@@ -1,0 +1,117 @@
+syntax: glob
+
+[Bb]inaries/
+
+### VisualStudio ###
+
+# user-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+# build/
+bld/
+[Bb]in/
+[Oo]bj/
+msbuild.log
+
+# visual studio 2015
+.vs/
+
+# mstest test results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# nunit
+*.VisualState.xml
+TestResult.xml
+
+# visual c++ cache files
+ipch/
+*.aps
+*.ncb
+*.opensdf
+*.sdf
+*.cachefile
+StyleCop.cache
+
+# visual studio profiler
+*.psess
+*.vsp
+*.vspx
+
+# resharper is a .NET coding add-in
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# click-once directory
+publish/
+
+# nuget Packages
+*.nupkg
+**/packages/*
+
+### MonoDevelop ###
+
+*.pidb
+*.userprefs
+
+# windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# folder config file
+Desktop.ini
+
+# windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# windows shortcuts
+*.lnk
+
+# common binary extensions on Windows
+*.exe
+*.dll
+*.lib
+
+### OSX ###
+
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# thumbnails
+._*
+
+# we have some checked in prebuilt generated files
+!src/pal/prebuilt/idl/*_i.c
+
+# calid 'debug' folder, that contains CLR debuggin code
+!src/debug
+
+# ignore folders created by the test build
+TestWrappers_x64_debug
+TestWrappers_x64_release
+
+Vagrantfile
+.vagrant
+
+# project specific
+docs/_build
+build/lib
+build/content
+
+# do not include secret files
+*.snk
