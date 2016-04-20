@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Saritasa.Tools.Interfaces
 {
     /// <summary>
-    /// <see cref="ILoggerFactory"/> instances manufacture <see cref="ILogger"/>
+    /// <see cref="ILoggerFactory" /> instances manufacture <see cref="ILogger" />
     /// instances by name. These factory methods may create new instances
     /// or retrieve cached / pooled instances depending on the the
     /// name of the requested logger.

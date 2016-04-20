@@ -16,11 +16,11 @@ namespace Saritasa.Tools.Emails
     /// </summary>
     public class FilterEmailInterceptor : IEmailInterceptor
     {
-        private IList<string> approvedAddresses = new List<string>() { "*" };
+        private IList<string> approvedAddresses = new List<string>();
 
         /// <summary>
         /// Gets approved addresses. Emails that do not match to these address patterns will not be sent.
-        /// Default is * (all addresses approved).
+        /// Default is all.
         /// </summary>
         public IEnumerable<string> ApprovedAddresses
         {
@@ -28,13 +28,29 @@ namespace Saritasa.Tools.Emails
         }
 
         /// <summary>
-        /// Adds approved emails. You can use ? and * symbols.
+        /// .ctor
+        /// </summary>
+        public FilterEmailInterceptor()
+        {
+        }
+
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        /// <param name="emails">Approved emails patterns. You can use ? and * symbols.</param>
+        public FilterEmailInterceptor(string emails)
+        {
+            SetApprovedEmails(emails);
+        }
+
+        /// <summary>
+        /// Adds approved emails. You can use ? and * symbols. If several patterns are specified use comma to separate them.
         /// </summary>
         public void AddApprovedEmails(string emails)
         {
-            if (string.IsNullOrEmpty("emails"))
+            if (string.IsNullOrEmpty(emails))
             {
-                throw new ArgumentNullException("emails");
+                throw new ArgumentNullException(nameof(emails));
             }
 
             var parsedEmails = emails.Split(new char[] { ',', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries);
@@ -52,6 +68,21 @@ namespace Saritasa.Tools.Emails
                     approvedAddresses.Add(item);
                 }
             }
+        }
+
+        /// <summary>
+        /// Sets the approved emails. You can use ? and * symbols. If several patterns are specified use comma to separate them.
+        /// </summary>
+        /// <param name="emails">The emails.</param>
+        public void SetApprovedEmails(string emails)
+        {
+            if (string.IsNullOrEmpty(emails))
+            {
+                throw new ArgumentException(nameof(emails));
+            }
+
+            approvedAddresses.Clear();
+            AddApprovedEmails(emails);
         }
 
         #region IEmailInterceptor
@@ -81,6 +112,11 @@ namespace Saritasa.Tools.Emails
         /// </summary>
         private void FilterAddress(MailAddressCollection addressCollection)
         {
+            if (addressCollection.Count < 1)
+            {
+                return;
+            }
+
             var badAddresses = new MailAddressCollection();
 
             foreach (var address in addressCollection)

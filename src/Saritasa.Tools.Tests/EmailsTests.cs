@@ -71,8 +71,7 @@ namespace Saritasa.Tools.Tests
         public void TestFilterEmailInterceptor()
         {
             EmailSender emailSender = new Dummy.DummyEmailSender();
-            var filterInterceptor = new FilterEmailInterceptor();
-            filterInterceptor.AddApprovedEmails("*@saritasa.com");
+            var filterInterceptor = new FilterEmailInterceptor("*@saritasa.com; *@saritasa-hosting.com");
             emailSender.AddInterceptor(filterInterceptor);
             var testInterceptor = new TestInterceptor();
             emailSender.AddInterceptor(testInterceptor);
@@ -82,6 +81,13 @@ namespace Saritasa.Tools.Tests
 
             emailSender.Send(new MailMessage("test@test.com", "test@saritasa.com")).Wait();
             Assert.Equal(1, testInterceptor.SentCallCount);
+
+            emailSender.Send(new MailMessage("test@test.com", "test@saritasa-hosting.com")).Wait();
+            Assert.Equal(2, testInterceptor.SentCallCount);
+
+            filterInterceptor.SetApprovedEmails("*");
+            emailSender.Send(new MailMessage("test@test.com", "test@example.com")).Wait();
+            Assert.Equal(3, testInterceptor.SentCallCount);
         }
     }
 }
