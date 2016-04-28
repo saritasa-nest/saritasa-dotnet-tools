@@ -36,9 +36,12 @@
     <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DomainEvents\DomainEventsManager.cs" />
     <Compile Include="Emails\EmailSender.cs" />
     <Compile Include="Emails\DefaultEmailExecutionStrategy.cs" />
     <Compile Include="Emails\FilterEmailInterceptor.cs" />
+    <Compile Include="Interfaces\IDomainEvent.cs" />
+    <Compile Include="Interfaces\IDomainEventsManager.cs" />
     <Compile Include="Interfaces\IEmailExecutionStrategy.cs" />
     <Compile Include="Emails\SaveToFileEmailInterceptor.cs" />
     <Compile Include="Emails\SmtpClientEmailSender.cs" />
@@ -48,6 +51,7 @@
     <Compile Include="Interfaces\ICommand.cs" />
     <Compile Include="Interfaces\IEmailInterceptor.cs" />
     <Compile Include="Interfaces\IEmailSender.cs" />
+    <Compile Include="Interfaces\IDomainEventsHandler.cs" />
     <Compile Include="Interfaces\ILogger.cs" />
     <Compile Include="Interfaces\ILoggerFactory.cs" />
     <Compile Include="Interfaces\IRepository.cs" />
