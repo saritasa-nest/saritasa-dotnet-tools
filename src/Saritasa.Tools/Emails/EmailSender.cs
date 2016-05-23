@@ -36,6 +36,13 @@ namespace Saritasa.Tools.Emails
         /// </summary>
         public CancellationToken CancellationToken { get; set; } = CancellationToken.None;
 
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        public EmailSender()
+        {
+        }
+
         /// <inheritdoc />
         public Task Send(MailMessage message)
         {
@@ -48,7 +55,13 @@ namespace Saritasa.Tools.Emails
                 interceptor.Sending(message, data, ref cancel);
                 if (cancel)
                 {
+#if NET4_5
+                    var tcs = new TaskCompletionSource<bool>();
+                    tcs.SetResult(true);
+                    return tcs.Task;
+#else
                     return Task.CompletedTask;
+#endif
                 }
             }
 

@@ -19,7 +19,13 @@ namespace Saritasa.Tools.Dummy
         /// <inheritdoc />
         protected override Task Process(MailMessage message, IDictionary<string, object> data)
         {
+#if NET4_5
+            var tcs = new TaskCompletionSource<bool>();
+            tcs.SetResult(true);
+            return tcs.Task;
+#else
             return Task.CompletedTask;
+#endif
         }
     }
 }

@@ -28,10 +28,10 @@ For documentation:
 Commands
 --------
 
-* Build the solution and prepare nuget package
+* Build the library, test it and prepare nuget packages
 
-```psake build```
+```psake pack```
 
 * Generate documentation
 
-```psake build-doc```
+```psake docs```

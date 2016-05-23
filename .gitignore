@@ -110,6 +110,7 @@ Vagrantfile
 
 # project specific
 docs/_build
+docs/conf.py
 build/lib
 build/content
 
