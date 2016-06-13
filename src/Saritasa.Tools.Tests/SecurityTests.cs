@@ -29,7 +29,6 @@ namespace Saritasa.Tools.Tests
             PasswordGenerator passwordGenerator2 = new PasswordGenerator();
             passwordGenerator2.PasswordLength = 15;
             passwordGenerator2.SetCharactersPool("1");
-            //Assert.That(passwordGenerator2.Generate(), Is.EqualTo("111111111111111"));
             Assert.That(passwordGenerator2.Generate(), Is.EqualTo(new string('1', 15)));
         }
 

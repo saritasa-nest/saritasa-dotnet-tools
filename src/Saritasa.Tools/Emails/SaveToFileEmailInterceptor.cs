@@ -1,14 +1,11 @@
-﻿//
-// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
-//
 
 namespace Saritasa.Tools.Emails
 {
     using System;
     using System.Collections.Generic;
     using System.Net.Mail;
-    using Interfaces;
     using System.IO;
     using System.Reflection;
 
@@ -87,7 +84,7 @@ namespace Saritasa.Tools.Emails
                     mailWriterType.GetConstructor(
                         BindingFlags.Instance | BindingFlags.NonPublic,
                         null,
-                        new Type[] { typeof(Stream) }, 
+                        new Type[] { typeof(Stream) },
                         null);
 
                 // construct MailWriter object with our FileStream

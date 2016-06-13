@@ -1,14 +1,11 @@
-﻿//
-// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
-//
 
-namespace Wnc.Infrastructure.DomainEvents
+namespace Saritasa.Tools.Domain
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Saritasa.Tools.Interfaces;
 
     /// <summary>
     /// Class for manage events.
@@ -30,7 +27,7 @@ namespace Wnc.Infrastructure.DomainEvents
         {
             Handlers.Add(handler);
         }
-        
+
         /// <inheritdoc />
         public void Raise<T>(T @event) where T : IDomainEvent
         {

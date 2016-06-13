@@ -10,7 +10,6 @@ namespace Saritasa.Tools.Tests
     using System.Net.Mail;
     using System.Threading;
     using NUnit.Framework;
-    using Interfaces;
     using Emails;
 
     /// <summary>

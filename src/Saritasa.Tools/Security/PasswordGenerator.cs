@@ -1,7 +1,5 @@
-﻿//
-// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
-//
 
 namespace Saritasa.Tools.Security
 {
@@ -59,7 +57,7 @@ namespace Saritasa.Tools.Security
             /// Combination of AllLetters and Digits.
             /// </summary>
             AlphaNumeric = AllLetters | Digits,
-           
+
             /// <summary>
             /// Combination of all elements.
             /// </summary>
@@ -223,7 +221,7 @@ namespace Saritasa.Tools.Security
             {
                 throw new ArgumentException("Characters pool cannot be empty");
             }
-            this.CharactersPool = pool; 
+            this.CharactersPool = pool;
         }
 
         /// <summary>
@@ -333,7 +331,7 @@ namespace Saritasa.Tools.Security
                     alphasUpperCount++;
                 }
                 else if (char.IsLower(password[a]))
-                { 
+                {
                     if (tempAlphaLowerIndex > -1 && tempAlphaLowerIndex + 1 == a)
                     {
                         consequenceAlphasLowerCount++;
@@ -343,7 +341,7 @@ namespace Saritasa.Tools.Security
                     alphasLowerCount++;
                 }
                 else if (char.IsNumber(password[a]))
-                { 
+                {
                     if (a > 0 && a < password.Length - 1)
                     {
                         middleCharsCount++;
@@ -357,7 +355,7 @@ namespace Saritasa.Tools.Security
                     digitsCount++;
                 }
                 else if (Regex.IsMatch(password[a].ToString(), @"[^a-zA-Z0-9_]"))
-                { 
+                {
                     if (a > 0 && a < (password.Length - 1))
                     {
                         middleCharsCount++;
@@ -386,13 +384,13 @@ namespace Saritasa.Tools.Security
                     }
                 }
                 if (charExists)
-                { 
-                    repeatCharsCount++; 
+                {
+                    repeatCharsCount++;
                     uniqueCharsCount = password.Length - repeatCharsCount;
-                    repeatIncrement = uniqueCharsCount > 0 ? Math.Ceiling(repeatIncrement / uniqueCharsCount) : Math.Ceiling(repeatIncrement); 
+                    repeatIncrement = uniqueCharsCount > 0 ? Math.Ceiling(repeatIncrement / uniqueCharsCount) : Math.Ceiling(repeatIncrement);
                 }
             }
-        
+
             // check for sequential alpha string patterns (forward and reverse)
             for (var s = 0; s < PoolAlphas.Length - 3; s++)
             {
@@ -404,7 +402,7 @@ namespace Saritasa.Tools.Security
                     sequenceCharsCount++;
                 }
             }
-        
+
             // check for sequential numeric string patterns (forward and reverse)
             for (var s = 0; s < PoolNumerics.Length - 3; s++)
             {
@@ -416,7 +414,7 @@ namespace Saritasa.Tools.Security
                     sequenceCharsCount++;
                 }
             }
-        
+
             // check for sequential symbol string patterns (forward and reverse)
             for (var s = 0; s < PoolSymbols.Length - 3; s++)
             {
@@ -428,31 +426,31 @@ namespace Saritasa.Tools.Security
                     sequenceCharsCount++;
                 }
             }
-        
+
             // Modify overall score value based on usage vs requirements //
 
             // General point assignment
             if (alphasUpperCount > 0 && alphasUpperCount < password.Length)
-            {   
+            {
                 score += (password.Length - alphasUpperCount) * 2;
             }
             if (alphasLowerCount > 0 && alphasLowerCount < password.Length)
-            {   
+            {
                 score += (password.Length - alphasLowerCount) * 2;
             }
             if (digitsCount > 0 && digitsCount < password.Length)
-            {   
+            {
                 score += digitsCount * FactorNumber;
             }
             if (symbolsCount > 0)
-            {   
+            {
                 score += symbolsCount * FactorSymbol;
             }
             if (middleCharsCount > 0)
-            {   
+            {
                 score += middleCharsCount * FactorMiddleChar;
             }
-        
+
             // Point deductions for poor practices //
 
             // only Letters
@@ -536,7 +534,7 @@ namespace Saritasa.Tools.Security
 
             score = score > 100 ? 100 : score;
             score = score < 0 ? 0 : score;
-            
+
             return score;
         }
 
@@ -553,7 +551,7 @@ namespace Saritasa.Tools.Security
         private Char[] CreateCharactersPool()
         {
             List<Char> chars = new List<Char>(65);
-            
+
             if (CharacterClasses.HasFlag(CharacterClass.UpperLetters))
             {
                 chars.AddRange(PoolUpperCase.ToCharArray());

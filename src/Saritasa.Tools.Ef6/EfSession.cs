@@ -1,7 +1,5 @@
-﻿//
-// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
-//
 
 namespace Saritasa.Tools.EntityFramework
 {
@@ -9,7 +7,7 @@ namespace Saritasa.Tools.EntityFramework
     using System.Data.Entity;
     using System.Data.Entity.Validation;
     using System.Linq;
-    using Interfaces;
+    using Domain;
 
     /// <summary>
     /// Entity framework implementation for ISession.
@@ -31,7 +29,7 @@ namespace Saritasa.Tools.EntityFramework
         /// <inheritdoc />
         public IQueryable<TEntity> GetAll<TEntity>(string path = "") where TEntity : class
         {
-            var set = (System.Data.Entity.Infrastructure.DbQuery<TEntity>) context.Set<TEntity>();
+            var set = (System.Data.Entity.Infrastructure.DbQuery<TEntity>)context.Set<TEntity>();
             if (string.IsNullOrEmpty(path) == false)
             {
                 var includes = path.Split(new char[] { ',' });
@@ -77,8 +75,7 @@ namespace Saritasa.Tools.EntityFramework
             catch (DbEntityValidationException validationException)
             {
                 throw new Exception(
-                    string.Join(", ", validationException.EntityValidationErrors.Select(x => x.ValidationErrors.First().ErrorMessage))
-                );
+                    string.Join(", ", validationException.EntityValidationErrors.Select(x => x.ValidationErrors.First().ErrorMessage)));
             }
         }
 

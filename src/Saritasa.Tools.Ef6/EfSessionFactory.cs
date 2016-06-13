@@ -1,12 +1,10 @@
-﻿//
-// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
-//
 
 namespace Saritasa.Tools.EntityFramework
 {
     using System.Data.Entity;
-    using Interfaces;
+    using Domain;
 
     /// <summary>
     /// Entity framework session factory implementation.

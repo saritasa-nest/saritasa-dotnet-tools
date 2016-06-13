@@ -1,7 +1,5 @@
-﻿//
-// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
-//
 
 namespace Saritasa.Tools.Emails
 {
@@ -9,7 +7,7 @@ namespace Saritasa.Tools.Emails
     using System.Collections.Generic;
     using System.Net.Mail;
     using System.Text.RegularExpressions;
-    using Interfaces;
+    using Domain;
 
     /// <summary>
     /// Filters users to whom send an email.
