@@ -34,7 +34,7 @@ We are using StyleCop.Analyzers project for extended code style check. It should
 Install-Package StyleCop.Analyzers
 ```
 
-Then you need to install our codestyle ruleset. To do that just run the following cmd command:
+Then you need to install our codestyle ruleset. To do that just run the following cmd command under administrator:
 
 ```
 cmd:

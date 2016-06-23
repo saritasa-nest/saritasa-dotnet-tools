@@ -18,10 +18,14 @@
     <Rule Id="CA1405" Action="Warning" />
     <Rule Id="CA1410" Action="Warning" />
     <Rule Id="CA1415" Action="Warning" />
+    <Rule Id="CA1801" Action="Warning" />
+    <Rule Id="CA1804" Action="Warning" />
+    <Rule Id="CA1816" Action="Warning" />
     <Rule Id="CA1821" Action="Warning" />
     <Rule Id="CA1900" Action="Warning" />
     <Rule Id="CA1901" Action="Warning" />
     <Rule Id="CA2002" Action="Warning" />
+    <Rule Id="CA2004" Action="Warning" />
     <Rule Id="CA2100" Action="Warning" />
     <Rule Id="CA2101" Action="Warning" />
     <Rule Id="CA2108" Action="Warning" />
@@ -51,9 +55,13 @@
     <Rule Id="CA2212" Action="Warning" />
     <Rule Id="CA2213" Action="Warning" />
     <Rule Id="CA2214" Action="Warning" />
+    <Rule Id="CA2215" Action="Warning" />
     <Rule Id="CA2216" Action="Warning" />
+    <Rule Id="CA2217" Action="Warning" />
     <Rule Id="CA2220" Action="Warning" />
+    <Rule Id="CA2221" Action="Warning" />
     <Rule Id="CA2229" Action="Warning" />
+    <Rule Id="CA2230" Action="Warning" />
     <Rule Id="CA2231" Action="Warning" />
     <Rule Id="CA2232" Action="Warning" />
     <Rule Id="CA2235" Action="Warning" />
@@ -117,7 +125,6 @@
     <Rule Id="SA1624" Action="None" />
     <Rule Id="SA1625" Action="None" />
     <Rule Id="SA1626" Action="None" />
-    <Rule Id="SA1627" Action="None" />
     <Rule Id="SA1633" Action="None" />
     <Rule Id="SA1634" Action="None" />
     <Rule Id="SA1635" Action="None" />
