@@ -25,7 +25,7 @@
     <WarningLevel>4</WarningLevel>
     <RegisterForComInterop>false</RegisterForComInterop>
     <DocumentationFile>bin\Debug\Saritasa.Tools.XML</DocumentationFile>
-    <CodeAnalysisRuleSet>saritasa.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>Saritasa.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <DebugType>pdbonly</DebugType>
@@ -33,7 +33,7 @@
     <DocumentationFile>bin\Release\Saritasa.Tools.XML</DocumentationFile>
     <Optimize>true</Optimize>
     <DefineConstants>TRACE</DefineConstants>
-    <CodeAnalysisRuleSet>saritasa.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>Saritasa.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -75,7 +75,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="Saritasa.ruleset" />
+    <None Include="SaritasaRulesetInstall.ps1" />
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\Newtonsoft.Json.dll" />
