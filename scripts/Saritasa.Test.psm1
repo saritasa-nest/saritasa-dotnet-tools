@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
 Run NUnit 3 tests.
 
@@ -21,13 +21,15 @@ function Invoke-Nunit3Runner
     }
 
     # Find nunit3-console.exe
-    $packagesDirectory = Get-ChildItem 'packages' -Recurse -Depth 3 | ? {$_.PSIsContainer} | Select -First 1
+    $packagesDirectory = Get-ChildItem 'packages' -Recurse -Depth 3 |
+        Where-Object { $_.PSIsContainer } | Select-Object -First 1
     if (!$packagesDirectory)
     {
         throw 'Cannot find packages directory.'
     }
     Write-Information "Found $packagesDirectory.FullName"
-    $nunitExeDirectory = Get-ChildItem $packagesDirectory.FullName 'NUnit.ConsoleRunner.*' | Sort-Object {$_.Name} | Select -Last 1
+    $nunitExeDirectory = Get-ChildItem $packagesDirectory.FullName 'NUnit.ConsoleRunner.*' |
+        Sort-Object { $_.Name } | Select-Object -Last 1
     if (!$nunitExeDirectory)
     {
         throw 'Cannot find nunit console runner package.'

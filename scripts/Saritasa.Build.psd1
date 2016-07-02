@@ -12,7 +12,7 @@
 RootModule = 'Saritasa.Build'
 
 # Version number of this module.
-ModuleVersion = '1.6.0'
+ModuleVersion = '1.8.0'
 
 # ID used to uniquely identify this module
 GUID = '5d34804a-169a-4fb1-bc0d-cc81f925f992'
@@ -27,7 +27,7 @@ CompanyName = 'Saritasa'
 Copyright = '(c) 2015-2016 Saritasa. All rights reserved.'
 
 # Description of the functionality provided by this module
-# Description = ''
+Description = 'Contains functions to execute MSBuild targets, restore NuGet packages, run EntityFramework migrations.'
 
 # Minimum version of the Windows PowerShell engine required by this module
 # PowerShellVersion = ''
@@ -45,7 +45,7 @@ Copyright = '(c) 2015-2016 Saritasa. All rights reserved.'
 # CLRVersion = ''
 
 # Processor architecture (None, X86, Amd64) required by this module
-# ProcessorArchitecture = ''
+ProcessorArchitecture = 'None'
 
 # Modules that must be imported into the global environment prior to importing this module
 # RequiredModules = @()
@@ -66,16 +66,18 @@ Copyright = '(c) 2015-2016 Saritasa. All rights reserved.'
 # NestedModules = @()
 
 # Functions to export from this module
-FunctionsToExport = '*'
+FunctionsToExport = 'Copy-DotnetConfig', 'Invoke-EFMigrate',
+    'Invoke-NugetRestore', 'Invoke-ProjectBuild',
+    'Invoke-SolutionBuild', 'Update-AssemblyInfoFile'
 
 # Cmdlets to export from this module
-CmdletsToExport = '*'
+CmdletsToExport = @()
 
 # Variables to export from this module
-VariablesToExport = '*'
+VariablesToExport = @()
 
 # Aliases to export from this module
-AliasesToExport = '*'
+AliasesToExport = @()
 
 # DSC resources to export from this module
 # DscResourcesToExport = @()
@@ -92,7 +94,7 @@ PrivateData = @{
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-        # Tags = @()
+        Tags = 'MSBuild', 'NuGet', 'EntityFramework', 'Version', 'Config'
 
         # A URL to the license for this module.
         LicenseUri = 'https://raw.githubusercontent.com/dermeister0/PSGallery/master/LICENSE'

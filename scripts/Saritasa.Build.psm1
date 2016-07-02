@@ -61,9 +61,9 @@ Based on SetVersion script.
 http://www.luisrocha.net/2009/11/setting-assembly-version-with-windows.html
 Copyright (c) 2009 Luis Rocha
 #>
-function Update-AssemblyInfoFiles
+function Update-AssemblyInfoFile
 {
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess = $true)]
     param
     (
         [Parameter(Mandatory = $true, HelpMessage = 'Version string in major.minor.build.revision format.')]
@@ -75,20 +75,26 @@ function Update-AssemblyInfoFiles
     $assemblyVersion = 'AssemblyVersion("' + $Version + '")';
     $fileVersion = 'AssemblyFileVersion("' + $Version + '")';
     
-    Get-ChildItem -r -Include AssemblyInfo.cs, AssemblyInfo.vb | ForEach-Object {
-        $filename = $_.Directory.ToString() + '\' + $_.Name
-        $filename + ' -> ' + $Version
+    Get-ChildItem -r -Include AssemblyInfo.cs, AssemblyInfo.vb | ForEach-Object `
+        {
+            $filename = $_.Directory.ToString() + '\' + $_.Name
         
-        # If you are using a source control that requires to check-out files before 
-        # modifying them, make sure to check-out the file here.
-        # For example, TFS will require the following command:
-        # tf checkout $filename
-    
-        (Get-Content $filename) | ForEach-Object {
-            % {$_ -replace $assemblyVersionPattern, $assemblyVersion } |
-            % {$_ -replace $fileVersionPattern, $fileVersion }
-        } | Set-Content $filename -Encoding UTF8
-    }
+            # If you are using a source control that requires to check-out files before 
+            # modifying them, make sure to check-out the file here.
+            # For example, TFS will require the following command:
+            # tf checkout $filename
+        
+            if ($PSCmdlet.ShouldProcess($filename))
+            {
+                (Get-Content $filename) | ForEach-Object `
+                    {
+                        ForEach-Object { $_ -replace $assemblyVersionPattern, $assemblyVersion } |
+                        ForEach-Object { $_ -replace $fileVersionPattern, $fileVersion }
+                    } | Set-Content $filename -Encoding UTF8
+                    
+                Write-Information $filename, ' -> ', $Version
+            }
+        }
 }
 
 function Copy-DotnetConfig
@@ -143,13 +149,15 @@ function Invoke-EFMigrate
     }
 
     # Find migrate.exe
-    $packagesDirectory = Get-ChildItem 'packages' -Recurse -Depth 3 | ? {$_.PSIsContainer} | Select -First 1
+    $packagesDirectory = Get-ChildItem 'packages' -Recurse -Depth 3 | 
+        Where-Object { $_.PSIsContainer } | Select-Object -First 1
     if (!$packagesDirectory)
     {
         throw 'Cannot find packages directory.'
     }
     Write-Information "Found $packagesDirectory.FullName"
-    $migrateExeDirectory = Get-ChildItem $packagesDirectory.FullName 'EntityFramework.*' | Sort-Object {$_.Name} | Select -Last 1
+    $migrateExeDirectory = Get-ChildItem $packagesDirectory.FullName 'EntityFramework.*' |
+        Sort-Object { $_.Name } | Select-Object -Last 1
     if (!$migrateExeDirectory)
     {
         throw 'Cannot find entity framework package.'
