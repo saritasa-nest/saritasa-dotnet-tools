@@ -1,7 +1,5 @@
-﻿//
-// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
-//
 
 namespace Saritasa.Tools.Tests
 {
@@ -13,28 +11,17 @@ namespace Saritasa.Tools.Tests
     [TestFixture]
     public class CommandsTests
     {
-        public class TestCommand : ICommand
+        [Command]
+        public class TestCommand
         {
             public int Id { get; set; }
         }
 
-        public class TestCommandHandler : ICommandHandler<TestCommand>
+        [CommandHandler]
+        public class TestCommandHandler
         {
-            public void Handle(TestCommand command)
+            public void HandleTestCommand(TestCommand command)
             {
-            }
-        }
-
-        public class TestCommandWithResult : ICommand
-        {
-            public int Id { get; set; }
-        }
-
-        public class TestCommandWithResultHandler : ICommandHandler
-        {
-            public string Handle(TestCommandWithResult command)
-            {
-                return "test";
             }
         }
 
@@ -42,12 +29,13 @@ namespace Saritasa.Tools.Tests
         public void Command_pipeline_test()
         {
             var cp = new CommandPipeline();
+            var resolver = new Func<Type, object>((t) =>
+            {
+                return Activator.CreateInstance(t);
+            });
             cp.AddHandlers(
                 new Domain.CommandPipelineMiddlewares.CommandHandlerLocatorMiddleware(Assembly.GetExecutingAssembly()),
-                new Domain.CommandPipelineMiddlewares.CommandExecutorMiddleware(new Func<Type, object>((t) =>
-                    {
-                        return Activator.CreateInstance(t);
-                    }))
+                new Domain.CommandPipelineMiddlewares.CommandExecutorMiddleware(resolver)
             );
 
             cp.Execute(new TestCommand() { Id = 5 });

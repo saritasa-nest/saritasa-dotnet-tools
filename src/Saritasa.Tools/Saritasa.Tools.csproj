@@ -54,12 +54,13 @@
     <Compile Include="Domain\IDomainEvent.cs" />
     <Compile Include="Domain\IDomainEventsManager.cs" />
     <Compile Include="Emails\IEmailExecutionStrategy.cs" />
-    <Compile Include="Emails\SaveToFileEmailInterceptor.cs" />
-    <Compile Include="Emails\SmtpClientEmailSender.cs" />
+    <Compile Include="Emails\SystemMail\SaveToFileEmailInterceptor.cs" />
+    <Compile Include="Emails\SystemMail\SmtpClientEmailSender.cs" />
+    <Compile Include="Emails\SystemMail\SystemMailFilterEmailInterceptor.cs" />
     <Compile Include="Exceptions\DomainException.cs" />
     <Compile Include="Exceptions\NotFoundException.cs" />
     <Compile Include="Exceptions\ValidationException.cs" />
-    <Compile Include="Domain\ICommand.cs" />
+    <Compile Include="Domain\CommandAttribute.cs" />
     <Compile Include="Emails\IEmailInterceptor.cs" />
     <Compile Include="Emails\IEmailSender.cs" />
     <Compile Include="Domain\IDomainEventsHandler.cs" />
@@ -75,6 +76,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="project.json" />
+    <None Include="Saritasa.Tools.project.json" />
     <None Include="SaritasaRulesetInstall.ps1" />
   </ItemGroup>
   <ItemGroup>

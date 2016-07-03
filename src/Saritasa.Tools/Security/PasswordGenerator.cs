@@ -238,7 +238,7 @@ namespace Saritasa.Tools.Security
         /// <returns>Password.</returns>
         public String Generate()
         {
-            var pool = String.IsNullOrEmpty(this.CharactersPool) ? CreateCharactersPool() : this.CharactersPool.ToCharArray();
+            var pool = string.IsNullOrEmpty(this.CharactersPool) ? CreateCharactersPool() : this.CharactersPool.ToCharArray();
             StringBuilder sb = new StringBuilder(PasswordLength);
 
             if (this.GeneratorFlags.HasFlag(GeneratorFlag.ShuffleChars))
@@ -255,7 +255,7 @@ namespace Saritasa.Tools.Security
             return sb.ToString();
         }
 
-#if !PORTABLE
+#if !PORTABLE && !NETCOREAPP1_0 && !NETSTANDARD1_6
         /// <summary>
         /// Generates new password to SecureString.
         /// </summary>
@@ -548,9 +548,9 @@ namespace Saritasa.Tools.Security
             return Math.Log(Math.Pow(this.PasswordLength, pool.Length), 2);
         }
 
-        private Char[] CreateCharactersPool()
+        private char[] CreateCharactersPool()
         {
-            List<Char> chars = new List<Char>(65);
+            var chars = new List<char>(65);
 
             if (CharacterClasses.HasFlag(CharacterClass.UpperLetters))
             {
@@ -614,13 +614,13 @@ namespace Saritasa.Tools.Security
             byte[] bytes = new byte[4];
             lock (RandomServiceLock)
             {
-                RandomService.GetNonZeroBytes(bytes);
+                RandomService.GetBytes(bytes);
             }
             return (int)Math.Round(((double)BitConverter.ToUInt32(bytes, 0) / uint.MaxValue) * (maxValue - 1));
 #else
             return RandomService.Next(maxValue);
 #endif
-        }
+            }
 
         private static string Reverse(string target)
         {

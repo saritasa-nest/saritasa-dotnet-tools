@@ -6,28 +6,26 @@ namespace Saritasa.Tools.Emails
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using System.Net.Mail;
     using System.Threading;
-    using Domain;
 
     using NameValueDict = System.Collections.Generic.IDictionary<string, object>;
 
     /// <summary>
     /// Abstract email sender implementation with interceptor support.
     /// </summary>
-    public abstract class EmailSender : IEmailSender
+    public abstract class EmailSender<TMessage> : IEmailSender<TMessage> where TMessage : class
     {
-        private IList<IEmailInterceptor> interceptors = new List<IEmailInterceptor>();
+        private IList<IEmailInterceptor<TMessage>> interceptors = new List<IEmailInterceptor<TMessage>>();
 
         /// <summary>
         /// Send message.
         /// </summary>
-        protected abstract Task Process(MailMessage message, NameValueDict data);
+        protected abstract Task Process(TMessage message, NameValueDict data);
 
         /// <summary>
         /// Execution strategy. DefaultEmailExecutionStrategy by default.
         /// </summary>
-        protected IEmailExecutionStrategy ExecutionStrategy { get; private set; } = new DefaultEmailExecutionStrategy();
+        protected IEmailExecutionStrategy<TMessage> ExecutionStrategy { get; private set; } = new DefaultEmailExecutionStrategy<TMessage>();
 
         /// <summary>
         /// Cancellation token instance. None by default.
@@ -42,7 +40,7 @@ namespace Saritasa.Tools.Emails
         }
 
         /// <inheritdoc />
-        public Task Send(MailMessage message)
+        public Task Send(TMessage message)
         {
             var data = new Dictionary<string, object>();
             bool cancel = false;
@@ -53,7 +51,7 @@ namespace Saritasa.Tools.Emails
                 interceptor.Sending(message, data, ref cancel);
                 if (cancel)
                 {
-#if NET4_5
+#if NET452
                     var tcs = new TaskCompletionSource<bool>();
                     tcs.SetResult(true);
                     return tcs.Task;
@@ -80,7 +78,7 @@ namespace Saritasa.Tools.Emails
         /// Add interceptor.
         /// </summary>
         /// <param name="interceptor">Interceptor.</param>
-        public void AddInterceptor(IEmailInterceptor interceptor)
+        public void AddInterceptor(IEmailInterceptor<TMessage> interceptor)
         {
             if (interceptor == null)
             {

@@ -1,13 +1,11 @@
-﻿//
-// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
-//
 
 namespace Saritasa.Tools.Tests
 {
     using System;
     using NUnit.Framework;
-    using Saritasa.Tools.Security;
+    using Security;
 
     /// <summary>
     /// Security tests.

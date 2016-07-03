@@ -1,7 +1,5 @@
-﻿//
-// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
-//
 
 namespace Saritasa.Tools.Tests
 {
@@ -11,17 +9,18 @@ namespace Saritasa.Tools.Tests
     using System.Threading;
     using NUnit.Framework;
     using Emails;
+    using Emails.SystemMail;
 
     /// <summary>
     /// Emails tests.
     /// </summary>
+    [TestFixture]
     public class EmailsTests
     {
         /// <summary>
         /// Interceptor for tests only. Has only counters.
         /// </summary>
-        [TestFixture]
-        private class TestInterceptor : IEmailInterceptor
+        private class TestInterceptor : IEmailInterceptor<MailMessage>
         {
             private int sendingCallCount, sentCallCount;
 
@@ -55,7 +54,7 @@ namespace Saritasa.Tools.Tests
         [Test]
         public void Test_that_interceptor_executes()
         {
-            EmailSender emailSender = new Dummy.DummyEmailSender();
+            var emailSender = new Dummy.DummyEmailSender();
             var testInterceptor = new TestInterceptor();
             emailSender.AddInterceptor(testInterceptor);
 
@@ -70,8 +69,8 @@ namespace Saritasa.Tools.Tests
         [Test]
         public void Email_filter_should_filter_addresses()
         {
-            EmailSender emailSender = new Dummy.DummyEmailSender();
-            var filterInterceptor = new FilterEmailInterceptor("*@saritasa.com; *@saritasa-hosting.com");
+            var emailSender = new Dummy.DummyEmailSender();
+            var filterInterceptor = new SystemMailFilterEmailInterceptor("*@saritasa.com; *@saritasa-hosting.com");
             emailSender.AddInterceptor(filterInterceptor);
             var testInterceptor = new TestInterceptor();
             emailSender.AddInterceptor(testInterceptor);

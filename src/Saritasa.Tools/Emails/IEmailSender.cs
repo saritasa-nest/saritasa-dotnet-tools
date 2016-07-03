@@ -4,18 +4,17 @@
 namespace Saritasa.Tools.Emails
 {
     using System;
-    using System.Net.Mail;
     using System.Threading.Tasks;
 
     /// <summary>
     /// Email sender interface.
     /// </summary>
-    public interface IEmailSender
+    public interface IEmailSender<TMessage> where TMessage : class
     {
         /// <summary>
         /// Sends the specified message.
         /// </summary>
         /// <param name="message">The message.</param>
-        Task Send(MailMessage message);
+        Task Send(TMessage message);
     }
 }

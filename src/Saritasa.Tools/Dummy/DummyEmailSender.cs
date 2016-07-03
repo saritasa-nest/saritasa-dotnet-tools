@@ -5,19 +5,18 @@ namespace Saritasa.Tools.Dummy
 {
     using System;
     using System.Collections.Generic;
-    using System.Net.Mail;
     using System.Threading.Tasks;
     using Emails;
 
     /// <summary>
     /// Empty email sender. Can be used for testing.
     /// </summary>
-    public class DummyEmailSender : EmailSender
+    public class DummyEmailSender<TMessage> : EmailSender<TMessage> where TMessage : class
     {
         /// <inheritdoc />
-        protected override Task Process(MailMessage message, IDictionary<string, object> data)
+        protected override Task Process(TMessage message, IDictionary<string, object> data)
         {
-#if NET4_5
+#if NET452
             var tcs = new TaskCompletionSource<bool>();
             tcs.SetResult(true);
             return tcs.Task;

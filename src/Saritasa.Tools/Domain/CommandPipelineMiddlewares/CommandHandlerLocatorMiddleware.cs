@@ -37,9 +37,9 @@ namespace Saritasa.Tools.Domain.CommandPipelineMiddlewares
         public void Handle(CommandExecutionContext context)
         {
             var cmdtype = context.Command.GetType();
-            var clstypes = assemblies.SelectMany(a => a.GetTypes()).Where(t => typeof(ICommandHandler).IsAssignableFrom(t));
+            var clstypes = assemblies.SelectMany(a => a.GetTypes()).Where(t => t.GetTypeInfo().GetCustomAttribute<CommandHandlerAttribute>() != null);
             var method = clstypes
-                .SelectMany(t => t.GetMethods())
+                .SelectMany(t => t.GetTypeInfo().GetMethods())
                 .FirstOrDefault(m => m.Name.StartsWith("Handle") && m.GetParameters().Any(pt => pt.ParameterType == cmdtype));
             context.HandlerMethod = method;
             context.HandlerType = method.DeclaringType;

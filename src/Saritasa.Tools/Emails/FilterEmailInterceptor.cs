@@ -5,14 +5,12 @@ namespace Saritasa.Tools.Emails
 {
     using System;
     using System.Collections.Generic;
-    using System.Net.Mail;
     using System.Text.RegularExpressions;
-    using Domain;
 
     /// <summary>
-    /// Filters users to whom send an email.
+    /// Filters users to whom send an email. The abstract class that contains general logic to be implemented.
     /// </summary>
-    public class FilterEmailInterceptor : IEmailInterceptor
+    public abstract class FilterEmailInterceptor<TMessage> : IEmailInterceptor<TMessage> where TMessage : class
     {
         private IList<string> approvedAddresses = new List<string>();
 
@@ -86,66 +84,19 @@ namespace Saritasa.Tools.Emails
         #region IEmailInterceptor
 
         /// <inheritdoc />
-        public void Sending(MailMessage mailMessage, IDictionary<string, object> data, ref bool cancel)
-        {
-            FilterAddress(mailMessage.To);
-            FilterAddress(mailMessage.CC);
-            FilterAddress(mailMessage.Bcc);
-
-            if (mailMessage.To.Count == 0 && mailMessage.CC.Count == 0 && mailMessage.Bcc.Count == 0)
-            {
-                cancel = true;
-            }
-        }
+        public abstract void Sending(TMessage mailMessage, IDictionary<string, object> data, ref bool cancel);
 
         /// <inheritdoc />
-        public void Sent(MailMessage mailMessage, IDictionary<string, object> data)
-        {
-        }
+        public abstract void Sent(TMessage mailMessage, IDictionary<string, object> data);
 
         #endregion
-
-        /// <summary>
-        /// Filters the collection of addresses by approved addresses.
-        /// </summary>
-        private void FilterAddress(MailAddressCollection addressCollection)
-        {
-            if (addressCollection.Count < 1)
-            {
-                return;
-            }
-
-            var badAddresses = new MailAddressCollection();
-
-            foreach (var address in addressCollection)
-            {
-                bool match = false;
-                foreach (var pattern in approvedAddresses)
-                {
-                    if (Regex.IsMatch(address.Address, WildcardToRegex(pattern)))
-                    {
-                        match = true;
-                    }
-                }
-
-                if (!match)
-                {
-                    badAddresses.Add(address);
-                }
-            }
-
-            foreach (var badAddress in badAddresses)
-            {
-                addressCollection.Remove(badAddress);
-            }
-        }
 
         /// <summary>
         /// Converts wildcards to regex. Determines what reg exp correspond to string with * and ? chars.
         /// </summary>
         /// <param name="pattern">The wildcards pattern.</param>
         /// <returns>Pattern string.</returns>
-        private static string WildcardToRegex(string pattern)
+        protected static string WildcardToRegex(string pattern)
         {
             return ("^" + Regex.Escape(pattern)).Replace("\\*", ".*").Replace("\\?", ".") + "$";
         }

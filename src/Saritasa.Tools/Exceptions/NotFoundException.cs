@@ -8,7 +8,9 @@ namespace Saritasa.Tools.Exceptions
     /// <summary>
     /// Exception occurs in domain part of application if entity is not found by key.
     /// </summary>
+#if !NETCOREAPP1_0 && !NETSTANDARD1_6
     [Serializable]
+#endif
     public class NotFoundException : DomainException
     {
         /// <summary>

@@ -3,25 +3,14 @@
 
 namespace Saritasa.Tools.Domain
 {
-    /// <summary>
-    /// Command handler.
-    /// </summary>
-    /// <typeparam name="TCommand"></typeparam>
-    public interface ICommandHandler<in TCommand> :
-        ICommandHandler where TCommand : ICommand
-    {
-        /// <summary>
-        /// Body of command.
-        /// </summary>
-        /// <param name="command">Command.</param>
-        void Handle(TCommand command);
-    }
+    using System;
 
     /// <summary>
     /// The class that contains commands handers should be marked
-    /// with this interface.
+    /// with this attribute.
     /// </summary>
-    public interface ICommandHandler
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+    public class CommandHandlerAttribute : Attribute
     {
     }
 }

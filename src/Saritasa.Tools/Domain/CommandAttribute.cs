@@ -8,7 +8,8 @@ namespace Saritasa.Tools.Domain
     /// <summary>
     /// Represents logical, descrete operation that changes system state.
     /// </summary>
-    public interface ICommand
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
+    public class CommandAttribute : Attribute
     {
     }
 }

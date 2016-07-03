@@ -20,7 +20,7 @@ namespace Saritasa.Tools.Domain
         /// Execute command.
         /// </summary>
         /// <param name="command">Command to execute.</param>
-        public void Execute(ICommand command)
+        public void Execute(object command)
         {
             var context = new CommandExecutionContext(command);
 

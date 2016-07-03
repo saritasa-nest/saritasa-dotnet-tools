@@ -8,7 +8,9 @@ namespace Saritasa.Tools.Exceptions
     /// <summary>
     /// Exception occurs in domain part of application. It can be logic or validation exception.
     /// </summary>
+#if !NETCOREAPP1_0 && !NETSTANDARD1_6
     [Serializable]
+#endif
     public class DomainException : Exception
     {
         /// <summary>

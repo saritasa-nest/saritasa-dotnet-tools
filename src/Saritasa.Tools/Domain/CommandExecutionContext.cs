@@ -58,7 +58,7 @@ namespace Saritasa.Tools.Domain
         /// <summary>
         /// Command to execute.
         /// </summary>
-        public ICommand Command { get; private set; }
+        public object Command { get; private set; }
 
         /// <summary>
         /// Command handler.
@@ -94,7 +94,7 @@ namespace Saritasa.Tools.Domain
         /// .ctor
         /// </summary>
         /// <param name="command">Command to execute.</param>
-        public CommandExecutionContext(ICommand command)
+        public CommandExecutionContext(object command)
         {
             Command = command;
             CreatedAt = DateTime.Now;

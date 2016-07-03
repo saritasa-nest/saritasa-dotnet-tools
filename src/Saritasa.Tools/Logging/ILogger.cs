@@ -4,7 +4,6 @@
 namespace Saritasa.Tools.Logging
 {
     using System;
-    using System.Runtime.CompilerServices;
 
     /// <summary>
     /// Logger abstraction.

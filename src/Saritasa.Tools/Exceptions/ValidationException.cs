@@ -8,7 +8,9 @@ namespace Saritasa.Tools.Exceptions
     /// <summary>
     /// Validation exception.
     /// </summary>
+#if !NETCOREAPP1_0 && !NETSTANDARD1_6
     [Serializable]
+#endif
     public class ValidationException : DomainException
     {
         /// <summary>

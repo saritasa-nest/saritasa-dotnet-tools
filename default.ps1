@@ -21,8 +21,8 @@ Properties `
 }
 
 $builds = @(
-    @{Id = 'v4.5'; Framework = 'net452'; symbol = 'NET4_5'}
-    @{Id = 'v4.6'; Framework = 'net461'; symbol = 'NET4_6'}
+    @{Id = 'v4.5.2'; Framework = 'net452'; symbol = 'NET452'}
+    @{Id = 'v4.6.1'; Framework = 'net461'; symbol = 'NET461'}
 )
 $packages = @(
     'Saritasa.Tools'

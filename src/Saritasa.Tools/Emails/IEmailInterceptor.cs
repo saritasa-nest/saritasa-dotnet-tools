@@ -5,19 +5,18 @@ namespace Saritasa.Tools.Emails
 {
     using System;
     using System.Collections.Generic;
-    using System.Net.Mail;
 
     /// <summary>
     /// Email interceptor to be used with EmailSender.
     /// </summary>
-    public interface IEmailInterceptor
+    public interface IEmailInterceptor<TMessage> where TMessage : class
     {
         /// <summary>
         /// The method is called after email sending.
         /// </summary>
         /// <param name="mailMessage">Mail message.</param>
         /// <param name="data">Additional data.</param>
-        void Sent(MailMessage mailMessage, IDictionary<string, object> data);
+        void Sent(TMessage mailMessage, IDictionary<string, object> data);
 
         /// <summary>
         /// The mail is called before email sending.
@@ -25,6 +24,6 @@ namespace Saritasa.Tools.Emails
         /// <param name="mailMessage">Mail message.</param>
         /// <param name="data">Additional data.</param>
         /// <param name="cancel">Should the email sending be cancelled.</param>
-        void Sending(MailMessage mailMessage, IDictionary<string, object> data, ref bool cancel);
+        void Sending(TMessage mailMessage, IDictionary<string, object> data, ref bool cancel);
     }
 }
