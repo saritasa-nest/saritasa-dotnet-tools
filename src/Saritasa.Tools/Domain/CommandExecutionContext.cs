@@ -94,6 +94,7 @@ namespace Saritasa.Tools.Domain
         /// .ctor
         /// </summary>
         /// <param name="command">Command to execute.</param>
+        [System.Diagnostics.DebuggerHidden]
         public CommandExecutionContext(object command)
         {
             Command = command;

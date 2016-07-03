@@ -5,6 +5,7 @@ namespace Saritasa.Tools.Domain
 {
     using System;
     using System.Collections.Generic;
+    using System.Reflection;
 
     /// <summary>
     /// Commands processing pipeline.
@@ -12,34 +13,51 @@ namespace Saritasa.Tools.Domain
     public class CommandPipeline
     {
         /// <summary>
-        /// Handlers list.
+        /// Middlewares list.
         /// </summary>
-        protected IList<ICommandPipelineMiddleware> Handlers { get; set; } = new List<ICommandPipelineMiddleware>();
+        protected IList<ICommandPipelineMiddleware> Middlewares { get; set; } = new List<ICommandPipelineMiddleware>();
 
         /// <summary>
         /// Execute command.
         /// </summary>
         /// <param name="command">Command to execute.</param>
+        [System.Diagnostics.DebuggerHidden]
         public void Execute(object command)
         {
             var context = new CommandExecutionContext(command);
 
-            foreach (var handler in Handlers)
+            foreach (var handler in Middlewares)
             {
                 handler.Handle(context);
             }
         }
 
         /// <summary>
-        /// Add more handlers to pipeline.
+        /// Add more middlewares to pipeline.
         /// </summary>
-        /// <param name="commandHandlers">Command handlers.</param>
-        public void AddHandlers(params ICommandPipelineMiddleware[] commandHandlers)
+        /// <param name="middlewares">Command middlewares.</param>
+        public void AddMiddlewares(params ICommandPipelineMiddleware[] middlewares)
         {
-            foreach (var handler in commandHandlers)
+            foreach (var middleware in middlewares)
             {
-                Handlers.Add(handler);
+                Middlewares.Add(middleware);
             }
+        }
+
+        /// <summary>
+        /// Creates default pipeline with command handler locator and executor.
+        /// </summary>
+        /// <param name="resolver">DI resolver for executor.</param>
+        /// <param name="assemblies">Assemblies that contain command handlers.</param>
+        /// <returns>Command pipeline.</returns>
+        public static CommandPipeline CreateDefaultPipeline(Func<Type, object> resolver, params Assembly[] assemblies)
+        {
+            var commandPipeline = new CommandPipeline();
+            commandPipeline.AddMiddlewares(
+                new CommandPipelineMiddlewares.CommandHandlerLocatorMiddleware(assemblies),
+                new CommandPipelineMiddlewares.CommandExecutorMiddleware(resolver)
+            );
+            return commandPipeline;
         }
     }
 }

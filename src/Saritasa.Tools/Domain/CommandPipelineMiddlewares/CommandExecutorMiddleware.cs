@@ -4,6 +4,7 @@
 namespace Saritasa.Tools.Domain.CommandPipelineMiddlewares
 {
     using System;
+    using System.Reflection;
 
     /// <summary>
     /// Default command executor. It does not process commands with Rejected status.
@@ -31,33 +32,88 @@ namespace Saritasa.Tools.Domain.CommandPipelineMiddlewares
             this.rethrow = rethrow;
         }
 
+        private object CreateFromDefaultCtorAndResolve(Type handlerType)
+        {
+            object handler = null;
+            var ctor = handlerType.GetTypeInfo().GetConstructor(new Type[] { });
+            if (ctor != null)
+            {
+                handler = ctor.Invoke(null);
+                var props = handler.GetType().GetTypeInfo().GetProperties(BindingFlags.Public);
+                foreach (var prop in props)
+                {
+                    if (prop.GetValue(handler) != null)
+                    {
+                        continue;
+                    }
+
+                    try
+                    {
+                        prop.SetValue(handler, resolver(prop.DeclaringType));
+                    }
+                    catch (Exception)
+                    {
+                        // just skip, have no idea what to do
+                    }
+                }
+            }
+            return handler;
+        }
+
+        private void ExecuteHandler(object handler, object command, MethodInfo handlerMethod)
+        {
+            var parameters = handlerMethod.GetParameters();
+            if (parameters.Length == 1)
+            {
+                handlerMethod.Invoke(handler, new object[] { command });
+            }
+            else if (parameters.Length > 1)
+            {
+                var paramsarr = new object[parameters.Length];
+                paramsarr[0] = command;
+                for (int i = 1; i < parameters.Length; i++)
+                {
+                    paramsarr[i] = resolver(parameters[i].ParameterType);
+                }
+                handlerMethod.Invoke(handler, paramsarr);
+            }
+        }
+
         /// <inheritdoc />
         public void Handle(CommandExecutionContext context)
         {
+            // rejected commands are not needed to process
             if (context.Status == CommandExecutionContext.CommandStatus.Rejected)
             {
                 return;
             }
 
-            var handler = resolver(context.HandlerType);
-            var parameters = context.HandlerMethod.GetParameters();
+            object handler = null;
+            bool canResolve = true;
 
+            // we should have handler object first
             try
             {
-                if (parameters.Length == 1)
-                {
-                    context.HandlerMethod.Invoke(handler, new object[] { context.Command });
-                }
-                else if (parameters.Length > 1)
-                {
-                    var paramsarr = new object[parameters.Length];
-                    paramsarr[0] = context.Command;
-                    for (int i = 1; i < parameters.Length; i++)
-                    {
-                        paramsarr[i] = resolver(parameters[i].ParameterType);
-                    }
-                    context.HandlerMethod.Invoke(handler, paramsarr);
-                }
+                handler = resolver(context.HandlerType);
+            }
+            catch (Exception)
+            {
+                canResolve = false;
+                handler = CreateFromDefaultCtorAndResolve(context.HandlerType);
+            }
+
+            // if we don't have handler - throw exception
+            if (handler == null)
+            {
+                var exception = new CommandHandlerNotFoundException();
+                exception.Data.Add(nameof(canResolve), canResolve);
+                throw exception;
+            }
+
+            // invoke method and resolve parameters if needed
+            try
+            {
+                ExecuteHandler(handler, context.Command, context.HandlerMethod);
                 context.Status = CommandExecutionContext.CommandStatus.Completed;
                 context.CompletedAt = DateTime.Now;
             }

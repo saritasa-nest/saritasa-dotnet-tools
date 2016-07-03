@@ -21,14 +21,17 @@ namespace Saritasa.Tools.Exceptions
         }
 
         /// <summary>
-        /// .ctor
+        /// .ctor with message.
+        /// <param name="message">Exception message.</param>
         /// </summary>
         public ValidationException(string message) : base(message)
         {
         }
 
         /// <summary>
-        /// .ctor
+        /// .ctor with message and inner exception.
+        /// <param name="message">Exception message.</param>
+        /// <param name="innerException">Inner exception.</param>
         /// </summary>
         public ValidationException(string message, Exception innerException) : base(message, innerException)
         {
