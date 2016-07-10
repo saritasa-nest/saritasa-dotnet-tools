@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.Domain.CommandPipelineMiddlewares
+namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
 {
     using System;
     using System.Reflection;
@@ -80,7 +80,7 @@ namespace Saritasa.Tools.Domain.CommandPipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public void Handle(CommandExecutionContext context)
+        public void Execute(CommandExecutionContext context)
         {
             // rejected commands are not needed to process
             if (context.Status == CommandExecutionContext.CommandStatus.Rejected)
@@ -111,15 +111,18 @@ namespace Saritasa.Tools.Domain.CommandPipelineMiddlewares
             }
 
             // invoke method and resolve parameters if needed
+            var stopWatch = System.Diagnostics.Stopwatch.StartNew();
             try
             {
                 ExecuteHandler(handler, context.Command, context.HandlerMethod);
+                stopWatch.Stop();
+                context.ExecutionDuration = stopWatch.ElapsedMilliseconds;
                 context.Status = CommandExecutionContext.CommandStatus.Completed;
-                context.CompletedAt = DateTime.Now;
             }
             catch (Exception)
             {
-                context.CompletedAt = DateTime.Now;
+                stopWatch.Stop();
+                context.ExecutionDuration = stopWatch.ElapsedMilliseconds;
                 context.Status = CommandExecutionContext.CommandStatus.Failed;
                 if (this.rethrow)
                 {

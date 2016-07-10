@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.Domain
+namespace Saritasa.Tools.Commands
 {
     using System;
     using System.Collections.Generic;
@@ -28,7 +28,7 @@ namespace Saritasa.Tools.Domain
 
             foreach (var handler in Middlewares)
             {
-                handler.Handle(context);
+                handler.Execute(context);
             }
         }
 

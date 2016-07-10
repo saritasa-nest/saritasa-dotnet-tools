@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.Domain.CommandPipelineMiddlewares
+namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
 {
     using System;
     using System.Collections.Generic;
@@ -21,8 +21,9 @@ namespace Saritasa.Tools.Domain.CommandPipelineMiddlewares
 
         private Assembly[] assemblies;
 
+        // TODO: [IK] need to implement caching to improve speed
         private IDictionary<Type, Tuple<Type, MethodInfo>> cache =
-            new Dictionary<Type, Tuple<Type, MethodInfo>>(150);
+            new System.Collections.Concurrent.ConcurrentDictionary<Type, Tuple<Type, MethodInfo>>(4, 150);
 
         /// <summary>
         /// .ctor
@@ -34,13 +35,13 @@ namespace Saritasa.Tools.Domain.CommandPipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public void Handle(CommandExecutionContext context)
+        public void Execute(CommandExecutionContext context)
         {
             var cmdtype = context.Command.GetType();
             var clstypes = assemblies.SelectMany(a => a.GetTypes()).Where(t => t.GetTypeInfo().GetCustomAttribute<CommandHandlerAttribute>() != null);
             var method = clstypes
                 .SelectMany(t => t.GetTypeInfo().GetMethods())
-                .FirstOrDefault(m => m.Name.StartsWith("Handle") && m.GetParameters().Any(pt => pt.ParameterType == cmdtype));
+                .FirstOrDefault(m => m.Name.StartsWith("Execute") && m.GetParameters().Any(pt => pt.ParameterType == cmdtype));
             context.HandlerMethod = method;
             context.HandlerType = method.DeclaringType;
         }

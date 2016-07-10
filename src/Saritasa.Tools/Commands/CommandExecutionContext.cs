@@ -1,9 +1,10 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.Domain
+namespace Saritasa.Tools.Commands
 {
     using System;
+    using System.Collections.Generic;
     using System.Reflection;
 
     /// <summary>
@@ -13,11 +14,18 @@ namespace Saritasa.Tools.Domain
     {
         private Guid commandId = Guid.Empty;
 
+        private IDictionary<string, string> data;
+
         /// <summary>
         /// Commands status.
         /// </summary>
         public enum CommandStatus : byte
         {
+            /// <summary>
+            /// Default command state.
+            /// </summary>
+            NotInitialized,
+
             /// <summary>
             /// The command in a processing state.
             /// </summary>
@@ -53,12 +61,45 @@ namespace Saritasa.Tools.Domain
                 }
                 return commandId;
             }
+
+            internal set
+            {
+                commandId = value;
+            }
         }
 
         /// <summary>
         /// Command to execute.
         /// </summary>
-        public object Command { get; private set; }
+        public object Command { get; set; }
+
+        /// <summary>
+        /// Custom data.
+        /// </summary>
+        public IDictionary<string, string> Data
+        {
+            get
+            {
+                if (data == null)
+                {
+                    data = new Dictionary<string, string>();
+                }
+                return data;
+            }
+
+            private set
+            {
+                data = value;
+            }
+        }
+
+        /// <summary>
+        /// Is custom data dictionary initialized.
+        /// </summary>
+        public bool HasData
+        {
+            get { return data != null; }
+        }
 
         /// <summary>
         /// Command handler.
@@ -81,14 +122,14 @@ namespace Saritasa.Tools.Domain
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
-        /// When processing has been completed.
+        /// Command execution duration.
         /// </summary>
-        public DateTime? CompletedAt { get; set; }
+        public long ExecutionDuration { get; set; }
 
         /// <summary>
         /// Processing status.
         /// </summary>
-        public CommandStatus Status { get; set; } = CommandStatus.Processing;
+        public CommandStatus Status { get; set; } = CommandStatus.NotInitialized;
 
         /// <summary>
         /// .ctor
@@ -99,6 +140,25 @@ namespace Saritasa.Tools.Domain
         {
             Command = command;
             CreatedAt = DateTime.Now;
+        }
+
+        /// <summary>
+        /// Get result object.
+        /// </summary>
+        /// <returns>Command execution results.</returns>
+        public CommandExecutionResult GetResult()
+        {
+            return new CommandExecutionResult()
+            {
+                CommandId = CommandId,
+                CommandName = Command.GetType().Name,
+                Command = Command,
+                Data = HasData ? Data : null,
+                Error = Error,
+                CreatedAt = CreatedAt,
+                ExecutionDuration = ExecutionDuration,
+                Status = Status,
+            };
         }
     }
 }
