@@ -39,6 +39,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\CommandExecutionContext.cs" />
@@ -51,6 +52,10 @@
     <Compile Include="Commands\CommandRepositories\FileCommandRepository.cs" />
     <Compile Include="Commands\CommandHandlerNotFoundException.cs" />
     <Compile Include="Commands\ICommandRepository.cs" />
+    <Compile Include="Commands\ICommandRepositoryPersist.cs" />
+    <Compile Include="Commands\ObjectSerializers\BinaryObjectSerializer.cs" />
+    <Compile Include="Commands\ObjectSerializers\JsonObjectSerializer.cs" />
+    <Compile Include="Commands\ObjectSerializers\XmlObjectSerializer.cs" />
     <Compile Include="Domain\DomainEventsManager.cs" />
     <Compile Include="Commands\ICommandPipelineMiddleware.cs" />
     <Compile Include="Commands\IObjectSerializer.cs" />

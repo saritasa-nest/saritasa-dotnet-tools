@@ -1,15 +1,17 @@
-﻿{
+{
   "title": "Saritasa Tools",
   "version": "0.1.0",
   "frameworks": {
     "net452": {
       "frameworkAssemblies": {
-        "System.Data": ""
+        "System.Data": "",
+        "System.Xml": ""
       }
     },
     "net461": {
       "frameworkAssemblies": {
-        "System.Data": ""
+        "System.Data": "",
+        "System.Xml": ""
       }
     },
     "netcoreapp1.0": {
@@ -22,5 +24,8 @@
         "NETStandard.Library": "1.6.0"
       }
     }
+  },
+  "dependencies": {
+    "Newtonsoft.Json": "9.0.1"
   }
 }

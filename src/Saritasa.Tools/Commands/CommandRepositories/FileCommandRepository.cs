@@ -9,16 +9,20 @@ namespace Saritasa.Tools.Commands.CommandRepositories
     using System.IO.Compression;
     using System.Linq;
     using Internal;
+    using ObjectSerializers;
 
     /// <summary>
     /// Makes log of all executed commands.
     /// </summary>
-    public class FileCommandRepository : ICommandRepository, IDisposable
+    public class FileCommandRepository : ICommandRepository, ICommandRepositoryPersist, IDisposable
     {
         /// <summary>
         /// Logs path.
         /// </summary>
-        public string LogsPath { get; private set; }
+        public string LogsPath
+        {
+            get { return logsPath; }
+        }
 
         bool disposed;
 
@@ -28,7 +32,9 @@ namespace Saritasa.Tools.Commands.CommandRepositories
 
         CommandBinarySerializer currentBinarySerializer;
 
-        readonly IObjectSerializer objectSerializer;
+        readonly string logsPath = string.Empty;
+
+        readonly IObjectSerializer serializer;
 
         readonly string prefix;
 
@@ -36,7 +42,7 @@ namespace Saritasa.Tools.Commands.CommandRepositories
 
         readonly bool compress;
 
-        readonly object objLock = new object();
+        static readonly object ObjLock = new object();
 
         Stream CurrentStream
         {
@@ -50,32 +56,28 @@ namespace Saritasa.Tools.Commands.CommandRepositories
         /// .ctor
         /// </summary>
         /// <param name="logsPath">Logs path.</param>
-        /// <param name="serializer">Object serializer.</param>
+        /// <param name="serializer">Object serializer. By default json serializer is used.</param>
         /// <param name="buffer">Should the output stream be buffered.</param>
         /// <param name="compress">Compress target files.</param>
         /// <param name="prefix">Files names prefix.</param>
-        public FileCommandRepository(string logsPath, IObjectSerializer serializer, string prefix = "",
+        public FileCommandRepository(string logsPath, IObjectSerializer serializer = null, string prefix = "",
             bool buffer = true, bool compress = false)
         {
-            if (!Directory.Exists(logsPath))
+            if (string.IsNullOrEmpty(logsPath))
             {
-                throw new ArgumentException($"Directory {logsPath} does not exist", nameof(logsPath));
+                throw new ArgumentException(nameof(logsPath));
             }
-            if (serializer == null)
-            {
-                throw new ArgumentNullException(nameof(serializer));
-            }
-            LogsPath = logsPath;
-            objectSerializer = serializer;
+            this.logsPath = logsPath;
+            this.serializer = serializer != null ? serializer : new JsonObjectSerializer();
             this.prefix = prefix;
             this.buffer = buffer;
             this.compress = compress;
             Directory.CreateDirectory(LogsPath);
         }
 
-        private string GetFileNameByDate(DateTime date)
+        private string GetFileNameByDate(DateTime date, int count)
         {
-            var name = $"{date.ToString("yyyyMMdd")}.bin";
+            var name = $"{date:yyyyMMdd}-{count:000}.bin";
             if (string.IsNullOrEmpty(prefix) == false)
             {
                 name = prefix + "-" + name;
@@ -83,6 +85,32 @@ namespace Saritasa.Tools.Commands.CommandRepositories
             if (compress)
             {
                 name += ".zip";
+            }
+            return name;
+        }
+
+        private string GetAvailableFileNameByDate(DateTime date)
+        {
+            if (currentFileStream != null)
+            {
+                return Path.GetFileName(currentFileStream.Name);
+            }
+
+            string name = string.Empty;
+            for (int i = 0; i < 1000; i++)
+            {
+                name = GetFileNameByDate(date, i);
+
+                // we cannot continue zip streams, so we have to create new file
+                // every time with new stream
+                if (compress && File.Exists(Path.Combine(LogsPath, name)))
+                {
+                    continue;
+                }
+                else
+                {
+                    break;
+                }
             }
             return name;
         }
@@ -97,9 +125,9 @@ namespace Saritasa.Tools.Commands.CommandRepositories
                 throw new ObjectDisposedException("The command repository has been disposed.");
             }
 
-            string name = GetFileNameByDate(DateTime.Now);
-            lock (objLock)
+            lock (ObjLock)
             {
+                string name = GetAvailableFileNameByDate(DateTime.Now);
                 if (currentFileStream == null || Path.GetFileName(currentFileStream.Name) != name)
                 {
                     Close();
@@ -108,20 +136,20 @@ namespace Saritasa.Tools.Commands.CommandRepositories
                     {
                         currentGZipStream = new GZipStream(currentFileStream, CompressionMode.Compress);
                     }
-                    currentBinarySerializer = new CommandBinarySerializer(CurrentStream, objectSerializer);
+                    currentBinarySerializer = new CommandBinarySerializer(CurrentStream, serializer);
                 }
             }
 
             currentBinarySerializer.Write(context);
             if (!buffer)
             {
-                lock (objLock)
+                lock (ObjLock)
                 {
                     if (currentGZipStream != null)
                     {
                         currentGZipStream.Flush();
                     }
-                    currentFileStream.FlushAsync();
+                    currentFileStream.Flush();
                 }
             }
         }
@@ -134,35 +162,37 @@ namespace Saritasa.Tools.Commands.CommandRepositories
             DateTime currentDate = startDate;
             while (currentDate <= endDate)
             {
-                var fileName = GetFileNameByDate(currentDate);
-                if (allFiles.Contains(fileName) == false)
+                for (int i = 0; i < 1000; i++)
                 {
-                    currentDate = currentDate.AddDays(1);
-                    continue;
-                }
-
-                Stream stream = null;
-                try
-                {
-                    stream = new FileStream(Path.Combine(LogsPath, fileName), FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                    if (compress)
+                    var fileName = GetFileNameByDate(currentDate, i);
+                    if (allFiles.Contains(fileName) == false)
                     {
-                        stream = new GZipStream(stream, CompressionMode.Decompress, false);
+                        break;
                     }
-                    var commandSerializer = new CommandBinarySerializer(stream, objectSerializer);
-                    for (CommandExecutionResult cmdResult = null; (cmdResult = commandSerializer.Read()) != null;)
+
+                    Stream stream = null;
+                    try
                     {
-                        if (cmdResult.CreatedAt >= startDate && cmdResult.CreatedAt <= endDate)
+                        stream = new FileStream(Path.Combine(LogsPath, fileName), FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                        if (compress)
                         {
-                            targetList.Add(cmdResult);
+                            stream = new GZipStream(stream, CompressionMode.Decompress, false);
+                        }
+                        var commandSerializer = new CommandBinarySerializer(stream, serializer);
+                        for (CommandExecutionResult cmdResult = null; (cmdResult = commandSerializer.Read()) != null;)
+                        {
+                            if (cmdResult.CreatedAt >= startDate && cmdResult.CreatedAt <= endDate)
+                            {
+                                targetList.Add(cmdResult);
+                            }
                         }
                     }
-                }
-                finally
-                {
-                    if (stream != null)
+                    finally
                     {
-                        stream.Dispose();
+                        if (stream != null)
+                        {
+                            stream.Dispose();
+                        }
                     }
                 }
                 currentDate = currentDate.AddDays(1);
@@ -208,6 +238,36 @@ namespace Saritasa.Tools.Commands.CommandRepositories
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        #region ICommandRepositoryPersist
+
+        /// <inheritdoc />
+        void ICommandRepositoryPersist.Save(IDictionary<string, object> dict)
+        {
+            dict[nameof(logsPath)] = logsPath;
+            dict[nameof(buffer)] = buffer;
+            dict[nameof(compress)] = compress;
+            dict[nameof(serializer)] = serializer.GetType().AssemblyQualifiedName;
+            dict[nameof(prefix)] = prefix;
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Create repository from dictionary.
+        /// </summary>
+        /// <param name="dict">Properties.</param>
+        /// <returns>Command repository.</returns>
+        public static ICommandRepository Create(IDictionary<string, object> dict)
+        {
+            return new FileCommandRepository(
+                dict[nameof(logsPath)].ToString(),
+                (IObjectSerializer)Activator.CreateInstance(Type.GetType(dict[nameof(serializer)].ToString())),
+                dict[nameof(prefix)].ToString(),
+                Convert.ToBoolean(dict[nameof(buffer)]),
+                Convert.ToBoolean(dict[nameof(compress)])
+            );
         }
     }
 }

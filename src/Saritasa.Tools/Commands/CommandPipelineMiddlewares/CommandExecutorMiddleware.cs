@@ -107,6 +107,7 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
             {
                 var exception = new CommandHandlerNotFoundException();
                 exception.Data.Add(nameof(canResolve), canResolve);
+                context.Status = CommandExecutionContext.CommandStatus.Rejected;
                 throw exception;
             }
 
