@@ -1,21 +1,25 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.Commands.CommandRepositories
+namespace Saritasa.Tools.Messages.Repositories
 {
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.IO.Compression;
     using System.Linq;
+    using System.Linq.Expressions;
     using Internal;
     using ObjectSerializers;
+    using System.Reflection;
 
     /// <summary>
-    /// Makes log of all executed commands.
+    /// Stores to file message.
     /// </summary>
-    public class FileCommandRepository : ICommandRepository, ICommandRepositoryPersist, IDisposable
+    public class FileMessageRepository : IMessageRepository, IDisposable
     {
+        const string DateTimeFormat = "yyyyMMdd";
+
         /// <summary>
         /// Logs path.
         /// </summary>
@@ -30,7 +34,7 @@ namespace Saritasa.Tools.Commands.CommandRepositories
 
         GZipStream currentGZipStream;
 
-        CommandBinarySerializer currentBinarySerializer;
+        MessageBinarySerializer currentBinarySerializer;
 
         readonly string logsPath = string.Empty;
 
@@ -60,7 +64,7 @@ namespace Saritasa.Tools.Commands.CommandRepositories
         /// <param name="buffer">Should the output stream be buffered.</param>
         /// <param name="compress">Compress target files.</param>
         /// <param name="prefix">Files names prefix.</param>
-        public FileCommandRepository(string logsPath, IObjectSerializer serializer = null, string prefix = "",
+        public FileMessageRepository(string logsPath, IObjectSerializer serializer = null, string prefix = "",
             bool buffer = true, bool compress = false)
         {
             if (string.IsNullOrEmpty(logsPath))
@@ -77,7 +81,7 @@ namespace Saritasa.Tools.Commands.CommandRepositories
 
         private string GetFileNameByDate(DateTime date, int count)
         {
-            var name = $"{date:yyyyMMdd}-{count:000}.bin";
+            var name = $"{date.ToString(DateTimeFormat)}-{count:000}.bin";
             if (string.IsNullOrEmpty(prefix) == false)
             {
                 name = prefix + "-" + name;
@@ -118,7 +122,7 @@ namespace Saritasa.Tools.Commands.CommandRepositories
         #region ICommandRepository
 
         /// <inheritdoc />
-        public void Add(CommandExecutionResult context)
+        public void Add(Message context)
         {
             if (disposed)
             {
@@ -136,7 +140,7 @@ namespace Saritasa.Tools.Commands.CommandRepositories
                     {
                         currentGZipStream = new GZipStream(currentFileStream, CompressionMode.Compress);
                     }
-                    currentBinarySerializer = new CommandBinarySerializer(CurrentStream, serializer);
+                    currentBinarySerializer = new MessageBinarySerializer(CurrentStream, serializer, null);
                 }
             }
 
@@ -149,16 +153,60 @@ namespace Saritasa.Tools.Commands.CommandRepositories
                     {
                         currentGZipStream.Flush();
                     }
-                    currentFileStream.Flush();
+                    currentFileStream.FlushAsync();
                 }
             }
         }
 
-        /// <inheritdoc />
-        public IEnumerable<CommandExecutionResult> GetByDates(DateTime startDate, DateTime endDate)
+        private string GetSearchPattern()
         {
-            var allFiles = new HashSet<string>(Directory.GetFiles(LogsPath).Select(f => Path.GetFileName(f)));
-            var targetList = new List<CommandExecutionResult>(150);
+            return compress ? prefix + "*.bin.zip" : prefix + "*.bin";
+        }
+
+        private string GetFileDatePart(string fileName)
+        {
+            return fileName.Length > 7 ? fileName.Substring(0, 8) : string.Empty;
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<Message> Get(Expression<Func<Message, bool>> selector, Assembly[] assemblies = null)
+        {
+            // analyze expression
+            var visitor = new CreatedDateExpressionVisitor();
+            visitor.Visit(selector);
+            var compiledSelector = selector.Compile();
+
+            // collect all files in dir
+            var allFiles = Directory.GetFiles(LogsPath, GetSearchPattern()).OrderBy(f => f).Select(f => Path.GetFileName(f));
+            var allFilesHash = new HashSet<string>(allFiles);
+
+            // prepare first and last dates
+            DateTime startDate = visitor.StartDate;
+            DateTime endDate = visitor.EndDate;
+            if (allFiles.Count() > 0)
+            {
+                DateTime tmp;
+                if (DateTime.TryParseExact(GetFileDatePart(allFiles.First()), DateTimeFormat,
+                    System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat, System.Globalization.DateTimeStyles.None, out tmp))
+                {
+                    if (tmp > startDate)
+                    {
+                        startDate = tmp;
+                    }
+                }
+                if (DateTime.TryParseExact(GetFileDatePart(allFiles.Last()), DateTimeFormat,
+                    System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat, System.Globalization.DateTimeStyles.None, out tmp))
+                {
+                    tmp = tmp.AddDays(1);
+                    if (tmp < endDate)
+                    {
+                        endDate = tmp;
+                    }
+                }
+            }
+
+            // actual search
+            var targetList = new List<Message>(150);
             DateTime currentDate = startDate;
             while (currentDate <= endDate)
             {
@@ -178,12 +226,12 @@ namespace Saritasa.Tools.Commands.CommandRepositories
                         {
                             stream = new GZipStream(stream, CompressionMode.Decompress, false);
                         }
-                        var commandSerializer = new CommandBinarySerializer(stream, serializer);
-                        for (CommandExecutionResult cmdResult = null; (cmdResult = commandSerializer.Read()) != null;)
+                        var commandSerializer = new MessageBinarySerializer(stream, serializer, assemblies);
+                        for (Message message = null; (message = commandSerializer.Read()) != null;)
                         {
-                            if (cmdResult.CreatedAt >= startDate && cmdResult.CreatedAt <= endDate)
+                            if (compiledSelector(message))
                             {
-                                targetList.Add(cmdResult);
+                                targetList.Add(message);
                             }
                         }
                     }
@@ -199,6 +247,18 @@ namespace Saritasa.Tools.Commands.CommandRepositories
             }
             return targetList;
         }
+
+        /// <inheritdoc />
+        public void SaveState(IDictionary<string, object> dict)
+        {
+            dict[nameof(logsPath)] = logsPath;
+            dict[nameof(buffer)] = buffer;
+            dict[nameof(compress)] = compress;
+            dict[nameof(serializer)] = serializer.GetType().AssemblyQualifiedName;
+            dict[nameof(prefix)] = prefix;
+        }
+
+        #endregion
 
         /// <summary>
         /// Close all streams.
@@ -216,8 +276,6 @@ namespace Saritasa.Tools.Commands.CommandRepositories
                 currentFileStream = null;
             }
         }
-
-        #endregion
 
         /// <inheritdoc />
         protected virtual void Dispose(bool disposing)
@@ -240,34 +298,68 @@ namespace Saritasa.Tools.Commands.CommandRepositories
             GC.SuppressFinalize(this);
         }
 
-        #region ICommandRepositoryPersist
-
-        /// <inheritdoc />
-        void ICommandRepositoryPersist.Save(IDictionary<string, object> dict)
-        {
-            dict[nameof(logsPath)] = logsPath;
-            dict[nameof(buffer)] = buffer;
-            dict[nameof(compress)] = compress;
-            dict[nameof(serializer)] = serializer.GetType().AssemblyQualifiedName;
-            dict[nameof(prefix)] = prefix;
-        }
-
-        #endregion
-
         /// <summary>
         /// Create repository from dictionary.
         /// </summary>
         /// <param name="dict">Properties.</param>
         /// <returns>Command repository.</returns>
-        public static ICommandRepository Create(IDictionary<string, object> dict)
+        public static IMessageRepository CreateFromState(IDictionary<string, object> dict)
         {
-            return new FileCommandRepository(
+            return new FileMessageRepository(
                 dict[nameof(logsPath)].ToString(),
                 (IObjectSerializer)Activator.CreateInstance(Type.GetType(dict[nameof(serializer)].ToString())),
                 dict[nameof(prefix)].ToString(),
                 Convert.ToBoolean(dict[nameof(buffer)]),
                 Convert.ToBoolean(dict[nameof(compress)])
             );
+        }
+    }
+
+    /// <summary>
+    /// Search for CreatedAt &gt; X AND CreatedAt &lt; X.
+    /// </summary>
+    internal class CreatedDateExpressionVisitor : ExpressionVisitor
+    {
+        public DateTime StartDate { get; set; } = DateTime.MinValue;
+
+        public DateTime EndDate { get; set; } = DateTime.MaxValue;
+
+        private DateTime GetDate(BinaryExpression conditionalNode)
+        {
+            if (conditionalNode.Left.NodeType == ExpressionType.MemberAccess && conditionalNode.Right.NodeType == ExpressionType.MemberAccess)
+            {
+                var leftMemberNode = (MemberExpression)conditionalNode.Left;
+                if (leftMemberNode.Member.Name != nameof(Message.CreatedAt))
+                {
+                    return DateTime.MinValue;
+                }
+                var memberNode = (MemberExpression)conditionalNode.Right;
+                var constantExpression = (ConstantExpression)memberNode.Expression;
+                return ((DateTime)((FieldInfo)memberNode.Member).GetValue(constantExpression.Value)).Date;
+            }
+            return DateTime.MinValue;
+        }
+
+        public override Expression Visit(Expression node)
+        {
+            if (node.NodeType == ExpressionType.GreaterThan || node.NodeType == ExpressionType.GreaterThanOrEqual)
+            {
+                var date = GetDate((BinaryExpression)node);
+                if (date > StartDate)
+                {
+                    StartDate = date;
+                }
+            }
+            else if (node.NodeType == ExpressionType.LessThan || node.NodeType == ExpressionType.LessThanOrEqual)
+            {
+                var date = GetDate((BinaryExpression)node);
+                if (date < EndDate)
+                {
+                    EndDate = date;
+                }
+            }
+
+            return base.Visit(node);
         }
     }
 }

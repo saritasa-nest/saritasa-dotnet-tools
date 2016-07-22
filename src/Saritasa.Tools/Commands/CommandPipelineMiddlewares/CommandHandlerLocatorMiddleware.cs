@@ -7,11 +7,12 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
     using System.Collections.Generic;
     using System.Reflection;
     using System.Linq;
+    using Messages;
 
     /// <summary>
     /// Locate command hanlder.
     /// </summary>
-    public class CommandHandlerLocatorMiddleware : ICommandPipelineMiddleware
+    public class CommandHandlerLocatorMiddleware : IMessagePipelineMiddleware
     {
         /// <inheritdoc />
         public string Id
@@ -35,15 +36,25 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public void Execute(CommandExecutionContext context)
+        public void Handle(Message message)
         {
-            var cmdtype = context.Command.GetType();
-            var clstypes = assemblies.SelectMany(a => a.GetTypes()).Where(t => t.GetTypeInfo().GetCustomAttribute<CommandHandlerAttribute>() != null);
+            var commandMessage = message as CommandMessage;
+            if (commandMessage == null)
+            {
+                throw new NotSupportedException("Message should be CommandMessage type");
+            }
+
+            var cmdtype = commandMessage.Content.GetType();
+            var clstypes = assemblies.SelectMany(a => a.GetTypes()).Where(t => t.GetTypeInfo().GetCustomAttribute<CommandsHandlerAttribute>() != null);
             var method = clstypes
                 .SelectMany(t => t.GetTypeInfo().GetMethods())
-                .FirstOrDefault(m => m.Name.StartsWith("Execute") && m.GetParameters().Any(pt => pt.ParameterType == cmdtype));
-            context.HandlerMethod = method;
-            context.HandlerType = method.DeclaringType;
+                .FirstOrDefault(m => m.Name.StartsWith("Handle") && m.GetParameters().Any(pt => pt.ParameterType == cmdtype));
+            if (method == null)
+            {
+                throw new CommandHandlerNotFoundException();
+            }
+            commandMessage.HandlerMethod = method;
+            commandMessage.HandlerType = method.DeclaringType;
         }
     }
 }

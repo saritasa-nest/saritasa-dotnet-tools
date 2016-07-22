@@ -42,23 +42,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Commands\CommandExecutionContext.cs" />
-    <Compile Include="Commands\CommandExecutionResult.cs" />
+    <Compile Include="Commands\CommandMessage.cs" />
     <Compile Include="Commands\CommandPipeline.cs" />
-    <Compile Include="Commands\CommandPipelineMiddlewares\CommandDataMiddleware.cs" />
+    <Compile Include="Commands\ICommandPipeline.cs" />
+    <Compile Include="Internal\TypesLoader.cs" />
+    <Compile Include="Messages\IMessagePipeline.cs" />
+    <Compile Include="Messages\Message.cs" />
+    <Compile Include="Messages\MessagePipeline.cs" />
+    <Compile Include="Messages\MessagePipelineMiddlewares\MessageDataMiddleware.cs" />
     <Compile Include="Commands\CommandPipelineMiddlewares\CommandExecutorMiddleware.cs" />
     <Compile Include="Commands\CommandPipelineMiddlewares\CommandHandlerLocatorMiddleware.cs" />
-    <Compile Include="Commands\CommandPipelineMiddlewares\CommandRepositoryMiddleware.cs" />
-    <Compile Include="Commands\CommandRepositories\FileCommandRepository.cs" />
+    <Compile Include="Messages\MessagePipelineMiddlewares\MessageRepositoryMiddleware.cs" />
+    <Compile Include="Messages\Repositories\AdoNetMessageRepository.cs" />
+    <Compile Include="Messages\Repositories\FileMessageRepository.cs" />
     <Compile Include="Commands\CommandHandlerNotFoundException.cs" />
-    <Compile Include="Commands\ICommandRepository.cs" />
-    <Compile Include="Commands\ICommandRepositoryPersist.cs" />
-    <Compile Include="Commands\ObjectSerializers\BinaryObjectSerializer.cs" />
-    <Compile Include="Commands\ObjectSerializers\JsonObjectSerializer.cs" />
-    <Compile Include="Commands\ObjectSerializers\XmlObjectSerializer.cs" />
+    <Compile Include="Messages\IMessageRepository.cs" />
+    <Compile Include="Messages\ObjectSerializers\BinaryObjectSerializer.cs" />
+    <Compile Include="Messages\ObjectSerializers\JsonObjectSerializer.cs" />
+    <Compile Include="Messages\ObjectSerializers\XmlObjectSerializer.cs" />
     <Compile Include="Domain\DomainEventsManager.cs" />
-    <Compile Include="Commands\ICommandPipelineMiddleware.cs" />
-    <Compile Include="Commands\IObjectSerializer.cs" />
+    <Compile Include="Messages\IMessagePipelineMiddleware.cs" />
+    <Compile Include="Messages\IObjectSerializer.cs" />
     <Compile Include="Emails\EmailSender.cs" />
     <Compile Include="Emails\DefaultEmailExecutionStrategy.cs" />
     <Compile Include="Emails\FilterEmailInterceptor.cs" />
@@ -75,7 +79,7 @@
     <Compile Include="Emails\IEmailInterceptor.cs" />
     <Compile Include="Emails\IEmailSender.cs" />
     <Compile Include="Domain\IDomainEventsHandler.cs" />
-    <Compile Include="Internal\CommandBinarySerializer.cs" />
+    <Compile Include="Internal\MessageBinarySerializer.cs" />
     <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Logging\ILoggerFactory.cs" />
     <Compile Include="Domain\IRepository.cs" />
@@ -83,6 +87,9 @@
     <Compile Include="Domain\IUnitOfWorkFactory.cs" />
     <Compile Include="Dummy\DummyEmailSender.cs" />
     <Compile Include="Dummy\DummyLogger.cs" />
+    <Compile Include="Messages\Repositories\SqlProviders\ISqlProvider.cs" />
+    <Compile Include="Messages\Repositories\SqlProviders\SqlServerSqlProvider.cs" />
+    <Compile Include="Messages\Repositories\SqlProviders\MySqlSqlProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Security\PasswordGenerator.cs" />
   </ItemGroup>

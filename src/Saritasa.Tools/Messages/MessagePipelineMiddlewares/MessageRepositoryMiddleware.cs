@@ -1,14 +1,14 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
+namespace Saritasa.Tools.Messages.CommandPipelineMiddlewares
 {
     using System;
 
     /// <summary>
     /// Saves the command execution context to repository.
     /// </summary>
-    public class CommandRepositoryMiddleware : ICommandPipelineMiddleware
+    public class MessageRepositoryMiddleware : IMessagePipelineMiddleware
     {
         /// <inheritdoc />
         public string Id
@@ -16,13 +16,13 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
             get { return "repository"; }
         }
 
-        ICommandRepository repository;
+        IMessageRepository repository;
 
         /// <summary>
         /// .ctor
         /// </summary>
         /// <param name="repository">Repository implementation.</param>
-        public CommandRepositoryMiddleware(ICommandRepository repository)
+        public MessageRepositoryMiddleware(IMessageRepository repository)
         {
             if (repository == null)
             {
@@ -32,9 +32,9 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public void Execute(CommandExecutionContext context)
+        public void Handle(Message message)
         {
-            repository.Add(context.GetResult());
+            repository.Add(message);
         }
     }
 }

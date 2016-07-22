@@ -7,21 +7,24 @@ namespace Saritasa.Tools.Internal
     using System.Collections.Generic;
     using System.IO;
     using System.Text;
-    using Commands;
+    using System.Linq;
+    using Messages;
+    using System.Reflection;
 
-    internal class CommandBinarySerializer
+    internal class MessageBinarySerializer
     {
         const byte TokenBeginOfCommand = 0x10;
         const byte TokenId = 0x11;
-        const byte TokenCommandType = 0x12;
-        const byte TokenCommandName = 0x13;
-        const byte TokenCommand = 0x14;
-        const byte TokenData = 0x15;
-        const byte TokenCreated = 0x16;
-        const byte TokenExecutionDuration = 0x17;
-        const byte TokenStatus = 0x18;
-        const byte TokenErrorType = 0x19;
-        const byte TokenError = 0x20;
+        const byte TokenType = 0x12;
+        const byte TokenContentType = 0x13;
+        const byte TokenContent = 0x15;
+        const byte TokenData = 0x16;
+        const byte TokenCreated = 0x17;
+        const byte TokenExecutionDuration = 0x18;
+        const byte TokenStatus = 0x19;
+        const byte TokenErrorDetails = 0x21;
+        const byte TokenErrorMessage = 0x22;
+        const byte TokenErrorType = 0x23;
         const byte TokenEndOfCommand = 0x50;
 
         static readonly Tuple<byte, byte[]> NullChunk = new Tuple<byte, byte[]>(0, null);
@@ -34,7 +37,9 @@ namespace Saritasa.Tools.Internal
 
         private readonly object objLock = new object();
 
-        public CommandBinarySerializer(Stream stream, IObjectSerializer serializer)
+        private Assembly[] assemblies;
+
+        public MessageBinarySerializer(Stream stream, IObjectSerializer serializer, Assembly[] assemblies)
         {
             if (stream == null)
             {
@@ -46,6 +51,7 @@ namespace Saritasa.Tools.Internal
             }
             this.serializer = serializer;
             this.stream = stream;
+            this.assemblies = assemblies;
         }
 
         private void WriteChunk(byte chunk, byte[] bytes = null)
@@ -81,20 +87,21 @@ namespace Saritasa.Tools.Internal
         /// Reads the next command from stream.
         /// </summary>
         /// <returns>Command execution result.</returns>
-        public CommandExecutionResult Read()
+        public Message Read()
         {
-            var result = new CommandExecutionResult();
+            var result = new Message();
             Tuple<byte, byte[]> chunk;
-            Type commandType = null;
             Type errorType = null;
-            bool commandStarted = false;
+            bool messageStarted = false;
+            byte[] content = null;
+
             while ((chunk = ReadChunk()) != NullChunk)
             {
                 if (chunk.Item1 == TokenBeginOfCommand)
                 {
-                    commandStarted = true;
+                    messageStarted = true;
                 }
-                if (!commandStarted)
+                if (!messageStarted)
                 {
                     continue;
                 }
@@ -102,16 +109,16 @@ namespace Saritasa.Tools.Internal
                 switch (chunk.Item1)
                 {
                     case TokenId:
-                        result.CommandId = new Guid(chunk.Item2);
+                        result.Id = new Guid(chunk.Item2);
                         break;
-                    case TokenCommandType:
-                        commandType = Type.GetType(Encoding.UTF8.GetString(chunk.Item2));
+                    case TokenType:
+                        result.Type = chunk.Item2[0];
                         break;
-                    case TokenCommand:
-                        result.Command = serializer.Deserialize(chunk.Item2, commandType);
+                    case TokenContent:
+                        content = chunk.Item2;
                         break;
-                    case TokenCommandName:
-                        result.CommandName = Encoding.UTF8.GetString(chunk.Item2);
+                    case TokenContentType:
+                        result.ContentType = Encoding.UTF8.GetString(chunk.Item2);
                         break;
                     case TokenData:
                         result.Data = (IDictionary<string, string>)serializer.Deserialize(chunk.Item2, typeof(IDictionary<string, string>));
@@ -120,18 +127,23 @@ namespace Saritasa.Tools.Internal
                         result.CreatedAt = DateTime.FromBinary(BitConverter.ToInt64(chunk.Item2, 0));
                         break;
                     case TokenExecutionDuration:
-                        result.ExecutionDuration = BitConverter.ToInt64(chunk.Item2, 0);
+                        result.ExecutionDuration = BitConverter.ToInt32(chunk.Item2, 0);
+                        break;
+                    case TokenErrorDetails:
+                        result.ErrorDetails = serializer.Deserialize(chunk.Item2, errorType) as Exception;
+                        break;
+                    case TokenErrorMessage:
+                        result.ErrorMessage = Encoding.UTF8.GetString(chunk.Item2);
                         break;
                     case TokenErrorType:
-                        errorType = Type.GetType(Encoding.UTF8.GetString(chunk.Item2));
-                        break;
-                    case TokenError:
-                        result.Error = serializer.Deserialize(chunk.Item2, errorType) as Exception;
+                        result.ErrorType = Encoding.UTF8.GetString(chunk.Item2);
                         break;
                     case TokenStatus:
-                        result.Status = (CommandExecutionContext.CommandStatus)chunk.Item2[0];
+                        result.Status = (Message.ProcessingStatus)chunk.Item2[0];
                         break;
                     case TokenEndOfCommand:
+                        var t = TypesLoader.LoadType(result.ContentType, assemblies);
+                        result.Content = serializer.Deserialize(content, t);
                         return result;
                 }
             }
@@ -139,31 +151,32 @@ namespace Saritasa.Tools.Internal
         }
 
         /// <summary>
-        /// Writes the command to stream.
+        /// Writes the message to stream.
         /// </summary>
-        /// <param name="result">Command execution result.</param>
-        public void Write(CommandExecutionResult result)
+        /// <param name="message">Message.</param>
+        public void Write(Message message)
         {
-            var commandBytes = serializer.Serialize(result.Command);
-            var errorBytes = result.Error != null ? serializer.Serialize(result.Error) : EmptyBytes;
-            var dataBytes = result.Data != null ? serializer.Serialize(result.Data) : EmptyBytes;
+            var messageBytes = serializer.Serialize(message.Content);
+            var errorBytes = message.ErrorDetails != null ? serializer.Serialize(message.ErrorDetails) : EmptyBytes;
+            var dataBytes = message.Data != null ? serializer.Serialize(message.Data) : EmptyBytes;
 
             lock (objLock)
             {
                 WriteChunk(TokenBeginOfCommand);
-                WriteChunk(TokenId, result.CommandId.ToByteArray()); // id
-                WriteChunk(TokenCommandType, Encoding.UTF8.GetBytes(result.Command.GetType().AssemblyQualifiedName)); // command type
-                WriteChunk(TokenCommandName, Encoding.UTF8.GetBytes(result.CommandName)); // command name
-                WriteChunk(TokenCreated, BitConverter.GetBytes(result.CreatedAt.ToBinary())); // created
-                WriteChunk(TokenExecutionDuration, BitConverter.GetBytes(result.ExecutionDuration)); // completed
-                WriteChunk(TokenStatus, BitConverter.GetBytes((byte)result.Status)); // status
-                if (result.Error != null)
+                WriteChunk(TokenId, message.Id.ToByteArray()); // id
+                WriteChunk(TokenType, BitConverter.GetBytes(message.Type)); // type
+                WriteChunk(TokenContentType, Encoding.UTF8.GetBytes(message.ContentType)); // message type
+                WriteChunk(TokenCreated, BitConverter.GetBytes(message.CreatedAt.ToBinary())); // created
+                WriteChunk(TokenExecutionDuration, BitConverter.GetBytes(message.ExecutionDuration)); // completed
+                WriteChunk(TokenStatus, BitConverter.GetBytes((byte)message.Status)); // status
+                if (message.ErrorDetails != null)
                 {
-                    WriteChunk(TokenErrorType, Encoding.UTF8.GetBytes(result.Error.GetType().AssemblyQualifiedName)); // error type
-                    WriteChunk(TokenError, errorBytes); // error
+                    WriteChunk(TokenErrorDetails, errorBytes); // error
                 }
-                WriteChunk(TokenCommand, commandBytes); // command object
-                if (result.Data != null)
+                WriteChunk(TokenErrorMessage, Encoding.UTF8.GetBytes(message.ErrorMessage)); // error message
+                WriteChunk(TokenErrorType, Encoding.UTF8.GetBytes(message.ErrorType)); // error type
+                WriteChunk(TokenContent, messageBytes); // message object
+                if (message.HasData)
                 {
                     WriteChunk(TokenData, dataBytes);
                 }

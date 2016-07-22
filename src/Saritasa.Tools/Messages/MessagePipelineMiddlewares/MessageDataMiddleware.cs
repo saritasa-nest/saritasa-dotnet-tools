@@ -5,11 +5,12 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
 {
     using System;
     using System.Collections.Generic;
+    using Messages;
 
     /// <summary>
-    /// Append additional data to command context.
+    /// Append additional data to message.
     /// </summary>
-    public class CommandDataMiddleware : ICommandPipelineMiddleware
+    public class MessageDataMiddleware : IMessagePipelineMiddleware
     {
         /// <inheritdoc />
         public string Id
@@ -23,7 +24,7 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
         /// .ctor
         /// </summary>
         /// <param name="action">The action to execute.</param>
-        public CommandDataMiddleware(Action<IDictionary<string, string>> action)
+        public MessageDataMiddleware(Action<IDictionary<string, string>> action)
         {
             if (action == null)
             {
@@ -33,7 +34,7 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public void Execute(CommandExecutionContext context)
+        public void Handle(Message context)
         {
             action(context.Data);
         }

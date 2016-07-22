@@ -2,7 +2,7 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 #if !NETCOREAPP1_0 && !NETSTANDARD1_6
-namespace Saritasa.Tools.Commands.ObjectSerializers
+namespace Saritasa.Tools.Messages.ObjectSerializers
 {
     using System;
     using System.IO;
@@ -43,6 +43,12 @@ namespace Saritasa.Tools.Commands.ObjectSerializers
                     return stream.ToArray();
                 }
             }
+        }
+
+        /// <inheritdoc />
+        public bool IsText
+        {
+            get { return true; }
         }
     }
 }

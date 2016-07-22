@@ -18,7 +18,7 @@ namespace Saritasa.Tools.Commands
     /// with this attribute.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-    public class CommandHandlerAttribute : Attribute
+    public class CommandsHandlerAttribute : Attribute
     {
     }
 

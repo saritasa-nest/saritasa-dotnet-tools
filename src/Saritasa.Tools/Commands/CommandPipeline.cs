@@ -4,43 +4,26 @@
 namespace Saritasa.Tools.Commands
 {
     using System;
-    using System.Collections.Generic;
     using System.Reflection;
+    using Messages;
 
     /// <summary>
-    /// Commands processing pipeline.
+    /// Commands specific pipeline.
     /// </summary>
-    public class CommandPipeline
+    public class CommandPipeline : MessagePipeline, ICommandPipeline
     {
-        /// <summary>
-        /// Middlewares list.
-        /// </summary>
-        protected IList<ICommandPipelineMiddleware> Middlewares { get; set; } = new List<ICommandPipelineMiddleware>();
-
         /// <summary>
         /// Execute command.
         /// </summary>
         /// <param name="command">Command to execute.</param>
         [System.Diagnostics.DebuggerHidden]
-        public void Execute(object command)
+        public void Handle(object command)
         {
-            var context = new CommandExecutionContext(command);
+            var context = new CommandMessage(command);
 
             foreach (var handler in Middlewares)
             {
-                handler.Execute(context);
-            }
-        }
-
-        /// <summary>
-        /// Add more middlewares to pipeline.
-        /// </summary>
-        /// <param name="middlewares">Command middlewares.</param>
-        public void AddMiddlewares(params ICommandPipelineMiddleware[] middlewares)
-        {
-            foreach (var middleware in middlewares)
-            {
-                Middlewares.Add(middleware);
+                handler.Handle(context);
             }
         }
 

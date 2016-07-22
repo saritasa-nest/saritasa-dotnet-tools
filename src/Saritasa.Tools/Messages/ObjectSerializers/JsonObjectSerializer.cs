@@ -1,13 +1,13 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.Commands.ObjectSerializers
+namespace Saritasa.Tools.Messages.ObjectSerializers
 {
     using System;
     using Newtonsoft.Json;
 
     /// <summary>
-    /// Json object serializer based on Newton Json lib.
+    /// Json object serializer based on NewtonJson lib.
     /// </summary>
     public class JsonObjectSerializer : IObjectSerializer
     {
@@ -22,6 +22,12 @@ namespace Saritasa.Tools.Commands.ObjectSerializers
         {
             var str = JsonConvert.SerializeObject(obj, Formatting.None);
             return System.Text.Encoding.UTF8.GetBytes(str);
+        }
+
+        /// <inheritdoc />
+        public bool IsText
+        {
+            get { return true; }
         }
     }
 }

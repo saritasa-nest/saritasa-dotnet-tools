@@ -5,11 +5,12 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
 {
     using System;
     using System.Reflection;
+    using Messages;
 
     /// <summary>
     /// Default command executor. It does not process commands with Rejected status.
     /// </summary>
-    public class CommandExecutorMiddleware : ICommandPipelineMiddleware
+    public class CommandExecutorMiddleware : IMessagePipelineMiddleware
     {
         /// <inheritdoc />
         public string Id
@@ -80,10 +81,16 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public void Execute(CommandExecutionContext context)
+        public void Handle(Message message)
         {
+            var commandMessage = message as CommandMessage;
+            if (commandMessage == null)
+            {
+                throw new NotSupportedException("Message should be CommandMessage type");
+            }
+
             // rejected commands are not needed to process
-            if (context.Status == CommandExecutionContext.CommandStatus.Rejected)
+            if (commandMessage.Status == Message.ProcessingStatus.Rejected)
             {
                 return;
             }
@@ -94,12 +101,12 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
             // we should have handler object first
             try
             {
-                handler = resolver(context.HandlerType);
+                handler = resolver(commandMessage.HandlerType);
             }
             catch (Exception)
             {
                 canResolve = false;
-                handler = CreateFromDefaultCtorAndResolve(context.HandlerType);
+                handler = CreateFromDefaultCtorAndResolve(commandMessage.HandlerType);
             }
 
             // if we don't have handler - throw exception
@@ -107,7 +114,7 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
             {
                 var exception = new CommandHandlerNotFoundException();
                 exception.Data.Add(nameof(canResolve), canResolve);
-                context.Status = CommandExecutionContext.CommandStatus.Rejected;
+                commandMessage.Status = Message.ProcessingStatus.Rejected;
                 throw exception;
             }
 
@@ -115,16 +122,17 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
             var stopWatch = System.Diagnostics.Stopwatch.StartNew();
             try
             {
-                ExecuteHandler(handler, context.Command, context.HandlerMethod);
+                ExecuteHandler(handler, commandMessage.Content, commandMessage.HandlerMethod);
                 stopWatch.Stop();
-                context.ExecutionDuration = stopWatch.ElapsedMilliseconds;
-                context.Status = CommandExecutionContext.CommandStatus.Completed;
+                commandMessage.ExecutionDuration = (int)stopWatch.ElapsedMilliseconds;
+                commandMessage.Status = Message.ProcessingStatus.Completed;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 stopWatch.Stop();
-                context.ExecutionDuration = stopWatch.ElapsedMilliseconds;
-                context.Status = CommandExecutionContext.CommandStatus.Failed;
+                commandMessage.ErrorDetails = ex;
+                commandMessage.ExecutionDuration = (int)stopWatch.ElapsedMilliseconds;
+                commandMessage.Status = Message.ProcessingStatus.Failed;
                 if (this.rethrow)
                 {
                     throw;
