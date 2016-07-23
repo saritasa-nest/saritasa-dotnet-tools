@@ -10,7 +10,7 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
     /// <summary>
     /// Append additional data to message.
     /// </summary>
-    public class MessageDataMiddleware : IMessagePipelineMiddleware
+    public class DataMiddleware : IMessagePipelineMiddleware
     {
         /// <inheritdoc />
         public string Id
@@ -24,7 +24,7 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
         /// .ctor
         /// </summary>
         /// <param name="action">The action to execute.</param>
-        public MessageDataMiddleware(Action<IDictionary<string, string>> action)
+        public DataMiddleware(Action<IDictionary<string, string>> action)
         {
             if (action == null)
             {

@@ -49,10 +49,11 @@
     <Compile Include="Messages\IMessagePipeline.cs" />
     <Compile Include="Messages\Message.cs" />
     <Compile Include="Messages\MessagePipeline.cs" />
-    <Compile Include="Messages\MessagePipelineMiddlewares\MessageDataMiddleware.cs" />
+    <Compile Include="Messages\MessagePipelineMiddlewares\DataMiddleware.cs" />
     <Compile Include="Commands\CommandPipelineMiddlewares\CommandExecutorMiddleware.cs" />
     <Compile Include="Commands\CommandPipelineMiddlewares\CommandHandlerLocatorMiddleware.cs" />
-    <Compile Include="Messages\MessagePipelineMiddlewares\MessageRepositoryMiddleware.cs" />
+    <Compile Include="Messages\MessagePipelineMiddlewares\RepositoryMiddleware.cs" />
+    <Compile Include="Messages\MessagePipelineMiddlewares\PerformanceCounterMiddleware.cs" />
     <Compile Include="Messages\Repositories\AdoNetMessageRepository.cs" />
     <Compile Include="Messages\Repositories\FileMessageRepository.cs" />
     <Compile Include="Commands\CommandHandlerNotFoundException.cs" />

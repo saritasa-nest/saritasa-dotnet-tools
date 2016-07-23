@@ -8,7 +8,7 @@ namespace Saritasa.Tools.Messages.CommandPipelineMiddlewares
     /// <summary>
     /// Saves the command execution context to repository.
     /// </summary>
-    public class MessageRepositoryMiddleware : IMessagePipelineMiddleware
+    public class RepositoryMiddleware : IMessagePipelineMiddleware
     {
         /// <inheritdoc />
         public string Id
@@ -22,7 +22,7 @@ namespace Saritasa.Tools.Messages.CommandPipelineMiddlewares
         /// .ctor
         /// </summary>
         /// <param name="repository">Repository implementation.</param>
-        public MessageRepositoryMiddleware(IMessageRepository repository)
+        public RepositoryMiddleware(IMessageRepository repository)
         {
             if (repository == null)
             {
