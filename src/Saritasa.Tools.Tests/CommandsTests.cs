@@ -9,6 +9,7 @@ namespace Saritasa.Tools.Tests
     using Commands;
     using Commands.CommandPipelineMiddlewares;
     using System.IO;
+    using Messages;
 
     [TestFixture]
     public class CommandsTests
@@ -21,7 +22,7 @@ namespace Saritasa.Tools.Tests
             public string Out { get; set; }
         }
 
-        [CommandHandler]
+        [CommandsHandler]
         public class TestCommandHandler
         {
             public void ExecuteTestCommand(TestCommand command)
@@ -43,7 +44,7 @@ namespace Saritasa.Tools.Tests
                 new CommandExecutorMiddleware(resolver)
             );
 
-            cp.Execute(new TestCommand() { Id = 5 });
+            cp.Handle(new TestCommand() { Id = 5 });
         }
 
         public class ByteObjectSerializer : IObjectSerializer
@@ -64,30 +65,10 @@ namespace Saritasa.Tools.Tests
                     throw new InvalidOperationException("Only byte is allowed");
                 }
             }
-        }
 
-        [Test]
-        public void Command_after_binary_seralizerdeserialize_should_be_equal()
-        {
-            var commandResult = new CommandExecutionResult((byte)0xEE);
-            commandResult.CommandName = "test";
-            commandResult.ExecutionDuration = 123;
-            commandResult.CreatedAt = new DateTime(2015, 1, 1, 10, 10, 10);
-            commandResult.Status = CommandExecutionContext.CommandStatus.Completed;
-
-            using (var memory = new MemoryStream())
+            public bool IsText
             {
-                var binary = new Internal.CommandBinarySerializer(memory, new ByteObjectSerializer());
-                binary.Write(commandResult);
-
-                memory.Seek(0, SeekOrigin.Begin);
-                var context2 = binary.Read();
-
-                Assert.That(context2.CommandId, Is.EqualTo(commandResult.CommandId));
-                Assert.That(context2.CreatedAt, Is.EqualTo(commandResult.CreatedAt));
-                Assert.That(context2.ExecutionDuration, Is.EqualTo(commandResult.ExecutionDuration));
-                Assert.That(context2.Status, Is.EqualTo(commandResult.Status));
-                Assert.That(context2.Command, Is.EqualTo((byte)0xEE));
+                get { return false; }
             }
         }
     }

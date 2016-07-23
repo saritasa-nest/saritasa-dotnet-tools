@@ -7,6 +7,7 @@ namespace Saritasa.Tools.Queries
     using System.Collections.Generic;
     using System.Linq;
     using Messages;
+    using System.Reflection;
 
     /// <summary>
     /// Query pipeline.
@@ -15,10 +16,16 @@ namespace Saritasa.Tools.Queries
     {
         private QueryMessage CreateMessage(Delegate func, params object[] args)
         {
+#if !NETCOREAPP1_0 && !NETSTANDARD1_6
+            var method = func.Method;
+#else
+            var method = func.GetInvocationList()[0].GetMethodInfo();
+#endif
+
             return new QueryMessage()
             {
-                ContentType = func.Method.DeclaringType.FullName + "." + func.Method.Name,
-                Content = func.Method.GetParameters().ToDictionary(p => p.Name, v => args[v.Position]),
+                ContentType = method.DeclaringType.FullName + "." + method.Name,
+                Content = method. GetParameters().ToDictionary(p => p.Name, v => args[v.Position]),
                 CreatedAt = DateTime.Now,
                 Status = Message.ProcessingStatus.Processing,
                 Parameters = args,

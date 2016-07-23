@@ -5,39 +5,56 @@ namespace Saritasa.Tools.Domain
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq.Expressions;
 
     /// <summary>
     /// Repository abstraction.
+    /// <typeparam name="TEntity">The entity repository is around.</typeparam>
     /// </summary>
-    public interface IRepository
+    public interface IRepository<TEntity> where TEntity : class
     {
-        /// <summary>
-        /// Get all entities of specified type.
-        /// </summary>
-        /// <typeparam name="TEntity">Entity type.</typeparam>
-        /// <returns>Enumerable of entities.</returns>
-        IEnumerable<TEntity> GetAll<TEntity>() where TEntity : class;
-
         /// <summary>
         /// Get entity instance by id.
         /// </summary>
-        /// <typeparam name="TEntity">Entity type.</typeparam>
         /// <param name="id">Entity id.</param>
         /// <returns>Entity instance.</returns>
-        TEntity Get<TEntity>(object id) where TEntity : class;
+        TEntity Get(object id);
+
+        /// <summary>
+        /// Get all entities of specified type.
+        /// </summary>
+        /// <returns>Enumerable of entities.</returns>
+        IEnumerable<TEntity> GetAll();
+
+        /// <summary>
+        /// Finds for range of entities based on predicate.
+        /// </summary>
+        /// <param name="predicate">Filter predicate.</param>
+        /// <returns>Enumerable of enitites.</returns>
+        IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate);
 
         /// <summary>
         /// Add entity.
         /// </summary>
-        /// <typeparam name="TEntity">Entity type.</typeparam>
         /// <param name="entity">Entity instance.</param>
-        void Add<TEntity>(TEntity entity) where TEntity : class;
+        void Add(TEntity entity);
+
+        /// <summary>
+        /// Add range of entities.
+        /// </summary>
+        /// <param name="entities">Entities.</param>
+        void AddRange(IEnumerable<TEntity> entities);
 
         /// <summary>
         /// Remove entity instance.
         /// </summary>
-        /// <typeparam name="TEntity">Entity type.</typeparam>
         /// <param name="entity">Entity instance.</param>
-        void Remove<TEntity>(TEntity entity) where TEntity : class;
+        void Remove(TEntity entity);
+
+        /// <summary>
+        /// Remove range of entities.
+        /// </summary>
+        /// <param name="entities">Entities.</param>
+        void RemoveRange(IEnumerable<TEntity> entities);
     }
 }
