@@ -20,17 +20,13 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
 
         Func<Type, object> resolver;
 
-        bool rethrow;
-
         /// <summary>
         /// .ctor
         /// </summary>
         /// <param name="resolver">DI resolver.</param>
-        /// <param name="rethrow">Rethrow exceptions that occured during commands execution.</param>
-        public CommandExecutorMiddleware(Func<Type, object> resolver, bool rethrow = true)
+        public CommandExecutorMiddleware(Func<Type, object> resolver)
         {
             this.resolver = resolver;
-            this.rethrow = rethrow;
         }
 
         private object CreateFromDefaultCtorAndResolve(Type handlerType)
@@ -130,12 +126,13 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
             catch (Exception ex)
             {
                 stopWatch.Stop();
-                commandMessage.ErrorDetails = ex;
                 commandMessage.ExecutionDuration = (int)stopWatch.ElapsedMilliseconds;
                 commandMessage.Status = Message.ProcessingStatus.Failed;
-                if (this.rethrow)
+                var innerException = ex.InnerException;
+                if (innerException != null)
                 {
-                    throw;
+                    commandMessage.ErrorDetails = innerException;
+                    commandMessage.ErrorDispatchInfo = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(innerException);
                 }
             }
         }

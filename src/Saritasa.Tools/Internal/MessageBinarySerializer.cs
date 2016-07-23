@@ -7,7 +7,6 @@ namespace Saritasa.Tools.Internal
     using System.Collections.Generic;
     using System.IO;
     using System.Text;
-    using System.Linq;
     using Messages;
     using System.Reflection;
 

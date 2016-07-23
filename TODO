@@ -1,0 +1,5 @@
+- Saritasa.Tools.Internal.TypesLoader, need to add caching
+- Move PagedEnumerable from Candy
+- Implement queries pipeline
+- Implement events pipeline
+- Implement code dom generation for objects

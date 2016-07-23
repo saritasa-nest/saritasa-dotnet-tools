@@ -91,6 +91,10 @@
     <Compile Include="Messages\Repositories\SqlProviders\SqlServerSqlProvider.cs" />
     <Compile Include="Messages\Repositories\SqlProviders\MySqlSqlProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Queries\QueryMessage.cs" />
+    <Compile Include="Queries\IQueryPipeline.cs" />
+    <Compile Include="Queries\QueryPipeline.cs" />
+    <Compile Include="Queries\QueryPipelineMIddlewares\QueryExecutorMiddleware.cs" />
     <Compile Include="Security\PasswordGenerator.cs" />
   </ItemGroup>
   <ItemGroup>

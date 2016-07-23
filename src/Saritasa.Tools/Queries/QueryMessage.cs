@@ -1,31 +1,28 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.Commands
+namespace Saritasa.Tools.Queries
 {
     using Messages;
     using System;
     using System.Reflection;
 
     /// <summary>
-    /// Command execution context.
+    /// Query execution context.
     /// </summary>
-    public class CommandMessage : Message
+    public class QueryMessage : Message
     {
+        string contentType;
+
         /// <summary>
-        /// Command handler.
+        /// Query handler.
         /// </summary>
         public Type HandlerType { get; set; }
 
         /// <summary>
-        /// Command handler method to execute.
+        /// Query handler method to execute.
         /// </summary>
         public MethodInfo HandlerMethod { get; set; }
-
-        /// <summary>
-        /// Information about the exception source.
-        /// </summary>
-        public System.Runtime.ExceptionServices.ExceptionDispatchInfo ErrorDispatchInfo { get; set; }
 
         /// <inheritdoc />
         public override string ErrorMessage
@@ -45,29 +42,39 @@ namespace Saritasa.Tools.Commands
             }
         }
 
+        /// <summary>
+        /// Information about the exception source.
+        /// </summary>
+        public System.Runtime.ExceptionServices.ExceptionDispatchInfo ErrorDispatchInfo { get; set; }
+
         /// <inheritdoc />
         public override string ContentType
         {
-            get
-            {
-                return Content.GetType().FullName;
-            }
+            get { return contentType; }
+            set { contentType = value; }
         }
+
+        /// <summary>
+        /// Execution result.
+        /// </summary>
+        public object Result { get; set; }
+
+        /// <summary>
+        /// Function to execute.
+        /// </summary>
+        public Delegate Func { get; set; }
+
+        /// <summary>
+        /// Function input parameters.
+        /// </summary>
+        public object[] Parameters { get; set; }
 
         /// <summary>
         /// .ctor
         /// </summary>
-        public CommandMessage()
+        public QueryMessage()
         {
-            Type = Message.MessageTypeCommand;
-        }
-
-        /// <summary>
-        /// .ctor
-        /// </summary>
-        /// <param name="command">Command message.</param>
-        public CommandMessage(object command) : base(command, Message.MessageTypeCommand)
-        {
+            Type = Message.MessageTypeQuery;
         }
     }
 }

@@ -133,12 +133,12 @@ namespace Saritasa.Tools.Messages
         public virtual string ErrorType { get; set; }
 
         /// <summary>
-        /// When command has been created.
+        /// When message has been created.
         /// </summary>
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
-        /// Command execution duration, in ms.
+        /// Message execution duration, in ms.
         /// </summary>
         public int ExecutionDuration { get; set; }
 

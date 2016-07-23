@@ -19,11 +19,16 @@ namespace Saritasa.Tools.Commands
         [System.Diagnostics.DebuggerHidden]
         public void Handle(object command)
         {
-            var context = new CommandMessage(command);
+            var commandMessage = new CommandMessage(command);
 
             foreach (var handler in Middlewares)
             {
-                handler.Handle(context);
+                handler.Handle(commandMessage);
+            }
+
+            if (commandMessage.ErrorDispatchInfo != null)
+            {
+                commandMessage.ErrorDispatchInfo.Throw();
             }
         }
 
