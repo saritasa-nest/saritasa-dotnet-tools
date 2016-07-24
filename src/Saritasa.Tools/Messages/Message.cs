@@ -60,7 +60,7 @@ namespace Saritasa.Tools.Messages
 
         private IDictionary<string, string> data;
 
-        private Guid id = Guid.Empty;
+        private Guid id;
 
         /// <summary>
         /// Unique message id.

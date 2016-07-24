@@ -119,7 +119,7 @@ namespace Saritasa.Tools.Messages.Repositories
             return name;
         }
 
-        #region ICommandRepository
+        #region IMessageRepository
 
         /// <inheritdoc />
         public void Add(Message context)
@@ -213,7 +213,7 @@ namespace Saritasa.Tools.Messages.Repositories
                 for (int i = 0; i < 1000; i++)
                 {
                     var fileName = GetFileNameByDate(currentDate, i);
-                    if (allFiles.Contains(fileName) == false)
+                    if (allFilesHash.Contains(fileName) == false)
                     {
                         break;
                     }

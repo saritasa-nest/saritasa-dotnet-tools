@@ -89,6 +89,8 @@
     <Compile Include="Domain\IUnitOfWorkFactory.cs" />
     <Compile Include="Dummy\DummyEmailSender.cs" />
     <Compile Include="Dummy\DummyLogger.cs" />
+    <Compile Include="Messages\Repositories\InMemoryMessageRepository.cs" />
+    <Compile Include="Messages\Repositories\NullMessageRepository.cs" />
     <Compile Include="Messages\Repositories\SqlProviders\ISqlProvider.cs" />
     <Compile Include="Messages\Repositories\SqlProviders\SqlServerSqlProvider.cs" />
     <Compile Include="Messages\Repositories\SqlProviders\MySqlSqlProvider.cs" />

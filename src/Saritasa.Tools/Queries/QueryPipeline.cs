@@ -25,7 +25,7 @@ namespace Saritasa.Tools.Queries
             return new QueryMessage()
             {
                 ContentType = method.DeclaringType.FullName + "." + method.Name,
-                Content = method. GetParameters().ToDictionary(p => p.Name, v => args[v.Position]),
+                Content = method.GetParameters().ToDictionary(p => p.Name, v => args[v.Position]),
                 CreatedAt = DateTime.Now,
                 Status = Message.ProcessingStatus.Processing,
                 Parameters = args,

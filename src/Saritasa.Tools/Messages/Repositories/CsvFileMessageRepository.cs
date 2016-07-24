@@ -86,17 +86,11 @@ namespace Saritasa.Tools.Messages.Repositories
                 return Path.GetFileName(currentFileStream.Name);
             }
 
-            string name = string.Empty;
-            for (int i = 0; i < 1000; i++)
-            {
-                name = GetFileNameByDate(date, i);
-                break;
-            }
-            return name;
+            return GetFileNameByDate(date, 0);
         }
 
-        static byte[] Comma = Encoding.UTF8.GetBytes(",");
-        static byte[] NewLine = Encoding.UTF8.GetBytes(Environment.NewLine);
+        static byte[] comma = Encoding.UTF8.GetBytes(",");
+        static byte[] newLine = Encoding.UTF8.GetBytes(Environment.NewLine);
 
         private static string PrepareString(string str)
         {
@@ -130,11 +124,11 @@ namespace Saritasa.Tools.Messages.Repositories
             stream.Write(bytes, 0, bytes.Length);
             if (!last)
             {
-                stream.Write(Comma, 0, Comma.Length);
+                stream.Write(comma, 0, comma.Length);
             }
             else
             {
-                stream.Write(NewLine, 0, NewLine.Length);
+                stream.Write(newLine, 0, newLine.Length);
             }
         }
 
@@ -165,6 +159,9 @@ namespace Saritasa.Tools.Messages.Repositories
             WriteBytes(message.ExecutionDuration.ToString(), currentFileStream, last: true);
         }
 
+        #region IMessageRepository
+
+        /// <inheritdoc />
         public void Add(Message message)
         {
             if (disposed)
@@ -193,6 +190,7 @@ namespace Saritasa.Tools.Messages.Repositories
             }
         }
 
+        /// <inheritdoc />
         public IEnumerable<Message> Get(Expression<Func<Message, bool>> selector, Assembly[] assemblies = null)
         {
             throw new NotImplementedException();
@@ -206,6 +204,8 @@ namespace Saritasa.Tools.Messages.Repositories
             dict[nameof(serializer)] = serializer.GetType().AssemblyQualifiedName;
             dict[nameof(prefix)] = prefix;
         }
+
+        #endregion
 
         /// <summary>
         /// Close all streams.

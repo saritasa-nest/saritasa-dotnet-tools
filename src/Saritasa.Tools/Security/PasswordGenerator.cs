@@ -26,27 +26,27 @@ namespace Saritasa.Tools.Security
             /// <summary>
             /// Lower letters.
             /// </summary>
-            LowerLetters = 0x1,
+            LowerLetters = 1,
 
             /// <summary>
             /// Upper letters.
             /// </summary>
-            UpperLetters = 0x2,
+            UpperLetters = 2,
 
             /// <summary>
             /// Digits.
             /// </summary>
-            Digits = 0x4,
+            Digits = 4,
 
             /// <summary>
             /// Special characters except space.
             /// </summary>
-            SpecialCharacters = 0x8,
+            SpecialCharacters = 8,
 
             /// <summary>
             /// Space character.
             /// </summary>
-            Space = 0x16,
+            Space = 16,
 
             /// <summary>
             /// Combination of LowerLetters and UpperLetters.
@@ -620,7 +620,7 @@ namespace Saritasa.Tools.Security
 #else
             return RandomService.Next(maxValue);
 #endif
-            }
+        }
 
         private static string Reverse(string target)
         {
