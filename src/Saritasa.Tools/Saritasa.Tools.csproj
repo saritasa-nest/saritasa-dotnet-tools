@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\CommandHandlersAttribute.cs" />
     <Compile Include="Commands\CommandMessage.cs" />
     <Compile Include="Commands\CommandPipeline.cs" />
     <Compile Include="Commands\ICommandPipeline.cs" />
@@ -76,7 +77,6 @@
     <Compile Include="Exceptions\DomainException.cs" />
     <Compile Include="Exceptions\NotFoundException.cs" />
     <Compile Include="Exceptions\ValidationException.cs" />
-    <Compile Include="Commands\CommandAttribute.cs" />
     <Compile Include="Emails\IEmailInterceptor.cs" />
     <Compile Include="Emails\IEmailSender.cs" />
     <Compile Include="Domain\IDomainEventsHandler.cs" />
@@ -92,6 +92,7 @@
     <Compile Include="Messages\Repositories\SqlProviders\SqlServerSqlProvider.cs" />
     <Compile Include="Messages\Repositories\SqlProviders\MySqlSqlProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Queries\QueryHandlersAttribute.cs" />
     <Compile Include="Queries\QueryMessage.cs" />
     <Compile Include="Queries\IQueryPipeline.cs" />
     <Compile Include="Queries\QueryPipeline.cs" />

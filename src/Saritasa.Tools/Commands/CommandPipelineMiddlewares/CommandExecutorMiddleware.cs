@@ -105,6 +105,11 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
                 handler = CreateFromDefaultCtorAndResolve(commandMessage.HandlerType);
             }
 
+            if (handler == null)
+            {
+                handler = CreateFromDefaultCtorAndResolve(commandMessage.HandlerType);
+            }
+
             // if we don't have handler - throw exception
             if (handler == null)
             {

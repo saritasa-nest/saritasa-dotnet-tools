@@ -6,14 +6,6 @@ namespace Saritasa.Tools.Commands
     using System;
 
     /// <summary>
-    /// Represents logical, descrete operation that changes system state.
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
-    public class CommandAttribute : Attribute
-    {
-    }
-
-    /// <summary>
     /// The class that contains commands handers should be marked
     /// with this attribute.
     /// </summary>
