@@ -4,6 +4,7 @@
 namespace Saritasa.Tools.Messages.Repositories.SqlProviders
 {
     using System;
+    using System.Text;
 
     /// <summary>
     /// SQL Server sql scripts.
@@ -34,7 +35,7 @@ namespace Saritasa.Tools.Messages.Repositories.SqlProviders
                 CREATE TABLE [{TableName}] (
                     Id bigint IDENTITY,
                     Type tinyint NOT NULL,
-                    ContentId char(32) NOT NULL,
+                    ContentId uniqueidentifier NOT NULL,
                     ContentType varchar(255) NOT NULL,
                     Content {(serializer.IsText ? "nvarchar(max)" : "varbinary(max)")} NOT NULL,
                     Data {(serializer.IsText ? "nvarchar(max)" : "varbinary(max)")},
@@ -67,6 +68,44 @@ namespace Saritasa.Tools.Messages.Repositories.SqlProviders
                 INSERT INTO [{TableName}] VALUES
                 (@Type, @ContentId, @ContentType, @Content, @Data, @ErrorDetails, @ErrorMessage, @ErrorType, @CreatedAt, @ExecutionDuration, @Status);
             ";
+        }
+
+        /// <inheritdoc />
+        public string GetSelectAllScript()
+        {
+            return $"SELECT * FROM [{TableName}]";
+        }
+
+        static readonly string[] FieldsList =
+        {
+            "ContentId",
+            "Type",
+            "ContentType",
+            "Content",
+            "Data",
+            "ErrorDetails",
+            "ErrorMessage",
+            "ErrorType",
+            "CreatedAt",
+            "ExecutionDuration",
+            "Status",
+        };
+
+        /// <inheritdoc />
+        public void AddAndWhereCondition(StringBuilder sb, int fieldind, string op, object value)
+        {
+            bool firstCondition = false;
+            if (sb.Length == 0)
+            {
+                firstCondition = true;
+                sb.Append("WHERE");
+            }
+
+            if (!firstCondition)
+            {
+                sb.Append(" AND");
+            }
+            sb.AppendFormat(" [{0}] {1} '{2}'", FieldsList[fieldind], op, value);
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.Internal
+namespace Saritasa.Tools.Messages.Internal
 {
     using System;
     using System.Collections.Generic;
@@ -141,7 +141,7 @@ namespace Saritasa.Tools.Internal
                         result.Status = (Message.ProcessingStatus)chunk.Item2[0];
                         break;
                     case TokenEndOfCommand:
-                        var t = TypesLoader.LoadType(result.ContentType, assemblies);
+                        var t = TypeHelpers.LoadType(result.ContentType, assemblies);
                         result.Content = serializer.Deserialize(content, t);
                         return result;
                 }

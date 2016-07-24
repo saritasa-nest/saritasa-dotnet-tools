@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.Internal
+namespace Saritasa.Tools.Messages.Internal
 {
     using System;
     using System.Reflection;
@@ -9,7 +9,7 @@ namespace Saritasa.Tools.Internal
     /// <summary>
     /// Load types from assemblies. Also allows to load standard .NET types.
     /// </summary>
-    public static class TypesLoader
+    public static class TypeHelpers
     {
         /// <summary>
         /// Load type from type full name. Searchs for assemblies.

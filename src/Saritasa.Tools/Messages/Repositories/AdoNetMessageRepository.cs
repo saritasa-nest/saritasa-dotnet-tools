@@ -11,6 +11,8 @@ namespace Saritasa.Tools.Messages.Repositories
     using System.Reflection;
     using ObjectSerializers;
     using SqlProviders;
+    using Internal;
+    using System.Text;
 
     /// <summary>
     /// Use ADO.NET infrastructure to store commands.
@@ -128,7 +130,7 @@ namespace Saritasa.Tools.Messages.Repositories
                 {
                     command.CommandText = sqlProvider.GetInsertMessageScript();
                     AddParameter(command, "@Type", result.Type);
-                    AddParameter(command, "@ContentId", result.Id.ToString().Replace("-", string.Empty));
+                    AddParameter(command, "@ContentId", result.Id.ToString());
                     AddParameter(command, "@ContentType", result.ContentType);
                     AddParameter(command, "@Content", serializer.Serialize(result.Content));
                     AddParameter(command, "@Data", result.Data != null ? serializer.Serialize(result.Data) : null);
@@ -176,7 +178,7 @@ namespace Saritasa.Tools.Messages.Repositories
                     if (command.ExecuteScalar() == null)
                     {
                         command.CommandText = sqlProvider.GetCreateTableScript();
-                        int a = command.ExecuteNonQuery();
+                        command.ExecuteNonQuery();
                     }
                 }
             }
@@ -217,7 +219,48 @@ namespace Saritasa.Tools.Messages.Repositories
         /// <inheritdoc />
         public IEnumerable<Message> Get(Expression<Func<Message, bool>> selector, Assembly[] assemblies = null)
         {
-            throw new NotImplementedException();
+            MessageParseExpressionVisitor visitor = new MessageParseExpressionVisitor();
+            visitor.Visit(selector);
+
+            // format query
+            StringBuilder sb = new StringBuilder();
+            sb.Append(sqlProvider.GetSelectAllScript());
+            if (visitor.StartDate.HasValue)
+            {
+                sqlProvider.AddAndWhereCondition(sb, Message.MessageFieldCreatedAtInd, ">=", visitor.StartDate.Value);
+            }
+
+            // execute
+            IList<Message> messages = new List<Message>();
+            var connection = GetConnection();
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = sb.ToString();
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var message = new Message();
+                        message.Type = reader.GetByte(1);
+                        message.Id = reader.GetGuid(2);
+                        message.ContentType = reader.GetString(3);
+                        message.Content = serializer.IsText ? reader.GetString(4) : reader.GetString(4);
+                        message.Data = serializer.IsText ?
+                            (IDictionary<string, string>)serializer.Deserialize(Encoding.UTF8.GetBytes(reader.GetString(5)), typeof(IDictionary<string, string>)) :
+                            (IDictionary<string, string>)serializer.Deserialize(Encoding.UTF8.GetBytes(reader.GetString(5)), typeof(IDictionary<string, string>));
+                        message.ErrorDetails = null; // TODO:
+                        message.ErrorMessage = reader.GetString(7);
+                        message.ErrorType = reader.GetString(8);
+                        message.CreatedAt = reader.GetDateTime(9);
+                        message.ExecutionDuration = reader.GetInt32(10);
+                        message.Status = (Message.ProcessingStatus)reader.GetByte(11);
+
+                        messages.Add(message);
+                    }
+                }
+            }
+
+            return messages;
         }
 
         /// <inheritdoc />
