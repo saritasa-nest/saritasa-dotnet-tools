@@ -126,7 +126,7 @@ namespace Saritasa.Tools.Messages.Repositories
         {
             if (disposed)
             {
-                throw new ObjectDisposedException("The command repository has been disposed.");
+                throw new ObjectDisposedException("The repository has been disposed.");
             }
 
             lock (ObjLock)
@@ -142,9 +142,9 @@ namespace Saritasa.Tools.Messages.Repositories
                     }
                     currentBinarySerializer = new MessageBinarySerializer(CurrentStream, serializer, null);
                 }
+                currentBinarySerializer.Write(context);
             }
 
-            currentBinarySerializer.Write(context);
             if (!buffer)
             {
                 lock (ObjLock)
@@ -302,7 +302,7 @@ namespace Saritasa.Tools.Messages.Repositories
         /// Create repository from dictionary.
         /// </summary>
         /// <param name="dict">Properties.</param>
-        /// <returns>Command repository.</returns>
+        /// <returns>Message repository.</returns>
         public static IMessageRepository CreateFromState(IDictionary<string, object> dict)
         {
             return new FileMessageRepository(

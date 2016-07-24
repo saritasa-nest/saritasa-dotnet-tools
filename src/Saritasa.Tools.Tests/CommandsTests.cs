@@ -14,7 +14,6 @@ namespace Saritasa.Tools.Tests
     [TestFixture]
     public class CommandsTests
     {
-        [Command]
         public class TestCommand
         {
             public int Id { get; set; }
