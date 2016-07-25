@@ -6,11 +6,19 @@ namespace Saritasa.Tools.Commands
     using System;
 
     /// <summary>
+    /// Indicates the class is command.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+    public class CommandAttribute : Attribute
+    {
+    }
+
+    /// <summary>
     /// The class that contains commands handers should be marked
     /// with this attribute.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-    public class CommandsHandlerAttribute : Attribute
+    public class CommandHandlersAttribute : Attribute
     {
     }
 

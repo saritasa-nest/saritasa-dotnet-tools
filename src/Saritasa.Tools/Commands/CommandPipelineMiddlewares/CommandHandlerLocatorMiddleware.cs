@@ -45,7 +45,7 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
             }
 
             var cmdtype = commandMessage.Content.GetType();
-            var clstypes = assemblies.SelectMany(a => a.GetTypes()).Where(t => t.GetTypeInfo().GetCustomAttribute<CommandsHandlerAttribute>() != null);
+            var clstypes = assemblies.SelectMany(a => a.GetTypes()).Where(t => t.GetTypeInfo().GetCustomAttribute<CommandHandlersAttribute>() != null);
             var method = clstypes
                 .SelectMany(t => t.GetTypeInfo().GetMethods())
                 .FirstOrDefault(m => m.Name.StartsWith("Handle") && m.GetParameters().Any(pt => pt.ParameterType == cmdtype));

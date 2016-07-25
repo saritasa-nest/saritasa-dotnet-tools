@@ -6,6 +6,14 @@ namespace Saritasa.Tools.Queries
     using System;
 
     /// <summary>
+    /// Indicates the method is query.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
+    public class QueryAttribute : Attribute
+    {
+    }
+
+    /// <summary>
     /// The class that contains queries handers should be marked
     /// with this attribute.
     /// </summary>
