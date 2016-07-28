@@ -51,5 +51,35 @@ namespace Saritasa.Tools.Messages.Internal
 
             return null;
         }
+
+        internal static void ResolveTypeForContent(Message message, byte[] bytes, IObjectSerializer objectSerializer, Assembly[] assemblies)
+        {
+            if (bytes == null || bytes.Length < 1)
+            {
+                return;
+            }
+
+            var t = LoadType(message.ContentType, assemblies);
+            if (t != null)
+            {
+                message.Content = objectSerializer.Deserialize(bytes, t);
+            }
+        }
+
+        internal static void ResolveTypeForError(Message message, byte[] bytes, IObjectSerializer objectSerializer, Assembly[] assemblies)
+        {
+            if (bytes == null || bytes.Length < 1)
+            {
+                return;
+            }
+
+            var t = LoadType(message.ContentType, assemblies);
+            if (t == null)
+            {
+                t = typeof(Exception);
+            }
+
+            message.Error = (Exception)objectSerializer.Deserialize(bytes, t);
+        }
     }
 }

@@ -129,7 +129,7 @@ namespace Saritasa.Tools.Messages.Internal
                         result.ExecutionDuration = BitConverter.ToInt32(chunk.Item2, 0);
                         break;
                     case TokenErrorDetails:
-                        result.ErrorDetails = serializer.Deserialize(chunk.Item2, errorType) as Exception;
+                        result.Error = serializer.Deserialize(chunk.Item2, errorType) as Exception;
                         break;
                     case TokenErrorMessage:
                         result.ErrorMessage = Encoding.UTF8.GetString(chunk.Item2);
@@ -156,7 +156,7 @@ namespace Saritasa.Tools.Messages.Internal
         public void Write(Message message)
         {
             var messageBytes = serializer.Serialize(message.Content);
-            var errorBytes = message.ErrorDetails != null ? serializer.Serialize(message.ErrorDetails) : EmptyBytes;
+            var errorBytes = message.Error != null ? serializer.Serialize(message.Error) : EmptyBytes;
             var dataBytes = message.Data != null ? serializer.Serialize(message.Data) : EmptyBytes;
 
             lock (objLock)
@@ -168,7 +168,7 @@ namespace Saritasa.Tools.Messages.Internal
                 WriteChunk(TokenCreated, BitConverter.GetBytes(message.CreatedAt.ToBinary())); // created
                 WriteChunk(TokenExecutionDuration, BitConverter.GetBytes(message.ExecutionDuration)); // completed
                 WriteChunk(TokenStatus, BitConverter.GetBytes((byte)message.Status)); // status
-                if (message.ErrorDetails != null)
+                if (message.Error != null)
                 {
                     WriteChunk(TokenErrorDetails, errorBytes); // error
                 }

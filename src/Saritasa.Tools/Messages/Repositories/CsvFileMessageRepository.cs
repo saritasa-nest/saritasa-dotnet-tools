@@ -155,7 +155,7 @@ namespace Saritasa.Tools.Messages.Repositories
             WriteBytes(Encoding.UTF8.GetString(serializer.Serialize(message.Data)), currentFileStream);
             WriteBytes(message.ErrorType, currentFileStream);
             WriteBytes(message.ErrorMessage, currentFileStream);
-            WriteBytes(Encoding.UTF8.GetString(serializer.Serialize(message.ErrorDetails)), currentFileStream);
+            WriteBytes(Encoding.UTF8.GetString(serializer.Serialize(message.Error)), currentFileStream);
             WriteBytes(message.ExecutionDuration.ToString(), currentFileStream, last: true);
         }
 
@@ -191,7 +191,7 @@ namespace Saritasa.Tools.Messages.Repositories
         }
 
         /// <inheritdoc />
-        public IEnumerable<Message> Get(Expression<Func<Message, bool>> selector, Assembly[] assemblies = null)
+        public IEnumerable<Message> Get(MessageQuery messageQuery)
         {
             throw new NotImplementedException();
         }

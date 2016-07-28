@@ -43,7 +43,7 @@ namespace Saritasa.Tools.Queries.QueryPipelineMIddlewares
                 var innerException = ex.InnerException;
                 if (innerException != null)
                 {
-                    queryMessage.ErrorDetails = innerException;
+                    queryMessage.Error = innerException;
                     queryMessage.ErrorDispatchInfo = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(innerException);
                 }
             }

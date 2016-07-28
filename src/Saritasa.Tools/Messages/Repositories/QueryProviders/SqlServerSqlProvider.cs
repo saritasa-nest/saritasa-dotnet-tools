@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.Messages.Repositories.SqlProviders
+namespace Saritasa.Tools.Messages.Repositories.QueryProviders
 {
     using System;
     using System.Text;
@@ -9,7 +9,7 @@ namespace Saritasa.Tools.Messages.Repositories.SqlProviders
     /// <summary>
     /// SQL Server sql scripts.
     /// </summary>
-    internal class SqlServerSqlProvider : ISqlProvider
+    internal class SqlServerQueryProvider : IMessageQueryProvider
     {
         const string TableName = "SaritasaMessages";
 
@@ -19,7 +19,7 @@ namespace Saritasa.Tools.Messages.Repositories.SqlProviders
         /// .ctor
         /// </summary>
         /// <param name="serializer">Used object serializer.</param>
-        public SqlServerSqlProvider(IObjectSerializer serializer)
+        public SqlServerQueryProvider(IObjectSerializer serializer)
         {
             if (serializer == null)
             {
@@ -70,12 +70,6 @@ namespace Saritasa.Tools.Messages.Repositories.SqlProviders
             ";
         }
 
-        /// <inheritdoc />
-        public string GetSelectAllScript()
-        {
-            return $"SELECT * FROM [{TableName}]";
-        }
-
         static readonly string[] FieldsList =
         {
             "ContentId",
@@ -92,20 +86,12 @@ namespace Saritasa.Tools.Messages.Repositories.SqlProviders
         };
 
         /// <inheritdoc />
-        public void AddAndWhereCondition(StringBuilder sb, int fieldind, string op, object value)
+        public string GetFilterScript(MessageQuery messageQuery)
         {
-            bool firstCondition = false;
-            if (sb.Length == 0)
-            {
-                firstCondition = true;
-                sb.Append("WHERE");
-            }
-
-            if (!firstCondition)
-            {
-                sb.Append(" AND");
-            }
-            sb.AppendFormat(" [{0}] {1} '{2}'", FieldsList[fieldind], op, value);
+            // TODO:
+            StringBuilder sb = new StringBuilder();
+            sb.Append($"SELECT * FROM [{TableName}]");
+            return sb.ToString();
         }
     }
 }

@@ -136,7 +136,7 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
                 var innerException = ex.InnerException;
                 if (innerException != null)
                 {
-                    commandMessage.ErrorDetails = innerException;
+                    commandMessage.Error = innerException;
                     commandMessage.ErrorDispatchInfo = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(innerException);
                 }
             }

@@ -3,12 +3,12 @@
 
 using System.Text;
 
-namespace Saritasa.Tools.Messages.Repositories.SqlProviders
+namespace Saritasa.Tools.Messages.Repositories.QueryProviders
 {
     /// <summary>
     /// Sql query provider for AdoNetMessageRepository.
     /// </summary>
-    internal interface ISqlProvider
+    internal interface IMessageQueryProvider
     {
         /// <summary>
         /// Create initial table for messages.
@@ -29,18 +29,10 @@ namespace Saritasa.Tools.Messages.Repositories.SqlProviders
         string GetInsertMessageScript();
 
         /// <summary>
-        /// Get select all script.
+        /// Get filter script.
         /// </summary>
+        /// <param name="messageQuery">Message query to filter by.</param>
         /// <returns>Sql query.</returns>
-        string GetSelectAllScript();
-
-        /// <summary>
-        /// Adds where condition to query.
-        /// </summary>
-        /// <param name="sb">String builder.</param>
-        /// <param name="fieldind">Field index.</param>
-        /// <param name="op">Operator.</param>
-        /// <param name="value">Value.</param>
-        void AddAndWhereCondition(StringBuilder sb, int fieldind, string op, object value);
+        string GetFilterScript(MessageQuery messageQuery);
     }
 }

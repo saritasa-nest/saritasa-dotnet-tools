@@ -169,12 +169,15 @@ namespace Saritasa.Tools.Messages.Repositories
         }
 
         /// <inheritdoc />
-        public IEnumerable<Message> Get(Expression<Func<Message, bool>> selector, Assembly[] assemblies = null)
+        public IEnumerable<Message> Get(MessageQuery messageQuery)
         {
             // analyze expression
             var visitor = new CreatedDateExpressionVisitor();
-            visitor.Visit(selector);
-            var compiledSelector = selector.Compile();
+            visitor.Visit(messageQuery.MessageSelector);
+            var compiledSelector = messageQuery.MessageSelector.Compile();
+            var compiledDataSelector = messageQuery.DataSelector.Compile();
+            Func<object, bool> compiledContentSelector = (Func<object, bool>)messageQuery.ContentSelector.Compile();
+            Func<object, bool> compiledErrorSelector = (Func<object, bool>)messageQuery.ErrorSelector.Compile();
 
             // collect all files in dir
             var allFiles = Directory.GetFiles(LogsPath, GetSearchPattern()).OrderBy(f => f).Select(f => Path.GetFileName(f));
@@ -226,10 +229,11 @@ namespace Saritasa.Tools.Messages.Repositories
                         {
                             stream = new GZipStream(stream, CompressionMode.Decompress, false);
                         }
-                        var commandSerializer = new MessageBinarySerializer(stream, serializer, assemblies);
+                        var commandSerializer = new MessageBinarySerializer(stream, serializer, messageQuery.Assemblies.ToArray());
                         for (Message message = null; (message = commandSerializer.Read()) != null;)
                         {
-                            if (compiledSelector(message))
+                            if (compiledSelector(message) && compiledContentSelector(message.Content) &&
+                                compiledDataSelector(message.Data) && compiledErrorSelector(message.Error))
                             {
                                 targetList.Add(message);
                             }

@@ -20,19 +20,19 @@ namespace Saritasa.Tools.Commands
         /// <summary>
         /// Command handler method to execute.
         /// </summary>
-        public MethodInfo HandlerMethod { get; set; }
+        protected internal MethodInfo HandlerMethod { get; set; }
 
         /// <summary>
         /// Information about the exception source.
         /// </summary>
-        public System.Runtime.ExceptionServices.ExceptionDispatchInfo ErrorDispatchInfo { get; set; }
+        protected internal System.Runtime.ExceptionServices.ExceptionDispatchInfo ErrorDispatchInfo { get; set; }
 
         /// <inheritdoc />
         public override string ErrorMessage
         {
             get
             {
-                return ErrorDetails != null ? ErrorDetails.Message : string.Empty;
+                return Error != null ? Error.Message : string.Empty;
             }
         }
 
@@ -41,7 +41,7 @@ namespace Saritasa.Tools.Commands
         {
             get
             {
-                return ErrorDetails != null ? ErrorDetails.GetType().FullName : string.Empty;
+                return Error != null ? Error.GetType().FullName : string.Empty;
             }
         }
 

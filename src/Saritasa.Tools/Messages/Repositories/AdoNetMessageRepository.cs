@@ -7,10 +7,11 @@ namespace Saritasa.Tools.Messages.Repositories
     using System.Collections.Generic;
     using System.Data;
     using System.Data.Common;
+    using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
     using ObjectSerializers;
-    using SqlProviders;
+    using QueryProviders;
     using Internal;
     using System.Text;
 
@@ -69,7 +70,7 @@ namespace Saritasa.Tools.Messages.Repositories
 
         IObjectSerializer serializer;
 
-        ISqlProvider sqlProvider;
+        IMessageQueryProvider queryProvider;
 
         object objLock = new object();
 
@@ -96,19 +97,19 @@ namespace Saritasa.Tools.Messages.Repositories
             this.connectionString = connectionString;
             this.factory = factory;
             this.serializer = serializer != null ? serializer : new JsonObjectSerializer();
-            this.sqlProvider = CreateSqlProvider(this.dialect, this.serializer);
+            this.queryProvider = CreateSqlProvider(this.dialect, this.serializer);
         }
 
-        private static ISqlProvider CreateSqlProvider(Dialect dialect, IObjectSerializer serializer)
+        private static IMessageQueryProvider CreateSqlProvider(Dialect dialect, IObjectSerializer serializer)
         {
             switch (dialect)
             {
                 case Dialect.Auto:
                     throw new NotImplementedException($"The sql provider {dialect} is not implemented yet");
                 case Dialect.MySql:
-                    return new MySqlSqlProvider(serializer);
+                    return new MySqlQueryProvider(serializer);
                 case Dialect.SqlServer:
-                    return new SqlServerSqlProvider(serializer);
+                    return new SqlServerQueryProvider(serializer);
                 default:
                     throw new NotImplementedException($"The sql provider {dialect} is not implemented yet");
             }
@@ -128,13 +129,13 @@ namespace Saritasa.Tools.Messages.Repositories
                 connection = GetConnection();
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = sqlProvider.GetInsertMessageScript();
+                    command.CommandText = queryProvider.GetInsertMessageScript();
                     AddParameter(command, "@Type", result.Type);
                     AddParameter(command, "@ContentId", result.Id.ToString());
                     AddParameter(command, "@ContentType", result.ContentType);
                     AddParameter(command, "@Content", serializer.Serialize(result.Content));
                     AddParameter(command, "@Data", result.Data != null ? serializer.Serialize(result.Data) : null);
-                    AddParameter(command, "@ErrorDetails", result.ErrorDetails != null ? serializer.Serialize(result.ErrorDetails) : null);
+                    AddParameter(command, "@ErrorDetails", result.Error != null ? serializer.Serialize(result.Error) : null);
                     AddParameter(command, "@ErrorMessage", result.ErrorMessage);
                     AddParameter(command, "@ErrorType", result.ErrorType);
                     AddParameter(command, "@CreatedAt", result.CreatedAt);
@@ -174,10 +175,10 @@ namespace Saritasa.Tools.Messages.Repositories
                 connection = GetConnection();
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = sqlProvider.GetExistsTableScript();
+                    command.CommandText = queryProvider.GetExistsTableScript();
                     if (command.ExecuteScalar() == null)
                     {
-                        command.CommandText = sqlProvider.GetCreateTableScript();
+                        command.CommandText = queryProvider.GetCreateTableScript();
                         command.ExecuteNonQuery();
                     }
                 }
@@ -217,25 +218,14 @@ namespace Saritasa.Tools.Messages.Repositories
         }
 
         /// <inheritdoc />
-        public IEnumerable<Message> Get(Expression<Func<Message, bool>> selector, Assembly[] assemblies = null)
+        public IEnumerable<Message> Get(MessageQuery messageQuery)
         {
-            MessageParseExpressionVisitor visitor = new MessageParseExpressionVisitor();
-            visitor.Visit(selector);
-
-            // format query
-            StringBuilder sb = new StringBuilder();
-            sb.Append(sqlProvider.GetSelectAllScript());
-            if (visitor.StartDate.HasValue)
-            {
-                sqlProvider.AddAndWhereCondition(sb, Message.MessageFieldCreatedAtInd, ">=", visitor.StartDate.Value);
-            }
-
             // execute
             IList<Message> messages = new List<Message>();
             var connection = GetConnection();
             using (var command = connection.CreateCommand())
             {
-                command.CommandText = sb.ToString();
+                command.CommandText = queryProvider.GetFilterScript(messageQuery);
                 using (var reader = command.ExecuteReader())
                 {
                     while (reader.Read())
@@ -244,11 +234,13 @@ namespace Saritasa.Tools.Messages.Repositories
                         message.Type = reader.GetByte(1);
                         message.Id = reader.GetGuid(2);
                         message.ContentType = reader.GetString(3);
-                        message.Content = serializer.IsText ? reader.GetString(4) : reader.GetString(4);
+                        var content = serializer.IsText ? Encoding.UTF8.GetBytes(reader.GetString(4)) : (byte[])reader[4];
+                        TypeHelpers.ResolveTypeForContent(message, content, serializer, messageQuery.Assemblies.ToArray());
                         message.Data = serializer.IsText ?
                             (IDictionary<string, string>)serializer.Deserialize(Encoding.UTF8.GetBytes(reader.GetString(5)), typeof(IDictionary<string, string>)) :
                             (IDictionary<string, string>)serializer.Deserialize(Encoding.UTF8.GetBytes(reader.GetString(5)), typeof(IDictionary<string, string>));
-                        message.ErrorDetails = null; // TODO:
+                        var error = serializer.IsText ? Encoding.UTF8.GetBytes(reader.GetString(7)) : (byte[])reader[7];
+                        TypeHelpers.ResolveTypeForError(message, error, serializer, messageQuery.Assemblies.ToArray());
                         message.ErrorMessage = reader.GetString(7);
                         message.ErrorType = reader.GetString(8);
                         message.CreatedAt = reader.GetDateTime(9);
@@ -266,13 +258,36 @@ namespace Saritasa.Tools.Messages.Repositories
         /// <inheritdoc />
         public void SaveState(IDictionary<string, object> dict)
         {
-            throw new NotImplementedException();
+            dict[nameof(dialect)] = dialect;
+            dict[nameof(keepConnection)] = keepConnection;
+            dict[nameof(factory)] = factory.GetType().Namespace;
+            dict[nameof(connectionString)] = connectionString;
+            dict[nameof(serializer)] = serializer.GetType().AssemblyQualifiedName;
+        }
+
+        /// <summary>
+        /// Create repository from dictionary.
+        /// </summary>
+        /// <param name="dict">Properties.</param>
+        /// <returns>Message repository.</returns>
+        public static IMessageRepository CreateFromState(IDictionary<string, object> dict)
+        {
+            return new AdoNetMessageRepository(
+                DbProviderFactories.GetFactory(dict[nameof(factory)].ToString()),
+                dict[nameof(connectionString)].ToString(),
+                (Dialect)Enum.Parse(typeof(Dialect), dict[nameof(dialect)].ToString(), true),
+                (IObjectSerializer)Activator.CreateInstance(Type.GetType(dict[nameof(serializer)].ToString()))
+            );
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
-            // TODO
+            if (activeConnection != null && activeConnection.State == ConnectionState.Open)
+            {
+                activeConnection.Close();
+                activeConnection = null;
+            }
         }
     }
 }

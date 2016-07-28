@@ -132,7 +132,7 @@ namespace Saritasa.Tools.Messages
         /// <summary>
         /// Contains exception if any error occured during message processing.
         /// </summary>
-        public virtual Exception ErrorDetails { get; set; }
+        public virtual Exception Error { get; set; }
 
         /// <summary>
         /// Error text message.

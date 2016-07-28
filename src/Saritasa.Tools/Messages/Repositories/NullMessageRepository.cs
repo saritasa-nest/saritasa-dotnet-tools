@@ -21,7 +21,7 @@ namespace Saritasa.Tools.Messages.Repositories
         }
 
         /// <inheritdoc />
-        public IEnumerable<Message> Get(Expression<Func<Message, bool>> selector, Assembly[] assemblies = null)
+        public IEnumerable<Message> Get(MessageQuery messageQuery)
         {
             return new List<Message>();
         }

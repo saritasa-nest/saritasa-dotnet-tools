@@ -39,9 +39,9 @@ namespace Saritasa.Tools.Messages.Repositories
         }
 
         /// <inheritdoc />
-        public IEnumerable<Message> Get(Expression<Func<Message, bool>> selector, Assembly[] assemblies = null)
+        public IEnumerable<Message> Get(MessageQuery messageQuery)
         {
-            var func = selector.Compile();
+            var func = messageQuery.MessageSelector.Compile();
             lock (objLock)
             {
                 return Messages.Where(func).ToList();

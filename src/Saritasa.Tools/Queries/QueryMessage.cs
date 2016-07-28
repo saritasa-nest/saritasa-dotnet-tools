@@ -17,19 +17,19 @@ namespace Saritasa.Tools.Queries
         /// <summary>
         /// Query handler.
         /// </summary>
-        public Type HandlerType { get; set; }
+        protected internal Type HandlerType { get; set; }
 
         /// <summary>
         /// Query handler method to execute.
         /// </summary>
-        public MethodInfo HandlerMethod { get; set; }
+        protected internal MethodInfo HandlerMethod { get; set; }
 
         /// <inheritdoc />
         public override string ErrorMessage
         {
             get
             {
-                return ErrorDetails != null ? ErrorDetails.Message : string.Empty;
+                return Error != null ? Error.Message : string.Empty;
             }
         }
 
@@ -38,7 +38,7 @@ namespace Saritasa.Tools.Queries
         {
             get
             {
-                return ErrorDetails != null ? ErrorDetails.GetType().FullName : string.Empty;
+                return Error != null ? Error.GetType().FullName : string.Empty;
             }
         }
 
@@ -57,17 +57,17 @@ namespace Saritasa.Tools.Queries
         /// <summary>
         /// Execution result.
         /// </summary>
-        public object Result { get; set; }
+        protected internal object Result { get; set; }
 
         /// <summary>
         /// Function to execute.
         /// </summary>
-        public Delegate Func { get; set; }
+        protected internal Delegate Func { get; set; }
 
         /// <summary>
         /// Function input parameters.
         /// </summary>
-        public object[] Parameters { get; set; }
+        protected internal object[] Parameters { get; set; }
 
         /// <summary>
         /// .ctor

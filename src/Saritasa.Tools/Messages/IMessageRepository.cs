@@ -23,10 +23,9 @@ namespace Saritasa.Tools.Messages
         /// <summary>
         /// Get messages filtered by expression.
         /// </summary>
-        /// <param name="selector">Expression.</param>
-        /// <param name="assemblies">Assemblies for types loading.</param>
+        /// <param name="messageQuery">Query.</param>
         /// <returns>Enumerable of messages.</returns>
-        IEnumerable<Message> Get(Expression<Func<Message, bool>> selector, Assembly[] assemblies = null);
+        IEnumerable<Message> Get(MessageQuery messageQuery);
 
         /// <summary>
         /// Save internal state to dict. The methpd represents the ability of message repository to
