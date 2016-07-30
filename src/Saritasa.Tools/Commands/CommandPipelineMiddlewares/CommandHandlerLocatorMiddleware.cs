@@ -8,18 +8,13 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
     using System.Reflection;
     using System.Linq;
     using Messages;
+    using Internal;
 
     /// <summary>
     /// Locate command hanlder.
     /// </summary>
     public class CommandHandlerLocatorMiddleware : IMessagePipelineMiddleware
     {
-        /// <inheritdoc />
-        public string Id
-        {
-            get { return "locator-by-assembly"; }
-        }
-
         private Assembly[] assemblies;
 
         // TODO: [IK] need to implement caching to improve speed
@@ -45,13 +40,29 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
             }
 
             var cmdtype = commandMessage.Content.GetType();
+            InternalLogger.Debug($"Finding command handler for type {cmdtype.Name}", nameof(CommandHandlerLocatorMiddleware));
             var clstypes = assemblies.SelectMany(a => a.GetTypes()).Where(t => t.GetTypeInfo().GetCustomAttribute<CommandHandlersAttribute>() != null);
+            if (clstypes.Count() < 1)
+            {
+                var assembliesStr = string.Join(",", assemblies.Select(a => a.FullName));
+                InternalLogger.Warn($"Cannot find command handlers in assemblies {assembliesStr}",
+                    nameof(CommandHandlerLocatorMiddleware));
+                throw new CommandHandlerNotFoundException();
+            }
+
             var method = clstypes
                 .SelectMany(t => t.GetTypeInfo().GetMethods())
                 .FirstOrDefault(m => m.Name.StartsWith("Handle") && m.GetParameters().Any(pt => pt.ParameterType == cmdtype));
             if (method == null)
             {
+                var assembliesStr = string.Join(",", assemblies.Select(a => a.FullName));
+                InternalLogger.Warn($"Cannot find command handler for command {cmdtype.Name} in assemblies {assembliesStr}",
+                    nameof(CommandHandlerLocatorMiddleware));
                 throw new CommandHandlerNotFoundException();
+            }
+            if (InternalLogger.IsDebugEnabled)
+            {
+                InternalLogger.Debug($"Found \"{method}\" for command {cmdtype}", nameof(CommandHandlerLocatorMiddleware));
             }
             commandMessage.HandlerMethod = method;
             commandMessage.HandlerType = method.DeclaringType;

@@ -1,12 +1,13 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.Messages.Internal
+namespace Saritasa.Tools.Internal
 {
     using System;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using Messages;
 
     /// <summary>
     /// Search for conditions in expression tree. Does not support complex expressions.

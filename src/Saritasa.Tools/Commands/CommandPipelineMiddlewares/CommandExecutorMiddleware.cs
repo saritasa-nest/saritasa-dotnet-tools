@@ -6,18 +6,13 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
     using System;
     using System.Reflection;
     using Messages;
+    using Internal;
 
     /// <summary>
     /// Default command executor. It does not process commands with Rejected status.
     /// </summary>
     public class CommandExecutorMiddleware : IMessagePipelineMiddleware
     {
-        /// <inheritdoc />
-        public string Id
-        {
-            get { return "executor"; }
-        }
-
         Func<Type, object> resolver;
 
         /// <summary>
@@ -48,9 +43,10 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
                     {
                         prop.SetValue(handler, resolver(prop.DeclaringType));
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
-                        // just skip, have no idea what to do
+                        InternalLogger.Error($"Cannot set value for handler {handler} of type {handlerType}. {ex}",
+                            nameof(CommandExecutorMiddleware));
                     }
                 }
             }
@@ -130,6 +126,7 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
             }
             catch (Exception ex)
             {
+                InternalLogger.Warn($"Exception while process \"{handler}\": {ex}", nameof(CommandExecutorMiddleware));
                 stopWatch.Stop();
                 commandMessage.ExecutionDuration = (int)stopWatch.ElapsedMilliseconds;
                 commandMessage.Status = Message.ProcessingStatus.Failed;
@@ -138,6 +135,10 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
                 {
                     commandMessage.Error = innerException;
                     commandMessage.ErrorDispatchInfo = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(innerException);
+                }
+                else
+                {
+                    InternalLogger.Warn($"For some reason InnerException is null. Type: {ex.GetType()}.", nameof(CommandExecutorMiddleware));
                 }
             }
         }

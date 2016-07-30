@@ -46,11 +46,12 @@
     <Compile Include="Commands\CommandMessage.cs" />
     <Compile Include="Commands\CommandPipeline.cs" />
     <Compile Include="Commands\ICommandPipeline.cs" />
+    <Compile Include="Internal\InternalLogger.cs" />
     <Compile Include="Messages\Endpoints\WebEndpoint.cs" />
     <Compile Include="Messages\IMessageEndpoint.cs" />
-    <Compile Include="Messages\Internal\MessageParseExpressionVisitor.cs" />
+    <Compile Include="Internal\MessageParseExpressionVisitor.cs" />
     <Compile Include="Messages\MessageQuery.cs" />
-    <Compile Include="Messages\Internal\TypeHelpers.cs" />
+    <Compile Include="Internal\TypeHelpers.cs" />
     <Compile Include="Messages\IMessagePipeline.cs" />
     <Compile Include="Messages\Message.cs" />
     <Compile Include="Messages\MessagePipeline.cs" />
@@ -85,7 +86,7 @@
     <Compile Include="Emails\IEmailInterceptor.cs" />
     <Compile Include="Emails\IEmailSender.cs" />
     <Compile Include="Domain\IDomainEventsHandler.cs" />
-    <Compile Include="Messages\Internal\MessageBinarySerializer.cs" />
+    <Compile Include="Internal\MessageBinarySerializer.cs" />
     <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Logging\ILoggerFactory.cs" />
     <Compile Include="Domain\IRepository.cs" />
@@ -117,9 +118,7 @@
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Internal\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
