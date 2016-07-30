@@ -12,6 +12,11 @@ namespace Saritasa.Tools.Commands
     /// </summary>
     public class CommandPipeline : MessagePipeline, ICommandPipeline
     {
+        static readonly byte[] AvailableMessageTypes = new byte[] { Message.MessageTypeCommand };
+
+        /// <inheritdoc />
+        public override byte[] MessageTypes => AvailableMessageTypes;
+
         /// <summary>
         /// Execute command.
         /// </summary>
@@ -46,6 +51,12 @@ namespace Saritasa.Tools.Commands
                 new CommandPipelineMiddlewares.CommandExecutorMiddleware(resolver)
             );
             return commandPipeline;
+        }
+
+        /// <inheritdoc />
+        public override void ProcessRaw(Message message)
+        {
+            Handle(message.Content);
         }
     }
 }

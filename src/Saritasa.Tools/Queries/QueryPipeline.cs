@@ -14,6 +14,11 @@ namespace Saritasa.Tools.Queries
     /// </summary>
     public class QueryPipeline : MessagePipeline, IQueryPipeline
     {
+        static readonly byte[] AvailableMessageTypes = new byte[] { Message.MessageTypeQuery };
+
+        /// <inheritdoc />
+        public override byte[] MessageTypes => AvailableMessageTypes;
+
         private QueryMessage CreateMessage(Delegate func, params object[] args)
         {
 #if !NETCOREAPP1_0 && !NETSTANDARD1_6
@@ -86,6 +91,11 @@ namespace Saritasa.Tools.Queries
             var queryPipeline = new QueryPipeline();
             queryPipeline.AddMiddlewares(new QueryPipelineMIddlewares.QueryExecutorMiddleware());
             return queryPipeline;
+        }
+
+        /// <inheritdoc />
+        public override void ProcessRaw(Message message)
+        {
         }
     }
 }

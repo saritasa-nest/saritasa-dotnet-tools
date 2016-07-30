@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.Messages.CommandPipelineMiddlewares
+namespace Saritasa.Tools.Messages.PipelineMiddlewares
 {
     using System;
 
@@ -10,12 +10,6 @@ namespace Saritasa.Tools.Messages.CommandPipelineMiddlewares
     /// </summary>
     public class RepositoryMiddleware : IMessagePipelineMiddleware
     {
-        /// <inheritdoc />
-        public string Id
-        {
-            get { return "repository"; }
-        }
-
         IMessageRepository repository;
 
         /// <summary>

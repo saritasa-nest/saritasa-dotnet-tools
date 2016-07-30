@@ -5,10 +5,9 @@ namespace Saritasa.Tools.Messages
 {
     using System;
     using System.Collections.Generic;
-    using System.Reflection;
 
     /// <summary>
-    /// Commands processing pipeline.
+    /// Messages processing pipeline.
     /// </summary>
     public class MessagePipeline : IMessagePipeline
     {
@@ -19,10 +18,13 @@ namespace Saritasa.Tools.Messages
 
         #region IMessagePipeline
 
-        /// <summary>
-        /// Add more middlewares to pipeline.
-        /// </summary>
-        /// <param name="middlewares">Command middlewares.</param>
+        /// <inheritdoc />
+        public virtual byte[] MessageTypes
+        {
+            get { return new byte[] { }; }
+        }
+
+        /// <inheritdoc />
         public void AddMiddlewares(params IMessagePipelineMiddleware[] middlewares)
         {
             foreach (var middleware in middlewares)
@@ -35,6 +37,11 @@ namespace Saritasa.Tools.Messages
         public IEnumerable<IMessagePipelineMiddleware> GetMiddlewares()
         {
             return Middlewares;
+        }
+
+        /// <inheritdoc />
+        public virtual void ProcessRaw(Message message)
+        {
         }
 
         #endregion

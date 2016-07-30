@@ -21,7 +21,7 @@ namespace Saritasa.Tools.Tests
             public string Out { get; set; }
         }
 
-        [CommandsHandler]
+        [CommandHandlers]
         public class TestCommandHandler
         {
             public void ExecuteTestCommand(TestCommand command)

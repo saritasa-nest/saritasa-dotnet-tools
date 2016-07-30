@@ -13,6 +13,11 @@ namespace Saritasa.Tools.Messages
     public interface IMessagePipeline
     {
         /// <summary>
+        /// Available message types to process.
+        /// </summary>
+        byte[] MessageTypes { get; }
+
+        /// <summary>
         /// Add more middlewares to pipeline.
         /// </summary>
         /// <param name="middlewares">Middlewares.</param>
@@ -23,5 +28,11 @@ namespace Saritasa.Tools.Messages
         /// </summary>
         /// <returns>Middlewares.</returns>
         IEnumerable<IMessagePipelineMiddleware> GetMiddlewares();
+
+        /// <summary>
+        /// Process raw message, for example, from deserialization.
+        /// </summary>
+        /// <param name="message">Message.</param>
+        void ProcessRaw(Message message);
     }
 }

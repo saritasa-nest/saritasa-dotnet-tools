@@ -3,17 +3,15 @@
 
 namespace Saritasa.Tools.Messages
 {
-    using System;
-
     /// <summary>
-    /// Pipeline handler to process message. It may change message context.
+    /// Endpoint to enter messages to system.
     /// </summary>
-    public interface IMessagePipelineMiddleware
+    public interface IMessageEndpoint
     {
         /// <summary>
-        /// Handles the message in context.
+        /// Register pipelines to accept incoming messages.
         /// </summary>
-        /// <param name="message">Command execution context.</param>
-        void Handle(Message message);
+        /// <param name="pipelines">Pipelines.</param>
+        void RegisterPipelines(params IMessagePipeline[] pipelines);
     }
 }

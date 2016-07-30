@@ -117,3 +117,7 @@ build/content
 
 # do not include secret files
 *.snk
+
+# web
+bower_components
+node_modules

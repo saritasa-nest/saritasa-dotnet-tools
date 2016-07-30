@@ -2,7 +2,7 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 #if !NETCOREAPP1_0 && !NETSTANDARD1_6
-namespace Saritasa.Tools.Messages.MessagePipelineMiddlewares
+namespace Saritasa.Tools.Messages.PipelineMiddlewares
 {
     using System;
     using System.Diagnostics;
@@ -40,12 +40,6 @@ namespace Saritasa.Tools.Messages.MessagePipelineMiddlewares
         PerformanceCounter performanceCounterRate;
         PerformanceCounter performanceCounterAvg;
         PerformanceCounter performanceCounterAvgBase;
-
-        /// <inheritdoc />
-        public string Id
-        {
-            get { return "perf-counter"; }
-        }
 
         /// <summary>
         /// .ctor
