@@ -272,12 +272,16 @@ namespace Saritasa.Tools.Messages.Repositories
         /// <returns>Message repository.</returns>
         public static IMessageRepository CreateFromState(IDictionary<string, object> dict)
         {
+#if NETCOREAPP1_0 || NETSTANDARD1_6
+            throw new NotSupportedException("Not sure how to handle DbProviderFactories for .NET Core");
+#else
             return new AdoNetMessageRepository(
                 DbProviderFactories.GetFactory(dict[nameof(factory)].ToString()),
                 dict[nameof(connectionString)].ToString(),
                 (Dialect)Enum.Parse(typeof(Dialect), dict[nameof(dialect)].ToString(), true),
                 (IObjectSerializer)Activator.CreateInstance(Type.GetType(dict[nameof(serializer)].ToString()))
             );
+#endif
         }
 
         /// <inheritdoc />

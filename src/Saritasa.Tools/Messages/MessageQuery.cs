@@ -163,6 +163,7 @@ namespace Saritasa.Tools.Messages
             return this;
         }
 
+#if !NETCOREAPP1_0 && !NETSTANDARD1_6
         /// <summary>
         /// Add calling assembly as type loader assembly.
         /// </summary>
@@ -172,6 +173,7 @@ namespace Saritasa.Tools.Messages
             Assemblies.Add(Assembly.GetCallingAssembly());
             return this;
         }
+#endif
 
         /// <summary>
         /// Set content selector.
