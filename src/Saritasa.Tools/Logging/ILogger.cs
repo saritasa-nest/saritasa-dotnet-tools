@@ -327,7 +327,7 @@ namespace Saritasa.Tools.Logging
         void Error(Exception exception, string format, params object[] args);
 
         /// <summary>
-        /// Logs an exception and an additional message at the ERROR level
+        /// Logs an exception and an additional message at the ERROR level.
         /// </summary>
         /// <param name="exception">The exception to log.</param>
         /// <param name="provider">An <see cref="IFormatProvider"/> which provides
@@ -337,6 +337,71 @@ namespace Saritasa.Tools.Logging
         /// <param name="args">An <see cref="object"/> array containing zero or more objects
         /// to format.</param>
         void Error(Exception exception, IFormatProvider provider, string format, params object[] args);
+
+        #endregion
+
+        #region Fatal
+
+        /// <summary>
+        /// Is the logger instance enabled for the FATAL level?
+        /// </summary>
+        bool IsFatalEnabled { get; }
+
+        /// <summary>
+        /// Logs a message at the FATAL level.
+        /// </summary>
+        /// <param name="message">The message to log.</param>
+        void Fatal(string message);
+
+        /// <summary>
+        /// Logs a message at the FATAL level according to the specified <paramref name="format"/> and <paramref name="args"/>.
+        /// </summary>
+        /// <param name="format">A composite format string that contains placeholders for the
+        /// arguments.</param>
+        /// <param name="args">An <see cref="object"/> array containing zero or more objects
+        /// to format.</param>
+        void Fatal(string format, params object[] args);
+
+        /// <summary>
+        /// Logs a message at the FATAL level according to the specified <paramref name="format"/> and <paramref name="args"/>.
+        /// </summary>
+        /// <param name="provider">An <see cref="IFormatProvider"/> which provides
+        /// culture-specific formatting capabilities.</param>
+        /// <param name="format">A composite format string that contains placeholders for the
+        /// arguments.</param>
+        /// <param name="args">An <see cref="object"/> array containing zero or more objects
+        /// to format.</param>
+        void Fatal(IFormatProvider provider, string format, params object[] args);
+
+        /// <summary>
+        /// Logs an exception and an additional message at the FATAL level.
+        /// </summary>
+        /// <param name="exception"> The exception to log.</param>
+        /// <param name="message">Additional information regarding the
+        /// logged exception.</param>
+        void Fatal(Exception exception, string message);
+
+        /// <summary>
+        /// Logs an exception and an additional message at the FATAL level
+        /// </summary>
+        /// <param name="exception">The exception to log </param>
+        /// <param name="format">A composite format string that contains placeholders for the
+        /// arguments.</param>
+        /// <param name="args">An <see cref="object"/> array containing zero or more objects
+        /// to format.</param>
+        void Fatal(Exception exception, string format, params object[] args);
+
+        /// <summary>
+        /// Logs an exception and an additional message at the FATAL level.
+        /// </summary>
+        /// <param name="exception">The exception to log.</param>
+        /// <param name="provider">An <see cref="IFormatProvider"/> which provides
+        /// culture-specific formatting capabilities.</param>
+        /// <param name="format">A composite format string that contains placeholders for the
+        /// arguments.</param>
+        /// <param name="args">An <see cref="object"/> array containing zero or more objects
+        /// to format.</param>
+        void Fatal(Exception exception, IFormatProvider provider, string format, params object[] args);
 
         #endregion
     }

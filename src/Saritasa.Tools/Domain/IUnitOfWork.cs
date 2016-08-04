@@ -14,6 +14,6 @@ namespace Saritasa.Tools.Domain
         /// Commit changes. If not called explicitly the changes will be roll backed.
         /// </summary>
         /// <returns>Records affected.</returns>
-        int SaveChanges();
+        int Complete();
     }
 }
