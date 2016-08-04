@@ -42,6 +42,12 @@ namespace Saritasa.Tools.Dummy
         }
 
         /// <inheritdoc />
+        public bool IsFatalEnabled
+        {
+            get { return false; }
+        }
+
+        /// <inheritdoc />
         public string Name
         {
             get { return "Dummy"; }
@@ -194,6 +200,36 @@ namespace Saritasa.Tools.Dummy
 
         /// <inheritdoc />
         public void Warn(Exception exception, IFormatProvider provider, string format, params object[] args)
+        {
+        }
+
+        /// <inheritdoc />
+        public void Fatal(string message)
+        {
+        }
+
+        /// <inheritdoc />
+        public void Fatal(Exception exception, string message)
+        {
+        }
+
+        /// <inheritdoc />
+        public void Fatal(string format, params object[] args)
+        {
+        }
+
+        /// <inheritdoc />
+        public void Fatal(Exception exception, string format, params object[] args)
+        {
+        }
+
+        /// <inheritdoc />
+        public void Fatal(IFormatProvider provider, string format, params object[] args)
+        {
+        }
+
+        /// <inheritdoc />
+        public void Fatal(Exception exception, IFormatProvider provider, string format, params object[] args)
         {
         }
     }
