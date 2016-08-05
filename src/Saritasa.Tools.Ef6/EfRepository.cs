@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.Ef6
+namespace Saritasa.Tools.Ef
 {
     using System;
     using System.Collections.Generic;
@@ -29,6 +29,10 @@ namespace Saritasa.Tools.Ef6
         /// <param name="context">Database context.</param>
         public EfRepository(TContext context)
         {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
             Context = context;
         }
 

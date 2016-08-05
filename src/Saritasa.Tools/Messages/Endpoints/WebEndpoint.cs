@@ -139,7 +139,7 @@ namespace Saritasa.Tools.Messages.Endpoints
                     {
                         InternalLogger.Error($"Error while executing message: {ex.ToString()}", nameof(WebEndpoint));
                     }
-                }, TaskContinuationOptions.OnlyOnRanToCompletion);
+                }, cancellationToken, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
 
                 if (cancellationToken.IsCancellationRequested)
                 {
