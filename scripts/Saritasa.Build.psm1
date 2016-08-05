@@ -10,7 +10,7 @@
     
     if (!(Test-Path $nugetExePath))
     {
-        Invoke-WebRequest 'http://nuget.org/nuget.exe' -OutFile $nugetExePath
+        Invoke-WebRequest 'https://dist.nuget.org/win-x86-commandline/latest/nuget.exe' -OutFile $nugetExePath
     }
     
     &$nugetExePath 'restore' $SolutionPath
