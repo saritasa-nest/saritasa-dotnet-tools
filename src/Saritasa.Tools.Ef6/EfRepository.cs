@@ -49,21 +49,21 @@ namespace Saritasa.Tools.Ef
         }
 
         /// <inheritdoc />
-        public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate)
+        public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate, IEnumerable<Expression<Func<TEntity, object>>> includes = null)
         {
-            return Context.Set<TEntity>().Where(predicate);
+            return Context.Set<TEntity>().Where(predicate).Include(includes);
         }
 
         /// <inheritdoc />
-        public TEntity Get(object id)
+        public virtual TEntity Get(object id, IEnumerable<Expression<Func<TEntity, object>>> includes = null)
         {
             return Context.Set<TEntity>().Find(id);
         }
 
         /// <inheritdoc />
-        public IEnumerable<TEntity> GetAll()
+        public IEnumerable<TEntity> GetAll(IEnumerable<Expression<Func<TEntity, object>>> includes = null)
         {
-            return Context.Set<TEntity>().ToList();
+            return Context.Set<TEntity>().Include(includes).ToList();
         }
 
         /// <inheritdoc />

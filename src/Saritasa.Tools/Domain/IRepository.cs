@@ -17,21 +17,24 @@ namespace Saritasa.Tools.Domain
         /// Get entity instance by id.
         /// </summary>
         /// <param name="id">Entity id.</param>
+        /// <param name="includes">Relations for include</param>
         /// <returns>Entity instance.</returns>
-        TEntity Get(object id);
+        TEntity Get(object id, IEnumerable<Expression<Func<TEntity, object>>> includes = null);
 
         /// <summary>
         /// Get all entities of specified type.
         /// </summary>
         /// <returns>Enumerable of entities.</returns>
-        IEnumerable<TEntity> GetAll();
+        /// <param name="includes">Relations for include</param>
+        IEnumerable<TEntity> GetAll(IEnumerable<Expression<Func<TEntity, object>>> includes = null);
 
         /// <summary>
         /// Finds for range of entities based on predicate.
         /// </summary>
         /// <param name="predicate">Filter predicate.</param>
+        /// <param name="includes">Relations for include</param>
         /// <returns>Enumerable of enitites.</returns>
-        IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate);
+        IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate, IEnumerable<Expression<Func<TEntity, object>>> includes = null);
 
         /// <summary>
         /// Add entity.

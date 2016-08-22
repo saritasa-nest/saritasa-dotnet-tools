@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="EfQueryableRepository.cs" />
     <Compile Include="EfRepository.cs" />
+    <Compile Include="IQueryableExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
