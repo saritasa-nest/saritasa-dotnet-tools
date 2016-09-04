@@ -1,0 +1,43 @@
+{
+  "title": "Saritasa Tools NLog4",
+  "version": "0.1.0",
+  "dependencies": {
+    "Saritasa.Tools": "*"
+  },
+  "frameworks": {
+    "net452": {
+      "frameworkAssemblies": {
+        "System.Data": "",
+        "System.Xml": ""
+      },
+      "dependencies": {
+        "NLog": "4.3.6"
+      }
+    },
+    "net461": {
+      "frameworkAssemblies": {
+        "System.Data": "",
+        "System.Xml": ""
+      },
+      "dependencies": {
+        "NLog": "4.3.6"
+      }
+    },
+    "netcoreapp1.0": {
+      "dependencies": {
+        "Microsoft.NETCore.App": "1.0.0",
+        "System.Data.Common": "4.1.0",
+        "NLog": "4.4.0-betaV15",
+        "NLog.Extensions.Logging": "1.0.0-rtm-alpha4"
+      }
+    },
+    "netstandard1.6": {
+      "dependencies": {
+        "NETStandard.Library": "1.6.0",
+        "System.Data.Common": "4.1.0",
+        "NLog": "4.4.0-betaV15",
+        "NLog.Extensions.Logging": "1.0.0-rtm-alpha4"
+      }
+    }
+  }
+}

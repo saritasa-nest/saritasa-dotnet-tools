@@ -21,36 +21,11 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
         /// <param name="resolver">DI resolver.</param>
         public CommandExecutorMiddleware(Func<Type, object> resolver)
         {
-            this.resolver = resolver;
-        }
-
-        private object CreateFromDefaultCtorAndResolve(Type handlerType)
-        {
-            object handler = null;
-            var ctor = handlerType.GetTypeInfo().GetConstructor(new Type[] { });
-            if (ctor != null)
+            if (resolver == null)
             {
-                handler = ctor.Invoke(null);
-                var props = handler.GetType().GetTypeInfo().GetProperties(BindingFlags.Public);
-                foreach (var prop in props)
-                {
-                    if (prop.GetValue(handler) != null)
-                    {
-                        continue;
-                    }
-
-                    try
-                    {
-                        prop.SetValue(handler, resolver(prop.DeclaringType));
-                    }
-                    catch (Exception ex)
-                    {
-                        InternalLogger.Error($"Cannot set value for handler {handler} of type {handlerType}. {ex}",
-                            nameof(CommandExecutorMiddleware));
-                    }
-                }
+                throw new ArgumentNullException(nameof(resolver));
             }
-            return handler;
+            this.resolver = resolver;
         }
 
         private void ExecuteHandler(object handler, object command, MethodInfo handlerMethod)
@@ -63,12 +38,26 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
             else if (parameters.Length > 1)
             {
                 var paramsarr = new object[parameters.Length];
-                paramsarr[0] = command;
-                for (int i = 1; i < parameters.Length; i++)
+                if (handlerMethod.DeclaringType != command.GetType())
                 {
-                    paramsarr[i] = resolver(parameters[i].ParameterType);
+                    paramsarr[0] = command;
+                    for (int i = 1; i < parameters.Length; i++)
+                    {
+                        paramsarr[i] = resolver(parameters[i].ParameterType);
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < parameters.Length; i++)
+                    {
+                        paramsarr[i] = resolver(parameters[i].ParameterType);
+                    }
                 }
                 handlerMethod.Invoke(handler, paramsarr);
+            }
+            else if (parameters.Length == 0)
+            {
+                handlerMethod.Invoke(handler, new object[] { });
             }
         }
 
@@ -88,29 +77,20 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
             }
 
             object handler = null;
-            bool canResolve = true;
 
-            // we should have handler object first
-            try
+            if (handler == null && commandMessage.HandlerMethod.DeclaringType == commandMessage.Content.GetType())
             {
-                handler = resolver(commandMessage.HandlerType);
+                handler = commandMessage.Content;
             }
-            catch (Exception)
+            else if (handler == null)
             {
-                canResolve = false;
-                handler = CreateFromDefaultCtorAndResolve(commandMessage.HandlerType);
-            }
-
-            if (handler == null)
-            {
-                handler = CreateFromDefaultCtorAndResolve(commandMessage.HandlerType);
+                handler = TypeHelpers.ResolveObjectForType(commandMessage.HandlerType, resolver, nameof(CommandExecutorMiddleware));
             }
 
             // if we don't have handler - throw exception
             if (handler == null)
             {
                 var exception = new CommandHandlerNotFoundException();
-                exception.Data.Add(nameof(canResolve), canResolve);
                 commandMessage.Status = Message.ProcessingStatus.Rejected;
                 throw exception;
             }

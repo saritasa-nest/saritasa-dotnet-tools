@@ -4,7 +4,10 @@
 namespace Saritasa.Tools.Queries.QueryPipelineMIddlewares
 {
     using System;
+    using System.Linq;
+    using System.Reflection;
     using Messages;
+    using Internal;
 
     /// <summary>
     /// Executes query delegate.
@@ -30,7 +33,7 @@ namespace Saritasa.Tools.Queries.QueryPipelineMIddlewares
             var stopWatch = System.Diagnostics.Stopwatch.StartNew();
             try
             {
-                queryMessage.Result = queryMessage.Func.DynamicInvoke(queryMessage.Parameters);
+                queryMessage.Result = queryMessage.Func.GetMethodInfo().Invoke(queryMessage.QueryObject, queryMessage.Parameters);
                 stopWatch.Stop();
                 queryMessage.ExecutionDuration = (int)stopWatch.ElapsedMilliseconds;
                 queryMessage.Status = Message.ProcessingStatus.Completed;

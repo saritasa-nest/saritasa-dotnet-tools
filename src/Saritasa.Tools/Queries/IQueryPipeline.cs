@@ -42,7 +42,7 @@ namespace Saritasa.Tools.Queries
         TResult Execute<T1, T2, TResult>(Func<T1, T2, TResult> func, T1 arg1, T2 arg2);
 
         /// <summary>
-        /// Executes query with 2 input parameters.
+        /// Executes query with 3 input parameters.
         /// </summary>
         /// <typeparam name="TResult">Query result.</typeparam>
         /// <typeparam name="T1">Argument type.</typeparam>
@@ -53,6 +53,13 @@ namespace Saritasa.Tools.Queries
         /// <param name="arg2">Argument 2.</param>
         /// <param name="arg3">Argument 3.</param>
         /// <returns>Result.</returns>
-        TResult Execute<T1, T2, T3, TResult>(Func<T1, T2, TResult> func, T1 arg1, T2 arg2, T3 arg3);
+        TResult Execute<T1, T2, T3, TResult>(Func<T1, T2, T3, TResult> func, T1 arg1, T2 arg2, T3 arg3);
+
+        /// <summary>
+        /// Get query object. Needed to resolve delegate, dependencies will not be resolved.
+        /// </summary>
+        /// <typeparam name="TQuery">Query type.</typeparam>
+        /// <returns>Transient query object.</returns>
+        TQuery GetQuery<TQuery>() where TQuery : class;
     }
 }

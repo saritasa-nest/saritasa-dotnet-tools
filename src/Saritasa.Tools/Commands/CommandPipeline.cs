@@ -38,6 +38,16 @@ namespace Saritasa.Tools.Commands
         }
 
         /// <summary>
+        /// Resolver that always returns null values.
+        /// </summary>
+        /// <param name="type">Type to resolve.</param>
+        /// <returns>Null.</returns>
+        public static object NullResolver(Type type)
+        {
+            return null;
+        }
+
+        /// <summary>
         /// Creates default pipeline with command handler locator and executor.
         /// </summary>
         /// <param name="resolver">DI resolver for executor.</param>
@@ -46,6 +56,11 @@ namespace Saritasa.Tools.Commands
         public static CommandPipeline CreateDefaultPipeline(Func<Type, object> resolver, params Assembly[] assemblies)
         {
             var commandPipeline = new CommandPipeline();
+            if (assemblies == null || assemblies.Length < 1)
+            {
+                assemblies = new Assembly[] { Assembly.GetEntryAssembly() };
+            }
+
             commandPipeline.AddMiddlewares(
                 new CommandPipelineMiddlewares.CommandHandlerLocatorMiddleware(assemblies),
                 new CommandPipelineMiddlewares.CommandExecutorMiddleware(resolver)

@@ -82,5 +82,101 @@ namespace Saritasa.Tools.Internal
 
             message.Error = (Exception)objectSerializer.Deserialize(bytes, t);
         }
+
+        internal static object ResolveObjectForType(Type type, Func<Type, object> resolver, string loggingSource = "")
+        {
+            object obj = null;
+            try
+            {
+                obj = resolver(type);
+            }
+            catch (Exception ex)
+            {
+                InternalLogger.Info($"Error while resolving type {type}: {ex}. Continue with fallback method.", loggingSource);
+            }
+            if (obj != null)
+            {
+                return obj;
+            }
+
+            // try default paramless ctor
+            var ctor = type.GetTypeInfo().GetConstructor(new Type[] { });
+            if (ctor != null)
+            {
+                obj = ctor.Invoke(null);
+            }
+
+            // try another ctor
+            if (obj == null)
+            {
+                var ctors = type.GetTypeInfo().GetConstructors(BindingFlags.Public | BindingFlags.Instance |
+                    BindingFlags.FlattenHierarchy);
+                if (ctors.Length > 0)
+                {
+                    ctor = ctors[0];
+                }
+                var ctorparams = ctor.GetParameters();
+                object[] ctorparamsValues = new object[ctorparams.Length];
+                for (int i = 0; i < ctorparams.Length; i++)
+                {
+                    ctorparamsValues[i] = resolver(ctorparams[i].ParameterType);
+                }
+                obj = ctor.Invoke(ctorparamsValues);
+            }
+
+            // prefill public dependencies
+            if (obj != null)
+            {
+                var props = obj.GetType().GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance |
+                    BindingFlags.FlattenHierarchy);
+                foreach (var prop in props)
+                {
+                    if (prop.GetValue(obj) != null)
+                    {
+                        continue;
+                    }
+
+                    try
+                    {
+                        prop.SetValue(obj, resolver(prop.PropertyType));
+                    }
+                    catch (Exception ex)
+                    {
+                        InternalLogger.Error($"Cannot set value for handler {obj} of type {type}. {ex}",
+                            loggingSource);
+                    }
+                }
+            }
+
+            return obj;
+        }
+
+        internal static void ResolveForParameters(object[] parameterValues, ParameterInfo[] parameters,
+            Func<Type, object> resolver, string loggingSource = "")
+        {
+            if (parameterValues.Length != parameters.Length)
+            {
+                InternalLogger.Warn($"Provided parameters count does not match method parameters count", loggingSource);
+                return;
+            }
+
+            for (int i = 0; i < parameterValues.Length; i++)
+            {
+                if (parameterValues[i] != null)
+                {
+                    continue;
+                }
+
+                var type = parameters[i].ParameterType;
+                try
+                {
+                    parameterValues[i] = resolver(type);
+                }
+                catch (Exception ex)
+                {
+                    InternalLogger.Warn($"Cannot resolve parameter of type {type}: {ex}", loggingSource);
+                }
+            }
+        }
     }
 }

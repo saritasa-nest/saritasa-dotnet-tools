@@ -107,6 +107,7 @@
     <Compile Include="Queries\IQueryPipeline.cs" />
     <Compile Include="Queries\QueryPipeline.cs" />
     <Compile Include="Queries\QueryPipelineMIddlewares\QueryExecutorMiddleware.cs" />
+    <Compile Include="Queries\QueryPipelineMIddlewares\QueryObjectResolverMiddleware.cs" />
     <Compile Include="Security\PasswordGenerator.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -15,6 +15,8 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
     /// </summary>
     public class CommandHandlerLocatorMiddleware : IMessagePipelineMiddleware
     {
+        const string HandlerPrefix = "Handle";
+
         private Assembly[] assemblies;
 
         // TODO: [IK] need to implement caching to improve speed
@@ -27,6 +29,14 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
         /// <param name="assemblies">Assemblies to locate.</param>
         public CommandHandlerLocatorMiddleware(params Assembly[] assemblies)
         {
+            if (assemblies == null || assemblies.Length < 1)
+            {
+                throw new ArgumentException("Assemblies to search handlers were not specified");
+            }
+            if (assemblies.Any(a => a == null))
+            {
+                throw new ArgumentNullException("Assemblies contain null value");
+            }
             this.assemblies = assemblies;
         }
 
@@ -52,7 +62,11 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
 
             var method = clstypes
                 .SelectMany(t => t.GetTypeInfo().GetMethods())
-                .FirstOrDefault(m => m.Name.StartsWith("Handle") && m.GetParameters().Any(pt => pt.ParameterType == cmdtype));
+                .FirstOrDefault(m => m.Name.StartsWith(HandlerPrefix) && m.GetParameters().Any(pt => pt.ParameterType == cmdtype));
+            if (method == null)
+            {
+                method = cmdtype.GetTypeInfo().GetMethod(HandlerPrefix);
+            }
             if (method == null)
             {
                 var assembliesStr = string.Join(",", assemblies.Select(a => a.FullName));

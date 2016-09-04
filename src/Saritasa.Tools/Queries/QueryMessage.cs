@@ -65,6 +65,11 @@ namespace Saritasa.Tools.Queries
         protected internal Delegate Func { get; set; }
 
         /// <summary>
+        /// Query object the delegate will be executed against.
+        /// </summary>
+        protected internal object QueryObject { get; set; }
+
+        /// <summary>
         /// Function input parameters.
         /// </summary>
         protected internal object[] Parameters { get; set; }

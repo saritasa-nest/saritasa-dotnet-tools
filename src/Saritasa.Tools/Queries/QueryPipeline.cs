@@ -75,20 +75,27 @@ namespace Saritasa.Tools.Queries
         }
 
         /// <inheritdoc />
-        public TResult Execute<T1, T2, T3, TResult>(Func<T1, T2, TResult> func, T1 arg1, T2 arg2, T3 arg3)
+        public TResult Execute<T1, T2, T3, TResult>(Func<T1, T2, T3, TResult> func, T1 arg1, T2 arg2, T3 arg3)
         {
             var message = CreateMessage(func, arg1, arg2, arg3);
             ProcessPipeline(message);
             return (TResult)message.Result;
         }
 
+        /// <inheritdoc />
+        public TQuery GetQuery<TQuery>() where TQuery : class
+        {
+            return Activator.CreateInstance<TQuery>();
+        }
+
         /// <summary>
         /// Creates default pipeline with query executor.
         /// </summary>
         /// <returns>Query pipeline.</returns>
-        public static QueryPipeline CreateDefaultPipeline()
+        public static QueryPipeline CreateDefaultPipeline(Func<Type, object> resolver)
         {
             var queryPipeline = new QueryPipeline();
+            queryPipeline.AddMiddlewares(new QueryPipelineMIddlewares.QueryObjectResolverMiddleware(resolver));
             queryPipeline.AddMiddlewares(new QueryPipelineMIddlewares.QueryExecutorMiddleware());
             return queryPipeline;
         }
