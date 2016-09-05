@@ -85,7 +85,13 @@ namespace Saritasa.Tools.Queries
         /// <inheritdoc />
         public TQuery GetQuery<TQuery>() where TQuery : class
         {
-            return Activator.CreateInstance<TQuery>();
+            var ctor = typeof(TQuery).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
+                null, new Type[] { }, null);
+            if (ctor == null)
+            {
+                throw new ArgumentException($"Type {typeof(TQuery)} must have public or private parameter-less constructor");
+            }
+            return (TQuery)ctor.Invoke(new object[] { });
         }
 
         /// <summary>
@@ -103,6 +109,7 @@ namespace Saritasa.Tools.Queries
         /// <inheritdoc />
         public override void ProcessRaw(Message message)
         {
+            throw new NotImplementedException();
         }
     }
 }
