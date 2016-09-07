@@ -282,6 +282,7 @@ namespace Saritasa.Tools.Messages.Endpoints
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         #endregion

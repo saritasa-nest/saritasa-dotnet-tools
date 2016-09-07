@@ -116,8 +116,14 @@ namespace Saritasa.Tools.Messages.Repositories
         }
 
         /// <inheritdoc />
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities",
+            Justification = "Parameters are used")]
         public void Add(Message result)
         {
+            if (disposed)
+            {
+                throw new ObjectDisposedException(nameof(AdoNetMessageRepository));
+            }
             if (isInitialized == false)
             {
                 Init();
@@ -160,13 +166,15 @@ namespace Saritasa.Tools.Messages.Repositories
             param.ParameterName = name;
             if (value is byte[] && serializer.IsText)
             {
-                value = System.Text.Encoding.UTF8.GetString((byte[])value);
+                value = Encoding.UTF8.GetString((byte[])value);
             }
             param.Value = value != null ? value : DBNull.Value;
             param.Direction = ParameterDirection.Input;
             cmd.Parameters.Add(param);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities",
+            Justification = "Parameters are used")]
         private void Init()
         {
             IDbConnection connection = null;
@@ -218,8 +226,15 @@ namespace Saritasa.Tools.Messages.Repositories
         }
 
         /// <inheritdoc />
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities",
+            Justification = "Parameters are used")]
         public IEnumerable<Message> Get(MessageQuery messageQuery)
         {
+            if (disposed)
+            {
+                throw new ObjectDisposedException(nameof(AdoNetMessageRepository));
+            }
+
             // execute
             IList<Message> messages = new List<Message>();
             var connection = GetConnection();
@@ -284,13 +299,38 @@ namespace Saritasa.Tools.Messages.Repositories
 #endif
         }
 
+        private bool disposed = false;
+
         /// <inheritdoc />
         public void Dispose()
         {
-            if (activeConnection != null && activeConnection.State == ConnectionState.Open)
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Dispose pattern impementation.
+        /// </summary>
+        /// <param name="disposing">Dispose managed resources.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
             {
-                activeConnection.Close();
-                activeConnection = null;
+                if (disposing)
+                {
+                    if (activeConnection != null && activeConnection.State == ConnectionState.Open)
+                    {
+                        activeConnection.Close();
+                        activeConnection.Dispose();
+                        activeConnection = null;
+                    }
+                    if (serializer != null && serializer is IDisposable)
+                    {
+                        (serializer as IDisposable).Dispose();
+                        serializer = null;
+                    }
+                }
+                disposed = true;
             }
         }
     }

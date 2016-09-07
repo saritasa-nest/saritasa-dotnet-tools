@@ -35,14 +35,27 @@ namespace Saritasa.Tools.Messages.ObjectSerializers
         public byte[] Serialize(object obj)
         {
             XmlSerializer xmlSerializer = new XmlSerializer(obj.GetType());
-            using (var stream = new MemoryStream())
+            MemoryStream stream = null;
+            byte[] bytes = null;
+            try
             {
+                stream = new MemoryStream();
                 using (var xmlWriter = XmlWriter.Create(stream, xmlWriterSettings))
                 {
                     xmlSerializer.Serialize(xmlWriter, obj);
-                    return stream.ToArray();
+                    bytes = stream.ToArray();
+                    stream = null;
                 }
             }
+            finally
+            {
+                if (stream != null)
+                {
+                    stream.Dispose();
+                    stream = null;
+                }
+            }
+            return bytes;
         }
 
         /// <inheritdoc />

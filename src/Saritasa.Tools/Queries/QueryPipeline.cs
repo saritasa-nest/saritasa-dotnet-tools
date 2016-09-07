@@ -6,8 +6,8 @@ namespace Saritasa.Tools.Queries
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Messages;
     using System.Reflection;
+    using Messages;
 
     /// <summary>
     /// Query pipeline.
@@ -53,7 +53,7 @@ namespace Saritasa.Tools.Queries
         /// <inheritdoc />
         public TResult Execute<TResult>(Func<TResult> func)
         {
-            var message = CreateMessage(func, new Dictionary<string, object>());
+            var message = CreateMessage(func);
             ProcessPipeline(message);
             return (TResult)message.Result;
         }
@@ -85,13 +85,35 @@ namespace Saritasa.Tools.Queries
         /// <inheritdoc />
         public TQuery GetQuery<TQuery>() where TQuery : class
         {
-            var ctor = typeof(TQuery).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
+#if !NETCOREAPP1_0 && !NETSTANDARD1_6
+            var ctor = typeof(TQuery).GetTypeInfo().GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
                 null, new Type[] { }, null);
+#else
+            var ctorMember = typeof(TQuery).GetTypeInfo().FindMembers(
+                MemberTypes.Constructor,
+                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
+                (member, filterCriteria) => true,
+                null).FirstOrDefault();
+            var ctor = ctorMember != null ? (ConstructorInfo) ctorMember : (ConstructorInfo)null;
+#endif
             if (ctor == null)
             {
                 throw new ArgumentException($"Type {typeof(TQuery)} must have public or private parameter-less constructor");
             }
+            
             return (TQuery)ctor.Invoke(new object[] { });
+        }
+
+        /// <summary>
+        /// Resolver that always returns null values.
+        /// </summary>
+        /// <param name="type">Type to resolve.</param>
+        /// <returns>Null.</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "type",
+            Justification = "Mock method")]
+        public static object NullResolver(Type type)
+        {
+            return null;
         }
 
         /// <summary>

@@ -92,6 +92,92 @@ namespace Saritasa.Tools.Security
         }
 
         /// <summary>
+        /// Possible additions of standards exceeding.
+        /// </summary>
+        public enum Addition
+        {
+            /// <summary>
+            /// Number of characters.
+            /// </summary>
+            NumberOfCharacters,
+
+            /// <summary>
+            /// Uppercase letters.
+            /// </summary>
+            UppercaseLetters,
+
+            /// <summary>
+            /// Lowercase letters.
+            /// </summary>
+            LowercaseLetters,
+
+            /// <summary>
+            /// Numbers.
+            /// </summary>
+            Numbers,
+
+            /// <summary>
+            /// Symbols.
+            /// </summary>
+            Symbols,
+
+            /// <summary>
+            /// Middle number or symbols.
+            /// </summary>
+            MiddleNumbersOrSymbols,
+
+            /// <summary>
+            /// Requirements.
+            /// </summary>
+            Requirements,
+
+            /// <summary>
+            /// Letterns only.
+            /// </summary>
+            LettersOnly,
+
+            /// <summary>
+            /// Numbers only.
+            /// </summary>
+            NumbersOnly,
+
+            /// <summary>
+            /// Repeat characters (case insensitive).
+            /// </summary>
+            RepeatCharacters,
+
+            /// <summary>
+            /// Consecutive Uppercase Letters.
+            /// </summary>
+            ConsecutiveUppercaseLetters,
+
+            /// <summary>
+            /// Consecutive Lowercase Letters
+            /// </summary>
+            ConsecutiveLowercaseLetters,
+
+            /// <summary>
+            /// Consecutive Numbers
+            /// </summary>
+            ConsecutiveNumbers,
+
+            /// <summary>
+            /// Sequential Letters (3+).
+            /// </summary>
+            SequentialLetters,
+
+            /// <summary>
+            /// Sequential Numbers (3+).
+            /// </summary>
+            SequentialNumbers,
+
+            /// <summary>
+            /// Sequential Symbols (3+).
+            /// </summary>
+            SequentialSymbols,
+        }
+
+        /// <summary>
         /// Password length. Default is 10.
         /// </summary>
         public int PasswordLength { get; set; }
@@ -236,7 +322,7 @@ namespace Saritasa.Tools.Security
         /// Generates new password to String.
         /// </summary>
         /// <returns>Password.</returns>
-        public String Generate()
+        public string Generate()
         {
             var pool = string.IsNullOrEmpty(this.CharactersPool) ? CreateCharactersPool() : this.CharactersPool.ToCharArray();
             StringBuilder sb = new StringBuilder(PasswordLength);
@@ -289,8 +375,12 @@ namespace Saritasa.Tools.Security
         /// Estimate password strength. See documentation for more details.
         /// </summary>
         /// <param name="password">Password to estimate.</param>
-        /// <returns>Estimate score.</returns>
-        public static int EstimatePasswordStrength(string password)
+        /// <param name="additions">Password strength properties.</param>
+        /// <remarks>
+        /// The source code has got from http://www.passwordmeter.com .
+        /// </remarks>
+        /// <returns>Estimated score.</returns>
+        public static int EstimatePasswordStrength(string password, out IDictionary<Addition, int> additions)
         {
             if (string.IsNullOrEmpty(password))
             {
@@ -532,10 +622,45 @@ namespace Saritasa.Tools.Security
                 score += requirements * 2;
             }
 
+            additions = new Dictionary<Addition, int>(10);
+
+            // determine if additional bonuses need to be applied and set image indicators accordingly
+            additions[Addition.MiddleNumbersOrSymbols] = middleCharsCount;
+            additions[Addition.Requirements] = requirements;
+            additions[Addition.NumberOfCharacters] = alphasOnlyCount;
+            additions[Addition.Symbols] = symbolsCount;
+            additions[Addition.UppercaseLetters] = alphasUpperCount;
+            additions[Addition.LowercaseLetters] = alphasLowerCount;
+            additions[Addition.MiddleNumbersOrSymbols] = middleCharsCount;
+
+            additions[Addition.LettersOnly] = alphasOnlyCount;
+            additions[Addition.NumbersOnly] = numbersOnlyCount;
+            additions[Addition.RepeatCharacters] = repeatCharsCount;
+            additions[Addition.ConsecutiveUppercaseLetters] = consequenceAlphasUpperCount;
+            additions[Addition.ConsecutiveLowercaseLetters] = consequenceAlphasLowerCount;
+            additions[Addition.ConsecutiveNumbers] = consequenceDigitsCount;
+            additions[Addition.SequentialLetters] = sequenceAlphasCount;
+            additions[Addition.SequentialNumbers] = sequenceNumbersCount;
+            additions[Addition.SequentialSymbols] = sequenceSymbolsCount;
+
             score = score > 100 ? 100 : score;
             score = score < 0 ? 0 : score;
 
             return score;
+        }
+
+        /// <summary>
+        /// Estimate password strength. See documentation for more details.
+        /// </summary>
+        /// <param name="password">Password to estimate.</param>
+        /// <remarks>
+        /// The source code has got from http://www.passwordmeter.com .
+        /// </remarks>
+        /// <returns>Estimated score.</returns>
+        public static int EstimatePasswordStrength(string password)
+        {
+            IDictionary<Addition, int> additions = null;
+            return EstimatePasswordStrength(password, out additions);
         }
 
         /// <summary>

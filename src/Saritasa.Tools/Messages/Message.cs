@@ -107,7 +107,7 @@ namespace Saritasa.Tools.Messages
         /// <summary>
         /// Message content. May be command object, or event object.
         /// </summary>
-        public virtual object Content { get; set; }
+        public object Content { get; set; }
 
         /// <summary>
         /// Custom data.

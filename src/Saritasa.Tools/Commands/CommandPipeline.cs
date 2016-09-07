@@ -42,6 +42,8 @@ namespace Saritasa.Tools.Commands
         /// </summary>
         /// <param name="type">Type to resolve.</param>
         /// <returns>Null.</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "type",
+            Justification = "Mock method")]
         public static object NullResolver(Type type)
         {
             return null;

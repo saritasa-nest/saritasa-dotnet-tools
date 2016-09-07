@@ -10,7 +10,7 @@ namespace Saritasa.Tools.Messages.PipelineMiddlewares
     /// <summary>
     /// Represents performance counter that count total messages passed.
     /// </summary>
-    public class PerformanceCounterMiddleware : IMessagePipelineMiddleware
+    public class PerformanceCounterMiddleware : IMessagePipelineMiddleware, IDisposable
     {
         /// <summary>
         /// Total processed messages counter.
@@ -92,6 +92,50 @@ namespace Saritasa.Tools.Messages.PipelineMiddlewares
             performanceCounterRate.Increment();
             performanceCounterAvg.IncrementBy(message.ExecutionDuration);
             performanceCounterAvgBase.Increment();
+        }
+
+        private bool disposed = false;
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Dispose object.
+        /// </summary>
+        /// <param name="disposing">Dispone managed resources.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    if (performanceCounterTotal != null)
+                    {
+                        performanceCounterTotal.Dispose();
+                        performanceCounterTotal = null;
+                    }
+                    if (performanceCounterRate != null)
+                    {
+                        performanceCounterRate.Dispose();
+                        performanceCounterRate = null;
+                    }
+                    if (performanceCounterAvg != null)
+                    {
+                        performanceCounterAvg.Dispose();
+                        performanceCounterAvg = null;
+                    }
+                    if (performanceCounterAvgBase != null)
+                    {
+                        performanceCounterAvgBase.Dispose();
+                        performanceCounterAvgBase = null;
+                    }
+                }
+                disposed = true;
+            }
         }
     }
 }
