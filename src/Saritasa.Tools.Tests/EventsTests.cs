@@ -1,0 +1,91 @@
+﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+// Licensed under the BSD license. See LICENSE file in the project root for full license information.
+
+namespace Saritasa.Tools.Tests
+{
+    using System;
+    using System.Reflection;
+    using NUnit.Framework;
+    using Events;
+
+    [TestFixture]
+    public class EventsTests
+    {
+        #region Interfaces
+
+        public interface IInterfaceA
+        {
+            string GetTestValue();
+        }
+
+        public class ImplementationA : IInterfaceA
+        {
+            public string GetTestValue() => "A";
+        }
+
+        public static object InterfacesResolver(Type t)
+        {
+            if (t == typeof(IInterfaceA))
+            {
+                return new ImplementationA();
+            }
+            return null;
+        }
+
+        #endregion
+
+        class CreateUserEvent
+        {
+            public int UserId { get; set; }
+
+            public string FirstName { get; set; }
+
+            public string LastName { get; set; }
+
+            public int HandlersCount { get; set; }
+
+            public void Handle()
+            {
+                HandlersCount++;
+            }
+        }
+
+        [EventHandlers]
+        class UserEventHandlers
+        {
+            public IInterfaceA InterfaceA1 { get; set; }
+
+            public void Handle(CreateUserEvent @event, IInterfaceA interfaceA2)
+            {
+                if (InterfaceA1 != null && interfaceA2 != null)
+                {
+                    @event.HandlersCount++;
+                }
+            }
+        }
+
+        [EventHandlers]
+        class UserSimpleHandler
+        {
+            public void HandleOnUserCreate(CreateUserEvent @event)
+            {
+                @event.HandlersCount++;
+            }
+        }
+
+        [Test]
+        public void Events_should_be_fired_withing_all_classes()
+        {
+            var ep = EventPipeline.CreateDefaultPipeline(InterfacesResolver,
+                Assembly.GetAssembly(typeof(CommandsTests)));
+            var ev = new CreateUserEvent()
+            {
+                UserId = 10,
+                FirstName = "Ivan",
+                LastName = "Ivanov",
+            };
+            ep.Raise(ev);
+            Assert.That(ev.HandlersCount, Is.EqualTo(3));
+        }
+    }
+}

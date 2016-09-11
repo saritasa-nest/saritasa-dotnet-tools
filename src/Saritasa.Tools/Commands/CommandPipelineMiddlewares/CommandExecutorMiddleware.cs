@@ -78,7 +78,7 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
 
             object handler = null;
 
-            if (handler == null && commandMessage.HandlerMethod.DeclaringType == commandMessage.Content.GetType())
+            if (commandMessage.HandlerMethod.DeclaringType == commandMessage.Content.GetType())
             {
                 handler = commandMessage.Content;
             }

@@ -9,6 +9,7 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
     using System.Linq;
     using Messages;
     using Internal;
+    using System.Linq.Expressions;
 
     /// <summary>
     /// Locate command hanlder.
@@ -20,8 +21,10 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
         private Assembly[] assemblies;
 
         // TODO: [IK] need to implement caching to improve speed
-        private IDictionary<Type, Tuple<Type, MethodInfo>> cache =
-            new System.Collections.Concurrent.ConcurrentDictionary<Type, Tuple<Type, MethodInfo>>(4, 150);
+        private IDictionary<Type, Expression<Func<object>>> cache =
+            new System.Collections.Concurrent.ConcurrentDictionary<Type, Expression<Func<object>>>(4, 150);
+
+        private IList<MethodInfo> commandHandlers = null;
 
         /// <summary>
         /// .ctor
@@ -38,6 +41,20 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
                 throw new ArgumentNullException("Assemblies contain null value");
             }
             this.assemblies = assemblies;
+
+            // precache all types with command handlers
+            commandHandlers = assemblies.SelectMany(a => a.GetTypes())
+                .Where(t => t.GetTypeInfo().GetCustomAttribute<CommandHandlersAttribute>() != null)
+                .SelectMany(t => t.GetTypeInfo().GetMethods())
+                .Where(m => m.Name.StartsWith(HandlerPrefix))
+                .ToArray();
+            if (commandHandlers.Count() < 1)
+            {
+                var assembliesStr = string.Join(",", assemblies.Select(a => a.FullName));
+                InternalLogger.Warn($"Cannot find command handlers in assemblies {assembliesStr}",
+                    nameof(CommandHandlerLocatorMiddleware));
+                throw new CommandHandlerNotFoundException();
+            }
         }
 
         /// <inheritdoc />
@@ -49,20 +66,14 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
                 throw new NotSupportedException("Message should be CommandMessage type");
             }
 
+            // find handler method
             var cmdtype = commandMessage.Content.GetType();
-            InternalLogger.Debug($"Finding command handler for type {cmdtype.Name}", nameof(CommandHandlerLocatorMiddleware));
-            var clstypes = assemblies.SelectMany(a => a.GetTypes()).Where(t => t.GetTypeInfo().GetCustomAttribute<CommandHandlersAttribute>() != null);
-            if (clstypes.Count() < 1)
+            if (InternalLogger.IsDebugEnabled)
             {
-                var assembliesStr = string.Join(",", assemblies.Select(a => a.FullName));
-                InternalLogger.Warn($"Cannot find command handlers in assemblies {assembliesStr}",
-                    nameof(CommandHandlerLocatorMiddleware));
-                throw new CommandHandlerNotFoundException();
+                InternalLogger.Debug($"Finding command handler for type {cmdtype.Name}", nameof(CommandHandlerLocatorMiddleware));
             }
-
-            var method = clstypes
-                .SelectMany(t => t.GetTypeInfo().GetMethods())
-                .FirstOrDefault(m => m.Name.StartsWith(HandlerPrefix) && m.GetParameters().Any(pt => pt.ParameterType == cmdtype));
+            var method = commandHandlers
+                .FirstOrDefault(m => m.GetParameters().Any(pt => pt.ParameterType == cmdtype));
             if (method == null)
             {
                 method = cmdtype.GetTypeInfo().GetMethod(HandlerPrefix);

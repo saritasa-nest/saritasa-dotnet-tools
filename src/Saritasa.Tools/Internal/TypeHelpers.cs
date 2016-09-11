@@ -99,8 +99,10 @@ namespace Saritasa.Tools.Internal
                 return obj;
             }
 
+            var typeInfo = type.GetTypeInfo();
+
             // try default paramless ctor
-            var ctor = type.GetTypeInfo().GetConstructor(new Type[] { });
+            var ctor = typeInfo.GetConstructor(new Type[] { });
             if (ctor != null)
             {
                 obj = ctor.Invoke(null);
@@ -109,7 +111,7 @@ namespace Saritasa.Tools.Internal
             // try another ctor
             if (obj == null)
             {
-                var ctors = type.GetTypeInfo().GetConstructors(BindingFlags.Public | BindingFlags.Instance |
+                var ctors = typeInfo.GetConstructors(BindingFlags.Public | BindingFlags.Instance |
                     BindingFlags.FlattenHierarchy);
                 if (ctors.Length > 0)
                 {
@@ -129,8 +131,9 @@ namespace Saritasa.Tools.Internal
             {
                 var props = obj.GetType().GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance |
                     BindingFlags.FlattenHierarchy);
-                foreach (var prop in props)
+                for (var i = 0; i < props.Length; i++)
                 {
+                    var prop = props[i];
                     if (prop.GetValue(obj) != null)
                     {
                         continue;

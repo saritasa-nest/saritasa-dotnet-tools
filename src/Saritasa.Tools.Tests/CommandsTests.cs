@@ -4,12 +4,9 @@
 namespace Saritasa.Tools.Tests
 {
     using System;
-    using System.IO;
     using System.Reflection;
     using NUnit.Framework;
     using Commands;
-    using Commands.CommandPipelineMiddlewares;
-    using Messages;
 
     [TestFixture]
     public class CommandsTests

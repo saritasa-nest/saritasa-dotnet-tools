@@ -100,7 +100,7 @@ namespace Saritasa.Tools.Queries
             {
                 throw new ArgumentException($"Type {typeof(TQuery)} must have public or private parameter-less constructor");
             }
-            
+
             return (TQuery)ctor.Invoke(new object[] { });
         }
 
