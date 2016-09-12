@@ -117,6 +117,10 @@ namespace Saritasa.Tools.Internal
                 {
                     ctor = ctors[0];
                 }
+                else
+                {
+                    return null;
+                }
                 var ctorparams = ctor.GetParameters();
                 object[] ctorparamsValues = new object[ctorparams.Length];
                 for (int i = 0; i < ctorparams.Length; i++)

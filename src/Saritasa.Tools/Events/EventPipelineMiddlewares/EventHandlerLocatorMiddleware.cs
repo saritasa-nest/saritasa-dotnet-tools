@@ -16,13 +16,13 @@ namespace Saritasa.Tools.Events.EventPipelineMiddlewares
     public class EventHandlerLocatorMiddleware : IMessagePipelineMiddleware
     {
         /// <inheritdoc />
-        public string Id { get; set; } = "EventHandler";
+        public string Id { get; set; } = "EventLocator";
 
         const string HandlerPrefix = "Handle";
 
-        private Assembly[] assemblies;
+        Assembly[] assemblies;
 
-        private IList<MethodInfo> eventHandlers = null;
+        IList<MethodInfo> eventHandlers = null;
 
         /// <summary>
         /// .ctor
@@ -90,7 +90,15 @@ namespace Saritasa.Tools.Events.EventPipelineMiddlewares
                     InternalLogger.Debug($"No handlers found for event {eventtype}");
                 }
             }
-            eventMessage.HandlerMethods = methods;
+
+            if (eventMessage.HandlerMethods == null)
+            {
+                eventMessage.HandlerMethods = methods;
+            }
+            else
+            {
+                eventMessage.HandlerMethods.AddRange(methods);
+            }
         }
     }
 }

@@ -8,11 +8,10 @@ namespace Saritasa.Tools.Commands.PipelineMiddlewares
     using Messages;
 
     /// <summary>
-    /// Append additional data to message.
+    /// Appends additional data to message.
     /// </summary>
     public class DataMiddleware : IMessagePipelineMiddleware
     {
-        /// <inheritdoc />
         /// <inheritdoc />
         public string Id { get; set; } = "Data";
 

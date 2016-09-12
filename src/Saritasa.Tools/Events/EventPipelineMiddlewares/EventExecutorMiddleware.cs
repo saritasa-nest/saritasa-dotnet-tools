@@ -92,10 +92,19 @@ namespace Saritasa.Tools.Events.EventPipelineMiddlewares
                 {
                     handler = eventMessage.Content;
                 }
-                else if (handler == null)
+                if (handler == null)
+                {
+                    handler = resolver(eventMessage.HandlerMethods[i].DeclaringType);
+                }
+                if (handler == null)
                 {
                     handler = TypeHelpers.ResolveObjectForType(eventMessage.HandlerMethods[i].DeclaringType,
                         resolver, nameof(EventExecutorMiddleware));
+                }
+                if (handler == null)
+                {
+                    InternalLogger.Warn($"Cannot resolve handler {eventMessage.HandlerMethods[i].Name}");
+                    continue;
                 }
 
                 // invoke method and resolve parameters if needed

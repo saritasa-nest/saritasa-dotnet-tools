@@ -23,10 +23,6 @@ namespace Saritasa.Tools.Events
             {
                 handler.Handle(message);
             }
-            if (message.ErrorDispatchInfo != null)
-            {
-                message.ErrorDispatchInfo.Throw();
-            }
         }
 
         /// <inheritdoc />

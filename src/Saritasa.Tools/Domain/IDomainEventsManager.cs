@@ -11,15 +11,22 @@ namespace Saritasa.Tools.Domain
         /// <summary>
         /// Register the domain event handler.
         /// </summary>
-        /// <typeparam name="T">Event.</typeparam>
+        /// <typeparam name="TEvent">Event.</typeparam>
         /// <param name="handler">Event handler.</param>
-        void Register<T>(IDomainEventHandler<T> handler) where T : IDomainEvent;
+        void Register<TEvent>(IDomainEventHandler<TEvent> handler) where TEvent : class;
 
         /// <summary>
         /// Raise the domain event.
         /// </summary>
-        /// <typeparam name="T">Event type.</typeparam>
+        /// <typeparam name="TEvent">Event type.</typeparam>
         /// <param name="event">Event.</param>
-        void Raise<T>(T @event) where T : IDomainEvent;
+        void Raise<TEvent>(TEvent @event) where TEvent : class;
+
+        /// <summary>
+        /// Determines whether events manager has handlers for specific event.
+        /// </summary>
+        /// <typeparam name="TEvent">Event type.</typeparam>
+        /// <returns>True if event can be handled.</returns>
+        bool HasHandlers<TEvent>() where TEvent : class;
     }
 }

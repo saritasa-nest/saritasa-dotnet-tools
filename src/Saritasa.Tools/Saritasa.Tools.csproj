@@ -50,6 +50,7 @@
     <Compile Include="Events\EventHandlersAttribute.cs" />
     <Compile Include="Events\EventPipeline.cs" />
     <Compile Include="Events\EventMessage.cs" />
+    <Compile Include="Events\EventPipelineMiddlewares\DomainEventLocatorMiddleware.cs" />
     <Compile Include="Events\EventPipelineMiddlewares\EventExecutorMiddleware.cs" />
     <Compile Include="Events\EventPipelineMiddlewares\EventHandlerLocatorMiddleware.cs" />
     <Compile Include="Events\IEventPipeline.cs" />
@@ -82,7 +83,6 @@
     <Compile Include="Emails\EmailSender.cs" />
     <Compile Include="Emails\DefaultEmailExecutionStrategy.cs" />
     <Compile Include="Emails\FilterEmailInterceptor.cs" />
-    <Compile Include="Domain\IDomainEvent.cs" />
     <Compile Include="Domain\IDomainEventsManager.cs" />
     <Compile Include="Emails\IEmailExecutionStrategy.cs" />
     <Compile Include="Emails\SystemMail\SaveToFileEmailInterceptor.cs" />

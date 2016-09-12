@@ -7,6 +7,8 @@ namespace Saritasa.Tools.Tests
     using System.Reflection;
     using NUnit.Framework;
     using Events;
+    using Domain;
+    using Events.EventPipelineMiddlewares;
 
     [TestFixture]
     public class EventsTests
@@ -87,5 +89,43 @@ namespace Saritasa.Tools.Tests
             ep.Raise(ev);
             Assert.That(ev.HandlersCount, Is.EqualTo(3));
         }
+
+        #region Domain_events_can_be_integrated_to_events_pipeline
+
+        class DomainTestEvent
+        {
+            public int Param { get; set; }
+        }
+
+        class DomainTestEventHandler : IDomainEventHandler<DomainTestEvent>
+        {
+            public void Handle(DomainTestEvent @event)
+            {
+                @event.Param = 42;
+            }
+        }
+
+        [Test]
+        public void Domain_events_can_be_integrated_to_events_pipeline()
+        {
+            var eventsManager = new DomainEventsManager();
+            Func<Type, object> resolver = (type) =>
+            {
+                if (type == typeof(IDomainEventsManager))
+                {
+                    return eventsManager;
+                }
+                return null;
+            };
+            var ep = EventPipeline.CreateDefaultPipeline(resolver, Assembly.GetAssembly(typeof(CommandsTests)));
+            eventsManager.Register(new DomainTestEventHandler());
+            ep.InsertMiddlewareBefore(new DomainEventLocatorMiddleware(eventsManager), "EventLocator");
+
+            var ev = new DomainTestEvent();
+            ep.Raise(ev);
+            Assert.That(ev.Param, Is.EqualTo(42));
+        }
+
+        #endregion
     }
 }

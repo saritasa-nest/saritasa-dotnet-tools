@@ -8,13 +8,16 @@ namespace Saritasa.Tools.Domain
     using System.Linq;
 
     /// <summary>
-    /// Class for manage events.
+    /// Domain events manager in-memory implementation.
     /// </summary>
     public class DomainEventsManager : IDomainEventsManager
     {
-        private List<object> handlers = new List<object>();
+        List<object> handlers = new List<object>();
 
-        private List<object> Handlers
+        /// <summary>
+        /// List of handlers.
+        /// </summary>
+        protected List<object> Handlers
         {
             get
             {
@@ -23,16 +26,16 @@ namespace Saritasa.Tools.Domain
         }
 
         /// <inheritdoc />
-        public void Register<T>(IDomainEventHandler<T> handler) where T : IDomainEvent
+        public virtual void Register<TEvent>(IDomainEventHandler<TEvent> handler) where TEvent : class
         {
             Handlers.Add(handler);
         }
 
         /// <inheritdoc />
-        public void Raise<T>(T @event) where T : IDomainEvent
+        public virtual void Raise<TEvent>(TEvent @event) where TEvent : class
         {
-            var registeredHandlers = handlers.Where(h => h is IDomainEventHandler<T>);
-            foreach (IDomainEventHandler<T> handler in registeredHandlers)
+            var registeredHandlers = handlers.Where(h => h is IDomainEventHandler<TEvent>);
+            foreach (IDomainEventHandler<TEvent> handler in registeredHandlers)
             {
                 handler.Handle(@event);
             }
@@ -44,6 +47,12 @@ namespace Saritasa.Tools.Domain
         public void Clear()
         {
             handlers.Clear();
+        }
+
+        /// <inheritdoc />
+        public bool HasHandlers<TEvent>() where TEvent : class
+        {
+            return handlers.Any(h => h is IDomainEventHandler<TEvent>);
         }
     }
 }

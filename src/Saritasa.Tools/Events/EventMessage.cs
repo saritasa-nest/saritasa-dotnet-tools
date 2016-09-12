@@ -38,11 +38,6 @@ namespace Saritasa.Tools.Events
             }
         }
 
-        /// <summary>
-        /// Information about the exception source.
-        /// </summary>
-        public System.Runtime.ExceptionServices.ExceptionDispatchInfo ErrorDispatchInfo { get; set; }
-
         /// <inheritdoc />
         public override string ContentType
         {
