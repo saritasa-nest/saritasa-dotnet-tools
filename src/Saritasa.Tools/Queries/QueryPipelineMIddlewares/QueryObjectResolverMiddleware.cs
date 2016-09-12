@@ -13,6 +13,9 @@ namespace Saritasa.Tools.Queries.QueryPipelineMIddlewares
     /// </summary>
     public class QueryObjectResolverMiddleware : IMessagePipelineMiddleware
     {
+        /// <inheritdoc />
+        public string Id { get; set; } = "QueryObjectResolver";
+
         Func<Type, object> resolver;
 
         /// <summary>

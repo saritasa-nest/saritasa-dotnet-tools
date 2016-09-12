@@ -10,6 +10,9 @@ namespace Saritasa.Tools.Messages.PipelineMiddlewares
     /// </summary>
     public class RepositoryMiddleware : IMessagePipelineMiddleware
     {
+        /// <inheritdoc />
+        public string Id { get; set; } = "Repository";
+
         IMessageRepository repository;
 
         /// <summary>

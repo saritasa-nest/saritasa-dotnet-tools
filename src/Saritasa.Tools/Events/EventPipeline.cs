@@ -4,11 +4,8 @@
 namespace Saritasa.Tools.Events
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Reflection;
     using Messages;
-    using Commands;
 
     /// <summary>
     /// Events pipeline.
@@ -54,7 +51,7 @@ namespace Saritasa.Tools.Events
                 assemblies = new Assembly[] { Assembly.GetEntryAssembly() };
             }
 
-            eventPipeline.AddMiddlewares(
+            eventPipeline.AppendMiddlewares(
                 new EventPipelineMiddlewares.EventHandlerLocatorMiddleware(assemblies),
                 new EventPipelineMiddlewares.EventExecutorMiddleware(resolver)
             );

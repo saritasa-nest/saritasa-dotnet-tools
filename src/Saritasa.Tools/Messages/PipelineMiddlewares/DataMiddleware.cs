@@ -13,10 +13,8 @@ namespace Saritasa.Tools.Commands.PipelineMiddlewares
     public class DataMiddleware : IMessagePipelineMiddleware
     {
         /// <inheritdoc />
-        public string Id
-        {
-            get { return "delegate"; }
-        }
+        /// <inheritdoc />
+        public string Id { get; set; } = "Data";
 
         Action<IDictionary<string, string>> action;
 

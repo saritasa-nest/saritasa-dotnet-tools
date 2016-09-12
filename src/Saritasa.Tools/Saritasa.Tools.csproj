@@ -62,6 +62,7 @@
     <Compile Include="Messages\IMessagePipeline.cs" />
     <Compile Include="Messages\Message.cs" />
     <Compile Include="Messages\MessagePipeline.cs" />
+    <Compile Include="Messages\MiddlewareNotFoundException.cs" />
     <Compile Include="Messages\PipelineMiddlewares\DataMiddleware.cs" />
     <Compile Include="Commands\CommandPipelineMiddlewares\CommandExecutorMiddleware.cs" />
     <Compile Include="Commands\CommandPipelineMiddlewares\CommandHandlerLocatorMiddleware.cs" />

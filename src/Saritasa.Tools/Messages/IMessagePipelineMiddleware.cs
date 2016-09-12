@@ -11,6 +11,11 @@ namespace Saritasa.Tools.Messages
     public interface IMessagePipelineMiddleware
     {
         /// <summary>
+        /// Middleware id.
+        /// </summary>
+        string Id { get; }
+
+        /// <summary>
         /// Handles the message in context.
         /// </summary>
         /// <param name="message">Command execution context.</param>

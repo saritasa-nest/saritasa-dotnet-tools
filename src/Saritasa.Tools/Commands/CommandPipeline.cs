@@ -63,7 +63,7 @@ namespace Saritasa.Tools.Commands
                 assemblies = new Assembly[] { Assembly.GetEntryAssembly() };
             }
 
-            commandPipeline.AddMiddlewares(
+            commandPipeline.AppendMiddlewares(
                 new CommandPipelineMiddlewares.CommandHandlerLocatorMiddleware(assemblies),
                 new CommandPipelineMiddlewares.CommandExecutorMiddleware(resolver)
             );

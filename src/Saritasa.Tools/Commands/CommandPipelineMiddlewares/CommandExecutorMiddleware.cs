@@ -13,6 +13,9 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
     /// </summary>
     public class CommandExecutorMiddleware : IMessagePipelineMiddleware
     {
+        /// <inheritdoc />
+        public string Id { get; set; } = "CommandExecutor";
+
         Func<Type, object> resolver;
 
         /// <summary>

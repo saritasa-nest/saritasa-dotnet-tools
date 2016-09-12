@@ -15,6 +15,9 @@ namespace Saritasa.Tools.Events.EventPipelineMiddlewares
     /// </summary>
     public class EventExecutorMiddleware : IMessagePipelineMiddleware
     {
+        /// <inheritdoc />
+        public string Id { get; set; } = "EventExecutor";
+
         Func<Type, object> resolver;
 
         /// <summary>

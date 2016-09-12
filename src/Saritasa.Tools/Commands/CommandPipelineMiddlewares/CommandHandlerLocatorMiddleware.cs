@@ -16,6 +16,9 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
     /// </summary>
     public class CommandHandlerLocatorMiddleware : IMessagePipelineMiddleware
     {
+        /// <inheritdoc />
+        public string Id { get; set; } = "CommandHandlerLocator";
+
         const string HandlerPrefix = "Handle";
 
         private Assembly[] assemblies;

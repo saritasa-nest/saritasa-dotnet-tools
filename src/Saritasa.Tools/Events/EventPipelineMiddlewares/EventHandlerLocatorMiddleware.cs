@@ -7,7 +7,6 @@ namespace Saritasa.Tools.Events.EventPipelineMiddlewares
     using System.Collections.Generic;
     using System.Reflection;
     using System.Linq;
-    using System.Linq.Expressions;
     using Messages;
     using Internal;
 
@@ -16,6 +15,9 @@ namespace Saritasa.Tools.Events.EventPipelineMiddlewares
     /// </summary>
     public class EventHandlerLocatorMiddleware : IMessagePipelineMiddleware
     {
+        /// <inheritdoc />
+        public string Id { get; set; } = "EventHandler";
+
         const string HandlerPrefix = "Handle";
 
         private Assembly[] assemblies;
