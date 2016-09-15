@@ -5,13 +5,15 @@
     "net452": {
       "frameworkAssemblies": {
         "System.Data": "",
-        "System.Xml": ""
+        "System.Xml": "",
+        "System.ComponentModel.DataAnnotations": ""
       }
     },
     "net461": {
       "frameworkAssemblies": {
         "System.Data": "",
-        "System.Xml": ""
+        "System.Xml": "",
+        "System.ComponentModel.DataAnnotations": ""
       }
     },
     "netcoreapp1.0": {

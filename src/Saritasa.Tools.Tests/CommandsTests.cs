@@ -4,9 +4,11 @@
 namespace Saritasa.Tools.Tests
 {
     using System;
+    using System.ComponentModel.DataAnnotations;
     using System.Reflection;
     using NUnit.Framework;
     using Commands;
+    using Commands.CommandPipelineMiddlewares;
 
     [TestFixture]
     public class CommandsTests
@@ -187,6 +189,63 @@ namespace Saritasa.Tools.Tests
             var cmd = new TestCommand3();
             cp.Handle(cmd);
             Assert.That(cmd.Param, Is.EqualTo(1));
+        }
+
+        #endregion
+
+        #region Validation_command_attributes_should_generate_exception
+
+        class CommandWithValidation
+        {
+            [System.ComponentModel.DataAnnotations.Range(0, 100)]
+            public int PercentInt { get; set; }
+
+            [Required]
+            public string Name { get; set; }
+
+            public void Handle()
+            {
+                PercentInt = 10;
+            }
+        }
+
+        [Test]
+        public void Validation_command_attributes_should_generate_exception()
+        {
+            var cp = CommandPipeline.CreateDefaultPipeline(CommandPipeline.NullResolver,
+                Assembly.GetAssembly(typeof(CommandsTests)));
+            cp.InsertMiddlewareAfter(new CommandValidationMiddleware(), "CommandHandlerLocator");
+            var cmd = new CommandWithValidation()
+            {
+                PercentInt = -10,
+                Name = string.Empty,
+            };
+
+            bool exceptionFired = false;
+            try
+            {
+                cp.Handle(cmd);
+            }
+            catch (CommandValidationException)
+            {
+                exceptionFired = true;
+            }
+            Assert.That(exceptionFired, Is.True);
+            Assert.That(cmd.PercentInt, Is.Not.EqualTo(10));
+
+            exceptionFired = false;
+            cmd.PercentInt = 20;
+            cmd.Name = "Mr Robot";
+            try
+            {
+                cp.Handle(cmd);
+            }
+            catch (Exception)
+            {
+                exceptionFired = true;
+            }
+            Assert.That(exceptionFired, Is.False);
+            Assert.That(cmd.PercentInt, Is.EqualTo(10));
         }
 
         #endregion

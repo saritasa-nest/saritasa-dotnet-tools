@@ -37,6 +37,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -45,6 +46,8 @@
     <Compile Include="Commands\CommandHandlersAttribute.cs" />
     <Compile Include="Commands\CommandMessage.cs" />
     <Compile Include="Commands\CommandPipeline.cs" />
+    <Compile Include="Commands\CommandPipelineMiddlewares\CommandValidationMiddleware.cs" />
+    <Compile Include="Commands\CommandValidationException.cs" />
     <Compile Include="Commands\ICommandPipeline.cs" />
     <Compile Include="Domain\IQueryableRepository.cs" />
     <Compile Include="Events\EventHandlersAttribute.cs" />
