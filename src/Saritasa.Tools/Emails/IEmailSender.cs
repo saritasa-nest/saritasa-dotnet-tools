@@ -15,6 +15,6 @@ namespace Saritasa.Tools.Emails
         /// Sends the specified message.
         /// </summary>
         /// <param name="message">The message.</param>
-        Task Send(TMessage message);
+        Task SendAsync(TMessage message);
     }
 }

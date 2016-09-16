@@ -7,10 +7,10 @@ Emails send handling.
 
 	Email sender interface.
 
-	.. function:: Task Send(MailMessage message);
+	.. function:: Task SendAsync(TMessage message);
 
 	Sends the specified message.
 
 .. class:: EmailSender
 
-	.. function:: Task Send(MailMessage message);
+	.. function:: Task SendAsync(TMessage message);

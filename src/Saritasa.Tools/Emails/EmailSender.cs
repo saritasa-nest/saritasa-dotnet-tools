@@ -40,7 +40,7 @@ namespace Saritasa.Tools.Emails
         }
 
         /// <inheritdoc />
-        public Task Send(TMessage message)
+        public Task SendAsync(TMessage message)
         {
             var data = new Dictionary<string, object>();
             bool cancel = false;

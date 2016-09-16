@@ -85,7 +85,7 @@ namespace Saritasa.Tools.Commands
         /// <summary>
         /// .ctor
         /// </summary>
-        /// <param name="validationResults">Validation results.</param>
+        /// <param name="brokenRules">Validation results.</param>
         public CommandValidationException(IEnumerable<BrokenRule> brokenRules)
         {
             if (brokenRules == null)

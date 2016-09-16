@@ -58,9 +58,9 @@ namespace Saritasa.Tools.Tests
             var testInterceptor = new TestInterceptor();
             emailSender.AddInterceptor(testInterceptor);
 
-            emailSender.Send(new MailMessage()).Wait();
-            emailSender.Send(new MailMessage()).Wait();
-            emailSender.Send(new MailMessage()).Wait();
+            emailSender.SendAsync(new MailMessage()).Wait();
+            emailSender.SendAsync(new MailMessage()).Wait();
+            emailSender.SendAsync(new MailMessage()).Wait();
 
             Assert.That(testInterceptor.SendingCallCount, Is.EqualTo(3));
             Assert.That(testInterceptor.SentCallCount, Is.EqualTo(3));
@@ -75,17 +75,17 @@ namespace Saritasa.Tools.Tests
             var testInterceptor = new TestInterceptor();
             emailSender.AddInterceptor(testInterceptor);
 
-            emailSender.Send(new MailMessage("test@test.com", "test@example.com")).Wait();
+            emailSender.SendAsync(new MailMessage("test@test.com", "test@example.com")).Wait();
             Assert.That(testInterceptor.SentCallCount, Is.EqualTo(0));
 
-            emailSender.Send(new MailMessage("test@test.com", "test@saritasa.com")).Wait();
+            emailSender.SendAsync(new MailMessage("test@test.com", "test@saritasa.com")).Wait();
             Assert.That(testInterceptor.SentCallCount, Is.EqualTo(1));
 
-            emailSender.Send(new MailMessage("test@test.com", "test@saritasa-hosting.com")).Wait();
+            emailSender.SendAsync(new MailMessage("test@test.com", "test@saritasa-hosting.com")).Wait();
             Assert.That(testInterceptor.SentCallCount, Is.EqualTo(2));
 
             filterInterceptor.SetApprovedEmails("*");
-            emailSender.Send(new MailMessage("test@test.com", "test@example.com")).Wait();
+            emailSender.SendAsync(new MailMessage("test@test.com", "test@example.com")).Wait();
             Assert.That(testInterceptor.SentCallCount, Is.EqualTo(3));
         }
     }
