@@ -6,13 +6,13 @@ namespace Saritasa.Tools.Domain
     /// <summary>
     /// Interface for event handlers.
     /// </summary>
-    /// <typeparam name="T">Domain event type.</typeparam>
-    public interface IDomainEventHandler<T> where T : class
+    /// <typeparam name="TEvent">Domain event type.</typeparam>
+    public interface IDomainEventHandler<in TEvent> where TEvent : class
     {
         /// <summary>
         /// Handle (call methods) for domain event of type T.
         /// </summary>
         /// <param name="event">Domain event type.</param>
-        void Handle(T @event);
+        void Handle(TEvent @event);
     }
 }

@@ -13,37 +13,19 @@ namespace Saritasa.Tools.Events
     /// </summary>
     public class EventMessage : Message
     {
-        string contentType;
-
         /// <summary>
         /// Event handler methods to execute.
         /// </summary>
         protected internal List<MethodInfo> HandlerMethods { get; set; }
 
         /// <inheritdoc />
-        public override string ErrorMessage
-        {
-            get
-            {
-                return Error != null ? Error.Message : string.Empty;
-            }
-        }
+        public override string ErrorMessage => Error?.Message ?? string.Empty;
 
         /// <inheritdoc />
-        public override string ErrorType
-        {
-            get
-            {
-                return Error != null ? Error.GetType().FullName : string.Empty;
-            }
-        }
+        public override string ErrorType => Error != null ? Error.GetType().FullName : string.Empty;
 
         /// <inheritdoc />
-        public override string ContentType
-        {
-            get { return contentType; }
-            set { contentType = value; }
-        }
+        public override string ContentType { get; set; }
 
         /// <summary>
         /// Function input parameters.

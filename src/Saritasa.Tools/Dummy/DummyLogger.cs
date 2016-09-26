@@ -12,46 +12,25 @@ namespace Saritasa.Tools.Dummy
     public class DummyLogger : ILogger
     {
         /// <inheritdoc />
-        public bool IsDebugEnabled
-        {
-            get { return false; }
-        }
+        public bool IsDebugEnabled => false;
 
         /// <inheritdoc />
-        public bool IsErrorEnabled
-        {
-            get { return false; }
-        }
+        public bool IsErrorEnabled => false;
 
         /// <inheritdoc />
-        public bool IsInfoEnabled
-        {
-            get { return false; }
-        }
+        public bool IsInfoEnabled => false;
 
         /// <inheritdoc />
-        public bool IsTraceEnabled
-        {
-            get { return false; }
-        }
+        public bool IsTraceEnabled => false;
 
         /// <inheritdoc />
-        public bool IsWarnEnabled
-        {
-            get { return false; }
-        }
+        public bool IsWarnEnabled => false;
 
         /// <inheritdoc />
-        public bool IsFatalEnabled
-        {
-            get { return false; }
-        }
+        public bool IsFatalEnabled => false;
 
         /// <inheritdoc />
-        public string Name
-        {
-            get { return "Dummy"; }
-        }
+        public string Name => "Dummy";
 
         /// <inheritdoc />
         public void Debug(string message)

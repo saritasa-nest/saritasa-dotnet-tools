@@ -1,10 +1,10 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-using System.Text;
-
 namespace Saritasa.Tools.Messages.Repositories.QueryProviders
 {
+    using System.Text;
+
     /// <summary>
     /// Sql query provider for AdoNetMessageRepository.
     /// </summary>

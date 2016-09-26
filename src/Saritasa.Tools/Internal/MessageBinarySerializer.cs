@@ -30,13 +30,13 @@ namespace Saritasa.Tools.Internal
 
         static readonly byte[] EmptyBytes = new byte[] { };
 
-        private readonly IObjectSerializer serializer;
+        readonly IObjectSerializer serializer;
 
-        private readonly Stream stream;
+        readonly Stream stream;
 
-        private readonly object objLock = new object();
+        readonly object objLock = new object();
 
-        private Assembly[] assemblies;
+        readonly Assembly[] assemblies;
 
         public MessageBinarySerializer(Stream stream, IObjectSerializer serializer, Assembly[] assemblies)
         {
@@ -89,61 +89,66 @@ namespace Saritasa.Tools.Internal
         public Message Read()
         {
             var result = new Message();
-            Tuple<byte, byte[]> chunk;
             Type errorType = null;
             bool messageStarted = false;
             byte[] content = null;
 
-            while ((chunk = ReadChunk()) != NullChunk)
+            lock (objLock)
             {
-                if (chunk.Item1 == TokenBeginOfCommand)
+                Tuple<byte, byte[]> chunk;
+                while (!Equals(chunk = ReadChunk(), NullChunk))
                 {
-                    messageStarted = true;
-                }
-                if (!messageStarted)
-                {
-                    continue;
-                }
+                    if (chunk.Item1 == TokenBeginOfCommand)
+                    {
+                        messageStarted = true;
+                    }
+                    if (!messageStarted)
+                    {
+                        continue;
+                    }
 
-                switch (chunk.Item1)
-                {
-                    case TokenId:
-                        result.Id = new Guid(chunk.Item2);
-                        break;
-                    case TokenType:
-                        result.Type = chunk.Item2[0];
-                        break;
-                    case TokenContent:
-                        content = chunk.Item2;
-                        break;
-                    case TokenContentType:
-                        result.ContentType = Encoding.UTF8.GetString(chunk.Item2);
-                        break;
-                    case TokenData:
-                        result.Data = (IDictionary<string, string>)serializer.Deserialize(chunk.Item2, typeof(IDictionary<string, string>));
-                        break;
-                    case TokenCreated:
-                        result.CreatedAt = DateTime.FromBinary(BitConverter.ToInt64(chunk.Item2, 0));
-                        break;
-                    case TokenExecutionDuration:
-                        result.ExecutionDuration = BitConverter.ToInt32(chunk.Item2, 0);
-                        break;
-                    case TokenErrorDetails:
-                        result.Error = serializer.Deserialize(chunk.Item2, errorType) as Exception;
-                        break;
-                    case TokenErrorMessage:
-                        result.ErrorMessage = Encoding.UTF8.GetString(chunk.Item2);
-                        break;
-                    case TokenErrorType:
-                        result.ErrorType = Encoding.UTF8.GetString(chunk.Item2);
-                        break;
-                    case TokenStatus:
-                        result.Status = (Message.ProcessingStatus)chunk.Item2[0];
-                        break;
-                    case TokenEndOfCommand:
-                        var t = TypeHelpers.LoadType(result.ContentType, assemblies);
-                        result.Content = serializer.Deserialize(content, t);
-                        return result;
+                    switch (chunk.Item1)
+                    {
+                        case TokenId:
+                            result.Id = new Guid(chunk.Item2);
+                            break;
+                        case TokenType:
+                            result.Type = chunk.Item2[0];
+                            break;
+                        case TokenContent:
+                            content = chunk.Item2;
+                            break;
+                        case TokenContentType:
+                            result.ContentType = Encoding.UTF8.GetString(chunk.Item2);
+                            break;
+                        case TokenData:
+                            result.Data =
+                                (IDictionary<string, string>)
+                                serializer.Deserialize(chunk.Item2, typeof(IDictionary<string, string>));
+                            break;
+                        case TokenCreated:
+                            result.CreatedAt = DateTime.FromBinary(BitConverter.ToInt64(chunk.Item2, 0));
+                            break;
+                        case TokenExecutionDuration:
+                            result.ExecutionDuration = BitConverter.ToInt32(chunk.Item2, 0);
+                            break;
+                        case TokenErrorDetails:
+                            result.Error = serializer.Deserialize(chunk.Item2, errorType) as Exception;
+                            break;
+                        case TokenErrorMessage:
+                            result.ErrorMessage = Encoding.UTF8.GetString(chunk.Item2);
+                            break;
+                        case TokenErrorType:
+                            result.ErrorType = Encoding.UTF8.GetString(chunk.Item2);
+                            break;
+                        case TokenStatus:
+                            result.Status = (Message.ProcessingStatus) chunk.Item2[0];
+                            break;
+                        case TokenEndOfCommand:
+                            var t = TypeHelpers.LoadType(result.ContentType, assemblies);
+                            result.Content = serializer.Deserialize(content, t);
+                            return result;
+                    }
                 }
             }
             return null;

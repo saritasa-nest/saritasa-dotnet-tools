@@ -9,7 +9,7 @@ namespace Saritasa.Tools.Emails
     /// <summary>
     /// Email interceptor to be used with EmailSender.
     /// </summary>
-    public interface IEmailInterceptor<TMessage> where TMessage : class
+    public interface IEmailInterceptor<in TMessage> where TMessage : class
     {
         /// <summary>
         /// The method is called after email sending.

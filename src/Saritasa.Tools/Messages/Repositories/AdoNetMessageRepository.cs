@@ -8,8 +8,6 @@ namespace Saritasa.Tools.Messages.Repositories
     using System.Data;
     using System.Data.Common;
     using System.Linq;
-    using System.Linq.Expressions;
-    using System.Reflection;
     using ObjectSerializers;
     using QueryProviders;
     using Internal;
@@ -56,32 +54,26 @@ namespace Saritasa.Tools.Messages.Repositories
             Oracle,
         }
 
-        Dialect dialect = Dialect.MySql;
+        readonly Dialect dialect = Dialect.MySql;
 
-        bool isInitialized = false;
+        readonly bool isInitialized = false;
 
         IDbConnection activeConnection;
 
-        DbProviderFactory factory;
+        readonly DbProviderFactory factory;
 
-        bool keepConnection;
-
-        string connectionString;
+        readonly string connectionString;
 
         IObjectSerializer serializer;
 
-        IMessageQueryProvider queryProvider;
+        readonly IMessageQueryProvider queryProvider;
 
-        object objLock = new object();
+        readonly object objLock = new object();
 
         /// <summary>
         /// Keep connection opened between queries. False by default.
         /// </summary>
-        public bool KeepConnection
-        {
-            get { return keepConnection; }
-            set { keepConnection = value; }
-        }
+        public bool KeepConnection { get; set; }
 
         /// <summary>
         /// Ado.Net repository.
@@ -96,11 +88,11 @@ namespace Saritasa.Tools.Messages.Repositories
             this.dialect = dialect;
             this.connectionString = connectionString;
             this.factory = factory;
-            this.serializer = serializer != null ? serializer : new JsonObjectSerializer();
+            this.serializer = serializer ?? new JsonObjectSerializer();
             this.queryProvider = CreateSqlProvider(this.dialect, this.serializer);
         }
 
-        private static IMessageQueryProvider CreateSqlProvider(Dialect dialect, IObjectSerializer serializer)
+        static IMessageQueryProvider CreateSqlProvider(Dialect dialect, IObjectSerializer serializer)
         {
             switch (dialect)
             {
@@ -152,7 +144,7 @@ namespace Saritasa.Tools.Messages.Repositories
             }
             finally
             {
-                if (keepConnection && connection != null)
+                if (KeepConnection && connection != null)
                 {
                     connection.Close();
                     connection = null;
@@ -160,22 +152,25 @@ namespace Saritasa.Tools.Messages.Repositories
             }
         }
 
-        private void AddParameter(IDbCommand cmd, string name, object value)
+        void AddParameter(IDbCommand cmd, string name, object value)
         {
             var param = factory.CreateParameter();
-            param.ParameterName = name;
-            if (value is byte[] && serializer.IsText)
+            if (param != null)
             {
-                value = Encoding.UTF8.GetString((byte[])value);
+                param.ParameterName = name;
+                if (value is byte[] && serializer.IsText)
+                {
+                    value = Encoding.UTF8.GetString((byte[])value);
+                }
+                param.Value = value ?? DBNull.Value;
+                param.Direction = ParameterDirection.Input;
+                cmd.Parameters.Add(param);
             }
-            param.Value = value != null ? value : DBNull.Value;
-            param.Direction = ParameterDirection.Input;
-            cmd.Parameters.Add(param);
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities",
             Justification = "Parameters are used")]
-        private void Init()
+        void Init()
         {
             IDbConnection connection = null;
             try
@@ -193,7 +188,7 @@ namespace Saritasa.Tools.Messages.Repositories
             }
             finally
             {
-                if (keepConnection && connection != null)
+                if (KeepConnection && connection != null)
                 {
                     connection.Close();
                     connection = null;
@@ -201,11 +196,11 @@ namespace Saritasa.Tools.Messages.Repositories
             }
         }
 
-        private IDbConnection GetConnection()
+        IDbConnection GetConnection()
         {
             lock (objLock)
             {
-                if (keepConnection)
+                if (KeepConnection)
                 {
                     if (activeConnection == null || activeConnection.State != ConnectionState.Open)
                     {
@@ -245,15 +240,15 @@ namespace Saritasa.Tools.Messages.Repositories
                 {
                     while (reader.Read())
                     {
-                        var message = new Message();
-                        message.Type = reader.GetByte(1);
-                        message.Id = reader.GetGuid(2);
-                        message.ContentType = reader.GetString(3);
+                        var message = new Message()
+                        {
+                            Type = reader.GetByte(1),
+                            Id = reader.GetGuid(2),
+                            ContentType = reader.GetString(3)
+                        };
                         var content = serializer.IsText ? Encoding.UTF8.GetBytes(reader.GetString(4)) : (byte[])reader[4];
                         TypeHelpers.ResolveTypeForContent(message, content, serializer, messageQuery.Assemblies.ToArray());
-                        message.Data = serializer.IsText ?
-                            (IDictionary<string, string>)serializer.Deserialize(Encoding.UTF8.GetBytes(reader.GetString(5)), typeof(IDictionary<string, string>)) :
-                            (IDictionary<string, string>)serializer.Deserialize(Encoding.UTF8.GetBytes(reader.GetString(5)), typeof(IDictionary<string, string>));
+                        message.Data = (IDictionary<string, string>)serializer.Deserialize(Encoding.UTF8.GetBytes(reader.GetString(5)), typeof(IDictionary<string, string>));
                         var error = serializer.IsText ? Encoding.UTF8.GetBytes(reader.GetString(7)) : (byte[])reader[7];
                         TypeHelpers.ResolveTypeForError(message, error, serializer, messageQuery.Assemblies.ToArray());
                         message.ErrorMessage = reader.GetString(7);
@@ -274,7 +269,7 @@ namespace Saritasa.Tools.Messages.Repositories
         public void SaveState(IDictionary<string, object> dict)
         {
             dict[nameof(dialect)] = dialect;
-            dict[nameof(keepConnection)] = keepConnection;
+            dict[nameof(KeepConnection)] = KeepConnection;
             dict[nameof(factory)] = factory.GetType().Namespace;
             dict[nameof(connectionString)] = connectionString;
             dict[nameof(serializer)] = serializer.GetType().AssemblyQualifiedName;
@@ -324,9 +319,9 @@ namespace Saritasa.Tools.Messages.Repositories
                         activeConnection.Dispose();
                         activeConnection = null;
                     }
-                    if (serializer != null && serializer is IDisposable)
+                    if (serializer is IDisposable)
                     {
-                        (serializer as IDisposable).Dispose();
+                        ((IDisposable)serializer).Dispose();
                         serializer = null;
                     }
                 }

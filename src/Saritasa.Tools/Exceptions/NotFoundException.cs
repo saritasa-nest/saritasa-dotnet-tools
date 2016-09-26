@@ -16,7 +16,7 @@ namespace Saritasa.Tools.Exceptions
         /// <summary>
         /// .ctor
         /// </summary>
-        public NotFoundException() : base()
+        public NotFoundException()
         {
         }
 

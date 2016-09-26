@@ -18,7 +18,7 @@ namespace Saritasa.Tools.Internal
 
         public DateTime? EndDate { get; set; }
 
-        private DateTime GetDate(BinaryExpression conditionalNode)
+        DateTime GetDate(BinaryExpression conditionalNode)
         {
             if (conditionalNode.Left.NodeType == ExpressionType.MemberAccess && conditionalNode.Right.NodeType == ExpressionType.MemberAccess)
             {

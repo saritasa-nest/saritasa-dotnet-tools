@@ -15,12 +15,12 @@ namespace Saritasa.Tools.Mvc.Utils
     /// </summary>
     public class CorsDelegatingHandler : DelegatingHandler
     {
-        private const string Origin = "Origin";
-        private const string AccessControlRequestMethod = "Access-Control-Request-Method";
-        private const string AccessControlRequestHeaders = "Access-Control-Request-Headers";
-        private const string AccessControlAllowOrigin = "Access-Control-Allow-Origin";
-        private const string AccessControlAllowMethods = "Access-Control-Allow-Methods";
-        private const string AccessControlAllowHeaders = "Access-Control-Allow-Headers";
+        const string Origin = "Origin";
+        const string AccessControlRequestMethod = "Access-Control-Request-Method";
+        const string AccessControlRequestHeaders = "Access-Control-Request-Headers";
+        const string AccessControlAllowOrigin = "Access-Control-Allow-Origin";
+        const string AccessControlAllowMethods = "Access-Control-Allow-Methods";
+        const string AccessControlAllowHeaders = "Access-Control-Allow-Headers";
 
         /// <inheritdoc />
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -54,12 +54,12 @@ namespace Saritasa.Tools.Mvc.Utils
                 }
                 else
                 {
-                    return base.SendAsync(request, cancellationToken).ContinueWith<HttpResponseMessage>(t =>
+                    return base.SendAsync(request, cancellationToken).ContinueWith(t =>
                     {
                         HttpResponseMessage response = t.Result;
                         response.Headers.Add(AccessControlAllowOrigin, request.Headers.GetValues(Origin).First());
                         return response;
-                    });
+                    }, cancellationToken);
                 }
             }
             else

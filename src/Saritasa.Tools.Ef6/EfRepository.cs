@@ -21,7 +21,7 @@ namespace Saritasa.Tools.Ef
         /// <summary>
         /// Database context.
         /// </summary>
-        protected TContext Context { get; private set; }
+        protected TContext Context { get; }
 
         /// <summary>
         /// .ctor
@@ -49,7 +49,8 @@ namespace Saritasa.Tools.Ef
         }
 
         /// <inheritdoc />
-        public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate, IEnumerable<Expression<Func<TEntity, object>>> includes = null)
+        public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate,
+            IEnumerable<Expression<Func<TEntity, object>>> includes = null)
         {
             return Context.Set<TEntity>().Where(predicate).Include(includes);
         }

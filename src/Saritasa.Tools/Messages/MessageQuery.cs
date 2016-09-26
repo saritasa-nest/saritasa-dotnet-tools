@@ -36,10 +36,7 @@ namespace Saritasa.Tools.Messages
         /// <summary>
         /// Has message message selector.
         /// </summary>
-        public bool HasMessageSelector
-        {
-            get { return MessageSelector != ReturnTrueMessageExpression; }
-        }
+        public bool HasMessageSelector => MessageSelector != ReturnTrueMessageExpression;
 
         /// <summary>
         /// Message data selector. Data is just key-value string dictionary.
@@ -49,10 +46,7 @@ namespace Saritasa.Tools.Messages
         /// <summary>
         /// Has query data selector.
         /// </summary>
-        public bool HasDataSelector
-        {
-            get { return DataSelector != ReturnTrueDictExpression; }
-        }
+        public bool HasDataSelector => DataSelector != ReturnTrueDictExpression;
 
         /// <summary>
         /// Internal message structure selector.
@@ -62,10 +56,7 @@ namespace Saritasa.Tools.Messages
         /// <summary>
         /// Has query content selector.
         /// </summary>
-        public bool HasContentSelector
-        {
-            get { return ContentSelector != ReturnTrueExpression; }
-        }
+        public bool HasContentSelector => ContentSelector != ReturnTrueExpression;
 
         /// <summary>
         /// Internal error structure selector.
@@ -75,10 +66,7 @@ namespace Saritasa.Tools.Messages
         /// <summary>
         /// Has query error selector.
         /// </summary>
-        public bool HasErrorSelector
-        {
-            get { return ErrorSelector != ReturnTrueExpression; }
-        }
+        public bool HasErrorSelector => ErrorSelector != ReturnTrueExpression;
 
         /// <summary>
         /// Assemblies to load types.
@@ -95,11 +83,11 @@ namespace Saritasa.Tools.Messages
         /// </summary>
         public int Take { get; private set; } = 1000;
 
-        private MessageQuery()
+        MessageQuery()
         {
         }
 
-        private MessageQuery(Expression<Func<Message, bool>> messageSelector)
+        MessageQuery(Expression<Func<Message, bool>> messageSelector)
         {
             if (messageSelector == null)
             {

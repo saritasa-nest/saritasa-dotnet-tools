@@ -21,13 +21,13 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
 
         const string HandlerPrefix = "Handle";
 
-        private Assembly[] assemblies;
+        readonly Assembly[] assemblies;
 
         // TODO: [IK] need to implement caching to improve speed
-        private IDictionary<Type, Expression<Func<object>>> cache =
+        IDictionary<Type, Expression<Func<object>>> cache =
             new System.Collections.Concurrent.ConcurrentDictionary<Type, Expression<Func<object>>>(4, 150);
 
-        private IList<MethodInfo> commandHandlers = null;
+        readonly IList<MethodInfo> commandHandlers = null;
 
         /// <summary>
         /// .ctor
@@ -41,7 +41,7 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
             }
             if (assemblies.Any(a => a == null))
             {
-                throw new ArgumentNullException("Assemblies contain null value");
+                throw new ArgumentNullException(nameof(assemblies));
             }
             this.assemblies = assemblies;
 
@@ -51,7 +51,7 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
                 .SelectMany(t => t.GetTypeInfo().GetMethods())
                 .Where(m => m.Name.StartsWith(HandlerPrefix))
                 .ToArray();
-            if (commandHandlers.Count() < 1)
+            if (commandHandlers.Any() == false)
             {
                 var assembliesStr = string.Join(",", assemblies.Select(a => a.FullName));
                 InternalLogger.Warn($"Cannot find command handlers in assemblies {assembliesStr}",

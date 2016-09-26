@@ -55,7 +55,7 @@ namespace Saritasa.Tools.Emails.SystemMail
         /// <summary>
         /// Filters the collection of addresses by approved addresses.
         /// </summary>
-        private void FilterAddress(MailAddressCollection addressCollection)
+        void FilterAddress(MailAddressCollection addressCollection)
         {
             if (addressCollection.Count < 1)
             {

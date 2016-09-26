@@ -25,7 +25,7 @@ namespace Saritasa.Tools.Internal
             // if it is a system type try to use Type.GetType first
             if (fullName.StartsWith("System"))
             {
-                Type.GetType(fullName, false, true);
+                t = Type.GetType(fullName, false, true);
                 if (t != null)
                 {
                     return t;
@@ -44,16 +44,11 @@ namespace Saritasa.Tools.Internal
             }
 
             // last chance
-            Type.GetType(fullName, false, true);
-            if (t != null)
-            {
-                return t;
-            }
-
-            return null;
+            return Type.GetType(fullName, false, true);
         }
 
-        internal static void ResolveTypeForContent(Message message, byte[] bytes, IObjectSerializer objectSerializer, Assembly[] assemblies)
+        internal static void ResolveTypeForContent(Message message, byte[] bytes, IObjectSerializer objectSerializer,
+            Assembly[] assemblies)
         {
             if (bytes == null || bytes.Length < 1)
             {
@@ -67,19 +62,15 @@ namespace Saritasa.Tools.Internal
             }
         }
 
-        internal static void ResolveTypeForError(Message message, byte[] bytes, IObjectSerializer objectSerializer, Assembly[] assemblies)
+        internal static void ResolveTypeForError(Message message, byte[] bytes, IObjectSerializer objectSerializer,
+            Assembly[] assemblies)
         {
             if (bytes == null || bytes.Length < 1)
             {
                 return;
             }
 
-            var t = LoadType(message.ContentType, assemblies);
-            if (t == null)
-            {
-                t = typeof(Exception);
-            }
-
+            var t = LoadType(message.ContentType, assemblies) ?? typeof(Exception);
             message.Error = (Exception)objectSerializer.Deserialize(bytes, t);
         }
 
@@ -122,7 +113,7 @@ namespace Saritasa.Tools.Internal
                     return null;
                 }
                 var ctorparams = ctor.GetParameters();
-                object[] ctorparamsValues = new object[ctorparams.Length];
+                var ctorparamsValues = new object[ctorparams.Length];
                 for (int i = 0; i < ctorparams.Length; i++)
                 {
                     ctorparamsValues[i] = resolver(ctorparams[i].ParameterType);

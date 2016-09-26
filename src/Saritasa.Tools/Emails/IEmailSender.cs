@@ -9,7 +9,7 @@ namespace Saritasa.Tools.Emails
     /// <summary>
     /// Email sender interface.
     /// </summary>
-    public interface IEmailSender<TMessage> where TMessage : class
+    public interface IEmailSender<in TMessage> where TMessage : class
     {
         /// <summary>
         /// Sends the specified message.

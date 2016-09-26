@@ -70,9 +70,9 @@ namespace Saritasa.Tools.Messages
             Rejected,
         }
 
-        private IDictionary<string, string> data;
+        IDictionary<string, string> data;
 
-        private Guid id;
+        Guid id;
 
         /// <summary>
         /// Unique message id.
@@ -114,14 +114,7 @@ namespace Saritasa.Tools.Messages
         /// </summary>
         public virtual IDictionary<string, string> Data
         {
-            get
-            {
-                if (data == null)
-                {
-                    data = new Dictionary<string, string>();
-                }
-                return data;
-            }
+            get { return data ?? (data = new Dictionary<string, string>()); }
 
             set
             {
@@ -162,10 +155,7 @@ namespace Saritasa.Tools.Messages
         /// <summary>
         /// Is custom data dictionary initialized.
         /// </summary>
-        public bool HasData
-        {
-            get { return data != null; }
-        }
+        public bool HasData => data != null;
 
         /// <summary>
         /// .ctor

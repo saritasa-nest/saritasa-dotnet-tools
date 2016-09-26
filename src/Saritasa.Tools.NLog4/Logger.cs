@@ -11,7 +11,7 @@ namespace Saritasa.Tools.NLog
     /// </summary>
     public class Logger : ILogger
     {
-        private readonly global::NLog.ILogger logger;
+        readonly global::NLog.ILogger logger;
 
         /// <summary>
         /// Initializes a new instance of the Logger class.
@@ -23,30 +23,30 @@ namespace Saritasa.Tools.NLog
         }
 
         /// <inheritdoc/>
-        public string Name => this.logger.Name;
+        public string Name => logger.Name;
 
         #region Debug
 
         /// <inheritdoc/>
-        public bool IsDebugEnabled => this.logger.IsDebugEnabled;
+        public bool IsDebugEnabled => logger.IsDebugEnabled;
 
         /// <inheritdoc/>
-        public void Debug(string message) => this.logger.Debug(message);
+        public void Debug(string message) => logger.Debug(message);
 
         /// <inheritdoc/>
-        public void Debug(string format, params object[] args) => this.logger.Debug(format, args);
+        public void Debug(string format, params object[] args) => logger.Debug(format, args);
 
         /// <inheritdoc/>
-        public void Debug(IFormatProvider provider, string format, params object[] args) => this.logger.Debug(provider, format, args);
+        public void Debug(IFormatProvider provider, string format, params object[] args) => logger.Debug(provider, format, args);
 
         /// <inheritdoc/>
-        public void Debug(Exception exception, string message) => this.logger.Debug(exception, message);
+        public void Debug(Exception exception, string message) => logger.Debug(exception, message);
 
         /// <inheritdoc/>
-        public void Debug(Exception exception, string format, params object[] args) => this.logger.Debug(exception, format, args);
+        public void Debug(Exception exception, string format, params object[] args) => logger.Debug(exception, format, args);
 
         /// <inheritdoc/>
-        public void Debug(Exception exception, IFormatProvider provider, string format, params object[] args) => this.logger.Debug(exception, provider, format, args);
+        public void Debug(Exception exception, IFormatProvider provider, string format, params object[] args) => logger.Debug(exception, provider, format, args);
 
         #endregion
 

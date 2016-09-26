@@ -20,9 +20,7 @@ namespace Saritasa.Tools.Events.EventPipelineMiddlewares
 
         const string HandlerPrefix = "Handle";
 
-        Assembly[] assemblies;
-
-        IList<MethodInfo> eventHandlers = null;
+        readonly IList<MethodInfo> eventHandlers;
 
         /// <summary>
         /// .ctor
@@ -36,9 +34,8 @@ namespace Saritasa.Tools.Events.EventPipelineMiddlewares
             }
             if (assemblies.Any(a => a == null))
             {
-                throw new ArgumentNullException("Assemblies contain null value");
+                throw new ArgumentNullException(nameof(assemblies));
             }
-            this.assemblies = assemblies;
 
             // precache all types with event handlers
             eventHandlers = assemblies.SelectMany(a => a.GetTypes())
@@ -66,10 +63,6 @@ namespace Saritasa.Tools.Events.EventPipelineMiddlewares
             var methods = eventHandlers
                 .Where(m => m.GetParameters().Any(pt => pt.ParameterType == eventtype))
                 .ToList();
-            if (methods == null)
-            {
-                methods = new List<MethodInfo>();
-            }
             var selfMethod = eventtype.GetTypeInfo().GetMethod(HandlerPrefix);
             if (selfMethod != null)
             {
@@ -79,7 +72,7 @@ namespace Saritasa.Tools.Events.EventPipelineMiddlewares
             {
                 if (methods.Any())
                 {
-                    for (int i = 0; i < methods.Count; i++)
+                    for (var i = 0; i < methods.Count; i++)
                     {
                         InternalLogger.Debug($"Found \"{methods[i].Name}\" for event {eventtype}",
                             nameof(EventHandlerLocatorMiddleware));

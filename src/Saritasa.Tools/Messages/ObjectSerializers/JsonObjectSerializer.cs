@@ -25,9 +25,6 @@ namespace Saritasa.Tools.Messages.ObjectSerializers
         }
 
         /// <inheritdoc />
-        public bool IsText
-        {
-            get { return true; }
-        }
+        public bool IsText => true;
     }
 }

@@ -12,18 +12,12 @@ namespace Saritasa.Tools.Domain
     /// </summary>
     public class DomainEventsManager : IDomainEventsManager
     {
-        List<object> handlers = new List<object>();
+        readonly List<object> handlers = new List<object>();
 
         /// <summary>
         /// List of handlers.
         /// </summary>
-        protected List<object> Handlers
-        {
-            get
-            {
-                return handlers;
-            }
-        }
+        protected List<object> Handlers => handlers;
 
         /// <inheritdoc />
         public virtual void Register<TEvent>(IDomainEventHandler<TEvent> handler) where TEvent : class

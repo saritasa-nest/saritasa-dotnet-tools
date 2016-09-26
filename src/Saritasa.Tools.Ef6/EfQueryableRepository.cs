@@ -19,7 +19,7 @@ namespace Saritasa.Tools.Ef
     public class EfQueryableRepository<TEntity, TContext> : EfRepository<TEntity, TContext>, IQueryableRepository<TEntity>
         where TEntity : class where TContext : DbContext
     {
-        DbSet<TEntity> set;
+        readonly DbSet<TEntity> set;
 
         /// <summary>
         /// .ctor

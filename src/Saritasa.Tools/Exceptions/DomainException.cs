@@ -16,7 +16,7 @@ namespace Saritasa.Tools.Exceptions
         /// <summary>
         /// .ctor
         /// </summary>
-        public DomainException() : base()
+        public DomainException()
         {
         }
 

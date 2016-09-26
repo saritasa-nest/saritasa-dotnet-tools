@@ -42,23 +42,17 @@ namespace Saritasa.Tools.Commands
             }
         }
 
-        List<BrokenRule> brokenRules = new List<BrokenRule>();
+        readonly List<BrokenRule> brokenRules = new List<BrokenRule>();
 
         /// <summary>
         /// List of broken rules.
         /// </summary>
-        public IEnumerable<BrokenRule> BrokenRules
-        {
-            get { return brokenRules; }
-        }
+        public IEnumerable<BrokenRule> BrokenRules => brokenRules;
 
         /// <summary>
         /// Has broken rules.
         /// </summary>
-        public bool HasErrors
-        {
-            get { return brokenRules.Count > 0; }
-        }
+        public bool HasErrors => brokenRules.Count > 0;
 
 #if !NETCOREAPP1_0 && !NETSTANDARD1_6
         /// <summary>

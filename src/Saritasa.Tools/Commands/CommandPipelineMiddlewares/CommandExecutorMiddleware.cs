@@ -16,7 +16,7 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
         /// <inheritdoc />
         public string Id { get; set; } = "CommandExecutor";
 
-        Func<Type, object> resolver;
+        readonly Func<Type, object> resolver;
 
         /// <summary>
         /// .ctor
@@ -31,16 +31,12 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
             this.resolver = resolver;
         }
 
-        private void ExecuteHandler(object handler, object command, MethodInfo handlerMethod)
+        void ExecuteHandler(object handler, object command, MethodBase handlerMethod)
         {
             var parameters = handlerMethod.GetParameters();
-            if (parameters.Length == 1)
+            var paramsarr = new object[parameters.Length];
+            if (parameters.Length > 1)
             {
-                handlerMethod.Invoke(handler, new object[] { command });
-            }
-            else if (parameters.Length > 1)
-            {
-                var paramsarr = new object[parameters.Length];
                 if (handlerMethod.DeclaringType != command.GetType())
                 {
                     paramsarr[0] = command;
@@ -58,9 +54,13 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
                 }
                 handlerMethod.Invoke(handler, paramsarr);
             }
-            else if (parameters.Length == 0)
+            else
             {
-                handlerMethod.Invoke(handler, new object[] { });
+                if (parameters.Length == 1)
+                {
+                    paramsarr[0] = command;
+                }
+                handlerMethod.Invoke(handler, paramsarr);
             }
         }
 
@@ -80,12 +80,11 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
             }
 
             object handler = null;
-
             if (commandMessage.HandlerMethod.DeclaringType == commandMessage.Content.GetType())
             {
                 handler = commandMessage.Content;
             }
-            else if (handler == null)
+            else
             {
                 handler = TypeHelpers.ResolveObjectForType(commandMessage.HandlerType, resolver, nameof(CommandExecutorMiddleware));
             }

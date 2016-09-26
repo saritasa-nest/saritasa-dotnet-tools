@@ -13,7 +13,7 @@ namespace Saritasa.Tools.Messages.PipelineMiddlewares
         /// <inheritdoc />
         public string Id { get; set; } = "Repository";
 
-        IMessageRepository repository;
+        readonly IMessageRepository repository;
 
         /// <summary>
         /// .ctor

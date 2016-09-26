@@ -12,8 +12,6 @@ namespace Saritasa.Tools.Queries
     /// </summary>
     public class QueryMessage : Message
     {
-        string contentType;
-
         /// <summary>
         /// Query handler.
         /// </summary>
@@ -25,22 +23,10 @@ namespace Saritasa.Tools.Queries
         protected internal MethodInfo HandlerMethod { get; set; }
 
         /// <inheritdoc />
-        public override string ErrorMessage
-        {
-            get
-            {
-                return Error != null ? Error.Message : string.Empty;
-            }
-        }
+        public override string ErrorMessage => Error?.Message ?? string.Empty;
 
         /// <inheritdoc />
-        public override string ErrorType
-        {
-            get
-            {
-                return Error != null ? Error.GetType().FullName : string.Empty;
-            }
-        }
+        public override string ErrorType => Error != null ? Error.GetType().FullName : string.Empty;
 
         /// <summary>
         /// Information about the exception source.
@@ -48,11 +34,7 @@ namespace Saritasa.Tools.Queries
         public System.Runtime.ExceptionServices.ExceptionDispatchInfo ErrorDispatchInfo { get; set; }
 
         /// <inheritdoc />
-        public override string ContentType
-        {
-            get { return contentType; }
-            set { contentType = value; }
-        }
+        public override string ContentType { get; set; }
 
         /// <summary>
         /// Execution result.

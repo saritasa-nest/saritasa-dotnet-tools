@@ -14,10 +14,10 @@ namespace Saritasa.Tools.Internal
     /// </summary>
     public static class InternalLogger
     {
-        private static readonly object LockObj = new object();
+        static readonly object LockObj = new object();
 
 #if !NETCOREAPP1_0 && !NETSTANDARD1_6
-        private static readonly TraceSource TraceSource = new TraceSource("Saritasa.Tools");
+        static readonly TraceSource TraceSource = new TraceSource("Saritasa.Tools");
 #endif
 
         /// <summary>
@@ -132,10 +132,13 @@ namespace Saritasa.Tools.Internal
             {
                 return;
             }
-
             if (MinLogLevel > level)
             {
                 return;
+            }
+            if (source == null)
+            {
+                source = string.Empty;
             }
 
             try
@@ -145,11 +148,8 @@ namespace Saritasa.Tools.Internal
                 sb.Append(" [");
                 sb.Append(level.ToString().ToUpperInvariant());
                 sb.Append("] ");
-                if (source != null)
-                {
-                    sb.Append(source);
-                    sb.Append(": ");
-                }
+                sb.Append(source);
+                sb.Append(": ");
                 sb.AppendLine(message);
 
                 if (string.IsNullOrEmpty(LogFile) == false)
@@ -201,41 +201,26 @@ namespace Saritasa.Tools.Internal
         /// <summary>
         /// Is trace logging enabled.
         /// </summary>
-        public static bool IsTraceEnabled
-        {
-            get { return IsEnabled && MinLogLevel >= LogLevel.Trace; }
-        }
+        public static bool IsTraceEnabled => IsEnabled && MinLogLevel >= LogLevel.Trace;
 
         /// <summary>
         /// Is debug logging enabled.
         /// </summary>
-        public static bool IsDebugEnabled
-        {
-            get { return IsEnabled && MinLogLevel >= LogLevel.Debug; }
-        }
+        public static bool IsDebugEnabled => IsEnabled && MinLogLevel >= LogLevel.Debug;
 
         /// <summary>
         /// Is info logging enabled.
         /// </summary>
-        public static bool IsInfoEnabled
-        {
-            get { return IsEnabled && MinLogLevel >= LogLevel.Info; }
-        }
+        public static bool IsInfoEnabled => IsEnabled && MinLogLevel >= LogLevel.Info;
 
         /// <summary>
         /// Is warning logging enabled.
         /// </summary>
-        public static bool IsWarnEnabled
-        {
-            get { return IsEnabled && MinLogLevel >= LogLevel.Warn; }
-        }
+        public static bool IsWarnEnabled => IsEnabled && MinLogLevel >= LogLevel.Warn;
 
         /// <summary>
         /// Is error logging enabled.
         /// </summary>
-        public static bool IsErrorEnabled
-        {
-            get { return IsEnabled && MinLogLevel >= LogLevel.Error; }
-        }
+        public static bool IsErrorEnabled => IsEnabled && MinLogLevel >= LogLevel.Error;
     }
 }

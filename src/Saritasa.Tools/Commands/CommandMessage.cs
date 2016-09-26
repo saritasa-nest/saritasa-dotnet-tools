@@ -28,31 +28,13 @@ namespace Saritasa.Tools.Commands
         protected internal System.Runtime.ExceptionServices.ExceptionDispatchInfo ErrorDispatchInfo { get; set; }
 
         /// <inheritdoc />
-        public override string ErrorMessage
-        {
-            get
-            {
-                return Error != null ? Error.Message : string.Empty;
-            }
-        }
+        public override string ErrorMessage => Error?.Message ?? string.Empty;
 
         /// <inheritdoc />
-        public override string ErrorType
-        {
-            get
-            {
-                return Error != null ? Error.GetType().FullName : string.Empty;
-            }
-        }
+        public override string ErrorType => Error != null ? Error.GetType().FullName : string.Empty;
 
         /// <inheritdoc />
-        public override string ContentType
-        {
-            get
-            {
-                return Content.GetType().FullName;
-            }
-        }
+        public override string ContentType => Content.GetType().FullName;
 
         /// <summary>
         /// .ctor

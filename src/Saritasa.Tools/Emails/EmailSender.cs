@@ -15,7 +15,7 @@ namespace Saritasa.Tools.Emails
     /// </summary>
     public abstract class EmailSender<TMessage> : IEmailSender<TMessage> where TMessage : class
     {
-        private IList<IEmailInterceptor<TMessage>> interceptors = new List<IEmailInterceptor<TMessage>>();
+        readonly IList<IEmailInterceptor<TMessage>> interceptors = new List<IEmailInterceptor<TMessage>>();
 
         /// <summary>
         /// Send message.
@@ -35,7 +35,7 @@ namespace Saritasa.Tools.Emails
         /// <summary>
         /// .ctor
         /// </summary>
-        public EmailSender()
+        protected EmailSender()
         {
         }
 

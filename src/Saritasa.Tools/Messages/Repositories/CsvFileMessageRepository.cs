@@ -22,18 +22,13 @@ namespace Saritasa.Tools.Messages.Repositories
         /// <summary>
         /// Logs path.
         /// </summary>
-        public string LogsPath
-        {
-            get { return logsPath; }
-        }
+        public string LogsPath { get; } = string.Empty;
 
         bool disposed;
 
         bool needWriteHeader;
 
         FileStream currentFileStream;
-
-        readonly string logsPath = string.Empty;
 
         readonly IObjectSerializer serializer;
 
@@ -57,8 +52,8 @@ namespace Saritasa.Tools.Messages.Repositories
             {
                 throw new ArgumentException(nameof(logsPath));
             }
-            this.logsPath = logsPath;
-            this.serializer = serializer != null ? serializer : new JsonObjectSerializer();
+            this.LogsPath = logsPath;
+            this.serializer = serializer ?? new JsonObjectSerializer();
             this.prefix = prefix;
             this.buffer = buffer;
             Directory.CreateDirectory(LogsPath);
@@ -69,9 +64,9 @@ namespace Saritasa.Tools.Messages.Repositories
             }
         }
 
-        private string GetFileNameByDate(DateTime date, int count)
+        string GetFileNameByDate(DateTime date, int count)
         {
-            var name = $"{date.ToString(DateTimeFormat)}-{count:000}.csv";
+            var name = $"{date:yyyyMMdd}-{count:000}.csv";
             if (string.IsNullOrEmpty(prefix) == false)
             {
                 name = prefix + "-" + name;
@@ -79,7 +74,7 @@ namespace Saritasa.Tools.Messages.Repositories
             return name;
         }
 
-        private string GetAvailableFileNameByDate(DateTime date)
+        string GetAvailableFileNameByDate(DateTime date)
         {
             if (currentFileStream != null)
             {
@@ -89,15 +84,15 @@ namespace Saritasa.Tools.Messages.Repositories
             return GetFileNameByDate(date, 0);
         }
 
-        static byte[] comma = Encoding.UTF8.GetBytes(",");
-        static byte[] newLine = Encoding.UTF8.GetBytes(Environment.NewLine);
+        static readonly byte[] Comma = Encoding.UTF8.GetBytes(",");
+        static readonly byte[] NewLine = Encoding.UTF8.GetBytes(Environment.NewLine);
 
         private static string PrepareString(string str)
         {
             bool mustQuote = str.Contains(",") || str.Contains("\"") || str.Contains("\r") || str.Contains("\n");
             if (mustQuote)
             {
-                StringBuilder sb = new StringBuilder();
+                var sb = new StringBuilder();
                 sb.Append("\"");
                 foreach (char nextChar in str)
                 {
@@ -114,7 +109,7 @@ namespace Saritasa.Tools.Messages.Repositories
             return str;
         }
 
-        private static void WriteBytes(string str, Stream stream, bool prepareString = true, bool last = false)
+        static void WriteBytes(string str, Stream stream, bool prepareString = true, bool last = false)
         {
             if (prepareString)
             {
@@ -124,20 +119,20 @@ namespace Saritasa.Tools.Messages.Repositories
             stream.Write(bytes, 0, bytes.Length);
             if (!last)
             {
-                stream.Write(comma, 0, comma.Length);
+                stream.Write(Comma, 0, Comma.Length);
             }
             else
             {
-                stream.Write(newLine, 0, newLine.Length);
+                stream.Write(NewLine, 0, NewLine.Length);
             }
         }
 
-        private static void WriteBytes(byte bt, Stream stream)
+        static void WriteBytes(byte bt, Stream stream)
         {
             stream.WriteByte(bt);
         }
 
-        private void WriteToFile(Message message)
+        void WriteToFile(Message message)
         {
             // Id,Type,CreatedAt,Status,ContentType,Content,Data,ErrorType,ErrorMessage,ErrorDetails,ExecutionDuration
             if (needWriteHeader)
@@ -199,7 +194,7 @@ namespace Saritasa.Tools.Messages.Repositories
         /// <inheritdoc />
         public void SaveState(IDictionary<string, object> dict)
         {
-            dict[nameof(logsPath)] = logsPath;
+            dict[nameof(LogsPath)] = LogsPath;
             dict[nameof(buffer)] = buffer;
             dict[nameof(serializer)] = serializer.GetType().AssemblyQualifiedName;
             dict[nameof(prefix)] = prefix;
@@ -248,7 +243,7 @@ namespace Saritasa.Tools.Messages.Repositories
         public static IMessageRepository CreateFromState(IDictionary<string, object> dict)
         {
             return new CsvFileMessageRepository(
-                dict[nameof(logsPath)].ToString(),
+                dict[nameof(LogsPath)].ToString(),
                 (IObjectSerializer)Activator.CreateInstance(Type.GetType(dict[nameof(serializer)].ToString())),
                 dict[nameof(prefix)].ToString(),
                 Convert.ToBoolean(dict[nameof(buffer)])

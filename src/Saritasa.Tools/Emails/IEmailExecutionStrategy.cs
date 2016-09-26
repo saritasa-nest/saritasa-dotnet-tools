@@ -22,6 +22,7 @@ namespace Saritasa.Tools.Emails
         /// <param name="data">Additional data.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Task.</returns>
-        Task Execute(Func<TMessage, NameValueDict, Task> handler, TMessage message, NameValueDict data, CancellationToken cancellationToken);
+        Task Execute(Func<TMessage, NameValueDict, Task> handler, TMessage message, NameValueDict data,
+            CancellationToken cancellationToken);
     }
 }

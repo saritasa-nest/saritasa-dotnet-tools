@@ -40,9 +40,9 @@ namespace Saritasa.Tools.Emails.SystemMail
             AfterSend = afterSend;
         }
 
-        private void Save(MailMessage message)
+        void Save(MailMessage message)
         {
-            var path = Path.Combine(Directory, string.Format("{0}.msg", DateTime.Now.ToString("yyyyMMdd-hhmmss")));
+            var path = Path.Combine(Directory, $"{DateTime.Now:yyyyMMdd-hhmmss}.msg");
             SaveMailMessage(message, path);
         }
 
@@ -73,26 +73,26 @@ namespace Saritasa.Tools.Emails.SystemMail
         /// </summary>
         /// <param name="message">The message.</param>
         /// <param name="fileName">Name of the file.</param>
-        private static void SaveMailMessage(MailMessage message, string fileName)
+        static void SaveMailMessage(MailMessage message, string fileName)
         {
-            Assembly assembly = typeof(SmtpClient).Assembly;
-            Type mailWriterType = assembly.GetType("System.Net.Mail.MailWriter");
+            var assembly = typeof(SmtpClient).Assembly;
+            var mailWriterType = assembly.GetType("System.Net.Mail.MailWriter");
 
             using (var fileStream = new FileStream(fileName, FileMode.Create))
             {
                 // get reflection info for MailWriter contructor
-                ConstructorInfo mailWriterContructor =
+                var mailWriterContructor =
                     mailWriterType.GetConstructor(
                         BindingFlags.Instance | BindingFlags.NonPublic,
                         null,
-                        new Type[] { typeof(Stream) },
+                        new[] { typeof(Stream) },
                         null);
 
                 // construct MailWriter object with our FileStream
-                object mailWriter = mailWriterContructor.Invoke(new object[] { fileStream });
+                var mailWriter = mailWriterContructor.Invoke(new object[] { fileStream });
 
                 // get reflection info for Send() method on MailMessage
-                MethodInfo sendMethod =
+                var sendMethod =
                     typeof(MailMessage).GetMethod(
                         "Send",
                         BindingFlags.Instance | BindingFlags.NonPublic);
@@ -104,7 +104,7 @@ namespace Saritasa.Tools.Emails.SystemMail
                         message,
                         BindingFlags.Instance | BindingFlags.NonPublic,
                         null,
-                        new object[] { mailWriter, true },
+                        new[] { mailWriter, true },
                         null);
                 }
                 else
@@ -113,12 +113,12 @@ namespace Saritasa.Tools.Emails.SystemMail
                         message,
                         BindingFlags.Instance | BindingFlags.NonPublic,
                         null,
-                        new object[] { mailWriter, true, true },
+                        new[] { mailWriter, true, true },
                         null);
                 }
 
                 // finally get reflection info for Close() method on our MailWriter
-                MethodInfo closeMethod =
+                var closeMethod =
                     mailWriter.GetType().GetMethod(
                         "Close",
                         BindingFlags.Instance | BindingFlags.NonPublic);

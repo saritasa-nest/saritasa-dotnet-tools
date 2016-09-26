@@ -16,7 +16,7 @@ namespace Saritasa.Tools.Tests
         [Test]
         public void Password_generator_with_specific_length_digits_should_match()
         {
-            PasswordGenerator passwordGenerator = new PasswordGenerator(
+            var passwordGenerator = new PasswordGenerator(
                 25,
                 PasswordGenerator.CharacterClass.Digits,
                 PasswordGenerator.GeneratorFlag.ShuffleChars
@@ -24,7 +24,7 @@ namespace Saritasa.Tools.Tests
             var password = passwordGenerator.Generate();
             Assert.That(password.Length, Is.EqualTo(25));
 
-            PasswordGenerator passwordGenerator2 = new PasswordGenerator();
+            var passwordGenerator2 = new PasswordGenerator();
             passwordGenerator2.PasswordLength = 15;
             passwordGenerator2.SetCharactersPool("1");
             Assert.That(passwordGenerator2.Generate(), Is.EqualTo(new string('1', 15)));

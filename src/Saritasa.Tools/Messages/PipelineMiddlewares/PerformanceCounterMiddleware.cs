@@ -35,9 +35,9 @@ namespace Saritasa.Tools.Messages.PipelineMiddlewares
         /// </summary>
         public const string AverageMessagesDurationBase = "Base Average Message Processing Duration";
 
-        bool initialized = false;
+        readonly bool initialized = false;
 
-        string category;
+        readonly string category;
 
         PerformanceCounter performanceCounterTotal;
         PerformanceCounter performanceCounterRate;
@@ -53,11 +53,11 @@ namespace Saritasa.Tools.Messages.PipelineMiddlewares
             this.category = category;
         }
 
-        private void Initialize()
+        void Initialize()
         {
             if (!PerformanceCounterCategory.Exists(category))
             {
-                CounterCreationDataCollection counterDataCollection = new CounterCreationDataCollection();
+                var counterDataCollection = new CounterCreationDataCollection();
 
                 var counterTotal = new CounterCreationData(TotalMessagesProcessed, "Total processed messages by application",
                     PerformanceCounterType.NumberOfItems64);

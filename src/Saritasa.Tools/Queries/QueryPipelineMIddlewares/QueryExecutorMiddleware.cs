@@ -4,10 +4,8 @@
 namespace Saritasa.Tools.Queries.QueryPipelineMIddlewares
 {
     using System;
-    using System.Linq;
     using System.Reflection;
     using Messages;
-    using Internal;
 
     /// <summary>
     /// Executes query delegate.
@@ -15,10 +13,7 @@ namespace Saritasa.Tools.Queries.QueryPipelineMIddlewares
     public class QueryExecutorMiddleware : IMessagePipelineMiddleware
     {
         /// <inheritdoc />
-        public string Id
-        {
-            get { return "executor"; }
-        }
+        public string Id => "executor";
 
         /// <inheritdoc />
         public void Handle(Message message)

@@ -18,7 +18,7 @@ namespace Saritasa.Tools.Events.EventPipelineMiddlewares
         /// <inheritdoc />
         public string Id { get; set; } = "EventExecutor";
 
-        Func<Type, object> resolver;
+        readonly Func<Type, object> resolver;
 
         /// <summary>
         /// .ctor
@@ -33,16 +33,12 @@ namespace Saritasa.Tools.Events.EventPipelineMiddlewares
             this.resolver = resolver;
         }
 
-        private void ExecuteHandler(object handler, object @event, MethodInfo handlerMethod)
+        void ExecuteHandler(object handler, object @event, MethodBase handlerMethod)
         {
             var parameters = handlerMethod.GetParameters();
-            if (parameters.Length == 1)
+            var paramsarr = new object[parameters.Length];
+            if (parameters.Length > 1)
             {
-                handlerMethod.Invoke(handler, new object[] { @event });
-            }
-            else if (parameters.Length > 1)
-            {
-                var paramsarr = new object[parameters.Length];
                 if (handlerMethod.DeclaringType != @event.GetType())
                 {
                     paramsarr[0] = @event;
@@ -60,9 +56,13 @@ namespace Saritasa.Tools.Events.EventPipelineMiddlewares
                 }
                 handlerMethod.Invoke(handler, paramsarr);
             }
-            else if (parameters.Length == 0)
+            else
             {
-                handlerMethod.Invoke(handler, new object[] { });
+                if (parameters.Length == 1)
+                {
+                    paramsarr[0] = @event;
+                }
+                handlerMethod.Invoke(handler, paramsarr);
             }
         }
 
@@ -81,13 +81,11 @@ namespace Saritasa.Tools.Events.EventPipelineMiddlewares
                 return;
             }
 
-            object handler = null;
             var exceptions = new List<Exception>(3);
-
             var stopWatch = System.Diagnostics.Stopwatch.StartNew();
             for (int i = 0; i < eventMessage.HandlerMethods.Count; i++)
             {
-                handler = null;
+                object handler = null;
                 if (eventMessage.HandlerMethods[i].DeclaringType == eventMessage.Content.GetType())
                 {
                     handler = eventMessage.Content;

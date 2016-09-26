@@ -8,7 +8,7 @@ namespace Saritasa.Tools.Events
     /// <summary>
     /// Indicates the class is command.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public class EventAttribute : Attribute
     {
     }
@@ -17,7 +17,7 @@ namespace Saritasa.Tools.Events
     /// The class that contains commands handers should be marked
     /// with this attribute.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public class EventHandlersAttribute : Attribute
     {
     }

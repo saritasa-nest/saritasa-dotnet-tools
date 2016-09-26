@@ -31,10 +31,7 @@ namespace Saritasa.Tools.Commands
                 handler.Handle(commandMessage);
             }
 
-            if (commandMessage.ErrorDispatchInfo != null)
-            {
-                commandMessage.ErrorDispatchInfo.Throw();
-            }
+            commandMessage.ErrorDispatchInfo?.Throw();
         }
 
         /// <summary>
@@ -60,7 +57,7 @@ namespace Saritasa.Tools.Commands
             var commandPipeline = new CommandPipeline();
             if (assemblies == null || assemblies.Length < 1)
             {
-                assemblies = new Assembly[] { Assembly.GetEntryAssembly() };
+                assemblies = new[] { Assembly.GetEntryAssembly() };
             }
 
             commandPipeline.AppendMiddlewares(

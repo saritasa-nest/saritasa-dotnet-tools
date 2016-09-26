@@ -33,9 +33,9 @@ namespace Saritasa.Tools.Messages.Endpoints
 
         HttpListener listener;
 
-        int port;
+        readonly int port;
 
-        string address;
+        readonly string address;
 
         CancellationToken cancellationToken = CancellationToken.None;
 
@@ -88,8 +88,10 @@ namespace Saritasa.Tools.Messages.Endpoints
             cancellationTokenSource = new CancellationTokenSource();
             cancellationToken = cancellationTokenSource.Token;
             listener.Start();
-            var thread = new Thread(new ThreadStart(Listen));
-            thread.IsBackground = true;
+            var thread = new Thread(Listen)
+            {
+                IsBackground = true
+            };
             thread.Start();
 
             InternalLogger.Trace($"Web endpoint started on {address}:{port}", nameof(WebEndpoint));
@@ -115,7 +117,7 @@ namespace Saritasa.Tools.Messages.Endpoints
             cancellationTokenSource = null;
             if (wait)
             {
-                threadWaitEvent.Wait();
+                threadWaitEvent.Wait(cancellationToken);
                 threadWaitEvent.Reset();
             }
         }
@@ -152,7 +154,7 @@ namespace Saritasa.Tools.Messages.Endpoints
             threadWaitEvent.Set();
         }
 
-        private void HandleRequest(HttpListenerContext listenerContext)
+        void HandleRequest(HttpListenerContext listenerContext)
         {
             HttpListenerRequest request = listenerContext.Request;
 
@@ -206,11 +208,11 @@ namespace Saritasa.Tools.Messages.Endpoints
             }
         }
 
-        private void FormatStreamFromString(string input, HttpListenerResponse response)
+        static void FormatStreamFromString(string input, HttpListenerResponse response)
         {
-            byte[] buffer = System.Text.Encoding.UTF8.GetBytes(input);
+            var buffer = System.Text.Encoding.UTF8.GetBytes(input);
             response.ContentLength64 = buffer.Length;
-            Stream output = response.OutputStream;
+            var output = response.OutputStream;
             output.Write(buffer, 0, buffer.Length);
             output.Flush();
         }
@@ -244,7 +246,7 @@ namespace Saritasa.Tools.Messages.Endpoints
 
         #region Dispose
 
-        private bool disposed = false;
+        bool disposed = false;
 
         /// <summary>
         /// Dispose object. Remove thread, stop listening.

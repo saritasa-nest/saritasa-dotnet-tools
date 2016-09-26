@@ -4,7 +4,6 @@
 namespace Saritasa.Tools.Queries
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
     using Messages;
@@ -19,7 +18,7 @@ namespace Saritasa.Tools.Queries
         /// <inheritdoc />
         public override byte[] MessageTypes => AvailableMessageTypes;
 
-        private QueryMessage CreateMessage(Delegate func, params object[] args)
+        static QueryMessage CreateMessage(Delegate func, params object[] args)
         {
 #if !NETCOREAPP1_0 && !NETSTANDARD1_6
             var method = func.Method;
@@ -38,16 +37,13 @@ namespace Saritasa.Tools.Queries
             };
         }
 
-        private void ProcessPipeline(QueryMessage message)
+        void ProcessPipeline(QueryMessage message)
         {
             foreach (var handler in Middlewares)
             {
                 handler.Handle(message);
             }
-            if (message.ErrorDispatchInfo != null)
-            {
-                message.ErrorDispatchInfo.Throw();
-            }
+            message.ErrorDispatchInfo?.Throw();
         }
 
         /// <inheritdoc />

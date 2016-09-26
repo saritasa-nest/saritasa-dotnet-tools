@@ -13,7 +13,7 @@ namespace Saritasa.Tools.Messages.Repositories.QueryProviders
     {
         const string TableName = "saritasa_messages";
 
-        IObjectSerializer serializer;
+        readonly IObjectSerializer serializer;
 
         /// <summary>
         /// .ctor
@@ -88,7 +88,7 @@ namespace Saritasa.Tools.Messages.Repositories.QueryProviders
         public string GetFilterScript(MessageQuery messageQuery)
         {
             // TODO
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             sb.Append($"SELECT * FROM `{TableName}`");
             return sb.ToString();
         }

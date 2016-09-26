@@ -6,8 +6,6 @@ namespace Saritasa.Tools.Messages.Repositories
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Linq.Expressions;
-    using System.Reflection;
 
     /// <summary>
     /// Simple in memory message repository.
@@ -17,9 +15,9 @@ namespace Saritasa.Tools.Messages.Repositories
         /// <summary>
         /// All stored messages.
         /// </summary>
-        public IList<Message> Messages { get; private set; }
+        public IList<Message> Messages { get; }
 
-        private readonly object objLock = new object();
+        readonly object objLock = new object();
 
         /// <summary>
         /// .ctor

@@ -16,7 +16,7 @@ namespace Saritasa.Tools.Exceptions
         /// <summary>
         /// .ctor
         /// </summary>
-        public ValidationException() : base()
+        public ValidationException()
         {
         }
 

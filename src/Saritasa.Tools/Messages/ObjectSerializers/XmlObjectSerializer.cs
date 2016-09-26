@@ -14,7 +14,7 @@ namespace Saritasa.Tools.Messages.ObjectSerializers
     /// </summary>
     public class XmlObjectSerializer : IObjectSerializer
     {
-        private static XmlWriterSettings xmlWriterSettings = new XmlWriterSettings()
+        static readonly XmlWriterSettings XmlWriterSettings = new XmlWriterSettings()
         {
             CheckCharacters = false,
             Indent = false,
@@ -24,7 +24,7 @@ namespace Saritasa.Tools.Messages.ObjectSerializers
         /// <inheritdoc />
         public object Deserialize(byte[] bytes, Type type)
         {
-            XmlSerializer xmlSerializer = new XmlSerializer(type);
+            var xmlSerializer = new XmlSerializer(type);
             using (var stream = new MemoryStream(bytes))
             {
                 return xmlSerializer.Deserialize(stream);
@@ -34,13 +34,13 @@ namespace Saritasa.Tools.Messages.ObjectSerializers
         /// <inheritdoc />
         public byte[] Serialize(object obj)
         {
-            XmlSerializer xmlSerializer = new XmlSerializer(obj.GetType());
+            var xmlSerializer = new XmlSerializer(obj.GetType());
             MemoryStream stream = null;
             byte[] bytes = null;
             try
             {
                 stream = new MemoryStream();
-                using (var xmlWriter = XmlWriter.Create(stream, xmlWriterSettings))
+                using (var xmlWriter = XmlWriter.Create(stream, XmlWriterSettings))
                 {
                     xmlSerializer.Serialize(xmlWriter, obj);
                     bytes = stream.ToArray();
@@ -59,10 +59,7 @@ namespace Saritasa.Tools.Messages.ObjectSerializers
         }
 
         /// <inheritdoc />
-        public bool IsText
-        {
-            get { return true; }
-        }
+        public bool IsText => true;
     }
 }
 #endif

@@ -24,34 +24,24 @@ namespace Saritasa.Tools
         /// </summary>
         public const int DefaultPageSize = 100;
 
-        private IEnumerable<T> source;
-        private int totalPages;
-        private int currentPage;
-        private int pageSize;
+        IEnumerable<T> source;
+        int totalPages;
+        int pageSize;
 
         /// <summary>
         /// Total pages.
         /// </summary>
-        public int TotalPages
-        {
-            get { return totalPages; }
-        }
+        public int TotalPages => totalPages;
 
         /// <summary>
         /// Current page. Starts from 1.
         /// </summary>
-        public int CurrentPage
-        {
-            get { return currentPage; }
-        }
+        public int CurrentPage { get; set; }
 
         /// <summary>
         /// Page size. Max number of items on page.
         /// </summary>
-        public int PageSize
-        {
-            get { return pageSize; }
-        }
+        public int PageSize => pageSize;
 
         /// <summary>
         /// Internal .ctor
@@ -86,7 +76,7 @@ namespace Saritasa.Tools
                 throw new ArgumentException(nameof(pageSize));
             }
 
-            this.currentPage = page;
+            this.CurrentPage = page;
             this.pageSize = pageSize;
             this.source = source.Skip((page - 1) * pageSize).Take(pageSize).ToList();
             this.totalPages = totalPages > 0 ? totalPages : GetTotalPages(source, PageSize);
@@ -121,13 +111,13 @@ namespace Saritasa.Tools
             return new PagedEnumerable<T>()
             {
                 source = source,
-                currentPage = page,
+                CurrentPage = page,
                 pageSize = pageSize,
                 totalPages = totalPages,
             };
         }
 
-        private static int GetTotalPages(IEnumerable<T> source, int pageSize)
+        static int GetTotalPages(IEnumerable<T> source, int pageSize)
         {
             return (source.Count() + pageSize - 1) / pageSize;
         }

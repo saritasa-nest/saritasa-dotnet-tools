@@ -16,7 +16,7 @@ namespace Saritasa.Tools.Queries.QueryPipelineMIddlewares
         /// <inheritdoc />
         public string Id { get; set; } = "QueryObjectResolver";
 
-        Func<Type, object> resolver;
+        readonly Func<Type, object> resolver;
 
         /// <summary>
         /// .ctor

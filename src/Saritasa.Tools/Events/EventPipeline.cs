@@ -17,14 +17,6 @@ namespace Saritasa.Tools.Events
         /// <inheritdoc />
         public override byte[] MessageTypes => AvailableMessageTypes;
 
-        private void ProcessPipeline(EventMessage message)
-        {
-            foreach (var handler in Middlewares)
-            {
-                handler.Handle(message);
-            }
-        }
-
         /// <inheritdoc />
         public void Raise(object @event)
         {

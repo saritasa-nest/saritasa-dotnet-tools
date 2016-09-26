@@ -23,10 +23,7 @@ namespace Saritasa.Tools.Messages.Repositories
         /// <summary>
         /// Logs path.
         /// </summary>
-        public string LogsPath
-        {
-            get { return logsPath; }
-        }
+        public string LogsPath => logsPath;
 
         bool disposed;
 
@@ -48,13 +45,7 @@ namespace Saritasa.Tools.Messages.Repositories
 
         static readonly object ObjLock = new object();
 
-        Stream CurrentStream
-        {
-            get
-            {
-                return currentGZipStream != null ? currentGZipStream : (Stream)currentFileStream;
-            }
-        }
+        Stream CurrentStream => currentGZipStream ?? (Stream)currentFileStream;
 
         /// <summary>
         /// .ctor
@@ -72,16 +63,16 @@ namespace Saritasa.Tools.Messages.Repositories
                 throw new ArgumentException(nameof(logsPath));
             }
             this.logsPath = logsPath;
-            this.serializer = serializer != null ? serializer : new JsonObjectSerializer();
+            this.serializer = serializer ?? new JsonObjectSerializer();
             this.prefix = prefix;
             this.buffer = buffer;
             this.compress = compress;
             Directory.CreateDirectory(LogsPath);
         }
 
-        private string GetFileNameByDate(DateTime date, int count)
+        string GetFileNameByDate(DateTime date, int count)
         {
-            var name = $"{date.ToString(DateTimeFormat)}-{count:000}.bin";
+            var name = $"{date:yyyyMMdd}-{count:000}.bin";
             if (string.IsNullOrEmpty(prefix) == false)
             {
                 name = prefix + "-" + name;
@@ -93,7 +84,7 @@ namespace Saritasa.Tools.Messages.Repositories
             return name;
         }
 
-        private string GetAvailableFileNameByDate(DateTime date)
+        string GetAvailableFileNameByDate(DateTime date)
         {
             if (currentFileStream != null)
             {
@@ -107,11 +98,7 @@ namespace Saritasa.Tools.Messages.Repositories
 
                 // we cannot continue zip streams, so we have to create new file
                 // every time with new stream
-                if (compress && File.Exists(Path.Combine(LogsPath, name)))
-                {
-                    continue;
-                }
-                else
+                if (!compress || !File.Exists(Path.Combine(LogsPath, name)))
                 {
                     break;
                 }
@@ -149,21 +136,18 @@ namespace Saritasa.Tools.Messages.Repositories
             {
                 lock (ObjLock)
                 {
-                    if (currentGZipStream != null)
-                    {
-                        currentGZipStream.Flush();
-                    }
+                    currentGZipStream?.Flush();
                     currentFileStream.FlushAsync();
                 }
             }
         }
 
-        private string GetSearchPattern()
+        string GetSearchPattern()
         {
             return compress ? prefix + "*.bin.zip" : prefix + "*.bin";
         }
 
-        private string GetFileDatePart(string fileName)
+        string GetFileDatePart(string fileName)
         {
             return fileName.Length > 7 ? fileName.Substring(0, 8) : string.Empty;
         }
@@ -176,17 +160,18 @@ namespace Saritasa.Tools.Messages.Repositories
             visitor.Visit(messageQuery.MessageSelector);
             var compiledSelector = messageQuery.MessageSelector.Compile();
             var compiledDataSelector = messageQuery.DataSelector.Compile();
-            Func<object, bool> compiledContentSelector = (Func<object, bool>)messageQuery.ContentSelector.Compile();
-            Func<object, bool> compiledErrorSelector = (Func<object, bool>)messageQuery.ErrorSelector.Compile();
+            var compiledContentSelector = (Func<object, bool>)messageQuery.ContentSelector.Compile();
+            var compiledErrorSelector = (Func<object, bool>)messageQuery.ErrorSelector.Compile();
 
             // collect all files in dir
-            var allFiles = Directory.GetFiles(LogsPath, GetSearchPattern()).OrderBy(f => f).Select(f => Path.GetFileName(f));
+            var allFiles =
+                Directory.GetFiles(LogsPath, GetSearchPattern()).OrderBy(f => f).Select(Path.GetFileName).ToArray();
             var allFilesHash = new HashSet<string>(allFiles);
 
             // prepare first and last dates
-            DateTime startDate = visitor.StartDate;
-            DateTime endDate = visitor.EndDate;
-            if (allFiles.Count() > 0)
+            var startDate = visitor.StartDate;
+            var endDate = visitor.EndDate;
+            if (allFiles.Any())
             {
                 DateTime tmp;
                 if (DateTime.TryParseExact(GetFileDatePart(allFiles.First()), DateTimeFormat,
@@ -210,10 +195,10 @@ namespace Saritasa.Tools.Messages.Repositories
 
             // actual search
             var targetList = new List<Message>(150);
-            DateTime currentDate = startDate;
+            var currentDate = startDate;
             while (currentDate <= endDate)
             {
-                for (int i = 0; i < 1000; i++)
+                for (var i = 0; i < 1000; i++)
                 {
                     var fileName = GetFileNameByDate(currentDate, i);
                     if (allFilesHash.Contains(fileName) == false)
@@ -230,7 +215,7 @@ namespace Saritasa.Tools.Messages.Repositories
                             stream = new GZipStream(stream, CompressionMode.Decompress, false);
                         }
                         var commandSerializer = new MessageBinarySerializer(stream, serializer, messageQuery.Assemblies.ToArray());
-                        for (Message message = null; (message = commandSerializer.Read()) != null;)
+                        for (Message message; (message = commandSerializer.Read()) != null;)
                         {
                             if (compiledSelector(message) && compiledContentSelector(message.Content) &&
                                 compiledDataSelector(message.Data) && compiledErrorSelector(message.Error))
@@ -241,10 +226,7 @@ namespace Saritasa.Tools.Messages.Repositories
                     }
                     finally
                     {
-                        if (stream != null)
-                        {
-                            stream.Dispose();
-                        }
+                        stream?.Dispose();
                     }
                 }
                 currentDate = currentDate.AddDays(1);
@@ -328,7 +310,7 @@ namespace Saritasa.Tools.Messages.Repositories
 
         public DateTime EndDate { get; set; } = DateTime.MaxValue;
 
-        private DateTime GetDate(BinaryExpression conditionalNode)
+        DateTime GetDate(BinaryExpression conditionalNode)
         {
             if (conditionalNode.Left.NodeType == ExpressionType.MemberAccess && conditionalNode.Right.NodeType == ExpressionType.MemberAccess)
             {

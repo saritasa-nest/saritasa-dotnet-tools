@@ -9,7 +9,7 @@ namespace Saritasa.Tools.Domain
     /// <summary>
     /// Unit of work factory abstraction.
     /// </summary>
-    public interface IUnitOfWorkFactory<TUnitOfWork> where TUnitOfWork : class
+    public interface IUnitOfWorkFactory<out TUnitOfWork> where TUnitOfWork : class
     {
         /// <summary>
         /// Creates unit of work with specified isolation level.

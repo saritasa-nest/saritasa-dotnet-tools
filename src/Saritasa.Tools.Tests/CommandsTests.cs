@@ -73,7 +73,7 @@ namespace Saritasa.Tools.Tests
         {
             var cp = CommandPipeline.CreateDefaultPipeline(CommandPipeline.NullResolver,
                 Assembly.GetAssembly(typeof(CommandsTests)));
-            var cmd = new SimpleTestCommand() { Id = 5 };
+            var cmd = new SimpleTestCommand() {Id = 5};
             cp.Handle(cmd);
             Assert.That(cmd.Out, Is.EqualTo("result"));
         }
@@ -246,6 +246,32 @@ namespace Saritasa.Tools.Tests
             }
             Assert.That(exceptionFired, Is.False);
             Assert.That(cmd.PercentInt, Is.EqualTo(10));
+        }
+
+        #endregion
+
+        #region If_command_handler_not_found_generate_exception
+
+        class CommandWithNoHandler
+        {
+        }
+
+        [Test]
+        public void If_command_handler_not_found_generate_exception()
+        {
+            var cp = CommandPipeline.CreateDefaultPipeline(CommandPipeline.NullResolver,
+                Assembly.GetAssembly(typeof(CommandsTests)));
+
+            bool exceptionFired = false;
+            try
+            {
+                cp.Handle(new CommandWithNoHandler());
+            }
+            catch (CommandHandlerNotFoundException)
+            {
+                exceptionFired = true;
+            }
+            Assert.That(exceptionFired, Is.True);
         }
 
         #endregion

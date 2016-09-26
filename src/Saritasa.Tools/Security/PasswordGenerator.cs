@@ -325,7 +325,7 @@ namespace Saritasa.Tools.Security
         public string Generate()
         {
             var pool = string.IsNullOrEmpty(this.CharactersPool) ? CreateCharactersPool() : this.CharactersPool.ToCharArray();
-            StringBuilder sb = new StringBuilder(PasswordLength);
+            var sb = new StringBuilder(PasswordLength);
 
             if (this.GeneratorFlags.HasFlag(GeneratorFlag.ShuffleChars))
             {
@@ -486,7 +486,8 @@ namespace Saritasa.Tools.Security
             {
                 var forward = PoolAlphas.Substring(s, 3);
                 var reverse = Reverse(forward);
-                if (passwordLower.IndexOf(forward) != -1 || passwordLower.IndexOf(reverse) != -1)
+                if (passwordLower.IndexOf(forward, StringComparison.Ordinal) != -1 ||
+                    passwordLower.IndexOf(reverse, StringComparison.Ordinal) != -1)
                 {
                     sequenceAlphasCount++;
                     sequenceCharsCount++;
@@ -498,7 +499,8 @@ namespace Saritasa.Tools.Security
             {
                 var forward = PoolNumerics.Substring(s, 3);
                 var reverse = Reverse(forward);
-                if (passwordLower.IndexOf(forward) != -1 || passwordLower.IndexOf(reverse) != -1)
+                if (passwordLower.IndexOf(forward, StringComparison.Ordinal) != -1 ||
+                    passwordLower.IndexOf(reverse, StringComparison.Ordinal) != -1)
                 {
                     sequenceNumbersCount++;
                     sequenceCharsCount++;
@@ -510,7 +512,8 @@ namespace Saritasa.Tools.Security
             {
                 var forward = PoolSymbols.Substring(s, 3);
                 var reverse = Reverse(forward);
-                if (passwordLower.IndexOf(forward) != -1 || passwordLower.IndexOf(reverse) != -1)
+                if (passwordLower.IndexOf(forward, StringComparison.Ordinal) != -1 ||
+                    passwordLower.IndexOf(reverse, StringComparison.Ordinal) != -1)
                 {
                     sequenceSymbolsCount++;
                     sequenceCharsCount++;
@@ -592,7 +595,7 @@ namespace Saritasa.Tools.Security
             }
 
             // determine if mandatory requirements have been met and set image indicators accordingly
-            var arrChars = new int[] { password.Length, alphasUpperCount, alphasLowerCount, digitsCount, symbolsCount };
+            var arrChars = new[] { password.Length, alphasUpperCount, alphasLowerCount, digitsCount, symbolsCount };
             for (var c = 0; c < arrChars.Length; c++)
             {
                 var minValue = 0;
@@ -615,33 +618,33 @@ namespace Saritasa.Tools.Security
                 }
             }
             requirements = requiredCharsCount;
-            int minRequiredChars = password.Length >= MinimumPasswordLength ? 3 : 4;
+            var minRequiredChars = password.Length >= MinimumPasswordLength ? 3 : 4;
             // one or more required characters exist
             if (requirements > minRequiredChars)
             {
                 score += requirements * 2;
             }
 
-            additions = new Dictionary<Addition, int>(10);
-
             // determine if additional bonuses need to be applied and set image indicators accordingly
-            additions[Addition.MiddleNumbersOrSymbols] = middleCharsCount;
-            additions[Addition.Requirements] = requirements;
-            additions[Addition.NumberOfCharacters] = alphasOnlyCount;
-            additions[Addition.Symbols] = symbolsCount;
-            additions[Addition.UppercaseLetters] = alphasUpperCount;
-            additions[Addition.LowercaseLetters] = alphasLowerCount;
-            additions[Addition.MiddleNumbersOrSymbols] = middleCharsCount;
-
-            additions[Addition.LettersOnly] = alphasOnlyCount;
-            additions[Addition.NumbersOnly] = numbersOnlyCount;
-            additions[Addition.RepeatCharacters] = repeatCharsCount;
-            additions[Addition.ConsecutiveUppercaseLetters] = consequenceAlphasUpperCount;
-            additions[Addition.ConsecutiveLowercaseLetters] = consequenceAlphasLowerCount;
-            additions[Addition.ConsecutiveNumbers] = consequenceDigitsCount;
-            additions[Addition.SequentialLetters] = sequenceAlphasCount;
-            additions[Addition.SequentialNumbers] = sequenceNumbersCount;
-            additions[Addition.SequentialSymbols] = sequenceSymbolsCount;
+            additions = new Dictionary<Addition, int>(10)
+            {
+                [Addition.MiddleNumbersOrSymbols] = middleCharsCount,
+                [Addition.Requirements] = requirements,
+                [Addition.NumberOfCharacters] = alphasOnlyCount,
+                [Addition.Symbols] = symbolsCount,
+                [Addition.UppercaseLetters] = alphasUpperCount,
+                [Addition.LowercaseLetters] = alphasLowerCount,
+                [Addition.MiddleNumbersOrSymbols] = middleCharsCount,
+                [Addition.LettersOnly] = alphasOnlyCount,
+                [Addition.NumbersOnly] = numbersOnlyCount,
+                [Addition.RepeatCharacters] = repeatCharsCount,
+                [Addition.ConsecutiveUppercaseLetters] = consequenceAlphasUpperCount,
+                [Addition.ConsecutiveLowercaseLetters] = consequenceAlphasLowerCount,
+                [Addition.ConsecutiveNumbers] = consequenceDigitsCount,
+                [Addition.SequentialLetters] = sequenceAlphasCount,
+                [Addition.SequentialNumbers] = sequenceNumbersCount,
+                [Addition.SequentialSymbols] = sequenceSymbolsCount
+            };
 
             score = score > 100 ? 100 : score;
             score = score < 0 ? 0 : score;
@@ -717,7 +720,7 @@ namespace Saritasa.Tools.Security
             return chars.ToArray();
         }
 
-        private static void ShuffleCharsArray(char[] chars)
+        static void ShuffleCharsArray(char[] chars)
         {
             for (int i = chars.Length - 1; i >= 1; i--)
             {
@@ -733,10 +736,10 @@ namespace Saritasa.Tools.Security
         /// </summary>
         /// <param name="maxValue">Maximum value for number.</param>
         /// <returns>The random number between zero and maxValue.</returns>
-        private static int GetNextRandom(int maxValue)
+        static int GetNextRandom(int maxValue)
         {
 #if !PORTABLE
-            byte[] bytes = new byte[4];
+            var bytes = new byte[4];
             lock (RandomServiceLock)
             {
                 RandomService.GetBytes(bytes);
@@ -747,7 +750,7 @@ namespace Saritasa.Tools.Security
 #endif
         }
 
-        private static string Reverse(string target)
+        static string Reverse(string target)
         {
             var arr = target.ToCharArray();
             Array.Reverse(arr);

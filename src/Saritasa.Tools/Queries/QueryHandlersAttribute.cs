@@ -8,7 +8,7 @@ namespace Saritasa.Tools.Queries
     /// <summary>
     /// Indicates the method is query.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Method, Inherited = false)]
     public class QueryAttribute : Attribute
     {
     }
@@ -17,7 +17,7 @@ namespace Saritasa.Tools.Queries
     /// The class that contains queries handers should be marked
     /// with this attribute.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public class QueryHandlersAttribute : Attribute
     {
     }

@@ -12,21 +12,18 @@ namespace Saritasa.Tools.Emails
     /// </summary>
     public abstract class FilterEmailInterceptor<TMessage> : IEmailInterceptor<TMessage> where TMessage : class
     {
-        private IList<string> approvedAddresses = new List<string>();
+        readonly IList<string> approvedAddresses = new List<string>();
 
         /// <summary>
         /// Gets approved addresses. Emails that do not match to these address patterns will not be sent.
         /// Default is all.
         /// </summary>
-        public IEnumerable<string> ApprovedAddresses
-        {
-            get { return approvedAddresses; }
-        }
+        public IEnumerable<string> ApprovedAddresses => approvedAddresses;
 
         /// <summary>
         /// .ctor
         /// </summary>
-        public FilterEmailInterceptor()
+        protected FilterEmailInterceptor()
         {
         }
 
@@ -34,7 +31,7 @@ namespace Saritasa.Tools.Emails
         /// .ctor
         /// </summary>
         /// <param name="emails">Approved emails patterns. You can use ? and * symbols.</param>
-        public FilterEmailInterceptor(string emails)
+        protected FilterEmailInterceptor(string emails)
         {
             SetApprovedEmails(emails);
         }

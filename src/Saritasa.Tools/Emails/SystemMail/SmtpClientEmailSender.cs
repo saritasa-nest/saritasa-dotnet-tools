@@ -17,7 +17,7 @@ namespace Saritasa.Tools.Emails.SystemMail
         /// <summary>
         /// Instance of SmtpClient.
         /// </summary>
-        public SmtpClient Client { get; private set; }
+        public SmtpClient Client { get; }
 
         /// <summary>
         /// .ctor

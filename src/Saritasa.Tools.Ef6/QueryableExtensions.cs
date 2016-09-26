@@ -12,7 +12,7 @@ namespace Saritasa.Tools.Ef
     /// <summary>
     /// Custom extensions for IQueryable
     /// </summary>
-    public static class IQueryableExtensions
+    public static class QueryableExtensions
     {
         /// <summary>
         /// Apply includes to query
@@ -24,13 +24,10 @@ namespace Saritasa.Tools.Ef
         public static IQueryable<TEntity> Include<TEntity>(this IQueryable<TEntity> @this, IEnumerable<Expression<Func<TEntity, object>>> includes)
             where TEntity : class
         {
-            IQueryable<TEntity> query = @this;
+            var query = @this;
             if (includes != null)
             {
-                foreach (var include in includes)
-                {
-                    query = query.Include(include);
-                }
+                query = includes.Aggregate(query, (current, include) => current.Include(include));
             }
             return query;
         }

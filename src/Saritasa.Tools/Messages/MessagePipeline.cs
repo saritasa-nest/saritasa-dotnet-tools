@@ -20,10 +20,7 @@ namespace Saritasa.Tools.Messages
         #region IMessagePipeline
 
         /// <inheritdoc />
-        public virtual byte[] MessageTypes
-        {
-            get { return new byte[] { }; }
-        }
+        public virtual byte[] MessageTypes => new byte[] { };
 
         /// <inheritdoc />
         public void AppendMiddlewares(params IMessagePipelineMiddleware[] middlewares)
@@ -32,7 +29,7 @@ namespace Saritasa.Tools.Messages
             {
                 Middlewares.Add(middleware);
             }
-            var ids = Middlewares.GroupBy(m => m.Id).Where(m => m.Count() > 1);
+            var ids = Middlewares.GroupBy(m => m.Id).Where(m => m.Count() > 1).ToArray();
             if (ids.Any())
             {
                 Middlewares.Clear();

@@ -16,7 +16,7 @@ namespace Saritasa.Tools.Messages.ObjectSerializers
         /// <inheritdoc />
         public object Deserialize(byte[] bytes, Type type)
         {
-            BinaryFormatter formatter = new BinaryFormatter();
+            var formatter = new BinaryFormatter();
             using (var memory = new MemoryStream(bytes))
             {
                 return formatter.Deserialize(memory);
@@ -26,7 +26,7 @@ namespace Saritasa.Tools.Messages.ObjectSerializers
         /// <inheritdoc />
         public byte[] Serialize(object obj)
         {
-            BinaryFormatter formatter = new BinaryFormatter();
+            var formatter = new BinaryFormatter();
             using (var memory = new MemoryStream())
             {
                 formatter.Serialize(memory, obj);
@@ -35,10 +35,7 @@ namespace Saritasa.Tools.Messages.ObjectSerializers
         }
 
         /// <inheritdoc />
-        public bool IsText
-        {
-            get { return false; }
-        }
+        public bool IsText => false;
     }
 }
 #endif
