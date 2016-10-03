@@ -53,19 +53,19 @@ namespace Saritasa.Tools.NLog
         #region Trace
 
         /// <inheritdoc/>
-        public bool IsTraceEnabled => this.logger.IsTraceEnabled;
+        public bool IsTraceEnabled => logger.IsTraceEnabled;
 
         /// <inheritdoc/>
-        public void Trace(string message) => this.logger.Trace(message);
+        public void Trace(string message) => logger.Trace(message);
 
         /// <inheritdoc/>
-        public void Trace(string format, params object[] args) => this.logger.Trace(format, args);
+        public void Trace(string format, params object[] args) => logger.Trace(format, args);
 
         /// <inheritdoc/>
-        public void Trace(IFormatProvider provider, string format, params object[] args) => this.logger.Trace(provider, format, args);
+        public void Trace(IFormatProvider provider, string format, params object[] args) => logger.Trace(provider, format, args);
 
         /// <inheritdoc/>
-        public void Trace(Exception exception, string message) => this.logger.Trace(exception, message);
+        public void Trace(Exception exception, string message) => logger.Trace(exception, message);
 
         /// <inheritdoc/>
         public void Trace(Exception exception, string format, params object[] args) => this.logger.Trace(exception, format, args);
@@ -78,100 +78,100 @@ namespace Saritasa.Tools.NLog
         #region Info
 
         /// <inheritdoc/>
-        public bool IsInfoEnabled => this.logger.IsInfoEnabled;
+        public bool IsInfoEnabled => logger.IsInfoEnabled;
 
         /// <inheritdoc/>
-        public void Info(string message) => this.logger.Info(message);
+        public void Info(string message) => logger.Info(message);
 
         /// <inheritdoc/>
-        public void Info(string format, params object[] args) => this.logger.Info(format, args);
+        public void Info(string format, params object[] args) => logger.Info(format, args);
 
         /// <inheritdoc/>
-        public void Info(IFormatProvider provider, string format, params object[] args) => this.logger.Info(provider, format, args);
+        public void Info(IFormatProvider provider, string format, params object[] args) => logger.Info(provider, format, args);
 
         /// <inheritdoc/>
-        public void Info(Exception exception, string message) => this.logger.Info(exception, message);
+        public void Info(Exception exception, string message) => logger.Info(exception, message);
 
         /// <inheritdoc/>
-        public void Info(Exception exception, string format, params object[] args) => this.logger.Info(exception, format, args);
+        public void Info(Exception exception, string format, params object[] args) => logger.Info(exception, format, args);
 
         /// <inheritdoc/>
-        public void Info(Exception exception, IFormatProvider provider, string format, params object[] args) => this.logger.Info(exception, provider, format, args);
+        public void Info(Exception exception, IFormatProvider provider, string format, params object[] args) => logger.Info(exception, provider, format, args);
 
         #endregion
 
         #region Warn
 
         /// <inheritdoc/>
-        public bool IsWarnEnabled => this.logger.IsWarnEnabled;
+        public bool IsWarnEnabled => logger.IsWarnEnabled;
 
         /// <inheritdoc/>
-        public void Warn(string message) => this.logger.Warn(message);
+        public void Warn(string message) => logger.Warn(message);
 
         /// <inheritdoc/>
-        public void Warn(string format, params object[] args) => this.logger.Warn(format, args);
+        public void Warn(string format, params object[] args) => logger.Warn(format, args);
 
         /// <inheritdoc/>
-        public void Warn(IFormatProvider provider, string format, params object[] args) => this.logger.Warn(provider, format, args);
+        public void Warn(IFormatProvider provider, string format, params object[] args) => logger.Warn(provider, format, args);
 
         /// <inheritdoc/>
-        public void Warn(Exception exception, string message) => this.logger.Warn(exception, message);
+        public void Warn(Exception exception, string message) => logger.Warn(exception, message);
 
         /// <inheritdoc/>
-        public void Warn(Exception exception, string format, params object[] args) => this.logger.Warn(exception, format, args);
+        public void Warn(Exception exception, string format, params object[] args) => logger.Warn(exception, format, args);
 
         /// <inheritdoc/>
-        public void Warn(Exception exception, IFormatProvider provider, string format, params object[] args) => this.logger.Warn(exception, provider, format, args);
+        public void Warn(Exception exception, IFormatProvider provider, string format, params object[] args) => logger.Warn(exception, provider, format, args);
 
         #endregion
 
         #region Error
 
         /// <inheritdoc/>
-        public bool IsErrorEnabled => this.logger.IsErrorEnabled;
+        public bool IsErrorEnabled => logger.IsErrorEnabled;
 
         /// <inheritdoc/>
-        public void Error(string message) => this.logger.Error(message);
+        public void Error(string message) => logger.Error(message);
 
         /// <inheritdoc/>
-        public void Error(string format, params object[] args) => this.logger.Error(format, args);
+        public void Error(string format, params object[] args) => logger.Error(format, args);
 
         /// <inheritdoc/>
-        public void Error(IFormatProvider provider, string format, params object[] args) => this.logger.Error(provider, format, args);
+        public void Error(IFormatProvider provider, string format, params object[] args) => logger.Error(provider, format, args);
 
         /// <inheritdoc/>
-        public void Error(Exception exception, string message) => this.logger.Error(exception, message);
+        public void Error(Exception exception, string message) => logger.Error(exception, message);
 
         /// <inheritdoc/>
-        public void Error(Exception exception, string format, params object[] args) => this.logger.Error(exception, format, args);
+        public void Error(Exception exception, string format, params object[] args) => logger.Error(exception, format, args);
 
         /// <inheritdoc/>
-        public void Error(Exception exception, IFormatProvider provider, string format, params object[] args) => this.logger.Error(exception, provider, format, args);
+        public void Error(Exception exception, IFormatProvider provider, string format, params object[] args) => logger.Error(exception, provider, format, args);
 
         #endregion
 
         #region Fatal
 
         /// <inheritdoc/>
-        public bool IsFatalEnabled => this.logger.IsFatalEnabled;
+        public bool IsFatalEnabled => logger.IsFatalEnabled;
 
         /// <inheritdoc/>
-        public void Fatal(string message) => this.logger.Error(message);
+        public void Fatal(string message) => logger.Error(message);
 
         /// <inheritdoc/>
-        public void Fatal(string format, params object[] args) => this.logger.Error(format, args);
+        public void Fatal(string format, params object[] args) => logger.Error(format, args);
 
         /// <inheritdoc/>
-        public void Fatal(IFormatProvider provider, string format, params object[] args) => this.logger.Error(provider, format, args);
+        public void Fatal(IFormatProvider provider, string format, params object[] args) => logger.Error(provider, format, args);
 
         /// <inheritdoc/>
-        public void Fatal(Exception exception, string message) => this.logger.Error(exception, message);
+        public void Fatal(Exception exception, string message) => logger.Error(exception, message);
 
         /// <inheritdoc/>
-        public void Fatal(Exception exception, string format, params object[] args) => this.logger.Error(exception, format, args);
+        public void Fatal(Exception exception, string format, params object[] args) => logger.Error(exception, format, args);
 
         /// <inheritdoc/>
-        public void Fatal(Exception exception, IFormatProvider provider, string format, params object[] args) => this.logger.Error(exception, provider, format, args);
+        public void Fatal(Exception exception, IFormatProvider provider, string format, params object[] args) => logger.Error(exception, provider, format, args);
 
         #endregion
     }

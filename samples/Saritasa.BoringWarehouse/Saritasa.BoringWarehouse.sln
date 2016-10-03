@@ -1,0 +1,59 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.BoringWarehouse.Web", "Saritasa.BoringWarehouse.Web\Saritasa.BoringWarehouse.Web.csproj", "{B8D48FD2-B20B-40A9-8870-9B964117DEFA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.BoringWarehouse.Domain", "Saritasa.BoringWarehouse.Domain\Saritasa.BoringWarehouse.Domain.csproj", "{CC1AE7A8-33C6-45F0-93E2-DDF1B52BD764}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.BoringWarehouse.DataAccess", "Saritasa.BoringWarehouse.DataAccess\Saritasa.BoringWarehouse.DataAccess.csproj", "{CA154950-2E0A-4568-9390-E196F0BC420E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Saritasa.Tools", "Saritasa.Tools", "{C71B2713-FE29-4CAA-A464-299BBFE963A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools", "..\..\src\Saritasa.Tools\Saritasa.Tools.csproj", "{A5451164-9DF3-45B9-9067-2DF7E23F8806}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.NLog4", "..\..\src\Saritasa.Tools.NLog4\Saritasa.Tools.NLog4.csproj", "{83D4925B-B04F-4C9C-8BF1-9B6A6BE0A87D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.Ef6", "..\..\src\Saritasa.Tools.Ef6\Saritasa.Tools.Ef6.csproj", "{D1AD1713-BC18-4340-B8DB-23D86D22FB7F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B8D48FD2-B20B-40A9-8870-9B964117DEFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8D48FD2-B20B-40A9-8870-9B964117DEFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8D48FD2-B20B-40A9-8870-9B964117DEFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8D48FD2-B20B-40A9-8870-9B964117DEFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC1AE7A8-33C6-45F0-93E2-DDF1B52BD764}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC1AE7A8-33C6-45F0-93E2-DDF1B52BD764}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC1AE7A8-33C6-45F0-93E2-DDF1B52BD764}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC1AE7A8-33C6-45F0-93E2-DDF1B52BD764}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA154950-2E0A-4568-9390-E196F0BC420E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA154950-2E0A-4568-9390-E196F0BC420E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA154950-2E0A-4568-9390-E196F0BC420E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA154950-2E0A-4568-9390-E196F0BC420E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5451164-9DF3-45B9-9067-2DF7E23F8806}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5451164-9DF3-45B9-9067-2DF7E23F8806}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5451164-9DF3-45B9-9067-2DF7E23F8806}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5451164-9DF3-45B9-9067-2DF7E23F8806}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83D4925B-B04F-4C9C-8BF1-9B6A6BE0A87D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83D4925B-B04F-4C9C-8BF1-9B6A6BE0A87D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83D4925B-B04F-4C9C-8BF1-9B6A6BE0A87D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83D4925B-B04F-4C9C-8BF1-9B6A6BE0A87D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1AD1713-BC18-4340-B8DB-23D86D22FB7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1AD1713-BC18-4340-B8DB-23D86D22FB7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1AD1713-BC18-4340-B8DB-23D86D22FB7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1AD1713-BC18-4340-B8DB-23D86D22FB7F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A5451164-9DF3-45B9-9067-2DF7E23F8806} = {C71B2713-FE29-4CAA-A464-299BBFE963A2}
+		{83D4925B-B04F-4C9C-8BF1-9B6A6BE0A87D} = {C71B2713-FE29-4CAA-A464-299BBFE963A2}
+		{D1AD1713-BC18-4340-B8DB-23D86D22FB7F} = {C71B2713-FE29-4CAA-A464-299BBFE963A2}
+	EndGlobalSection
+EndGlobal

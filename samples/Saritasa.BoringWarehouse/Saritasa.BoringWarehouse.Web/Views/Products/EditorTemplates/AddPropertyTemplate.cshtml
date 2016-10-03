@@ -1,0 +1,7 @@
+﻿@model Saritasa.BoringWarehouse.Web.Models.AddProductPropertyTemplate
+
+<div class="container">
+    <input data-val="true" data-val-number="The field Id must be a number." data-val-required="Требуется поле Id." id="@("Properties_" + Model.Index + "__Id")" name="@("Properties[" + Model.Index + "].Id")" type="hidden" value="0">
+    <input class="form-control col-md-6 text-box single-line" data-val="true" data-val-maxlength="Поле Name должно иметь тип строки или массива с максимальной длиной &quot;255&quot;." data-val-maxlength-max="255" data-val-required="Требуется поле Name." id="@("Properties_" + Model.Index + "__Name")" name="@("Properties[" + Model.Index + "].Name")" type="text" value="">
+    <input class="form-control col-md-6 text-box single-line" data-val="true" data-val-maxlength="Поле Value должно иметь тип строки или массива с максимальной длиной &quot;255&quot;." data-val-maxlength-max="255" data-val-required="Требуется поле Value." id="@("Properties_" + Model.Index + "__Value")" name="@("Properties[" + Model.Index + "].Value")" type="text" value="">
+</div>

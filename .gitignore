@@ -122,3 +122,4 @@ build/content
 bower_components
 node_modules
 bundles
+*.sqlite
