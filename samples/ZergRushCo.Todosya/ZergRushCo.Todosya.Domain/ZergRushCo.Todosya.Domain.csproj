@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0184CEB7-AD6D-4F0A-836A-8CC9E8153286}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ZergRushCo.Todosya.Domain</RootNamespace>
+    <AssemblyName>ZergRushCo.Todosya.Domain</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>Saritasa.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>Saritasa.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Candy, Version=0.6.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Candy.0.6.1\lib\net46\Candy.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="IAppUnitOfWork.cs" />
+    <Compile Include="IAppUnitOfWorkFactory.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tasks\ColorValidationAttribute.cs" />
+    <Compile Include="Tasks\Commands\CheckTaskCommand.cs" />
+    <Compile Include="Tasks\Commands\CreateProjectCommand.cs" />
+    <Compile Include="Tasks\Commands\RemoveProjectCommand.cs" />
+    <Compile Include="Tasks\Commands\UpdateProjectCommand.cs" />
+    <Compile Include="Tasks\Commands\CreateTaskCommand.cs" />
+    <Compile Include="Tasks\Commands\RemoveTaskCommand.cs" />
+    <Compile Include="Tasks\Commands\UpdateTaskCommand.cs" />
+    <Compile Include="Tasks\Dtos\ProjectDto.cs" />
+    <Compile Include="Tasks\Dtos\TaskDto.cs" />
+    <Compile Include="Tasks\Entities\Project.cs" />
+    <Compile Include="Tasks\Entities\Task.cs" />
+    <Compile Include="Tasks\Handlers\ProjectHandlers.cs" />
+    <Compile Include="Tasks\Handlers\TaskHandlers.cs" />
+    <Compile Include="Tasks\Queries\ProjectsQueries.cs" />
+    <Compile Include="Tasks\Queries\TasksQueries.cs" />
+    <Compile Include="Tasks\Repositories\IProjectRepository.cs" />
+    <Compile Include="Tasks\Repositories\ITaskRepository.cs" />
+    <Compile Include="Users\Commands\LoginUserCommand.cs" />
+    <Compile Include="Users\Commands\UpdateUserRawCommand.cs" />
+    <Compile Include="Users\Commands\UpdateUserCommand.cs" />
+    <Compile Include="Users\Commands\RegisterUserCommand.cs" />
+    <Compile Include="Users\Entities\Role.cs" />
+    <Compile Include="Users\Entities\User.cs" />
+    <Compile Include="Users\Events\UserCreatedEvent.cs" />
+    <Compile Include="Users\Handlers\UserEventsHandlers.cs" />
+    <Compile Include="Users\Handlers\UserHandlers.cs" />
+    <Compile Include="Users\Queries\UsersQueries.cs" />
+    <Compile Include="Users\Repositories\IUserRepository.cs" />
+    <Compile Include="Users\Services\AppUserManager.cs" />
+    <Compile Include="Users\Services\AppPasswordHasher.cs" />
+    <Compile Include="Users\Services\UserStoreService.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Saritasa.Tools\Saritasa.Tools.csproj">
+      <Project>{a5451164-9df3-45b9-9067-2df7e23f8806}</Project>
+      <Name>Saritasa.Tools</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

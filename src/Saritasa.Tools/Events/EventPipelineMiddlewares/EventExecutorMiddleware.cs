@@ -92,7 +92,14 @@ namespace Saritasa.Tools.Events.EventPipelineMiddlewares
                 }
                 if (handler == null)
                 {
-                    handler = resolver(eventMessage.HandlerMethods[i].DeclaringType);
+                    try
+                    {
+                        handler = resolver(eventMessage.HandlerMethods[i].DeclaringType);
+                    }
+                    catch (Exception ex)
+                    {
+                        InternalLogger.Info($"Exception while resolving {eventMessage.HandlerMethods[i].Name}: {ex}");
+                    }
                 }
                 if (handler == null)
                 {

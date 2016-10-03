@@ -8,10 +8,10 @@ namespace Saritasa.Tools.Messages.Repositories
     using System.Data;
     using System.Data.Common;
     using System.Linq;
+    using System.Text;
     using ObjectSerializers;
     using QueryProviders;
     using Internal;
-    using System.Text;
 
     /// <summary>
     /// Use ADO.NET infrastructure to store commands.
@@ -54,7 +54,7 @@ namespace Saritasa.Tools.Messages.Repositories
             Oracle,
         }
 
-        readonly Dialect dialect = Dialect.MySql;
+        readonly Dialect dialect;
 
         readonly bool isInitialized = false;
 
@@ -102,6 +102,8 @@ namespace Saritasa.Tools.Messages.Repositories
                     return new MySqlQueryProvider(serializer);
                 case Dialect.SqlServer:
                     return new SqlServerQueryProvider(serializer);
+                case Dialect.SqLite:
+                    return new SqLiteQueryProvider(serializer);
                 default:
                     throw new NotImplementedException($"The sql provider {dialect} is not implemented yet");
             }

@@ -1,0 +1,200 @@
+﻿@{
+    ViewBag.Title = "Dashboard";
+}
+
+@section head {
+    <style>
+        .todo-action:hover {
+            text-decoration: none;
+        }
+        #tasks .form-group {
+            margin-bottom: 0;
+        }
+    </style>
+}
+
+<br />
+<div class="row">
+    <div class="col-md-6">
+        <h4>Here is your tasks list</h4>
+    </div>
+    <div class="col-md-6">
+        <input id="task-new" type="button" class="btn btn-default pull-right" value="New" />
+    </div>
+</div>
+
+<div id="tasks" style="display: none;">
+    <div data-bind="foreach: tasks">
+        <div class="row form-group">
+            <div class="col-md-1">
+                <label class="pull-right">
+                    <input type="checkbox" data-bind="checked: isDone" class="form-control" />
+                </label>
+            </div>
+            <div class="col-md-5">
+                <p data-bind="text: text, visible: !isEdit()" class="task-control"></p>
+                <input type="text" data-bind="textInput: text, visible: isEdit(), css: { error: text().length < 1 && isTouched() }"
+                    placeholder="Task Name" data-role="text" class="wide-input form-control"/>
+            </div>
+            <div class="col-md-4">
+                <p data-bind="text: projectName, visible: !isEdit(), style: { color: projectColor }" class="task-control"></p>
+                <select data-bind="options: $parent.projects, optionsText: 'name', optionsValue: 'id', value: projectId, visible: isEdit()"
+                    class="wide-input form-control"></select>
+            </div>
+            <div class="col-md-2">
+                <span class="pull-left">
+                    <a href="javascript:;"
+                       class="glyphicon glyphicon glyphicon-edit todo-action btn btn-default"
+                       aria-hidden="true"
+                       data-bind="visible: !isEdit(), click: edit"></a>
+                    <a href="javascript:;"
+                       class="glyphicon glyphicon glyphicon glyphicon-ok todo-action btn btn-default"
+                       aria-hidden="true"
+                       data-bind="visible: isEdit(), click: save"></a>
+                    <a href="javascript:;"
+                       class="glyphicon glyphicon-remove todo-action btn btn-default"
+                       aria-hidden="true"
+                       data-bind="click: $parent.removeTask"></a>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div data-bind="if: tasks().length < 1">
+        No tasks defined. Click "New" button to create new task.
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        require(['App', 'jquery', 'knockout', 'Services/TasksService'], function (App, $, ko, tasksService) {
+            // task model
+            var Task = function (opt) {
+                var opt = opt || {};
+                this.id = opt.id || -1;
+                this.text = ko.observable(opt.text || '');
+                this.projectId = ko.observable(opt.projectId || 0);
+                this.isDone = ko.observable(opt.isDone || false);
+                this.isEdit = ko.observable(opt.isEdit || false);
+                this.isTouched = ko.observable(opt.isTouched || false);
+                this.projects = opt.projects;
+                this.projectName = ko.computed(function () {
+                    var self = this;
+                    var project = ko.utils.arrayFirst(this.projects(), function (p) {
+                        return p.id === self.projectId();
+                    });
+                    return project ? project.name() : '<none>';
+                }, this);
+                this.projectColor = ko.computed(function () {
+                    var self = this;
+                    var project = ko.utils.arrayFirst(this.projects(), function (p) {
+                        return p.id === self.projectId();
+                    });
+                    return project ? project.color() : '#000';
+                }, this);
+                this.isDone.subscribe(function () {
+                    var task = this;
+                    if (task.id > 0) {
+                        tasksService.check(task.id, task.isDone());
+                    }
+                }, this);
+                this.text.subscribe(function () {
+                    this.isTouched(true);
+                }, this);
+
+                var self = this;
+            }
+            Task.prototype.edit = function () {
+                this.isEdit(true);
+            }
+            Task.prototype.save = function (task) {
+                // validate
+                if (!task.text()) {
+                    return;
+                }
+
+                if (task.id > 0) {
+                    tasksService.update(task);
+                }
+                else {
+                    tasksService.create(task).then(function (data) {
+                        task.id = data.Id;
+                    });
+                }
+                this.isEdit(false);
+            }
+
+            // project model
+            var Project = function (opt) {
+                var opt = opt || {};
+                this.id = opt.id || -1;
+                this.name = ko.observable(opt.name || '');
+                this.color = ko.observable(opt.color || '#000');
+            }
+
+            // view model
+            var ViewModel = function () {
+                this.tasks = ko.observableArray();
+                this.projects = ko.observableArray();
+
+                var self = this;
+                this.removeTask = function (task) {
+                    if (task.id < 1) {
+                        self.tasks.remove(task);
+                        return;
+                    }
+
+                    if (confirm('Are you sure you want to delete the task?')) {
+                        tasksService.remove(task.id);
+                        self.tasks.remove(task);
+                    }
+                }
+            }
+
+            // init page controls
+            function init(viewModel) {
+                tasksService.getProjects().then(function (data) {
+                    viewModel.projects.push(new Project({
+                        id: -1,
+                        name: '',
+                        color: '#000'
+                    }));
+                    $.each(data, function (ind, item) {
+                        viewModel.projects.push(new Project({
+                            id: item.Id,
+                            name: item.Name,
+                            color: item.Color
+                        }));
+                    });
+                })
+                .then(function () {
+                    tasksService.get().then(function (data) {
+                        $.each(data, function (ind, item) {
+                            viewModel.tasks.push(new Task({
+                                id: item.Id,
+                                text: item.Text,
+                                projectId: item.ProjectId,
+                                isDone: item.IsDone,
+                                projects: viewModel.projects,
+                            }));
+                        });
+                    });
+                });
+
+                $('#task-new').on('click', function () {
+                    viewModel.tasks.push(new Task({
+                        id: -1,
+                        isEdit: true,
+                        projects: viewModel.projects
+                    }));
+                    $('#tasks input[data-role=text]:last').focus();
+                });
+            }
+
+            var viewModel = new ViewModel();
+            init(viewModel);
+
+            ko.applyBindings(viewModel);
+            $('#tasks').show();
+        });
+    </script>
+}

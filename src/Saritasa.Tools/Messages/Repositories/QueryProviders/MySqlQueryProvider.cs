@@ -46,11 +46,11 @@ namespace Saritasa.Tools.Messages.Repositories.QueryProviders
                     `execution_duration` INT NOT NULL,
                     `status` TINYINT NOT NULL,
                     PRIMARY KEY (`id`),
-                    INDEX `type` (`type`),
-                    INDEX `content_id` (`content_id`),
-                    INDEX `content_type` (`content_type`),
-                    INDEX `error_type` (`error_type`),
-                    INDEX `created_at` (`created_at`)
+                    INDEX `ix_type` (`type`),
+                    INDEX `ix_content_id` (`content_id`),
+                    INDEX `ix_content_type` (`content_type`),
+                    INDEX `ix_error_type` (`error_type`),
+                    INDEX `ix_created_at` (`created_at`)
                 )";
         }
 

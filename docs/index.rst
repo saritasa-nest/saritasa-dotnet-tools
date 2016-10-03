@@ -7,11 +7,12 @@ Table of Contents
 -----------------
 
 .. toctree::
-    :maxdepth: 2
+    :titlesonly:
 
-    core
+    general
     emails
-    unitofwork
+    dataaccess
     logging
+    messages/index
     mvc
     security

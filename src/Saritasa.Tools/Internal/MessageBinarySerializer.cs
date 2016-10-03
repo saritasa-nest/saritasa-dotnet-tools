@@ -123,8 +123,7 @@ namespace Saritasa.Tools.Internal
                             break;
                         case TokenData:
                             result.Data =
-                                (IDictionary<string, string>)
-                                serializer.Deserialize(chunk.Item2, typeof(IDictionary<string, string>));
+                                (IDictionary<string, string>)serializer.Deserialize(chunk.Item2, typeof(IDictionary<string, string>));
                             break;
                         case TokenCreated:
                             result.CreatedAt = DateTime.FromBinary(BitConverter.ToInt64(chunk.Item2, 0));
@@ -142,7 +141,7 @@ namespace Saritasa.Tools.Internal
                             result.ErrorType = Encoding.UTF8.GetString(chunk.Item2);
                             break;
                         case TokenStatus:
-                            result.Status = (Message.ProcessingStatus) chunk.Item2[0];
+                            result.Status = (Message.ProcessingStatus)chunk.Item2[0];
                             break;
                         case TokenEndOfCommand:
                             var t = TypeHelpers.LoadType(result.ContentType, assemblies);
