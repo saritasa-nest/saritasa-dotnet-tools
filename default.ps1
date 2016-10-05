@@ -8,6 +8,7 @@ if ($PSVersionTable.PSVersion.Major -lt 3)
 Framework 4.6
 
 . .\scripts\BuildTasks.ps1
+. .\scripts\PublishTasks.ps1
 
 Import-Module .\scripts\Saritasa.Psake.psd1
 Import-Module .\scripts\Saritasa.Build.psd1
