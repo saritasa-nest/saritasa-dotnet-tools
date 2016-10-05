@@ -7,6 +7,8 @@ if ($PSVersionTable.PSVersion.Major -lt 3)
 
 Framework 4.6
 
+. .\scripts\BuildTasks.ps1
+
 Import-Module .\scripts\Saritasa.Psake.psd1
 Import-Module .\scripts\Saritasa.Build.psd1
 Import-Module .\scripts\Saritasa.Test.psd1
@@ -18,6 +20,7 @@ Properties `
     $signKey = './saritasa-tools.snk'
     $nuspecFile = './build/Saritasa.Tools.nuspec'
     $libDirectory = './build/lib'
+    $Configuration = 'Release'
 }
 
 $builds = @(

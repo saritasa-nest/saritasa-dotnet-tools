@@ -9,3 +9,5 @@ COPY 123 RemoteFreedom
 EXPOSE 80
 
 CMD ["dir"]
+
+ENTRYPOINT ["cmd"]
