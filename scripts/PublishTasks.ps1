@@ -8,7 +8,7 @@ Task package-zerg -depends build-zerg `
 {
     $packagePath = "$samples\ZergRushCo.Todosya\Zerg.zip"
     Invoke-PackageBuild -ProjectPath "$samples\ZergRushCo.Todosya\ZergRushCo.Todosya.Web\ZergRushCo.Todosya.Web.csproj" `
-        -PackagePath $packagePath -Configuration $Configuration -Precompile $false
+        -PackagePath $packagePath -Configuration $Configuration
 
     Set-Location "$samples\ZergRushCo.Todosya\Docker"
     Copy-Item $packagePath .
