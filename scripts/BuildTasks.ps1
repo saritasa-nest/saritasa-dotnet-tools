@@ -18,4 +18,6 @@ Task build-zerg `
     }
 
     gulp
+
+    Set-Location "$samples\.."
 }

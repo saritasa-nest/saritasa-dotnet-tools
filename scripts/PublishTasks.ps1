@@ -6,6 +6,13 @@ Import-Module "$root\Saritasa.WebDeploy.psd1"
 
 Task package-zerg -depends build-zerg `
 {
+    $packagePath = "$samples\ZergRushCo.Todosya\Zerg.zip"
     Invoke-PackageBuild -ProjectPath "$samples\ZergRushCo.Todosya\ZergRushCo.Todosya.Web\ZergRushCo.Todosya.Web.csproj" `
-        -PackagePath 'Zerg.zip' -Configuration $Configuration -Precompile $false
+        -PackagePath $packagePath -Configuration $Configuration -Precompile $false
+
+    Set-Location "$samples\ZergRushCo.Todosya\Docker"
+    Copy-Item $packagePath .
+
+    $version = (gitversion /showvariable SemVer)
+    docker build -t zerg:latest -t "zerg:$version" .
 }
