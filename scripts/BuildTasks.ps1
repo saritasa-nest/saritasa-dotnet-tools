@@ -21,3 +21,11 @@ Task build-zerg `
 
     Set-Location "$samples\.."
 }
+
+Task build-bw `
+{
+    Invoke-NugetRestore "$src\Saritasa.Tools.sln"
+    &"$root\nuget.exe" restore "$src\Saritasa.Tools.NLog4\packages.config" -SolutionDirectory $src
+    Invoke-NugetRestore "$samples\Saritasa.BoringWarehouse\Saritasa.BoringWarehouse.sln"
+    Invoke-SolutionBuild "$samples\Saritasa.BoringWarehouse\Saritasa.BoringWarehouse.sln" -Configuration $Configuration
+}
