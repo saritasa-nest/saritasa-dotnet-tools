@@ -73,7 +73,7 @@ namespace Saritasa.Tools.Tests
         {
             var cp = CommandPipeline.CreateDefaultPipeline(CommandPipeline.NullResolver,
                 Assembly.GetAssembly(typeof(CommandsTests)));
-            var cmd = new SimpleTestCommand() {Id = 5};
+            var cmd = new SimpleTestCommand() { Id = 5 };
             cp.Handle(cmd);
             Assert.That(cmd.Out, Is.EqualTo("result"));
         }

@@ -17,7 +17,7 @@ namespace Saritasa.Tools.Domain
         /// Get entity instance by id.
         /// </summary>
         /// <param name="id">Entity id.</param>
-        /// <param name="includes">Relations for include</param>
+        /// <param name="includes">Relations to include.</param>
         /// <returns>Entity instance.</returns>
         TEntity Get(object id, IEnumerable<Expression<Func<TEntity, object>>> includes = null);
 
@@ -25,7 +25,7 @@ namespace Saritasa.Tools.Domain
         /// Get all entities of specified type.
         /// </summary>
         /// <returns>Enumerable of entities.</returns>
-        /// <param name="includes">Relations for include</param>
+        /// <param name="includes">Relations to include.</param>
         IEnumerable<TEntity> GetAll(IEnumerable<Expression<Func<TEntity, object>>> includes = null);
 
         /// <summary>

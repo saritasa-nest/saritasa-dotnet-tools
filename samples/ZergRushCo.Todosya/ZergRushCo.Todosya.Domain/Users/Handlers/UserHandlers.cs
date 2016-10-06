@@ -9,10 +9,13 @@ using ZergRushCo.Todosya.Domain.Users.Events;
 
 namespace ZergRushCo.Todosya.Domain.Users.Handlers
 {
+    /// <summary>
+    /// User handlers.
+    /// </summary>
     [CommandHandlers]
     public class UserHandlers
     {
-        public void HandlerRegisterUser(RegisterUserCommand command, IAppUnitOfWorkFactory uowFactory,
+        public void HandleRegisterUser(RegisterUserCommand command, IAppUnitOfWorkFactory uowFactory,
             IEventPipeline eventsPipeline)
         {
             using (var uow = uowFactory.Create())

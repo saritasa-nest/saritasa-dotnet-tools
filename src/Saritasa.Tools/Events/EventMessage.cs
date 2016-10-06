@@ -25,7 +25,7 @@ namespace Saritasa.Tools.Events
         public override string ErrorType => Error != null ? Error.GetType().FullName : string.Empty;
 
         /// <inheritdoc />
-        public override string ContentType { get; set; }
+        public override string ContentType => Content.GetType().FullName;
 
         /// <summary>
         /// Function input parameters.

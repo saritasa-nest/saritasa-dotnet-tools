@@ -26,6 +26,7 @@ namespace Saritasa.Tools.Messages.PipelineMiddlewares
                 throw new ArgumentNullException(nameof(repository));
             }
             this.repository = repository;
+            Id = repository.GetType().Name;
         }
 
         /// <inheritdoc />

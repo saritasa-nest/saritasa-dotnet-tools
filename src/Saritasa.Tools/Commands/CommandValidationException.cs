@@ -13,6 +13,9 @@ namespace Saritasa.Tools.Commands
     /// <summary>
     /// Wraps set of object validation exceptions. Domain exception.
     /// </summary>
+#if !NETCOREAPP1_0 && !NETSTANDARD1_6
+    [Serializable]
+#endif
     public class CommandValidationException : DomainException
     {
         /// <summary>

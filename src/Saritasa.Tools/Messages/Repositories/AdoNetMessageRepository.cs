@@ -46,7 +46,7 @@ namespace Saritasa.Tools.Messages.Repositories
             /// <summary>
             /// SQLite.
             /// </summary>
-            SqLite,
+            Sqlite,
 
             /// <summary>
             /// Oracle.
@@ -102,7 +102,7 @@ namespace Saritasa.Tools.Messages.Repositories
                     return new MySqlQueryProvider(serializer);
                 case Dialect.SqlServer:
                     return new SqlServerQueryProvider(serializer);
-                case Dialect.SqLite:
+                case Dialect.Sqlite:
                     return new SqLiteQueryProvider(serializer);
                 default:
                     throw new NotImplementedException($"The sql provider {dialect} is not implemented yet");

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Saritasa.Tools.Commands;
 using Saritasa.Tools.Exceptions;
 using ZergRushCo.Todosya.Domain.Tasks.Commands;
@@ -53,6 +54,7 @@ namespace ZergRushCo.Todosya.Domain.Tasks.Handlers
                     throw new DomainException("Only user who created project can remove it.");
                 }
 
+                uow.TaskRepository.RemoveRange(uow.TaskRepository.Where(t => t.Project.Id == project.Id));
                 uow.ProjectRepository.Remove(project);
                 uow.Complete();
             }

@@ -46,6 +46,13 @@ namespace Saritasa.Tools.Events
             return eventPipeline;
         }
 
+#pragma warning disable SA1401
+        /// <summary>
+        /// Empty event pipeline;
+        /// </summary>
+        public static EventPipeline Empty = new EventPipeline();
+#pragma warning restore SA1401
+
         /// <inheritdoc />
         public override void ProcessRaw(Message message)
         {

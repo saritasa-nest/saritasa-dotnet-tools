@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.Ef6", "..\..
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.Mvc5", "..\..\src\Saritasa.Tools.Mvc5\Saritasa.Tools.Mvc5.csproj", "{6C773C8F-226C-454E-8656-3A6B9BF38476}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZergRushCo.Todosya.Tests", "ZergRushCo.Todosya.Tests\ZergRushCo.Todosya.Tests.csproj", "{64615AF2-4F28-4FB4-83D7-029E7B3AB4D4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,10 @@ Global
 		{6C773C8F-226C-454E-8656-3A6B9BF38476}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C773C8F-226C-454E-8656-3A6B9BF38476}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C773C8F-226C-454E-8656-3A6B9BF38476}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64615AF2-4F28-4FB4-83D7-029E7B3AB4D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64615AF2-4F28-4FB4-83D7-029E7B3AB4D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64615AF2-4F28-4FB4-83D7-029E7B3AB4D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64615AF2-4F28-4FB4-83D7-029E7B3AB4D4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

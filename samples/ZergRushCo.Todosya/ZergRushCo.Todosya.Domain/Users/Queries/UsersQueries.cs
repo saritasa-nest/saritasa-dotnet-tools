@@ -1,4 +1,5 @@
-﻿using ZergRushCo.Todosya.Domain.Users.Entities;
+﻿using System.Linq;
+using ZergRushCo.Todosya.Domain.Users.Entities;
 
 namespace ZergRushCo.Todosya.Domain.Users.Queries
 {
@@ -9,6 +10,15 @@ namespace ZergRushCo.Todosya.Domain.Users.Queries
         public UsersQueries(IAppUnitOfWork uow)
         {
             this.uow = uow;
+        }
+
+        private UsersQueries()
+        {
+        }
+
+        public User GetByEmail(string email)
+        {
+            return uow.UserRepository.FirstOrDefault(u => u.Email == email);
         }
 
         public User GetById(int id)

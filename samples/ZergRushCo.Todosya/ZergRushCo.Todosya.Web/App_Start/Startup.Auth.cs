@@ -20,7 +20,7 @@ namespace ZergRushCo.Todosya.Web
 
             CookieOptions = new CookieAuthenticationOptions
             {
-                AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie   
+                AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie
             };
         }
     }

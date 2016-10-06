@@ -1,4 +1,5 @@
-﻿using System.Data.Entity;
+﻿using System.Data.Common;
+using System.Data.Entity;
 using SQLite.CodeFirst;
 using ZergRushCo.Todosya.Domain.Tasks.Entities;
 using ZergRushCo.Todosya.Domain.Users.Entities;
@@ -18,6 +19,15 @@ namespace ZergRushCo.Todosya.DataAccess
         {
         }
 
+        public AppDbContext(DbConnection connection) : base(connection, true)
+        {
+        }
+
+        /// <summary>
+        /// Use Sqlite database initializer. True by default. We don't need it for testing.
+        /// </summary>
+        public bool UseSqliteDatabase { get; set; } = true;
+
         public DbSet<User> Users { get; set; }
 
         public DbSet<Task> Tasks { get; set; }
@@ -26,8 +36,11 @@ namespace ZergRushCo.Todosya.DataAccess
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            var sqliteConnectionInitializer = new SqliteCreateDatabaseIfNotExists<AppDbContext>(modelBuilder);
-            Database.SetInitializer(sqliteConnectionInitializer);
+            if (UseSqliteDatabase)
+            {
+                var sqliteConnectionInitializer = new SqliteCreateDatabaseIfNotExists<AppDbContext>(modelBuilder);
+                Database.SetInitializer(sqliteConnectionInitializer);
+            }
 
             modelBuilder.Entity<Task>()
                 .HasRequired(c => c.User)

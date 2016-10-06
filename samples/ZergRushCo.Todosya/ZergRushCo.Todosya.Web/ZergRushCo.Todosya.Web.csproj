@@ -166,6 +166,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App_Start\DebugEndpointConfig.cs" />
     <Compile Include="Controllers\JsonProjectsController.cs" />
     <Compile Include="App_Start\DiConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />

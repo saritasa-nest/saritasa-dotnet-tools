@@ -90,7 +90,9 @@ namespace Saritasa.Tools.Messages.Endpoints
             listener.Start();
             var thread = new Thread(Listen)
             {
-                IsBackground = true
+                Name = "MessagesWebEndpoint",
+                IsBackground = true,
+                Priority = ThreadPriority.BelowNormal,
             };
             thread.Start();
 
@@ -176,7 +178,7 @@ namespace Saritasa.Tools.Messages.Endpoints
                                 message,
                                 System.Text.Encoding.UTF8.GetBytes(message.Content.ToString()),
                                 new ObjectSerializers.JsonObjectSerializer(), // only json is supported
-                                AppDomain.CurrentDomain.GetAssemblies() // pretend that all types are loaded to current domain
+                                AppDomain.CurrentDomain.GetAssemblies() // pretend that all types are loaded into current domain
                             );
                         }
                         catch (Exception ex)

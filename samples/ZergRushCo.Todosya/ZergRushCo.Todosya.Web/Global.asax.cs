@@ -11,6 +11,7 @@ namespace ZergRushCo.Todosya.Web
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             DiConfig.Register();
+            DebugEndpointConfig.Register();
         }
     }
 }

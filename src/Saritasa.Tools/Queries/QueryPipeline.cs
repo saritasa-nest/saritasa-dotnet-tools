@@ -1,19 +1,23 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Linq;
+using System.Reflection;
+using Saritasa.Tools.Internal;
+using Saritasa.Tools.Messages;
+
 namespace Saritasa.Tools.Queries
 {
-    using System;
-    using System.Linq;
-    using System.Reflection;
-    using Messages;
-
     /// <summary>
     /// Query pipeline.
     /// </summary>
     public class QueryPipeline : MessagePipeline, IQueryPipeline
     {
-        static readonly byte[] AvailableMessageTypes = new byte[] { Message.MessageTypeQuery };
+        static readonly byte[] AvailableMessageTypes = { Message.MessageTypeQuery };
 
         /// <inheritdoc />
         public override byte[] MessageTypes => AvailableMessageTypes;
@@ -81,23 +85,7 @@ namespace Saritasa.Tools.Queries
         /// <inheritdoc />
         public TQuery GetQuery<TQuery>() where TQuery : class
         {
-#if !NETCOREAPP1_0 && !NETSTANDARD1_6
-            var ctor = typeof(TQuery).GetTypeInfo().GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
-                null, new Type[] { }, null);
-#else
-            var ctorMember = typeof(TQuery).GetTypeInfo().FindMembers(
-                MemberTypes.Constructor,
-                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
-                (member, filterCriteria) => true,
-                null).FirstOrDefault();
-            var ctor = ctorMember != null ? (ConstructorInfo) ctorMember : (ConstructorInfo)null;
-#endif
-            if (ctor == null)
-            {
-                throw new ArgumentException($"Type {typeof(TQuery)} must have public or private parameter-less constructor");
-            }
-
-            return (TQuery)ctor.Invoke(new object[] { });
+            return (TQuery)CreateObjectFromType(typeof(TQuery));
         }
 
         /// <summary>
@@ -127,7 +115,75 @@ namespace Saritasa.Tools.Queries
         /// <inheritdoc />
         public override void ProcessRaw(Message message)
         {
-            throw new NotImplementedException();
+#if !NETCOREAPP1_0 && !NETSTANDARD1_6
+            if (message == null)
+            {
+                throw new ArgumentNullException(nameof(message));
+            }
+            if (string.IsNullOrEmpty(message.ContentType))
+            {
+                throw new ArgumentException(nameof(message.ContentType));
+            }
+            if (message.ContentType.IndexOf(".") < 0)
+            {
+                throw new ArgumentException("Cannot specify method name and type from content type");
+            }
+
+            var objectTypeName = message.ContentType.Substring(0, message.ContentType.LastIndexOf(".", StringComparison.Ordinal));
+            var objectType = TypeHelpers.LoadType(objectTypeName, AppDomain.CurrentDomain.GetAssemblies());
+            var obj = CreateObjectFromType(objectType);
+
+            var methodName = message.ContentType.Substring(message.ContentType.LastIndexOf(".", StringComparison.Ordinal) + 1);
+            var method = objectType.GetMethod(methodName);
+            if (method == null)
+            {
+                throw new ArgumentException($"Cannot find method {methodName}");
+            }
+            var delegateType = Expression.GetDelegateType(
+                method.GetParameters().Select(p => p.ParameterType).Concat(new[] { method.ReturnType }).ToArray());
+            var @delegate = obj.GetType().GetMethod(methodName).CreateDelegate(delegateType, obj);
+            if (@delegate == null)
+            {
+                throw new Exception("Cannot create delegate");
+            }
+
+            var messageContent = ((IDictionary<string, object>)message.Content).Values;
+            var methodTypes = method.GetParameters().Select(p => p.ParameterType);
+            var values = methodTypes.Zip(messageContent, (mt, mc) =>
+            {
+                return TypeHelpers.ConvertType(mc, mt);
+            });
+
+            var queryMessage = CreateMessage(@delegate, values.ToArray());
+            ProcessPipeline(queryMessage);
+            message.Content = queryMessage.Result;
+#endif
+        }
+
+        /// <summary>
+        /// Create object from type. Type must have parameterless ctor.
+        /// </summary>
+        /// <param name="t">Type.</param>
+        /// <returns>Created object.</returns>
+        private object CreateObjectFromType(Type t)
+        {
+#if !NETCOREAPP1_0 && !NETSTANDARD1_6
+            var ctor = t.GetTypeInfo().GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
+                null, new Type[] { }, null);
+#else
+            var ctorMember = t.GetTypeInfo().FindMembers(
+                MemberTypes.Constructor,
+                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
+                (member, filterCriteria) => true,
+                null).FirstOrDefault();
+            var ctor = ctorMember != null ? (ConstructorInfo) ctorMember : (ConstructorInfo)null;
+#endif
+            if (ctor == null)
+            {
+                throw new ArgumentException($"Type {t} must have public or private parameter-less constructor");
+            }
+
+            return ctor.Invoke(new object[] { });
         }
     }
 }

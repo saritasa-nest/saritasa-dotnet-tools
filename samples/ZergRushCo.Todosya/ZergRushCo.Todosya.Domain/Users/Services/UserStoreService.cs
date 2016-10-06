@@ -44,7 +44,7 @@ namespace ZergRushCo.Todosya.Domain.Users.Services
         {
             return Task.Run(() =>
             {
-                commandPipeline.Handle(new RegisterUserCommand()
+                var command = new RegisterUserCommand()
                 {
                     FirstName = user.FirstName,
                     LastName = user.LastName,
@@ -53,7 +53,9 @@ namespace ZergRushCo.Todosya.Domain.Users.Services
                     Country = user.Country,
                     BirthDay = user.BirthDay,
                     City = user.City,
-                });
+                };
+                commandPipeline.Handle(command);
+                user.Id = command.UserId;
             });
         }
 
@@ -72,7 +74,7 @@ namespace ZergRushCo.Todosya.Domain.Users.Services
         /// <inheritdoc />
         public Task<User> FindByNameAsync(string userName)
         {
-            return Task.Run(() => userRepository.FirstOrDefault(u => u.UserName == userName));
+            return Task.Run(() => userRepository.FirstOrDefault(u => u.UserName == userName && u.IsActive));
         }
 
         /// <inheritdoc />
