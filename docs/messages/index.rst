@@ -17,9 +17,9 @@ You can setup you application to process everything thru single pipeline:
 
     ::
 
-        Commands---v
-        Queries ---+---> (message) ---> Pipeline ---> (processing) ---> Result
-        Events ----^
+        Commands ---> (message) ---> Commands Pipeline ---> (processing) ---> Action
+        Queries ---> (message) ---> Queries Pipeline ---> (processing) ---> Result
+        Events ---> (message) ---> Events Pipeline ---> (processing) ---> Actions
 
 Pipeline is a set of handlers (middlewares) to process your commands/queries. Here is a sample pipeline:
 
