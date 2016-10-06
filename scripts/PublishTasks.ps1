@@ -16,3 +16,16 @@ Task package-zerg -depends build-zerg `
     $version = (gitversion /showvariable SemVer)
     docker build -t zerg:latest -t "zerg:$version" .
 }
+
+Task publish-bw -depends build-bw `
+{
+    $packagePath = "$samples\Saritasa.BoringWarehouse\BW.zip"
+    Invoke-PackageBuild -ProjectPath "$samples\Saritasa.BoringWarehouse\Saritasa.BoringWarehouse.Web\Saritasa.BoringWarehouse.Web.csproj" `
+        -PackagePath $packagePath -Configuration $Configuration -Precompile $false
+
+    Set-Location "$samples\Saritasa.BoringWarehouse\Docker"
+    Copy-Item $packagePath .
+
+    $version = (gitversion /showvariable SemVer)
+    docker build -t zerg:latest -t "bw:$version" .
+}
