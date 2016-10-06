@@ -27,5 +27,5 @@ Task publish-bw -depends build-bw `
     Copy-Item $packagePath .
 
     $version = (gitversion /showvariable SemVer)
-    docker build -t zerg:latest -t "bw:$version" .
+    docker build -t bw:latest -t "bw:$version" .
 }
