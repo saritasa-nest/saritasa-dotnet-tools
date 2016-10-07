@@ -29,11 +29,19 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                @Html.ActionLink("Todosya", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                <a href="@Url.Action("Index", "Home")" class="navbar-brand">
+                    <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                    Todosya
+                </a>
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Dashboard", "Index", "Home")</li>
+                    <li>
+                        <a href="@Url.Action("Index", "Home")">
+                            <i class="fa fa-tachometer" aria-hidden="true"></i>
+                            Dashboard
+                        </a>
+                    </li>
                     @if (Request.IsAuthenticated)
                     {
                         <li>@Html.ActionLink("Projects", "Index", "Projects")</li>
