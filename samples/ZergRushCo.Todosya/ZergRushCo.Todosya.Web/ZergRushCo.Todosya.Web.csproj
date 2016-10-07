@@ -203,6 +203,7 @@
     <Content Include="gulpfile.js\bundle-bower-style.js" />
     <Content Include="gulpfile.js\bundle-style.js" />
     <Content Include="gulpfile.js\clean-temp.js" />
+    <Content Include="gulpfile.js\custom.js" />
     <Content Include="gulpfile.js\index.js" />
     <Content Include="gulpfile.js\validate-js.js" />
     <Content Include="gulpfile.js\validate-style.js" />

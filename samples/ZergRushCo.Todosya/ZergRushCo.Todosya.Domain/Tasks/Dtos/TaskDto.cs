@@ -13,7 +13,10 @@ namespace ZergRushCo.Todosya.Domain.Tasks.Dtos
         {
             Id = task.Id;
             UserId = task.User.Id;
-            ProjectId = task.Project.Id;
+            if (task.Project != null)
+            {
+                ProjectId = task.Project.Id;
+            }
             Text = task.Text;
             IsDone = task.IsDone;
             DueDate = task.DueDate;

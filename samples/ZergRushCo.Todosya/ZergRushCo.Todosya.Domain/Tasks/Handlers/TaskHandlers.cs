@@ -13,7 +13,7 @@ namespace ZergRushCo.Todosya.Domain.Tasks.Handlers
             using (var uow = uowFactory.Create())
             {
                 var project = uow.ProjectRepository.Get(command.ProjectId);
-                if (project.User.Id != command.UserId)
+                if (project != null && project.User.Id != command.UserId)
                 {
                     throw new DomainException("User does not own the project");
                 }
@@ -39,7 +39,7 @@ namespace ZergRushCo.Todosya.Domain.Tasks.Handlers
             using (var uow = uowFactory.Create())
             {
                 var project = uow.ProjectRepository.Get(command.ProjectId);
-                if (project.User.Id != command.UserId)
+                if (project != null && project.User.Id != command.UserId)
                 {
                     throw new DomainException("User does not own the project");
                 }

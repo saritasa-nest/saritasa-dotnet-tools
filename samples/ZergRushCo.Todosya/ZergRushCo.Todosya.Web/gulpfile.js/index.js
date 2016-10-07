@@ -32,5 +32,6 @@ gulp.task('default', function () {
         'bundle-bower-style',
         'bundle-app-pages',
         'bundle-style',
+        'custom',
         'clean-temp');
 });

@@ -20,6 +20,7 @@
     "knockout": "^3.4.0",
     "jquery": "^3.1.1",
     "bootstrap-sass": "bootstrap-sass-official#^3.3.7",
-    "tinyColorPicker": "^1.1.1"
+    "tinyColorPicker": "^1.1.1",
+    "font-awesome": "^4.6.3"
   }
 }

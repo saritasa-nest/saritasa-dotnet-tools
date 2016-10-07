@@ -46,10 +46,6 @@ namespace ZergRushCo.Todosya.DataAccess
                 .HasRequired(c => c.User)
                 .WithMany()
                 .WillCascadeOnDelete(false);
-            modelBuilder.Entity<Task>()
-                .HasRequired(c => c.Project)
-                .WithMany()
-                .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<Project>()
                 .HasRequired(c => c.User)

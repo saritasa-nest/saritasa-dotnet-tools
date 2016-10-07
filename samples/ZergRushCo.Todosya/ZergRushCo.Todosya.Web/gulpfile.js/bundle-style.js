@@ -41,7 +41,7 @@ gulp.task('bundle-style', function () {
         .pipe(gulpif(config.useCssMin, gulpif('*.css', postcss(postcssOptions))))
         .pipe(gulpif(config.useSourcemaps, sourcemaps.write()))
         .pipe(gulp.dest(path.join(config.dest, config.pagesDir)));
-    return merge(appstream);
+    return merge(appstream, pagesstream);
 });
 
 // empty pipeline item
