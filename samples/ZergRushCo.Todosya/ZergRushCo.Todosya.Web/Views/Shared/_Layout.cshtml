@@ -1,4 +1,13 @@
 ﻿@using Microsoft.AspNet.Identity
+@functions
+{
+    HtmlString GetActiveTabClass(string currentTab = null)
+    {
+        currentTab = currentTab ?? string.Empty;
+        var activeTab = ViewBag.ActiveMenu ?? string.Empty;
+        return currentTab == activeTab ? new HtmlString("class=\"active\"") : new HtmlString(string.Empty);
+    }
+}
 
 <!DOCTYPE html>
 
@@ -36,7 +45,7 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li>
+                    <li @GetActiveTabClass("dashboard")>
                         <a href="@Url.Action("Index", "Home")">
                             <i class="fa fa-tachometer" aria-hidden="true"></i>
                             Dashboard
@@ -44,10 +53,10 @@
                     </li>
                     @if (Request.IsAuthenticated)
                     {
-                        <li>@Html.ActionLink("Projects", "Index", "Projects")</li>
+                        <li @GetActiveTabClass("projects")>@Html.ActionLink("Projects", "Index", "Projects")</li>
                     }
-                    <li>@Html.ActionLink("About", "About", "Home")</li>
-                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+                    <li @GetActiveTabClass("about")>@Html.ActionLink("About", "About", "Home")</li>
+                    <li @GetActiveTabClass("contact")>@Html.ActionLink("Contact", "Contact", "Home")</li>
                 </ul>
                 @Html.Partial("_LoginPartial")
             </div>
