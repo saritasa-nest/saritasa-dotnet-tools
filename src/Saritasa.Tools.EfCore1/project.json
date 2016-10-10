@@ -1,0 +1,36 @@
+{
+  "version": "1.0.0-*",
+
+  "dependencies": {
+    "Saritasa.Tools": "*"
+  },
+
+  "frameworks": {
+    "net452": {
+      "frameworkAssemblies": {
+        "System.Data": ""
+      },
+      "dependencies": {
+        "Microsoft.EntityFrameworkCore": "1.0.1"
+      }
+    },
+    "net461": {
+      "frameworkAssemblies": {
+        "System.Data": ""
+      },
+      "dependencies": {
+        "Microsoft.EntityFrameworkCore": "1.0.1"
+      }
+    },
+    "netcoreapp1.0": {
+      "dependencies": {
+        "Microsoft.EntityFrameworkCore": "1.0.1"
+      }
+    },
+    "netstandard1.6": {
+      "dependencies": {
+        "Microsoft.EntityFrameworkCore": "1.0.1"
+      }
+    }
+  }
+}

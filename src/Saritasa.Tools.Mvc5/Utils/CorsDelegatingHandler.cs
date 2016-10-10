@@ -11,7 +11,7 @@ namespace Saritasa.Tools.Mvc.Utils
     using System.Threading.Tasks;
 
     /// <summary>
-    /// Adds cors headers to response.
+    /// Adds CORS headers to response.
     /// </summary>
     public class CorsDelegatingHandler : DelegatingHandler
     {

@@ -16,18 +16,18 @@ namespace Saritasa.Tools.Domain
         /// <summary>
         /// Get entity instance by id.
         /// </summary>
-        /// <param name="id">Entity id.</param>
+        /// <param name="keyValues">Entity ids.</param>
         /// <returns>Entity instance.</returns>
-        TEntity Get(object id);
+        TEntity Get(params object[] keyValues);
 
         /// <summary>
         /// Get entity instance by id.
         /// </summary>
-        /// <param name="id">Entity id.</param>
         /// <param name="includes">Relations to include.</param>
+        /// <param name="keyValues">Entity ids.</param>
         /// <typeparam name="TProperty">Property type.</typeparam>
         /// <returns>Entity instance.</returns>
-        TEntity Get<TProperty>(object id, IEnumerable<Expression<Func<TEntity, TProperty>>> includes = null);
+        TEntity Get<TProperty>(IEnumerable<Expression<Func<TEntity, TProperty>>> includes, params object[] keyValues);
 
         /// <summary>
         /// Get all entities of specified type.
@@ -41,7 +41,7 @@ namespace Saritasa.Tools.Domain
         /// <param name="includes">Relations to include.</param>
         /// <typeparam name="TProperty">Property type.</typeparam>
         /// <returns>Enumerable of entities.</returns>
-        IEnumerable<TEntity> GetAll<TProperty>(IEnumerable<Expression<Func<TEntity, TProperty>>> includes = null);
+        IEnumerable<TEntity> GetAll<TProperty>(IEnumerable<Expression<Func<TEntity, TProperty>>> includes);
 
         /// <summary>
         /// Finds for range of entities based on predicate.
@@ -57,7 +57,7 @@ namespace Saritasa.Tools.Domain
         /// <param name="includes">Relations for include</param>
         /// <typeparam name="TProperty">Property type.</typeparam>
         /// <returns>Enumerable of enitites.</returns>
-        IEnumerable<TEntity> Find<TProperty>(Expression<Func<TEntity, bool>> predicate, IEnumerable<Expression<Func<TEntity, TProperty>>> includes = null);
+        IEnumerable<TEntity> Find<TProperty>(Expression<Func<TEntity, bool>> predicate, IEnumerable<Expression<Func<TEntity, TProperty>>> includes);
 
         /// <summary>
         /// Add entity.
