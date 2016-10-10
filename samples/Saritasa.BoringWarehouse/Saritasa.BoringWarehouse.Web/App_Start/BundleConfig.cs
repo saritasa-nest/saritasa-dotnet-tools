@@ -8,44 +8,44 @@
         public static void RegisterBundles(BundleCollection bundles)
         {
             bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
-                        "~/bower_components/jquery/dist/jquery.js"));
+                        "~/Static/js/jquery.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/jquery-tmpl").Include(
-                        "~/bower_components/jquery-tmpl/jquery.tmpl.js"));
+                        "~/Static/js/jquery.tmpl.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
-                        "~/bower_components/jquery-validation/dist/jquery.validate.js"));
+                        "~/Static/js/jquery.validate.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/datatables").Include(
-                        "~/bower_components/datatables/media/js/jquery.dataTables.js",
-                        "~/bower_components/datatables/media/js/dataTables.bootstrap.js",
-                        "~/bower_components/datatables-buttons/js/dataTables.buttons.js",
-                        "~/bower_components/datatables-buttons/js/buttons.bootstrap.js",
-                        "~/bower_components/datatables-select/js/dataTables.select.js"
+                        "~/Static/js/jquery.dataTables.js",
+                        "~/Static/js/dataTables.bootstrap.js",
+                        "~/Static/js/dataTables.buttons.js",
+                        "~/Static/js/buttons.bootstrap.js",
+                        "~/Static/js/dataTables.select.js"
                 ));
 
             bundles.Add(new ScriptBundle("~/bundles/bootbox").Include(
-                "~/bower_components/bootbox.js/bootbox.js"
+                "~/Static/js/bootbox.js"
                 ));
 
             bundles.Add(new ScriptBundle("~/bundles/properties-list-edit").Include(
-                "~/Scripts/propertiesListEdit.js"));
+                "~/Static/js/propertiesListEdit.js"));
 
             // Use the development version of Modernizr to develop with and learn from. Then, when you're
             // ready for production, use the build tool at http://modernizr.com to pick only the tests you need.
             bundles.Add(new ScriptBundle("~/bundles/modernizr").Include(
-                        "~/Scripts/modernizr-*"));
+                        "~/Static/js/modernizr-*"));
 
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
-                      "~/bower_components/bootstrap/dist/js/bootstrap.js",
-                      "~/Scripts/respond.js"));
+                      "~/Static/js/bootstrap.js",
+                      "~/Static/js/respond.js"));
 
-            bundles.Add(new StyleBundle("~/Content/css").Include(
-                      "~/bower_components/bootstrap/dist/css/bootstrap.css",
-                      "~/bower_components/datatables/media/css/dataTables.bootstrap.css",
-                      "~/bower_components/datatables-buttons/css/buttons.bootstrap.css",
-                      "~/bower_components/datatables-select/css/select.bootstrap.css",
-                      "~/Content/site.css"
+            bundles.Add(new StyleBundle("~/Static/css").Include(
+                      "~/Static/css/bootstrap.css",
+                      "~/Static/css/dataTables.bootstrap.css",
+                      "~/Static/css/buttons.bootstrap.css",
+                      "~/Static/css/select.bootstrap.css",
+                      "~/Static/css/site.css"
                 ));
         }
     }

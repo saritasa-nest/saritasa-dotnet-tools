@@ -157,44 +157,35 @@
     <Compile Include="Views\HtmlExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\bootstrap-theme.css" />
-    <Content Include="Content\bootstrap-theme.min.css" />
-    <Content Include="Content\bootstrap.css" />
-    <Content Include="Content\bootstrap.min.css" />
     <Content Include="favicon.ico" />
-    <Content Include="fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Static\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
-    <Content Include="Content\Site.css" />
-    <Content Include="fonts\glyphicons-halflings-regular.woff2" />
-    <Content Include="fonts\glyphicons-halflings-regular.woff" />
-    <Content Include="fonts\glyphicons-halflings-regular.ttf" />
-    <Content Include="fonts\glyphicons-halflings-regular.eot" />
-    <Content Include="Content\bootstrap.min.css.map" />
-    <Content Include="Content\bootstrap.css.map" />
-    <Content Include="Content\bootstrap-theme.min.css.map" />
-    <Content Include="Content\bootstrap-theme.css.map" />
+    <Content Include="Static\css\Site.css" />
+    <Content Include="Static\fonts\glyphicons-halflings-regular.woff2" />
+    <Content Include="Static\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="Static\fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="Static\fonts\glyphicons-halflings-regular.eot" />
     <Content Include="bower.json" />
     <Content Include="gulpfile.js" />
     <Content Include="package.json" />
-    <None Include="Scripts\jquery-3.1.0.intellisense.js" />
-    <Content Include="Scripts\bootstrap.js" />
-    <Content Include="Scripts\bootstrap.min.js" />
-    <Content Include="Scripts\jquery-3.1.0.js" />
-    <Content Include="Scripts\jquery-3.1.0.min.js" />
-    <Content Include="Scripts\jquery-3.1.0.slim.js" />
-    <Content Include="Scripts\jquery-3.1.0.slim.min.js" />
-    <None Include="Scripts\jquery.validate-vsdoc.js" />
-    <Content Include="Scripts\jquery.validate.js" />
-    <Content Include="Scripts\jquery.validate.min.js" />
-    <Content Include="Scripts\jquery.validate.unobtrusive.js" />
-    <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
-    <Content Include="Scripts\modernizr-2.8.3.js" />
-    <Content Include="Scripts\propertiesListEdit.js" />
-    <Content Include="Scripts\respond.js" />
-    <Content Include="Scripts\respond.matchmedia.addListener.js" />
-    <Content Include="Scripts\respond.matchmedia.addListener.min.js" />
-    <Content Include="Scripts\respond.min.js" />
-    <Content Include="Scripts\_references.js" />
+    <Content Include="Static\css\bootstrap.css" />
+    <Content Include="Static\css\buttons.bootstrap.css" />
+    <Content Include="Static\css\dataTables.bootstrap.css" />
+    <Content Include="Static\css\select.bootstrap.css" />
+    <Content Include="Static\js\bootbox.js" />
+    <Content Include="Static\js\bootstrap.js" />
+    <Content Include="Static\js\buttons.bootstrap.js" />
+    <Content Include="Static\js\dataTables.bootstrap.js" />
+    <Content Include="Static\js\dataTables.buttons.js" />
+    <Content Include="Static\js\dataTables.select.js" />
+    <Content Include="Static\js\jquery.dataTables.js" />
+    <Content Include="Static\js\jquery.js" />
+    <Content Include="Static\js\jquery.tmpl.js" />
+    <Content Include="Static\js\jquery.validate.js" />
+    <Content Include="Static\js\modernizr-2.8.3.js" />
+    <Content Include="Static\js\propertiesListEdit.js" />
+    <Content Include="Static\js\respond.js" />
+    <Content Include="Static\js\_references.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -255,12 +246,6 @@
       <Project>{cc1ae7a8-33c6-45f0-93e2-ddf1b52bd764}</Project>
       <Name>Saritasa.BoringWarehouse.Domain</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Scripts\jquery-3.1.0.slim.min.map" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Scripts\jquery-3.1.0.min.map" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

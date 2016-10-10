@@ -18,7 +18,7 @@
         /// <inheritdoc />
         public Product Get(int id, IEnumerable<Expression<Func<Product, object>>> includes = null)
         {
-            return Find(p => p.Id == (int)id, includes).SingleOrDefault();
+            return Find(p => p.Id == id, includes).SingleOrDefault();
         }
     }
 }
