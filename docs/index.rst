@@ -16,3 +16,4 @@ Table of Contents
     messages/index
     mvc
     security
+    pagination

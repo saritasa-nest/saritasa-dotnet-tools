@@ -6,11 +6,11 @@ if ($PSVersionTable.PSVersion.Major -lt 3)
 }
 
 Framework 4.6
+$InformationPreference = 'Continue'
+$env:PSModulePath += ";$PSScriptRoot\scripts"
 
-Import-Module .\scripts\Saritasa.Psake.psd1
-Import-Module .\scripts\Saritasa.Build.psd1
-Import-Module .\scripts\Saritasa.Test.psd1
-Register-HelpTask
+Import-Module Saritasa.Build
+Import-Module Saritasa.Test
 
 Properties `
 {

@@ -7,12 +7,15 @@ NUnit.ConsoleRunner package should be installed.
 #>
 function Invoke-Nunit3Runner
 {
+    [CmdletBinding()]
     param
     (
         [Parameter(Mandatory = $true, HelpMessage = 'Path to assembly file with tests.')]
         [string] $TestAssembly,
         [string[]] $Params
     )
+
+    Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
 
     # Format and validate params
     if (!(Test-Path $TestAssembly))

@@ -6,7 +6,7 @@
     "Ivan Kozhin"
   ],
   "license": "ISC",
-  "homepage": "https://github.com/krasninja/saritasatools",
+  "homepage": "https://github.com/saritasa/saritasatools",
   "ignore": [
     "**/.*",
     "node_modules",

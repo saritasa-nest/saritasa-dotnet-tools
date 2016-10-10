@@ -5,9 +5,9 @@
     <version>0.1</version>
     <authors>Saritasa</authors>
     <owners>Saritasa</owners>
-    <licenseUrl>https://github.com/krasninja/saritasatools/master/LICENSE</licenseUrl>
-    <projectUrl>https://github.com/krasninja/saritasatools</projectUrl>
-    <iconUrl>https://raw.githubusercontent.com/krasninja/saritasatools/master/icon.png</iconUrl>
+    <licenseUrl>https://github.com/saritasa/saritasatools/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/saritasa/saritasatools</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/saritasa/saritasatools/master/icon.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Collection of tools for our company projects for Entity Framework 6.</description>
     <copyright>Copyright 2016</copyright>
