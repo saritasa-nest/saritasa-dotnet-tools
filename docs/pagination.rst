@@ -3,9 +3,6 @@ Pagination
 
 Simplify pagination.
 
-PagedEnumerable
----------------
-
 .. class:: PagedEnumerable
 
     The class helps to make paged enumerables. It wraps current page and page size. If not specified default page is first and default page size is 100. If ``totalPages`` parameter is below or equal zero it will be automatically populated with ``Count()`` method.
