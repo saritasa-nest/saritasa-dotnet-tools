@@ -18,10 +18,7 @@ namespace Saritasa.Tools.Tests
 
         class TestMiddleware1 : IMessagePipelineMiddleware
         {
-            public string Id
-            {
-                get { return "Test1"; }
-            }
+            public string Id => "Test1";
 
             public void Handle(Message message)
             {
@@ -30,10 +27,7 @@ namespace Saritasa.Tools.Tests
 
         class TestMiddleware2 : IMessagePipelineMiddleware
         {
-            public string Id
-            {
-                get { return "Test2"; }
-            }
+            public string Id => "Test2";
 
             public void Handle(Message message)
             {
@@ -42,10 +36,7 @@ namespace Saritasa.Tools.Tests
 
         class TestMiddleware3 : IMessagePipelineMiddleware
         {
-            public string Id
-            {
-                get { return "Test3"; }
-            }
+            public string Id => "Test3";
 
             public void Handle(Message message)
             {

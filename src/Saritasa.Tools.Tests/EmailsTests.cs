@@ -24,15 +24,9 @@ namespace Saritasa.Tools.Tests
         {
             private int sendingCallCount, sentCallCount;
 
-            public int SendingCallCount
-            {
-                get { return sendingCallCount; }
-            }
+            public int SendingCallCount => sendingCallCount;
 
-            public int SentCallCount
-            {
-                get { return sentCallCount; }
-            }
+            public int SentCallCount => sentCallCount;
 
             public void Sending(MailMessage mailMessage, IDictionary<string, object> data, ref bool cancel)
             {

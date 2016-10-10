@@ -1,7 +1,26 @@
 Saritasa Tools
 ==============
 
-An infrastructure components and development tools for company projects.
+An infrastructure components and development tools for company projects. Read the documentation on [Read the Docs](http://saritasa-tools.readthedocs.io/en/latest/index.html).
+
+Overview
+--------
+
+1. Saritasa.Tools - _General assembly_.
+   - Messages (commands, queries, events) - _pipeline to process and log system queries/actions;_
+   - Unit of Work - _general interface for unit of work pattern;_
+   - Repository - _general interface for repository pattern;_
+   - Emails - _intefaces for system emails;_
+   - Logging - _general interfaces for logging;_
+   - Exceptions - _domain exception, validation;_
+   - Security - _password generator;_
+   - Pagination;
+1. Saritasa.Tools.Ef6 - _Unit of work and repository implementation for Entity Framework 6._
+1. Saritasa.Tools.EfCore1 - _Unit of work and repository implementation for Entity Framework Core._
+1. Saritasa.Tools.Mvc5 - _utilities for ASP.NET MVC 5._
+    - CORS helper class;
+    - Razor helpers;
+1. Saritasa.Tools.NLog4 - _logger interface implementation for NLog 4._
 
 Installation
 ------------
@@ -17,12 +36,12 @@ Here are steps you need to do to setup environment to be able to develop. You ne
 
 - Visual Studio 2015 (https://www.visualstudio.com/downloads/download-visual-studio-vs.aspx)
 - psake (https://github.com/psake/psake)
-- PowerShell
+- PowerShell 5
 
 For documentation:
 
 - python 3 (`choco install python`)
-- sphinx  (`pip install sphinx`)
+- sphinx (`pip install sphinx`)
 - read the docs theme (`pip install sphinx_rtd_theme`)
 
 Code Style Setup

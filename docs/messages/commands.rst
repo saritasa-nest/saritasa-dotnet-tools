@@ -5,7 +5,7 @@ Command is something that changes the state (database insert/update/delete) of a
 
 1. Setup command pipeline, you can start with general one:
 
-   .. code-block:: c#
+    .. code-block:: c#
 
         var commandPipeline = Saritasa.Tools.Commands.CommandPipeline.CreateDefaultPipeline(container.Resolve,
             System.Reflection.Assembly.GetAssembly(typeof(Domain.Users.Entities.User)));
@@ -51,3 +51,18 @@ There is how you can resolve dependencies for your command handlers:
 - Using you handler class public constructor arguments.
 - Using public properties of command handler.
 - Using arguments of handler method.
+
+Middlewares
+-----------
+
+    .. class:: CommandHandlerLocatorMiddleware
+
+        Included to default pipeline. Locates for command handler class.
+
+    .. class:: CommandExecutorMiddleware
+
+        Included to default pipeline. Executes command against found command handler.
+
+    .. class:: CommandValidationMiddleware
+
+        Validates command against data annotation attributes. Generates ``CommandValidationException``.
