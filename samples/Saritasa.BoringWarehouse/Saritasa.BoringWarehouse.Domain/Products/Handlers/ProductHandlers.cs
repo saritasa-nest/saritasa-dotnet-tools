@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+
     using Commands;
     using Entities;
     using Users.Entities;
@@ -78,23 +79,20 @@
                 {
                     throw new DomainException("Can not find updater");
                 }
-
-                // delete properties
-                foreach (ProductProperty removedProperty in product.Properties.Where(oldP => command.Properties.All(newP => newP.Id != oldP.Id)).ToList())
+                // Delete properties
+                foreach (ProductProperty removedProperty in product.Properties.Where(oldP => !command.Properties.Any(newP => newP.Id == oldP.Id)).ToList())
                 {
                     product.Properties.Remove(removedProperty);
                     uow.ProductPropertyRepository.Remove(removedProperty);
                 }
-
-                // update existing properties
+                // Update existing properties
                 foreach (ProductProperty existProperty in product.Properties)
                 {
                     ProductProperty updatedProperty = command.Properties.SingleOrDefault(pp => pp.Id == existProperty.Id);
                     existProperty.Name = updatedProperty.Name;
                     existProperty.Value = updatedProperty.Value;
                 }
-
-                // add new properties
+                // Add new properties
                 foreach (ProductProperty property in command.Properties.Where(pp => pp.Id == 0))
                 {
                     product.Properties.Add(property);

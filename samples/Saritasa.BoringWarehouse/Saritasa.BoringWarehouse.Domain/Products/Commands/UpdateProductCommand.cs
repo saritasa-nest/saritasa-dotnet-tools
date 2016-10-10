@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using Saritasa.BoringWarehouse.Domain.Products.Entities;
-
-namespace Saritasa.BoringWarehouse.Domain.Products.Commands
+﻿namespace Saritasa.BoringWarehouse.Domain.Products.Commands
 {
+    using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations;
+
+    using Entities;
+
     public class UpdateProductCommand
     {
         public UpdateProductCommand()

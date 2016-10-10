@@ -9,8 +9,8 @@ var sass = require('gulp-sass');
 gulp.task('sass', function () {
     gulp.src('./bower_components/**/*.scss')
     .pipe(sass())
-    .pipe(gulp.dest('./bower_components'));
-});
+    .pipe(gulp.dest('./bower_components'))
+})
 
 gulp.task('default', function () {
     // place code for your default task here

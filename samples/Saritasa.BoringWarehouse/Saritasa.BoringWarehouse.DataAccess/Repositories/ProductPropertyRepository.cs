@@ -1,12 +1,10 @@
 ﻿namespace Saritasa.BoringWarehouse.DataAccess.Repositories
 {
-    using Domain.Products.Entities;
-    using Domain.Products.Repositories;
     using Tools.Ef;
 
-    /// <summary>
-    /// Product property repository.
-    /// </summary>
+    using Domain.Products.Entities;
+    using Domain.Products.Repositories;
+
     public class ProductPropertyRepository : EfRepository<ProductProperty, AppDbContext>, IProductPropertyRepository
     {
         public ProductPropertyRepository(AppDbContext context) 

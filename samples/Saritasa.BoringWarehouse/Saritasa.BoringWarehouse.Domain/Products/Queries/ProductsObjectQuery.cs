@@ -1,15 +1,13 @@
-﻿using Candy;
-using Saritasa.BoringWarehouse.Domain.Products.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Candy.StringExtensions;
-using static Candy.CollectionsExtensions;
-
-namespace Saritasa.BoringWarehouse.Domain.Products.Queries
+﻿namespace Saritasa.BoringWarehouse.Domain.Products.Queries
 {
+    using System.Collections.Generic;
+    using System.Linq;
+
+    using Candy;
+    using static Candy.CollectionsExtensions;
+
+    using Entities;
+
     public class ProductsObjectQuery : BaseObjectQuery
     {
         public PagedResult<Product> Search(IEnumerable<Product> products)

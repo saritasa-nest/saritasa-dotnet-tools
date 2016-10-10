@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Saritasa.BoringWarehouse.Domain.Users.Entities;
-using static Candy.CollectionsExtensions;
-
-namespace Saritasa.BoringWarehouse.Domain.Users.Queries
+﻿namespace Saritasa.BoringWarehouse.Domain.Users.Queries
 {
+    using System.Collections.Generic;
+    using System.Linq;
+
+    using static Candy.CollectionsExtensions;
+
+    using Entities;
+
     public class UsersObjectQuery : BaseObjectQuery
     {
         public PagedResult<User> Search(IEnumerable<User> users)

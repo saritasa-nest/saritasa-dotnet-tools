@@ -1,8 +1,7 @@
-﻿using System.Web;
-using System.Web.Optimization;
-
-namespace Saritasa.BoringWarehouse.Web
+﻿namespace Saritasa.BoringWarehouse.Web
 {
+    using System.Web.Optimization;
+
     public class BundleConfig
     {
         // For more information on bundling, visit http://go.microsoft.com/fwlink/?LinkId=301862
@@ -42,12 +41,12 @@ namespace Saritasa.BoringWarehouse.Web
                       "~/Scripts/respond.js"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
-                    "~/bower_components/bootstrap/dist/css/bootstrap.css",
-                    "~/bower_components/datatables/media/css/dataTables.bootstrap.css",
-                    "~/bower_components/datatables-buttons/css/buttons.bootstrap.css",
-                    "~/bower_components/datatables-select/css/select.bootstrap.css",
-                    "~/Content/site.css"
-            ));
+                      "~/bower_components/bootstrap/dist/css/bootstrap.css",
+                      "~/bower_components/datatables/media/css/dataTables.bootstrap.css",
+                      "~/bower_components/datatables-buttons/css/buttons.bootstrap.css",
+                      "~/bower_components/datatables-select/css/select.bootstrap.css",
+                      "~/Content/site.css"
+                ));
         }
     }
 }

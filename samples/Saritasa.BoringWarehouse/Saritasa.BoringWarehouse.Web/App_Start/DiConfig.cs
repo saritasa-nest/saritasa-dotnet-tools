@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
-using Autofac;
-using Autofac.Integration.Mvc;
-using Saritasa.BoringWarehouse.Web;
-
-namespace Saritasa.BoringWarehouse.Web
+﻿namespace Saritasa.BoringWarehouse.Web
 {
+    using System.Configuration;
+    using System.Web.Mvc;
+
+    using Autofac;
+    using Autofac.Integration.Mvc;
+
     /// <summary>
     /// Dependency injection configuration.
     /// </summary>

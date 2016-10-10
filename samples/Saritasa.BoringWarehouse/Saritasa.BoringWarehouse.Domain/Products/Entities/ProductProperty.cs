@@ -1,7 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Saritasa.BoringWarehouse.Domain.Products.Entities
+﻿namespace Saritasa.BoringWarehouse.Domain.Products.Entities
 {
+    using System.ComponentModel.DataAnnotations;
+
     /// <summary>
     /// Product property.
     /// </summary>

@@ -1,17 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
-using Saritasa.BoringWarehouse.Domain.Users.Entities;
-
-namespace Saritasa.BoringWarehouse.Web.Core
+﻿namespace Saritasa.BoringWarehouse.Web.Core
 {
+    using System;
+    using System.Linq;
+    using System.Web.Mvc;
+
+    using Domain.Users.Entities;
+
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class AuthorizeAttribute : System.Web.Mvc.AuthorizeAttribute
     {
         public AuthorizeAttribute()
         {
+
         }
 
         public AuthorizeAttribute(params UserRole[] roles)
@@ -21,6 +21,7 @@ namespace Saritasa.BoringWarehouse.Web.Core
                 Roles = string.Join(",", roles.Select(r => r.ToString()));
             }
         }
+        
 
         protected override void HandleUnauthorizedRequest(AuthorizationContext filterContext)
         {

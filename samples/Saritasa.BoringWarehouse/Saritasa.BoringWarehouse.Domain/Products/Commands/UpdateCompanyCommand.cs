@@ -1,9 +1,24 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Saritasa.BoringWarehouse.Domain.Products.Commands
+﻿namespace Saritasa.BoringWarehouse.Domain.Products.Commands
 {
+    using System.ComponentModel.DataAnnotations;
+
+    using Entities;
+
+    /// <summary>
+    /// Update company command
+    /// </summary>
     public class UpdateCompanyCommand
     {
+        public UpdateCompanyCommand()
+        {
+        }
+
+        public UpdateCompanyCommand(Company company)
+        {
+            CompanyId = company.Id;
+            Name = company.Name;
+        }
+
         [Key]
         public int CompanyId { get; set; }
 

@@ -1,6 +1,7 @@
 ﻿(function () {
     "use strict";
 
+
     var idTmpl = '<script id="propertyIdTmpl" type="text/x-jquery-tmpl">\
         <div>\
             <input type="hidden" id="Properties_${Index}__Id" name="Properties[${Index}].Id" value="${Id}" data-index="${Index}" />\

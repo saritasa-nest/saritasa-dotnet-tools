@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Saritasa.BoringWarehouse.Domain.Products.Entities;
-
-namespace Saritasa.BoringWarehouse.Web.Models
+﻿namespace Saritasa.BoringWarehouse.Web.Models
 {
+    using Domain.Products.Entities;
+
     public class AddProductPropertyTemplate
     {
         public AddProductPropertyTemplate(int index, ProductProperty property = null)

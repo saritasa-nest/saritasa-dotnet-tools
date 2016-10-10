@@ -1,10 +1,10 @@
-﻿using Saritasa.BoringWarehouse.Domain.Users.Entities;
-using Saritasa.BoringWarehouse.Domain.Users.Repositories;
-
-namespace Saritasa.BoringWarehouse.DataAccess.Repositories
+﻿namespace Saritasa.BoringWarehouse.DataAccess.Repositories
 {
+    using Domain.Users.Entities;
+    using Domain.Users.Repositories;
+
     /// <summary>
-    /// User repository.
+    /// Custom user repository.
     /// </summary>
     public class UserRepository : Tools.Ef.EfRepository<User, AppDbContext>, IUserRepository
     {

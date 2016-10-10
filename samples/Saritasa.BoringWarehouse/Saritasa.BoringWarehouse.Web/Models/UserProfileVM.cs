@@ -1,25 +1,16 @@
-﻿using Saritasa.BoringWarehouse.Domain.Users.Entities;
-using Saritasa.Tools.Commands;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Saritasa.BoringWarehouse.Domain.Users.Commands
+﻿namespace Saritasa.BoringWarehouse.Web.Models
 {
-    /// <summary>
-    /// Create user.
-    /// </summary>
-    public class UpdateUserProfileCommand
-    {
-        public UpdateUserProfileCommand()
-        {
+    using System.ComponentModel.DataAnnotations;
 
+    using Domain.Users.Entities;
+
+    public class UserProfileVM
+    {
+        public UserProfileVM()
+        {
         }
 
-        public UpdateUserProfileCommand(User user)
+        public UserProfileVM(User user)
         {
             UserId = user.Id;
             FirstName = user.FirstName;

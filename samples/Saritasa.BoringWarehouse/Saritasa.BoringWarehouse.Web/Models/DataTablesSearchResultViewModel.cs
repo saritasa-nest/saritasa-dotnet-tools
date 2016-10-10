@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace Saritasa.BoringWarehouse.Web.Models
+﻿namespace Saritasa.BoringWarehouse.Web.Models
 {
+    using System.Collections;
+
     public class DataTablesSearchResultViewModel
     {
         public int draw { get; set; }
