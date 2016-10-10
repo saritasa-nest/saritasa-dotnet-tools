@@ -80,6 +80,10 @@ namespace ZergRushCo.Todosya.Web
             var emailSender = new Saritasa.Tools.Emails.SystemMail.SmtpClientEmailSender();
             builder.RegisterInstance(emailSender).AsImplementedInterfaces().SingleInstance();
 
+            // logger
+            var loggerFactory = new Saritasa.Tools.NLog.LoggerFactory();
+            builder.RegisterInstance(loggerFactory).AsImplementedInterfaces().SingleInstance();
+
             // set the dependency resolver to be Autofac
             builder.Update(container);
             DependencyResolver.SetResolver(new AutofacDependencyResolver(container));

@@ -255,6 +255,10 @@
       <Project>{D1AD1713-BC18-4340-B8DB-23D86D22FB7F}</Project>
       <Name>Saritasa.Tools.Ef6</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\src\Saritasa.Tools.NLog4\Saritasa.Tools.NLog4.csproj">
+      <Project>{83d4925b-b04f-4c9c-8bf1-9b6a6be0a87d}</Project>
+      <Name>Saritasa.Tools.NLog4</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\src\Saritasa.Tools\Saritasa.Tools.csproj">
       <Project>{a5451164-9df3-45b9-9067-2df7e23f8806}</Project>
       <Name>Saritasa.Tools</Name>

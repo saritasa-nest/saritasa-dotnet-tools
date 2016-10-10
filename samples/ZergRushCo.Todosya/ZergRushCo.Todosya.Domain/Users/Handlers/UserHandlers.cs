@@ -3,6 +3,7 @@ using System.Linq;
 using Saritasa.Tools.Commands;
 using Saritasa.Tools.Events;
 using Saritasa.Tools.Exceptions;
+using Saritasa.Tools.Logging;
 using ZergRushCo.Todosya.Domain.Users.Commands;
 using ZergRushCo.Todosya.Domain.Users.Entities;
 using ZergRushCo.Todosya.Domain.Users.Events;
@@ -15,6 +16,13 @@ namespace ZergRushCo.Todosya.Domain.Users.Handlers
     [CommandHandlers]
     public class UserHandlers
     {
+        readonly ILogger logger;
+
+        public UserHandlers(ILoggerFactory loggerFactory)
+        {
+            logger = Utils.GetCurrentClassLogger(loggerFactory);
+        }
+
         public void HandleRegisterUser(RegisterUserCommand command, IAppUnitOfWorkFactory uowFactory,
             IEventPipeline eventsPipeline)
         {
@@ -46,6 +54,7 @@ namespace ZergRushCo.Todosya.Domain.Users.Handlers
                 });
 
                 command.UserId = user.Id;
+                logger.Info($"User {user.FirstName} {user.LastName} with id {user.Id} is registered.");
             }
         }
 
