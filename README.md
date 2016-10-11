@@ -22,6 +22,17 @@ Overview
     - Razor helpers;
 1. Saritasa.Tools.NLog4 - _logger interface implementation for NLog 4._
 
+Goals
+-----
+
+1. Provide common infrastructure for our projects. Make the same or similar vision of current patterns like Repository, Unit of Work, etc.
+
+1. Within Messages module provide flexible and extensible framework to manage business requirements.
+
+1. Provide common logging infrastructure to easily track users activity and system bottlenecks.
+
+1. Arrange best practices and common modules among projects.
+
 Installation
 ------------
 

@@ -9,7 +9,6 @@ Table of Contents
 .. toctree::
     :titlesonly:
 
-    general
     domain
     emails
     dataaccess

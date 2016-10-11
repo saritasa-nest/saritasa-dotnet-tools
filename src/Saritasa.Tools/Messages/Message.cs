@@ -5,6 +5,7 @@ namespace Saritasa.Tools.Messages
 {
     using System;
     using System.Collections.Generic;
+    using Newtonsoft.Json;
 
     /// <summary>
     /// Command execution result.
@@ -155,6 +156,7 @@ namespace Saritasa.Tools.Messages
         /// <summary>
         /// Is custom data dictionary initialized.
         /// </summary>
+        [JsonIgnore]
         public bool HasData => data != null;
 
         /// <summary>

@@ -15,3 +15,8 @@ This is the sample project that shows how to use repository with unit of work, e
 bower install
 npm install
 ```
+
+SandBox
+--------
+
+Simple console application project.

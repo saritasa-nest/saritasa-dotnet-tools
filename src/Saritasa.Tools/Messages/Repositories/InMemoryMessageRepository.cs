@@ -1,11 +1,15 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using Newtonsoft.Json;
+
 namespace Saritasa.Tools.Messages.Repositories
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text;
+    using ObjectSerializers;
 
     /// <summary>
     /// Simple in memory message repository.
@@ -49,6 +53,21 @@ namespace Saritasa.Tools.Messages.Repositories
         /// <inheritdoc />
         public void SaveState(IDictionary<string, object> dict)
         {
+        }
+
+        /// <summary>
+        /// Dump messages into string.
+        /// </summary>
+        /// <returns>String with data.</returns>
+        public string Dump()
+        {
+            var sb = new StringBuilder((Messages.Count + 1) * 250);
+            foreach (var message in Messages)
+            {
+                sb.AppendLine(JsonConvert.SerializeObject(message, Formatting.Indented));
+                sb.AppendLine("----------");
+            }
+            return sb.ToString();
         }
 
         /// <summary>
