@@ -1,11 +1,10 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-using System.Text.RegularExpressions;
-
 namespace Saritasa.Tools.Tests
 {
     using System;
+    using System.Text.RegularExpressions;
     using NUnit.Framework;
     using Messages;
     using Messages.PipelineMiddlewares;

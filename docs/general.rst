@@ -3,11 +3,13 @@ General
 
 The project contains infrastructure tools for .NET projects.
 
-Exceptions
-----------
+Goals
+-----
 
-``DomainException`` - Exception indicates that something wrong happaned to domain part of application. Usually the message can be shown to user.
+1. Provide common infrastructure for our projects. Make the same or similar vision of current patterns like Repository, Unit of Work, etc.
 
-``CommandValidationException`` - Inherits from ``DomainException``. Contains result of command validation against data annotation attributes.
+2. Within Messages module provide flexible and extensible framework to manage business requirements.
 
-``NotFoundException`` - Inherits from ``DomainException``. Usually means that object you try to find by specified key is not in collection.
+3. Provide common logging infrastructure to easily track users activity and system bottlenecks.
+
+4. Arrange best practices and common modules among projects.

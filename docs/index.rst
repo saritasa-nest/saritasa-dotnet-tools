@@ -10,6 +10,7 @@ Table of Contents
     :titlesonly:
 
     general
+    domain
     emails
     dataaccess
     logging

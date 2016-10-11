@@ -19,10 +19,10 @@ namespace ZergRushCo.Todosya.Tests
             uowFactory.SetSeedScenario1();
 
             // capture before
-            int tasksProjectCount = 0, totalTasksCount = 0;
+            int totalTasksCount = 0;
             using (var uow = uowFactory.Create())
             {
-                tasksProjectCount = uow.TaskRepository.GetAll().Count(t => t.Project.Id == 1);
+                int tasksProjectCount = uow.TaskRepository.GetAll().Count(t => t.Project.Id == 1);
                 totalTasksCount = uow.TaskRepository.GetAll().Count();
                 Assert.That(tasksProjectCount, Is.Positive);
                 Assert.That(totalTasksCount, Is.Positive);

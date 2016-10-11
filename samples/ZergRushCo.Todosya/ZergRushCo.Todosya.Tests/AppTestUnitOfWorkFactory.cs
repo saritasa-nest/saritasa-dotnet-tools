@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Data.Common;
+using System.IO;
 using ZergRushCo.Todosya.DataAccess;
 using ZergRushCo.Todosya.Domain;
 
@@ -24,7 +25,8 @@ namespace ZergRushCo.Todosya.Tests
 
         public void SetSeedScenario1()
         {
-            var dataLoader = new Effort.DataLoaders.CsvDataLoader(@"D:\work2\saritasatools\samples\ZergRushCo.Todosya\ZergRushCo.Todosya.Tests\Seed1");
+            var dataLoader = new Effort.DataLoaders.CsvDataLoader(
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\Seed1"));
             connection = Effort.DbConnectionFactory.CreatePersistent(id.ToString(), dataLoader);
         }
 
