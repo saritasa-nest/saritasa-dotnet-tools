@@ -48,7 +48,7 @@ namespace Saritasa.Tools.Tests
         [Test]
         public void Test_that_interceptor_executes()
         {
-            var emailSender = new Dummy.DummyEmailSender<MailMessage>();
+            var emailSender = new DummyEmailSender<MailMessage>();
             var testInterceptor = new TestInterceptor();
             emailSender.AddInterceptor(testInterceptor);
 
@@ -63,7 +63,7 @@ namespace Saritasa.Tools.Tests
         [Test]
         public void Email_filter_should_filter_addresses()
         {
-            var emailSender = new Dummy.DummyEmailSender<MailMessage>();
+            var emailSender = new DummyEmailSender<MailMessage>();
             var filterInterceptor = new SystemMailFilterEmailInterceptor("*@saritasa.com; *@saritasa-hosting.com");
             emailSender.AddInterceptor(filterInterceptor);
             var testInterceptor = new TestInterceptor();

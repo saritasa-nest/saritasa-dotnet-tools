@@ -21,7 +21,7 @@ namespace ZergRushCo.Todosya.Tests
         {
             var uowFactory = new AppTestUnitOfWorkFactory();
 
-            var userHandlers = new Domain.Users.Handlers.UserHandlers();
+            var userHandlers = new Domain.Users.Handlers.UserHandlers(new Saritasa.Tools.Logging.DummyLoggerFactory());
             var registerUserCommand = new RegisterUserCommand()
             {
                 FirstName = "Ivan",
@@ -49,7 +49,7 @@ namespace ZergRushCo.Todosya.Tests
         {
             var uowFactory = new AppTestUnitOfWorkFactory();
 
-            var userHandlers = new Domain.Users.Handlers.UserHandlers();
+            var userHandlers = new Domain.Users.Handlers.UserHandlers(new Saritasa.Tools.Logging.DummyLoggerFactory());
             var registerUserCommand1 = new RegisterUserCommand()
             {
                 FirstName = "Ivan",

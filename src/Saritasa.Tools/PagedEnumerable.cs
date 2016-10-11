@@ -53,19 +53,19 @@ namespace Saritasa.Tools
         /// <summary>
         /// Creates paged enumerable from source and query source list by page and pageSize.
         /// </summary>
-        /// <param name="source">Enumerable.</param>
+        /// <param name="baseSource">Enumerable.</param>
         /// <param name="page">Current page. Default is 1.</param>
         /// <param name="pageSize">Page size. Default is 100.</param>
         /// <param name="totalPages">Total pages. If below zero it will be calculated.</param>
         public PagedEnumerable(
-            IEnumerable<T> source,
+            IEnumerable<T> baseSource,
             int page = DefaultCurrentPage,
             int pageSize = DefaultPageSize,
             int totalPages = -1)
         {
-            if (source == null)
+            if (baseSource == null)
             {
-                throw new ArgumentNullException(nameof(source));
+                throw new ArgumentNullException(nameof(baseSource));
             }
             if (page <= 0)
             {
@@ -78,8 +78,8 @@ namespace Saritasa.Tools
 
             this.CurrentPage = page;
             this.pageSize = pageSize;
-            this.source = source.Skip((page - 1) * pageSize).Take(pageSize).ToList();
-            this.totalPages = totalPages > 0 ? totalPages : GetTotalPages(source, PageSize);
+            this.totalPages = totalPages > 0 ? totalPages : GetTotalPages(baseSource, PageSize);
+            this.source = baseSource.Skip((page - 1) * pageSize).Take(pageSize).ToList();
         }
 
         /// <summary>
@@ -128,7 +128,7 @@ namespace Saritasa.Tools
         /// <returns>Enumerator.</returns>
         public IEnumerator<T> GetEnumerator()
         {
-            return this.source.GetEnumerator();
+            return source.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()

@@ -50,6 +50,7 @@
     <Compile Include="Commands\CommandValidationException.cs" />
     <Compile Include="Commands\ICommandPipeline.cs" />
     <Compile Include="Domain\IQueryableRepository.cs" />
+    <Compile Include="Logging\DummyLoggerFactory.cs" />
     <Compile Include="Events\EventHandlersAttribute.cs" />
     <Compile Include="Events\EventPipeline.cs" />
     <Compile Include="Events\EventMessage.cs" />
@@ -71,6 +72,7 @@
     <Compile Include="Messages\PipelineMiddlewares\DataMiddleware.cs" />
     <Compile Include="Commands\CommandPipelineMiddlewares\CommandExecutorMiddleware.cs" />
     <Compile Include="Commands\CommandPipelineMiddlewares\CommandHandlerLocatorMiddleware.cs" />
+    <Compile Include="Messages\PipelineMiddlewares\RepositoryMessagesFilter.cs" />
     <Compile Include="Messages\PipelineMiddlewares\RepositoryMiddleware.cs" />
     <Compile Include="Messages\PipelineMiddlewares\PerformanceCounterMiddleware.cs" />
     <Compile Include="Messages\Repositories\AdoNetMessageRepository.cs" />
@@ -104,8 +106,8 @@
     <Compile Include="Domain\IRepository.cs" />
     <Compile Include="Domain\IUnitOfWork.cs" />
     <Compile Include="Domain\IUnitOfWorkFactory.cs" />
-    <Compile Include="Dummy\DummyEmailSender.cs" />
-    <Compile Include="Dummy\DummyLogger.cs" />
+    <Compile Include="Emails\DummyEmailSender.cs" />
+    <Compile Include="Logging\DummyLogger.cs" />
     <Compile Include="Messages\Repositories\InMemoryMessageRepository.cs" />
     <Compile Include="Messages\Repositories\NullMessageRepository.cs" />
     <Compile Include="Messages\Repositories\QueryProviders\IMessageQueryProvider.cs" />

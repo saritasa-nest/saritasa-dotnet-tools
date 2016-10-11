@@ -6,8 +6,8 @@ namespace Saritasa.Tools.Tests
     using System;
     using System.Reflection;
     using NUnit.Framework;
-    using Events;
     using Domain;
+    using Events;
     using Events.EventPipelineMiddlewares;
 
     [TestFixture]

@@ -48,6 +48,7 @@
     <Compile Include="CommandsTests.cs" />
     <Compile Include="EmailsTests.cs" />
     <Compile Include="EventsTests.cs" />
+    <Compile Include="MessagesRepositoryFilterTests.cs" />
     <Compile Include="MessagesTests.cs" />
     <Compile Include="QueriesTests.cs" />
     <Compile Include="SecurityTests.cs" />

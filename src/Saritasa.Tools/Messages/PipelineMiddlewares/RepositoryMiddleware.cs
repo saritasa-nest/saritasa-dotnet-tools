@@ -11,9 +11,11 @@ namespace Saritasa.Tools.Messages.PipelineMiddlewares
     public class RepositoryMiddleware : IMessagePipelineMiddleware
     {
         /// <inheritdoc />
-        public string Id { get; set; } = "Repository";
+        public string Id { get; set; }
 
         readonly IMessageRepository repository;
+
+        readonly RepositoryMessagesFilter filter;
 
         /// <summary>
         /// .ctor
@@ -29,9 +31,27 @@ namespace Saritasa.Tools.Messages.PipelineMiddlewares
             Id = repository.GetType().Name;
         }
 
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        /// <param name="repository">Repository implementation.</param>
+        /// <param name="filter">Filter incoming messages.</param>
+        public RepositoryMiddleware(IMessageRepository repository, RepositoryMessagesFilter filter) : this(repository)
+        {
+            if (filter == null)
+            {
+                throw new ArgumentNullException(nameof(filter));
+            }
+            this.filter = filter;
+        }
+
         /// <inheritdoc />
         public void Handle(Message message)
         {
+            if (filter != null && filter.IsMatch(message) == false)
+            {
+                return;
+            }
             repository.Add(message);
         }
     }
