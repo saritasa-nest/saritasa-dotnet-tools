@@ -7,17 +7,23 @@ if ($PSVersionTable.PSVersion.Major -lt 3)
 
 Framework 4.6
 $InformationPreference = 'Continue'
-$env:PSModulePath += ";$PSScriptRoot\scripts"
+$env:PSModulePath += ";$PSScriptRoot\scripts\Modules"
+
+. .\scripts\Saritasa.PsakeTasks.ps1
+
+. .\scripts\BuildTasks.ps1
+. .\scripts\PublishTasks.ps1
 
 Import-Module Saritasa.Build
 Import-Module Saritasa.Test
 
 Properties `
 {
-    $version = '0.1.0'
-    $signKey = './saritasa-tools.snk'
-    $nuspecFile = './build/Saritasa.Tools.nuspec'
-    $libDirectory = './build/lib'
+    $Version = '0.1.0'
+    $SignKey = './saritasa-tools.snk'
+    $NuspecFile = './build/Saritasa.Tools.nuspec'
+    $LibDirectory = './build/lib'
+    $Configuration = 'Release'
 }
 
 $builds = @(
@@ -42,37 +48,37 @@ Task pack -description 'Build the library, test it and prepare nuget packages' `
     Invoke-NugetRestore './src/Saritasa.Tools.sln'
 
     # update version
-    Update-AssemblyInfoFile $version
+    Update-AssemblyInfoFile $Version
 
     # build all versions, sign, test and prepare package directory
     foreach ($package in $packages)
     {
         Get-PackageName($package)
-        Remove-Item $libDirectory -Recurse -Force -ErrorAction SilentlyContinue
-        New-Item $libDirectory -ItemType Directory
+        Remove-Item $LibDirectory -Recurse -Force -ErrorAction SilentlyContinue
+        New-Item $LibDirectory -ItemType Directory
         foreach ($build in $builds)
         {
             # build & sign
             $id = $build.Id
             $symbol = $build.symbol
             $args = @("/p:TargetFrameworkVersion=$id", "/p:DefineConstants=$symbol")
-            if (Test-Path $signKey)
+            if (Test-Path $SignKey)
             {
-                $args += "/p:AssemblyOriginatorKeyFile=$signKey" + '/p:SignAssembly=true'
+                $args += "/p:AssemblyOriginatorKeyFile=$SignKey" + '/p:SignAssembly=true'
             }
-            Invoke-ProjectBuild -ProjectPath "./src/$package/$package.csproj" -Configuration 'Release' -BuildParams $args
+            Invoke-ProjectBuild -ProjectPath "./src/$package/$package.csproj" -Configuration $Configuration -BuildParams $args
 
             # copy
-            New-Item (Join-Path $libDirectory $build.Framework) -ItemType Directory
+            New-Item (Join-Path $LibDirectory $build.Framework) -ItemType Directory
             $packageFile = Get-PackageName $package
-            Copy-Item "./src/$package/bin/Release/$packageFile.dll" (Join-Path $libDirectory $build.Framework)
-            Copy-Item "./src/$package/bin/Release/$packageFile.XML" (Join-Path $libDirectory $build.Framework)
+            Copy-Item "./src/$package/bin/$Configuration/$packageFile.dll" (Join-Path $LibDirectory $build.Framework)
+            Copy-Item "./src/$package/bin/$Configuration/$packageFile.XML" (Join-Path $LibDirectory $build.Framework)
         }
 
         # pack, we already have nuget in current folder
         $nugetExePath = "$PSScriptRoot\scripts\nuget.exe"
-        $buildDirectory = (Get-Item $libDirectory).Parent.FullName
-        &"$nugetExePath" @('pack', (Join-Path $buildDirectory "$package.nuspec"), '-Version', $version, '-NonInteractive', '-Exclude', '*.snk')
+        $buildDirectory = (Get-Item $LibDirectory).Parent.FullName
+        &"$nugetExePath" @('pack', (Join-Path $buildDirectory "$package.nuspec"), '-Version', $Version, '-NonInteractive', '-Exclude', '*.snk')
         if ($LASTEXITCODE)
         {
             throw 'Nuget pack failed.'
@@ -80,15 +86,15 @@ Task pack -description 'Build the library, test it and prepare nuget packages' `
     }
 
     # little clean up
-    Remove-Item $libDirectory -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item $LibDirectory -Recurse -Force -ErrorAction SilentlyContinue
 
     # build docs
-    Compile-Docs
+    CompileDocs
 }
 
 Task clean -description 'Clean solution' `
 {
-    Remove-Item $libDirectory -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item $LibDirectory -Recurse -Force -ErrorAction SilentlyContinue
     Remove-Item './Saritasa.*.nupkg' -ErrorAction SilentlyContinue
     Remove-Item './src/*.suo' -Recurse -Force -ErrorAction SilentlyContinue
     Remove-Item './src/Saritasa.Tools/bin' -Recurse -Force -ErrorAction SilentlyContinue
@@ -101,15 +107,15 @@ Task clean -description 'Clean solution' `
 
 Task docs -description 'Compile and open documentation' `
 {
-    Compile-Docs
+    CompileDocs
     Invoke-Item './docs/_build/html/index.html'
 }
 
-function Compile-Docs
+function CompileDocs
 {
     Set-Location '.\docs'
     Copy-Item '.\conf.py.template' '.\conf.py'
-    (Get-Content '.\conf.py').replace('VX.VY', $version) | Set-Content '.\conf.py'
+    (Get-Content '.\conf.py').replace('VX.VY', $Version) | Set-Content '.\conf.py'
     &'.\make.cmd' @('html')
     if ($LASTEXITCODE)
     {
