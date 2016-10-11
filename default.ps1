@@ -42,7 +42,7 @@ function Get-PackageName([string]$package)
     If ([System.Char]::IsDigit($package[$package.Length-1])) {$package.Substring(0, $package.Length-1)} Else {$package}
 }
 
-Task pack -description 'Build the library, test it and prepare nuget packages' `
+Task pack -depends download-nuget -description 'Build the library, test it and prepare nuget packages' `
 {
     # nuget restore
     Invoke-NugetRestore './src/Saritasa.Tools.sln'
@@ -76,7 +76,7 @@ Task pack -description 'Build the library, test it and prepare nuget packages' `
         }
 
         # pack, we already have nuget in current folder
-        $nugetExePath = "$PSScriptRoot\scripts\nuget.exe"
+        $nugetExePath = "$PSScriptRoot\tools\nuget.exe"
         $buildDirectory = (Get-Item $LibDirectory).Parent.FullName
         &"$nugetExePath" @('pack', (Join-Path $buildDirectory "$package.nuspec"), '-Version', $Version, '-NonInteractive', '-Exclude', '*.snk')
         if ($LASTEXITCODE)

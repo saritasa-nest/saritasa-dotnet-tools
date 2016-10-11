@@ -3,7 +3,12 @@ $src = "$root\..\src"
 $samples = "$root\..\samples"
 $tools = "$root\..\tools"
 
-Task pre-build `
+Task download-nuget `
+{
+    Install-NugetCli -Destination $tools
+}
+
+Task pre-build -depends download-nuget `
 {
     Invoke-NugetRestore "$src\Saritasa.Tools.sln"
 
@@ -12,7 +17,6 @@ Task pre-build `
         New-Item -ItemType Directory $tools
     }
 
-    Install-NugetCli -Destination $tools
     &"$tools\nuget.exe" restore "$src\Saritasa.Tools.NLog4\packages.config" -SolutionDirectory $src
 
     Invoke-NugetRestore "$samples\ZergRushCo.Todosya\ZergRushCo.Todosya.sln"
