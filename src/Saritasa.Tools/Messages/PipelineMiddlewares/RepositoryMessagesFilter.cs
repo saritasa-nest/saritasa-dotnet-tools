@@ -26,30 +26,38 @@ namespace Saritasa.Tools.Messages.PipelineMiddlewares
         /// </summary>
         public Predicate<Message> Predicate { get; private set; }
 
+        Message.ProcessingStatus[] statuses;
+
         /// <summary>
         /// Only messages with specified statuses will be stored.
         /// </summary>
-        public Message.ProcessingStatus[] Statuses { get; private set; }
+        public Message.ProcessingStatus[] Statuses => statuses;
 
         /// <summary>
         /// Only messages with execution time above will be stored.
         /// </summary>
         public int ExecutionDurationAbove { get; private set; }
 
+        Regex[] includeContentTypes;
+
         /// <summary>
         /// Only messages that matches regexp selected content type pattern will be stored.
         /// </summary>
-        public Regex[] IncludeContentTypes { get; private set; }
+        public Regex[] IncludeContentTypes => includeContentTypes;
+
+        Regex[] excludedContentTypes;
 
         /// <summary>
         /// Messages with matched content types will be excluded.
         /// </summary>
-        public Regex[] ExcludedContentTypes { get; private set; }
+        public Regex[] ExcludedContentTypes => excludedContentTypes;
+
+        byte[] types;
 
         /// <summary>
         /// Only specified messages types will be stored.
         /// </summary>
-        public byte[] Types { get; private set; }
+        public byte[] Types => types;
 
         /// <summary>
         /// Returns true if message matches current filter criterias.
@@ -58,11 +66,12 @@ namespace Saritasa.Tools.Messages.PipelineMiddlewares
         /// <returns>True if matches, otherwise false.</returns>
         public bool IsMatch(Message message)
         {
-            if (Statuses?.Contains(message.Status) == false)
-            {
-                return false;
-            }
-            if (message.ExecutionDuration < ExecutionDurationAbove)
+            if (Predicate?.Invoke(message) == false ||
+                Statuses?.Contains(message.Status) == false ||
+                message.ExecutionDuration < ExecutionDurationAbove ||
+                excludedContentTypes?.Any(ct => ct.IsMatch(message.ContentType)) == true ||
+                includeContentTypes?.Any(ct => ct.IsMatch(message.ContentType)) == false ||
+                types?.Contains(message.Type) == false)
             {
                 return false;
             }
@@ -96,11 +105,15 @@ namespace Saritasa.Tools.Messages.PipelineMiddlewares
         /// <returns>Current repository messages filter.</returns>
         public RepositoryMessagesFilter WithStatus(Message.ProcessingStatus status)
         {
-            int length = Statuses?.Length ?? 0;
-            var newStatuses = new Message.ProcessingStatus[length + 1];
-            Statuses?.CopyTo(newStatuses, 0);
-            newStatuses[newStatuses.Length - 1] = status;
-            Statuses = newStatuses;
+            if (statuses == null)
+            {
+                statuses = new Message.ProcessingStatus[1];
+            }
+            else
+            {
+                Array.Resize(ref statuses, statuses.Length + 1);
+            }
+            statuses[statuses.Length - 1] = status;
             return this;
         }
 
@@ -126,7 +139,15 @@ namespace Saritasa.Tools.Messages.PipelineMiddlewares
         /// <returns>Current repository messages filter.</returns>
         public RepositoryMessagesFilter WithIncludeContentType(Regex regex)
         {
-            // TODO:
+            if (includeContentTypes == null)
+            {
+                includeContentTypes = new Regex[1];
+            }
+            else
+            {
+                Array.Resize(ref includeContentTypes, includeContentTypes.Length + 1);
+            }
+            includeContentTypes[includeContentTypes.Length - 1] = regex;
             return this;
         }
 
@@ -137,7 +158,34 @@ namespace Saritasa.Tools.Messages.PipelineMiddlewares
         /// <returns>Current repository messages filter.</returns>
         public RepositoryMessagesFilter WithExcludeContentType(Regex regex)
         {
-            // TODO:
+            if (excludedContentTypes == null)
+            {
+                excludedContentTypes = new Regex[1];
+            }
+            else
+            {
+                Array.Resize(ref excludedContentTypes, excludedContentTypes.Length + 1);
+            }
+            excludedContentTypes[excludedContentTypes.Length - 1] = regex;
+            return this;
+        }
+
+        /// <summary>
+        /// Include message type (command, query, event).
+        /// </summary>
+        /// <param name="type">Message type.</param>
+        /// <returns>Current repository messages filter.</returns>
+        public RepositoryMessagesFilter WithType(byte type)
+        {
+            if (types == null)
+            {
+                types = new byte[1];
+            }
+            else
+            {
+                Array.Resize(ref types, types.Length + 1);
+            }
+            types[types.Length - 1] = type;
             return this;
         }
     }

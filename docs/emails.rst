@@ -10,11 +10,13 @@ Emails send handling.
 
     .. function:: Task SendAsync(TMessage message);
 
-    Sends the specified message.
+        Sends the specified message.
 
 .. class:: EmailSender
 
     .. function:: Task SendAsync(TMessage message);
+
+         Sends the specified message.
 
 Example of registration with Autofac:
 

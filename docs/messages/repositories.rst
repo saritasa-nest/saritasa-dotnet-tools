@@ -66,17 +66,22 @@ Repositories
 
 There are built in repositories.
 
-AdoNetMessageRepository
-=======================
+    .. class:: AdoNetMessageRepository
 
-CsvFileMessageRepository
-========================
+        Stores in data source that supports ADO.NET provider.
 
-FileMessageRepository
-=====================
+    .. class:: CsvFileMessageRepository
 
-InMemoryMessageRepository
-=========================
+        Stores messages to csv file.
 
-NullMessageRepository
-=====================
+    .. class:: FileMessageRepository
+
+        Stores message in files.
+
+    .. class:: InMemoryMessageRepository
+
+        Stores all messages in plain list.
+
+    .. class:: NullMessageRepository
+
+        Does nothing, for testing purposes.

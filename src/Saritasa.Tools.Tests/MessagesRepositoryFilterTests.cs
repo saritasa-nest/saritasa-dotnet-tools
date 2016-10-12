@@ -46,14 +46,34 @@ namespace Saritasa.Tools.Tests
         [Test]
         public void Repository_should_filter_by_content_type()
         {
-            var filter = RepositoryMessagesFilter.Create().WithExcludeContentType(new Regex(@".(C|c)orrectCommand$"));
+            var filter = RepositoryMessagesFilter.Create()
+                .WithIncludeContentType(new Regex(@".(C|c)orrectCommand$"))
+                .WithExcludeContentType(new Regex(@".IncorrectCommand$"));
             var msg = new Message()
             {
                 ContentType = "Saritasa.Demo.IncorrectCommand",
             };
             Assert.That(filter.IsMatch(msg), Is.False);
+
             msg.ContentType = "Saritasa.Demo.CorrectCommand";
             Assert.That(filter.IsMatch(msg), Is.True);
+
+            filter = filter.WithExcludeContentType(new Regex(@"Command"));
+            Assert.That(filter.IsMatch(msg), Is.False);
+        }
+
+        [Test]
+        public void Repository_should_filter_by_type()
+        {
+            var filter = RepositoryMessagesFilter.Create().WithType(Message.MessageTypeCommand);
+            var msgquery = new Message()
+            {
+                Type = Message.MessageTypeQuery,
+            };
+            Assert.That(filter.IsMatch(msgquery), Is.False);
+
+            filter = filter.WithType(Message.MessageTypeQuery);
+            Assert.That(filter.IsMatch(msgquery), Is.True);
         }
     }
 }
