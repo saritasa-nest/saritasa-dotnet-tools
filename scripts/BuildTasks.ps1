@@ -5,19 +5,17 @@ $tools = "$root\..\tools"
 
 Task download-nuget `
 {
+    if (!(Test-Path $tools))
+    {
+        New-Item -ItemType Directory $tools
+    }
+
     Install-NugetCli -Destination $tools
 }
 
 Task pre-build -depends download-nuget `
 {
     Invoke-NugetRestore "$src\Saritasa.Tools.sln"
-
-    if (!(Test-Path $tools))
-    {
-        New-Item -ItemType Directory $tools
-    }
-
-    &"$tools\nuget.exe" restore "$src\Saritasa.Tools.NLog4\packages.config" -SolutionDirectory $src
 
     Invoke-NugetRestore "$samples\ZergRushCo.Todosya\ZergRushCo.Todosya.sln"
     Invoke-NugetRestore "$samples\Saritasa.BoringWarehouse\Saritasa.BoringWarehouse.sln"
@@ -44,4 +42,9 @@ Task build-zergrushco -depends pre-build `
 Task build-boringwarehouse -depends pre-build `
 {
     Invoke-SolutionBuild "$samples\Saritasa.BoringWarehouse\Saritasa.BoringWarehouse.sln" -Configuration $Configuration
+}
+
+Task build-saritasatools -depends pre-build `
+{
+    Invoke-SolutionBuild "$src\Saritasa.Tools.sln" -Configuration $Configuration
 }

@@ -1,8 +1,10 @@
+###########
 Data Access
-===========
+###########
 
+************
 Unit of Work
-------------
+************
 
 Unit of Work design pattern does two important things: first it maintains in-memory updates and second it sends these in-memory updates as one transaction to the database.
 
@@ -72,8 +74,9 @@ To achieve this there are two interfaces available: ``IUnitOfWork`` and ``IUnitO
         builder.RegisterType<DataAccess.AppUnitOfWork>().AsImplementedInterfaces();
         builder.RegisterType<DataAccess.AppUnitOfWorkFactory>().AsImplementedInterfaces().SingleInstance();
 
+**********
 Repository
-----------
+**********
 
 A Repository mediates between the domain and data mapping layers, acting like an in-memory domain object collection. In our implementation repository works in a context of unit of work. There are two interfaces available:
 

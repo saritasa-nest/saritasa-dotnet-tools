@@ -1,8 +1,13 @@
 ﻿using System.Linq;
+using Saritasa.Tools.Queries;
 using ZergRushCo.Todosya.Domain.Users.Entities;
 
 namespace ZergRushCo.Todosya.Domain.Users.Queries
 {
+    /// <summary>
+    /// Useres queries.
+    /// </summary>
+    [QueryHandlers]
     public class UsersQueries
     {
         readonly IAppUnitOfWork uow;

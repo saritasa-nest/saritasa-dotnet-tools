@@ -4,7 +4,7 @@ $samples = "$root\..\samples"
 
 Import-Module Saritasa.WebDeploy
 
-Task package-zergrushco -depends pre-build `
+Task package-zergrushco -depends build-zergrushco `
 {
     $packagePath = "$samples\ZergRushCo.Todosya\ZergRushCo.zip"
     Invoke-PackageBuild -ProjectPath "$samples\ZergRushCo.Todosya\ZergRushCo.Todosya.Web\ZergRushCo.Todosya.Web.csproj" `

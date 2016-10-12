@@ -1,8 +1,10 @@
+######
 Domain
-======
+######
 
+**********
 Exceptions
-----------
+**********
 
 ``DomainException`` - Exception indicates that something wrong happaned to domain part of application. Usually the message can be shown to user.
 

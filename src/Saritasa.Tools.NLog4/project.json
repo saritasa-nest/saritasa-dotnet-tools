@@ -11,7 +11,7 @@
         "System.Xml": ""
       },
       "dependencies": {
-        "NLog": "4.3.6"
+        "NLog": "4.3.10"
       }
     },
     "net461": {
@@ -20,7 +20,7 @@
         "System.Xml": ""
       },
       "dependencies": {
-        "NLog": "4.3.6"
+        "NLog": "4.3.10"
       }
     },
     "netcoreapp1.0": {

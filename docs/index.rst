@@ -1,10 +1,12 @@
+##############
 Saritasa.Tools
-==============
+##############
 
 Development tools for company projects.
 
+*****************
 Table of Contents
------------------
+*****************
 
 .. toctree::
     :titlesonly:

@@ -1,5 +1,6 @@
+##########
 Pagination
-==========
+##########
 
 Simplify pagination.
 

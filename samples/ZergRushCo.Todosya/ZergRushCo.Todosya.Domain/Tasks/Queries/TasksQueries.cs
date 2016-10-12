@@ -1,11 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Saritasa.Tools;
+using Saritasa.Tools.Queries;
 using ZergRushCo.Todosya.Domain.Tasks.Dtos;
 using ZergRushCo.Todosya.Domain.Tasks.Entities;
 
 namespace ZergRushCo.Todosya.Domain.Tasks.Queries
 {
+    /// <summary>
+    /// Tasks queries.
+    /// </summary>
+    [QueryHandlers]
     public class TasksQueries
     {
         readonly IAppUnitOfWork uow;

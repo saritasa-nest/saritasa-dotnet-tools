@@ -1,5 +1,6 @@
+#######
 Logging
-=======
+#######
 
 General logging interface.
 

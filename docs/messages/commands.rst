@@ -1,5 +1,10 @@
+########
 Commands
-========
+########
+
+********
+Overview
+********
 
 Command is something that changes the state (database insert/update/delete) of application. It utilizes Command behavioral design pattern: you should separate data for command and its handler. Here is a general usage:
 
@@ -37,14 +42,22 @@ Command is something that changes the state (database insert/update/delete) of a
             }
         }
 
+4. Execute command using command pipeline:
+   
+    .. code-block:: c#
+
+        CreateProjectCommand command = new CreateProjectCommand() { Name = "Test", CreatedByUserId = CurrentUser.Id };
+        CommandPipeline.Handle(command);
+
 That's it!
 
 **How to return data?**
 
 In general you should not return any data from command. But in most cases you need at least the ``id`` of newly created entity. We recommend to make special property in command. For example command ``CreateProjectCommand`` has out field ``ProjectId``.
 
+**********************
 Rependencies Resolving
-----------------------
+**********************
 
 There is how you can resolve dependencies for your command handlers:
 
@@ -52,8 +65,9 @@ There is how you can resolve dependencies for your command handlers:
 - Using public properties of command handler.
 - Using arguments of handler method.
 
+***********
 Middlewares
------------
+***********
 
     .. class:: CommandHandlerLocatorMiddleware
 

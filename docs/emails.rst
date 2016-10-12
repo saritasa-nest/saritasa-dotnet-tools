@@ -1,5 +1,6 @@
+######
 Emails
-======
+######
 
 Emails send handling.
 
@@ -15,7 +16,7 @@ Emails send handling.
 
     .. function:: Task SendAsync(TMessage message);
 
-Example of registration:
+Example of registration with Autofac:
 
     .. code-block:: c#
 
