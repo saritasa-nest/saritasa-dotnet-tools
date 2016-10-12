@@ -111,7 +111,7 @@
     <Compile Include="Messages\Repositories\InMemoryMessageRepository.cs" />
     <Compile Include="Messages\Repositories\NullMessageRepository.cs" />
     <Compile Include="Messages\Repositories\QueryProviders\IMessageQueryProvider.cs" />
-    <Compile Include="Messages\Repositories\QueryProviders\SqLiteQueryProvider.cs" />
+    <Compile Include="Messages\Repositories\QueryProviders\SqliteQueryProvider.cs" />
     <Compile Include="Messages\Repositories\QueryProviders\SqlServerSqlProvider.cs" />
     <Compile Include="Messages\Repositories\QueryProviders\MySqlQueryProvider.cs" />
     <Compile Include="PagedEnumerable.cs" />

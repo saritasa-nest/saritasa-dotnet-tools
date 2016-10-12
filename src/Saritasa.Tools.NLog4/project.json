@@ -1,5 +1,5 @@
 {
-  "title": "Saritasa Tools NLog4",
+  "title": "Saritasa Tools for NLog4",
   "version": "0.1.0",
   "dependencies": {
     "Saritasa.Tools": "*"

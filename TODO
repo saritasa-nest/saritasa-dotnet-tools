@@ -1,2 +1,3 @@
 - Saritasa.Tools.Internal.TypesLoader, need to add caching
+- Implement async operations
 - Implement code dom generation for objects

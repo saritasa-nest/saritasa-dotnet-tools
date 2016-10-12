@@ -56,7 +56,7 @@ namespace Saritasa.Tools.Messages.Repositories
 
         readonly Dialect dialect;
 
-        readonly bool isInitialized = false;
+        bool isInitialized = false;
 
         IDbConnection activeConnection;
 
@@ -76,7 +76,7 @@ namespace Saritasa.Tools.Messages.Repositories
         public bool KeepConnection { get; set; }
 
         /// <summary>
-        /// Ado.Net repository.
+        /// ADO.NET repository.
         /// </summary>
         /// <param name="factory">Database factory class to be used.</param>
         /// <param name="connectionString">Database connection string.</param>
@@ -89,24 +89,47 @@ namespace Saritasa.Tools.Messages.Repositories
             this.connectionString = connectionString;
             this.factory = factory;
             this.serializer = serializer ?? new JsonObjectSerializer();
-            this.queryProvider = CreateSqlProvider(this.dialect, this.serializer);
+            this.queryProvider = CreateSqlProvider(this.dialect, this.factory, this.serializer);
         }
 
-        static IMessageQueryProvider CreateSqlProvider(Dialect dialect, IObjectSerializer serializer)
+        static IMessageQueryProvider CreateSqlProvider(Dialect dialect, DbProviderFactory factory, IObjectSerializer serializer)
         {
             switch (dialect)
             {
                 case Dialect.Auto:
-                    throw new NotImplementedException($"The sql provider {dialect} is not implemented yet");
+                    var provider = CreateSqlProviderByFactory(factory, serializer);
+                    if (provider == null)
+                    {
+                        throw new NotImplementedException($"The sql provider for factory {factory} is not implemented yet");
+                    }
+                    return provider;
                 case Dialect.MySql:
                     return new MySqlQueryProvider(serializer);
                 case Dialect.SqlServer:
                     return new SqlServerQueryProvider(serializer);
                 case Dialect.Sqlite:
-                    return new SqLiteQueryProvider(serializer);
+                    return new SqliteQueryProvider(serializer);
                 default:
                     throw new NotImplementedException($"The sql provider {dialect} is not implemented yet");
             }
+        }
+
+        static IMessageQueryProvider CreateSqlProviderByFactory(DbProviderFactory factory, IObjectSerializer serializer)
+        {
+            var name = factory.GetType().Name.ToLowerInvariant();
+            if (name.Contains("sqlclient"))
+            {
+                return new SqlServerQueryProvider(serializer);
+            }
+            if (name.Contains("mysql"))
+            {
+                return new MySqlQueryProvider(serializer);
+            }
+            if (name.Contains("sqlite"))
+            {
+                return new SqliteQueryProvider(serializer);
+            }
+            return null;
         }
 
         /// <inheritdoc />
@@ -121,6 +144,7 @@ namespace Saritasa.Tools.Messages.Repositories
             if (isInitialized == false)
             {
                 Init();
+                isInitialized = true;
             }
 
             IDbConnection connection = null;
@@ -321,9 +345,10 @@ namespace Saritasa.Tools.Messages.Repositories
                         activeConnection.Dispose();
                         activeConnection = null;
                     }
-                    if (serializer is IDisposable)
+                    if (serializer != null)
                     {
-                        ((IDisposable)serializer).Dispose();
+                        var disposableSerializer = serializer as IDisposable;
+                        disposableSerializer?.Dispose();
                         serializer = null;
                     }
                 }

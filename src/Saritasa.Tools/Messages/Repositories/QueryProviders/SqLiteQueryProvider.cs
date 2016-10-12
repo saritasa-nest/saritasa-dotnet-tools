@@ -9,7 +9,7 @@ namespace Saritasa.Tools.Messages.Repositories.QueryProviders
     /// <summary>
     /// SqLite sql scripts.
     /// </summary>
-    internal class SqLiteQueryProvider : IMessageQueryProvider
+    internal class SqliteQueryProvider : IMessageQueryProvider
     {
         const string TableName = "saritasa_messages";
 
@@ -19,7 +19,7 @@ namespace Saritasa.Tools.Messages.Repositories.QueryProviders
         /// .ctor
         /// </summary>
         /// <param name="serializer">Used object serializer.</param>
-        public SqLiteQueryProvider(IObjectSerializer serializer)
+        public SqliteQueryProvider(IObjectSerializer serializer)
         {
             if (serializer == null)
             {

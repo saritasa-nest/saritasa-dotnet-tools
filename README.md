@@ -89,3 +89,7 @@ Commands
 * Generate documentation
 
 ```psake docs```
+
+* Clean project
+
+```psake clean```
