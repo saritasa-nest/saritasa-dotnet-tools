@@ -19,12 +19,14 @@ Import-Module Saritasa.Test
 
 Properties `
 {
-    $Version = '0.1.0'
     $SignKey = './saritasa-tools.snk'
     $NuspecFile = './build/Saritasa.Tools.nuspec'
     $LibDirectory = './build/lib'
     $Configuration = 'Release'
 }
+
+# Global variable.
+$script:Version = '0.0.0'
 
 $builds = @(
     @{Id = 'v4.5.2'; Framework = 'net452'; symbol = 'NET452'}
@@ -37,19 +39,15 @@ $packages = @(
     'Saritasa.Tools.NLog4'
 )
 
+$docsRoot = Resolve-Path "$PSScriptRoot\docs"
+
 function Get-PackageName([string]$package)
 {
     If ([System.Char]::IsDigit($package[$package.Length-1])) {$package.Substring(0, $package.Length-1)} Else {$package}
 }
 
-Task pack -depends download-nuget -description 'Build the library, test it and prepare nuget packages' `
+Task pack -depends pre-build, get-version -description 'Build the library, test it and prepare nuget packages' `
 {
-    # nuget restore
-    Invoke-NugetRestore './src/Saritasa.Tools.sln'
-
-    # update version
-    Update-AssemblyInfoFile $Version
-
     # build all versions, sign, test and prepare package directory
     foreach ($package in $packages)
     {
@@ -105,7 +103,7 @@ Task clean -description 'Clean solution' `
     Remove-Item './scripts/nuget.exe' -ErrorAction SilentlyContinue
 }
 
-Task docs -description 'Compile and open documentation' `
+Task docs -depends get-version -description 'Compile and open documentation' `
 {
     CompileDocs
     Invoke-Item './docs/_build/html/index.html'
@@ -113,13 +111,12 @@ Task docs -description 'Compile and open documentation' `
 
 function CompileDocs
 {
-    Set-Location '.\docs'
-    Copy-Item '.\conf.py.template' '.\conf.py'
-    (Get-Content '.\conf.py').replace('VX.VY', $Version) | Set-Content '.\conf.py'
-    &'.\make.cmd' @('html')
+    Copy-Item "$docsRoot\conf.py.template" "$docsRoot\conf.py"
+    (Get-Content "$docsRoot\conf.py").Replace('VX.VY', $Version) | Set-Content "$docsRoot\conf.py"
+    
+    python -m sphinx.__init__ -b html -d "$docsRoot\_build\doctrees" $docsRoot "$docsRoot\_build\html"
     if ($LASTEXITCODE)
     {
         throw 'Cannot compile documentation.'
     }
-    Set-Location '..'
 }

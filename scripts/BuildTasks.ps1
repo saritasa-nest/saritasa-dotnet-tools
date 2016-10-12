@@ -19,6 +19,13 @@ Task pre-build -depends download-nuget `
 
     Invoke-NugetRestore "$samples\ZergRushCo.Todosya\ZergRushCo.Todosya.sln"
     Invoke-NugetRestore "$samples\Saritasa.BoringWarehouse\Saritasa.BoringWarehouse.sln"
+
+    GitVersion.exe /updateassemblyinfo
+}
+
+Task get-version `
+{
+    $script:Version = GitVersion.exe /showvariable MajorMinorPatch
 }
 
 Task build-samples -depends build-zergrushco, build-boringwarehouse
