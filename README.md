@@ -6,7 +6,7 @@ An infrastructure components and development tools for company projects. Read th
 Overview
 --------
 
-1. Saritasa.Tools - _General assembly_.
+1. Saritasa.Tools - _general assembly;_
    - Messages (commands, queries, events) - _pipeline to process and log system queries/actions;_
    - Unit of Work - _general interface for unit of work pattern;_
    - Repository - _general interface for repository pattern;_
@@ -15,12 +15,12 @@ Overview
    - Exceptions - _domain exception, validation;_
    - Security - _password generator;_
    - Pagination;
-1. Saritasa.Tools.Ef6 - _Unit of work and repository implementation for Entity Framework 6._
-1. Saritasa.Tools.EfCore1 - _Unit of work and repository implementation for Entity Framework Core._
-1. Saritasa.Tools.Mvc5 - _utilities for ASP.NET MVC 5._
+1. Saritasa.Tools.Ef6 - _unit of work and repository implementation for Entity Framework 6;_
+1. Saritasa.Tools.EfCore1 - _unit of work and repository implementation for Entity Framework Core;_
+1. Saritasa.Tools.Mvc5 - _utilities for ASP.NET MVC 5;_
     - CORS helper class;
     - Razor helpers;
-1. Saritasa.Tools.NLog4 - _logger interface implementation for NLog 4._
+1. Saritasa.Tools.NLog4 - _logger interface implementation for NLog 4;_
 
 Goals
 -----

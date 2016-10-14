@@ -29,7 +29,7 @@ Command is something that changes the state (database insert/update/delete) of a
             public int ProjectId { get; set; }
         }
 
-3. Create command handler. To create it make new separate class, add ``CommandHandlers`` attribute to it and make a method within it where accept your command as first argument.
+3. Create command handler. To create it make new separate class, add ``CommandHandlers`` attribute to it and make a method within it where accept your command as first argument. Method name should start with ``Handle`` prefix and first argument should be command class.
 
     .. code-block:: c#
 
@@ -50,6 +50,12 @@ Command is something that changes the state (database insert/update/delete) of a
         CommandPipeline.Handle(command);
 
 That's it!
+
+Command contains data that needs for command execution - it is like model class in ASP.NET MVC. Try to implement command handler with all necessary dependencies it needs. Do not make "hidden" dependencies. This will make your code much clear and more testable. So think about the "black box" that has input and output.
+
+    ::
+
+        Input dependencies, services, command ---> [Box, actions] ---> Output (can be omitted)
 
 **How to return data?**
 

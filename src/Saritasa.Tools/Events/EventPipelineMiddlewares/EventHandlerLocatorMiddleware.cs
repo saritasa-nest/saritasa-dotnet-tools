@@ -11,7 +11,7 @@ namespace Saritasa.Tools.Events.EventPipelineMiddlewares
     using Internal;
 
     /// <summary>
-    /// Locate command hanlder.
+    /// Locates command hanlder.
     /// </summary>
     public class EventHandlerLocatorMiddleware : IMessagePipelineMiddleware
     {
