@@ -5,16 +5,18 @@ namespace Saritasa.Tools.Emails
 {
     using System;
     using System.Collections.Generic;
+#if !NETCOREAPP1_0 && !NETSTANDARD1_6
+    using System.Net.Mail;
+#endif
     using System.Threading.Tasks;
-    using Emails;
 
     /// <summary>
     /// Empty email sender. Can be used for testing.
     /// </summary>
-    public class DummyEmailSender<TMessage> : EmailSender<TMessage> where TMessage : class
+    public class DummyEmailSender : EmailSender
     {
         /// <inheritdoc />
-        protected override Task Process(TMessage message, IDictionary<string, object> data)
+        protected override Task Process(MailMessage message, IDictionary<string, object> data)
         {
 #if NET452
             var tcs = new TaskCompletionSource<bool>();

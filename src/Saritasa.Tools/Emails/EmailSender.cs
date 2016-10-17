@@ -5,27 +5,31 @@ namespace Saritasa.Tools.Emails
 {
     using System;
     using System.Collections.Generic;
+#if !NETCOREAPP1_0 && !NETSTANDARD1_6
+    using System.Net.Mail;
+#endif
     using System.Threading.Tasks;
     using System.Threading;
 
     using NameValueDict = System.Collections.Generic.IDictionary<string, object>;
 
     /// <summary>
-    /// Abstract email sender implementation with interceptor support.
+    /// Abstract email sender implementation with interceptors support.
     /// </summary>
-    public abstract class EmailSender<TMessage> : IEmailSender<TMessage> where TMessage : class
+    public abstract class EmailSender : IEmailSender
     {
-        readonly IList<IEmailInterceptor<TMessage>> interceptors = new List<IEmailInterceptor<TMessage>>();
+        readonly IList<IEmailInterceptor> interceptors = new List<IEmailInterceptor>();
 
         /// <summary>
         /// Send message.
         /// </summary>
-        protected abstract Task Process(TMessage message, NameValueDict data);
+        protected abstract Task Process(MailMessage message, NameValueDict data);
 
         /// <summary>
-        /// Execution strategy. DefaultEmailExecutionStrategy by default.
+        /// Execution strategy. DefaultEmailExecutionStrategy used by default. Determines the way how we should proceed
+        /// actual email sending.
         /// </summary>
-        protected IEmailExecutionStrategy<TMessage> ExecutionStrategy { get; private set; } = new DefaultEmailExecutionStrategy<TMessage>();
+        protected IEmailExecutionStrategy ExecutionStrategy { get; private set; } = new DefaultEmailExecutionStrategy();
 
         /// <summary>
         /// Cancellation token instance. None by default.
@@ -40,7 +44,7 @@ namespace Saritasa.Tools.Emails
         }
 
         /// <inheritdoc />
-        public Task SendAsync(TMessage message)
+        public Task SendAsync(MailMessage message)
         {
             var data = new Dictionary<string, object>();
             bool cancel = false;
@@ -78,7 +82,7 @@ namespace Saritasa.Tools.Emails
         /// Add interceptor.
         /// </summary>
         /// <param name="interceptor">Interceptor.</param>
-        public void AddInterceptor(IEmailInterceptor<TMessage> interceptor)
+        public void AddInterceptor(IEmailInterceptor interceptor)
         {
             if (interceptor == null)
             {

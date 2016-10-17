@@ -50,6 +50,10 @@
     <Compile Include="Commands\CommandValidationException.cs" />
     <Compile Include="Commands\ICommandPipeline.cs" />
     <Compile Include="Domain\IQueryableRepository.cs" />
+    <Compile Include="Emails\Interceptors\CountEmailsInterceptor.cs" />
+    <Compile Include="Emails\MailAddress.cs" />
+    <Compile Include="Emails\MailAddressCollection.cs" />
+    <Compile Include="Emails\MailMessage.cs" />
     <Compile Include="Logging\DummyLoggerFactory.cs" />
     <Compile Include="Events\EventHandlersAttribute.cs" />
     <Compile Include="Events\EventPipeline.cs" />
@@ -88,12 +92,11 @@
     <Compile Include="Messages\IObjectSerializer.cs" />
     <Compile Include="Emails\EmailSender.cs" />
     <Compile Include="Emails\DefaultEmailExecutionStrategy.cs" />
-    <Compile Include="Emails\FilterEmailInterceptor.cs" />
+    <Compile Include="Emails\Interceptors\FilterEmailInterceptor.cs" />
     <Compile Include="Domain\IDomainEventsManager.cs" />
     <Compile Include="Emails\IEmailExecutionStrategy.cs" />
-    <Compile Include="Emails\SystemMail\SaveToFileEmailInterceptor.cs" />
-    <Compile Include="Emails\SystemMail\SmtpClientEmailSender.cs" />
-    <Compile Include="Emails\SystemMail\SystemMailFilterEmailInterceptor.cs" />
+    <Compile Include="Emails\Interceptors\SaveToFileEmailInterceptor.cs" />
+    <Compile Include="Emails\SmtpClientEmailSender.cs" />
     <Compile Include="Exceptions\DomainException.cs" />
     <Compile Include="Exceptions\NotFoundException.cs" />
     <Compile Include="Exceptions\ValidationException.cs" />

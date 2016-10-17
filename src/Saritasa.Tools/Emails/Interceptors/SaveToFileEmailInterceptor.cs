@@ -2,7 +2,7 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 #if !NETCOREAPP1_0 && !NETSTANDARD1_6
-namespace Saritasa.Tools.Emails.SystemMail
+namespace Saritasa.Tools.Emails.Interceptors
 {
     using System;
     using System.Collections.Generic;
@@ -13,7 +13,7 @@ namespace Saritasa.Tools.Emails.SystemMail
     /// <summary>
     /// Saves emails into specified folder in .eml format.
     /// </summary>
-    public class SaveToFileEmailInterceptor : IEmailInterceptor<MailMessage>
+    public class SaveToFileEmailInterceptor : IEmailInterceptor
     {
         /// <summary>
         /// Directory to save emails.
@@ -46,7 +46,7 @@ namespace Saritasa.Tools.Emails.SystemMail
             SaveMailMessage(message, path);
         }
 
-        #region IEmailInterceptor
+        #region IEmailInterceptor implementation
 
         /// <inheritdoc />
         public void Sending(MailMessage mailMessage, IDictionary<string, object> data, ref bool cancel)

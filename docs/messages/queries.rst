@@ -60,3 +60,11 @@ Query is a reading operation. Query always returns result and does not change sy
 ***********
 Middlewares
 ***********
+
+    .. class:: QueryExecutorMiddleware
+
+        Executes query delegate. Included in default pipeline.
+
+    .. class:: QueryObjectResolverMiddleware
+
+        Resolve object handler for query. Included in default pipeline.

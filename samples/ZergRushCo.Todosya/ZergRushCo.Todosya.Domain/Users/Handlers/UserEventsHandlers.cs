@@ -13,7 +13,7 @@ namespace ZergRushCo.Todosya.Domain.Users.Handlers
     public class UserEventsHandlers
     {
         public void HandleSendEmailOnUserCreate(UserCreatedEvent userCreatedEvent,
-            Saritasa.Tools.Emails.IEmailSender<MailMessage> emailSender)
+            Saritasa.Tools.Emails.IEmailSender emailSender)
         {
             var message = new MailMessage()
             {

@@ -29,7 +29,7 @@ namespace Saritasa.Tools.Logging
         }
 #else
         /// <summary>
-        /// Creates the logger with fully qualified name of the current class, including the 
+        /// Creates the logger with fully qualified name of the current class, including the
         /// namespace but not the assembly.
         /// </summary>
         /// <remarks>

@@ -76,7 +76,7 @@ namespace ZergRushCo.Todosya.Web
             builder.RegisterType<Domain.Tasks.Queries.ProjectsQueries>().AsSelf();
 
             // emails
-            var emailSender = new Saritasa.Tools.Emails.SystemMail.SmtpClientEmailSender();
+            var emailSender = new Saritasa.Tools.Emails.SmtpClientEmailSender();
             builder.RegisterInstance(emailSender).AsImplementedInterfaces().SingleInstance();
 
             // logger

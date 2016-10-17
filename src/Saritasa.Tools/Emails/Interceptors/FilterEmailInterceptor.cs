@@ -1,16 +1,19 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.Emails
+namespace Saritasa.Tools.Emails.Interceptors
 {
     using System;
     using System.Collections.Generic;
+#if !NETCOREAPP1_0 && !NETSTANDARD1_6
+    using System.Net.Mail;
+#endif
     using System.Text.RegularExpressions;
 
     /// <summary>
-    /// Filters users to whom send an email. The abstract class that contains general logic to be implemented.
+    /// Filters users to whom send an email.
     /// </summary>
-    public abstract class FilterEmailInterceptor<TMessage> : IEmailInterceptor<TMessage> where TMessage : class
+    public class FilterEmailInterceptor : IEmailInterceptor
     {
         readonly IList<string> approvedAddresses = new List<string>();
 
@@ -23,7 +26,7 @@ namespace Saritasa.Tools.Emails
         /// <summary>
         /// .ctor
         /// </summary>
-        protected FilterEmailInterceptor()
+        public FilterEmailInterceptor()
         {
         }
 
@@ -31,7 +34,7 @@ namespace Saritasa.Tools.Emails
         /// .ctor
         /// </summary>
         /// <param name="emails">Approved emails patterns. You can use ? and * symbols.</param>
-        protected FilterEmailInterceptor(string emails)
+        public FilterEmailInterceptor(string emails)
         {
             SetApprovedEmails(emails);
         }
@@ -78,13 +81,25 @@ namespace Saritasa.Tools.Emails
             AddApprovedEmails(emails);
         }
 
-        #region IEmailInterceptor
+        #region IEmailInterceptor implementation
 
         /// <inheritdoc />
-        public abstract void Sending(TMessage mailMessage, IDictionary<string, object> data, ref bool cancel);
+        public virtual void Sending(MailMessage mailMessage, IDictionary<string, object> data, ref bool cancel)
+        {
+            FilterAddress(mailMessage.To);
+            FilterAddress(mailMessage.CC);
+            FilterAddress(mailMessage.Bcc);
+
+            if (mailMessage.To.Count == 0 && mailMessage.CC.Count == 0 && mailMessage.Bcc.Count == 0)
+            {
+                cancel = true;
+            }
+        }
 
         /// <inheritdoc />
-        public abstract void Sent(TMessage mailMessage, IDictionary<string, object> data);
+        public virtual void Sent(MailMessage mailMessage, IDictionary<string, object> data)
+        {
+        }
 
         #endregion
 
@@ -96,6 +111,41 @@ namespace Saritasa.Tools.Emails
         protected static string WildcardToRegex(string pattern)
         {
             return ("^" + Regex.Escape(pattern)).Replace("\\*", ".*").Replace("\\?", ".") + "$";
+        }
+
+        /// <summary>
+        /// Filters the collection of addresses by approved addresses.
+        /// </summary>
+        private void FilterAddress(MailAddressCollection addressCollection)
+        {
+            if (addressCollection.Count < 1)
+            {
+                return;
+            }
+
+            var badAddresses = new MailAddressCollection();
+
+            foreach (var address in addressCollection)
+            {
+                bool match = false;
+                foreach (var pattern in ApprovedAddresses)
+                {
+                    if (Regex.IsMatch(address.Address, WildcardToRegex(pattern)))
+                    {
+                        match = true;
+                    }
+                }
+
+                if (!match)
+                {
+                    badAddresses.Add(address);
+                }
+            }
+
+            foreach (var badAddress in badAddresses)
+            {
+                addressCollection.Remove(badAddress);
+            }
         }
     }
 }

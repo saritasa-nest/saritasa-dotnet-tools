@@ -9,7 +9,7 @@ namespace Saritasa.Tools.Queries.QueryPipelineMiddlewares
     using Messages;
 
     /// <summary>
-    /// Resolve object for query.
+    /// Resolve object handler for query.
     /// </summary>
     public class QueryObjectResolverMiddleware : IMessagePipelineMiddleware
     {

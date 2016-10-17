@@ -2,7 +2,7 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 #if !NETCOREAPP1_0 && !NETSTANDARD1_6
-namespace Saritasa.Tools.Emails.SystemMail
+namespace Saritasa.Tools.Emails
 {
     using System;
     using System.Collections.Generic;
@@ -12,7 +12,7 @@ namespace Saritasa.Tools.Emails.SystemMail
     /// <summary>
     /// Send email using SmtpClient.
     /// </summary>
-    public class SmtpClientEmailSender : EmailSender<MailMessage>
+    public class SmtpClientEmailSender : EmailSender
     {
         /// <summary>
         /// Instance of SmtpClient.

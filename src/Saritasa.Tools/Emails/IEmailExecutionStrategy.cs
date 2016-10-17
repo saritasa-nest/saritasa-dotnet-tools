@@ -4,6 +4,9 @@
 namespace Saritasa.Tools.Emails
 {
     using System;
+#if !NETCOREAPP1_0 && !NETSTANDARD1_6
+    using System.Net.Mail;
+#endif
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -12,7 +15,7 @@ namespace Saritasa.Tools.Emails
     /// <summary>
     /// Email execution strategies.
     /// </summary>
-    public interface IEmailExecutionStrategy<TMessage> where TMessage : class
+    public interface IEmailExecutionStrategy
     {
         /// <summary>
         /// Execute mail send handler.
@@ -22,7 +25,7 @@ namespace Saritasa.Tools.Emails
         /// <param name="data">Additional data.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Task.</returns>
-        Task Execute(Func<TMessage, NameValueDict, Task> handler, TMessage message, NameValueDict data,
+        Task Execute(Func<MailMessage, NameValueDict, Task> handler, MailMessage message, NameValueDict data,
             CancellationToken cancellationToken);
     }
 }
