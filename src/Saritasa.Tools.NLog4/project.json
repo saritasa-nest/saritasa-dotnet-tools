@@ -25,10 +25,10 @@
     },
     "netcoreapp1.0": {
       "dependencies": {
-        "Microsoft.NETCore.App": "1.0.0",
         "System.Data.Common": "4.1.0",
         "NLog": "4.4.0-betaV15",
-        "NLog.Extensions.Logging": "1.0.0-rtm-alpha4"
+        "NLog.Extensions.Logging": "1.0.0-rtm-alpha4",
+        "Microsoft.NETCore.App": "1.0.1"
       }
     },
     "netstandard1.6": {

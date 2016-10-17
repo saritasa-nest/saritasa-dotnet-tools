@@ -18,8 +18,8 @@
     },
     "netcoreapp1.0": {
       "dependencies": {
-        "Microsoft.NETCore.App": "1.0.0",
-        "System.Data.Common":  "4.1.0"
+        "Microsoft.NETCore.App": "1.0.1",
+        "System.Data.Common": "4.1.0"
       }
     },
     "netstandard1.6": {
