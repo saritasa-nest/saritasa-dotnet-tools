@@ -25,7 +25,7 @@
     <WarningLevel>4</WarningLevel>
     <RegisterForComInterop>false</RegisterForComInterop>
     <DocumentationFile>bin\Debug\Saritasa.Tools.XML</DocumentationFile>
-    <CodeAnalysisRuleSet>Saritasa.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>..\Saritasa.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <DebugType>pdbonly</DebugType>
@@ -33,7 +33,7 @@
     <DocumentationFile>bin\Release\Saritasa.Tools.XML</DocumentationFile>
     <Optimize>true</Optimize>
     <DefineConstants>TRACE</DefineConstants>
-    <CodeAnalysisRuleSet>Saritasa.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>..\Saritasa.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
