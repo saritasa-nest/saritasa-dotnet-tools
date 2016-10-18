@@ -48,6 +48,7 @@ Here are steps you need to do to setup environment to be able to develop. You ne
 - Visual Studio 2015 (https://www.visualstudio.com/downloads/download-visual-studio-vs.aspx)
 - psake (https://github.com/psake/psake)
 - PowerShell 5
+- GitVersion (`choco install gitversion.portable`)
 
 For documentation:
 
