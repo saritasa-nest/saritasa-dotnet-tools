@@ -7,8 +7,14 @@ namespace ZergRushCo.Todosya.Domain.Users.Entities
     /// </summary>
     public class Role : IRole<int>
     {
+        /// <summary>
+        /// Unique role id.
+        /// </summary>
         public int Id { get; private set; }
 
+        /// <summary>
+        /// Role name.
+        /// </summary>
         public string Name { get; set; }
     }
 }

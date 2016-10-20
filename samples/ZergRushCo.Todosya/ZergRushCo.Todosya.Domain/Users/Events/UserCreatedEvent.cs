@@ -12,6 +12,9 @@ namespace ZergRushCo.Todosya.Domain.Users.Events
     /// </summary>
     public class UserCreatedEvent
     {
+        /// <summary>
+        /// User entity.
+        /// </summary>
         public User User { get; set; }
     }
 }

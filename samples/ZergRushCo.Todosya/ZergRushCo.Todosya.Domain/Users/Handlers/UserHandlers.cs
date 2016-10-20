@@ -11,18 +11,28 @@ using ZergRushCo.Todosya.Domain.Users.Events;
 namespace ZergRushCo.Todosya.Domain.Users.Handlers
 {
     /// <summary>
-    /// User handlers.
+    /// User commands handlers.
     /// </summary>
     [CommandHandlers]
     public class UserHandlers
     {
         readonly ILogger logger;
 
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        /// <param name="loggerFactory">Logger factory.</param>
         public UserHandlers(ILoggerFactory loggerFactory)
         {
             logger = Utils.GetCurrentClassLogger(loggerFactory);
         }
 
+        /// <summary>
+        /// Handle user registration.
+        /// </summary>
+        /// <param name="command">Command.</param>
+        /// <param name="uowFactory">Application unit of work factory.</param>
+        /// <param name="eventsPipeline">Events pipeline.</param>
         public void HandleRegisterUser(RegisterUserCommand command, IAppUnitOfWorkFactory uowFactory,
             IEventPipeline eventsPipeline)
         {
@@ -58,6 +68,11 @@ namespace ZergRushCo.Todosya.Domain.Users.Handlers
             }
         }
 
+        /// <summary>
+        /// Handle user update.
+        /// </summary>
+        /// <param name="command">Command.</param>
+        /// <param name="uowFactory">Application unit of work factory.</param>
         public void HandleUpdateUser(UpdateUserCommand command, IAppUnitOfWorkFactory uowFactory)
         {
             var email = command.Email.ToLowerInvariant().Trim();
@@ -86,6 +101,11 @@ namespace ZergRushCo.Todosya.Domain.Users.Handlers
             }
         }
 
+        /// <summary>
+        /// Handle user update.
+        /// </summary>
+        /// <param name="command">Command.</param>
+        /// <param name="uowFactory">Application unit of work factory.</param>
         public void HandleRawUpdateUser(UpdateUserRawCommand command, IAppUnitOfWorkFactory uowFactory)
         {
             var email = command.Email.ToLowerInvariant().Trim();

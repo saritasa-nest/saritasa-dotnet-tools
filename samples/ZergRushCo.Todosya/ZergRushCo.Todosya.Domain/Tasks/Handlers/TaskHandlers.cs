@@ -5,6 +5,9 @@ using ZergRushCo.Todosya.Domain.Tasks.Commands;
 
 namespace ZergRushCo.Todosya.Domain.Tasks.Handlers
 {
+    /// <summary>
+    /// Tasks related handlers.
+    /// </summary>
     [CommandHandlers]
     public class TaskHandlers
     {

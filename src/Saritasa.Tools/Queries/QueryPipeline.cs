@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Linq;
 using System.Reflection;
+using Newtonsoft.Json.Linq;
 using Saritasa.Tools.Internal;
 using Saritasa.Tools.Messages;
 
@@ -164,7 +165,7 @@ namespace Saritasa.Tools.Queries
             {
                 throw new ArgumentException(nameof(message.ContentType));
             }
-            if (message.ContentType.IndexOf(".") < 0)
+            if (message.ContentType.IndexOf(".", StringComparison.Ordinal) < 0)
             {
                 throw new ArgumentException("Cannot specify method name and type from content type");
             }
@@ -189,10 +190,7 @@ namespace Saritasa.Tools.Queries
 
             var messageContent = ((IDictionary<string, object>)message.Content).Values;
             var methodTypes = method.GetParameters().Select(p => p.ParameterType);
-            var values = methodTypes.Zip(messageContent, (mt, mc) =>
-            {
-                return TypeHelpers.ConvertType(mc, mt);
-            });
+            var values = methodTypes.Zip(messageContent, (mt, mc) => TypeHelpers.ConvertType(mc, mt));
 
             var queryMessage = CreateMessage(@delegate, values.ToArray());
             ProcessPipeline(queryMessage);
@@ -205,7 +203,7 @@ namespace Saritasa.Tools.Queries
         /// </summary>
         /// <param name="t">Type.</param>
         /// <returns>Created object.</returns>
-        private object CreateObjectFromType(Type t)
+        private static object CreateObjectFromType(Type t)
         {
 #if !NETCOREAPP1_0 && !NETSTANDARD1_6
             var ctor = t.GetTypeInfo().GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,

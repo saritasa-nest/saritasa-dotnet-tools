@@ -9,6 +9,10 @@ namespace ZergRushCo.Todosya.Domain.Users.Services
     /// </summary>
     public class AppUserManager : UserManager<User, int>
     {
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        /// <param name="store">Application user story.</param>
         public AppUserManager(IUserStore<User, int> store) : base(store)
         {
             this.PasswordHasher = new AppPasswordHasher();

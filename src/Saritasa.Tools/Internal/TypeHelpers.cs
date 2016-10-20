@@ -213,7 +213,7 @@ namespace Saritasa.Tools.Internal
         {
 #if !NETCOREAPP1_0 && !NETSTANDARD1_6
             var tc = TypeDescriptor.GetConverter(type);
-            return tc.ConvertFrom(obj);
+            return tc.ConvertFrom(obj.ToString());
 #else
             return obj;
 #endif

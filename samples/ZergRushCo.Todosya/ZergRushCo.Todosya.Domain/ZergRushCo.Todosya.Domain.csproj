@@ -72,7 +72,6 @@
     <Compile Include="Tasks\Queries\TasksQueries.cs" />
     <Compile Include="Tasks\Repositories\IProjectRepository.cs" />
     <Compile Include="Tasks\Repositories\ITaskRepository.cs" />
-    <Compile Include="Users\Commands\LoginUserCommand.cs" />
     <Compile Include="Users\Commands\UpdateUserRawCommand.cs" />
     <Compile Include="Users\Commands\UpdateUserCommand.cs" />
     <Compile Include="Users\Commands\RegisterUserCommand.cs" />

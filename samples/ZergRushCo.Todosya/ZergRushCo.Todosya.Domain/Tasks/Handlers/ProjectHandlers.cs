@@ -12,6 +12,11 @@ namespace ZergRushCo.Todosya.Domain.Tasks.Handlers
     [CommandHandlers]
     public class ProjectHandlers
     {
+        /// <summary>
+        /// Create project handler.
+        /// </summary>
+        /// <param name="command">Command.</param>
+        /// <param name="uowFactory">Application unit of work factory.</param>
         public void HandleCreateProject(CreateProjectCommand command, IAppUnitOfWorkFactory uowFactory)
         {
             using (var uow = uowFactory.Create())
@@ -28,6 +33,11 @@ namespace ZergRushCo.Todosya.Domain.Tasks.Handlers
             }
         }
 
+        /// <summary>
+        /// Update project handler.
+        /// </summary>
+        /// <param name="command">Command.</param>
+        /// <param name="uowFactory">Application unit of work factory.</param>
         public void HandleUpdateProject(UpdateProjectCommand command, IAppUnitOfWorkFactory uowFactory)
         {
             using (var uow = uowFactory.Create())
@@ -46,6 +56,11 @@ namespace ZergRushCo.Todosya.Domain.Tasks.Handlers
             }
         }
 
+        /// <summary>
+        /// Remove project handler.
+        /// </summary>
+        /// <param name="command">Command.</param>
+        /// <param name="uowFactory">Application unit of work factory.</param>
         public void HandleRemoveProject(RemoveProjectCommand command, IAppUnitOfWorkFactory uowFactory)
         {
             using (var uow = uowFactory.Create())

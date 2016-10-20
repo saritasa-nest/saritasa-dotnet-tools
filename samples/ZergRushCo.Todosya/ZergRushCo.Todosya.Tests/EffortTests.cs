@@ -11,7 +11,7 @@ using ZergRushCo.Todosya.Domain.Users.Entities;
 namespace ZergRushCo.Todosya.Tests
 {
     /// <summary>
-    /// Effort library tests.
+    /// Effort library tests. Mainly for demonstration purposes.
     /// </summary>
     [TestFixture]
     public class EffortTests

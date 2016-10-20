@@ -14,15 +14,18 @@ namespace Saritasa.Tools.Messages.Endpoints
     using Internal;
 
     /// <summary>
-    /// Web endpoint.
+    /// Web endpoint. Allows to send messages directly to application. Must be POST request.
+    /// Sample:
+    /// POST http://localhost:26025/query/ZergRushCo.Todosya.Domain.Tasks.Queries.ProjectsQueries.GetByUser
+    /// {"userId":2,"page":1,"pageSize":10}
     /// </summary>
     public class WebEndpoint : IMessageEndpoint, IDisposable
     {
-        const string HttpVerbPost = "POST";
-        const int DefaultConnectionWaitTime = 550; // ms
-        const string ContentTypeJson = "application/json";
-        const string ContentTypePlainText = "text/plain";
-        const string Server = "Saritasa.Tools WebEndpoint/1.0.0";
+        private const string HttpVerbPost = "POST";
+        private const int DefaultConnectionWaitTime = 550; // ms
+        private const string ContentTypeJson = "application/json";
+        private const string ContentTypePlainText = "text/plain";
+        private const string Server = "Saritasa.Tools WebEndpoint/1.0.0";
 
         /// <summary>
         /// Default TCP port;
@@ -156,24 +159,27 @@ namespace Saritasa.Tools.Messages.Endpoints
             threadWaitEvent.Set();
         }
 
-        void HandleRequest(HttpListenerContext listenerContext)
+        private void HandleRequest(HttpListenerContext listenerContext)
         {
             HttpListenerRequest request = listenerContext.Request;
 
-            using (HttpListenerResponse response = listenerContext.Response)
+            using (var response = listenerContext.Response)
             {
                 listenerContext.Response.AddHeader("Server", Server);
 
                 if (request.HttpMethod == HttpVerbPost)
                 {
+                    var message = new Message();
+                    message.Type = GetMessageTypeFromUri(request.Url);
+                    message.ContentType = GetMessageContentTypeFromUri(request.Url);
+
                     response.ContentType = ContentTypeJson;
                     using (var streamReader = new StreamReader(request.InputStream))
                     {
-                        Message message = null;
                         try
                         {
                             var body = streamReader.ReadToEnd();
-                            message = JsonConvert.DeserializeObject<Message>(body);
+                            message.Content = JsonConvert.DeserializeObject(body);
                             TypeHelpers.ResolveTypeForContent(
                                 message,
                                 System.Text.Encoding.UTF8.GetBytes(message.Content.ToString()),
@@ -210,7 +216,71 @@ namespace Saritasa.Tools.Messages.Endpoints
             }
         }
 
-        static void FormatStreamFromString(string input, HttpListenerResponse response)
+        private static byte GetMessageTypeFromUri(Uri uri)
+        {
+            var str = uri.PathAndQuery.Trim();
+            if (string.IsNullOrEmpty(str))
+            {
+                throw new ArgumentException(nameof(uri));
+            }
+
+            if (str[0] == '/')
+            {
+                str = str.Substring(1, str.Length - 1);
+            }
+
+            var ind = str.IndexOf(@"/", StringComparison.Ordinal);
+            if (ind < 0)
+            {
+                throw new ArgumentException(nameof(uri));
+            }
+
+            var cmd = str.Substring(0, ind);
+            byte cmdnum = 0;
+            if (byte.TryParse(cmd, out cmdnum))
+            {
+                return cmdnum;
+            }
+
+            switch (cmd)
+            {
+                case "command": return Message.MessageTypeCommand;
+                case "query": return Message.MessageTypeQuery;
+                case "event": return Message.MessageTypeEvent;
+            }
+
+            throw new ArgumentException(nameof(uri));
+        }
+
+        static string GetMessageContentTypeFromUri(Uri uri)
+        {
+            var str = uri.PathAndQuery.Trim();
+            if (string.IsNullOrEmpty(str))
+            {
+                throw new ArgumentException(nameof(uri));
+            }
+
+            if (str[0] == '/')
+            {
+                str = str.Substring(1, str.Length - 1);
+            }
+
+            var ind = str.IndexOf(@"/", StringComparison.Ordinal);
+            if (ind < 0)
+            {
+                throw new ArgumentException(nameof(uri));
+            }
+
+            var contentType = str.Substring(ind + 1, uri.PathAndQuery.Length - ind - 2);
+            if (string.IsNullOrEmpty(contentType))
+            {
+                throw new ArgumentNullException(nameof(uri));
+            }
+
+            return contentType;
+        }
+
+        private static void FormatStreamFromString(string input, HttpListenerResponse response)
         {
             var buffer = System.Text.Encoding.UTF8.GetBytes(input);
             response.ContentLength64 = buffer.Length;
@@ -223,7 +293,7 @@ namespace Saritasa.Tools.Messages.Endpoints
         {
             InternalLogger.Trace($"Processing message id: {message.Id} contenttype: {message.ContentType}",
                 nameof(WebEndpoint));
-            bool isPipelineFound = false;
+            var isPipelineFound = false;
             for (int i = 0; i < pipelines.Length; i++)
             {
                 if (pipelines[i].MessageTypes.Contains(message.Type))
@@ -243,6 +313,10 @@ namespace Saritasa.Tools.Messages.Endpoints
         /// <inheritdoc />
         public void RegisterPipelines(params IMessagePipeline[] pipelines)
         {
+            if (pipelines.Length == 0)
+            {
+                throw new ArgumentException("Value cannot be an empty collection.", nameof(pipelines));
+            }
             this.pipelines = pipelines;
         }
 

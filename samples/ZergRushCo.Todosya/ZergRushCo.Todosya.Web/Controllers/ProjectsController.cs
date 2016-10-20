@@ -8,6 +8,9 @@ using Saritasa.Tools.Queries;
 
 namespace ZergRushCo.Todosya.Web.Controllers
 {
+    /// <summary>
+    /// Controller contains actions for projects handling.
+    /// </summary>
     public class ProjectsController : BaseController
     {
         public ProjectsController(ICommandPipeline commandPipeline, IQueryPipeline queryPipeline) :

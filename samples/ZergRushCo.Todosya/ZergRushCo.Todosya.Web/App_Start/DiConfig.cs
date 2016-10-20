@@ -48,21 +48,22 @@ namespace ZergRushCo.Todosya.Web
             // make container
             var container = builder.Build();
 
+            var repositoryMiddleware = new Saritasa.Tools.Messages.PipelineMiddlewares.RepositoryMiddleware(
+                new Saritasa.Tools.Messages.Repositories.AdoNetMessageRepository(
+                    System.Data.Common.DbProviderFactories.GetFactory(connectionStringConf.ProviderName),
+                    connectionString)
+            );
+
             // command pipeline
             var commandPipeline = Saritasa.Tools.Commands.CommandPipeline.CreateDefaultPipeline(container.Resolve,
                 System.Reflection.Assembly.GetAssembly(typeof(Domain.Users.Entities.User)));
-            commandPipeline.AppendMiddlewares(
-                new Saritasa.Tools.Messages.PipelineMiddlewares.RepositoryMiddleware(
-                    new Saritasa.Tools.Messages.Repositories.AdoNetMessageRepository(
-                        System.Data.Common.DbProviderFactories.GetFactory(connectionStringConf.ProviderName),
-                        connectionString)
-                )
-            );
+            commandPipeline.AppendMiddlewares(repositoryMiddleware);
             builder = new ContainerBuilder();
             builder.RegisterInstance(commandPipeline).AsImplementedInterfaces().SingleInstance();
 
             // query pipeline
             var queryPipeline = Saritasa.Tools.Queries.QueryPipeline.CreateDefaultPipeline(container.Resolve);
+            queryPipeline.AppendMiddlewares(repositoryMiddleware);
             builder.RegisterInstance(queryPipeline).AsImplementedInterfaces().SingleInstance();
 
             // events pipeline

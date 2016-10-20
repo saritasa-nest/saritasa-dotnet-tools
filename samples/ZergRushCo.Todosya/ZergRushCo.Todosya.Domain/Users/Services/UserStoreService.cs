@@ -23,6 +23,11 @@ namespace ZergRushCo.Todosya.Domain.Users.Services
         readonly IUserRepository userRepository;
         readonly ICommandPipeline commandPipeline;
 
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        /// <param name="userRepository">User repository.</param>
+        /// <param name="commandPipeline">Command pipeline.</param>
         public UserStoreService(IUserRepository userRepository, ICommandPipeline commandPipeline)
         {
             if (userRepository == null)
@@ -230,6 +235,7 @@ namespace ZergRushCo.Todosya.Domain.Users.Services
 
         #endregion
 
+        /// <inheritdoc />
         public void Dispose()
         {
         }

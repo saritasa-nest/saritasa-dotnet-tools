@@ -13,6 +13,7 @@ namespace ZergRushCo.Todosya.Domain.Tasks
     /// </summary>
     public class ColorValidationAttribute : ValidationAttribute
     {
+        /// <inheritdoc />
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             return Regex.IsMatch(value.ToString(), @"^#(?:[0-9a-fA-F]{3}){1,2}$") ?

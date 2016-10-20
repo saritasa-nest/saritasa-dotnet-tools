@@ -64,7 +64,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppDbContext.cs" />
-    <Compile Include="AppDbContextInitializer.cs" />
     <Compile Include="AppUnitOfWork.cs" />
     <Compile Include="AppUnitOfWorkFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

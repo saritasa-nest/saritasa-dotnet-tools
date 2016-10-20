@@ -11,14 +11,25 @@ namespace ZergRushCo.Todosya.DataAccess
     /// </summary>
     public class AppDbContext : DbContext
     {
+        /// <summary>
+        /// .ctor
+        /// </summary>
         public AppDbContext()
         {
         }
 
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        /// <param name="nameOrConnectionString">Connection string name of connection string itself.</param>
         public AppDbContext(string nameOrConnectionString) : base(nameOrConnectionString)
         {
         }
 
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        /// <param name="connection">ADO.NET database connection.</param>
         public AppDbContext(DbConnection connection) : base(connection, true)
         {
         }
@@ -28,12 +39,25 @@ namespace ZergRushCo.Todosya.DataAccess
         /// </summary>
         public bool UseSqliteDatabase { get; set; } = true;
 
+        /// <summary>
+        /// Users database set.
+        /// </summary>
         public DbSet<User> Users { get; set; }
 
+        /// <summary>
+        /// Tasks database set.
+        /// </summary>
         public DbSet<Task> Tasks { get; set; }
 
+        /// <summary>
+        /// Projects database set.
+        /// </summary>
         public DbSet<Project> Projects { get; set; }
 
+        /// <summary>
+        /// Database model initializer.
+        /// </summary>
+        /// <param name="modelBuilder">Model builder.</param>
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             if (UseSqliteDatabase)

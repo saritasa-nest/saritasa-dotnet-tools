@@ -23,6 +23,10 @@ namespace ZergRushCo.Todosya.Tests
 
         public IAppUnitOfWork Create(IsolationLevel isolationLevel) => new AppUnitOfWork(CreateContext());
 
+        /// <summary>
+        /// Set seed scenario #1. The scenario contains 2 projects, 3 tasks and
+        /// 1 user (email: test@saritasa.com, password: 111111).
+        /// </summary>
         public void SetSeedScenario1()
         {
             var dataLoader = new Effort.DataLoaders.CsvDataLoader(
