@@ -4,6 +4,9 @@ using Saritasa.Tools.Queries;
 
 namespace ZergRushCo.Todosya.Web.Controllers
 {
+    /// <summary>
+    /// Base controller that contains common properties.
+    /// </summary>
     public class BaseController : Controller
     {
         protected readonly ICommandPipeline CommandPipeline;

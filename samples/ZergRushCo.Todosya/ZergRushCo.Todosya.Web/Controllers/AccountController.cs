@@ -11,6 +11,9 @@ using ZergRushCo.Todosya.Domain.Users.Commands;
 
 namespace ZergRushCo.Todosya.Web.Controllers
 {
+    /// <summary>
+    /// User account controller.
+    /// </summary>
     [Authorize]
     public class AccountController : Controller
     {

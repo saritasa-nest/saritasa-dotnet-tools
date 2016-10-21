@@ -1,4 +1,8 @@
-﻿define(['jquery'], function($) {
+﻿/*
+ * Main application module. Loads with every page load.
+ */
+
+define(['jquery'], function($) {
     var App = {};
 
     App.sayHello = function() {

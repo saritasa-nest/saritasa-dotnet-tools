@@ -15,6 +15,9 @@ namespace ZergRushCo.Todosya.Web
     {
         public static Saritasa.Tools.Messages.Endpoints.WebEndpoint WebEndpoint { get; private set; }
 
+        /// <summary>
+        /// Register and turn on webpoint. EnableDebugEndpoint application setting shoul be set to true.
+        /// </summary>
         public static void Register()
         {
             var settingValue = ConfigurationManager.AppSettings.Get("EnableDebugEndpoint");

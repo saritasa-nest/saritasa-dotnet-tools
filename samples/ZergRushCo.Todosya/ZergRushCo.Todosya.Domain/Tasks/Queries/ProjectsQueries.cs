@@ -36,7 +36,7 @@ namespace ZergRushCo.Todosya.Domain.Tasks.Queries
         /// Get project by id.
         /// </summary>
         /// <param name="projectId">Project id.</param>
-        /// <returns>Project.</returns>
+        /// <returns>Project or null if project not found.</returns>
         public Project GetById(int projectId)
         {
             return uow.ProjectRepository.Get(projectId);
@@ -49,9 +49,10 @@ namespace ZergRushCo.Todosya.Domain.Tasks.Queries
         /// <param name="page">Page number.</param>
         /// <param name="pageSize">Page size, default is 10.</param>
         /// <returns>Projects paged enumerable.</returns>
-        public PagedEnumerable<Project> GetByUser(int userId, int page, int pageSize = 10)
+        public PagedEnumerable<ProjectDto> GetByUser(int userId, int page, int pageSize = 10)
         {
-            return new PagedEnumerable<Project>(uow.ProjectRepository.Find(p => p.User.Id == userId), page, pageSize);
+            var query = uow.ProjectRepository.Find(p => p.User.Id == userId).Select(p => new ProjectDto(p));
+            return new PagedEnumerable<ProjectDto>(query, page, pageSize);
         }
 
         /// <summary>

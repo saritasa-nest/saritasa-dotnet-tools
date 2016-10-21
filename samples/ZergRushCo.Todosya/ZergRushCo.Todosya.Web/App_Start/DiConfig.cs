@@ -4,11 +4,18 @@ using System;
 using System.Configuration;
 using System.Web;
 using System.Web.Mvc;
+using Saritasa.Tools.Emails.Interceptors;
 
 namespace ZergRushCo.Todosya.Web
 {
+    /// <summary>
+    /// Dependency injection configuration.
+    /// </summary>
     public class DiConfig
     {
+        /// <summary>
+        /// Configures dependency injection container.
+        /// </summary>
         public static void Register()
         {
             var builder = new ContainerBuilder();
@@ -78,6 +85,8 @@ namespace ZergRushCo.Todosya.Web
 
             // emails
             var emailSender = new Saritasa.Tools.Emails.SmtpClientEmailSender();
+            emailSender.AddInterceptor(new FilterEmailInterceptor("*@saritasa.com mytest@example.com"));
+            emailSender.AddInterceptor(new CountEmailsInterceptor());
             builder.RegisterInstance(emailSender).AsImplementedInterfaces().SingleInstance();
 
             // logger

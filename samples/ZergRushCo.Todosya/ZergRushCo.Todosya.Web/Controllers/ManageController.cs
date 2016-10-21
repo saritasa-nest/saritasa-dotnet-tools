@@ -10,6 +10,9 @@ using ZergRushCo.Todosya.Web.Core.Identity;
 
 namespace ZergRushCo.Todosya.Web.Controllers
 {
+    /// <summary>
+    /// Manage user account controller.
+    /// </summary>
     [Authorize]
     public class ManageController : BaseController
     {

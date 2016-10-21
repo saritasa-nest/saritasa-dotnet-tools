@@ -12,16 +12,16 @@ namespace Saritasa.Tools.Domain
     public interface IUnitOfWorkFactory<out TUnitOfWork> where TUnitOfWork : class
     {
         /// <summary>
+        /// Creates unit of work with default isolation level.
+        /// </summary>
+        /// <returns>Unit of work.</returns>
+        TUnitOfWork Create();
+
+        /// <summary>
         /// Creates unit of work with specified isolation level.
         /// </summary>
         /// <param name="isolationLevel">Isolation level.</param>
         /// <returns>Unit of work.</returns>
         TUnitOfWork Create(IsolationLevel isolationLevel);
-
-        /// <summary>
-        /// Creates unit of work with default isolation level.
-        /// </summary>
-        /// <returns>Unit of work.</returns>
-        TUnitOfWork Create();
     }
 }

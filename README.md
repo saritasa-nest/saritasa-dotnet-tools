@@ -27,11 +27,11 @@ Goals
 
 1. Provide common infrastructure for our projects. Make the same or similar vision of current patterns like Repository, Unit of Work, etc.
 
-1. Within Messages module provide flexible and extensible framework to manage business requirements.
+1. Provide flexible and extensible infrastructure to manage business requirements.
 
-1. Provide common logging infrastructure to easily track users activity and system bottlenecks.
+1. Provide common logging infrastructure to easily track application activity and system bottlenecks.
 
-1. Arrange best practices and common modules among projects.
+1. Arrange best practices and common functionality among our projects.
 
 Installation
 ------------

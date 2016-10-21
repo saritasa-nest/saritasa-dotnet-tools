@@ -1,4 +1,8 @@
-﻿define(['jquery'], function ($) {
+﻿/*
+ * Fake task service that needs only for development.
+ */
+
+define(['jquery'], function ($) {
     'use strict';
 
     return {

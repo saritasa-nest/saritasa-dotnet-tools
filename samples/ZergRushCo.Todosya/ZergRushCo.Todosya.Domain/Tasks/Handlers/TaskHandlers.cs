@@ -11,6 +11,11 @@ namespace ZergRushCo.Todosya.Domain.Tasks.Handlers
     [CommandHandlers]
     public class TaskHandlers
     {
+        /// <summary>
+        /// Handles task create.
+        /// </summary>
+        /// <param name="command">Command.</param>
+        /// <param name="uowFactory">Application unit of work factory.</param>
         public void HandleCreateTask(CreateTaskCommand command, IAppUnitOfWorkFactory uowFactory)
         {
             using (var uow = uowFactory.Create())
@@ -37,6 +42,11 @@ namespace ZergRushCo.Todosya.Domain.Tasks.Handlers
             }
         }
 
+        /// <summary>
+        /// Handles task update.
+        /// </summary>
+        /// <param name="command">Command.</param>
+        /// <param name="uowFactory">Application unit of work factory.</param>
         public void HandleUpdateTask(UpdateTaskCommand command, IAppUnitOfWorkFactory uowFactory)
         {
             using (var uow = uowFactory.Create())
@@ -61,6 +71,11 @@ namespace ZergRushCo.Todosya.Domain.Tasks.Handlers
             }
         }
 
+        /// <summary>
+        /// Handles task remove.
+        /// </summary>
+        /// <param name="command">Command.</param>
+        /// <param name="uowFactory">Application unit of work.</param>
         public void HandleRemoveTask(RemoveTaskCommand command, IAppUnitOfWorkFactory uowFactory)
         {
             using (var uow = uowFactory.Create())
@@ -75,7 +90,12 @@ namespace ZergRushCo.Todosya.Domain.Tasks.Handlers
                 uow.Complete();
             }
         }
-        
+
+        /// <summary>
+        /// Handles task check/uncheck (done/not done).
+        /// </summary>
+        /// <param name="command">Command.</param>
+        /// <param name="uowFactory">Application unit of work factory.</param>
         public void HandleCheckTask(CheckTaskCommand command, IAppUnitOfWorkFactory uowFactory)
         {
             using (var uow = uowFactory.Create())

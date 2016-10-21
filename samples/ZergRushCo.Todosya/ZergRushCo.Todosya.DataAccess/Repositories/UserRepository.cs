@@ -9,6 +9,10 @@ namespace ZergRushCo.Todosya.DataAccess.Repositories
     /// </summary>
     public class UserRepository : EfQueryableRepository<User, AppDbContext>, IUserRepository
     {
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        /// <param name="context">Application database context.</param>
         public UserRepository(AppDbContext context) : base(context)
         {
         }

@@ -33,7 +33,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -53,11 +62,17 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Queries\ProductsQueries.cs" />
+    <Compile Include="RepositoryUsageExample.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Saritasa.Tools.Ef6\Saritasa.Tools.Ef6.csproj">
+      <Project>{D1AD1713-BC18-4340-B8DB-23D86D22FB7F}</Project>
+      <Name>Saritasa.Tools.Ef6</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\src\Saritasa.Tools\Saritasa.Tools.csproj">
       <Project>{a5451164-9df3-45b9-9067-2df7e23f8806}</Project>
       <Name>Saritasa.Tools</Name>

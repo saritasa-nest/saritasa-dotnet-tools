@@ -7,6 +7,9 @@ using ZergRushCo.Todosya.Domain.Tasks.Queries;
 
 namespace ZergRushCo.Todosya.Web.Controllers
 {
+    /// <summary>
+    /// Project controller for ajax requestes.
+    /// </summary>
     [Authorize]
     [RoutePrefix("json/projects")]
     public class JsonProjectsController : BaseController

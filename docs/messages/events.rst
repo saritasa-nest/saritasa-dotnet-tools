@@ -6,7 +6,7 @@ Events
 Overview
 ********
 
-Events are actions to something that happens to system. They are executed separately independ of main action. For example after user creation welcome email should be sent to him. User creation is a command and email sending is an event.
+Things happen. Not all of them are interesting, some may be worth recording but don't provoke a reaction. The most interesting ones cause a reaction. Many systems need to react to interesting events only. Events are reactions to something that happens to system. They are executed separately. For example after user creation welcome email should be sent to him. User creation is a command and email sending is an event.
 
     ::
 

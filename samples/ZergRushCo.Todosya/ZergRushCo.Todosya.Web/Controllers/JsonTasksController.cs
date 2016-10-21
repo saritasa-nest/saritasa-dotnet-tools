@@ -8,6 +8,9 @@ using ZergRushCo.Todosya.Domain.Tasks.Commands;
 
 namespace ZergRushCo.Todosya.Web.Controllers
 {
+    /// <summary>
+    /// Tasks controller for ajax requests.
+    /// </summary>
     [Authorize]
     [RoutePrefix("json/tasks")]
     public class JsonTasksController : BaseController

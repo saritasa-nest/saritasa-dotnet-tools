@@ -64,7 +64,7 @@ namespace ZergRushCo.Todosya.Domain.Users.Handlers
                 });
 
                 command.UserId = user.Id;
-                logger.Info($"User {user.FirstName} {user.LastName} with id {user.Id} is registered.");
+                logger.Info($"User {user.FirstName} {user.LastName} with id {user.Id} has been registered.");
             }
         }
 

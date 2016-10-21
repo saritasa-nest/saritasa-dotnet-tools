@@ -54,7 +54,7 @@ namespace Saritasa.Tools.Domain
         /// Finds for range of entities based on predicate.
         /// </summary>
         /// <param name="predicate">Filter predicate.</param>
-        /// <param name="includes">Relations for include</param>
+        /// <param name="includes">Relations to include</param>
         /// <typeparam name="TProperty">Property type.</typeparam>
         /// <returns>Enumerable of enitites.</returns>
         IEnumerable<TEntity> Find<TProperty>(Expression<Func<TEntity, bool>> predicate, IEnumerable<Expression<Func<TEntity, TProperty>>> includes);
