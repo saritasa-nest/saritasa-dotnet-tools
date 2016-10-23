@@ -107,6 +107,7 @@ namespace SandBox
             {
                 var product = uow.ProductRepository.Get(10);
                 uow.ProductRepository.Add(new Product(10, "Test"));
+                uow.Complete();
             }
         }
     }
@@ -154,7 +155,8 @@ namespace SandBox
             {
             }
 
-            public IProductRepository ProductRepository => new ProductRepository(Context);
+            public IQueryableRepository<Product> ProductRepository =>
+                new Saritasa.Tools.Ef.EfQueryableRepository<Product, AppDbContext>(Context);
         }
 
         /// <summary>

@@ -1,12 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using SandBox.Commands;
-using SandBox.Events;
-using SandBox.Queries;
 using Saritasa.Tools.Commands;
 using Saritasa.Tools.Commands.CommandPipelineMiddlewares;
 using Saritasa.Tools.Events;
@@ -15,6 +8,9 @@ using Saritasa.Tools.Messages.PipelineMiddlewares;
 using Saritasa.Tools.Messages.Repositories;
 using Saritasa.Tools.Queries;
 using Saritasa.Tools.Queries.QueryPipelineMiddlewares;
+using SandBox.Commands;
+using SandBox.Events;
+using SandBox.Queries;
 
 namespace SandBox
 {
@@ -103,7 +99,7 @@ namespace SandBox
         /// <summary>
         /// Entry point.
         /// </summary>
-        /// <param name="args"></param>
+        /// <param name="args">Arguments.</param>
         static void Main(string[] args)
         {
             Init();
