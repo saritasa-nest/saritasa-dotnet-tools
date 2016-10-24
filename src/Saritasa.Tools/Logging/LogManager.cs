@@ -38,15 +38,6 @@ namespace Saritasa.Tools.Logging
         }
 
         /// <summary>
-        /// Get logger that does nothing.
-        /// </summary>
-        /// <returns>Dummy logger.</returns>
-        public static ILogger GetDummyLogger()
-        {
-            return new DummyLogger();
-        }
-
-        /// <summary>
         /// Get the logger with name of current class.
         /// </summary>
         /// <returns>Named logger.</returns>

@@ -4,6 +4,7 @@
 namespace Saritasa.Tools.Queries.QueryPipelineMiddlewares
 {
     using System;
+    using System.Linq;
     using System.Reflection;
     using Internal;
     using Messages;
@@ -36,14 +37,15 @@ namespace Saritasa.Tools.Queries.QueryPipelineMiddlewares
                 throw new NotSupportedException("Message should be QueryMessage type");
             }
 
-            queryMessage.QueryObject = TypeHelpers.ResolveObjectForType(queryMessage.Func.GetMethodInfo().DeclaringType, resolver,
+            queryMessage.QueryObject = TypeHelpers.ResolveObjectForType(queryMessage.QueryObject.GetType(), resolver,
                 nameof(QueryObjectResolverMiddleware));
+
             if (queryMessage.QueryObject == null)
             {
                 queryMessage.QueryObject = resolver.Target;
             }
 
-            TypeHelpers.ResolveForParameters(queryMessage.Parameters, queryMessage.Func.GetMethodInfo().GetParameters(), resolver);
+            TypeHelpers.ResolveForParameters(queryMessage.Parameters, queryMessage.Method.GetParameters(), resolver);
         }
     }
 }

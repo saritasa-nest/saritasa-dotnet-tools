@@ -42,9 +42,9 @@ namespace Saritasa.Tools.Queries
         protected internal object Result { get; set; }
 
         /// <summary>
-        /// Function to execute.
+        /// Method to execute.
         /// </summary>
-        protected internal Delegate Func { get; set; }
+        protected internal MethodInfo Method { get; set; }
 
         /// <summary>
         /// Query object the delegate will be executed against.

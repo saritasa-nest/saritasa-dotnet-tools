@@ -211,6 +211,11 @@ namespace Saritasa.Tools.Internal
         /// <returns>Converted object.</returns>
         internal static object ConvertType(object obj, Type type)
         {
+            if (obj == null)
+            {
+                return null;
+            }
+
 #if !NETCOREAPP1_0 && !NETSTANDARD1_6
             var tc = TypeDescriptor.GetConverter(type);
             return tc.ConvertFrom(obj.ToString());

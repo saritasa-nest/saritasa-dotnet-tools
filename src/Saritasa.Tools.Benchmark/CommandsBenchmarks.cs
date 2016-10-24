@@ -85,7 +85,7 @@ namespace Saritasa.Tools.Benchmark
             }
         }
 
-        [Benchmark]
+        [Benchmark(Baseline = true)]
         public void RunCommandDirect()
         {
             var usersCommand = new UsersCommandHandlers((IUsersService)InterfacesResolver(typeof(IUsersService)));

@@ -48,7 +48,7 @@ namespace Saritasa.Tools.Tests
 
         #endregion
 
-        class QueryObject
+        public class QueryObject
         {
             public IList<int> SimpleQuery(int a, int b)
             {
@@ -71,7 +71,7 @@ namespace Saritasa.Tools.Tests
         public void Can_run_simple_query()
         {
             var qp = QueryPipeline.CreateDefaultPipeline(QueryPipeline.NullResolver);
-            var result = qp.Execute(qp.GetQuery<QueryObject>().SimpleQuery, 10, 20);
+            var result = qp.Query<QueryObject>().With(q => q.SimpleQuery(10, 20));
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Count, Is.EqualTo(2));
             Assert.That(result[1], Is.EqualTo(20));
@@ -83,10 +83,29 @@ namespace Saritasa.Tools.Tests
         public void Can_run_query_with_resolving()
         {
             var qp = QueryPipeline.CreateDefaultPipeline(QueriesTests.InterfacesResolver);
-            var result = qp.Execute(qp.GetQuery<QueryObject>().SimpleQueryWithDependency, 10, 20, (IInterfaceB)null);
+            var result = qp.Query<QueryObject>().With(q => q.SimpleQueryWithDependency(10, 20, null));
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Count, Is.EqualTo(2));
             Assert.That(result[1], Is.EqualTo(20));
+        }
+
+        [Test]
+        public void Can_run_query_from_raw_message()
+        {
+            var qp = QueryPipeline.CreateDefaultPipeline(QueriesTests.InterfacesResolver);
+            var message = new Messages.Message()
+            {
+                ContentType = "Saritasa.Tools.Tests.QueriesTests+QueryObject.SimpleQueryWithDependency",
+                Type = Messages.Message.MessageTypeQuery,
+                Content = new Dictionary<string, object>()
+                {
+                    ["a"] = 10,
+                    ["b"] = 20,
+                    ["dependencyB"] = null,
+                }
+            };
+            qp.ProcessRaw(message);
+            Assert.That(message.Content, Is.TypeOf(typeof(List<int>)));
         }
 
         #region Can_run_query_with_private_object_ctor
@@ -116,7 +135,7 @@ namespace Saritasa.Tools.Tests
         public void Can_run_query_with_private_object_ctor()
         {
             var qp = QueryPipeline.CreateDefaultPipeline(QueriesTests.InterfacesResolver);
-            var result = qp.Execute(qp.GetQuery<QueryObjectWithPrivateCtor>().Query);
+            var result = qp.Query<QueryObjectWithPrivateCtor>().With(q => q.Query());
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Count, Is.EqualTo(2));
             Assert.That(result[0], Is.EqualTo("A"));

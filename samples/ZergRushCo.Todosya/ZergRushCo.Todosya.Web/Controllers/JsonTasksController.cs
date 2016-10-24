@@ -25,7 +25,7 @@ namespace ZergRushCo.Todosya.Web.Controllers
         public ActionResult Get()
         {
             var userId = Convert.ToInt32(User.Identity.GetUserId());
-            var data = QueryPipeline.Execute(QueryPipeline.GetQuery<TasksQueries>().GetByUserDto, userId);
+            var data = QueryPipeline.Query<TasksQueries>().With(q => q.GetByUserDto(userId));
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
@@ -36,7 +36,7 @@ namespace ZergRushCo.Todosya.Web.Controllers
             var userId = Convert.ToInt32(User.Identity.GetUserId());
             command.UserId = userId;
             CommandPipeline.Handle(command);
-            var data = QueryPipeline.Execute(QueryPipeline.GetQuery<TasksQueries>().GetByIdDto, command.TaskId);
+            var data = QueryPipeline.Query<TasksQueries>().With(q => q.GetByIdDto(command.TaskId));
             return Json(data);
         }
 
@@ -47,7 +47,7 @@ namespace ZergRushCo.Todosya.Web.Controllers
             var userId = Convert.ToInt32(User.Identity.GetUserId());
             command.UserId = userId;
             CommandPipeline.Handle(command);
-            var data = QueryPipeline.Execute(QueryPipeline.GetQuery<TasksQueries>().GetByIdDto, command.Id);
+            var data = QueryPipeline.Query<TasksQueries>().With(q => q.GetByIdDto(command.Id));
             return Json(data);
         }
 

@@ -1,18 +1,16 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Linq;
-using System.Reflection;
-using Newtonsoft.Json.Linq;
-using Saritasa.Tools.Internal;
-using Saritasa.Tools.Messages;
-
 namespace Saritasa.Tools.Queries
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq.Expressions;
+    using System.Linq;
+    using System.Reflection;
+    using Internal;
+    using Messages;
+
     /// <summary>
     /// Query pipeline.
     /// </summary>
@@ -38,7 +36,8 @@ namespace Saritasa.Tools.Queries
                 CreatedAt = DateTime.Now,
                 Status = Message.ProcessingStatus.Processing,
                 Parameters = args,
-                Func = func,
+                Method = method,
+                QueryObject = CreateObjectFromType(method.GetBaseDefinition().DeclaringType),
             };
         }
 
@@ -51,82 +50,93 @@ namespace Saritasa.Tools.Queries
             message.ErrorDispatchInfo?.Throw();
         }
 
-        /// <inheritdoc />
-        public TResult Execute<TResult>(Func<TResult> func)
+        /// <summary>
+        /// The class wraps query object and makes actual call to query pipeline.
+        /// </summary>
+        /// <typeparam name="TQuery">Query type.</typeparam>
+        public struct Caller<TQuery> : ICaller<TQuery> where TQuery : class
         {
-            var message = CreateMessage(func);
-            ProcessPipeline(message);
-            return (TResult)message.Result;
+            TQuery query;
+
+            QueryPipeline queryPipeline;
+
+            /// <summary>
+            /// .ctor
+            /// </summary>
+            /// <param name="queryPipeline">Query pipeline.</param>
+            public Caller(QueryPipeline queryPipeline)
+            {
+                this.query = null;
+                this.queryPipeline = queryPipeline;
+            }
+
+            /// <summary>
+            /// .ctor
+            /// </summary>
+            /// <param name="queryPipeline">Query pipeline.</param>
+            /// <param name="query">Query object.</param>
+            public Caller(QueryPipeline queryPipeline, TQuery query) : this(queryPipeline)
+            {
+                if (query == null)
+                {
+                    throw new ArgumentNullException(nameof(query));
+                }
+                this.query = query;
+            }
+
+            /// <inheritdoc />
+            public TResult With<TResult>(Expression<Func<TQuery, TResult>> expression)
+            {
+                if (query == null)
+                {
+                    query = (TQuery)CreateObjectFromType(typeof(TQuery));
+                }
+
+                var mce = expression.Body as MethodCallExpression;
+                var args = mce.Arguments.Select(a => PartiallyEvaluateExpression(a)).ToArray();
+                var method = mce.Method;
+                var message = new QueryMessage()
+                {
+                    ContentType = method.DeclaringType.FullName + "." + method.Name,
+                    Content = method.GetParameters().ToDictionary(p => p.Name, v => args[v.Position]),
+                    CreatedAt = DateTime.Now,
+                    Status = Message.ProcessingStatus.Processing,
+                    Parameters = args,
+                    QueryObject = query,
+                    Method = method,
+                };
+                queryPipeline.ProcessPipeline(message);
+                return (TResult)message.Result;
+            }
+        }
+
+        private static object PartiallyEvaluateExpression(Expression expression)
+        {
+            switch (expression.NodeType)
+            {
+                case ExpressionType.Constant:
+                    return ((ConstantExpression)expression).Value;
+                case ExpressionType.MemberAccess:
+                    // TODO: carefully check for performance
+                    var objectMember = Expression.Convert(expression, typeof(object));
+                    var getterLambda = Expression.Lambda<Func<object>>(objectMember);
+                    var getter = getterLambda.Compile();
+                    return getter();
+                default:
+                    throw new InvalidOperationException($"Cannot evaluate type {expression.NodeType}");
+            }
         }
 
         /// <inheritdoc />
-        public TResult Execute<T, TResult>(Func<T, TResult> func, T arg)
+        public ICaller<TQuery> Query<TQuery>() where TQuery : class
         {
-            var message = CreateMessage(func, arg);
-            ProcessPipeline(message);
-            return (TResult)message.Result;
+            return new Caller<TQuery>(this);
         }
 
         /// <inheritdoc />
-        public TResult Execute<T1, T2, TResult>(Func<T1, T2, TResult> func, T1 arg1, T2 arg2)
+        public ICaller<TQuery> Query<TQuery>(TQuery obj) where TQuery : class
         {
-            var message = CreateMessage(func, arg1, arg2);
-            ProcessPipeline(message);
-            return (TResult)message.Result;
-        }
-
-        /// <inheritdoc />
-        public TResult Execute<T1, T2, T3, TResult>(Func<T1, T2, T3, TResult> func, T1 arg1, T2 arg2, T3 arg3)
-        {
-            var message = CreateMessage(func, arg1, arg2, arg3);
-            ProcessPipeline(message);
-            return (TResult)message.Result;
-        }
-
-        /// <inheritdoc />
-        public TResult Execute<T1, T2, T3, T4, TResult>(Func<T1, T2, T3, T4, TResult> func, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
-        {
-            var message = CreateMessage(func, arg1, arg2, arg3, arg4);
-            ProcessPipeline(message);
-            return (TResult)message.Result;
-        }
-
-        /// <inheritdoc />
-        public TResult Execute<T1, T2, T3, T4, T5, TResult>(Func<T1, T2, T3, T4, T5, TResult> func, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
-        {
-            var message = CreateMessage(func, arg1, arg2, arg3, arg4, arg5);
-            ProcessPipeline(message);
-            return (TResult)message.Result;
-        }
-
-        /// <inheritdoc />
-        public TResult Execute<T1, T2, T3, T4, T5, T6, TResult>(Func<T1, T2, T3, T4, T5, T6, TResult> func, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
-        {
-            var message = CreateMessage(func, arg1, arg2, arg3, arg4, arg5, arg6);
-            ProcessPipeline(message);
-            return (TResult)message.Result;
-        }
-
-        /// <inheritdoc />
-        public TResult Execute<T1, T2, T3, T4, T5, T6, T7, TResult>(Func<T1, T2, T3, T4, T5, T6, T7, TResult> func, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
-        {
-            var message = CreateMessage(func, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-            ProcessPipeline(message);
-            return (TResult)message.Result;
-        }
-
-        /// <inheritdoc />
-        public TResult Execute<T1, T2, T3, T4, T5, T6, T7, T8, TResult>(Func<T1, T2, T3, T4, T5, T6, T7, T8, TResult> func, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8)
-        {
-            var message = CreateMessage(func, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-            ProcessPipeline(message);
-            return (TResult)message.Result;
-        }
-
-        /// <inheritdoc />
-        public TQuery GetQuery<TQuery>() where TQuery : class
-        {
-            return (TQuery)CreateObjectFromType(typeof(TQuery));
+            return new Caller<TQuery>(this, obj);
         }
 
         /// <summary>

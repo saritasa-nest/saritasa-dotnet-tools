@@ -86,7 +86,7 @@ namespace SandBox
             inMemoryMessageRepository.Messages.Clear();
 
             // query
-            var list = QueryPipeline.Execute(QueryPipeline.GetQuery<ProductsQueries>().Get, 0, 10);
+            var list = ((QueryPipeline)QueryPipeline).Query<ProductsQueries>().With(q => q.Get(0, 10));
             Console.WriteLine(inMemoryMessageRepository.Dump());
             inMemoryMessageRepository.Messages.Clear();
 

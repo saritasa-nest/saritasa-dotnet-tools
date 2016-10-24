@@ -43,7 +43,7 @@ namespace ZergRushCo.Todosya.Web.Controllers
             ViewBag.StatusMessage = isUpdated ? "Profile updated" : string.Empty;
 
             var userId = Convert.ToInt32(User.Identity.GetUserId());
-            var model = new Domain.Users.Commands.UpdateUserCommand(QueryPipeline.Execute(userQueries.GetById, userId));
+            var model = new Domain.Users.Commands.UpdateUserCommand(QueryPipeline.Query(userQueries).With(q => q.GetById(userId)));
             return View(model);
         }
 

@@ -24,7 +24,7 @@ namespace ZergRushCo.Todosya.Web.Controllers
         public ActionResult Get()
         {
             var userId = Convert.ToInt32(User.Identity.GetUserId());
-            var data = QueryPipeline.Execute(QueryPipeline.GetQuery<ProjectsQueries>().GetByUserDto, userId);
+            var data = QueryPipeline.Query<ProjectsQueries>().With(q => q.GetByUserDto(userId));
             return Json(data, JsonRequestBehavior.AllowGet);
         }
     }

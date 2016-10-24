@@ -21,7 +21,7 @@ namespace ZergRushCo.Todosya.Web.Controllers
         public ActionResult Index(int page = 1)
         {
             var userId = Convert.ToInt32(User.Identity.GetUserId());
-            return View(QueryPipeline.Execute(QueryPipeline.GetQuery<ProjectsQueries>().GetByUser, userId, page, 10));
+            return View(QueryPipeline.Query<ProjectsQueries>().With(q => q.GetByUser(userId, page, 10)));
         }
 
         [HttpGet]
@@ -46,7 +46,7 @@ namespace ZergRushCo.Todosya.Web.Controllers
         [HttpGet]
         public ActionResult Edit(int id)
         {
-            var project = QueryPipeline.Execute(QueryPipeline.GetQuery<ProjectsQueries>().GetById, id);
+            var project = QueryPipeline.Query<ProjectsQueries>().With(q => q.GetById(id));
             if (project == null)
             {
                 return HttpNotFound();
@@ -77,7 +77,7 @@ namespace ZergRushCo.Todosya.Web.Controllers
         [HttpGet]
         public ActionResult Remove(int id)
         {
-            var project = QueryPipeline.Execute(QueryPipeline.GetQuery<ProjectsQueries>().GetById, id);
+            var project = QueryPipeline.Query<ProjectsQueries>().With(q => q.GetById(id));
             if (project == null)
             {
                 return HttpNotFound();

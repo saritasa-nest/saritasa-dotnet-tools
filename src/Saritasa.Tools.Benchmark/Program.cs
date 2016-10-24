@@ -13,7 +13,7 @@ namespace Saritasa.Tools.Benchmark
         /// <param name="args">App args.</param>
         static void Main(string[] args)
         {
-            var summary = BenchmarkRunner.Run<CommandsBenchmarks>();
+            var summary = BenchmarkRunner.Run<QueriesBenchmarks>();
         }
     }
 }
