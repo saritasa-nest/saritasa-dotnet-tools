@@ -67,7 +67,13 @@
     <Compile Include="Events\PipelineMiddlewares\EventHandlerLocatorMiddleware.cs" />
     <Compile Include="Events\IEventPipeline.cs" />
     <Compile Include="Internal\InternalLogger.cs" />
+    <Compile Include="Logging\DummyScopedLogger.cs" />
+    <Compile Include="Logging\DummyScopedLoggerFactory.cs" />
+    <Compile Include="Logging\IScopedLogger.cs" />
+    <Compile Include="Logging\IScope.cs" />
+    <Compile Include="Logging\LoggerFactoryExtensions.cs" />
     <Compile Include="Logging\LogManager.cs" />
+    <Compile Include="Logging\Internal\Scope.cs" />
     <Compile Include="Logging\Utils.cs" />
     <Compile Include="Messages\Endpoints\WebEndpoint.cs" />
     <Compile Include="Messages\IMessageEndpoint.cs" />
