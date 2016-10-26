@@ -79,7 +79,7 @@ namespace Saritasa.Tools.Tests
         public void Events_should_be_fired_withing_all_classes()
         {
             var ep = EventPipeline.CreateDefaultPipeline(InterfacesResolver,
-                Assembly.GetAssembly(typeof(CommandsTests)));
+                Assembly.GetAssembly(typeof(CommandsTests))).UseInternalResolver(true);
             var ev = new CreateUserEvent()
             {
                 UserId = 10,

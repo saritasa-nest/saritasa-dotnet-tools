@@ -4,21 +4,14 @@
 namespace Saritasa.Tools.Queries
 {
     using System;
-
-    /// <summary>
-    /// Indicates the method is query.
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Method, Inherited = false)]
-    public class QueryAttribute : Attribute
-    {
-    }
+    using Messages;
 
     /// <summary>
     /// The class that contains queries handers should be marked
     /// with this attribute.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public class QueryHandlersAttribute : Attribute
+    public class QueryHandlersAttribute : MessageHandlersAttribute
     {
     }
 }

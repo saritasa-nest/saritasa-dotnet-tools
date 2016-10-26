@@ -52,6 +52,11 @@ namespace Saritasa.Tools.Queries
         protected internal object QueryObject { get; set; }
 
         /// <summary>
+        /// If true QueryObject has been created by Caller.
+        /// </summary>
+        protected internal bool FakeQueryObject { get; set; } = false;
+
+        /// <summary>
         /// Function input parameters.
         /// </summary>
         protected internal object[] Parameters { get; set; }

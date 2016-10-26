@@ -4,32 +4,25 @@
 namespace Saritasa.Tools.Queries.QueryPipelineMiddlewares
 {
     using System;
-    using System.Linq;
-    using System.Reflection;
     using Internal;
     using Messages;
 
     /// <summary>
     /// Resolve object handler for query.
     /// </summary>
-    public class QueryObjectResolverMiddleware : IMessagePipelineMiddleware
+    public class QueryObjectResolverMiddleware : BaseExecutorMiddleware
     {
-        /// <inheritdoc />
-        public string Id { get; set; } = "QueryObjectResolver";
-
-        readonly Func<Type, object> resolver;
-
         /// <summary>
         /// .ctor
         /// </summary>
         /// <param name="resolver">Resolver func.</param>
-        public QueryObjectResolverMiddleware(Func<Type, object> resolver)
+        public QueryObjectResolverMiddleware(Func<Type, object> resolver) : base(resolver)
         {
-            this.resolver = resolver;
+            Id = "QueryResolver";
         }
 
         /// <inheritdoc />
-        public void Handle(Message message)
+        public override void Handle(Message message)
         {
             var queryMessage = message as QueryMessage;
             if (queryMessage == null)
@@ -37,15 +30,18 @@ namespace Saritasa.Tools.Queries.QueryPipelineMiddlewares
                 throw new NotSupportedException("Message should be QueryMessage type");
             }
 
-            queryMessage.QueryObject = TypeHelpers.ResolveObjectForType(queryMessage.QueryObject.GetType(), resolver,
-                nameof(QueryObjectResolverMiddleware));
-
+            if (queryMessage.FakeQueryObject)
+            {
+                queryMessage.QueryObject = ResolveObject(queryMessage.QueryObject.GetType(), nameof(QueryObjectResolverMiddleware));
+            }
             if (queryMessage.QueryObject == null)
             {
-                queryMessage.QueryObject = resolver.Target;
+                throw new InvalidOperationException($"Query object of type {queryMessage.QueryObject.GetType()} cannot be resolved");
             }
-
-            TypeHelpers.ResolveForParameters(queryMessage.Parameters, queryMessage.Method.GetParameters(), resolver);
+            if (UseParametersResolve)
+            {
+                TypeHelpers.ResolveForParameters(queryMessage.Parameters, queryMessage.Method.GetParameters(), Resolver);
+            }
         }
     }
 }

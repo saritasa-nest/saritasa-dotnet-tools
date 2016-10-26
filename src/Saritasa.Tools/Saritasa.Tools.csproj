@@ -46,6 +46,7 @@
     <Compile Include="Commands\CommandHandlersAttribute.cs" />
     <Compile Include="Commands\CommandMessage.cs" />
     <Compile Include="Commands\CommandPipeline.cs" />
+    <Compile Include="Commands\CommandPipelineExtensions.cs" />
     <Compile Include="Commands\CommandPipelineMiddlewares\CommandValidationMiddleware.cs" />
     <Compile Include="Commands\CommandValidationException.cs" />
     <Compile Include="Commands\ICommandPipeline.cs" />
@@ -54,6 +55,8 @@
     <Compile Include="Emails\MailAddress.cs" />
     <Compile Include="Emails\MailAddressCollection.cs" />
     <Compile Include="Emails\MailMessage.cs" />
+    <Compile Include="Events\EventPipelineExtensions.cs" />
+    <Compile Include="Messages\BaseExecutorMiddleware.cs" />
     <Compile Include="Logging\DummyLoggerFactory.cs" />
     <Compile Include="Events\EventHandlersAttribute.cs" />
     <Compile Include="Events\EventPipeline.cs" />
@@ -68,6 +71,7 @@
     <Compile Include="Messages\Endpoints\WebEndpoint.cs" />
     <Compile Include="Messages\IMessageEndpoint.cs" />
     <Compile Include="Internal\MessageParseExpressionVisitor.cs" />
+    <Compile Include="Messages\MessageHandlersAttribute.cs" />
     <Compile Include="Messages\MessageQuery.cs" />
     <Compile Include="Internal\TypeHelpers.cs" />
     <Compile Include="Messages\IMessagePipeline.cs" />
@@ -124,6 +128,7 @@
     <Compile Include="Queries\QueryMessage.cs" />
     <Compile Include="Queries\IQueryPipeline.cs" />
     <Compile Include="Queries\QueryPipeline.cs" />
+    <Compile Include="Queries\QueryPipelineExtensions.cs" />
     <Compile Include="Queries\QueryPipelineMIddlewares\QueryExecutorMiddleware.cs" />
     <Compile Include="Queries\QueryPipelineMIddlewares\QueryObjectResolverMiddleware.cs" />
     <Compile Include="Security\PasswordGenerator.cs" />

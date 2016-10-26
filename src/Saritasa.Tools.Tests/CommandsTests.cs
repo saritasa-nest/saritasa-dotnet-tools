@@ -72,7 +72,7 @@ namespace Saritasa.Tools.Tests
         public void Can_run_default_simple_pipeline()
         {
             var cp = CommandPipeline.CreateDefaultPipeline(CommandPipeline.NullResolver,
-                Assembly.GetAssembly(typeof(CommandsTests)));
+                Assembly.GetAssembly(typeof(CommandsTests))).UseInternalResolver(true);
             var cmd = new SimpleTestCommand() { Id = 5 };
             cp.Handle(cmd);
             Assert.That(cmd.Out, Is.EqualTo("result"));
@@ -96,7 +96,7 @@ namespace Saritasa.Tools.Tests
         public void Command_with_handle_in_it_should_run()
         {
             var cp = CommandPipeline.CreateDefaultPipeline(CommandPipeline.NullResolver,
-                Assembly.GetAssembly(typeof(CommandsTests)));
+                Assembly.GetAssembly(typeof(CommandsTests))).UseInternalResolver(true);
             var cmd = new SimpleTestCommandWithHandler();
             cp.Handle(cmd);
             Assert.That(cmd.Param, Is.EqualTo("result"));
@@ -120,7 +120,7 @@ namespace Saritasa.Tools.Tests
         public void Command_with_handle_in_it_and_deps_should_run()
         {
             var cp = CommandPipeline.CreateDefaultPipeline(InterfacesResolver,
-                Assembly.GetAssembly(typeof(CommandsTests)));
+                Assembly.GetAssembly(typeof(CommandsTests))).UseInternalResolver(true);
             var cmd = new TestCommandWithHandlerAndDeps();
             cp.Handle(cmd);
             Assert.That(cmd.Param, Is.EqualTo("AB"));
@@ -150,7 +150,7 @@ namespace Saritasa.Tools.Tests
         public void Can_run_command_handler_with_public_properties_resolve()
         {
             var cp = CommandPipeline.CreateDefaultPipeline(InterfacesResolver,
-                Assembly.GetAssembly(typeof(CommandsTests)));
+                Assembly.GetAssembly(typeof(CommandsTests))).UseInternalResolver(true);
             var cmd = new TestCommand2();
             cp.Handle(cmd);
             Assert.That(cmd.Param, Is.EqualTo(1));
@@ -185,7 +185,7 @@ namespace Saritasa.Tools.Tests
         public void Can_run_command_handler_with_ctor_properties_resolve()
         {
             var cp = CommandPipeline.CreateDefaultPipeline(InterfacesResolver,
-                Assembly.GetAssembly(typeof(CommandsTests)));
+                Assembly.GetAssembly(typeof(CommandsTests))).UseInternalResolver(true);
             var cmd = new TestCommand3();
             cp.Handle(cmd);
             Assert.That(cmd.Param, Is.EqualTo(1));
@@ -213,7 +213,7 @@ namespace Saritasa.Tools.Tests
         public void Validation_command_attributes_should_generate_exception()
         {
             var cp = CommandPipeline.CreateDefaultPipeline(CommandPipeline.NullResolver,
-                Assembly.GetAssembly(typeof(CommandsTests)));
+                Assembly.GetAssembly(typeof(CommandsTests))).UseInternalResolver(true);
             cp.InsertMiddlewareAfter(new CommandValidationMiddleware(), "CommandHandlerLocator");
             var cmd = new CommandWithValidation()
             {

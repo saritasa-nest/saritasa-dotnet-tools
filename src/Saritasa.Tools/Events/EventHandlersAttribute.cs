@@ -4,21 +4,14 @@
 namespace Saritasa.Tools.Events
 {
     using System;
-
-    /// <summary>
-    /// Indicates the class is command.
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public class EventAttribute : Attribute
-    {
-    }
+    using Messages;
 
     /// <summary>
     /// The class that contains commands handers should be marked
     /// with this attribute.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public class EventHandlersAttribute : Attribute
+    public class EventHandlersAttribute : MessageHandlersAttribute
     {
     }
 }

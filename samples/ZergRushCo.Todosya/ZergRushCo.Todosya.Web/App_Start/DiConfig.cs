@@ -4,6 +4,9 @@ using System;
 using System.Configuration;
 using System.Web;
 using System.Web.Mvc;
+using Saritasa.Tools.Commands;
+using Saritasa.Tools.Queries;
+using Saritasa.Tools.Events;
 using Saritasa.Tools.Emails.Interceptors;
 
 namespace ZergRushCo.Todosya.Web
@@ -42,7 +45,7 @@ namespace ZergRushCo.Todosya.Web
             builder.Register(c =>
                 new Domain.Users.Services.UserStoreService(
                     c.Resolve<Domain.Users.Repositories.IUserRepository>(),
-                    c.Resolve<Saritasa.Tools.Commands.ICommandPipeline>()
+                    c.Resolve<ICommandPipeline>()
                 )).AsImplementedInterfaces();
             builder.Register(c =>
                 new Core.Identity.AppSignInManager(
@@ -62,20 +65,23 @@ namespace ZergRushCo.Todosya.Web
             );
 
             // command pipeline
-            var commandPipeline = Saritasa.Tools.Commands.CommandPipeline.CreateDefaultPipeline(container.Resolve,
+            var commandPipeline = CommandPipeline.CreateDefaultPipeline(container.Resolve,
                 System.Reflection.Assembly.GetAssembly(typeof(Domain.Users.Entities.User)));
             commandPipeline.AppendMiddlewares(repositoryMiddleware);
+            commandPipeline.UseInternalResolver(true);
             builder = new ContainerBuilder();
             builder.RegisterInstance(commandPipeline).AsImplementedInterfaces().SingleInstance();
 
             // query pipeline
-            var queryPipeline = Saritasa.Tools.Queries.QueryPipeline.CreateDefaultPipeline(container.Resolve);
+            var queryPipeline = QueryPipeline.CreateDefaultPipeline(container.Resolve);
             queryPipeline.AppendMiddlewares(repositoryMiddleware);
+            queryPipeline.UseInternalResolver(true);
             builder.RegisterInstance(queryPipeline).AsImplementedInterfaces().SingleInstance();
 
             // events pipeline
-            var eventsPipeline = Saritasa.Tools.Events.EventPipeline.CreateDefaultPipeline(container.Resolve,
+            var eventsPipeline = EventPipeline.CreateDefaultPipeline(container.Resolve,
                 System.Reflection.Assembly.GetAssembly(typeof(Domain.Users.Entities.User)));
+            eventsPipeline.UseInternalResolver(true);
             builder.RegisterInstance(eventsPipeline).AsImplementedInterfaces().SingleInstance();
 
             // register queries as separate objects

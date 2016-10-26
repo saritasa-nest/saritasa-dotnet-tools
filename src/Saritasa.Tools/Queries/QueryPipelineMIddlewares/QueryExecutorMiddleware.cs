@@ -12,7 +12,7 @@ namespace Saritasa.Tools.Queries.QueryPipelineMiddlewares
     public class QueryExecutorMiddleware : IMessagePipelineMiddleware
     {
         /// <inheritdoc />
-        public string Id => "executor";
+        public string Id => "QueryExecutor";
 
         /// <inheritdoc />
         public void Handle(Message message)
@@ -28,14 +28,11 @@ namespace Saritasa.Tools.Queries.QueryPipelineMiddlewares
             try
             {
                 queryMessage.Result = queryMessage.Method.Invoke(queryMessage.QueryObject, queryMessage.Parameters);
-                stopWatch.Stop();
                 queryMessage.ExecutionDuration = (int)stopWatch.ElapsedMilliseconds;
                 queryMessage.Status = Message.ProcessingStatus.Completed;
             }
             catch (Exception ex)
             {
-                stopWatch.Stop();
-                queryMessage.ExecutionDuration = (int)stopWatch.ElapsedMilliseconds;
                 queryMessage.Status = Message.ProcessingStatus.Failed;
                 var innerException = ex.InnerException;
                 if (innerException != null)
@@ -43,6 +40,11 @@ namespace Saritasa.Tools.Queries.QueryPipelineMiddlewares
                     queryMessage.Error = innerException;
                     queryMessage.ErrorDispatchInfo = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(innerException);
                 }
+            }
+            finally
+            {
+                stopWatch.Stop();
+                queryMessage.ExecutionDuration = (int)stopWatch.ElapsedMilliseconds;
             }
         }
     }

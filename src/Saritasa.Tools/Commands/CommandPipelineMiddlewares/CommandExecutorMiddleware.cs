@@ -4,68 +4,25 @@
 namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
 {
     using System;
-    using System.Reflection;
     using Messages;
     using Internal;
 
     /// <summary>
     /// Default command executor. It does not process commands with Rejected status.
     /// </summary>
-    public class CommandExecutorMiddleware : IMessagePipelineMiddleware
+    public class CommandExecutorMiddleware : BaseExecutorMiddleware
     {
-        /// <inheritdoc />
-        public string Id { get; set; } = "CommandExecutor";
-
-        readonly Func<Type, object> resolver;
-
         /// <summary>
         /// .ctor
         /// </summary>
         /// <param name="resolver">DI resolver.</param>
-        public CommandExecutorMiddleware(Func<Type, object> resolver)
+        public CommandExecutorMiddleware(Func<Type, object> resolver) : base(resolver)
         {
-            if (resolver == null)
-            {
-                throw new ArgumentNullException(nameof(resolver));
-            }
-            this.resolver = resolver;
-        }
-
-        void ExecuteHandler(object handler, object command, MethodBase handlerMethod)
-        {
-            var parameters = handlerMethod.GetParameters();
-            var paramsarr = new object[parameters.Length];
-            if (parameters.Length > 1)
-            {
-                if (handlerMethod.DeclaringType != command.GetType())
-                {
-                    paramsarr[0] = command;
-                    for (int i = 1; i < parameters.Length; i++)
-                    {
-                        paramsarr[i] = resolver(parameters[i].ParameterType);
-                    }
-                }
-                else
-                {
-                    for (int i = 0; i < parameters.Length; i++)
-                    {
-                        paramsarr[i] = resolver(parameters[i].ParameterType);
-                    }
-                }
-                handlerMethod.Invoke(handler, paramsarr);
-            }
-            else
-            {
-                if (parameters.Length == 1)
-                {
-                    paramsarr[0] = command;
-                }
-                handlerMethod.Invoke(handler, paramsarr);
-            }
+            Id = "CommandExecutor";
         }
 
         /// <inheritdoc />
-        public void Handle(Message message)
+        public override void Handle(Message message)
         {
             var commandMessage = message as CommandMessage;
             if (commandMessage == null)
@@ -80,21 +37,21 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
             }
 
             object handler = null;
+            // when command class contains Handle method within
             if (commandMessage.HandlerMethod.DeclaringType == commandMessage.Content.GetType())
             {
                 handler = commandMessage.Content;
             }
             else
             {
-                handler = TypeHelpers.ResolveObjectForType(commandMessage.HandlerType, resolver, nameof(CommandExecutorMiddleware));
+                handler = ResolveObject(commandMessage.HandlerType, nameof(CommandExecutorMiddleware));
             }
 
             // if we don't have handler - throw exception
             if (handler == null)
             {
-                var exception = new CommandHandlerNotFoundException();
                 commandMessage.Status = Message.ProcessingStatus.Rejected;
-                throw exception;
+                throw new CommandHandlerNotFoundException();
             }
 
             // invoke method and resolve parameters if needed
@@ -102,15 +59,11 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
             try
             {
                 ExecuteHandler(handler, commandMessage.Content, commandMessage.HandlerMethod);
-                stopWatch.Stop();
-                commandMessage.ExecutionDuration = (int)stopWatch.ElapsedMilliseconds;
                 commandMessage.Status = Message.ProcessingStatus.Completed;
             }
             catch (Exception ex)
             {
                 InternalLogger.Warn($"Exception while process \"{handler}\": {ex}", nameof(CommandExecutorMiddleware));
-                stopWatch.Stop();
-                commandMessage.ExecutionDuration = (int)stopWatch.ElapsedMilliseconds;
                 commandMessage.Status = Message.ProcessingStatus.Failed;
                 var innerException = ex.InnerException;
                 if (innerException != null)
@@ -122,6 +75,11 @@ namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
                 {
                     InternalLogger.Warn($"For some reason InnerException is null. Type: {ex.GetType()}.", nameof(CommandExecutorMiddleware));
                 }
+            }
+            finally
+            {
+                stopWatch.Stop();
+                commandMessage.ExecutionDuration = (int)stopWatch.ElapsedMilliseconds;
             }
         }
     }

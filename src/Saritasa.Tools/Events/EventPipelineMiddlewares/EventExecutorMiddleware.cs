@@ -6,68 +6,25 @@ namespace Saritasa.Tools.Events.EventPipelineMiddlewares
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reflection;
     using Messages;
     using Internal;
 
     /// <summary>
     /// Default event executor. It does not process events with Rejected status.
     /// </summary>
-    public class EventExecutorMiddleware : IMessagePipelineMiddleware
+    public class EventExecutorMiddleware : BaseExecutorMiddleware
     {
-        /// <inheritdoc />
-        public string Id { get; set; } = "EventExecutor";
-
-        readonly Func<Type, object> resolver;
-
         /// <summary>
         /// .ctor
         /// </summary>
         /// <param name="resolver">DI resolver.</param>
-        public EventExecutorMiddleware(Func<Type, object> resolver)
+        public EventExecutorMiddleware(Func<Type, object> resolver) : base(resolver)
         {
-            if (resolver == null)
-            {
-                throw new ArgumentNullException(nameof(resolver));
-            }
-            this.resolver = resolver;
-        }
-
-        void ExecuteHandler(object handler, object @event, MethodBase handlerMethod)
-        {
-            var parameters = handlerMethod.GetParameters();
-            var paramsarr = new object[parameters.Length];
-            if (parameters.Length > 1)
-            {
-                if (handlerMethod.DeclaringType != @event.GetType())
-                {
-                    paramsarr[0] = @event;
-                    for (int i = 1; i < parameters.Length; i++)
-                    {
-                        paramsarr[i] = resolver(parameters[i].ParameterType);
-                    }
-                }
-                else
-                {
-                    for (int i = 0; i < parameters.Length; i++)
-                    {
-                        paramsarr[i] = resolver(parameters[i].ParameterType);
-                    }
-                }
-                handlerMethod.Invoke(handler, paramsarr);
-            }
-            else
-            {
-                if (parameters.Length == 1)
-                {
-                    paramsarr[0] = @event;
-                }
-                handlerMethod.Invoke(handler, paramsarr);
-            }
+            Id = "EventExecutor";
         }
 
         /// <inheritdoc />
-        public void Handle(Message message)
+        public override void Handle(Message message)
         {
             var eventMessage = message as EventMessage;
             if (eventMessage == null)
@@ -81,11 +38,14 @@ namespace Saritasa.Tools.Events.EventPipelineMiddlewares
                 return;
             }
 
-            var exceptions = new List<Exception>(3);
+            var exceptions = new List<Exception>(3); // stores exceptions from all handlers
             var stopWatch = System.Diagnostics.Stopwatch.StartNew();
+
+            // executes every handle method
             for (int i = 0; i < eventMessage.HandlerMethods.Count; i++)
             {
                 object handler = null;
+                // event already implements Handle method
                 if (eventMessage.HandlerMethods[i].DeclaringType == eventMessage.Content.GetType())
                 {
                     handler = eventMessage.Content;
@@ -94,17 +54,12 @@ namespace Saritasa.Tools.Events.EventPipelineMiddlewares
                 {
                     try
                     {
-                        handler = resolver(eventMessage.HandlerMethods[i].DeclaringType);
+                        handler = ResolveObject(eventMessage.HandlerMethods[i].DeclaringType, nameof(EventExecutorMiddleware));
                     }
                     catch (Exception ex)
                     {
                         InternalLogger.Info($"Exception while resolving {eventMessage.HandlerMethods[i].Name}: {ex}");
                     }
-                }
-                if (handler == null)
-                {
-                    handler = TypeHelpers.ResolveObjectForType(eventMessage.HandlerMethods[i].DeclaringType,
-                        resolver, nameof(EventExecutorMiddleware));
                 }
                 if (handler == null)
                 {

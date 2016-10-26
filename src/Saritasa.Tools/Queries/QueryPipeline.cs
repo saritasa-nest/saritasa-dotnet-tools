@@ -87,9 +87,11 @@ namespace Saritasa.Tools.Queries
             /// <inheritdoc />
             public TResult With<TResult>(Expression<Func<TQuery, TResult>> expression)
             {
+                bool fakeQueryObject = false;
                 if (query == null)
                 {
                     query = (TQuery)CreateObjectFromType(typeof(TQuery));
+                    fakeQueryObject = true;
                 }
 
                 var mce = expression.Body as MethodCallExpression;
@@ -103,6 +105,7 @@ namespace Saritasa.Tools.Queries
                     Status = Message.ProcessingStatus.Processing,
                     Parameters = args,
                     QueryObject = query,
+                    FakeQueryObject = fakeQueryObject,
                     Method = method,
                 };
                 queryPipeline.ProcessPipeline(message);

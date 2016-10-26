@@ -70,7 +70,7 @@ namespace Saritasa.Tools.Tests
         [Test]
         public void Can_run_simple_query()
         {
-            var qp = QueryPipeline.CreateDefaultPipeline(QueryPipeline.NullResolver);
+            var qp = QueryPipeline.CreateDefaultPipeline(QueryPipeline.NullResolver).UseInternalResolver(true);
             var result = qp.Query<QueryObject>().With(q => q.SimpleQuery(10, 20));
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Count, Is.EqualTo(2));
@@ -82,7 +82,7 @@ namespace Saritasa.Tools.Tests
         [Test]
         public void Can_run_query_with_resolving()
         {
-            var qp = QueryPipeline.CreateDefaultPipeline(QueriesTests.InterfacesResolver);
+            var qp = QueryPipeline.CreateDefaultPipeline(QueriesTests.InterfacesResolver).UseInternalResolver(true);
             var result = qp.Query<QueryObject>().With(q => q.SimpleQueryWithDependency(10, 20, null));
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Count, Is.EqualTo(2));
@@ -92,7 +92,7 @@ namespace Saritasa.Tools.Tests
         [Test]
         public void Can_run_query_from_raw_message()
         {
-            var qp = QueryPipeline.CreateDefaultPipeline(QueriesTests.InterfacesResolver);
+            var qp = QueryPipeline.CreateDefaultPipeline(QueriesTests.InterfacesResolver).UseInternalResolver(true);
             var message = new Messages.Message()
             {
                 ContentType = "Saritasa.Tools.Tests.QueriesTests+QueryObject.SimpleQueryWithDependency",
@@ -134,7 +134,7 @@ namespace Saritasa.Tools.Tests
         [Test]
         public void Can_run_query_with_private_object_ctor()
         {
-            var qp = QueryPipeline.CreateDefaultPipeline(QueriesTests.InterfacesResolver);
+            var qp = QueryPipeline.CreateDefaultPipeline(QueriesTests.InterfacesResolver).UseInternalResolver(true);
             var result = qp.Query<QueryObjectWithPrivateCtor>().With(q => q.Query());
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Count, Is.EqualTo(2));
