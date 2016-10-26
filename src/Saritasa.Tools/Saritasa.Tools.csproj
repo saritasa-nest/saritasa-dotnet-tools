@@ -47,7 +47,7 @@
     <Compile Include="Commands\CommandMessage.cs" />
     <Compile Include="Commands\CommandPipeline.cs" />
     <Compile Include="Commands\CommandPipelineExtensions.cs" />
-    <Compile Include="Commands\CommandPipelineMiddlewares\CommandValidationMiddleware.cs" />
+    <Compile Include="Commands\PipelineMiddlewares\CommandValidationMiddleware.cs" />
     <Compile Include="Commands\CommandValidationException.cs" />
     <Compile Include="Commands\ICommandPipeline.cs" />
     <Compile Include="Domain\InstanceUnitOfWorkFactory.cs" />
@@ -62,9 +62,9 @@
     <Compile Include="Events\EventHandlersAttribute.cs" />
     <Compile Include="Events\EventPipeline.cs" />
     <Compile Include="Events\EventMessage.cs" />
-    <Compile Include="Events\EventPipelineMiddlewares\DomainEventLocatorMiddleware.cs" />
-    <Compile Include="Events\EventPipelineMiddlewares\EventExecutorMiddleware.cs" />
-    <Compile Include="Events\EventPipelineMiddlewares\EventHandlerLocatorMiddleware.cs" />
+    <Compile Include="Events\PipelineMiddlewares\DomainEventLocatorMiddleware.cs" />
+    <Compile Include="Events\PipelineMiddlewares\EventExecutorMiddleware.cs" />
+    <Compile Include="Events\PipelineMiddlewares\EventHandlerLocatorMiddleware.cs" />
     <Compile Include="Events\IEventPipeline.cs" />
     <Compile Include="Internal\InternalLogger.cs" />
     <Compile Include="Logging\LogManager.cs" />
@@ -80,8 +80,8 @@
     <Compile Include="Messages\MessagePipeline.cs" />
     <Compile Include="Messages\MiddlewareNotFoundException.cs" />
     <Compile Include="Messages\PipelineMiddlewares\DataMiddleware.cs" />
-    <Compile Include="Commands\CommandPipelineMiddlewares\CommandExecutorMiddleware.cs" />
-    <Compile Include="Commands\CommandPipelineMiddlewares\CommandHandlerLocatorMiddleware.cs" />
+    <Compile Include="Commands\PipelineMiddlewares\CommandExecutorMiddleware.cs" />
+    <Compile Include="Commands\PipelineMiddlewares\CommandHandlerLocatorMiddleware.cs" />
     <Compile Include="Messages\PipelineMiddlewares\RepositoryMessagesFilter.cs" />
     <Compile Include="Messages\PipelineMiddlewares\RepositoryMiddleware.cs" />
     <Compile Include="Messages\PipelineMiddlewares\PerformanceCounterMiddleware.cs" />
@@ -130,8 +130,8 @@
     <Compile Include="Queries\IQueryPipeline.cs" />
     <Compile Include="Queries\QueryPipeline.cs" />
     <Compile Include="Queries\QueryPipelineExtensions.cs" />
-    <Compile Include="Queries\QueryPipelineMIddlewares\QueryExecutorMiddleware.cs" />
-    <Compile Include="Queries\QueryPipelineMIddlewares\QueryObjectResolverMiddleware.cs" />
+    <Compile Include="Queries\PipelineMIddlewares\QueryExecutorMiddleware.cs" />
+    <Compile Include="Queries\PipelineMIddlewares\QueryObjectResolverMiddleware.cs" />
     <Compile Include="Security\PasswordGenerator.cs" />
   </ItemGroup>
   <ItemGroup>

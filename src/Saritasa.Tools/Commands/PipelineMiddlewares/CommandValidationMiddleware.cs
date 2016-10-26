@@ -2,7 +2,7 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 #if !NETCOREAPP1_0 && !NETSTANDARD1_6
-namespace Saritasa.Tools.Commands.CommandPipelineMiddlewares
+namespace Saritasa.Tools.Commands.PipelineMiddlewares
 {
     using System;
     using System.ComponentModel.DataAnnotations;

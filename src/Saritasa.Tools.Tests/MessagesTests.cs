@@ -8,7 +8,7 @@ namespace Saritasa.Tools.Tests
     using System.Reflection;
     using NUnit.Framework;
     using Commands;
-    using Commands.CommandPipelineMiddlewares;
+    using Commands.PipelineMiddlewares;
     using Messages;
 
     [TestFixture]

@@ -61,8 +61,8 @@ namespace Saritasa.Tools.Commands
             }
 
             commandPipeline.AppendMiddlewares(
-                new CommandPipelineMiddlewares.CommandHandlerLocatorMiddleware(assemblies),
-                new CommandPipelineMiddlewares.CommandExecutorMiddleware(resolver)
+                new PipelineMiddlewares.CommandHandlerLocatorMiddleware(assemblies),
+                new PipelineMiddlewares.CommandExecutorMiddleware(resolver)
             );
             return commandPipeline;
         }

@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Reflection;
 using Saritasa.Tools.Commands;
-using Saritasa.Tools.Commands.CommandPipelineMiddlewares;
+using Saritasa.Tools.Commands.PipelineMiddlewares;
 using Saritasa.Tools.Events;
-using Saritasa.Tools.Events.EventPipelineMiddlewares;
+using Saritasa.Tools.Events.PipelineMiddlewares;
 using Saritasa.Tools.Messages.PipelineMiddlewares;
 using Saritasa.Tools.Messages.Repositories;
 using Saritasa.Tools.Queries;
-using Saritasa.Tools.Queries.QueryPipelineMiddlewares;
+using Saritasa.Tools.Queries.PipelineMiddlewares;
 using SandBox.Commands;
 using SandBox.Events;
 using SandBox.Queries;
@@ -56,6 +56,7 @@ namespace SandBox
                 new CommandExecutorMiddleware(Resolver),
                 new RepositoryMiddleware(inMemoryMessageRepository)
             );
+            CommandPipeline.UseInternalResolver(true);
 
             // create query pipeline manually
             QueryPipeline = new QueryPipeline();
@@ -64,6 +65,7 @@ namespace SandBox
                 new QueryExecutorMiddleware(),
                 new RepositoryMiddleware(inMemoryMessageRepository)
             );
+            QueryPipeline.UseInternalResolver(true);
 
             // create event pipeline manually
             EventPipeline = new EventPipeline();
@@ -72,6 +74,7 @@ namespace SandBox
                 new EventExecutorMiddleware(Resolver),
                 new RepositoryMiddleware(inMemoryMessageRepository)
             );
+            EventPipeline.UseInternalResolver(true);
         }
 
         static void Test()

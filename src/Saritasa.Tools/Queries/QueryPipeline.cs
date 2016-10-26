@@ -161,8 +161,8 @@ namespace Saritasa.Tools.Queries
         public static QueryPipeline CreateDefaultPipeline(Func<Type, object> resolver)
         {
             var queryPipeline = new QueryPipeline();
-            queryPipeline.AppendMiddlewares(new QueryPipelineMiddlewares.QueryObjectResolverMiddleware(resolver));
-            queryPipeline.AppendMiddlewares(new QueryPipelineMiddlewares.QueryExecutorMiddleware());
+            queryPipeline.AppendMiddlewares(new PipelineMiddlewares.QueryObjectResolverMiddleware(resolver));
+            queryPipeline.AppendMiddlewares(new PipelineMiddlewares.QueryExecutorMiddleware());
             return queryPipeline;
         }
 

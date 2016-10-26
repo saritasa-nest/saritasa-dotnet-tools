@@ -40,8 +40,8 @@ namespace Saritasa.Tools.Events
             }
 
             eventPipeline.AppendMiddlewares(
-                new EventPipelineMiddlewares.EventHandlerLocatorMiddleware(assemblies),
-                new EventPipelineMiddlewares.EventExecutorMiddleware(resolver)
+                new PipelineMiddlewares.EventHandlerLocatorMiddleware(assemblies),
+                new PipelineMiddlewares.EventExecutorMiddleware(resolver)
             );
             return eventPipeline;
         }

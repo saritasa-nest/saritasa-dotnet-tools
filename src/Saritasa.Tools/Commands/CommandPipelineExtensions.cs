@@ -17,7 +17,7 @@ namespace Saritasa.Tools.Commands
         public static ICommandPipeline UseInternalResolver(this ICommandPipeline commandPipeline,
             bool resolveMethodParameters = false)
         {
-            var middleware = (CommandPipelineMiddlewares.CommandExecutorMiddleware)commandPipeline.GetMiddlewareById("CommandExecutor");
+            var middleware = (PipelineMiddlewares.CommandExecutorMiddleware)commandPipeline.GetMiddlewareById("CommandExecutor");
             middleware.UseInternalObjectResolver = true;
             middleware.UseParametersResolve = resolveMethodParameters;
             return commandPipeline;
