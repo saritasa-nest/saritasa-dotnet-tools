@@ -9,7 +9,7 @@ namespace Saritasa.Tools.Logging.Inetrnal
 {
     internal class Scope : IScope
     {
-        private volatile bool isDisposed;
+        private bool isDisposed;
 
         public Scope(string scopeName = null)
         {
