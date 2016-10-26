@@ -50,6 +50,7 @@
     <Compile Include="Commands\CommandPipelineMiddlewares\CommandValidationMiddleware.cs" />
     <Compile Include="Commands\CommandValidationException.cs" />
     <Compile Include="Commands\ICommandPipeline.cs" />
+    <Compile Include="Domain\InstanceUnitOfWorkFactory.cs" />
     <Compile Include="Domain\IQueryableRepository.cs" />
     <Compile Include="Emails\Interceptors\CountEmailsInterceptor.cs" />
     <Compile Include="Emails\MailAddress.cs" />

@@ -61,16 +61,6 @@ Command contains data that needs for command execution - it is like model class 
 
 In general you should not return any data from command. But in most cases you need at least the ``id`` of newly created entity. We recommend to make special property in command. For example command ``CreateProjectCommand`` has out field ``ProjectId``.
 
-**********************
-Rependencies Resolving
-**********************
-
-There is how you can resolve dependencies for your command handlers:
-
-- Using you handler class public constructor arguments.
-- Using public properties of command handler.
-- Using arguments of handler method.
-
 ***********
 Middlewares
 ***********

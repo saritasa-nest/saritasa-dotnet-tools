@@ -47,13 +47,13 @@ Query is a reading operation. Query always returns result and does not change sy
    
     .. code-block:: c#
 
-        var task = QueryPipeline.Execute(QueryPipeline.GetQuery<TasksQueries>().GetByIdDto, 3);
+        var task = QueryPipeline.Query<TasksQueries>().With(q => q.GetByIdDto(command.TaskId)); // #1
         // or
-        var task = QueryPipeline.Execute(tasksQueries.GetByIdDto, 3);
+        var task = QueryPipeline.Query<TasksQueries>(tasksQueries).With(q => q.GetByIdDto(command.TaskId)); // #2
         // the same as
-        var task = tasksQueries.GetByIdDto(3);
+        var task = tasksQueries.GetByIdDto(3); // #3
 
-    As you can see ``QueryPipeline.GetQuery`` is used to get method delegate. Maybe it looks ugly but it is only needed to get delegate type. To do that query handler must have default parameterless constructor either private or public.
+    At first case ``Query<TasksQueries>()`` will create temporary object and ``TasksQueries`` will be resolved. So that ``TasksQueries`` must have parameterless constructor (public or private). At second case we presume that provided ``tasksQueries`` argument is already resolved by application. Third case is just usual method call and can be used when performance required.
 
 .. note:: Query pipeline maked additional performance overhead because of reflection and additional calls. If performance makes sense inject query handler classes using your DI container and use them directly.
 
