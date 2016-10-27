@@ -121,5 +121,17 @@ namespace Saritasa.Tools.Messages
         }
 
         #endregion
+
+        /// <summary>
+        /// Processes the message thru all middlewares.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        protected void ProcessMiddlewares(Message message)
+        {
+            foreach (var handler in Middlewares)
+            {
+                handler.Handle(message);
+            }
+        }
     }
 }

@@ -25,12 +25,7 @@ namespace Saritasa.Tools.Commands
         public void Handle(object command)
         {
             var commandMessage = new CommandMessage(command);
-
-            foreach (var handler in Middlewares)
-            {
-                handler.Handle(commandMessage);
-            }
-
+            ProcessMiddlewares(commandMessage);
             commandMessage.ErrorDispatchInfo?.Throw();
         }
 
@@ -70,7 +65,15 @@ namespace Saritasa.Tools.Commands
         /// <inheritdoc />
         public override void ProcessRaw(Message message)
         {
-            Handle(message.Content);
+            var commandMessage = new CommandMessage(message.Content);
+            ProcessMiddlewares(commandMessage);
+            message.Content = commandMessage.Content;
+            message.Error = commandMessage.Error;
+            message.ErrorMessage = commandMessage.ErrorMessage;
+            message.ErrorType = commandMessage.ErrorType;
+            message.Status = commandMessage.Status;
+            message.ExecutionDuration = commandMessage.ExecutionDuration;
+            message.Data = commandMessage.Data;
         }
     }
 }

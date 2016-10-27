@@ -38,15 +38,13 @@ namespace Saritasa.Tools.Queries
                 Parameters = args,
                 Method = method,
                 QueryObject = CreateObjectFromType(method.GetBaseDefinition().DeclaringType),
+                FakeQueryObject = true,
             };
         }
 
         void ProcessPipeline(QueryMessage message)
         {
-            foreach (var handler in Middlewares)
-            {
-                handler.Handle(message);
-            }
+            ProcessMiddlewares(message);
             message.ErrorDispatchInfo?.Throw();
         }
 
@@ -208,6 +206,12 @@ namespace Saritasa.Tools.Queries
             var queryMessage = CreateMessage(@delegate, values.ToArray());
             ProcessPipeline(queryMessage);
             message.Content = queryMessage.Result;
+            message.Error = queryMessage.Error;
+            message.ErrorMessage = queryMessage.ErrorMessage;
+            message.ErrorType = queryMessage.ErrorType;
+            message.Status = queryMessage.Status;
+            message.ExecutionDuration = queryMessage.ExecutionDuration;
+            message.Data = queryMessage.Data;
 #endif
         }
 

@@ -20,11 +20,7 @@ namespace Saritasa.Tools.Events
         /// <inheritdoc />
         public void Raise(object @event)
         {
-            var eventMessage = new EventMessage(@event);
-            foreach (var handler in Middlewares)
-            {
-                handler.Handle(eventMessage);
-            }
+            ProcessMiddlewares(new EventMessage(@event));
         }
 
         /// <summary>

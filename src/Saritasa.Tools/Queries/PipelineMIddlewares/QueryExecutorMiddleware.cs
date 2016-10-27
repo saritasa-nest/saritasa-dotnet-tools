@@ -28,7 +28,6 @@ namespace Saritasa.Tools.Queries.PipelineMiddlewares
             try
             {
                 queryMessage.Result = queryMessage.Method.Invoke(queryMessage.QueryObject, queryMessage.Parameters);
-                queryMessage.ExecutionDuration = (int)stopWatch.ElapsedMilliseconds;
                 queryMessage.Status = Message.ProcessingStatus.Completed;
             }
             catch (Exception ex)

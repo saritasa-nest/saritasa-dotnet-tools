@@ -172,6 +172,7 @@ namespace Saritasa.Tools.Messages.Endpoints
                     var message = new Message();
                     message.Type = GetMessageTypeFromUri(request.Url);
                     message.ContentType = GetMessageContentTypeFromUri(request.Url);
+                    message.CreatedAt = DateTime.Now;
 
                     response.ContentType = ContentTypeJson;
                     using (var streamReader = new StreamReader(request.InputStream))
