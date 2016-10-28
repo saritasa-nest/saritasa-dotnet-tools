@@ -82,14 +82,14 @@ namespace Saritasa.Tools.Emails
         /// Add interceptor.
         /// </summary>
         /// <param name="interceptor">Interceptor.</param>
-        public void AddInterceptor(IEmailInterceptor interceptor)
+        public EmailSender AddInterceptor(IEmailInterceptor interceptor)
         {
             if (interceptor == null)
             {
                 throw new ArgumentNullException(nameof(interceptor));
             }
-
             interceptors.Add(interceptor);
+            return this;
         }
     }
 }

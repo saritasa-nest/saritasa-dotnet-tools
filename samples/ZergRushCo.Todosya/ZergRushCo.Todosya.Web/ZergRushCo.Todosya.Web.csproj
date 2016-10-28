@@ -200,15 +200,15 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="App\App.js" />
-    <Content Include="App\config.js" />
-    <Content Include="App\jquery-noconflict.js" />
-    <Content Include="App\Services\TasksService.js" />
-    <Content Include="App\Services\TasksServiceFake.js" />
+    <Content Include="Frontend\App.js" />
+    <Content Include="Frontend\config.js" />
+    <Content Include="Frontend\jquery-noconflict.js" />
+    <Content Include="Frontend\Services\TasksService.js" />
+    <Content Include="Frontend\Services\TasksServiceFake.js" />
     <Content Include="config.js" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
-    <Content Include="App\sass\style.scss" />
+    <Content Include="Frontend\sass\style.scss" />
     <Content Include="gulpfile.js\bundle-app-pages.js" />
     <Content Include="gulpfile.js\bundle-app-requirejs.js" />
     <Content Include="gulpfile.js\bundle-app.js" />

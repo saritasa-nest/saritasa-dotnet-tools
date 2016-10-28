@@ -4,6 +4,7 @@
 namespace Saritasa.Tools.Exceptions
 {
     using System;
+    using System.Runtime.Serialization;
 
     /// <summary>
     /// Exception occurs in domain part of application. It can be logic or validation exception.
@@ -33,5 +34,18 @@ namespace Saritasa.Tools.Exceptions
         public DomainException(string message, Exception innerException) : base(message, innerException)
         {
         }
+
+#if !NETCOREAPP1_0 && !NETSTANDARD1_6
+        /// <summary>
+        /// .ctor for deserialization.
+        /// </summary>
+        /// <param name="info">Stores all the data needed to serialize or deserialize an object.</param>
+        /// <param name="context">Describes the source and destination of a given serialized stream,
+        /// and provides an additional caller-defined context.</param>
+        protected DomainException(SerializationInfo info, StreamingContext context) 
+            : base(info, context)
+        {
+        }
+#endif
     }
 }
