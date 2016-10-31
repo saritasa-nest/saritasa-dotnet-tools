@@ -1,10 +1,8 @@
-#######
 Queries
-#######
+=======
 
-********
 Overview
-********
+--------
 
 Query is a reading operation. Query always returns result and does not change system state. For example getting user by id, or getting list of products. To use queries with query pipeline you should pass method delegate and parameters. Here are steps required:
 
@@ -57,9 +55,8 @@ Query is a reading operation. Query always returns result and does not change sy
 
 .. note:: Query pipeline maked additional performance overhead because of reflection and additional calls. If performance makes sense inject query handler classes using your DI container and use them directly.
 
-***********
 Middlewares
-***********
+-----------
 
     .. class:: QueryExecutorMiddleware
 

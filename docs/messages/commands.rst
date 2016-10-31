@@ -1,10 +1,8 @@
-########
 Commands
-########
+========
 
-********
 Overview
-********
+--------
 
 Command is something that changes the state (database insert/update/delete) of application. It utilizes Command behavioral design pattern: you should separate data for command and its handler. Here is a general usage:
 
@@ -61,9 +59,8 @@ Command contains data that needs for command execution - it is like model class 
 
 In general you should not return any data from command. But in most cases you need at least the ``id`` of newly created entity. We recommend to make special property in command. For example command ``CreateProjectCommand`` has out field ``ProjectId``.
 
-***********
 Middlewares
-***********
+-----------
 
     .. class:: CommandHandlerLocatorMiddleware
 

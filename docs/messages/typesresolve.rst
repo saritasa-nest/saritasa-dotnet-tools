@@ -1,6 +1,5 @@
-#############
 Types Resolve
-#############
+=============
 
 When you create default command, query or events pipeline you need to provide ``resolve`` function. It is used to resolve handlers therefor you should register all messages handlers with your IoC container. However you can use internal IoC container that is in Saritasa Tools library. By default we rely on your IoC setup. If you want to use internal IoC you should call ``UseInternalResolver`` extension method on your pipeline. Here is how it works:
 

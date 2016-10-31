@@ -1,12 +1,7 @@
-########
 Messages
-########
+========
 
 The main idea is to process application business logic in general way.
-
-*****************
-Table of Contents
-*****************
 
 .. toctree::
     :titlesonly:
@@ -15,6 +10,7 @@ Table of Contents
     queries
     events
     repositories
+    typesresolve
 
 You can setup you application to process everything thru single pipeline:
 
@@ -32,9 +28,8 @@ Pipeline is a set of handlers (middlewares) to process your commands/queries. He
 
 Middleware makes an action on your message. You can create and insert your own custom middleware into pipeline to add additional logic to whole application.
 
-*******
 Message
-*******
+-------
 
 Every request that goes thru pipeline is converted to ``Message`` instance. Properies:
 
@@ -52,9 +47,8 @@ ExecutionDuration    Milliseconds of processing time.
 Status               Status of execution. NotInitialized, Processing, Completed, Failed, Rejected.
 ==================== ==============================================================================================
 
-***********
 Middlewares
-***********
+-----------
 
 There are general middlewares that can be used in pipeline.
 

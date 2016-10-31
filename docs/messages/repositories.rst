@@ -1,10 +1,8 @@
-############
 Repositories
-############
+============
 
-********
 Overview
-********
+--------
 
 You can store message to repository (database, files, any other destination) for logging purposes. Since the message is stored in structure way you can use it afterwards:
 
@@ -19,18 +17,17 @@ For example when user updates product details following JSON will be stored to c
     .. code-block:: json
 
         {
-            "HandlerType": "SandBox.CommandsHandlers, SandBox, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
-            "ErrorMessage": "Test",
-            "ErrorType": "System.Exception",
-            "ContentType": "SandBox.Commands.UpdateProductCommand",
             "Id": "ff369938-1e78-4dae-80dc-c22ccceef724",
             "Type": 1,
+            "ContentType": "SandBox.Commands.UpdateProductCommand",
             "Content": {
                 "ProductId": 10,
                 "Name": "Test",
                 "BestBefore": null
             },
             "Data": {},
+            "ErrorType": "System.Exception",
+            "ErrorMessage": "Test",
             "Error": {
                 "ClassName": "System.Exception",
                 "Message": "Test",
@@ -60,9 +57,8 @@ To use it you should call ``AppendMiddleware`` on your message pipeline and pass
 
 You can also set ``RepositoryMessagesFilter`` to filter what messages to store.
 
-************
 Repositories
-************
+------------
 
 There are built in repositories.
 

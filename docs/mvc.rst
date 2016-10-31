@@ -1,6 +1,5 @@
-###
 MVC
-###
+===
 
 .. class:: CorsDelegatingHandler
 

@@ -1,6 +1,5 @@
-########
 Security
-########
+========
 
 .. class:: PasswordGenerator
 

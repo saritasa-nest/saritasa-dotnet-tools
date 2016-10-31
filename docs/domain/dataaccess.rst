@@ -1,10 +1,8 @@
-###########
 Data Access
-###########
+===========
 
-************
 Unit of Work
-************
+------------
 
 Unit of Work design pattern does two important things: first it maintains in-memory updates and second it sends these in-memory updates as one transaction to the database.
 
@@ -28,7 +26,7 @@ To achieve this there are two interfaces available: ``IUnitOfWork`` and ``IUnitO
     Please note that we use repository in context of unit of work.
 
 3. Make implementation of ``IAppUnitOfWork`` and ``IAppUnitOfWork`` in your data access layer:
-   
+
    .. code-block:: c#
 
         public class AppUnitOfWork : EfUnitOfWork<AppDbContext>, IAppUnitOfWork
@@ -42,11 +40,11 @@ To achieve this there are two interfaces available: ``IUnitOfWork`` and ``IUnitO
         {
             public IAppUnitOfWork Create() => new AppUnitOfWork(new AppDbContext());
             public IAppUnitOfWork Create(IsolationLevel isolationLevel) => new AppUnitOfWork(new AppDbContext());
-        }         
+        }
 
 4. The things almost done, now you can access your data in abstract way:
-   
-   .. code-block:: c#
+
+    .. code-block:: c#
 
         using (var uow = unitOfWorkFactory.Create())
         {
@@ -74,9 +72,8 @@ To achieve this there are two interfaces available: ``IUnitOfWork`` and ``IUnitO
         builder.RegisterType<DataAccess.AppUnitOfWork>().AsImplementedInterfaces();
         builder.RegisterType<DataAccess.AppUnitOfWorkFactory>().AsImplementedInterfaces().SingleInstance();
 
-**********
 Repository
-**********
+----------
 
 A Repository mediates between the domain and data mapping layers, acting like an in-memory domain object collection. In our implementation repository works in a context of unit of work. There are two interfaces available:
 

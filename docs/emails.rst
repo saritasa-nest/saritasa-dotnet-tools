@@ -1,6 +1,5 @@
-######
 Emails
-######
+======
 
 Emails send handling. It is built around standard class ``MailMessage``. In simple case only ``IEmailSender`` interface will be used with only one method.
 
@@ -28,15 +27,13 @@ Example of registration with Autofac:
 
 .. note:: For frameworks that do not support MailMessage API (.NET Standard < 2.0) there is lightweight implementation for ``MailAddress``, ``MailAddressCollection`` and ``MailMessage``.
 
-*************
 Email Senders
-*************
+-------------
 
 Right now only ``SmtpClientEmailSender`` is available that uses ``SmtpClient`` to send emails. In future we will probably add providers for SendGrid and AWS.
 
-************
 Interceptors
-************
+------------
 
 You can set additional behavior before and after emails sending by using interceptors. Interceptors are handlers that are executed before or after email sending. They can even cancel it. You can use them with ``EmailSender`` class. Here is a simple example how it can be used to filter users out by email address (what sometimes needed for development environment):
 
