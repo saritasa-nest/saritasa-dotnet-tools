@@ -61,7 +61,7 @@ To achieve this there are two interfaces available: ``IUnitOfWork`` and ``IUnitO
                 PasswordHash = command.Password,
             };
             uow.UserRepository.Add(user);
-            uow.Complete();
+            uow.SaveChanges();
         }
 
 5. For better usage also you can register them in you DI container. Here is an example for Autofac:

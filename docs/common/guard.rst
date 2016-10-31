@@ -7,13 +7,13 @@ Provides common patterns to validate values. Contains set of methods to write le
 
         void CreateUser(User user, int score)
         {
-            ValidateUtils.IsNotNull(user, "user");
-            ValidateUtils.IsNotNegative(score, "score");
+            Guard.IsNotNull(user, "user");
+            Guard.IsNotNegative(score, "score");
         }
 
 There are methods implemented: ``IsNotEmpty``, ``IsNotOutOfLength``, ``IsNotNull``, ``IsNotNegative``, ``IsNotNegativeOrZero``, ``IsNotInPast``, ``IsNotInFuture``, ``IsNotInvalidEmail``.
 
-.. class:: ValidateUtils
+.. class:: Guard
 
     Contains common validation regexp patterns.
 
