@@ -1,6 +1,6 @@
 ﻿using System.Web.Mvc;
-using Saritasa.Tools.Commands;
-using Saritasa.Tools.Queries;
+using Saritasa.Tools.Messages.Commands;
+using Saritasa.Tools.Messages.Queries;
 
 namespace ZergRushCo.Todosya.Web.Controllers
 {

@@ -1,6 +1,6 @@
 ﻿using System;
 using SandBox.Commands;
-using Saritasa.Tools.Commands;
+using Saritasa.Tools.Messages.Commands;
 
 namespace SandBox
 {

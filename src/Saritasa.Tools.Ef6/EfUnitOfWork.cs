@@ -53,19 +53,19 @@ namespace Saritasa.Tools.Ef
         }
 
         /// <inheritdoc />
-        public int Complete()
+        public int SaveChanges()
         {
             return Context.SaveChanges();
         }
 
         /// <inheritdoc />
-        public Task<int> CompleteAsync()
+        public Task<int> SaveChangesAsync()
         {
             return Context.SaveChangesAsync();
         }
 
         /// <inheritdoc />
-        public Task<int> CompleteAsync(CancellationToken cancellationToken)
+        public Task<int> SaveChangesAsync(CancellationToken cancellationToken)
         {
             return Context.SaveChangesAsync(cancellationToken);
         }

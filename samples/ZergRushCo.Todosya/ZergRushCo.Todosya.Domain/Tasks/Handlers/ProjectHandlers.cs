@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
-using Saritasa.Tools.Commands;
-using Saritasa.Tools.Exceptions;
+using Saritasa.Tools.Messages.Commands;
+using Saritasa.Tools.Domain.Exceptions;
 using ZergRushCo.Todosya.Domain.Tasks.Commands;
 
 namespace ZergRushCo.Todosya.Domain.Tasks.Handlers
@@ -28,7 +28,7 @@ namespace ZergRushCo.Todosya.Domain.Tasks.Handlers
                     User = uow.UserRepository.Get(command.CreatedByUserId),
                 };
                 uow.ProjectRepository.Add(project);
-                uow.Complete();
+                uow.SaveChanges();
                 command.ProjectId = project.Id;
             }
         }
@@ -52,7 +52,7 @@ namespace ZergRushCo.Todosya.Domain.Tasks.Handlers
                 project.Name = command.Name;
                 project.Color = command.Color;
                 project.UpdatedAt = DateTime.Now;
-                uow.Complete();
+                uow.SaveChanges();
             }
         }
 
@@ -74,7 +74,7 @@ namespace ZergRushCo.Todosya.Domain.Tasks.Handlers
 
                 uow.TaskRepository.RemoveRange(uow.TaskRepository.Where(t => t.Project.Id == project.Id));
                 uow.ProjectRepository.Remove(project);
-                uow.Complete();
+                uow.SaveChanges();
             }
         }
     }

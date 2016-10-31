@@ -71,6 +71,18 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.1.0.0\lib\netstandard1.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Logging.1.0.0\lib\netstandard1.1\Microsoft.Extensions.Logging.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.1.0.0\lib\netstandard1.1\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.Owin.Security.OAuth, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Owin.Security.OAuth.3.0.1\lib\net45\Microsoft.Owin.Security.OAuth.dll</HintPath>
       <Private>True</Private>
@@ -263,17 +275,29 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Saritasa.Tools.Common\Saritasa.Tools.Common.csproj">
+      <Project>{2900d88a-2522-4299-8d51-6af26b74c91c}</Project>
+      <Name>Saritasa.Tools.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\src\Saritasa.Tools.Domain\Saritasa.Tools.Domain.csproj">
+      <Project>{32a3a81c-a65c-4f78-8300-17151987697c}</Project>
+      <Name>Saritasa.Tools.Domain</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\src\Saritasa.Tools.Ef6\Saritasa.Tools.Ef6.csproj">
       <Project>{D1AD1713-BC18-4340-B8DB-23D86D22FB7F}</Project>
       <Name>Saritasa.Tools.Ef6</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\src\Saritasa.Tools.Emails\Saritasa.Tools.Emails.csproj">
+      <Project>{baaf1392-6bac-4220-8149-b207befe2fdd}</Project>
+      <Name>Saritasa.Tools.Emails</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\src\Saritasa.Tools.Messages\Saritasa.Tools.Messages.csproj">
+      <Project>{aee65918-25df-4a25-bfb8-56552faa2a51}</Project>
+      <Name>Saritasa.Tools.Messages</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\src\Saritasa.Tools.NLog4\Saritasa.Tools.NLog4.csproj">
       <Project>{83d4925b-b04f-4c9c-8bf1-9b6a6be0a87d}</Project>
       <Name>Saritasa.Tools.NLog4</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\src\Saritasa.Tools\Saritasa.Tools.csproj">
-      <Project>{a5451164-9df3-45b9-9067-2df7e23f8806}</Project>
-      <Name>Saritasa.Tools</Name>
     </ProjectReference>
     <ProjectReference Include="..\ZergRushCo.Todosya.DataAccess\ZergRushCo.Todosya.DataAccess.csproj">
       <Project>{73fd073c-8f4e-4a5b-8035-8502e3257da6}</Project>

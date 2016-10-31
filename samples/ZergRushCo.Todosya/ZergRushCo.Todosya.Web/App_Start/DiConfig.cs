@@ -1,13 +1,14 @@
-﻿using Autofac;
-using Autofac.Integration.Mvc;
-using System;
+﻿using System;
 using System.Configuration;
 using System.Web;
 using System.Web.Mvc;
-using Saritasa.Tools.Commands;
-using Saritasa.Tools.Queries;
-using Saritasa.Tools.Events;
+using Saritasa.Tools.Messages.Commands;
+using Saritasa.Tools.Messages.Queries;
+using Saritasa.Tools.Messages.Events;
 using Saritasa.Tools.Emails.Interceptors;
+using Autofac;
+using Autofac.Integration.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace ZergRushCo.Todosya.Web
 {
@@ -58,8 +59,8 @@ namespace ZergRushCo.Todosya.Web
             // make container
             var container = builder.Build();
 
-            var repositoryMiddleware = new Saritasa.Tools.Messages.PipelineMiddlewares.RepositoryMiddleware(
-                new Saritasa.Tools.Messages.Repositories.AdoNetMessageRepository(
+            var repositoryMiddleware = new Saritasa.Tools.Messages.Common.PipelineMiddlewares.RepositoryMiddleware(
+                new Saritasa.Tools.Messages.Common.Repositories.AdoNetMessageRepository(
                     System.Data.Common.DbProviderFactories.GetFactory(connectionStringConf.ProviderName),
                     connectionString)
             );
@@ -96,7 +97,7 @@ namespace ZergRushCo.Todosya.Web
             builder.RegisterInstance(emailSender).AsImplementedInterfaces().SingleInstance();
 
             // logger
-            var loggerFactory = new Saritasa.Tools.NLog.LoggerFactory();
+            var loggerFactory = new Saritasa.Tools.NLog4.NLogLoggerProvider();
             builder.RegisterInstance(loggerFactory).AsImplementedInterfaces().SingleInstance();
 
             // set the dependency resolver to be Autofac

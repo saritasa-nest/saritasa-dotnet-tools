@@ -1,0 +1,125 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{AEE65918-25DF-4A25-BFB8-56552FAA2A51}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Saritasa.Tools.Messages</RootNamespace>
+    <AssemblyName>Saritasa.Tools.Messages</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Common\BaseExecutorMiddleware.cs" />
+    <Compile Include="Commands\CommandHandlerNotFoundException.cs" />
+    <Compile Include="Commands\CommandHandlersAttribute.cs" />
+    <Compile Include="Commands\CommandMessage.cs" />
+    <Compile Include="Commands\CommandPipeline.cs" />
+    <Compile Include="Commands\CommandPipelineExtensions.cs" />
+    <Compile Include="Commands\CommandValidationException.cs" />
+    <Compile Include="Commands\ICommandPipeline.cs" />
+    <Compile Include="Commands\PipelineMiddlewares\CommandExecutorMiddleware.cs" />
+    <Compile Include="Commands\PipelineMiddlewares\CommandHandlerLocatorMiddleware.cs" />
+    <Compile Include="Commands\PipelineMiddlewares\CommandValidationMiddleware.cs" />
+    <Compile Include="Common\Endpoints\WebEndpoint.cs" />
+    <Compile Include="Events\EventHandlersAttribute.cs" />
+    <Compile Include="Events\EventMessage.cs" />
+    <Compile Include="Events\EventPipeline.cs" />
+    <Compile Include="Events\EventPipelineExtensions.cs" />
+    <Compile Include="Events\IEventPipeline.cs" />
+    <Compile Include="Events\PipelineMiddlewares\DomainEventLocatorMiddleware.cs" />
+    <Compile Include="Events\PipelineMiddlewares\EventExecutorMiddleware.cs" />
+    <Compile Include="Events\PipelineMiddlewares\EventHandlerLocatorMiddleware.cs" />
+    <Compile Include="Common\IMessageEndpoint.cs" />
+    <Compile Include="Common\IMessagePipeline.cs" />
+    <Compile Include="Common\IMessagePipelineMiddleware.cs" />
+    <Compile Include="Common\IMessageRepository.cs" />
+    <Compile Include="Common\IObjectSerializer.cs" />
+    <Compile Include="Common\Message.cs" />
+    <Compile Include="Common\MessageHandlersAttribute.cs" />
+    <Compile Include="Common\MessagePipeline.cs" />
+    <Compile Include="Common\MessageQuery.cs" />
+    <Compile Include="Common\MiddlewareNotFoundException.cs" />
+    <Compile Include="Common\ObjectSerializers\BinaryObjectSerializer.cs" />
+    <Compile Include="Common\ObjectSerializers\JsonObjectSerializer.cs" />
+    <Compile Include="Common\ObjectSerializers\XmlObjectSerializer.cs" />
+    <Compile Include="Internal\InternalLogger.cs" />
+    <Compile Include="Internal\MessageBinarySerializer.cs" />
+    <Compile Include="Internal\MessageParseExpressionVisitor.cs" />
+    <Compile Include="Internal\TypeHelpers.cs" />
+    <Compile Include="Common\PipelineMiddlewares\DataMiddleware.cs" />
+    <Compile Include="Common\PipelineMiddlewares\PerformanceCounterMiddleware.cs" />
+    <Compile Include="Common\PipelineMiddlewares\RepositoryMessagesFilter.cs" />
+    <Compile Include="Common\PipelineMiddlewares\RepositoryMiddleware.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Queries\IQueryPipeline.cs" />
+    <Compile Include="Queries\PipelineMIddlewares\QueryExecutorMiddleware.cs" />
+    <Compile Include="Queries\PipelineMIddlewares\QueryObjectResolverMiddleware.cs" />
+    <Compile Include="Queries\QueryHandlersAttribute.cs" />
+    <Compile Include="Queries\QueryMessage.cs" />
+    <Compile Include="Queries\QueryPipeline.cs" />
+    <Compile Include="Queries\QueryPipelineExtensions.cs" />
+    <Compile Include="Common\Repositories\AdoNetMessageRepository.cs" />
+    <Compile Include="Common\Repositories\CsvFileMessageRepository.cs" />
+    <Compile Include="Common\Repositories\FileMessageRepository.cs" />
+    <Compile Include="Common\Repositories\InMemoryMessageRepository.cs" />
+    <Compile Include="Common\Repositories\NullMessageRepository.cs" />
+    <Compile Include="Common\Repositories\QueryProviders\IMessageQueryProvider.cs" />
+    <Compile Include="Common\Repositories\QueryProviders\MySqlQueryProvider.cs" />
+    <Compile Include="Common\Repositories\QueryProviders\SqLiteQueryProvider.cs" />
+    <Compile Include="Common\Repositories\QueryProviders\SqlServerSqlProvider.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Saritasa.Tools.Domain\Saritasa.Tools.Domain.csproj">
+      <Project>{32a3a81c-a65c-4f78-8300-17151987697c}</Project>
+      <Name>Saritasa.Tools.Domain</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="Saritasa.Tools.Messages.project.json" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

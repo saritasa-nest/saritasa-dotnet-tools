@@ -6,8 +6,8 @@ namespace Saritasa.Tools.Tests
     using System;
     using System.Text.RegularExpressions;
     using NUnit.Framework;
-    using Messages;
-    using Messages.PipelineMiddlewares;
+    using Messages.Common.PipelineMiddlewares;
+    using Messages.Common;
 
     [TestFixture]
     public class MessagesRepositoryFilterTests

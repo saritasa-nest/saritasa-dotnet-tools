@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
-using Saritasa.Tools.Commands;
+using Saritasa.Tools.Messages.Commands;
 using ZergRushCo.Todosya.Domain.Users.Commands;
 using ZergRushCo.Todosya.Domain.Users.Entities;
 using ZergRushCo.Todosya.Domain.Users.Repositories;

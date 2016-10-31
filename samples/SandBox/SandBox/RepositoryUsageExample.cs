@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
+using System.Data.Entity;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Saritasa.Tools.Domain;
-using System.Data.Common;
-using System.Data.Entity;
-using System.Data;
 
 namespace SandBox
 {
@@ -107,7 +107,7 @@ namespace SandBox
             {
                 var product = uow.ProductRepository.Get(10);
                 uow.ProductRepository.Add(new Product(10, "Test"));
-                uow.Complete();
+                uow.SaveChanges();
             }
         }
     }

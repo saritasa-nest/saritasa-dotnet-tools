@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
-using Saritasa.Tools.Commands;
-using Saritasa.Tools.Queries;
+using Saritasa.Tools.Messages.Commands;
+using Saritasa.Tools.Messages.Queries;
 using ZergRushCo.Todosya.Domain.Tasks.Queries;
 using ZergRushCo.Todosya.Domain.Tasks.Commands;
 

@@ -7,9 +7,9 @@ namespace Saritasa.Tools.Tests
     using System.Linq;
     using System.Reflection;
     using NUnit.Framework;
-    using Commands;
-    using Commands.PipelineMiddlewares;
-    using Messages;
+    using Messages.Common;
+    using Messages.Commands;
+    using Messages.Commands.PipelineMiddlewares;
 
     [TestFixture]
     public class MessagesTests

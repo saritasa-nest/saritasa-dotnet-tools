@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using Saritasa.Tools.Events;
-using Saritasa.Tools.Exceptions;
+using Saritasa.Tools.Domain.Exceptions;
+using Saritasa.Tools.Messages.Events;
 using ZergRushCo.Todosya.Domain.Users.Commands;
 
 namespace ZergRushCo.Todosya.Tests
@@ -21,7 +21,7 @@ namespace ZergRushCo.Todosya.Tests
         {
             var uowFactory = new AppTestUnitOfWorkFactory();
 
-            var userHandlers = new Domain.Users.Handlers.UserHandlers(new Saritasa.Tools.Logging.DummyLoggerFactory());
+            var userHandlers = new Domain.Users.Handlers.UserHandlers();
             var registerUserCommand = new RegisterUserCommand()
             {
                 FirstName = "Ivan",
@@ -49,7 +49,7 @@ namespace ZergRushCo.Todosya.Tests
         {
             var uowFactory = new AppTestUnitOfWorkFactory();
 
-            var userHandlers = new Domain.Users.Handlers.UserHandlers(new Saritasa.Tools.Logging.DummyLoggerFactory());
+            var userHandlers = new Domain.Users.Handlers.UserHandlers();
             var registerUserCommand1 = new RegisterUserCommand()
             {
                 FirstName = "Ivan",

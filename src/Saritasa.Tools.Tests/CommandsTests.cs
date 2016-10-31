@@ -1,14 +1,16 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using Saritasa.Tools.Messages.Events.PipelineMiddlewares;
+
 namespace Saritasa.Tools.Tests
 {
     using System;
     using System.ComponentModel.DataAnnotations;
     using System.Reflection;
     using NUnit.Framework;
-    using Commands;
-    using Commands.PipelineMiddlewares;
+    using Messages.Commands;
+    using Messages.Commands.PipelineMiddlewares;
 
     [TestFixture]
     public class CommandsTests

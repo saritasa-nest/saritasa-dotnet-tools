@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Saritasa.Tools;
-using Saritasa.Tools.Queries;
+using Saritasa.Tools.Common;
+using Saritasa.Tools.Messages.Queries;
 using ZergRushCo.Todosya.Domain.Tasks.Dtos;
 using ZergRushCo.Todosya.Domain.Tasks.Entities;
 

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
-using Saritasa.Tools.Commands;
-using Saritasa.Tools.Events;
-using Saritasa.Tools.Exceptions;
-using Saritasa.Tools.Logging;
+using Microsoft.Extensions.Logging;
+using Saritasa.Tools.Messages.Commands;
+using Saritasa.Tools.Messages.Events;
+using Saritasa.Tools.Domain.Exceptions;
 using ZergRushCo.Todosya.Domain.Users.Commands;
 using ZergRushCo.Todosya.Domain.Users.Entities;
 using ZergRushCo.Todosya.Domain.Users.Events;
@@ -16,16 +16,7 @@ namespace ZergRushCo.Todosya.Domain.Users.Handlers
     [CommandHandlers]
     public class UserHandlers
     {
-        readonly ILogger logger;
-
-        /// <summary>
-        /// .ctor
-        /// </summary>
-        /// <param name="loggerFactory">Logger factory.</param>
-        public UserHandlers(ILoggerFactory loggerFactory)
-        {
-            logger = Utils.GetCurrentClassLogger(loggerFactory);
-        }
+        readonly ILogger logger = AppLogging.CreateLogger<UserHandlers>();
 
         /// <summary>
         /// Handle user registration.
@@ -56,7 +47,7 @@ namespace ZergRushCo.Todosya.Domain.Users.Handlers
                     UserName = email,
                 };
                 uow.UserRepository.Add(user);
-                uow.Complete();
+                uow.SaveChanges();
 
                 eventsPipeline.Raise(new UserCreatedEvent()
                 {
@@ -64,7 +55,7 @@ namespace ZergRushCo.Todosya.Domain.Users.Handlers
                 });
 
                 command.UserId = user.Id;
-                logger.Info($"User {user.FirstName} {user.LastName} with id {user.Id} has been registered.");
+                logger.LogInformation($"User {user.FirstName} {user.LastName} with id {user.Id} has been registered.");
             }
         }
 
@@ -96,7 +87,7 @@ namespace ZergRushCo.Todosya.Domain.Users.Handlers
                 user.City = command.City;
                 user.UpdatedAt = DateTime.Now;
 
-                uow.Complete();
+                uow.SaveChanges();
                 command.HasPassword = string.IsNullOrEmpty(user.PasswordHash) == false;
             }
         }
@@ -130,7 +121,7 @@ namespace ZergRushCo.Todosya.Domain.Users.Handlers
                 user.PasswordHash = command.PasswordHash;
                 user.UpdatedAt = DateTime.Now;
 
-                uow.Complete();
+                uow.SaveChanges();
                 command.HasPassword = string.IsNullOrEmpty(user.PasswordHash) == false;
             }
         }

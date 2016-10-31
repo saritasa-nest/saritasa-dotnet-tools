@@ -70,13 +70,13 @@
     <Compile Include="Repositories\UserRepository.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Saritasa.Tools.Domain\Saritasa.Tools.Domain.csproj">
+      <Project>{32a3a81c-a65c-4f78-8300-17151987697c}</Project>
+      <Name>Saritasa.Tools.Domain</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\src\Saritasa.Tools.Ef6\Saritasa.Tools.Ef6.csproj">
       <Project>{D1AD1713-BC18-4340-B8DB-23D86D22FB7F}</Project>
       <Name>Saritasa.Tools.Ef6</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\src\Saritasa.Tools\Saritasa.Tools.csproj">
-      <Project>{a5451164-9df3-45b9-9067-2df7e23f8806}</Project>
-      <Name>Saritasa.Tools</Name>
     </ProjectReference>
     <ProjectReference Include="..\ZergRushCo.Todosya.Domain\ZergRushCo.Todosya.Domain.csproj">
       <Project>{0184ceb7-ad6d-4f0a-836a-8cc9e8153286}</Project>

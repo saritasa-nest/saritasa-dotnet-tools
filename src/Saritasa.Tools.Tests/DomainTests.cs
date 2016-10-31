@@ -7,7 +7,7 @@ namespace Saritasa.Tools.Tests
     using System.IO;
     using System.Runtime.Serialization.Formatters.Binary;
     using NUnit.Framework;
-    using Exceptions;
+    using Domain.Exceptions;
 
     [TestFixture]
     public class DomainTests

@@ -5,7 +5,7 @@ namespace Saritasa.Tools.Tests
 {
     using System;
     using NUnit.Framework;
-    using Security;
+    using Misc.Security;
 
     /// <summary>
     /// Security tests.

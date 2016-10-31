@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using Saritasa.Tools.Commands;
+using Saritasa.Tools.Messages.Commands;
 
 namespace ZergRushCo.Todosya.Domain.Tasks.Commands
 {

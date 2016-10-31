@@ -6,7 +6,8 @@ namespace Saritasa.Tools.Tests
     using System;
     using System.Collections.Generic;
     using NUnit.Framework;
-    using Queries;
+    using Messages.Common;
+    using Messages.Queries;
 
     [TestFixture]
     public class QueriesTests
@@ -93,10 +94,10 @@ namespace Saritasa.Tools.Tests
         public void Can_run_query_from_raw_message()
         {
             var qp = QueryPipeline.CreateDefaultPipeline(QueriesTests.InterfacesResolver).UseInternalResolver(true);
-            var message = new Messages.Message()
+            var message = new Message()
             {
                 ContentType = "Saritasa.Tools.Tests.QueriesTests+QueryObject.SimpleQueryWithDependency",
-                Type = Messages.Message.MessageTypeQuery,
+                Type = Message.MessageTypeQuery,
                 Content = new Dictionary<string, object>()
                 {
                     ["a"] = 10,

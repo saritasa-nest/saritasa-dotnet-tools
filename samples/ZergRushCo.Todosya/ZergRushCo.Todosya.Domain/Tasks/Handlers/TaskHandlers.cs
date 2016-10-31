@@ -1,6 +1,6 @@
 ﻿using System;
-using Saritasa.Tools.Commands;
-using Saritasa.Tools.Exceptions;
+using Saritasa.Tools.Messages.Commands;
+using Saritasa.Tools.Domain.Exceptions;
 using ZergRushCo.Todosya.Domain.Tasks.Commands;
 
 namespace ZergRushCo.Todosya.Domain.Tasks.Handlers
@@ -37,7 +37,7 @@ namespace ZergRushCo.Todosya.Domain.Tasks.Handlers
                     User = user,
                 };
                 uow.TaskRepository.Add(task);
-                uow.Complete();
+                uow.SaveChanges();
                 command.TaskId = task.Id;
             }
         }
@@ -67,7 +67,7 @@ namespace ZergRushCo.Todosya.Domain.Tasks.Handlers
                 dbtask.IsDone = command.IsDone;
                 dbtask.Text = command.Text.Trim();
                 dbtask.Project = project;
-                uow.Complete();
+                uow.SaveChanges();
             }
         }
 
@@ -87,7 +87,7 @@ namespace ZergRushCo.Todosya.Domain.Tasks.Handlers
                 }
 
                 uow.TaskRepository.Remove(dbtask);
-                uow.Complete();
+                uow.SaveChanges();
             }
         }
 
@@ -107,7 +107,7 @@ namespace ZergRushCo.Todosya.Domain.Tasks.Handlers
                 }
 
                 dbtask.IsDone = command.IsDone;
-                uow.Complete();
+                uow.SaveChanges();
             }
         }
     }

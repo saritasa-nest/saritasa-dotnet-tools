@@ -1,6 +1,6 @@
 ﻿using System;
 using SandBox.Events;
-using Saritasa.Tools.Events;
+using Saritasa.Tools.Messages.Events;
 
 namespace SandBox
 {

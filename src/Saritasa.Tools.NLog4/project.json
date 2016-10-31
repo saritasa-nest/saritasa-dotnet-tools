@@ -1,22 +1,21 @@
 {
   "title": "Saritasa Tools for NLog4",
   "version": "0.1.0",
-  "dependencies": {
-    "Saritasa.Tools": "*"
-  },
   "frameworks": {
     "net452": {
       "frameworkAssemblies": {
         "System.Data": "",
+        "System.Runtime": "",
         "System.Xml": ""
       },
       "dependencies": {
-        "NLog": "4.3.10"
+        "NLog": "4.3.10",
       }
     },
     "net461": {
       "frameworkAssemblies": {
         "System.Data": "",
+        "System.Runtime": "",
         "System.Xml": ""
       },
       "dependencies": {
@@ -39,5 +38,8 @@
         "NLog.Extensions.Logging": "1.0.0-rtm-alpha4"
       }
     }
+  },
+  "dependencies": {
+    "Microsoft.Extensions.Logging": "1.0.0"
   }
 }
