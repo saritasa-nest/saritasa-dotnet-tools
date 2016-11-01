@@ -54,7 +54,7 @@ namespace SandBox
             {
             }
 
-            public int GetSomethingFromStoredProcedure() => 42;
+            public int GetSomethingFromStoredProcedure() => 42; // raw sql, stored procedures, etc
         }
 
         /// <summary>

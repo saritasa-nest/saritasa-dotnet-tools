@@ -9,7 +9,7 @@ namespace Saritasa.Tools.NLog4
     /// <summary>
     /// Wrap NLog's Logger in a Microsoft.Extensions.Logging's interface <see cref="Microsoft.Extensions.Logging.ILogger" />.
     /// </summary>
-    internal class NLogLogger : ILogger
+    internal class NLogLogger : Microsoft.Extensions.Logging.ILogger
     {
         private readonly NLog.Logger logger;
 

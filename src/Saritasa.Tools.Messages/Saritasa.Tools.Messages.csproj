@@ -20,6 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>..\Saritasa.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,12 +29,10 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>..\Saritasa.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile>bin\Release\Saritasa.Tools.Messages.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -57,6 +56,7 @@
     <Compile Include="Commands\PipelineMiddlewares\CommandHandlerLocatorMiddleware.cs" />
     <Compile Include="Commands\PipelineMiddlewares\CommandValidationMiddleware.cs" />
     <Compile Include="Common\Endpoints\WebEndpoint.cs" />
+    <Compile Include="Common\HandlerSearchMethod.cs" />
     <Compile Include="Events\EventHandlersAttribute.cs" />
     <Compile Include="Events\EventMessage.cs" />
     <Compile Include="Events\EventPipeline.cs" />
@@ -113,6 +113,9 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="Saritasa.Tools.Messages.project.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="CHANGELOG.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

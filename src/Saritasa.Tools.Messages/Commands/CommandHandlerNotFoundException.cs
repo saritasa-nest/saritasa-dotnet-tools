@@ -13,14 +13,35 @@ namespace Saritasa.Tools.Messages.Commands
 #endif
     public class CommandHandlerNotFoundException : Exception
     {
-        const string Msg = "Cannot find command handler or it cannot be resolved. Make sure it has default public parameterless " +
+        const string DefaultMessage = "Cannot find command handler or it cannot be resolved. Make sure it has default public parameterless " +
             "constructor or registered with your dependency injection container.";
 
         /// <summary>
         /// .ctor
         /// </summary>
-        public CommandHandlerNotFoundException() : base(Msg)
+        public CommandHandlerNotFoundException() : base(DefaultMessage)
         {
         }
+
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        /// <param name="message">Exception message.</param>
+        public CommandHandlerNotFoundException(string message) : base(message)
+        {
+        }
+
+    #if !NETCOREAPP1_0 && !NETSTANDARD1_6
+        /// <summary>
+        /// .ctor for deserialization.
+        /// </summary>
+        /// <param name="info">Stores all the data needed to serialize or deserialize an object.</param>
+        /// <param name="context">Describes the source and destination of a given serialized stream,
+        /// and provides an additional caller-defined context.</param>
+        protected CommandHandlerNotFoundException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
+            : base(info, context)
+        {
+        }
+#endif
     }
 }

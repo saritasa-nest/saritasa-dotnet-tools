@@ -3,6 +3,9 @@
 
 namespace Saritasa.Tools.Messages.Commands
 {
+    using System;
+    using Common;
+
     /// <summary>
     /// Command pipeline extensions.
     /// </summary>
@@ -18,8 +21,30 @@ namespace Saritasa.Tools.Messages.Commands
             bool resolveMethodParameters = false)
         {
             var middleware = (PipelineMiddlewares.CommandExecutorMiddleware)commandPipeline.GetMiddlewareById("CommandExecutor");
+            if (middleware == null)
+            {
+                throw new MiddlewareNotFoundException();
+            }
             middleware.UseInternalObjectResolver = true;
             middleware.UseParametersResolve = resolveMethodParameters;
+            return commandPipeline;
+        }
+
+        /// <summary>
+        /// Use another method to search handlers.
+        /// </summary>
+        /// <param name="commandPipeline">Command pipeline.</param>
+        /// <param name="searchMethod">Handlers search method.</param>
+        /// <returns>Command pipeline.</returns>
+        public static ICommandPipeline UseHandlerSearchMethod(this ICommandPipeline commandPipeline,
+            HandlerSearchMethod searchMethod)
+        {
+            var middleware = (PipelineMiddlewares.CommandHandlerLocatorMiddleware)commandPipeline.GetMiddlewareById("CommandHandlerLocator");
+            if (middleware == null)
+            {
+                throw new MiddlewareNotFoundException();
+            }
+            middleware.HandlerSearchMethod = searchMethod;
             return commandPipeline;
         }
     }

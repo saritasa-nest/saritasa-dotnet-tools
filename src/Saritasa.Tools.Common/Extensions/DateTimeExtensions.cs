@@ -54,7 +54,7 @@ namespace Saritasa.Tools.Common.Extensions
             /// Trancate by seconds: 2016-03-06 07:05:23 -> 2016-01-01 07:05:00.
             /// </summary>
             Seconds,
-            
+
             /// <summary>
             /// Trancate by minutes: 2016-03-06 07:05:23 -> 2016-01-01 07:00:00.
             /// </summary>
@@ -64,7 +64,7 @@ namespace Saritasa.Tools.Common.Extensions
             /// Trancate by hours: 2016-03-06 07:05:23 -> 2016-01-01 00:00:00.
             /// </summary>
             Hours,
-            
+
             /// <summary>
             /// Trancate by days: 2016-03-06 07:05:23 -> 2016-03-00 00:00:00.
             /// </summary>

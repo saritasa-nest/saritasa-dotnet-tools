@@ -32,7 +32,7 @@ namespace Saritasa.Tools.Messages.Common
         /// Get middle by its id. If not found null will be returned.
         /// </summary>
         /// <param name="id">Middleware id.</param>
-        /// <returns>Middleware or null.</returns>
+        /// <returns>Middleware or null if not found.</returns>
         IMessagePipelineMiddleware GetMiddlewareById(string id);
 
         /// <summary>

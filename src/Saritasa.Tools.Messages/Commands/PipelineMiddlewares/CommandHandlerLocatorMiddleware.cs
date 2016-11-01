@@ -27,7 +27,29 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         IDictionary<Type, Expression<Func<object>>> cache =
             new System.Collections.Concurrent.ConcurrentDictionary<Type, Expression<Func<object>>>(4, 150);
 
-        readonly IList<MethodInfo> commandHandlers = null;
+        IList<MethodInfo> commandHandlers = null;
+
+        HandlerSearchMethod handlerSearchMethod = HandlerSearchMethod.ClassAttribute;
+
+        /// <summary>
+        /// What method to use to search command handler class.
+        /// </summary>
+        public HandlerSearchMethod HandlerSearchMethod
+        {
+            get
+            {
+                return handlerSearchMethod;
+            }
+
+            set
+            {
+                if (handlerSearchMethod != value)
+                {
+                    handlerSearchMethod = value;
+                    Init();
+                }
+            }
+        }
 
         /// <summary>
         /// .ctor
@@ -44,19 +66,30 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
                 throw new ArgumentNullException(nameof(assemblies));
             }
             this.assemblies = assemblies;
+            Init();
+        }
 
+        /// <summary>
+        /// Prefills command handlers. We cannot do it in runtime because there can be race conditions
+        /// during initialization. Much simple just do that once on application start.
+        /// </summary>
+        private void Init()
+        {
             // precache all types with command handlers
             commandHandlers = assemblies.SelectMany(a => a.GetTypes())
-                .Where(t => t.GetTypeInfo().GetCustomAttribute<CommandHandlersAttribute>() != null)
+                .Where(t =>
+                    HandlerSearchMethod == HandlerSearchMethod.ClassAttribute ?
+                        t.GetTypeInfo().GetCustomAttribute<CommandHandlersAttribute>() != null :
+                        t.Name.EndsWith("Handlers"))
                 .SelectMany(t => t.GetTypeInfo().GetMethods())
                 .Where(m => m.Name.StartsWith(HandlerPrefix))
                 .ToArray();
             if (commandHandlers.Any() == false)
             {
                 var assembliesStr = string.Join(",", assemblies.Select(a => a.FullName));
-                InternalLogger.Warn($"Cannot find command handlers in assemblies {assembliesStr}",
+                InternalLogger.Warn($"Cannot find command handlers in assemblie(-s) {assembliesStr}",
                     nameof(CommandHandlerLocatorMiddleware));
-                throw new CommandHandlerNotFoundException();
+                throw new CommandHandlerNotFoundException($"Cannot find command handlers in assemblie(-s) {assembliesStr}");
             }
         }
 

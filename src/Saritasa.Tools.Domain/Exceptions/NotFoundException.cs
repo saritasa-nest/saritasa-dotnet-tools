@@ -42,7 +42,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         /// <param name="info">Stores all the data needed to serialize or deserialize an object.</param>
         /// <param name="context">Describes the source and destination of a given serialized stream,
         /// and provides an additional caller-defined context.</param>
-        protected NotFoundException(SerializationInfo info, StreamingContext context) 
+        protected NotFoundException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
         }

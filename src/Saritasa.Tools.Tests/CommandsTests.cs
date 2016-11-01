@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using Saritasa.Tools.Messages.Common;
 using Saritasa.Tools.Messages.Events.PipelineMiddlewares;
 
 namespace Saritasa.Tools.Tests
@@ -274,6 +275,35 @@ namespace Saritasa.Tools.Tests
                 exceptionFired = true;
             }
             Assert.That(exceptionFired, Is.True);
+        }
+
+        #endregion
+
+        #region Can find command handler by class name
+
+        public class SimpleTestCommand2
+        {
+            public int Id { get; set; }
+
+            public string Out { get; set; }
+        }
+
+        public class TestCommandHandlers
+        {
+            public void HandleTestCommand(SimpleTestCommand2 command)
+            {
+                command.Out = "out";
+            }
+        }
+
+        [Test]
+        public void Can_find_handler_with_ClassSuffix_search_method()
+        {
+            var cp = CommandPipeline.CreateDefaultPipeline(CommandPipeline.NullResolver,
+                Assembly.GetAssembly(typeof(CommandsTests))).UseInternalResolver(true).UseHandlerSearchMethod(HandlerSearchMethod.ClassSuffix);
+            var cmd = new SimpleTestCommand2() { Id = 6 };
+            cp.Handle(cmd);
+            Assert.That(cmd.Out, Is.EqualTo("out"));
         }
 
         #endregion
