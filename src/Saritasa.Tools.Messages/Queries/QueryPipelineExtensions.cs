@@ -3,6 +3,8 @@
 
 namespace Saritasa.Tools.Messages.Queries
 {
+    using Common;
+
     /// <summary>
     /// Query pipeline extensions.
     /// </summary>
@@ -18,6 +20,10 @@ namespace Saritasa.Tools.Messages.Queries
             bool resolveMethodParameters = false)
         {
             var middleware = (PipelineMiddlewares.QueryObjectResolverMiddleware)queryPipeline.GetMiddlewareById("QueryResolver");
+            if (middleware == null)
+            {
+                throw new MiddlewareNotFoundException();
+            }
             middleware.UseInternalObjectResolver = true;
             middleware.UseParametersResolve = resolveMethodParameters;
             return queryPipeline;

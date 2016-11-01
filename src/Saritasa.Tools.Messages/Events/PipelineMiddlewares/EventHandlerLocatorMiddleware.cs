@@ -20,7 +20,31 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
 
         const string HandlerPrefix = "Handle";
 
-        readonly IList<MethodInfo> eventHandlers;
+        readonly Assembly[] assemblies;
+
+        IList<MethodInfo> eventHandlers;
+
+        HandlerSearchMethod handlerSearchMethod = HandlerSearchMethod.ClassAttribute;
+
+        /// <summary>
+        /// What method to use to search command handler class.
+        /// </summary>
+        public HandlerSearchMethod HandlerSearchMethod
+        {
+            get
+            {
+                return handlerSearchMethod;
+            }
+
+            set
+            {
+                if (handlerSearchMethod != value)
+                {
+                    handlerSearchMethod = value;
+                    Init();
+                }
+            }
+        }
 
         /// <summary>
         /// .ctor
@@ -36,10 +60,17 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
             {
                 throw new ArgumentNullException(nameof(assemblies));
             }
+            this.assemblies = assemblies;
+            Init();
+        }
 
+        private void Init()
+        {
             // precache all types with event handlers
             eventHandlers = assemblies.SelectMany(a => a.GetTypes())
-                .Where(t => t.GetTypeInfo().GetCustomAttribute<EventHandlersAttribute>() != null)
+                .Where(t => HandlerSearchMethod == HandlerSearchMethod.ClassAttribute ?
+                    t.GetTypeInfo().GetCustomAttribute<EventHandlersAttribute>() != null :
+                    t.Name.EndsWith("Handlers"))
                 .SelectMany(t => t.GetTypeInfo().GetMethods())
                 .Where(m => m.Name.StartsWith(HandlerPrefix))
                 .ToArray();

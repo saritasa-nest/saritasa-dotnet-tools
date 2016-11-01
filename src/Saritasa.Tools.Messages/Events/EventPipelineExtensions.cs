@@ -3,6 +3,8 @@
 
 namespace Saritasa.Tools.Messages.Events
 {
+    using Common;
+
     /// <summary>
     /// Event pipeline extensions.
     /// </summary>
@@ -18,8 +20,30 @@ namespace Saritasa.Tools.Messages.Events
             bool resolveMethodParameters = false)
         {
             var middleware = (PipelineMiddlewares.EventExecutorMiddleware)eventPipeline.GetMiddlewareById("EventExecutor");
+            if (middleware == null)
+            {
+                throw new MiddlewareNotFoundException();
+            }
             middleware.UseInternalObjectResolver = true;
             middleware.UseParametersResolve = resolveMethodParameters;
+            return eventPipeline;
+        }
+
+        /// <summary>
+        /// Use another method to search handlers.
+        /// </summary>
+        /// <param name="eventPipeline">Event pipeline.</param>
+        /// <param name="searchMethod">Handlers search method.</param>
+        /// <returns>Event pipeline.</returns>
+        public static IEventPipeline UseHandlerSearchMethod(this IEventPipeline eventPipeline,
+            HandlerSearchMethod searchMethod)
+        {
+            var middleware = (PipelineMiddlewares.EventHandlerLocatorMiddleware)eventPipeline.GetMiddlewareById("EventHandlerLocator");
+            if (middleware == null)
+            {
+                throw new MiddlewareNotFoundException();
+            }
+            middleware.HandlerSearchMethod = searchMethod;
             return eventPipeline;
         }
     }
