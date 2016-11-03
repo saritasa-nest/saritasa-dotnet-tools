@@ -3,8 +3,8 @@
     using System;
     using System.Linq;
 
-    using Tools.Commands;
-    using Tools.Exceptions;
+    using Tools.Messages.Commands;
+    using Tools.Domain.Exceptions;
 
     using Commands;
     using Entities;
@@ -36,7 +36,7 @@
                     Role = UserRole.Regular,
                 };
                 uow.UserRepository.Add(user);
-                uow.Complete();
+                uow.SaveChanges();
                 command.UserId = user.Id;
             }
         }
@@ -88,7 +88,7 @@
                 {
                     dbUser.PasswordHashed = Candy.SecurityUtils.Hash(command.Password, Candy.SecurityUtils.HashMethods.Sha256);
                 }
-                uow.Complete();
+                uow.SaveChanges();
             }
         }
     }

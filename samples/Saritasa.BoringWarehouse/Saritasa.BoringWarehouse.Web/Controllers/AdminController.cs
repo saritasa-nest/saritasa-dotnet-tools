@@ -7,8 +7,8 @@
 
     using Domain.Users.Entities;
 
-    using Tools.Commands;
-    using Tools.Exceptions;
+    using Tools.Messages.Commands;
+    using Tools.Domain.Exceptions;
     
     using Domain;
     using Domain.Users.Commands;

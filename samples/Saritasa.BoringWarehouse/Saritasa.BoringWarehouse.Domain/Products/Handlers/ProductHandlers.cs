@@ -4,11 +4,12 @@
     using System.Collections.Generic;
     using System.Linq;
 
+    using Tools.Messages.Commands;
+    using Tools.Domain.Exceptions;
+
     using Commands;
     using Entities;
     using Users.Entities;
-    using Tools.Commands;
-    using Tools.Exceptions;
 
     /// <summary>
     /// Product handlers.
@@ -43,7 +44,7 @@
                     CreatedBy = creator
                 };
                 uow.ProductRepository.Add(product);
-                uow.Complete();
+                uow.SaveChanges();
                 command.ProductId = product.Id;
             }
         }
@@ -60,7 +61,7 @@
                 // Delete properties before
                 uow.ProductPropertyRepository.RemoveRange(product.Properties);
                 uow.ProductRepository.Remove(product);
-                uow.Complete();
+                uow.SaveChanges();
             }
         }
 
@@ -104,7 +105,7 @@
                 product.Sku = command.Sku;
                 product.IsActive = command.IsActive;
                 product.UpdatedAt = DateTime.Now;
-                uow.Complete();
+                uow.SaveChanges();
             }
         }
     }

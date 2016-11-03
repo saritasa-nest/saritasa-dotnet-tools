@@ -2,7 +2,7 @@
 {
     using System.ComponentModel.DataAnnotations;
 
-    using Tools.Commands;
+    using Tools.Messages.Commands;
 
     using Entities;
 

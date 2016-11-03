@@ -2,8 +2,8 @@
 {
     using System.Linq;
 
-    using Tools.Commands;
-    using Tools.Exceptions;
+    using Tools.Domain.Exceptions;
+    using Tools.Messages.Commands;
 
     using Commands;
     using Entities;
@@ -39,7 +39,7 @@
                     CreatedBy = creator
                 };
                 uow.CompanyRepository.Add(company);
-                uow.Complete();
+                uow.SaveChanges();
                 command.CompanyId = company.Id;
             }
         }
@@ -59,7 +59,7 @@
                 }
                 Company company = uow.CompanyRepository.Get(command.CompanyId);
                 company.Name = command.Name;
-                uow.Complete();
+                uow.SaveChanges();
             }
         }
 
@@ -74,7 +74,7 @@
             {
                 Company company = uow.CompanyRepository.Get(command.CompanyId);
                 uow.CompanyRepository.Remove(company);
-                uow.Complete();
+                uow.SaveChanges();
             }
         }
     }
