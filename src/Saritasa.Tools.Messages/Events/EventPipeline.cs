@@ -32,7 +32,7 @@ namespace Saritasa.Tools.Messages.Events
             var eventPipeline = new EventPipeline();
             if (assemblies == null || assemblies.Length < 1)
             {
-                assemblies = new Assembly[] { Assembly.GetEntryAssembly() };
+                assemblies = new[] { Assembly.GetEntryAssembly() };
             }
 
             eventPipeline.AppendMiddlewares(

@@ -39,7 +39,7 @@ namespace Saritasa.Tools.Common.Tests
             {
                 list.Add(i);
             }
-            foreach (var sublist in CollectionsExtensions.ChunkSelectRange(list, 45))
+            foreach (var sublist in list.ChunkSelectRange(45))
             {
                 foreach (var item in sublist)
                 {
@@ -60,7 +60,7 @@ namespace Saritasa.Tools.Common.Tests
             {
                 list.Add(i);
             }
-            foreach (var item in CollectionsExtensions.ChunkSelect(list, 45))
+            foreach (var item in list.ChunkSelect(45))
             {
                 sum += item;
             }

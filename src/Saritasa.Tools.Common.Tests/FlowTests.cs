@@ -114,9 +114,6 @@ namespace Saritasa.Tools.Common.Tests
         [Serializable]
         private class CustomException : Exception
         {
-            public CustomException()
-            {
-            }
         }
 
         private void CustomMethodNoReturn()
@@ -287,11 +284,7 @@ namespace Saritasa.Tools.Common.Tests
         public void Memoize_with_default_dict_should_call_handler_once()
         {
             int value = 0;
-            var memoized1 = FlowUtils.Memoize(
-                new Func<int>(() =>
-                {
-                    return ++value;
-                }));
+            var memoized1 = FlowUtils.Memoize(() => ++value);
 
             Assert.Equal(1, memoized1());
             Assert.Equal(1, memoized1());
@@ -317,11 +310,8 @@ namespace Saritasa.Tools.Common.Tests
         {
             int value = 0;
             var memoized1 = FlowUtils.Memoize(
-                new Func<Int32>(() =>
-                {
-                    return ++value;
-                }),
-                FlowUtils.CreateMaxAgeCacheStrategy<Int32>(TimeSpan.FromSeconds(1))
+                () => ++value,
+                FlowUtils.CreateMaxAgeCacheStrategy<int>(TimeSpan.FromSeconds(1))
             );
 
             Assert.Equal(1, memoized1());
@@ -339,10 +329,7 @@ namespace Saritasa.Tools.Common.Tests
         {
             int value = 0;
             var memoized1 = FlowUtils.Memoize(
-                new Func<int, int>((int a) =>
-                {
-                    return ++value;
-                }),
+                (a) => ++value,
                 FlowUtils.CreateMaxCountCacheStrategy<int, int>(maxCount: 3, removeCount: 2)
             );
 

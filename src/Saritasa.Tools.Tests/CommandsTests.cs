@@ -197,7 +197,7 @@ namespace Saritasa.Tools.Tests
 
         class CommandWithValidation
         {
-            [System.ComponentModel.DataAnnotations.Range(0, 100)]
+            [Range(0, 100)]
             public int PercentInt { get; set; }
 
             [Required]

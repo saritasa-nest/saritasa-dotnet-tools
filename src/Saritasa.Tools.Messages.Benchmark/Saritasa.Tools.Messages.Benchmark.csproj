@@ -7,8 +7,8 @@
     <ProjectGuid>{6A11CB78-CB88-448A-86F3-C4AFEFEB413A}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Saritasa.Tools.Benchmark</RootNamespace>
-    <AssemblyName>Saritasa.Tools.Benchmark</AssemblyName>
+    <RootNamespace>Saritasa.Tools.Messages.Benchmark</RootNamespace>
+    <AssemblyName>Saritasa.Tools.Messages.Benchmark</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

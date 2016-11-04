@@ -7,8 +7,8 @@
     <ProjectGuid>{83D4925B-B04F-4C9C-8BF1-9B6A6BE0A87D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Saritasa.Tools.NLog</RootNamespace>
-    <AssemblyName>Saritasa.Tools.NLog</AssemblyName>
+    <RootNamespace>Saritasa.Tools.NLog4</RootNamespace>
+    <AssemblyName>Saritasa.Tools.NLog4</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -33,7 +33,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Saritasa.Tools.NLog.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\Saritasa.Tools.NLog4.xml</DocumentationFile>
     <CodeAnalysisRuleSet>..\Saritasa.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>

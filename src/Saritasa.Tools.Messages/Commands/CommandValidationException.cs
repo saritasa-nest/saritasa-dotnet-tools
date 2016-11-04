@@ -40,8 +40,8 @@ namespace Saritasa.Tools.Messages.Commands
             /// <param name="message">Validation message.</param>
             public BrokenRule(string propertyName, string message)
             {
-                this.PropertyName = propertyName;
-                this.Message = message;
+                PropertyName = propertyName;
+                Message = message;
             }
         }
 

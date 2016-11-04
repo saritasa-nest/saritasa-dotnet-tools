@@ -295,11 +295,11 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
             InternalLogger.Trace($"Processing message id: {message.Id} contenttype: {message.ContentType}",
                 nameof(WebEndpoint));
             var isPipelineFound = false;
-            for (int i = 0; i < pipelines.Length; i++)
+            foreach (IMessagePipeline pipeline in pipelines)
             {
-                if (pipelines[i].MessageTypes.Contains(message.Type))
+                if (pipeline.MessageTypes.Contains(message.Type))
                 {
-                    pipelines[i].ProcessRaw(message);
+                    pipeline.ProcessRaw(message);
                     isPipelineFound = true;
                 }
             }
@@ -323,7 +323,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
 
         #region Dispose
 
-        bool disposed = false;
+        bool disposed;
 
         /// <summary>
         /// Dispose object. Remove thread, stop listening.

@@ -33,10 +33,9 @@ namespace Saritasa.Tools.Common.Tests
         [Fact]
         public void Is_not_null_should_throw_exception()
         {
-            object obj = null;
             Assert.Throws<ArgumentNullException>(() =>
             {
-                Guard.IsNotNull(obj, "obj");
+                Guard.IsNotNull(null, "obj");
             });
         }
     }

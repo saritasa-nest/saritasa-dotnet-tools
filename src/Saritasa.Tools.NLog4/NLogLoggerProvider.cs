@@ -9,13 +9,6 @@ namespace Saritasa.Tools.NLog4
     public class NLogLoggerProvider : Microsoft.Extensions.Logging.ILoggerProvider
     {
         /// <summary>
-        /// <see cref="NLogLoggerProvider" /> with default options.
-        /// </summary>
-        public NLogLoggerProvider()
-        {
-        }
-
-        /// <summary>
         /// Create a logger with the name <paramref name="name" />.
         /// </summary>
         /// <param name="name">Name of the logger to be created.</param>

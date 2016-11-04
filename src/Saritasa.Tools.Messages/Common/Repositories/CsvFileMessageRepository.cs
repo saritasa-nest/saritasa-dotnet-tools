@@ -16,7 +16,6 @@ namespace Saritasa.Tools.Messages.Common.Repositories
     /// </summary>
     public class CsvFileMessageRepository : IMessageRepository, IDisposable
     {
-        const string DateTimeFormat = "yyyyMMdd";
         const string CsvHeader = "Id,Type,CreatedAt,Status,ContentType,Content,Data,ErrorType,ErrorMessage,ErrorDetails,ExecutionDuration"; // 11
 
         /// <summary>

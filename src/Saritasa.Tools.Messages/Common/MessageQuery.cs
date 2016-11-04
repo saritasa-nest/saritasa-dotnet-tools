@@ -31,7 +31,7 @@ namespace Saritasa.Tools.Messages.Common
         /// <summary>
         /// Message selector. Contain main message criterias.
         /// </summary>
-        public Expression<Func<Message, bool>> MessageSelector { get; private set; } = ReturnTrueMessageExpression;
+        public Expression<Func<Message, bool>> MessageSelector { get; } = ReturnTrueMessageExpression;
 
         /// <summary>
         /// Has message message selector.
@@ -71,7 +71,7 @@ namespace Saritasa.Tools.Messages.Common
         /// <summary>
         /// Assemblies to load types.
         /// </summary>
-        public IList<Assembly> Assemblies { get; private set; } = new List<Assembly>();
+        public IList<Assembly> Assemblies { get; } = new List<Assembly>();
 
         /// <summary>
         /// How many messages to skip.

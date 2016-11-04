@@ -24,7 +24,7 @@ namespace Saritasa.Tools.Common.Extensions
         {
             if (target.GetType().IsEnum == false)
             {
-                throw new ArgumentOutOfRangeException("target", "Target is not enum");
+                throw new ArgumentOutOfRangeException(nameof(target), "Target is not enum");
             }
 
             FieldInfo fieldInfo = target.GetType().GetField(target.ToString());

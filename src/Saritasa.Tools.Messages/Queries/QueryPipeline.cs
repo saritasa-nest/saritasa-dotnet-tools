@@ -56,7 +56,7 @@ namespace Saritasa.Tools.Messages.Queries
         {
             TQuery query;
 
-            QueryPipeline queryPipeline;
+            readonly QueryPipeline queryPipeline;
 
             /// <summary>
             /// .ctor
@@ -93,7 +93,7 @@ namespace Saritasa.Tools.Messages.Queries
                 }
 
                 var mce = expression.Body as MethodCallExpression;
-                var args = mce.Arguments.Select(a => PartiallyEvaluateExpression(a)).ToArray();
+                var args = mce.Arguments.Select(PartiallyEvaluateExpression).ToArray();
                 var method = mce.Method;
                 var message = new QueryMessage()
                 {

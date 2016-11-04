@@ -9,7 +9,7 @@ namespace Saritasa.Tools.Messages.Common
     /// The attribuet indicates that class contains handlers. Useful to find all kind of
     /// handlers (commands, queries, etc).
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Class)]
     public class MessageHandlersAttribute : Attribute
     {
     }

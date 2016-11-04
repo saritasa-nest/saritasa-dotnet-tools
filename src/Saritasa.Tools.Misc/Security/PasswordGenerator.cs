@@ -290,7 +290,7 @@ namespace Saritasa.Tools.Misc.Security
         static PasswordGenerator()
         {
 #if !PORTABLE
-            RandomService = System.Security.Cryptography.RandomNumberGenerator.Create();
+            RandomService = RandomNumberGenerator.Create();
 #else
             RandomService = new Random();
 #endif

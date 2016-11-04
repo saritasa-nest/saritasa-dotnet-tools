@@ -72,7 +72,7 @@ namespace Saritasa.Tools.Common.Utils
 #if PORTABLE || NETCOREAPP1_0 || NETSTANDARD1_6
                         System.Threading.Tasks.Task.Delay(delay).Wait();
 #else
-                        System.Threading.Thread.Sleep((int)delay.TotalMilliseconds);
+                        Thread.Sleep((int)delay.TotalMilliseconds);
 #endif
                     }
                 }
@@ -89,7 +89,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="transientExceptions">Set of exceptions on which repeat occures. If null retry will appear on any exception.</param>
         public static void Retry(Action action, RetryStrategy retryStrategy, params Type[] transientExceptions)
         {
-            FlowUtils.Retry<bool>(
+            FlowUtils.Retry(
                 () =>
                 {
                     action();
@@ -154,7 +154,7 @@ namespace Saritasa.Tools.Common.Utils
                     }
                     if (delay.TotalMilliseconds > 0)
                     {
-                        await Task.Delay(delay);
+                        await Task.Delay(delay, cancellationToken);
                     }
                 }
             }
@@ -180,7 +180,7 @@ namespace Saritasa.Tools.Common.Utils
 #if PORTABLE || NETSTANDARD1_6 || NETCOREAPP1_0
                 if (executedExceptionType.Equals(exceptionType) || executedExceptionType.GetTypeInfo().IsSubclassOf(exceptionType))
 #else
-                if (executedExceptionType.Equals(exceptionType) || executedExceptionType.IsSubclassOf(exceptionType))
+                if (executedExceptionType == exceptionType || executedExceptionType.IsSubclassOf(exceptionType))
 #endif
                 {
                     isSubclass = true;
@@ -208,7 +208,7 @@ namespace Saritasa.Tools.Common.Utils
             Guard.IsNotNegativeOrZero(numberOfTries, nameof(numberOfTries));
             Guard.IsNotNegative(delay.Value, nameof(delay));
 
-            return new RetryStrategy((int attemptCount, Exception lastException, out TimeSpan neededDelay) =>
+            return (int attemptCount, Exception lastException, out TimeSpan neededDelay) =>
             {
                 if (attemptCount >= numberOfTries)
                 {
@@ -218,7 +218,7 @@ namespace Saritasa.Tools.Common.Utils
 
                 neededDelay = attemptCount == 1 && firstFastRetry ? TimeSpan.Zero : delay.Value;
                 return false;
-            });
+            };
         }
 
         /// <summary>
@@ -247,7 +247,7 @@ namespace Saritasa.Tools.Common.Utils
             Guard.IsNotNegative(delay.Value, nameof(delay));
             Guard.IsNotNegative(increment.Value, nameof(increment));
 
-            return new RetryStrategy((int attemptCount, Exception lastException, out TimeSpan neededDelay) =>
+            return (int attemptCount, Exception lastException, out TimeSpan neededDelay) =>
             {
                 if (attemptCount >= numberOfTries)
                 {
@@ -259,7 +259,7 @@ namespace Saritasa.Tools.Common.Utils
                     TimeSpan.Zero :
                     TimeSpan.FromMilliseconds(delay.Value.TotalMilliseconds + (attemptCount * increment.Value.TotalMilliseconds));
                 return false;
-            });
+            };
         }
 
         /// <summary>
@@ -299,7 +299,7 @@ namespace Saritasa.Tools.Common.Utils
                 throw new ArgumentOutOfRangeException(nameof(minBackoff), "minBackoff cannot be less than maxBackoff");
             }
 
-            return new RetryStrategy((int attemptCount, Exception lastException, out TimeSpan neededDelay) =>
+            return (int attemptCount, Exception lastException, out TimeSpan neededDelay) =>
             {
                 if (attemptCount >= numberOfTries)
                 {
@@ -315,12 +315,12 @@ namespace Saritasa.Tools.Common.Utils
                 {
                     Random random = new Random();
                     int num = (int)((Math.Pow(2.0, attemptCount) - 1.0) *
-                        random.Next((int)(deltaBackoff.Value.TotalMilliseconds * 0.8), (int)(deltaBackoff.Value.TotalMilliseconds * 1.2)));
+                                    random.Next((int)(deltaBackoff.Value.TotalMilliseconds * 0.8), (int)(deltaBackoff.Value.TotalMilliseconds * 1.2)));
                     int num2 = (int)Math.Min(minBackoff.Value.TotalMilliseconds + num, maxBackoff.Value.TotalMilliseconds);
                     neededDelay = TimeSpan.FromMilliseconds(num2);
                 }
                 return false;
-            });
+            };
         }
 
         /// <summary>
@@ -331,7 +331,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <returns>Retry strategy delegate.</returns>
         public static RetryStrategy CreateCallbackRetryStrategy(RetryCallback callback)
         {
-            return new RetryStrategy((int attemptCount, Exception lastException, out TimeSpan neededDelay) =>
+            return (int attemptCount, Exception lastException, out TimeSpan neededDelay) =>
             {
                 neededDelay = TimeSpan.Zero;
                 try
@@ -340,9 +340,10 @@ namespace Saritasa.Tools.Common.Utils
                 }
                 catch (Exception)
                 {
+                    // ignored
                 }
                 return false;
-            });
+            };
         }
 
         #endregion
@@ -354,12 +355,9 @@ namespace Saritasa.Tools.Common.Utils
         {
             var temp = Volatile.Read(ref eventDelegate);
 #if !PORTABLE && !NETSTANDARD1_6 && !NETCOREAPP1_0
-            System.Threading.Thread.MemoryBarrier();
+            Thread.MemoryBarrier();
 #endif
-            if (temp != null)
-            {
-                temp(sender, e);
-            }
+            temp?.Invoke(sender, e);
         }
 
         /// <summary>
@@ -368,9 +366,9 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         public static void RaiseAll<TEventArgs>(object sender, TEventArgs e, ref EventHandler<TEventArgs> eventDelegate)
         {
-            var temp = System.Threading.Volatile.Read(ref eventDelegate);
+            var temp = Volatile.Read(ref eventDelegate);
 #if !PORTABLE && !NETSTANDARD1_6 && !NETCOREAPP1_0
-            System.Threading.Thread.MemoryBarrier();
+            Thread.MemoryBarrier();
 #endif
             if (temp == null)
             {
@@ -409,15 +407,12 @@ namespace Saritasa.Tools.Common.Utils
 #endif
         public sealed class SkipMemoizeException<TResult> : Exception
         {
-            private TResult result;
+            private readonly TResult result;
 
             /// <summary>
             /// Returned result.
             /// </summary>
-            public TResult Result
-            {
-                get { return result; }
-            }
+            public TResult Result => result;
 
             /// <summary>
             /// .ctor
@@ -471,7 +466,7 @@ namespace Saritasa.Tools.Common.Utils
             }
             object lockobj = new object();
 
-            return new CacheStrategy<TKey, TResult>((key, dict, notInCache) =>
+            return (key, dict, notInCache) =>
             {
                 DateTime dt = default(DateTime);
                 bool cached = false;
@@ -484,7 +479,7 @@ namespace Saritasa.Tools.Common.Utils
                     }
                 }
                 return !cached || (DateTime.Now - dt) >= maxAge;
-            });
+            };
         }
 
         /// <summary>
@@ -562,7 +557,7 @@ namespace Saritasa.Tools.Common.Utils
             }
             object lockobj = new object();
 
-            return new CacheStrategy<TKey, TResult>((TKey key, IDictionary<TKey, TResult> dict, bool notInCache) =>
+            return (TKey key, IDictionary<TKey, TResult> dict, bool notInCache) =>
             {
                 if (notInCache && !purge)
                 {
@@ -600,7 +595,7 @@ namespace Saritasa.Tools.Common.Utils
                     }
                 }
                 return false;
-            });
+            };
         }
 
         /// <summary>
@@ -693,10 +688,10 @@ namespace Saritasa.Tools.Common.Utils
             }
             if (strategies == null)
             {
-                strategies = (key, dict, notInCache) => { return false; };
+                strategies = (key, dict, notInCache) => false;
             }
 
-            return new Func<TKey, TResult>((key) =>
+            return (key) =>
             {
                 TResult result = default(TResult);
                 bool needUpdate = false, strategiesAlreadyApplied = false;
@@ -749,7 +744,7 @@ namespace Saritasa.Tools.Common.Utils
                     }
                 }
                 return result;
-            });
+            };
         }
 
         /// <summary>
@@ -769,15 +764,9 @@ namespace Saritasa.Tools.Common.Utils
             CacheStrategy<int, TResult> strategies = null,
             IDictionary<int, TResult> cache = null)
         {
-            var func2 = new Func<int, TResult>((arg) =>
-            {
-                return func();
-            });
+            var func2 = new Func<int, TResult>((arg) => func());
             var memorized = Memoize(func2, strategies, cache);
-            return new Func<TResult>(() =>
-            {
-                return memorized(0);
-            });
+            return () => memorized(0);
         }
 
         /// <summary>
