@@ -6,12 +6,11 @@ namespace Saritasa.Tools.Tests
     using System;
     using System.Linq;
     using System.Reflection;
-    using NUnit.Framework;
+    using Xunit;
     using Messages.Common;
     using Messages.Commands;
     using Messages.Commands.PipelineMiddlewares;
 
-    [TestFixture]
     public class MessagesTests
     {
         #region Test middlewares
@@ -45,58 +44,49 @@ namespace Saritasa.Tools.Tests
 
         #endregion
 
-        [Test]
+        [Fact]
         public void Messages_pipeline_insert_after_should_increase_length()
         {
             var cp = new CommandPipeline();
             cp.AppendMiddlewares(new CommandHandlerLocatorMiddleware(Assembly.GetAssembly(typeof(MessagesTests))));
-            Assert.That(cp.GetMiddlewares().Count(), Is.EqualTo(1), "AppendMiddlewares failed");
+            Assert.Equal(1, cp.GetMiddlewares().Count());
 
             cp.InsertMiddlewareAfter(new TestMiddleware1());
-            Assert.That(cp.GetMiddlewares().ElementAt(1).Id, Is.EqualTo("Test1"), "InsertMiddlewareAfter1 failed");
+            Assert.Equal("Test1", cp.GetMiddlewares().ElementAt(1).Id);
             cp.InsertMiddlewareAfter(new TestMiddleware3());
 
             cp.InsertMiddlewareAfter(new TestMiddleware2(), "Test1");
-            Assert.That(cp.GetMiddlewares().ElementAt(2).Id, Is.EqualTo("Test2"), "InsertMiddlewareAfter2 failed");
-            Assert.That(cp.GetMiddlewares().ElementAt(3).Id, Is.EqualTo("Test3"), "InsertMiddlewareAfter2 failed");
-            Assert.That(cp.GetMiddlewares().Count(), Is.EqualTo(4));
+            Assert.Equal("Test2", cp.GetMiddlewares().ElementAt(2).Id);
+            Assert.Equal("Test3", cp.GetMiddlewares().ElementAt(3).Id);
+            Assert.Equal(4, cp.GetMiddlewares().Count());
         }
 
-        [Test]
+        [Fact]
         public void Messages_pipeline_insert_before_should_increase_length()
         {
             var cp = new CommandPipeline();
             cp.AppendMiddlewares(new CommandHandlerLocatorMiddleware(Assembly.GetAssembly(typeof(MessagesTests))));
-            Assert.That(cp.GetMiddlewares().Count(), Is.EqualTo(1), "AppendMiddlewares failed");
+            Assert.Equal(1, cp.GetMiddlewares().Count());
 
             cp.InsertMiddlewareBefore(new TestMiddleware1());
-            Assert.That(cp.GetMiddlewares().ElementAt(0).Id, Is.EqualTo("Test1"), "InsertMiddlewareBefore1 failed");
+            Assert.Equal("Test1", cp.GetMiddlewares().ElementAt(0).Id);
             cp.InsertMiddlewareAfter(new TestMiddleware2());
 
             // test1, locator, test3, test2
             cp.InsertMiddlewareBefore(new TestMiddleware3(), "Test2");
-            Assert.That(cp.GetMiddlewares().ElementAt(2).Id, Is.EqualTo("Test3"), "InsertMiddlewareBefore2 failed");
-            Assert.That(cp.GetMiddlewares().ElementAt(3).Id, Is.EqualTo("Test2"), "InsertMiddlewareBefore2 failed");
-            Assert.That(cp.GetMiddlewares().Count(), Is.EqualTo(4));
+            Assert.Equal("Test3", cp.GetMiddlewares().ElementAt(2).Id);
+            Assert.Equal("Test2", cp.GetMiddlewares().ElementAt(3).Id);
+            Assert.Equal(4, cp.GetMiddlewares().Count());
         }
 
-        [Test]
+        [Fact]
         public void Inserting_middlewares_with_duplicated_ids_should_generate_exception()
         {
             var cp = new CommandPipeline();
             cp.AppendMiddlewares(new CommandHandlerLocatorMiddleware(Assembly.GetAssembly(typeof(MessagesTests))));
             cp.InsertMiddlewareBefore(new TestMiddleware1());
 
-            bool fired = false;
-            try
-            {
-                cp.InsertMiddlewareBefore(new TestMiddleware1());
-            }
-            catch (ArgumentException)
-            {
-                fired = true;
-            }
-            Assert.That(fired, Is.True);
+            Assert.Throws<ArgumentException>(() => { cp.InsertMiddlewareBefore(new TestMiddleware1()); });
         }
     }
 }

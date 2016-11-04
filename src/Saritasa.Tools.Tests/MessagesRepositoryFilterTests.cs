@@ -5,14 +5,13 @@ namespace Saritasa.Tools.Tests
 {
     using System;
     using System.Text.RegularExpressions;
-    using NUnit.Framework;
+    using Xunit;
     using Messages.Common.PipelineMiddlewares;
     using Messages.Common;
 
-    [TestFixture]
     public class MessagesRepositoryFilterTests
     {
-        [Test]
+        [Fact]
         public void Repository_should_filter_by_status()
         {
             var filter = RepositoryMessagesFilter.Create().WithStatus(Message.ProcessingStatus.Completed);
@@ -20,17 +19,17 @@ namespace Saritasa.Tools.Tests
             {
                 Status = Message.ProcessingStatus.Failed,
             };
-            Assert.That(filter.IsMatch(msg1), Is.False);
+            Assert.False(filter.IsMatch(msg1));
             var msg2 = new Message()
             {
                 Status = Message.ProcessingStatus.Completed,
             };
-            Assert.That(filter.IsMatch(msg2), Is.True);
+            Assert.True(filter.IsMatch(msg2));
             filter = filter.WithStatus(Message.ProcessingStatus.Failed);
-            Assert.That(filter.IsMatch(msg1), Is.True);
+            Assert.True(filter.IsMatch(msg1));
         }
 
-        [Test]
+        [Fact]
         public void Repository_should_filter_by_execution_duration()
         {
             var filter = RepositoryMessagesFilter.Create().WithExecutionDurationAbove(100);
@@ -38,12 +37,12 @@ namespace Saritasa.Tools.Tests
             {
                 ExecutionDuration = 200,
             };
-            Assert.That(filter.IsMatch(msg), Is.True);
+            Assert.True(filter.IsMatch(msg));
             msg.ExecutionDuration = 99;
-            Assert.That(filter.IsMatch(msg), Is.False);
+            Assert.False(filter.IsMatch(msg));
         }
 
-        [Test]
+        [Fact]
         public void Repository_should_filter_by_content_type()
         {
             var filter = RepositoryMessagesFilter.Create()
@@ -53,16 +52,16 @@ namespace Saritasa.Tools.Tests
             {
                 ContentType = "Saritasa.Demo.IncorrectCommand",
             };
-            Assert.That(filter.IsMatch(msg), Is.False);
+            Assert.False(filter.IsMatch(msg));
 
             msg.ContentType = "Saritasa.Demo.CorrectCommand";
-            Assert.That(filter.IsMatch(msg), Is.True);
+            Assert.True(filter.IsMatch(msg));
 
             filter = filter.WithExcludeContentType(new Regex(@"Command"));
-            Assert.That(filter.IsMatch(msg), Is.False);
+            Assert.False(filter.IsMatch(msg));
         }
 
-        [Test]
+        [Fact]
         public void Repository_should_filter_by_type()
         {
             var filter = RepositoryMessagesFilter.Create().WithType(Message.MessageTypeCommand);
@@ -70,10 +69,10 @@ namespace Saritasa.Tools.Tests
             {
                 Type = Message.MessageTypeQuery,
             };
-            Assert.That(filter.IsMatch(msgquery), Is.False);
+            Assert.False(filter.IsMatch(msgquery));
 
             filter = filter.WithType(Message.MessageTypeQuery);
-            Assert.That(filter.IsMatch(msgquery), Is.True);
+            Assert.True(filter.IsMatch(msgquery));
         }
     }
 }

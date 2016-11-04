@@ -4,16 +4,15 @@
 namespace Saritasa.Tools.Tests
 {
     using System;
-    using NUnit.Framework;
+    using Xunit;
     using Misc.Security;
 
     /// <summary>
     /// Security tests.
     /// </summary>
-    [TestFixture]
     public class SecurityTests
     {
-        [Test]
+        [Fact]
         public void Password_generator_with_specific_length_digits_should_match()
         {
             var passwordGenerator = new PasswordGenerator(
@@ -22,36 +21,36 @@ namespace Saritasa.Tools.Tests
                 PasswordGenerator.GeneratorFlag.ShuffleChars
             );
             var password = passwordGenerator.Generate();
-            Assert.That(password.Length, Is.EqualTo(25));
+            Assert.Equal(25, password.Length);
 
             var passwordGenerator2 = new PasswordGenerator();
             passwordGenerator2.PasswordLength = 15;
             passwordGenerator2.SetCharactersPool("1");
-            Assert.That(passwordGenerator2.Generate(), Is.EqualTo(new string('1', 15)));
+            Assert.Equal(new string('1', 15), passwordGenerator2.Generate());
         }
 
-        [Test]
+        [Fact]
         public void Test_password_entropy_match()
         {
             PasswordGenerator passwordGenerator = new PasswordGenerator();
             passwordGenerator.PasswordLength = 10;
             passwordGenerator.SetCharactersPool("0123456789"); // 10 symbols
             var entropy = passwordGenerator.GetEntropy();
-            Assert.That(entropy, Is.InRange(33.119, 33.319));
+            Assert.InRange(entropy, 33.119, 33.319);
         }
 
-        [Test]
+        [Fact]
         public void Test_password_strenght_matches()
         {
-            Assert.That(PasswordGenerator.EstimatePasswordStrength("1111"), Is.EqualTo(0));
-            Assert.That(PasswordGenerator.EstimatePasswordStrength("2222222222"), Is.EqualTo(0));
-            Assert.That(PasswordGenerator.EstimatePasswordStrength("123456789"), Is.EqualTo(4));
-            Assert.That(PasswordGenerator.EstimatePasswordStrength("123456789A"), Is.EqualTo(73));
-            Assert.That(PasswordGenerator.EstimatePasswordStrength("123456789AB"), Is.EqualTo(75));
-            Assert.That(PasswordGenerator.EstimatePasswordStrength("CCCCCCCCC"), Is.EqualTo(0));
-            Assert.That(PasswordGenerator.EstimatePasswordStrength("8m6y2L2WhalkPDa"), Is.EqualTo(100));
-            Assert.That(PasswordGenerator.EstimatePasswordStrength("AA11bb00__"), Is.EqualTo(68));
-            Assert.That(PasswordGenerator.EstimatePasswordStrength("123456_789AB"), Is.EqualTo(89));
+            Assert.Equal(0, PasswordGenerator.EstimatePasswordStrength("1111"));
+            Assert.Equal(0, PasswordGenerator.EstimatePasswordStrength("2222222222"));
+            Assert.Equal(4, PasswordGenerator.EstimatePasswordStrength("123456789"));
+            Assert.Equal(73, PasswordGenerator.EstimatePasswordStrength("123456789A"));
+            Assert.Equal(75, PasswordGenerator.EstimatePasswordStrength("123456789AB"));
+            Assert.Equal(0, PasswordGenerator.EstimatePasswordStrength("CCCCCCCCC"));
+            Assert.Equal(100, PasswordGenerator.EstimatePasswordStrength("8m6y2L2WhalkPDa"));
+            Assert.Equal(68, PasswordGenerator.EstimatePasswordStrength("AA11bb00__"));
+            Assert.Equal(89, PasswordGenerator.EstimatePasswordStrength("123456_789AB"));
         }
     }
 }

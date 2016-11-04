@@ -5,11 +5,10 @@ namespace Saritasa.Tools.Tests
 {
     using System;
     using System.Collections.Generic;
-    using NUnit.Framework;
+    using Xunit;
     using Messages.Common;
     using Messages.Queries;
 
-    [TestFixture]
     public class QueriesTests
     {
         #region Interfaces
@@ -68,29 +67,29 @@ namespace Saritasa.Tools.Tests
 
         #region Can_run_simple_query
 
-        [Test]
+        [Fact]
         public void Can_run_simple_query()
         {
             var qp = QueryPipeline.CreateDefaultPipeline(QueryPipeline.NullResolver).UseInternalResolver(true);
             var result = qp.Query<QueryObject>().With(q => q.SimpleQuery(10, 20));
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count, Is.EqualTo(2));
-            Assert.That(result[1], Is.EqualTo(20));
+            Assert.NotNull(result);
+            Assert.Equal(2, result.Count);
+            Assert.Equal(20, result[1]);
         }
 
         #endregion
 
-        [Test]
+        [Fact]
         public void Can_run_query_with_resolving()
         {
             var qp = QueryPipeline.CreateDefaultPipeline(QueriesTests.InterfacesResolver).UseInternalResolver(true);
             var result = qp.Query<QueryObject>().With(q => q.SimpleQueryWithDependency(10, 20, null));
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count, Is.EqualTo(2));
-            Assert.That(result[1], Is.EqualTo(20));
+            Assert.NotNull(result);
+            Assert.Equal(2, result.Count);
+            Assert.Equal(20, result[1]);
         }
 
-        [Test]
+        [Fact]
         public void Can_run_query_from_raw_message()
         {
             var qp = QueryPipeline.CreateDefaultPipeline(QueriesTests.InterfacesResolver).UseInternalResolver(true);
@@ -106,7 +105,7 @@ namespace Saritasa.Tools.Tests
                 }
             };
             qp.ProcessRaw(message);
-            Assert.That(message.Content, Is.TypeOf(typeof(List<int>)));
+            Assert.IsType<List<int>>(message.Content);
         }
 
         #region Can_run_query_with_private_object_ctor
@@ -132,14 +131,14 @@ namespace Saritasa.Tools.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void Can_run_query_with_private_object_ctor()
         {
             var qp = QueryPipeline.CreateDefaultPipeline(QueriesTests.InterfacesResolver).UseInternalResolver(true);
             var result = qp.Query<QueryObjectWithPrivateCtor>().With(q => q.Query());
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count, Is.EqualTo(2));
-            Assert.That(result[0], Is.EqualTo("A"));
+            Assert.NotNull(result);
+            Assert.Equal(2, result.Count);
+            Assert.Equal("A", result[0]);
         }
 
         #endregion

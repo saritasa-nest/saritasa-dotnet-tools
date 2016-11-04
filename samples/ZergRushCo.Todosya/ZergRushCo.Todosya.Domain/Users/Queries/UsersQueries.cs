@@ -32,7 +32,7 @@ namespace ZergRushCo.Todosya.Domain.Users.Queries
         /// Get user by email address.
         /// </summary>
         /// <param name="email">Email address.</param>
-        /// <returns>User instance or null of not found.</returns>
+        /// <returns>User instance or null if not found.</returns>
         public User GetByEmail(string email)
         {
             return uow.UserRepository.FirstOrDefault(u => u.Email == email);
@@ -42,7 +42,7 @@ namespace ZergRushCo.Todosya.Domain.Users.Queries
         /// Get user by id.
         /// </summary>
         /// <param name="id">User id.</param>
-        /// <returns>User instance or null of not found.</returns>
+        /// <returns>User instance or null if not found.</returns>
         public User GetById(int id)
         {
             return uow.UserRepository.Get(id);
