@@ -4,17 +4,15 @@
 namespace Saritasa.Tools.Common.Tests
 {
     using System;
-    using NUnit.Framework;
-    using Extensions;
+    using Xunit;
     using Utils;
 
     /// <summary>
     /// Validation module test.
     /// </summary>
-    [TestFixture]
     public class GuardTests
     {
-        [Test]
+        [Fact]
         public void Valid_emails_should_not_throw_exception()
         {
             Guard.IsNotInvalidEmail("fwd2ivan@yandex.ru", "test");
@@ -23,7 +21,7 @@ namespace Saritasa.Tools.Common.Tests
             Guard.IsNotInvalidEmail("ivan+ivan@kras.saritas.local", "test");
         }
 
-        [Test]
+        [Fact]
         public void Invalid_emails_should_throw_exception()
         {
             Assert.Throws<ArgumentException>(() => { Guard.IsNotInvalidEmail("fwd2ivanyandex.ru", "test"); });
@@ -32,7 +30,7 @@ namespace Saritasa.Tools.Common.Tests
             Assert.Throws<ArgumentException>(() => { Guard.IsNotInvalidEmail("fwd2ivan@", "test"); });
         }
 
-        [Test]
+        [Fact]
         public void Is_not_null_should_throw_exception()
         {
             object obj = null;

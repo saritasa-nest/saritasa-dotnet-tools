@@ -1,14 +1,13 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.Common
+namespace Saritasa.Tools.Common.Utils
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Text.RegularExpressions;
     using Extensions;
-    using Utils;
 
     /// <summary>
     /// Contains various check methods. If condition is false it generates exception.

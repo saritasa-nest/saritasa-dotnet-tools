@@ -57,7 +57,7 @@
     <Compile Include="Utils\SecurityUtils.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Utils\StringUtils.cs" />
-    <Compile Include="Guard.cs" />
+    <Compile Include="Utils\Guard.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Saritasa.Tools.Common.project.json" />

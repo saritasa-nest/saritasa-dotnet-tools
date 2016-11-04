@@ -5,32 +5,31 @@ namespace Saritasa.Tools.Common.Tests
 {
     using System;
     using System.Collections.Generic;
-    using NUnit.Framework;
+    using Xunit;
     using Extensions;
 
     /// <summary>
     /// All extension methods tests.
     /// </summary>
-    [TestFixture]
     public class ExtensionsTest
     {
-        [Test]
+        [Fact]
         public void String_format_should_format()
         {
-            Assert.That("{0} + {1} = {2}".FormatWith(2, 2, 4), Is.EqualTo("2 + 2 = 4"));
+            Assert.Equal("2 + 2 = 4", "{0} + {1} = {2}".FormatWith(2, 2, 4));
         }
 
-        [Test]
+        [Fact]
         public void Dictionary_get_default_value_should_get_default()
         {
             Dictionary<int, string> dict = new Dictionary<int, string>();
             dict.Add(1, "abc");
             dict.Add(2, "bca");
-            Assert.That(dict.GetValueDefault(5, "default"), Is.EqualTo("default"));
-            Assert.That(dict.GetValueDefault(1, "abc"), Is.EqualTo("abc"));
+            Assert.Equal("default", dict.GetValueDefault(5, "default"));
+            Assert.Equal("abc", dict.GetValueDefault(1, "abc"));
         }
 
-        [Test]
+        [Fact]
         public void Chunk_select_range_should_return_subsets()
         {
             int capacity = 250;
@@ -48,10 +47,10 @@ namespace Saritasa.Tools.Common.Tests
                 }
             }
 
-            Assert.That(sum, Is.EqualTo(31125));
+            Assert.Equal(31125, sum);
         }
 
-        [Test]
+        [Fact]
         public void Chunk_select_should_return_subsets()
         {
             int capacity = 250;
@@ -66,7 +65,7 @@ namespace Saritasa.Tools.Common.Tests
                 sum += item;
             }
 
-            Assert.That(sum, Is.EqualTo(31125));
+            Assert.Equal(31125, sum);
         }
     }
 }
