@@ -20,7 +20,7 @@ namespace Saritasa.Tools.Messages.Common
         {
         }
 
-        #if !NETCOREAPP1_0 && !NETSTANDARD1_6
+#if !NETCOREAPP1_0 && !NETSTANDARD1_6
         /// <summary>
         /// .ctor for deserialization.
         /// </summary>

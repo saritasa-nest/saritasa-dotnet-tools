@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.Common.Tests
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{59041E71-0E53-412B-9248-19C37CC3ACAF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.Messages.Tests", "Saritasa.Tools.Messages.Tests\Saritasa.Tools.Messages.Tests.csproj", "{84A546BA-C7BE-4CCC-8355-5E15502F6AD2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -125,6 +127,14 @@ Global
 		{347E7D34-C497-47D4-97CF-3B7245AB6BDD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{347E7D34-C497-47D4-97CF-3B7245AB6BDD}.Release|x86.ActiveCfg = Release|Any CPU
 		{347E7D34-C497-47D4-97CF-3B7245AB6BDD}.Release|x86.Build.0 = Release|Any CPU
+		{84A546BA-C7BE-4CCC-8355-5E15502F6AD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84A546BA-C7BE-4CCC-8355-5E15502F6AD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84A546BA-C7BE-4CCC-8355-5E15502F6AD2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{84A546BA-C7BE-4CCC-8355-5E15502F6AD2}.Debug|x86.Build.0 = Debug|Any CPU
+		{84A546BA-C7BE-4CCC-8355-5E15502F6AD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84A546BA-C7BE-4CCC-8355-5E15502F6AD2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84A546BA-C7BE-4CCC-8355-5E15502F6AD2}.Release|x86.ActiveCfg = Release|Any CPU
+		{84A546BA-C7BE-4CCC-8355-5E15502F6AD2}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -141,5 +151,6 @@ Global
 		{32A3A81C-A65C-4F78-8300-17151987697C} = {59041E71-0E53-412B-9248-19C37CC3ACAF}
 		{2900D88A-2522-4299-8D51-6AF26B74C91C} = {59041E71-0E53-412B-9248-19C37CC3ACAF}
 		{347E7D34-C497-47D4-97CF-3B7245AB6BDD} = {5FFB7A6F-AD4A-45A5-A75D-0E55CACE9F35}
+		{84A546BA-C7BE-4CCC-8355-5E15502F6AD2} = {5FFB7A6F-AD4A-45A5-A75D-0E55CACE9F35}
 	EndGlobalSection
 EndGlobal

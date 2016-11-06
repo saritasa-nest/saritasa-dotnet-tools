@@ -89,6 +89,11 @@ namespace Saritasa.Tools.Tests
             Assert.Equal(3, ev.HandlersCount);
         }
 
+        [Fact]
+        public void Events_can_be_processed_from_raw_messages()
+        {
+        }
+
         #region Domain_events_can_be_integrated_to_events_pipeline
 
         class DomainTestEvent

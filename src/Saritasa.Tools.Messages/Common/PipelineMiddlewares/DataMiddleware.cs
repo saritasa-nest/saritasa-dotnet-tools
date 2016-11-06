@@ -5,7 +5,6 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
 {
     using System;
     using System.Collections.Generic;
-    using Messages;
 
     /// <summary>
     /// Appends additional data to message.

@@ -1,13 +1,13 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.Tests
+namespace Saritasa.Tools.Messages.Tests
 {
     using System;
     using System.Collections.Generic;
     using Xunit;
-    using Messages.Common;
-    using Messages.Queries;
+    using Common;
+    using Queries;
 
     public class QueriesTests
     {
@@ -95,7 +95,7 @@ namespace Saritasa.Tools.Tests
             var qp = QueryPipeline.CreateDefaultPipeline(QueriesTests.InterfacesResolver).UseInternalResolver(true);
             var message = new Message()
             {
-                ContentType = "Saritasa.Tools.Tests.QueriesTests+QueryObject.SimpleQueryWithDependency",
+                ContentType = "Saritasa.Tools.Messages.Tests.QueriesTests+QueryObject.SimpleQueryWithDependency",
                 Type = Message.MessageTypeQuery,
                 Content = new Dictionary<string, object>()
                 {
