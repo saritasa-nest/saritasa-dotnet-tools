@@ -29,19 +29,12 @@ namespace Saritasa.Tools.Emails
         /// Execution strategy. DefaultEmailExecutionStrategy used by default. Determines the way how we should proceed
         /// actual email sending.
         /// </summary>
-        protected IEmailExecutionStrategy ExecutionStrategy { get; private set; } = new DefaultEmailExecutionStrategy();
+        protected IEmailExecutionStrategy ExecutionStrategy { get; } = new DefaultEmailExecutionStrategy();
 
         /// <summary>
         /// Cancellation token instance. None by default.
         /// </summary>
         public CancellationToken CancellationToken { get; set; } = CancellationToken.None;
-
-        /// <summary>
-        /// .ctor
-        /// </summary>
-        protected EmailSender()
-        {
-        }
 
         /// <inheritdoc />
         public Task SendAsync(MailMessage message)
@@ -75,7 +68,7 @@ namespace Saritasa.Tools.Emails
                         interceptor.Sent(message, data);
                     }
                 }
-            });
+            }, CancellationToken);
         }
 
         /// <summary>

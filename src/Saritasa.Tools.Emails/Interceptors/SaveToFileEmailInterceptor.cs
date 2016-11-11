@@ -18,12 +18,12 @@ namespace Saritasa.Tools.Emails.Interceptors
         /// <summary>
         /// Directory to save emails.
         /// </summary>
-        public string Directory { get; private set; }
+        public string Directory { get; }
 
         /// <summary>
         /// Save only sent emails.
         /// </summary>
-        public bool AfterSend { get; private set; }
+        public bool AfterSend { get; }
 
         /// <summary>
         /// .ctor

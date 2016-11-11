@@ -97,7 +97,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
             performanceCounterAvgBase.Increment();
         }
 
-        private bool disposed = false;
+        private bool disposed;
 
         /// <inheritdoc />
         public void Dispose()

@@ -27,7 +27,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         IDictionary<Type, Expression<Func<object>>> cache =
             new System.Collections.Concurrent.ConcurrentDictionary<Type, Expression<Func<object>>>(4, 150);
 
-        IList<MethodInfo> commandHandlers = null;
+        IList<MethodInfo> commandHandlers;
 
         HandlerSearchMethod handlerSearchMethod = HandlerSearchMethod.ClassAttribute;
 

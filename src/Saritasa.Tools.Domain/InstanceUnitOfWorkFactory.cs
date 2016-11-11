@@ -14,7 +14,7 @@ namespace Saritasa.Tools.Domain
     /// <typeparam name="TUnitOfWork">Unit of work type.</typeparam>
     public class InstanceUnitOfWorkFactory<TUnitOfWork> : IUnitOfWorkFactory<TUnitOfWork> where TUnitOfWork : class
     {
-        TUnitOfWork unitOfWork;
+        readonly TUnitOfWork unitOfWork;
 
         /// <summary>
         /// .ctor

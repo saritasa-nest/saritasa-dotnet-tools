@@ -85,6 +85,16 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Saritasa.Tools.Domain\Saritasa.Tools.Domain.csproj">
+      <Project>{32A3A81C-A65C-4F78-8300-17151987697C}</Project>
+      <Name>Saritasa.Tools.Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\src\Saritasa.Tools.Messages\Saritasa.Tools.Messages.csproj">
+      <Project>{AEE65918-25DF-4A25-BFB8-56552FAA2A51}</Project>
+      <Name>Saritasa.Tools.Messages</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -15,7 +15,7 @@ namespace Saritasa.Tools.Mvc.Utils
         /// Initializes a new instance of the <see cref="DifferentFolderRazorViewEngine" /> class.
         /// </summary>
         /// <param name="path">The path. Must be in format "~/MyPath".</param>
-        public DifferentFolderRazorViewEngine(string path) : base()
+        public DifferentFolderRazorViewEngine(string path)
         {
             if (string.IsNullOrWhiteSpace(path))
             {

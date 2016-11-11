@@ -34,7 +34,7 @@ namespace Saritasa.Tools.Messages.Common
         /// .ctor
         /// </summary>
         /// <param name="resolver">Types resolver.</param>
-        public BaseExecutorMiddleware(Func<Type, object> resolver)
+        protected BaseExecutorMiddleware(Func<Type, object> resolver)
         {
             if (resolver == null)
             {
@@ -105,7 +105,7 @@ namespace Saritasa.Tools.Messages.Common
             }
             else
             {
-                handlerMethod.Invoke(handler, new object[] { obj });
+                handlerMethod.Invoke(handler, new[] { obj });
             }
         }
     }

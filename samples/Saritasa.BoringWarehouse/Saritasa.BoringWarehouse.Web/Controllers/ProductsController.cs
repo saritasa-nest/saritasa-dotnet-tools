@@ -5,8 +5,8 @@
     using System.Linq;
     using System.Web.Mvc;
 
-    using Tools.Commands;
-    using Tools.Exceptions;
+    using Tools.Messages.Commands;
+    using Tools.Domain.Exceptions;
 
     using Domain;
     using Domain.Products.Commands;

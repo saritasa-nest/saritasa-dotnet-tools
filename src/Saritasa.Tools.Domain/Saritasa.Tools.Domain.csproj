@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="DomainEventsManager.cs" />
     <Compile Include="Exceptions\DomainException.cs" />
+    <Compile Include="Exceptions\SecurityException.cs" />
     <Compile Include="Exceptions\NotFoundException.cs" />
     <Compile Include="Exceptions\ValidationException.cs" />
     <Compile Include="IDomainEventsHandler.cs" />

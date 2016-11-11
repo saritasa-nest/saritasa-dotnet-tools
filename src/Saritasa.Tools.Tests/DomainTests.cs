@@ -6,23 +6,29 @@ namespace Saritasa.Tools.Tests
     using System;
     using System.IO;
     using System.Runtime.Serialization.Formatters.Binary;
-    using NUnit.Framework;
+    using Xunit;
     using Domain.Exceptions;
 
-    [TestFixture]
+    /// <summary>
+    /// Domain tests.
+    /// </summary>
     public class DomainTests
     {
-        [Test]
+        [Fact]
         public void Domain_exception_should_serialize_deserialize_correctly()
         {
             var domainException = new DomainException("Test");
             var formatter = new BinaryFormatter();
+
+            DomainException deserializedDomainException = null;
             using (var memoryStream = new MemoryStream())
             {
                 formatter.Serialize(memoryStream, domainException);
                 memoryStream.Seek(0, SeekOrigin.Begin);
-                formatter.Deserialize(memoryStream);
+                deserializedDomainException = (DomainException)formatter.Deserialize(memoryStream);
             }
+
+            Assert.Equal(domainException.Message, deserializedDomainException.Message);
         }
     }
 }

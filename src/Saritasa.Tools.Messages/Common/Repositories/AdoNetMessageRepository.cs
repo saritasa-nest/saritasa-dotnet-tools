@@ -56,7 +56,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
         readonly Dialect dialect;
 
-        bool isInitialized = false;
+        bool isInitialized;
 
         IDbConnection activeConnection;
 
@@ -231,16 +231,22 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                     if (activeConnection == null || activeConnection.State != ConnectionState.Open)
                     {
                         activeConnection = factory.CreateConnection();
-                        activeConnection.ConnectionString = connectionString;
-                        activeConnection.Open();
+                        if (activeConnection != null)
+                        {
+                            activeConnection.ConnectionString = connectionString;
+                            activeConnection.Open();
+                        }
                     }
                     return activeConnection;
                 }
                 else
                 {
                     var connection = factory.CreateConnection();
-                    connection.ConnectionString = connectionString;
-                    connection.Open();
+                    if (connection != null)
+                    {
+                        connection.ConnectionString = connectionString;
+                        connection.Open();
+                    }
                     return connection;
                 }
             }
@@ -320,7 +326,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 #endif
         }
 
-        private bool disposed = false;
+        private bool disposed;
 
         /// <inheritdoc />
         public void Dispose()

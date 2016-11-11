@@ -226,9 +226,17 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Saritasa.Tools.Domain\Saritasa.Tools.Domain.csproj">
+      <Project>{32a3a81c-a65c-4f78-8300-17151987697c}</Project>
+      <Name>Saritasa.Tools.Domain</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\src\Saritasa.Tools.Ef6\Saritasa.Tools.Ef6.csproj">
       <Project>{d1ad1713-bc18-4340-b8db-23d86d22fb7f}</Project>
       <Name>Saritasa.Tools.Ef6</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\src\Saritasa.Tools.Messages\Saritasa.Tools.Messages.csproj">
+      <Project>{aee65918-25df-4a25-bfb8-56552faa2a51}</Project>
+      <Name>Saritasa.Tools.Messages</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\src\Saritasa.Tools.NLog4\Saritasa.Tools.NLog4.csproj">
       <Project>{83d4925b-b04f-4c9c-8bf1-9b6a6be0a87d}</Project>

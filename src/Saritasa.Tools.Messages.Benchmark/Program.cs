@@ -10,10 +10,9 @@ namespace Saritasa.Tools.Messages.Benchmark
         /// <summary>
         /// Main entry point.
         /// </summary>
-        /// <param name="args">App args.</param>
-        static void Main(string[] args)
+        static void Main()
         {
-            var summary = BenchmarkRunner.Run<QueriesBenchmarks>();
+            BenchmarkRunner.Run<QueriesBenchmarks>();
         }
     }
 }

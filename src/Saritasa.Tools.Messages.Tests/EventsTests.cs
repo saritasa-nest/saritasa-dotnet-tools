@@ -5,12 +5,11 @@ namespace Saritasa.Tools.Tests
 {
     using System;
     using System.Reflection;
-    using NUnit.Framework;
+    using Xunit;
     using Domain;
     using Messages.Events;
     using Messages.Events.PipelineMiddlewares;
 
-    [TestFixture]
     public class EventsTests
     {
         #region Interfaces
@@ -75,7 +74,7 @@ namespace Saritasa.Tools.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void Events_should_be_fired_withing_all_classes()
         {
             var ep = EventPipeline.CreateDefaultPipeline(InterfacesResolver,
@@ -87,7 +86,12 @@ namespace Saritasa.Tools.Tests
                 LastName = "Ivanov",
             };
             ep.Raise(ev);
-            Assert.That(ev.HandlersCount, Is.EqualTo(3));
+            Assert.Equal(3, ev.HandlersCount);
+        }
+
+        [Fact]
+        public void Events_can_be_processed_from_raw_messages()
+        {
         }
 
         #region Domain_events_can_be_integrated_to_events_pipeline
@@ -105,7 +109,7 @@ namespace Saritasa.Tools.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void Domain_events_can_be_integrated_to_events_pipeline()
         {
             var eventsManager = new DomainEventsManager();
@@ -123,7 +127,7 @@ namespace Saritasa.Tools.Tests
 
             var ev = new DomainTestEvent();
             ep.Raise(ev);
-            Assert.That(ev.Param, Is.EqualTo(42));
+            Assert.Equal(42, ev.Param);
         }
 
         #endregion

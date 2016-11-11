@@ -5,8 +5,8 @@
     using System.Web.Mvc;
     using System.Web.Security;
 
-    using Tools.Commands;
-    using Tools.Exceptions;
+    using Tools.Messages.Commands;
+    using Tools.Domain.Exceptions;
 
     using Core;
     using Domain.Users.Commands;

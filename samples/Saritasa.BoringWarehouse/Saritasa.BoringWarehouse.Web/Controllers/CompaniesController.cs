@@ -3,8 +3,8 @@
     using System;
     using System.Web.Mvc;
 
-    using Tools.Commands;
-    using Tools.Exceptions;
+    using Tools.Messages.Commands;
+    using Tools.Domain.Exceptions;
 
     using Domain.Products.Commands;
     using Domain.Products.Entities;

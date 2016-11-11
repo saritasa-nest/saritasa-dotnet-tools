@@ -5,11 +5,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{347E7D34-C497-47D4-97CF-3B7245AB6BDD}</ProjectGuid>
+    <ProjectGuid>{84A546BA-C7BE-4CCC-8355-5E15502F6AD2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Saritasa.Tools.Common.Tests</RootNamespace>
-    <AssemblyName>Saritasa.Tools.Common.Tests</AssemblyName>
+    <RootNamespace>Saritasa.Tools.Messages.Tests</RootNamespace>
+    <AssemblyName>Saritasa.Tools.Messages.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
@@ -34,6 +34,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -59,25 +60,28 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AtomicTest.cs" />
-    <Compile Include="ExtensionsTest.cs" />
-    <Compile Include="FlowTests.cs" />
+    <Compile Include="CommandsTests.cs" />
+    <Compile Include="EventsTests.cs" />
+    <Compile Include="MessagesRepositoryFilterTests.cs" />
+    <Compile Include="MessagesTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SecurityTest.cs" />
-    <Compile Include="StringTest.cs" />
-    <Compile Include="GuardTests.cs" />
+    <Compile Include="QueriesTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Saritasa.Tools.Common\Saritasa.Tools.Common.csproj">
-      <Project>{2900d88a-2522-4299-8d51-6af26b74c91c}</Project>
-      <Name>Saritasa.Tools.Common</Name>
+    <ProjectReference Include="..\Saritasa.Tools.Domain\Saritasa.Tools.Domain.csproj">
+      <Project>{32a3a81c-a65c-4f78-8300-17151987697c}</Project>
+      <Name>Saritasa.Tools.Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Saritasa.Tools.Messages\Saritasa.Tools.Messages.csproj">
+      <Project>{aee65918-25df-4a25-bfb8-56552faa2a51}</Project>
+      <Name>Saritasa.Tools.Messages</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

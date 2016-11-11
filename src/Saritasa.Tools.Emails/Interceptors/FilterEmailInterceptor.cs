@@ -49,7 +49,7 @@ namespace Saritasa.Tools.Emails.Interceptors
                 throw new ArgumentNullException(nameof(emails));
             }
 
-            var parsedEmails = emails.Split(new char[] { ',', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            var parsedEmails = emails.Split(new[] { ',', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
             foreach (var email in parsedEmails)
             {

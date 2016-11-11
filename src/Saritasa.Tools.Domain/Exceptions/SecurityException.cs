@@ -1,22 +1,37 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.Messages.Common
+namespace Saritasa.Tools.Domain.Exceptions
 {
     using System;
+    using System.Runtime.Serialization;
 
     /// <summary>
-    /// Middleware not found exception.
+    /// Domain security exception.
     /// </summary>
 #if !NETCOREAPP1_0 && !NETSTANDARD1_6
     [Serializable]
 #endif
-    public class MiddlewareNotFoundException : Exception
+    public class SecurityException : DomainException
     {
         /// <summary>
         /// .ctor
         /// </summary>
-        public MiddlewareNotFoundException() : base("Middleware not found")
+        public SecurityException() : base("Permissions required")
+        {
+        }
+
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        public SecurityException(string message) : base(message)
+        {
+        }
+
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        public SecurityException(string message, Exception innerException) : base(message, innerException)
         {
         }
 
@@ -27,7 +42,7 @@ namespace Saritasa.Tools.Messages.Common
         /// <param name="info">Stores all the data needed to serialize or deserialize an object.</param>
         /// <param name="context">Describes the source and destination of a given serialized stream,
         /// and provides an additional caller-defined context.</param>
-        protected MiddlewareNotFoundException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
+        protected SecurityException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
         }

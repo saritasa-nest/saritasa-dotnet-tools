@@ -10,7 +10,7 @@ namespace Saritasa.Tools.Messages.Commands
     /// The class that contains commands handers should be marked
     /// with this attribute.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public class CommandHandlersAttribute : MessageHandlersAttribute
     {
     }
@@ -18,7 +18,7 @@ namespace Saritasa.Tools.Messages.Commands
     /// <summary>
     /// Marks property as output. Is not for processing.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Property)]
     public class CommandOut : Attribute
     {
     }

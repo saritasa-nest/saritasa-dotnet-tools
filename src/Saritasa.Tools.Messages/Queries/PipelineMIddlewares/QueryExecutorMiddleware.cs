@@ -20,7 +20,7 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
             var queryMessage = message as QueryMessage;
             if (queryMessage == null)
             {
-                throw new NotSupportedException("Message should be QueryMessage type");
+                throw new ArgumentException("Message should be QueryMessage type");
             }
 
             // invoke method and resolve parameters if needed

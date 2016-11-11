@@ -36,16 +36,8 @@
     <CodeAnalysisRuleSet>..\Saritasa.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Castle.Core, Version=3.3.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-      <HintPath>..\packages\Castle.Core.3.3.3\lib\net45\Castle.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Moq, Version=4.5.28.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
       <HintPath>..\packages\Moq.4.5.28\lib\net45\Moq.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="nunit.framework, Version=3.5.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUnit.3.5.0\lib\net45\nunit.framework.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -70,7 +62,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommandsTests.cs" />
     <Compile Include="DomainTests.cs" />
     <Compile Include="EmailsTests.cs" />
     <Compile Include="EventsTests.cs" />
@@ -78,9 +69,6 @@
     <Compile Include="Expressions\ExpressionTransformVisitorTests.cs" />
     <Compile Include="Expressions\Fixtures\ExpressionExecutorFixture.cs" />
     <Compile Include="Expressions\Fixtures\ExpressionTransformVisitorFixture.cs" />
-    <Compile Include="MessagesRepositoryFilterTests.cs" />
-    <Compile Include="MessagesTests.cs" />
-    <Compile Include="QueriesTests.cs" />
     <Compile Include="SecurityTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
