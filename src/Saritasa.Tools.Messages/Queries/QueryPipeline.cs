@@ -95,24 +95,6 @@ namespace Saritasa.Tools.Messages.Queries
                     fakeQueryObject = true;
                 }
 
-                var expressionExecutorFactory = new ExpressionExecutorFactory();
-                var expressionExecutor = expressionExecutorFactory.Create(eec =>
-                {
-                    eec.ConfigureTransformation(etc =>
-                    {
-                        etc.UseTransfomer<MethodCallExpressionTransformer>();
-                        etc.UseTransfomer<LambdaExpressionTransformer>();
-                    });
-
-                    eec.UseCompiledCache<CompiledExpressionProvider>();
-                });
-
-                expressionExecutor.Compile(expression);
-                //expressionExecutor.Context
-
-                //// ([int32]q)
-                //var transformed = transformer.Visit(expression);
-
                 var mce = expression.Body as MethodCallExpression;
                 var args = mce.Arguments.Select(a => PartiallyEvaluateExpression(a)).ToArray();
                 var method = mce.Method;

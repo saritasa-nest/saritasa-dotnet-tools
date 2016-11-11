@@ -1,4 +1,5 @@
-﻿using Saritasa.Tools.Messages.Common.Expressions;
+﻿using Moq;
+using Saritasa.Tools.Messages.Common.Expressions;
 using Saritasa.Tools.Messages.Common.Expressions.Compilation;
 using Saritasa.Tools.Messages.Common.Expressions.Transformers;
 using System;
@@ -13,17 +14,21 @@ namespace Saritasa.Tools.Tests.Expressions.Fixtures
     {
         public ExpressionExecutor Create()
         {
-            var factory = new ExpressionExecutorFactory();
-            return factory.Create(cf =>
-            {
-                cf.UseCompiledCache<CompiledExpressionProvider>();
-
-                cf.ConfigureTransformation(etc =>
+            var moq = new Mock<IServiceProvider>();
+            moq.Setup(x => x.GetService(It.Is<Type>(t => t == typeof(ICompiledExpressionProvider))))
+                .Returns(new CompiledExpressionProvider());
+            moq.Setup(x => x.GetService(It.Is<Type>(t => t == typeof(IExpressionCompilator))))
+                .Returns(new ExpressionCompilator());
+            moq.Setup(x => x.GetService(It.Is<Type>(t => t == typeof(IExpressionTransformVisitorFactory))))
+                .Returns(new ExpressionTransformVisitorFactory(new List<IExpressionTransformer>()
                 {
-                    etc.UseTransfomer<MethodCallExpressionTransformer>();
-                    etc.UseTransfomer<LambdaExpressionTransformer>();
-                });
-            });
+                    new MethodCallExpressionTransformer(),
+                    new LambdaExpressionTransformer()
+                }));
+
+            var factory = new ExpressionExecutorFactory(moq.Object);
+
+            return factory.Create();
         }
     }
 }

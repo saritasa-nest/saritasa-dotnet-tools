@@ -28,13 +28,8 @@ namespace Saritasa.Tools.Tests.Expressions
             // Arrange
             var executor = fixture.Create();
 
-            var compiled = executor.Compile<int, int>((first) => CompiledMethod(first));
-
             // Act
             var executed = executor.Execute((first) => CompiledMethod(first), 1);
-
-            // Assert
-            Assert.Equal(1, executor.Context.CompiledExpressionProvider.KeyValues.Count);
         }
 
         [Theory]
@@ -46,14 +41,11 @@ namespace Saritasa.Tools.Tests.Expressions
             // Arrange
             var executor = fixture.Create();
 
-            var compiled = executor.Compile<int, int>((first) => CompiledMethod(first));
-
             // Act
             var executed = executor.Execute((first) => CompiledMethod(first), firstValue);
 
             // Assert
             Assert.Equal(result, executed);
-            Assert.Equal(1, executor.Context.CompiledExpressionProvider.KeyValues.Count);
         }
     }
 }

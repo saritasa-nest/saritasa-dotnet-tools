@@ -10,7 +10,7 @@ namespace Saritasa.Tools.Messages.Common.Expressions
     {
         private IReadOnlyList<IExpressionTransformer> expressionTransformers;
 
-        public ExpressionTransformVisitorFactory(IReadOnlyList<IExpressionTransformer> transformers)
+        public ExpressionTransformVisitorFactory(IReadOnlyList<IExpressionTransformer> expressionTransformers)
         {
             this.expressionTransformers = expressionTransformers;
         }

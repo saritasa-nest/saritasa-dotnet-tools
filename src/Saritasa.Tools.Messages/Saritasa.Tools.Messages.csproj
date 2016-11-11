@@ -96,6 +96,7 @@
     <Compile Include="Internal\InternalLogger.cs" />
     <Compile Include="Internal\MessageBinarySerializer.cs" />
     <Compile Include="Internal\MessageParseExpressionVisitor.cs" />
+    <Compile Include="Internal\ServiceProviderExtension.cs" />
     <Compile Include="Internal\TypeHelpers.cs" />
     <Compile Include="Common\PipelineMiddlewares\DataMiddleware.cs" />
     <Compile Include="Common\PipelineMiddlewares\PerformanceCounterMiddleware.cs" />

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Saritasa.Tools.Messages.Internal;
 
 namespace Saritasa.Tools.Messages.Common.Expressions
 {
@@ -18,9 +19,9 @@ namespace Saritasa.Tools.Messages.Common.Expressions
 
         public ExpressionExecutor Create()
         {
-            var compiledExpressionProvider = serviceProvider.GetService(typeof(ICompiledExpressionProvider)) as ICompiledExpressionProvider;
-            var expressionCompilator = serviceProvider.GetService(typeof(IExpressionCompilator)) as IExpressionCompilator;
-            var transformVisitorFactory = serviceProvider.GetService(typeof(IExpressionTransformVisitorFactory)) as IExpressionTransformVisitorFactory;
+            var compiledExpressionProvider = serviceProvider.GetService<ICompiledExpressionProvider>();
+            var expressionCompilator = serviceProvider.GetService<IExpressionCompilator>();
+            var transformVisitorFactory = serviceProvider.GetService<IExpressionTransformVisitorFactory>();
 
             return new ExpressionExecutor(compiledExpressionProvider, expressionCompilator, transformVisitorFactory);
         }

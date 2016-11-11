@@ -1,5 +1,6 @@
 ﻿using Saritasa.Tools.Messages.Common.Expressions;
 using Saritasa.Tools.Messages.Common.Expressions.Transformers;
+using System.Collections.Generic;
 
 namespace Saritasa.Tools.Tests.Expressions.Fixtures
 {
@@ -7,12 +8,11 @@ namespace Saritasa.Tools.Tests.Expressions.Fixtures
     {
         public ExpressionTransformVisitor CreateWithAllTransformers()
         {
-            var factory = new ExpressionTransformVisitorFactory();
-            return factory.Create(cfg =>
-            {
-                cfg.UseTransfomer<MethodCallExpressionTransformer>();
-                cfg.UseTransfomer<LambdaExpressionTransformer>();
-            });
+            return new ExpressionTransformVisitor(new List<IExpressionTransformer>()
+                {
+                    new MethodCallExpressionTransformer(),
+                    new LambdaExpressionTransformer()
+                });
         }
     }
 }

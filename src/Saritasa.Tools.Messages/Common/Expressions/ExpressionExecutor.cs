@@ -25,12 +25,7 @@ namespace Saritasa.Tools.Messages.Common.Expressions
             this.transformVisitorFactory = transformVisitorFactory;
         }
 
-        public Func<TInput, TResult> Compile<TInput, TResult>(Expression<Func<TInput, TResult>> expression)
-        {
-            return expressionProvider.GetOrAdd<TInput, TResult>(GetMethodInfo(expression), () => (dynamic)expressionCompilator.Compile(expression));
-        }
-
-        public TResult Execute<TInput, TResult>(Expression<Func<TInput, TResult>> expression, MethodInfo info, TInput input)
+        public TResult Execute<TInput, TResult>(Expression<Func<TInput, TResult>> expression, TInput input)
         {
             var compiledExpression = expressionProvider.GetOrAdd<TInput, TResult>(GetMethodInfo(expression), () =>
             {
