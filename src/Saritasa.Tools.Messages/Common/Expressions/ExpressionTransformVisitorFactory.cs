@@ -1,31 +1,23 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq.Expressions;
 
 namespace Saritasa.Tools.Messages.Common.Expressions
 {
-    public class ExpressionTransformVisitorFactory : IExpressionTransformFactory
+    public class ExpressionTransformVisitorFactory : IExpressionTransformVisitorFactory
     {
-        private ExpressionTransformContext context;
+        private IReadOnlyList<IExpressionTransformer> expressionTransformers;
 
-        public ExpressionTransformVisitorFactory(ExpressionTransformContext context)
+        public ExpressionTransformVisitorFactory(IReadOnlyList<IExpressionTransformer> transformers)
         {
-            this.context = context;
+            this.expressionTransformers = expressionTransformers;
         }
 
-        public ExpressionTransformVisitorFactory() { }
-
-        public ExpressionTransformContext Context => context;
-
-        public ExpressionTransformVisitor Create()
+        public ExpressionVisitor Create()
         {
-            return new ExpressionTransformVisitor(Context);
-        }
-
-        public ExpressionTransformVisitor Create(Action<ExpressionTransformContext> contextConfigure)
-        {
-            var context = new ExpressionTransformContext();
-            contextConfigure(context);
-
-            return new ExpressionTransformVisitor(context);
+            return new ExpressionTransformVisitor(expressionTransformers);
         }
     }
 }

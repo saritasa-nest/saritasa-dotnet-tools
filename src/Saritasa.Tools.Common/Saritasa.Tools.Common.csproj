@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\ServiceProviderExtensions.cs" />
     <Compile Include="Utils\AtomicUtils.cs" />
     <Compile Include="Extensions\CollectionsExtensions.cs" />
     <Compile Include="Extensions\DateTimeExtensions.cs" />

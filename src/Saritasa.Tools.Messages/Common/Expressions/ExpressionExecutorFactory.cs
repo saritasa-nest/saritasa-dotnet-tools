@@ -9,15 +9,20 @@ namespace Saritasa.Tools.Messages.Common.Expressions
 {
     public class ExpressionExecutorFactory
     {
-        public ExpressionExecutor Create(Action<ExpressionExecutorContext> configureContext)
+        private IServiceProvider serviceProvider;
+
+        public ExpressionExecutorFactory(IServiceProvider serviceProvider)
         {
-            var context = new ExpressionExecutorContext();
-            context.TransformContext = new ExpressionTransformContext();
-            context.Compilator = new ExpressionCompilator();
+            this.serviceProvider = serviceProvider;
+        }
 
-            configureContext(context);
+        public ExpressionExecutor Create()
+        {
+            var compiledExpressionProvider = serviceProvider.GetService(typeof(ICompiledExpressionProvider)) as ICompiledExpressionProvider;
+            var expressionCompilator = serviceProvider.GetService(typeof(IExpressionCompilator)) as IExpressionCompilator;
+            var transformVisitorFactory = serviceProvider.GetService(typeof(IExpressionTransformVisitorFactory)) as IExpressionTransformVisitorFactory;
 
-            return new ExpressionExecutor(context);
+            return new ExpressionExecutor(compiledExpressionProvider, expressionCompilator, transformVisitorFactory);
         }
     }
 }

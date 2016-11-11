@@ -27,7 +27,7 @@ namespace Saritasa.Tools.Messages.Common.Expressions.Transformers
             return nodeFrom == ExpressionType.Call;
         }
 
-        public Expression Transform(Expression input, ExpressionTransformContext context)
+        public Expression Transform(Expression input, ExpressionTransformVisitor visitor)
         {
             var methodCallExpression = input as MethodCallExpression;
             if (methodCallExpression == null)
@@ -45,7 +45,7 @@ namespace Saritasa.Tools.Messages.Common.Expressions.Transformers
                     var constantMethodCallArgument = methodCallArgument as ConstantExpression;
                     var parameterExpression = Expression.Parameter(constantMethodCallArgument.Type, $"p{argumentIndex}");
                     parameters.Add(parameterExpression);
-                    context.TransformedParameterExpressions.Add(parameterExpression);
+                    visitor.TransformedParameterExpressions.Add(parameterExpression);
                 }
                 else if (methodCallArgument.NodeType == ExpressionType.MemberAccess)
                 {
@@ -54,7 +54,7 @@ namespace Saritasa.Tools.Messages.Common.Expressions.Transformers
 
                     var parameterExpression = Expression.Parameter(propertyOrFieldType, $"p{argumentIndex}");
                     parameters.Add(parameterExpression);
-                    context.TransformedParameterExpressions.Add(parameterExpression);
+                    visitor.TransformedParameterExpressions.Add(parameterExpression);
                 }
                 else
                 {

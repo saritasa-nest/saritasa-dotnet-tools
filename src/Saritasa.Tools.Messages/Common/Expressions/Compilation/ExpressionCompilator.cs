@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Saritasa.Tools.Messages.Common.Expressions.Compilation
 {
-    public class ExpressionCompilator
+    public class ExpressionCompilator : IExpressionCompilator
     {
         public Func<TInput, TResult> Compile<TInput, TResult>(Expression<Func<TInput, TResult>> compilationExpression)
         {

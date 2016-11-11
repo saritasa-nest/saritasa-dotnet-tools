@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Saritasa.Tools.Messages.Common.Expressions.Compilation;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -10,23 +11,33 @@ namespace Saritasa.Tools.Messages.Common.Expressions
 {
     public class ExpressionExecutor
     {
-        private ExpressionExecutorContext context;
+        private ICompiledExpressionProvider expressionProvider;
+        private IExpressionCompilator expressionCompilator;
+        private IExpressionTransformVisitorFactory transformVisitorFactory;
 
-        public ExpressionExecutor(ExpressionExecutorContext context)
+        public ExpressionExecutor(
+            ICompiledExpressionProvider expressionProvider,
+            IExpressionCompilator expressionCompilator,
+            IExpressionTransformVisitorFactory transformVisitorFactory)
         {
-            this.context = context;
+            this.expressionCompilator = expressionCompilator;
+            this.expressionProvider = expressionProvider;
+            this.transformVisitorFactory = transformVisitorFactory;
         }
-
-        public ExpressionExecutorContext Context => context;
 
         public Func<TInput, TResult> Compile<TInput, TResult>(Expression<Func<TInput, TResult>> expression)
         {
-            return context.CompiledExpressionProvider.GetOrAdd<TInput, TResult>(GetMethodInfo(expression), () => (dynamic)context.Compilator.Compile(expression));
+            return expressionProvider.GetOrAdd<TInput, TResult>(GetMethodInfo(expression), () => (dynamic)expressionCompilator.Compile(expression));
         }
 
-        public TResult Execute<TInput, TResult>(Expression<Func<TInput, TResult>> expression, TInput input)
+        public TResult Execute<TInput, TResult>(Expression<Func<TInput, TResult>> expression, MethodInfo info, TInput input)
         {
-            var compiledExpression = context.CompiledExpressionProvider.GetOrAdd<TInput, TResult>(GetMethodInfo(expression), () => (dynamic)context.Compilator.Compile(expression));
+            var compiledExpression = expressionProvider.GetOrAdd<TInput, TResult>(GetMethodInfo(expression), () =>
+            {
+                var transformer = transformVisitorFactory.Create();
+                var transformedExpression = transformer.Visit(expression);
+                return (dynamic)expressionCompilator.Compile((Expression<Func<TInput, TResult>>)transformedExpression);
+            });
 
             return compiledExpression.Invoke(input);
         }

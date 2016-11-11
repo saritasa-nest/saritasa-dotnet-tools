@@ -15,18 +15,26 @@ namespace Saritasa.Tools.Messages.Common.Expressions
     /// </remarks>
     public class ExpressionTransformVisitor : ExpressionVisitor
     {
-        private ExpressionTransformContext context;
+        private IReadOnlyList<IExpressionTransformer> transformers;
 
-        public ExpressionTransformVisitor(ExpressionTransformContext context)
+        public ExpressionTransformVisitor(IReadOnlyList<IExpressionTransformer> transformers)
         {
-            this.context = context;
+            this.transformers = transformers;
         }
 
-        public ExpressionTransformContext Context => context;
+        /// <summary>
+        /// Transformed parameters
+        /// </summary>
+        public ICollection<ParameterExpression> TransformedParameterExpressions { get; set; } = new List<ParameterExpression>();
 
         private IExpressionTransformer GetTransfomer(Expression node)
         {
-            return context.Transformers.FirstOrDefault(transfomer => transfomer.SupportTransform(node.NodeType));
+            return transformers.FirstOrDefault(transfomer => transfomer.SupportTransform(node.NodeType));
+        }
+
+        private bool HasSupportingTransformer(Expression node)
+        {
+            return transformers.Any(transformer => transformer.SupportTransform(node.NodeType));
         }
 
         public override Expression Visit(Expression node)
@@ -45,10 +53,10 @@ namespace Saritasa.Tools.Messages.Common.Expressions
         {
             var visitedLambda = base.VisitLambda<T>(node);
 
-            if (context.HasSupportingTransformer(node))
+            if (HasSupportingTransformer(node))
             {
                 var transformer = GetTransfomer(node);
-                return transformer.Transform(visitedLambda, context);
+                return transformer.Transform(visitedLambda, this);
             }
 
             return visitedLambda;
@@ -56,10 +64,10 @@ namespace Saritasa.Tools.Messages.Common.Expressions
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            if (context.HasSupportingTransformer(node))
+            if (HasSupportingTransformer(node))
             {
                 var transfomer = GetTransfomer(node);
-                return transfomer.Transform(node, context);
+                return transfomer.Transform(node, this);
             }
 
             return base.VisitMethodCall(node);

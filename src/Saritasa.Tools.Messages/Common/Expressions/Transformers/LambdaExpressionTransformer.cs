@@ -17,9 +17,9 @@ namespace Saritasa.Tools.Messages.Common.Expressions.Transformers
             return nodeFrom == ExpressionType.Lambda;
         }
 
-        public Expression Transform(Expression input, ExpressionTransformContext context)
+        public Expression Transform(Expression input, ExpressionTransformVisitor visitor)
         {
-            if (!context.TransformedParameterExpressions.Any())
+            if (!visitor.TransformedParameterExpressions.Any())
             {
                 return input;
             }
@@ -31,7 +31,7 @@ namespace Saritasa.Tools.Messages.Common.Expressions.Transformers
             }
 
             var parameters = new List<ParameterExpression>(lamdaExpression.Parameters);
-            parameters.AddRange(context.TransformedParameterExpressions);
+            parameters.AddRange(visitor.TransformedParameterExpressions);
 
             return Expression.Lambda(lamdaExpression.Body, parameters);
         }

@@ -15,15 +15,15 @@ namespace Saritasa.Tools.Messages.Common.Expressions
     {
         private IList<IExpressionTransformer> transformers = new List<IExpressionTransformer>();
 
+        public ExpressionTransformContext(IList<IExpressionTransformer> transformers)
+        {
+            this.transformers = transformers;
+        }
+
         /// <summary>
         /// Transformers of expression.
         /// </summary>
         public IReadOnlyCollection<IExpressionTransformer> Transformers => new ReadOnlyCollection<IExpressionTransformer>(transformers);
-
-        /// <summary>
-        /// Transformed parameter expressions.
-        /// </summary>
-        public ICollection<ParameterExpression> TransformedParameterExpressions { get; set; } = new List<ParameterExpression>();
 
         /// <summary>
         /// Checking up transformability.

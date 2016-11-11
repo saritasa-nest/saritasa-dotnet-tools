@@ -21,6 +21,6 @@ namespace Saritasa.Tools.Messages.Common.Expressions
         /// <summary>
         /// Transforming expression.
         /// </summary>
-        Expression Transform(Expression input, ExpressionTransformContext context);
+        Expression Transform(Expression input, ExpressionTransformVisitor visitor);
     }
 }
