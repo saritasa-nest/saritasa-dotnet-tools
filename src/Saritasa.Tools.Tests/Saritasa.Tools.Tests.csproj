@@ -64,7 +64,6 @@
   <ItemGroup>
     <Compile Include="DomainTests.cs" />
     <Compile Include="EmailsTests.cs" />
-    <Compile Include="EventsTests.cs" />
     <Compile Include="Expressions\ExpressionExecutorTests.cs" />
     <Compile Include="Expressions\ExpressionTransformVisitorTests.cs" />
     <Compile Include="Expressions\Fixtures\ExpressionExecutorFixture.cs" />
