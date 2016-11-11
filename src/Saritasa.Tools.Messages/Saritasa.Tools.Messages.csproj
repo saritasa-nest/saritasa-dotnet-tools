@@ -65,9 +65,7 @@
     <Compile Include="Common\Expressions\IExpressionTransformer.cs" />
     <Compile Include="Common\Expressions\IExpressionTransformVisitorFactory.cs" />
     <Compile Include="Common\Expressions\ExpressionTransformContext.cs" />
-    <Compile Include="Common\Expressions\ExpressionTransformContextExtensions.cs" />
     <Compile Include="Common\Expressions\ExpressionTransformVisitorFactory.cs" />
-    <Compile Include="Common\Expressions\IReadOnlyDictionary.cs" />
     <Compile Include="Common\Expressions\Transformers\LambdaExpressionTransformer.cs" />
     <Compile Include="Common\Expressions\Transformers\MethodCallExpressionTransformer.cs" />
     <Compile Include="Common\HandlerSearchMethod.cs" />
@@ -127,7 +125,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Common\Expressions\Expressions.cd" />
     <None Include="packages.config" />
     <None Include="Saritasa.Tools.Messages.project.json" />
   </ItemGroup>
