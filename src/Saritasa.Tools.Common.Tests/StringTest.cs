@@ -37,6 +37,9 @@ namespace Saritasa.Tools.Common.Tests
         public void Test_default_parse_calls()
         {
             Assert.False(StringUtils.ParseDefault("incorrect", false));
+            Assert.True(StringUtils.ParseDefault("true", true));
+            Assert.True(StringUtils.ParseDefault("t", false, true));
+            Assert.False(StringUtils.ParseDefault("no", true, true));
             Assert.Equal(1, StringUtils.ParseDefault("incorrect", 1));
             Assert.Equal('a', StringUtils.ParseDefault("incorrect", 'a'));
             Assert.Equal(DateTime.MaxValue, StringUtils.ParseDefault("incorrect", DateTime.MaxValue));
