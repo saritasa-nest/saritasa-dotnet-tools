@@ -4,7 +4,9 @@
 namespace Saritasa.Tools.Domain.Exceptions
 {
     using System;
+#if !NETCOREAPP1_0 && !NETSTANDARD1_6
     using System.Runtime.Serialization;
+#endif
 
     /// <summary>
     /// Validation exception.

@@ -1,6 +1,19 @@
 {
   "title": "Saritasa Tools Emails",
   "version": "0.1.0",
+  "authors": [ "Saritasa" ],
+  "description": "The package is a part of Saritasa Tools project. Saritasa.Tools.Emails contains emails sending pipeline and interceptors.",
+  "packOptions": {
+    "iconUrl": "https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png",
+    "licenseUrl": "https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/LICENSE",
+    "requireLicenseAcceptance": false,
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/Saritasa/SaritasaTools"
+    },
+    "summary": "Emails sending using pipeline and interceptors.",
+    "tags": [ "emails" ]
+  },
   "frameworks": {
     "net452": {
       "frameworkAssemblies": {
@@ -28,5 +41,9 @@
         "System.Data.Common": "4.1.0"
       }
     }
+  },
+  "buildOptions": {
+    "keyFile": "../../tools/SaritasaTools.snk",
+    "xmlDoc": true
   }
 }

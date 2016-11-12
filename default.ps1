@@ -33,8 +33,13 @@ $builds = @(
     @{Id = 'v4.6.1'; Framework = 'net461'; symbol = 'NET461'}
 )
 $packages = @(
-    'Saritasa.Tools'
+    'Saritasa.Tools.Common'
+    'Saritasa.Tools.Domain'
     'Saritasa.Tools.Ef6'
+    'Saritasa.Tools.EfCore1'
+    'Saritasa.Tools.Emails'
+    'Saritasa.Tools.Messages'
+    'Saritasa.Tools.Misc'
     'Saritasa.Tools.Mvc5'
     'Saritasa.Tools.NLog4'
 )

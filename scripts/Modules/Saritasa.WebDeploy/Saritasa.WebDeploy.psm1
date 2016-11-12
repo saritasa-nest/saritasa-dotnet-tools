@@ -178,6 +178,7 @@ function Invoke-WebDeployment
         [Parameter(Mandatory = $true)]
         [AllowEmptyString()]
         [string] $Application,
+        [switch] $AllowUntrusted,
         [string[]] $MSDeployParams
     )
 
@@ -189,7 +190,13 @@ function Invoke-WebDeployment
     $args = @("-source:package='$PackagePath'",
               ("-dest:auto,computerName='https://${ServerHost}:$msdeployPort/msdeploy.axd?site=$SiteName',includeAcls='False'," + $credential),
               '-verb:sync', '-disableLink:AppPoolExtension', '-disableLink:ContentExtension', '-disableLink:CertificateExtension',
-              '-allowUntrusted', "-setParam:name='IIS Web Application Name',value='$SiteName/$Application'")
+              "-setParam:name='IIS Web Application Name',value='$SiteName/$Application'")
+
+    if ($AllowUntrusted)
+    {
+        $args += '-allowUntrusted'
+    }
+
     if ($MSDeployParams)
     {
         $args += $MSDeployParams
@@ -285,6 +292,7 @@ function Invoke-WebSiteDeployment
         [Parameter(Mandatory = $true)]
         [AllowEmptyString()]
         [string] $Application,
+        [switch] $AllowUntrusted,
         [string[]] $MSDeployParams
     )
 
@@ -293,8 +301,14 @@ function Invoke-WebSiteDeployment
     Assert-WebDeployCredential
     Write-Information "Deploying web site from $Path to $ServerHost/$Application..."
 
-    $args = @('-verb:sync', '-allowUntrusted', "-source:iisApp='$Path'",
+    $args = @('-verb:sync', "-source:iisApp='$Path'",
               ("-dest:iisApp='$SiteName/$Application',computerName='https://${ServerHost}:$msdeployPort/msdeploy.axd?site=$SiteName'," + $credential))
+
+    if ($AllowUntrusted)
+    {
+        $args += '-allowUntrusted'
+    }
+
     if ($MSDeployParams)
     {
         $args += $MSDeployParams
