@@ -19,7 +19,7 @@ namespace Saritasa.Tools.Messages.Common.Expressions
 
         public ExpressionExecutor Create()
         {
-            var compiledExpressionProvider = serviceProvider.GetService<ICompiledExpressionProvider>();
+            var compiledExpressionProvider = serviceProvider.GetService<ICompiledExpressionCache>();
             var expressionCompilator = serviceProvider.GetService<IExpressionCompilator>();
             var transformVisitorFactory = serviceProvider.GetService<IExpressionTransformVisitorFactory>();
 

@@ -15,8 +15,8 @@ namespace Saritasa.Tools.Tests.Expressions.Fixtures
         public ExpressionExecutor Create()
         {
             var moq = new Mock<IServiceProvider>();
-            moq.Setup(x => x.GetService(It.Is<Type>(t => t == typeof(ICompiledExpressionProvider))))
-                .Returns(new CompiledExpressionProvider());
+            moq.Setup(x => x.GetService(It.Is<Type>(t => t == typeof(ICompiledExpressionCache))))
+                .Returns(new CompiledExpressionCache());
             moq.Setup(x => x.GetService(It.Is<Type>(t => t == typeof(IExpressionCompilator))))
                 .Returns(new ExpressionCompilator());
             moq.Setup(x => x.GetService(It.Is<Type>(t => t == typeof(IExpressionTransformVisitorFactory))))

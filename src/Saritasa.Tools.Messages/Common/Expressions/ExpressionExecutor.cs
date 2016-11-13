@@ -9,40 +9,82 @@ using System.Threading.Tasks;
 
 namespace Saritasa.Tools.Messages.Common.Expressions
 {
+    /// <summary>
+    /// Main aggregate object for use.
+    /// </summary>
     public class ExpressionExecutor
     {
-        private ICompiledExpressionProvider expressionProvider;
+        private ICompiledExpressionCache compiledExpressionCache;
         private IExpressionCompilator expressionCompilator;
         private IExpressionTransformVisitorFactory transformVisitorFactory;
 
         public ExpressionExecutor(
-            ICompiledExpressionProvider expressionProvider,
+            ICompiledExpressionCache expressionProvider,
             IExpressionCompilator expressionCompilator,
             IExpressionTransformVisitorFactory transformVisitorFactory)
         {
             this.expressionCompilator = expressionCompilator;
-            this.expressionProvider = expressionProvider;
+            this.compiledExpressionCache = expressionProvider;
             this.transformVisitorFactory = transformVisitorFactory;
         }
 
-        public TResult Execute<TInput, TResult>(Expression<Func<TInput, TResult>> expression, TInput input)
+        /// <summary>
+        /// Count of cached items.
+        /// </summary>
+        public int CacheCount => compiledExpressionCache.Count;
+
+        /// <summary>
+        /// Clearing cache.
+        /// </summary>
+        public void ClearCache() => compiledExpressionCache.Clear();
+
+        /// <summary>
+        /// Compiling expression or returning already compiled.
+        /// </summary>
+        public void PreCompile(Expression expression)
         {
-            var compiledExpression = expressionProvider.GetOrAdd<TInput, TResult>(GetMethodInfo(expression), () =>
+            compiledExpressionCache.GetOrAdd(GetMethodInfo(expression), () =>
             {
                 var transformer = transformVisitorFactory.Create();
                 var transformedExpression = transformer.Visit(expression);
-                return (dynamic)expressionCompilator.Compile((Expression<Func<TInput, TResult>>)transformedExpression);
+                return expressionCompilator.Compile(transformedExpression);
             });
-
-            return compiledExpression.Invoke(input);
         }
 
-        private MethodInfo GetMethodInfo<TInput, TResult>(Expression<Func<TInput, TResult>> expression)
+        /// <summary>
+        /// Execute on compiled delegate from cache.
+        /// </summary>
+        public TResult Execute<TInput, TResult>(MethodInfo info, TInput input)
         {
-            var body = expression.Body;
-            if (body is MethodCallExpression)
+            var func = (Func<TInput, TResult>)compiledExpressionCache.Get(info);
+
+            return func(input);
+        }
+
+        public TResult Execute<TInput, TInput2, TResult>(MethodInfo info, TInput input, TInput2 input2)
+        {
+            var func = (Func<TInput, TInput2, TResult>)compiledExpressionCache.Get(info);
+
+            return func(input, input2);
+        }
+
+        public TResult Execute<TInput, TInput2, TInput3, TResult>(MethodInfo info, TInput input, TInput2 input2, TInput3 input3)
+        {
+            var func = (Func<TInput, TInput2, TInput3, TResult>)compiledExpressionCache.Get(info);
+
+            return func(input, input2, input3);
+        }
+
+        private MethodInfo GetMethodInfo(Expression expression)
+        {
+            var lambdaExpression = expression as LambdaExpression;
+            if (lambdaExpression != null)
             {
-                return (body as MethodCallExpression).Method;
+                var body = lambdaExpression.Body;
+                if (body is MethodCallExpression)
+                {
+                    return (body as MethodCallExpression).Method;
+                }
             }
 
             throw new NotSupportedException();
