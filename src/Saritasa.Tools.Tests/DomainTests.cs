@@ -3,7 +3,6 @@
 
 namespace Saritasa.Tools.Tests
 {
-    using System;
     using System.IO;
     using System.Runtime.Serialization.Formatters.Binary;
     using Xunit;

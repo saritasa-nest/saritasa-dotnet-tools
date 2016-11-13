@@ -3,7 +3,6 @@
 
 namespace Saritasa.Tools.Messages.Common
 {
-    using System;
     using System.Collections.Generic;
 
     /// <summary>

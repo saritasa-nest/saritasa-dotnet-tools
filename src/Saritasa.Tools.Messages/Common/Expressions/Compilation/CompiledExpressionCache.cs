@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Saritasa.Tools.Messages.Common.Expressions.Compilation
 {
+    /// <summary>
+    /// Cache of compiled expressions.
+    /// </summary>
     public class CompiledExpressionCache : ICompiledExpressionCache
     {
         private static ConcurrentDictionary<MethodInfo, Delegate> cache = new ConcurrentDictionary<MethodInfo, Delegate>();
@@ -36,6 +36,12 @@ namespace Saritasa.Tools.Messages.Common.Expressions.Compilation
         public Delegate GetOrAdd(MethodInfo methodInfo, Func<Delegate> factory)
         {
             return cache.GetOrAdd(methodInfo, (source) => factory());
+        }
+
+        /// <inheritdoc/>
+        public bool HasKey(MethodInfo methodInfo)
+        {
+            return cache.ContainsKey(methodInfo);
         }
     }
 }

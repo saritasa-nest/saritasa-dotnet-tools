@@ -3,12 +3,10 @@
 
 namespace Saritasa.Tools.Messages.Common.Repositories
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
     using Newtonsoft.Json;
-    using ObjectSerializers;
 
     /// <summary>
     /// Simple in memory message repository.

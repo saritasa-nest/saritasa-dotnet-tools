@@ -4,7 +4,6 @@
 namespace Saritasa.Tools.Messages.Internal
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Reflection;
     using System.ComponentModel;

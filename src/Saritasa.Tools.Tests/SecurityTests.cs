@@ -3,7 +3,6 @@
 
 namespace Saritasa.Tools.Tests
 {
-    using System;
     using Xunit;
     using Misc.Security;
 

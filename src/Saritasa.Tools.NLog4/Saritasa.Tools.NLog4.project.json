@@ -5,7 +5,7 @@
   },
   "dependencies": {
     "Microsoft.Extensions.Logging.Abstractions": "1.0.0",
-    "NLog": "4.3.10",
+    "NLog": "4.3.11",
     "StyleCop.Analyzers": "1.0.0"
   }
 }

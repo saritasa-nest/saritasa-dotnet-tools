@@ -4,7 +4,6 @@
 namespace Saritasa.Tools.Messages.Internal
 {
     using System;
-    using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
     using Common;

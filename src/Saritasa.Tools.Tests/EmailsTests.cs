@@ -3,7 +3,6 @@
 
 namespace Saritasa.Tools.Tests
 {
-    using System;
     using System.Net.Mail;
     using Xunit;
     using Emails;

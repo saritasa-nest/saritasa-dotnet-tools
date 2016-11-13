@@ -1,10 +1,6 @@
 ﻿using Saritasa.Tools.Tests.Expressions.Fixtures;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Saritasa.Tools.Tests.Expressions
@@ -36,13 +32,13 @@ namespace Saritasa.Tools.Tests.Expressions
             Expression<Func<ExpressionExecutorTests, int>> expression = (v) => SimpleReturn(10 + 1, 1 + 3);
 
             // Act
-            executor.ClearCache();
+            executor.CompiledCache.Clear();
             executor.PreCompile(expression);
             executor.PreCompile(expression);
             executor.PreCompile(expression);
 
             // Assert
-            Assert.Equal(1, executor.CacheCount);
+            Assert.Equal(1, executor.CompiledCache.Count);
         }
 
         [Theory]
@@ -54,13 +50,13 @@ namespace Saritasa.Tools.Tests.Expressions
             Expression<Func<ExpressionExecutorTests, int>> expression = (v) => CompiledMethod(value0, value1);
 
             // Act
-            executor.ClearCache();
+            executor.CompiledCache.Clear();
             executor.PreCompile(expression);
             executor.PreCompile(expression);
             executor.PreCompile(expression);
 
             // Assert
-            Assert.Equal(1, executor.CacheCount);
+            Assert.Equal(1, executor.CompiledCache.Count);
         }
 
         [Theory]
@@ -73,7 +69,7 @@ namespace Saritasa.Tools.Tests.Expressions
             var methodInfo = typeof(ExpressionExecutorTests).GetMethod("CompiledMethod");
 
             // Act
-            executor.ClearCache();
+            executor.CompiledCache.Clear();
             executor.PreCompile(expression);
             executor.PreCompile(expression);
             executor.PreCompile(expression);
@@ -82,7 +78,7 @@ namespace Saritasa.Tools.Tests.Expressions
 
             // Assert
             Assert.Equal(result, executed);
-            Assert.Equal(1, executor.CacheCount);
+            Assert.Equal(1, executor.CompiledCache.Count);
         }
     }
 }

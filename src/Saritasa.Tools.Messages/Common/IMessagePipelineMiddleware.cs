@@ -3,8 +3,6 @@
 
 namespace Saritasa.Tools.Messages.Common
 {
-    using System;
-
     /// <summary>
     /// Pipeline handler to process message. It may change message context.
     /// </summary>

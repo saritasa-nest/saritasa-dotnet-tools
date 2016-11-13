@@ -62,7 +62,6 @@
     <Compile Include="Common\Expressions\Compilation\IExpressionCompilator.cs" />
     <Compile Include="Common\Expressions\ExpressionExecutor.cs" />
     <Compile Include="Common\Expressions\ExpressionExecutorFactory.cs" />
-    <Compile Include="Common\Expressions\IExpressionReducer.cs" />
     <Compile Include="Common\Expressions\IExpressionTransformer.cs" />
     <Compile Include="Common\Expressions\IExpressionTransformVisitorFactory.cs" />
     <Compile Include="Common\Expressions\ExpressionTransformVisitorFactory.cs" />
@@ -125,6 +124,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
+    <None Include="ClassDiagram2.cd" />
     <None Include="packages.config" />
     <None Include="Saritasa.Tools.Messages.project.json" />
   </ItemGroup>

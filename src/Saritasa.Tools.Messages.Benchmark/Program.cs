@@ -13,6 +13,7 @@ namespace Saritasa.Tools.Messages.Benchmark
         static void Main()
         {
             BenchmarkRunner.Run<QueriesBenchmarks>();
+            BenchmarkRunner.Run<ExpressionExecutorBenchmarks>();
         }
     }
 }

@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Saritasa.Tools.Messages.Common.Expressions.Compilation
 {
@@ -27,6 +23,16 @@ namespace Saritasa.Tools.Messages.Common.Expressions.Compilation
         /// </summary>
         Delegate Get(MethodInfo methodInfo);
 
+        /// <summary>
+        /// Checking up existence of compiled expression.
+        /// </summary>
+        /// <param name="methodInfo"></param>
+        /// <returns></returns>
+        bool HasKey(MethodInfo methodInfo);
+
+        /// <summary>
+        /// Clearing cache.
+        /// </summary>
         void Clear();
     }
 }

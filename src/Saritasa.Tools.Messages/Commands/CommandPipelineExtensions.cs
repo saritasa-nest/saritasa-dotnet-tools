@@ -3,7 +3,6 @@
 
 namespace Saritasa.Tools.Messages.Commands
 {
-    using System;
     using Common;
 
     /// <summary>

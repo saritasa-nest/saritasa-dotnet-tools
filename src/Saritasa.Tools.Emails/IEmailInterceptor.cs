@@ -3,7 +3,6 @@
 
 namespace Saritasa.Tools.Emails
 {
-    using System;
     using System.Collections.Generic;
 #if !NETCOREAPP1_0 && !NETSTANDARD1_6
     using System.Net.Mail;
