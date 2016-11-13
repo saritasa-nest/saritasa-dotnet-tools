@@ -9,7 +9,7 @@ namespace Saritasa.Tools.Common
     using System.Linq;
 
     /// <summary>
-    /// Paged enumerable.
+    /// Paged enumerable. May additionaly query source to get total number of items in collection.
     /// </summary>
     /// <typeparam name="T">Source type.</typeparam>
     public class PagedEnumerable<T> : IEnumerable<T>
@@ -83,7 +83,7 @@ namespace Saritasa.Tools.Common
         }
 
         /// <summary>
-        /// Creates the instance without any queries. It only fills internal properies.
+        /// Creates the paged enumerable instance without any queries. It only fills internal properies.
         /// </summary>
         /// <param name="source">Enumerable.</param>
         /// <param name="page">Page to select. Default is first.</param>

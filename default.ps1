@@ -51,7 +51,15 @@ function Get-PackageName([string]$package)
     If ([System.Char]::IsDigit($package[$package.Length-1])) {$package.Substring(0, $package.Length-1)} Else {$package}
 }
 
-Task pack -depends pre-build, get-version -description 'Build the library, test it and prepare nuget packages' `
+Task pack -description 'Build the library, test it and prepare nuget packages' `
+{
+    foreach ($package in $packages)
+    {
+        &dotnet pack ".\src\$package" --configuration release --output '.'
+    }
+}
+
+Task pack-old -depends pre-build, get-version -description 'Build the library, test it and prepare nuget packages' `
 {
     # build all versions, sign, test and prepare package directory
     foreach ($package in $packages)
