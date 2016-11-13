@@ -62,6 +62,23 @@ namespace Saritasa.Tools.Messages.Benchmark
         }
 
         [Benchmark]
+        public void RunCompiledExpressionNonGenericSum()
+        {
+            var factory = new ExpressionExecutorFactory(serviceProvider);
+            var expressionExecutor = factory.Create();
+            expressionExecutor.PreCompile(sumExpression);
+
+
+            Enumerable.Range(1, 10000)
+                .Aggregate((cur, next) =>
+                {
+                    var result = expressionExecutor.Execute(methodInfo, this, cur, next);
+
+                    return (int)result;
+                });
+        }
+
+        [Benchmark]
         public void RunReflectionSum()
         {
             Enumerable.Range(1, 10000)
@@ -73,5 +90,7 @@ namespace Saritasa.Tools.Messages.Benchmark
                     return (int)result;
                 });
         }
+
+
     }
 }

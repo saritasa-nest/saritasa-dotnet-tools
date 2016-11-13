@@ -14,6 +14,10 @@ namespace Saritasa.Tools.Messages.Common.Expressions
     {
         private IReadOnlyList<IExpressionTransformer> transformers;
 
+        /// <summary>
+        /// Ctor.
+        /// </summary>
+        /// <param name="transformers"></param>
         public ExpressionTransformVisitor(IReadOnlyList<IExpressionTransformer> transformers)
         {
             this.transformers = transformers;

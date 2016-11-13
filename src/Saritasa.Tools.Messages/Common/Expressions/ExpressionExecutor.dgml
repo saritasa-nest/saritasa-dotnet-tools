@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DirectedGraph xmlns="http://schemas.microsoft.com/vs/2009/dgml">
+  <Nodes>
+    <Node Id="Cache" Bounds="-549.561649373373,-469.201093041992,171.146670939127,85.9201914550781" Group="Expanded" LayoutSettings="List" />
+    <Node Id="CompiledExpressionCache" Bounds="-543.561645100911,-443.200993041992,159.146666666667,25.96" />
+    <Node Id="ExpressionCompiler" Bounds="-543.561649373372,-415.241001586914,124.106666666667,25.96" />
+    <Node Id="ExpressionExecutor" Bounds="-645.713311767578,-545.140995483398,121.45,25.96" UseManualLocation="True" />
+    <Node Id="ExpressionExecutorFactory" Bounds="-812.239993693034,-697.101163232422,453.825015258789,347.800357373047" Group="Expanded" UseManualLocation="True" />
+    <Node Id="ExpressionTransformVisitor" Bounds="-786.239993489583,-457.18100402832,162.326666666667,25.96" />
+    <Node Id="ExpressionTransformVisitorFactory.cs" Bounds="-786.239993693034,-429.220997314453,200.503333333333,25.96" Label="ExpressionTransformVisitorFactory" />
+    <Node Id="IExpressionTransformer" Bounds="-786.239976806641,-401.261005859375,142.34,25.96" />
+    <Node Id="MainEntryPoint" Category="Comment" Bounds="-641.044978434245,-657.101063232422,108.113333333333,25.96" Label="Main entry point" UseManualLocation="True" />
+    <Node Id="Transform" Bounds="-792.239993693034,-483.18110402832,212.503333333333,113.880198168945" Group="Expanded" LayoutSettings="List" />
+  </Nodes>
+  <Links>
+    <Link Source="Cache" Target="CompiledExpressionCache" Category="Contains" />
+    <Link Source="Cache" Target="ExpressionCompiler" Category="Contains" />
+    <Link Source="ExpressionExecutor" Target="Cache" Bounds="-570.160326253231,-519.180980224609,50.3236695305305,44.0519199235968" />
+    <Link Source="ExpressionExecutor" Target="Transform" Bounds="-625.48219428065,-519.180980224609,28.1168007153841,29.4864394734677" />
+    <Link Source="ExpressionExecutorFactory" Target="Cache" Category="Contains" />
+    <Link Source="ExpressionExecutorFactory" Target="ExpressionExecutor" Category="Contains" />
+    <Link Source="ExpressionExecutorFactory" Target="MainEntryPoint" Category="Contains" />
+    <Link Source="ExpressionExecutorFactory" Target="Transform" Category="Contains" />
+    <Link Source="MainEntryPoint" Target="ExpressionExecutor" Bounds="-586.756443415014,-631.141063232422,1.37551735525687,77.0015186365977" />
+    <Link Source="Transform" Target="ExpressionTransformVisitor" Category="Contains" />
+    <Link Source="Transform" Target="ExpressionTransformVisitorFactory.cs" Category="Contains" />
+    <Link Source="Transform" Target="IExpressionTransformer" Category="Contains" />
+  </Links>
+  <Categories>
+    <Category Id="Comment" Label="Comment" Description="Represents a user defined comment on the diagram" CanBeDataDriven="True" IsProviderRoot="False" NavigationActionLabel="Comments" />
+    <Category Id="Contains" Label="Contains" Description="Whether the source of the link contains the target object" CanBeDataDriven="False" CanLinkedNodesBeDataDriven="True" IncomingActionLabel="Contained By" IsContainment="True" OutgoingActionLabel="Contains" />
+  </Categories>
+  <Properties>
+    <Property Id="Bounds" DataType="System.Windows.Rect" />
+    <Property Id="CanBeDataDriven" Label="CanBeDataDriven" Description="CanBeDataDriven" DataType="System.Boolean" />
+    <Property Id="CanLinkedNodesBeDataDriven" Label="CanLinkedNodesBeDataDriven" Description="CanLinkedNodesBeDataDriven" DataType="System.Boolean" />
+    <Property Id="Expression" DataType="System.String" />
+    <Property Id="Group" Label="Group" Description="Display the node as a group" DataType="Microsoft.VisualStudio.GraphModel.GraphGroupStyle" />
+    <Property Id="GroupLabel" DataType="System.String" />
+    <Property Id="IncomingActionLabel" Label="IncomingActionLabel" Description="IncomingActionLabel" DataType="System.String" />
+    <Property Id="IsContainment" DataType="System.Boolean" />
+    <Property Id="IsEnabled" DataType="System.Boolean" />
+    <Property Id="IsProviderRoot" Label="IsProviderRoot" Description="IsProviderRoot" DataType="System.Boolean" />
+    <Property Id="Label" Label="Label" Description="Displayable label of an Annotatable object" DataType="System.String" />
+    <Property Id="LayoutSettings" DataType="Microsoft.VisualStudio.Diagrams.View.GroupLayoutStyle" />
+    <Property Id="NavigationActionLabel" Label="NavigationActionLabel" Description="NavigationActionLabel" DataType="System.String" />
+    <Property Id="OutgoingActionLabel" Label="OutgoingActionLabel" Description="OutgoingActionLabel" DataType="System.String" />
+    <Property Id="TargetType" DataType="System.Type" />
+    <Property Id="UseManualLocation" DataType="System.Boolean" />
+    <Property Id="Value" DataType="System.String" />
+    <Property Id="ValueLabel" DataType="System.String" />
+  </Properties>
+  <Styles>
+    <Style TargetType="Node" GroupLabel="Comment" ValueLabel="Has comment">
+      <Condition Expression="HasCategory('Comment')" />
+      <Setter Property="Background" Value="#FFFFFACD" />
+      <Setter Property="Stroke" Value="#FFE5C365" />
+      <Setter Property="StrokeThickness" Value="1" />
+      <Setter Property="NodeRadius" Value="2" />
+      <Setter Property="MaxWidth" Value="250" />
+    </Style>
+  </Styles>
+</DirectedGraph>
