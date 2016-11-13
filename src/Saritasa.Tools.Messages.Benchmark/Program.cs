@@ -12,7 +12,6 @@ namespace Saritasa.Tools.Messages.Benchmark
         /// </summary>
         static void Main()
         {
-            BenchmarkRunner.Run<QueriesBenchmarks>();
             BenchmarkRunner.Run<ExpressionExecutorBenchmarks>();
         }
     }

@@ -61,7 +61,7 @@ namespace Saritasa.Tools.Tests.Expressions
 
         [Theory]
         [InlineData(1, 2, 3)]
-        public void Expression_executor_with_one_method_and_outher_parameters_should_compile_and_execute_correctly(int value0, int value1, int result)
+        public void Expression_executor_with_one_method_and_outer_parameters_should_compile_and_execute_correctly(int value0, int value1, int result)
         {
             // Arrange
             var executor = fixture.Create();
