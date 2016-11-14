@@ -13,7 +13,7 @@ namespace Saritasa.Tools.Misc.Security
 #endif
 
     /// <summary>
-    /// Class to be used for passwords generation.
+    /// Passwords generation and strength estimation.
     /// </summary>
     public class PasswordGenerator
     {

@@ -9,7 +9,7 @@ namespace Saritasa.Tools.Domain
     /// <summary>
     /// Repository that also implements IQueryable interface.
     /// </summary>
-    /// <typeparam name="TEntity">The entity repository wraps.</typeparam>
+    /// <typeparam name="TEntity">The entity that repository wraps.</typeparam>
     public interface IQueryableRepository<TEntity> : IRepository<TEntity>, IQueryable<TEntity>
         where TEntity : class
     {

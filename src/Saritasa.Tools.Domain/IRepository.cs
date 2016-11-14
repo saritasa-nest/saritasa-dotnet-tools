@@ -44,7 +44,7 @@ namespace Saritasa.Tools.Domain
         IEnumerable<TEntity> GetAll<TProperty>(IEnumerable<Expression<Func<TEntity, TProperty>>> includes);
 
         /// <summary>
-        /// Finds for range of entities based on predicate.
+        /// Find for range of entities based on predicate.
         /// </summary>
         /// <param name="predicate">Filter predicate.</param>
         /// <returns>Enumerable of enitites.</returns>
