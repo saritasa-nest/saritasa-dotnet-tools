@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.NLog4
+namespace Saritasa.Tools.NLog
 {
     /// <summary>
     /// Provider logger for NLog.
@@ -15,7 +15,7 @@ namespace Saritasa.Tools.NLog4
         /// <returns>New logger.</returns>
         public Microsoft.Extensions.Logging.ILogger CreateLogger(string name)
         {
-            return new NLogLogger(NLog.LogManager.GetLogger(name));
+            return new NLogLogger(global::NLog.LogManager.GetLogger(name));
         }
 
         /// <inheritdoc />

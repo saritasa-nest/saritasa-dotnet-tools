@@ -56,51 +56,11 @@ Task pack -description 'Build the library, test it and prepare nuget packages' `
     foreach ($package in $packages)
     {
         &dotnet pack ".\src\$package" --configuration release --output '.'
-    }
-}
-
-Task pack-old -depends pre-build, get-version -description 'Build the library, test it and prepare nuget packages' `
-{
-    # build all versions, sign, test and prepare package directory
-    foreach ($package in $packages)
-    {
-        Get-PackageName($package)
-        Remove-Item $LibDirectory -Recurse -Force -ErrorAction SilentlyContinue
-        New-Item $LibDirectory -ItemType Directory
-        foreach ($build in $builds)
-        {
-            # build & sign
-            $id = $build.Id
-            $symbol = $build.symbol
-            $args = @("/p:TargetFrameworkVersion=$id", "/p:DefineConstants=$symbol")
-            if (Test-Path $SignKey)
-            {
-                $args += "/p:AssemblyOriginatorKeyFile=$SignKey" + '/p:SignAssembly=true'
-            }
-            Invoke-ProjectBuild -ProjectPath "./src/$package/$package.csproj" -Configuration $Configuration -BuildParams $args
-
-            # copy
-            New-Item (Join-Path $LibDirectory $build.Framework) -ItemType Directory
-            $packageFile = Get-PackageName $package
-            Copy-Item "./src/$package/bin/$Configuration/$packageFile.dll" (Join-Path $LibDirectory $build.Framework)
-            Copy-Item "./src/$package/bin/$Configuration/$packageFile.XML" (Join-Path $LibDirectory $build.Framework)
-        }
-
-        # pack, we already have nuget in current folder
-        $nugetExePath = "$PSScriptRoot\tools\nuget.exe"
-        $buildDirectory = (Get-Item $LibDirectory).Parent.FullName
-        &"$nugetExePath" @('pack', (Join-Path $buildDirectory "$package.nuspec"), '-Version', $Version, '-NonInteractive', '-Exclude', '*.snk')
         if ($LASTEXITCODE)
         {
             throw 'Nuget pack failed.'
         }
     }
-
-    # little clean up
-    Remove-Item $LibDirectory -Recurse -Force -ErrorAction SilentlyContinue
-
-    # build docs
-    CompileDocs
 }
 
 Task clean -description 'Clean solution' `

@@ -54,6 +54,7 @@
     <Compile Include="EfQueryableRepository.cs" />
     <Compile Include="EfRepository.cs" />
     <Compile Include="EfUnitOfWork.cs" />
+    <Compile Include="EfUnitOfWorkFactory.cs" />
     <Compile Include="QueryableExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
