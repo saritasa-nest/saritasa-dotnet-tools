@@ -78,7 +78,7 @@ namespace Saritasa.Tools.Tests
         public void Events_should_be_fired_withing_all_classes()
         {
             var ep = EventPipeline.CreateDefaultPipeline(InterfacesResolver,
-                Assembly.GetAssembly(typeof(CommandsTests))).UseInternalResolver(true);
+                typeof(CommandsTests).GetTypeInfo().Assembly).UseInternalResolver(true);
             var ev = new CreateUserEvent()
             {
                 UserId = 10,
@@ -121,7 +121,7 @@ namespace Saritasa.Tools.Tests
                 }
                 return null;
             };
-            var ep = EventPipeline.CreateDefaultPipeline(resolver, Assembly.GetAssembly(typeof(CommandsTests)));
+            var ep = EventPipeline.CreateDefaultPipeline(resolver, typeof(CommandsTests).GetTypeInfo().Assembly);
             eventsManager.Register(new DomainTestEventHandler());
             ep.InsertMiddlewareBefore(new DomainEventLocatorMiddleware(eventsManager), "EventLocator");
 

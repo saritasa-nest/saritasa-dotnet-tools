@@ -111,7 +111,6 @@ namespace Saritasa.Tools.Common.Tests
         /// <summary>
         /// Custom exception for tests only.
         /// </summary>
-        [Serializable]
         private class CustomException : Exception
         {
         }

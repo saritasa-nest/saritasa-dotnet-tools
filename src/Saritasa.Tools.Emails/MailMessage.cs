@@ -13,6 +13,29 @@ namespace Saritasa.Tools.Emails
     public class MailMessage : IDisposable
     {
         /// <summary>
+        /// .ctor
+        /// </summary>
+        public MailMessage()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the MailMessage class by using the specified System.String class objects.
+        /// </summary>
+        /// <param name="from">From email address, user who sent the message.</param>
+        /// <param name="to">To email address.</param>
+        public MailMessage(string from, string to)
+        {
+            From = new MailAddress(from);
+            To.Add(new MailAddress(to));
+        }
+
+        /// <summary>
+        /// Gets or sets the from address for this e-mail message.
+        /// </summary>
+        public MailAddress From { get; set; }
+
+        /// <summary>
         /// Recipients of the e-mail message.
         /// </summary>
         public MailAddressCollection To { get; } = new MailAddressCollection();

@@ -5,7 +5,9 @@ namespace Saritasa.Tools.Tests
 {
     using System;
     using System.IO;
+#if !NETCOREAPP1_0 && !NETSTANDARD1_6
     using System.Runtime.Serialization.Formatters.Binary;
+#endif
     using Xunit;
     using Domain.Exceptions;
 
@@ -14,6 +16,7 @@ namespace Saritasa.Tools.Tests
     /// </summary>
     public class DomainTests
     {
+#if !NETCOREAPP1_0 && !NETSTANDARD1_6
         [Fact]
         public void Domain_exception_should_serialize_deserialize_correctly()
         {
@@ -30,5 +33,6 @@ namespace Saritasa.Tools.Tests
 
             Assert.Equal(domainException.Message, deserializedDomainException.Message);
         }
+#endif
     }
 }

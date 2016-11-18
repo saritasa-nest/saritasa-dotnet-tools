@@ -97,7 +97,7 @@ namespace ZergRushCo.Todosya.Web
             builder.RegisterInstance(emailSender).AsImplementedInterfaces().SingleInstance();
 
             // logger
-            var loggerFactory = new Saritasa.Tools.NLog4.NLogLoggerProvider();
+            var loggerFactory = new Saritasa.Tools.NLog.NLogLoggerProvider();
             builder.RegisterInstance(loggerFactory).AsImplementedInterfaces().SingleInstance();
 
             // set the dependency resolver to be Autofac

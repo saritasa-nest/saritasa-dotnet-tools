@@ -4,7 +4,9 @@
 namespace Saritasa.Tools.Tests
 {
     using System;
+#if !NETCOREAPP1_0 && !NETSTANDARD1_6
     using System.Net.Mail;
+#endif
     using Xunit;
     using Emails;
     using Emails.Interceptors;

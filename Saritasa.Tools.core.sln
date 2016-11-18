@@ -10,21 +10,29 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		global.json = global.json
 	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Saritasa.Tools.NLog4", "Saritasa.Tools.NLog4\Saritasa.Tools.NLog4.xproj", "{822F4E77-E795-4102-BEE1-B72DCAC6B408}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Saritasa.Tools.NLog4", "src\Saritasa.Tools.NLog4\Saritasa.Tools.NLog4.xproj", "{822F4E77-E795-4102-BEE1-B72DCAC6B408}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Saritasa.Tools.EfCore1", "Saritasa.Tools.EfCore1\Saritasa.Tools.EfCore1.xproj", "{E667F09D-FC4E-4AA6-9FEF-F9EB607CD1BD}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Saritasa.Tools.EfCore1", "src\Saritasa.Tools.EfCore1\Saritasa.Tools.EfCore1.xproj", "{E667F09D-FC4E-4AA6-9FEF-F9EB607CD1BD}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Saritasa.Tools.Common", "Saritasa.Tools.Common\Saritasa.Tools.Common.xproj", "{2900D88A-2522-4299-8D51-6AF26B74C91C}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Saritasa.Tools.Common", "src\Saritasa.Tools.Common\Saritasa.Tools.Common.xproj", "{2900D88A-2522-4299-8D51-6AF26B74C91C}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Saritasa.Tools.Domain", "Saritasa.Tools.Domain\Saritasa.Tools.Domain.xproj", "{32A3A81C-A65C-4F78-8300-17151987697C}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Saritasa.Tools.Domain", "src\Saritasa.Tools.Domain\Saritasa.Tools.Domain.xproj", "{32A3A81C-A65C-4F78-8300-17151987697C}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Saritasa.Tools.Emails", "Saritasa.Tools.Emails\Saritasa.Tools.Emails.xproj", "{BAAF1392-6BAC-4220-8149-B207BEFE2FDD}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Saritasa.Tools.Emails", "src\Saritasa.Tools.Emails\Saritasa.Tools.Emails.xproj", "{BAAF1392-6BAC-4220-8149-B207BEFE2FDD}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Saritasa.Tools.Messages", "Saritasa.Tools.Messages\Saritasa.Tools.Messages.xproj", "{AEE65918-25DF-4A25-BFB8-56552FAA2A51}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Saritasa.Tools.Messages", "src\Saritasa.Tools.Messages\Saritasa.Tools.Messages.xproj", "{AEE65918-25DF-4A25-BFB8-56552FAA2A51}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Saritasa.Tools.Misc", "Saritasa.Tools.Misc\Saritasa.Tools.Misc.xproj", "{1C26D4A0-A677-4BA5-B267-3C11BAECB233}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Saritasa.Tools.Misc", "src\Saritasa.Tools.Misc\Saritasa.Tools.Misc.xproj", "{1C26D4A0-A677-4BA5-B267-3C11BAECB233}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Saritasa.Tools.Ef6", "Saritasa.Tools.Ef6\Saritasa.Tools.Ef6.xproj", "{D1AD1713-BC18-4340-B8DB-23D86D22FB7F}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Saritasa.Tools.Ef6", "src\Saritasa.Tools.Ef6\Saritasa.Tools.Ef6.xproj", "{D1AD1713-BC18-4340-B8DB-23D86D22FB7F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{635DB5B1-86B3-4F5B-97A6-04C71D672296}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Saritasa.Tools.Common.Tests", "test\Saritasa.Tools.Common.Tests\Saritasa.Tools.Common.Tests.xproj", "{347E7D34-C497-47D4-97CF-3B7245AB6BDD}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Saritasa.Tools.Messages.Tests", "test\Saritasa.Tools.Messages.Tests\Saritasa.Tools.Messages.Tests.xproj", "{84A546BA-C7BE-4CCC-8355-5E15502F6AD2}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Saritasa.Tools.Tests", "test\Saritasa.Tools.Tests\Saritasa.Tools.Tests.xproj", "{647E7D34-C497-47D4-97CF-3B7245AB6BDD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -64,6 +72,18 @@ Global
 		{D1AD1713-BC18-4340-B8DB-23D86D22FB7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D1AD1713-BC18-4340-B8DB-23D86D22FB7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D1AD1713-BC18-4340-B8DB-23D86D22FB7F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{347E7D34-C497-47D4-97CF-3B7245AB6BDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{347E7D34-C497-47D4-97CF-3B7245AB6BDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{347E7D34-C497-47D4-97CF-3B7245AB6BDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{347E7D34-C497-47D4-97CF-3B7245AB6BDD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84A546BA-C7BE-4CCC-8355-5E15502F6AD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84A546BA-C7BE-4CCC-8355-5E15502F6AD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84A546BA-C7BE-4CCC-8355-5E15502F6AD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84A546BA-C7BE-4CCC-8355-5E15502F6AD2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{647E7D34-C497-47D4-97CF-3B7245AB6BDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{647E7D34-C497-47D4-97CF-3B7245AB6BDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{647E7D34-C497-47D4-97CF-3B7245AB6BDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{647E7D34-C497-47D4-97CF-3B7245AB6BDD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -77,5 +97,8 @@ Global
 		{AEE65918-25DF-4A25-BFB8-56552FAA2A51} = {45D13EC5-88F3-403A-8148-0812C2796062}
 		{1C26D4A0-A677-4BA5-B267-3C11BAECB233} = {45D13EC5-88F3-403A-8148-0812C2796062}
 		{D1AD1713-BC18-4340-B8DB-23D86D22FB7F} = {45D13EC5-88F3-403A-8148-0812C2796062}
+		{347E7D34-C497-47D4-97CF-3B7245AB6BDD} = {635DB5B1-86B3-4F5B-97A6-04C71D672296}
+		{84A546BA-C7BE-4CCC-8355-5E15502F6AD2} = {635DB5B1-86B3-4F5B-97A6-04C71D672296}
+		{647E7D34-C497-47D4-97CF-3B7245AB6BDD} = {635DB5B1-86B3-4F5B-97A6-04C71D672296}
 	EndGlobalSection
 EndGlobal

@@ -48,7 +48,7 @@ namespace Saritasa.Tools.Messages.Tests
         public void Messages_pipeline_insert_after_should_increase_length()
         {
             var cp = new CommandPipeline();
-            cp.AppendMiddlewares(new CommandHandlerLocatorMiddleware(Assembly.GetAssembly(typeof(MessagesTests))));
+            cp.AppendMiddlewares(new CommandHandlerLocatorMiddleware(typeof(MessagesTests).GetTypeInfo().Assembly));
             Assert.Equal(1, cp.GetMiddlewares().Count());
 
             cp.InsertMiddlewareAfter(new TestMiddleware1());
@@ -65,7 +65,7 @@ namespace Saritasa.Tools.Messages.Tests
         public void Messages_pipeline_insert_before_should_increase_length()
         {
             var cp = new CommandPipeline();
-            cp.AppendMiddlewares(new CommandHandlerLocatorMiddleware(Assembly.GetAssembly(typeof(MessagesTests))));
+            cp.AppendMiddlewares(new CommandHandlerLocatorMiddleware(typeof(MessagesTests).GetTypeInfo().Assembly));
             Assert.Equal(1, cp.GetMiddlewares().Count());
 
             cp.InsertMiddlewareBefore(new TestMiddleware1());
@@ -83,7 +83,7 @@ namespace Saritasa.Tools.Messages.Tests
         public void Inserting_middlewares_with_duplicated_ids_should_generate_exception()
         {
             var cp = new CommandPipeline();
-            cp.AppendMiddlewares(new CommandHandlerLocatorMiddleware(Assembly.GetAssembly(typeof(MessagesTests))));
+            cp.AppendMiddlewares(new CommandHandlerLocatorMiddleware(typeof(MessagesTests).GetTypeInfo().Assembly));
             cp.InsertMiddlewareBefore(new TestMiddleware1());
 
             Assert.Throws<ArgumentException>(() => { cp.InsertMiddlewareBefore(new TestMiddleware1()); });

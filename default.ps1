@@ -17,21 +17,9 @@ $env:PSModulePath += ";$PSScriptRoot\scripts\Modules"
 Import-Module Saritasa.Build
 Import-Module Saritasa.Test
 
-Properties `
-{
-    $SignKey = './saritasa-tools.snk'
-    $NuspecFile = './build/Saritasa.Tools.nuspec'
-    $LibDirectory = './build/lib'
-    $Configuration = 'Release'
-}
-
 # Global variable.
 $script:Version = '0.0.0'
 
-$builds = @(
-    @{Id = 'v4.5.2'; Framework = 'net452'; symbol = 'NET452'}
-    @{Id = 'v4.6.1'; Framework = 'net461'; symbol = 'NET461'}
-)
 $packages = @(
     'Saritasa.Tools.Common'
     'Saritasa.Tools.Domain'
