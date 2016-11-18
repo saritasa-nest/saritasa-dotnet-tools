@@ -13,7 +13,7 @@ namespace Saritasa.Tools.Messages.Benchmark
     public class ExpressionExecutorBenchmarks
     {
         private Expression<Func<ExpressionExecutorBenchmarks, int, int, int>> sumExpression = (v, p0, p1) => v.Sum(p0, p1);
-        private ServiceProvider serviceProvider = new ServiceProvider();
+        private ExpressionExecutorServices serviceProvider = new ExpressionExecutorServices();
         private MethodInfo methodInfo = typeof(ExpressionExecutorBenchmarks).GetMethod(nameof(ExpressionExecutorBenchmarks.Sum), BindingFlags.NonPublic | BindingFlags.Instance);
 
         private int Sum(int v0, int v1) => v0 + v1;
@@ -45,7 +45,7 @@ namespace Saritasa.Tools.Messages.Benchmark
         }
 
         [Benchmark]
-        public void RunCompiledExpressionSum()
+        public void RunCompiledExpressionGenericSum()
         {
             var factory = new ExpressionExecutorFactory(serviceProvider);
             var expressionExecutor = factory.Create();

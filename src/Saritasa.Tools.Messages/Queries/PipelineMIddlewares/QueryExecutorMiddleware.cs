@@ -4,13 +4,23 @@
 namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
 {
     using System;
+    using System.Collections.Generic;
+    using System.Reflection;
     using Common;
+    using Saritasa.Tools.Messages.Common.Expressions;
 
     /// <summary>
     /// Executes query delegate.
     /// </summary>
     public class QueryExecutorMiddleware : IMessagePipelineMiddleware
     {
+        private readonly ExpressionExecutorFactory expressionExecutorFactory;
+
+        public QueryExecutorMiddleware()
+        {
+            this.expressionExecutorFactory = new ExpressionExecutorFactory(new ExpressionExecutorServices());
+        }
+
         /// <inheritdoc />
         public string Id => "QueryExecutor";
 
@@ -27,7 +37,8 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
             var stopWatch = System.Diagnostics.Stopwatch.StartNew();
             try
             {
-                queryMessage.Result = queryMessage.Method.Invoke(queryMessage.QueryObject, queryMessage.Parameters);
+                queryMessage.Result = InvokeExpression(queryMessage.Method, queryMessage.QueryObject, queryMessage.Parameters.Length, queryMessage.Parameters);
+                // queryMessage.Result = queryMessage.Method.Invoke(queryMessage.QueryObject, queryMessage.Parameters);
                 queryMessage.Status = Message.ProcessingStatus.Completed;
             }
             catch (Exception ex)
@@ -45,6 +56,34 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
                 stopWatch.Stop();
                 queryMessage.ExecutionDuration = (int)stopWatch.ElapsedMilliseconds;
             }
+        }
+
+        private dynamic InvokeExpression(MethodInfo info, dynamic input, int parametersCount, dynamic[] parameters)
+        {
+            var executor = expressionExecutorFactory.Create();
+
+            if (parametersCount == 0)
+            {
+                return executor.Execute(info, input);
+            }
+            else if (parametersCount == 1)
+            {
+                return executor.Execute(info, input, parameters[0]);
+            }
+            else if (parametersCount == 2)
+            {
+                return executor.Execute(info, input, parameters[0], parameters[1]);
+            }
+            else if (parametersCount == 3)
+            {
+                return executor.Execute(info, input, parameters[0], parameters[1], parameters[2]);
+            }
+            else if (parametersCount == 4)
+            {
+                return executor.Execute(info, input, parameters[0], parameters[1], parameters[2], parameters[3]);
+            }
+
+            throw new NotSupportedException();
         }
     }
 }

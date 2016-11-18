@@ -38,6 +38,7 @@ namespace Saritasa.Tools.Messages.Common.Expressions
             return transformers.Any(transformer => transformer.SupportTransform(node.NodeType));
         }
 
+        /// <inheritdoc/>
         public override Expression Visit(Expression node)
         {
             var visitedExpression = base.Visit(node);
@@ -45,11 +46,13 @@ namespace Saritasa.Tools.Messages.Common.Expressions
             return visitedExpression;
         }
 
+        /// <inheritdoc/>
         protected override Expression VisitParameter(ParameterExpression node)
         {
             return base.VisitParameter(node);
         }
 
+        /// <inheritdoc/>
         protected override Expression VisitLambda<T>(Expression<T> node)
         {
             var visitedLambda = base.VisitLambda<T>(node);
@@ -63,6 +66,7 @@ namespace Saritasa.Tools.Messages.Common.Expressions
             return visitedLambda;
         }
 
+        /// <inheritdoc/>
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
             if (HasSupportingTransformer(node))

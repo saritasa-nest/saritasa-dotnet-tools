@@ -1,7 +1,11 @@
-﻿using Saritasa.Tools.Messages.Common.Expressions.Compilation;
-using System;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using Microsoft.CSharp.RuntimeBinder;
+using Saritasa.Tools.Messages.Common.Expressions.Compilation;
 
 namespace Saritasa.Tools.Messages.Common.Expressions
 {
@@ -13,6 +17,8 @@ namespace Saritasa.Tools.Messages.Common.Expressions
         private ICompiledExpressionCache compiledExpressionCache;
         private IExpressionCompilator expressionCompilator;
         private IExpressionTransformVisitorFactory transformVisitorFactory;
+        private static ConcurrentDictionary<MethodInfo, MethodInfo> genericInvokationCache =
+            new ConcurrentDictionary<MethodInfo, MethodInfo>();
 
         /// <summary>
         /// Ctor.
@@ -50,9 +56,25 @@ namespace Saritasa.Tools.Messages.Common.Expressions
         /// </summary>
         public object Execute(MethodInfo info, params object[] parameters)
         {
-            var func = compiledExpressionCache.Get(info);
+            // TODO: add expression execute with ivoking object and parameters.
+            var genericMethod = genericInvokationCache.GetOrAdd(info, (key) =>
+            {
+                var method = this.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public)
+                .FirstOrDefault(x => x.ContainsGenericParameters && x.GetGenericArguments().Length == parameters.Length + 1 /* executing object */);
 
-            return func.DynamicInvoke(parameters);
+                if (method == null)
+                {
+                    throw new NotSupportedException();
+                }
+
+                return method.MakeGenericMethod(
+                    parameters
+                    .Select(x => x.GetType())
+                    .Concat(new[] { info.ReturnType })
+                    .ToArray());
+            });
+
+            return genericMethod.Invoke(this, new[] { info }.Concat(parameters).ToArray());
         }
 
         /// <summary>

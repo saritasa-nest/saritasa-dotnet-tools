@@ -1,23 +1,19 @@
-﻿using Saritasa.Tools.Messages.Common.Expressions.Compilation;
-using System;
-using Saritasa.Tools.Messages.Internal;
-
-namespace Saritasa.Tools.Messages.Common.Expressions
+﻿namespace Saritasa.Tools.Messages.Common.Expressions
 {
     public class ExpressionExecutorFactory
     {
-        private IServiceProvider executorServices;
+        private ExpressionExecutorServices executorServices;
 
-        public ExpressionExecutorFactory(IServiceProvider serviceProvider)
+        public ExpressionExecutorFactory(ExpressionExecutorServices executorServices)
         {
-            this.executorServices = serviceProvider;
+            this.executorServices = executorServices;
         }
 
         public ExpressionExecutor Create()
         {
-            var compiledExpressionProvider = executorServices.GetService<ICompiledExpressionCache>();
-            var expressionCompilator = executorServices.GetService<IExpressionCompilator>();
-            var transformVisitorFactory = executorServices.GetService<IExpressionTransformVisitorFactory>();
+            var compiledExpressionProvider = executorServices.CompiledCache;
+            var expressionCompilator = executorServices.ExpressionCompilator;
+            var transformVisitorFactory = executorServices.TransformVisitorFactory;
 
             return new ExpressionExecutor(compiledExpressionProvider, expressionCompilator, transformVisitorFactory);
         }

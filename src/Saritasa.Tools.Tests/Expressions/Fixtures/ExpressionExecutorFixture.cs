@@ -11,19 +11,7 @@ namespace Saritasa.Tools.Tests.Expressions.Fixtures
     {
         public ExpressionExecutor Create()
         {
-            var moq = new Mock<IServiceProvider>();
-            moq.Setup(x => x.GetService(It.Is<Type>(t => t == typeof(ICompiledExpressionCache))))
-                .Returns(new CompiledExpressionCache());
-            moq.Setup(x => x.GetService(It.Is<Type>(t => t == typeof(IExpressionCompilator))))
-                .Returns(new ExpressionCompilator());
-            moq.Setup(x => x.GetService(It.Is<Type>(t => t == typeof(IExpressionTransformVisitorFactory))))
-                .Returns(new ExpressionTransformVisitorFactory(new List<IExpressionTransformer>()
-                {
-                    new MethodCallExpressionTransformer(),
-                    new LambdaExpressionTransformer()
-                }));
-
-            var factory = new ExpressionExecutorFactory(moq.Object);
+            var factory = new ExpressionExecutorFactory(new ExpressionExecutorServices());
 
             return factory.Create();
         }

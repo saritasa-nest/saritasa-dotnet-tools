@@ -10,6 +10,7 @@ namespace Saritasa.Tools.Messages.Queries
     using System.Reflection;
     using Internal;
     using Common;
+    using Saritasa.Tools.Messages.Common.Expressions;
 
     /// <summary>
     /// Query pipeline.
@@ -57,6 +58,7 @@ namespace Saritasa.Tools.Messages.Queries
             TQuery query;
 
             readonly QueryPipeline queryPipeline;
+            readonly ExpressionExecutorFactory expressionExecutorFactory;
 
             /// <summary>
             /// .ctor
@@ -66,6 +68,8 @@ namespace Saritasa.Tools.Messages.Queries
             {
                 this.query = null;
                 this.queryPipeline = queryPipeline;
+
+                this.expressionExecutorFactory = new ExpressionExecutorFactory(new ExpressionExecutorServices());
             }
 
             /// <summary>
@@ -91,6 +95,9 @@ namespace Saritasa.Tools.Messages.Queries
                     query = (TQuery)CreateObjectFromType(typeof(TQuery));
                     fakeQueryObject = true;
                 }
+
+                var expressionExecutor = expressionExecutorFactory.Create();
+                expressionExecutor.PreCompile(expression);
 
                 var mce = expression.Body as MethodCallExpression;
                 var args = mce.Arguments.Select(PartiallyEvaluateExpression).ToArray();
