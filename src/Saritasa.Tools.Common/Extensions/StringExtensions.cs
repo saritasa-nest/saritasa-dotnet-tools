@@ -98,7 +98,7 @@ namespace Saritasa.Tools.Common.Extensions
         [DebuggerStepThrough]
         public static bool IsNotEmpty(this string target)
         {
-            return IsEmpty(target) == false;
+            return !IsEmpty(target);
         }
 
         /// <summary>

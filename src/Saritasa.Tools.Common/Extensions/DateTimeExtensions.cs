@@ -86,8 +86,6 @@ namespace Saritasa.Tools.Common.Extensions
         {
             switch (truncation)
             {
-                case DateTimeTruncation.None:
-                    return date;
                 case DateTimeTruncation.Seconds:
                     return new DateTime(date.Year, date.Month, date.Day, date.Hour, date.Minute, 0, date.Kind);
                 case DateTimeTruncation.Minutes:
@@ -98,6 +96,7 @@ namespace Saritasa.Tools.Common.Extensions
                     return new DateTime(date.Year, date.Month, 1, 0, 0, 0, date.Kind);
                 case DateTimeTruncation.Months:
                     return new DateTime(date.Year, 1, 1, 0, 0, 0, date.Kind);
+                case DateTimeTruncation.None:
                 default:
                     return date;
             }

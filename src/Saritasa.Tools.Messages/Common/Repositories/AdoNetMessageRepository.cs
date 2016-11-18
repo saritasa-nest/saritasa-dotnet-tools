@@ -141,7 +141,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             {
                 throw new ObjectDisposedException(nameof(AdoNetMessageRepository));
             }
-            if (isInitialized == false)
+            if (!isInitialized)
             {
                 Init();
                 isInitialized = true;
@@ -184,11 +184,12 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             if (param != null)
             {
                 param.ParameterName = name;
-                if (value is byte[] && serializer.IsText)
+                var locvalue = value;
+                if (locvalue is byte[] && serializer.IsText)
                 {
-                    value = Encoding.UTF8.GetString((byte[])value);
+                    locvalue = Encoding.UTF8.GetString((byte[])locvalue);
                 }
-                param.Value = value ?? DBNull.Value;
+                param.Value = locvalue ?? DBNull.Value;
                 param.Direction = ParameterDirection.Input;
                 cmd.Parameters.Add(param);
             }

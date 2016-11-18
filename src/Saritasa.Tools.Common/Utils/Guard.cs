@@ -328,7 +328,7 @@ namespace Saritasa.Tools.Common.Utils
         {
             IsNotEmpty(argument, argumentName);
 
-            if (EmailExpression.IsMatch(argument) == false)
+            if (!EmailExpression.IsMatch(argument))
             {
                 throw new ArgumentException("\"{0}\" is not a valid email address.".FormatWith(argumentName), argumentName);
             }

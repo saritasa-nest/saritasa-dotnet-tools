@@ -19,7 +19,7 @@ namespace Saritasa.Tools.Messages.Commands
     /// Marks property as output. Is not for processing.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
-    public class CommandOut : Attribute
+    public class CommandOutAttribute : Attribute
     {
     }
 }

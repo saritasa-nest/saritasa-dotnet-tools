@@ -153,13 +153,13 @@ namespace Saritasa.Tools.Common.Utils
             var success = Boolean.TryParse(target, out result);
             if (extended == true && success == false)
             {
-                target = target.ToLowerInvariant().Trim();
-                if (Array.IndexOf(trueValues, target) > -1)
+                var trimmedTarget = target.ToLowerInvariant().Trim();
+                if (Array.IndexOf(trueValues, trimmedTarget) > -1)
                 {
                     success = true;
                     result = true;
                 }
-                else if (Array.IndexOf(falseValues, target) > -1)
+                else if (Array.IndexOf(falseValues, trimmedTarget) > -1)
                 {
                     success = true;
                     result = false;

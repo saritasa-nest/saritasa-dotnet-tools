@@ -90,10 +90,11 @@ namespace Saritasa.Tools.Common.Extensions
         /// <returns>Enumeration of iterators.</returns>
         public static IEnumerable<IEnumerable<T>> ChunkSelectRange<T>(this IEnumerable<T> source, int chunkSize = DefaultChunkSize)
         {
+            var originalSource = source;
             while (source.Any())
             {
-                yield return source.Take(chunkSize);
-                source = source.Skip(chunkSize);
+                yield return originalSource.Take(chunkSize);
+                originalSource = originalSource.Skip(chunkSize);
             }
         }
 
@@ -109,10 +110,11 @@ namespace Saritasa.Tools.Common.Extensions
         {
             long totalNumberOfElements = source.LongCount();
             int currentPosition = 0;
+            var originalSource = source;
             while (totalNumberOfElements > currentPosition)
             {
-                yield return source.Take(chunkSize);
-                source = source.Skip(chunkSize);
+                yield return originalSource.Take(chunkSize);
+                originalSource = originalSource.Skip(chunkSize);
                 currentPosition += chunkSize;
             }
         }
@@ -127,8 +129,8 @@ namespace Saritasa.Tools.Common.Extensions
         public static IEnumerable<T> ChunkSelect<T>(this IEnumerable<T> source, int chunkSize = DefaultChunkSize)
         {
             var currentPosition = 0;
-            var subsource = source;
-            bool hasRecords = false;
+            IEnumerable<T> subsource;
+            bool hasRecords;
             do
             {
                 subsource = source.Skip(currentPosition).Take(chunkSize);
@@ -153,13 +155,14 @@ namespace Saritasa.Tools.Common.Extensions
         public static IEnumerable<T> ChunkSelect<T>(this IQueryable<T> source, int chunkSize = DefaultChunkSize)
         {
             int currentPosition = 0;
-            bool hasRecords = false;
+            bool hasRecords;
+            var originalSource = source;
             do
             {
-                source = source.Skip(currentPosition).Take(chunkSize);
+                originalSource = originalSource.Skip(currentPosition).Take(chunkSize);
                 hasRecords = false;
                 // actual query is here
-                foreach (var item in source)
+                foreach (var item in originalSource)
                 {
                     hasRecords = true;
                     yield return item;

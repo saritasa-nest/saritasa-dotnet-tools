@@ -26,6 +26,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
         private const string ContentTypeJson = "application/json";
         private const string ContentTypePlainText = "text/plain";
         private const string Server = "Saritasa.Tools WebEndpoint/1.0.0";
+        private const string DefaultAddress = "127.0.0.1";
 
         /// <summary>
         /// Default TCP port;
@@ -51,7 +52,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
         /// <param name="address">Address to bind, loopback by default.</param>
         /// <param name="port">TCP port. By default 26025.</param>
         /// </summary>
-        public WebEndpoint(string address = "127.0.0.1", int port = 26025)
+        public WebEndpoint(string address = DefaultAddress, int port = DefaultPort)
         {
             if (string.IsNullOrWhiteSpace(address))
             {
@@ -82,13 +83,11 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
             }
             InternalLogger.Trace($"Web endpoint starting on {address}:{port}", nameof(WebEndpoint));
 
-            if (cancellationTokenSource != null)
+            if (cancellationTokenSource == null)
             {
-                cancellationTokenSource.Dispose();
-                cancellationTokenSource = null;
+                cancellationTokenSource = new CancellationTokenSource();
             }
 
-            cancellationTokenSource = new CancellationTokenSource();
             cancellationToken = cancellationTokenSource.Token;
             listener.Start();
             var thread = new Thread(Listen)
@@ -237,7 +236,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
             }
 
             var cmd = str.Substring(0, ind);
-            byte cmdnum = 0;
+            byte cmdnum;
             if (byte.TryParse(cmd, out cmdnum))
             {
                 return cmdnum;

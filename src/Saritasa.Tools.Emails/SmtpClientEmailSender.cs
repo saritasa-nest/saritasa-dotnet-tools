@@ -12,7 +12,7 @@ namespace Saritasa.Tools.Emails
     /// <summary>
     /// Send email using SmtpClient.
     /// </summary>
-    public class SmtpClientEmailSender : EmailSender
+    public class SmtpClientEmailSender : EmailSender, IDisposable
     {
         /// <summary>
         /// Instance of SmtpClient.
@@ -46,6 +46,35 @@ namespace Saritasa.Tools.Emails
         {
             return Client.SendMailAsync(message);
         }
+
+        #region Dispose
+
+        private bool disposed = false;
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Dispose object.
+        /// </summary>
+        /// <param name="disposing">Is called from Dispose.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    Client.Dispose();
+                }
+                disposed = true;
+            }
+        }
+
+        #endregion
     }
 }
 #endif

@@ -56,7 +56,7 @@ namespace Saritasa.Tools.Common.Utils
                 catch (Exception executedException)
                 {
                     bool isTransient = IsSubtypeOf(executedException, transientExceptions);
-                    if (isTransient == false)
+                    if (!isTransient)
                     {
                         throw;
                     }
@@ -126,7 +126,7 @@ namespace Saritasa.Tools.Common.Utils
 #else
                 var tcs = new TaskCompletionSource<T>();
                 tcs.SetCanceled();
-                return await tcs.Task;
+                return await tcs.Task.ConfigureAwait(false);
 #endif
             }
 
@@ -136,12 +136,12 @@ namespace Saritasa.Tools.Common.Utils
                 attemptCount++;
                 try
                 {
-                    return await action();
+                    return await action().ConfigureAwait(false);
                 }
                 catch (Exception executedException)
                 {
                     bool isTransient = IsSubtypeOf(executedException, transientExceptions);
-                    if (isTransient == false)
+                    if (!isTransient)
                     {
                         throw;
                     }
@@ -154,7 +154,7 @@ namespace Saritasa.Tools.Common.Utils
                     }
                     if (delay.TotalMilliseconds > 0)
                     {
-                        await Task.Delay(delay, cancellationToken);
+                        await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
                     }
                 }
             }
@@ -468,8 +468,8 @@ namespace Saritasa.Tools.Common.Utils
 
             return (key, dict, notInCache) =>
             {
-                DateTime dt = default(DateTime);
-                bool cached = false;
+                DateTime dt;
+                bool cached;
                 lock (lockobj)
                 {
                     cached = timestampsStorage.TryGetValue(key, out dt);
@@ -480,21 +480,6 @@ namespace Saritasa.Tools.Common.Utils
                 }
                 return !cached || (DateTime.Now - dt) >= maxAge;
             };
-        }
-
-        /// <summary>
-        /// Cache strategy based on age validation. If item exceed specific time on life it shoule be
-        /// invalidated. Overload for delegates with no arguments.
-        /// </summary>
-        /// <typeparam name="TResult">Cache function result type.</typeparam>
-        /// <param name="maxAge">Maximum age to live.</param>
-        /// <param name="timestampsStorage"></param>
-        /// <returns>Cache strategy instance delegate.</returns>
-        public static CacheStrategy<int, TResult> CreateMaxAgeCacheStrategy<TResult>(
-            TimeSpan maxAge,
-            IDictionary<int, DateTime> timestampsStorage = null)
-        {
-            return CreateMaxAgeCacheStrategy<int, TResult>(maxAge, timestampsStorage);
         }
 
         /// <summary>

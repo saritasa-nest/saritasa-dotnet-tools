@@ -28,17 +28,17 @@ namespace Saritasa.Tools.Messages.Internal
         /// <summary>
         /// Is internal logger enabled.
         /// </summary>
-        public static bool IsEnabled { get; set; } = false;
+        public static bool IsEnabled { get; set; }
 
         /// <summary>
         /// Log to standard diagnostic trace.
         /// </summary>
-        public static bool LogToTrace { get; set; } = false;
+        public static bool LogToTrace { get; set; }
 
         /// <summary>
         /// Log to console.
         /// </summary>
-        public static bool LogToConsole { get; set; } = false;
+        public static bool LogToConsole { get; set; }
 
         /// <summary>
         /// Min log level. Error by default.
@@ -128,7 +128,7 @@ namespace Saritasa.Tools.Messages.Internal
 
         private static void Write(LogLevel level, string message, string source = null)
         {
-            if (IsEnabled == false)
+            if (!IsEnabled)
             {
                 return;
             }
@@ -152,7 +152,7 @@ namespace Saritasa.Tools.Messages.Internal
                 sb.Append(": ");
                 sb.AppendLine(message);
 
-                if (string.IsNullOrEmpty(LogFile) == false)
+                if (!string.IsNullOrEmpty(LogFile))
                 {
                     lock (LockObj)
                     {
@@ -175,15 +175,13 @@ namespace Saritasa.Tools.Messages.Internal
                         case LogLevel.Debug:
                             eventType = TraceEventType.Verbose;
                             break;
-                        case LogLevel.Info:
-                            eventType = TraceEventType.Information;
-                            break;
                         case LogLevel.Warn:
                             eventType = TraceEventType.Warning;
                             break;
                         case LogLevel.Error:
                             eventType = TraceEventType.Error;
                             break;
+                        case LogLevel.Info:
                         default:
                             eventType = TraceEventType.Information;
                             break;

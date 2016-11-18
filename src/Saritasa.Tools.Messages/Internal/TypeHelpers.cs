@@ -23,7 +23,7 @@ namespace Saritasa.Tools.Messages.Internal
         /// <returns>Type. Null if type cannot be found.</returns>
         public static Type LoadType(string fullName, Assembly[] assemblies)
         {
-            Type t = null;
+            Type t;
 
             // if it is a system type try to use Type.GetType first
             if (fullName.StartsWith("System"))

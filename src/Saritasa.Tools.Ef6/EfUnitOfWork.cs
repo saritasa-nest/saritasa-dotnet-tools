@@ -33,23 +33,33 @@ namespace Saritasa.Tools.Ef
             Context = context;
         }
 
+        private bool disposed = false;
+
         /// <summary>
         /// Dispose object.
         /// </summary>
-        /// <param name="disposing">Dispone managed resources.</param>
+        /// <param name="disposing">Dispose managed resources.</param>
         protected virtual void Dispose(bool disposing)
         {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    if (Context != null)
+                    {
+                        Context.Dispose();
+                        Context = null;
+                    }
+                }
+            }
             Dispose();
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
-            if (Context != null)
-            {
-                Context.Dispose();
-                Context = null;
-            }
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         /// <inheritdoc />

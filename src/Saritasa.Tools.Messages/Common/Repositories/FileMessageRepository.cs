@@ -73,7 +73,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         string GetFileNameByDate(DateTime date, int count)
         {
             var name = $"{date:yyyyMMdd}-{count:000}.bin";
-            if (string.IsNullOrEmpty(prefix) == false)
+            if (!string.IsNullOrEmpty(prefix))
             {
                 name = prefix + "-" + name;
             }
@@ -175,12 +175,9 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             {
                 DateTime tmp;
                 if (DateTime.TryParseExact(GetFileDatePart(allFiles.First()), DateTimeFormat,
-                    System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat, System.Globalization.DateTimeStyles.None, out tmp))
+                    System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat, System.Globalization.DateTimeStyles.None, out tmp) && tmp > startDate)
                 {
-                    if (tmp > startDate)
-                    {
-                        startDate = tmp;
-                    }
+                    startDate = tmp;
                 }
                 if (DateTime.TryParseExact(GetFileDatePart(allFiles.Last()), DateTimeFormat,
                     System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat, System.Globalization.DateTimeStyles.None, out tmp))
@@ -201,7 +198,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                 for (var i = 0; i < 1000; i++)
                 {
                     var fileName = GetFileNameByDate(currentDate, i);
-                    if (allFilesHash.Contains(fileName) == false)
+                    if (!allFilesHash.Contains(fileName))
                     {
                         break;
                     }
