@@ -205,6 +205,7 @@ namespace Saritasa.Tools.Common.Tests
                 CustomMethodReturnWithCustomExceptionAsync,
                 FlowUtils.CreateFixedDelayRetryStrategy(3, TimeSpan.FromMilliseconds(50)),
                 CancellationToken.None,
+                false,
                 typeof(CustomException));
             try
             {

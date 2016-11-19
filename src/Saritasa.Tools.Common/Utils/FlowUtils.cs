@@ -65,7 +65,7 @@ namespace Saritasa.Tools.Common.Utils
                     bool shouldStop = retryStrategy(attemptCount, executedException, out delay);
                     if (shouldStop)
                     {
-                        break;
+                        throw;
                     }
                     if (delay.TotalMilliseconds > 0)
                     {
@@ -77,7 +77,6 @@ namespace Saritasa.Tools.Common.Utils
                     }
                 }
             }
-            return default(T);
         }
 
         /// <summary>
@@ -107,12 +106,14 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="action">Unreliable action to execute.</param>
         /// <param name="retryStrategy">Retry strategy.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
+        /// <param name="continueOnCapturedContext">Configures an awaiter used to await this Task.</param>
         /// <param name="transientExceptions">Transient exceptions.</param>
         /// <returns>Task that specified when action executed successfully or with error after all retries.</returns>
         public static async Task<T> RetryAsync<T>(
             Func<Task<T>> action,
             RetryStrategy retryStrategy,
             CancellationToken cancellationToken = default(CancellationToken),
+            bool continueOnCapturedContext = false,
             params Type[] transientExceptions)
         {
             Guard.IsNotNull(action, nameof(action));
@@ -126,7 +127,7 @@ namespace Saritasa.Tools.Common.Utils
 #else
                 var tcs = new TaskCompletionSource<T>();
                 tcs.SetCanceled();
-                return await tcs.Task.ConfigureAwait(false);
+                return await tcs.Task.ConfigureAwait(continueOnCapturedContext);
 #endif
             }
 
@@ -136,7 +137,7 @@ namespace Saritasa.Tools.Common.Utils
                 attemptCount++;
                 try
                 {
-                    return await action().ConfigureAwait(false);
+                    return await action().ConfigureAwait(continueOnCapturedContext);
                 }
                 catch (Exception executedException)
                 {
@@ -150,15 +151,14 @@ namespace Saritasa.Tools.Common.Utils
                     bool shouldStop = retryStrategy(attemptCount, executedException, out delay);
                     if (shouldStop)
                     {
-                        break;
+                        throw;
                     }
                     if (delay.TotalMilliseconds > 0)
                     {
-                        await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
+                        await Task.Delay(delay, cancellationToken).ConfigureAwait(continueOnCapturedContext);
                     }
                 }
             }
-            return default(T);
         }
 
         /// <summary>
