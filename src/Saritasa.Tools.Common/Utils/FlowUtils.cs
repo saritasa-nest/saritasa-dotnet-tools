@@ -484,6 +484,21 @@ namespace Saritasa.Tools.Common.Utils
 
         /// <summary>
         /// Cache strategy based on age validation. If item exceed specific time on life it shoule be
+        /// invalidated. Overload for delegates with no arguments.
+        /// </summary>
+        /// <typeparam name="TResult">Cache function result type.</typeparam>
+        /// <param name="maxAge">Maximum age to live.</param>
+        /// <param name="timestampsStorage"></param>
+        /// <returns>Cache strategy instance delegate.</returns>
+        public static CacheStrategy<int, TResult> CreateMaxAgeCacheStrategy<TResult>(
+            TimeSpan maxAge,
+            IDictionary<int, DateTime> timestampsStorage = null)
+        {
+            return CreateMaxAgeCacheStrategy<int, TResult>(maxAge, timestampsStorage);
+        }
+
+        /// <summary>
+        /// Cache strategy based on age validation. If item exceed specific time on life it shoule be
         /// invalidated. Overload for delegates with 2 arguments.
         /// </summary>
         /// <typeparam name="T1">Type component for key.</typeparam>
