@@ -13,6 +13,8 @@ namespace Saritasa.Tools.Messages.Benchmark
         static void Main()
         {
             BenchmarkRunner.Run<ExpressionExecutorBenchmarks>();
+            //var bench = new ExpressionExecutorBenchmarks();
+            //bench.RunCompiledExpressionExecuteWrapperForNonGenericSum();
         }
     }
 }

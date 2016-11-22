@@ -2,17 +2,22 @@
 using System;
 using System.Linq.Expressions;
 using Xunit;
-using System.Collections.Generic;
+using Xunit.Abstractions;
+using Saritasa.Tools.Messages.Common.Expressions;
 
 namespace Saritasa.Tools.Tests.Expressions
 {
     public class ExpressionExecutorTests : IClassFixture<ExpressionExecutorFixture>
     {
         private ExpressionExecutorFixture fixture;
+        private ITestOutputHelper testOutputHelper;
+        private ExpressionExecutor executor;
 
-        public ExpressionExecutorTests(ExpressionExecutorFixture fixture)
+        public ExpressionExecutorTests(ExpressionExecutorFixture fixture, ITestOutputHelper testOutputHelper)
         {
             this.fixture = fixture;
+            this.testOutputHelper = testOutputHelper;
+            this.executor = fixture.Create();
         }
 
         public int CompiledMethod(int first, int second)
@@ -75,7 +80,29 @@ namespace Saritasa.Tools.Tests.Expressions
             executor.PreCompile(expression);
             executor.PreCompile(expression);
 
-            var executed = executor.Execute<ExpressionExecutorTests, int, int, int>(methodInfo, this, value0, value1);
+            var executed = executor.ExecuteTyped<ExpressionExecutorTests, int, int, int>(methodInfo, this, value0, value1);
+
+            // Assert
+            Assert.Equal(result, executed);
+            Assert.Equal(1, executor.CompiledCache.Count);
+        }
+
+        [Theory]
+        [InlineData(1, 2, 3)]
+        public void Expression_execute_non_typed_with_one_method_and_outer_parameters_should_compile_and_execute_correctly(int value0, int value1, int result)
+        {
+            // Arrange
+            var executor = fixture.Create();
+            Expression<Func<ExpressionExecutorTests, int>> expression = (v) => CompiledMethod(value0, value1);
+            var methodInfo = typeof(ExpressionExecutorTests).GetMethod("CompiledMethod");
+
+            // Act
+            executor.CompiledCache.Clear();
+            executor.PreCompile(expression);
+            executor.PreCompile(expression);
+            executor.PreCompile(expression);
+
+            var executed = executor.Execute(methodInfo, this, value0, value1);
 
             // Assert
             Assert.Equal(result, executed);

@@ -3,8 +3,6 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using Microsoft.CSharp.RuntimeBinder;
 using Saritasa.Tools.Messages.Common.Expressions.Compilation;
 
 namespace Saritasa.Tools.Messages.Common.Expressions
@@ -17,7 +15,7 @@ namespace Saritasa.Tools.Messages.Common.Expressions
         private ICompiledExpressionCache compiledExpressionCache;
         private IExpressionCompilator expressionCompilator;
         private IExpressionTransformVisitorFactory transformVisitorFactory;
-        private static ConcurrentDictionary<MethodInfo, MethodInfo> genericInvokationCache =
+        private static ConcurrentDictionary<MethodInfo, MethodInfo> genericInvocationCache =
             new ConcurrentDictionary<MethodInfo, MethodInfo>();
 
         /// <summary>
@@ -52,35 +50,42 @@ namespace Saritasa.Tools.Messages.Common.Expressions
         }
 
         /// <summary>
-        /// Non generic execute.
+        /// Dynamic execute for compiled expressions.
         /// </summary>
-        public object Execute(MethodInfo info, params object[] parameters)
+        /// <param name="info">info, used as key.</param>
+        /// <param name="parameters">parameters for func.</param>
+        public dynamic Execute(MethodInfo info, params dynamic[] parameters)
         {
-            // TODO: add expression execute with ivoking object and parameters.
-            var genericMethod = genericInvokationCache.GetOrAdd(info, (key) =>
+            dynamic func = compiledExpressionCache.Get(info);
+
+            if (parameters.Count() == 0)
             {
-                var method = this.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public)
-                .FirstOrDefault(x => x.ContainsGenericParameters && x.GetGenericArguments().Length == parameters.Length + 1 /* executing object */);
+                return func.Invoke();
+            }
+            if (parameters.Count() == 1)
+            {
+                return func.Invoke(parameters[0]);
+            }
+            else if (parameters.Count() == 2)
+            {
+                return func.Invoke(parameters[0], parameters[1]);
+            }
+            else if (parameters.Count() == 3)
+            {
+                return func.Invoke(parameters[0], parameters[1], parameters[2]);
+            }
+            else if (parameters.Count() == 4)
+            {
+                return func.Invoke(parameters[0], parameters[1], parameters[2], parameters[3]);
+            }
 
-                if (method == null)
-                {
-                    throw new NotSupportedException();
-                }
-
-                return method.MakeGenericMethod(
-                    parameters
-                    .Select(x => x.GetType())
-                    .Concat(new[] { info.ReturnType })
-                    .ToArray());
-            });
-
-            return genericMethod.Invoke(this, new[] { info }.Concat(parameters).ToArray());
+            throw new NotImplementedException();
         }
 
         /// <summary>
         /// Execute on compiled delegate from cache.
         /// </summary>
-        public TResult Execute<TInput, TResult>(MethodInfo info, TInput input)
+        public TResult ExecuteTyped<TInput, TResult>(MethodInfo info, TInput input)
         {
             var func = (Func<TInput, TResult>)compiledExpressionCache.Get(info);
 
@@ -90,7 +95,7 @@ namespace Saritasa.Tools.Messages.Common.Expressions
         /// <summary>
         /// Generic execute of precompiled expression.
         /// </summary>
-        public TResult Execute<TInput, TInput2, TResult>(MethodInfo info, TInput input, TInput2 input2)
+        public TResult ExecuteTyped<TInput, TInput2, TResult>(MethodInfo info, TInput input, TInput2 input2)
         {
             var func = (Func<TInput, TInput2, TResult>)compiledExpressionCache.Get(info);
 
@@ -100,7 +105,7 @@ namespace Saritasa.Tools.Messages.Common.Expressions
         /// <summary>
         /// Generic execute of precompiled expression.
         /// </summary>
-        public TResult Execute<TInput, TInput2, TInput3, TResult>(MethodInfo info, TInput input, TInput2 input2, TInput3 input3)
+        public TResult ExecuteTyped<TInput, TInput2, TInput3, TResult>(MethodInfo info, TInput input, TInput2 input2, TInput3 input3)
         {
             var func = (Func<TInput, TInput2, TInput3, TResult>)compiledExpressionCache.Get(info);
 
@@ -110,7 +115,7 @@ namespace Saritasa.Tools.Messages.Common.Expressions
         /// <summary>
         /// Generic execute of precompiled expression.
         /// </summary>
-        public TResult Execute<TInput, TInput2, TInput3, TInput4, TResult>(MethodInfo info, TInput input, TInput2 input2, TInput3 input3, TInput4 input4)
+        public TResult ExecuteTyped<TInput, TInput2, TInput3, TInput4, TResult>(MethodInfo info, TInput input, TInput2 input2, TInput3 input3, TInput4 input4)
         {
             var func = (Func<TInput, TInput2, TInput3, TInput4, TResult>)compiledExpressionCache.Get(info);
 
