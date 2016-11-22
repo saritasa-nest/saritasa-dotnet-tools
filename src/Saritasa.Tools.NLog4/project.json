@@ -1,5 +1,5 @@
 {
-  "title": "Saritasa Tools NLog4",
+  "title": "Saritasa Tools for NLog4",
   "version": "0.1.0",
   "authors": [ "Saritasa" ],
   "description": "The package is a part of Saritasa Tools project. Saritasa.Tools.NLog4 contains implementation for Microsoft common logging infrastructure for NLog.",

@@ -106,14 +106,12 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="action">Unreliable action to execute.</param>
         /// <param name="retryStrategy">Retry strategy.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
-        /// <param name="continueOnCapturedContext">Configures an awaiter used to await this Task.</param>
         /// <param name="transientExceptions">Transient exceptions.</param>
         /// <returns>Task that specified when action executed successfully or with error after all retries.</returns>
         public static async Task<T> RetryAsync<T>(
             Func<Task<T>> action,
             RetryStrategy retryStrategy,
             CancellationToken cancellationToken = default(CancellationToken),
-            bool continueOnCapturedContext = false,
             params Type[] transientExceptions)
         {
             Guard.IsNotNull(action, nameof(action));
@@ -127,7 +125,7 @@ namespace Saritasa.Tools.Common.Utils
 #else
                 var tcs = new TaskCompletionSource<T>();
                 tcs.SetCanceled();
-                return await tcs.Task.ConfigureAwait(continueOnCapturedContext);
+                return await tcs.Task.ConfigureAwait(false);
 #endif
             }
 
@@ -137,7 +135,7 @@ namespace Saritasa.Tools.Common.Utils
                 attemptCount++;
                 try
                 {
-                    return await action().ConfigureAwait(continueOnCapturedContext);
+                    return await action().ConfigureAwait(false);
                 }
                 catch (Exception executedException)
                 {
@@ -155,7 +153,7 @@ namespace Saritasa.Tools.Common.Utils
                     }
                     if (delay.TotalMilliseconds > 0)
                     {
-                        await Task.Delay(delay, cancellationToken).ConfigureAwait(continueOnCapturedContext);
+                        await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
                     }
                 }
             }

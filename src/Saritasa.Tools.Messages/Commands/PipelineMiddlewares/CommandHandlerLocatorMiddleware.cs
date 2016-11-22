@@ -84,7 +84,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
                 .SelectMany(t => t.GetTypeInfo().GetMethods())
                 .Where(m => m.Name.StartsWith(HandlerPrefix))
                 .ToArray();
-            if (commandHandlers.Any() == false)
+            if (!commandHandlers.Any())
             {
                 var assembliesStr = string.Join(",", assemblies.Select(a => a.FullName));
                 InternalLogger.Warn($"Cannot find command handlers in assemblie(-s) {assembliesStr}",

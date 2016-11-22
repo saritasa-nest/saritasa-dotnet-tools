@@ -598,16 +598,8 @@ namespace Saritasa.Tools.Misc.Security
             var arrChars = new[] { password.Length, alphasUpperCount, alphasLowerCount, digitsCount, symbolsCount };
             for (var c = 0; c < arrChars.Length; c++)
             {
-                int minValue;
                 // password length
-                if (c == 0)
-                {
-                    minValue = MinimumPasswordLength - 1;
-                }
-                else
-                {
-                    minValue = 0;
-                }
+                int minValue = c == 0 ? MinimumPasswordLength - 1 : 0;
                 if (arrChars[c] == minValue + 1 || arrChars[c] > minValue + 1)
                 {
                     requiredCharsCount++;

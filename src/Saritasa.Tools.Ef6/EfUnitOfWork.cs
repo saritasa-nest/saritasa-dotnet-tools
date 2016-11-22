@@ -33,7 +33,7 @@ namespace Saritasa.Tools.Ef
             Context = context;
         }
 
-        private bool disposed = false;
+        private bool disposed;
 
         /// <summary>
         /// Dispose object.
@@ -51,6 +51,7 @@ namespace Saritasa.Tools.Ef
                         Context = null;
                     }
                 }
+                disposed = true;
             }
             Dispose();
         }

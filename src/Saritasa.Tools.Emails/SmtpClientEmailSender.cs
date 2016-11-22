@@ -49,7 +49,7 @@ namespace Saritasa.Tools.Emails
 
         #region Dispose
 
-        private bool disposed = false;
+        private bool disposed;
 
         /// <inheritdoc />
         public void Dispose()
@@ -61,7 +61,7 @@ namespace Saritasa.Tools.Emails
         /// <summary>
         /// Dispose object.
         /// </summary>
-        /// <param name="disposing">Is called from Dispose.</param>
+        /// <param name="disposing">Dispose managed resources.</param>
         protected virtual void Dispose(bool disposing)
         {
             if (!disposed)

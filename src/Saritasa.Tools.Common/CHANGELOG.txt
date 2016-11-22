@@ -1,6 +1,7 @@
 ﻿0.1.1 [TBD]
-[+] FlowUtils.RetryAsync now supports continueOnCapturedContext parameter, default is false.
+[+] FlowUtils.RetryAsync now uses ConfigureAwait false to call action.
 [+] FlowUtils.RetryAsync now throws exception if retry limit is reached.
+[*] Made DateTimeUtils.Range function public.
 
 0.1.0 [2016-11-13]
 [+] Initial release.

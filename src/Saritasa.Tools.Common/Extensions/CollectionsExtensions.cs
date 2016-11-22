@@ -91,7 +91,7 @@ namespace Saritasa.Tools.Common.Extensions
         public static IEnumerable<IEnumerable<T>> ChunkSelectRange<T>(this IEnumerable<T> source, int chunkSize = DefaultChunkSize)
         {
             var originalSource = source;
-            while (source.Any())
+            while (originalSource.Any())
             {
                 yield return originalSource.Take(chunkSize);
                 originalSource = originalSource.Skip(chunkSize);

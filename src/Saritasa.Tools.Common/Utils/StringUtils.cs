@@ -139,8 +139,8 @@ namespace Saritasa.Tools.Common.Utils
             return success ? result : defaultValue;
         }
 
-        private static string[] trueValues = new string[] { "yes", "y", "t", "1" };
-        private static string[] falseValues = new string[] { "no", "n", "f", "0" };
+        private static string[] trueValues = new[] { "yes", "y", "t", "1" };
+        private static string[] falseValues = new[] { "no", "n", "f", "0" };
 
         /// <summary>
         /// Tries to convert target string to Boolean. If fails returns default value.
@@ -151,7 +151,7 @@ namespace Saritasa.Tools.Common.Utils
         {
             Boolean result;
             var success = Boolean.TryParse(target, out result);
-            if (extended == true && success == false)
+            if (extended && !success)
             {
                 var trimmedTarget = target.ToLowerInvariant().Trim();
                 if (Array.IndexOf(trueValues, trimmedTarget) > -1)
