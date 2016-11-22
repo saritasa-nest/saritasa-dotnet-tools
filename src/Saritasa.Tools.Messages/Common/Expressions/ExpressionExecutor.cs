@@ -79,7 +79,7 @@ namespace Saritasa.Tools.Messages.Common.Expressions
                 return func.Invoke(parameters[0], parameters[1], parameters[2], parameters[3]);
             }
 
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         /// <summary>
