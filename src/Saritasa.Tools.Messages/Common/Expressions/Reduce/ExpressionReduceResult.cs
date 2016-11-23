@@ -13,7 +13,7 @@ namespace Saritasa.Tools.Messages.Common.Expressions.Reduce
         public Expression ReducedExpression { get; set; }
 
         /// <summary>
-        /// Parameters after reduce, if we have const in expression query, we collapse theirs.
+        /// Reduced parameters on method call arguments if we have reduced they.
         /// </summary>
         public dynamic[] Parameters { get; set; }
     }

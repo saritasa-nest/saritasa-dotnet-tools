@@ -1,9 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using Saritasa.Tools.Messages.Common.Expressions;
-using Saritasa.Tools.Messages.Common.Expressions.Compilation;
-using Saritasa.Tools.Messages.Common.Expressions.Transformers;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -29,7 +26,6 @@ namespace Saritasa.Tools.Messages.Benchmark
         [Benchmark]
         public void RunCompiledExpressionGenericSum()
         {
-            
             Enumerable.Range(1, 10000)
                 .Aggregate((cur, next) =>
                 {

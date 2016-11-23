@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 using Saritasa.Tools.Messages.Common.Expressions.Compilation;
-using Saritasa.Tools.Messages.Common.Expressions.Reduce;
 
 namespace Saritasa.Tools.Messages.Common.Expressions
 {
@@ -16,8 +14,7 @@ namespace Saritasa.Tools.Messages.Common.Expressions
         private ICompiledExpressionCache compiledExpressionCache;
         private IExpressionCompilator expressionCompilator;
         private IExpressionTransformVisitorFactory transformVisitorFactory;
-        private static ConcurrentDictionary<MethodInfo, MethodInfo> genericInvocationCache =
-            new ConcurrentDictionary<MethodInfo, MethodInfo>();
+        private IExpressionReduceVisitorFactory reduceVisitorFactory;
 
         private Dictionary<int, Func<dynamic, dynamic[], dynamic>> callDispatchers = new Dictionary<int, Func<dynamic, dynamic[], dynamic>>
         {
@@ -42,11 +39,13 @@ namespace Saritasa.Tools.Messages.Common.Expressions
         public ExpressionExecutor(
             ICompiledExpressionCache expressionProvider,
             IExpressionCompilator expressionCompilator,
-            IExpressionTransformVisitorFactory transformVisitorFactory)
+            IExpressionTransformVisitorFactory transformVisitorFactory,
+            IExpressionReduceVisitorFactory reduceVisitorFactory)
         {
             this.expressionCompilator = expressionCompilator;
             this.compiledExpressionCache = expressionProvider;
             this.transformVisitorFactory = transformVisitorFactory;
+            this.reduceVisitorFactory = reduceVisitorFactory;
         }
 
         /// <summary>
@@ -69,11 +68,12 @@ namespace Saritasa.Tools.Messages.Common.Expressions
         }
 
         /// <summary>
-        /// Reducing expression for collapse operations in query.
+        /// Reducing expression for collapse binary operations in query like +, -, /, *, &lt;, &gt;, &lt;&lt;, &gt;&gt;.
         /// </summary>
-        public ExpressionReduceResult Reduce(Expression expression)
+        public Expression Reduce(Expression expression)
         {
-            throw new NotImplementedException();
+            var reduceVisitor = reduceVisitorFactory.Create();
+            return reduceVisitor.VisitAndReduce(expression);
         }
 
         /// <summary>

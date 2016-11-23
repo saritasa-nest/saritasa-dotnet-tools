@@ -39,10 +39,10 @@ namespace Saritasa.Tools.Tests.Expressions
             Expression<Func<ExpressionReduceVisitorTests, int>> expectedExpression = (v) => v.Sum(value1, 3);
 
             // Act
-            var result = visitor.VisitAndReduce(sumExpression, null);
+            var result = visitor.VisitAndReduce(sumExpression);
 
             // Assert
-            Assert.Equal(expectedExpression.ToString(), result.ReducedExpression.ToString());
+            Assert.Equal(expectedExpression.ToString(), result.ToString());
         }
 
         [Theory]
@@ -55,10 +55,10 @@ namespace Saritasa.Tools.Tests.Expressions
             Expression<Func<ExpressionReduceVisitorTests, int>> expectedExpression = (v) => v.Substract(value1, 0);
 
             // Act
-            var result = visitor.VisitAndReduce(substract, null);
+            var result = visitor.VisitAndReduce(substract);
 
             // Assert
-            Assert.Equal(expectedExpression.ToString(), result.ReducedExpression.ToString());
+            Assert.Equal(expectedExpression.ToString(), result.ToString());
         }
 
         [Theory]
@@ -71,10 +71,10 @@ namespace Saritasa.Tools.Tests.Expressions
             Expression<Func<ExpressionReduceVisitorTests, int>> expectedExpression = (v) => v.Substract(value1, 3);
 
             // Act
-            var result = visitor.VisitAndReduce(substract, null);
+            var result = visitor.VisitAndReduce(substract);
 
             // Assert
-            Assert.Equal(expectedExpression.ToString(), result.ReducedExpression.ToString());
+            Assert.Equal(expectedExpression.ToString(), result.ToString());
         }
 
         [Theory]
@@ -87,10 +87,10 @@ namespace Saritasa.Tools.Tests.Expressions
             Expression<Func<ExpressionReduceVisitorTests, int>> expectedExpression = (v) => v.Substract(v.testField, 6);
 
             // Act
-            var result = visitor.VisitAndReduce(sumExpression, null);
+            var result = visitor.VisitAndReduce(sumExpression);
 
             // Assert
-            Assert.Equal(expectedExpression.ToString(), result.ReducedExpression.ToString());
+            Assert.Equal(expectedExpression.ToString(), result.ToString());
         }
 
         [Theory]
@@ -107,9 +107,9 @@ namespace Saritasa.Tools.Tests.Expressions
             .Chain(v.testField, 6);
 
             // Act
-            var result = visitor.VisitAndReduce(sumExpression, null);
+            var result = visitor.VisitAndReduce(sumExpression);
 
-            Assert.Equal(expectedExpression.ToString(), result.ReducedExpression.ToString());
+            Assert.Equal(expectedExpression.ToString(), result.ToString());
         }
     }
 }

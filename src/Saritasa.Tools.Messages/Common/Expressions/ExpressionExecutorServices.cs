@@ -19,6 +19,7 @@ namespace Saritasa.Tools.Messages.Common.Expressions
                 new LambdaExpressionTransformer(),
                 new MethodCallExpressionTransformer()
             });
+            ReduceVisitorFactory = new ExpressionReduceVisitorFactory();
         }
 
         public ICompiledExpressionCache CompiledCache { get; set; }
@@ -26,5 +27,7 @@ namespace Saritasa.Tools.Messages.Common.Expressions
         public IExpressionCompilator ExpressionCompilator { get; set; }
 
         public IExpressionTransformVisitorFactory TransformVisitorFactory { get; set; }
+
+        public IExpressionReduceVisitorFactory ReduceVisitorFactory { get; set; }
     }
 }

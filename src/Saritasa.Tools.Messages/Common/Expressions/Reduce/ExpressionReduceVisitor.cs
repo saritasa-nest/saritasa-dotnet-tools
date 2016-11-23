@@ -7,31 +7,15 @@ namespace Saritasa.Tools.Messages.Common.Expressions.Reduce
     /// <summary>
     /// Visitor for reducing expression.
     /// </summary>
-    public class ExpressionReduceVisitor : ExpressionVisitor
+    public class ExpressionReduceVisitor : ExpressionVisitor, IExpressionReduceVisitor
     {
-        private ExpressionReduceResult reduceResult;
-        private dynamic[] originalParameters;
-
-        /// <summary>
-        /// Ctor.
-        /// </summary>
-        public ExpressionReduceVisitor()
-        {
-            reduceResult = new ExpressionReduceResult();
-        }
-
         /// <summary>
         /// Visiting node and reducing if we need this.
         /// </summary>
         /// <param name="node">Original expression before reduce.</param>
-        /// <param name="originalParameters">Original parameters for execution of expression.</param>
-        public ExpressionReduceResult VisitAndReduce(Expression node, dynamic[] originalParameters)
+        public Expression VisitAndReduce(Expression node)
         {
-            this.originalParameters = originalParameters;
-
-            reduceResult.ReducedExpression = Visit(node);
-
-            return reduceResult;
+            return Visit(node);
         }
 
         /// <inheritdoc/>
@@ -43,14 +27,15 @@ namespace Saritasa.Tools.Messages.Common.Expressions.Reduce
 
             foreach (var arg in arguments)
             {
-                var canReduce = true;
+                var canReduce = false;
 
                 if (arg is BinaryExpression)
                 {
                     var binaryExpression = arg as BinaryExpression;
 
-                    canReduce &= binaryExpression.Left.NodeType == ExpressionType.MemberAccess;
-                    canReduce &= binaryExpression.Right.NodeType == ExpressionType.MemberAccess;
+                    canReduce |= binaryExpression.Left.NodeType == ExpressionType.MemberAccess && binaryExpression.Right.NodeType == ExpressionType.MemberAccess;
+                    canReduce |= binaryExpression.Left.NodeType == ExpressionType.Constant && binaryExpression.Right.NodeType != ExpressionType.Constant;
+                    canReduce |= binaryExpression.Left.NodeType != ExpressionType.Constant && binaryExpression.Right.NodeType == ExpressionType.Constant;
 
                     if (canReduce)
                     {
@@ -59,6 +44,7 @@ namespace Saritasa.Tools.Messages.Common.Expressions.Reduce
 
                         var compiled = Expression.Lambda(arg).Compile();
                         var result = compiled.DynamicInvoke();
+
                         reducedArguments.Add(argumentIndex, Expression.Constant(result));
                     }
                 }

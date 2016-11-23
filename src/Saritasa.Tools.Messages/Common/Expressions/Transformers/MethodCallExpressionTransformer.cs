@@ -19,11 +19,13 @@ namespace Saritasa.Tools.Messages.Common.Expressions.Transformers
             [MemberTypes.Property] = (memberInfo) => RetrievePropertyType(memberInfo)
         };
 
+        /// <inheritdoc/>
         public bool SupportTransform(ExpressionType nodeFrom)
         {
             return nodeFrom == ExpressionType.Call;
         }
 
+        /// <inheritdoc/>
         public Expression Transform(Expression input, ExpressionTransformVisitor visitor)
         {
             var methodCallExpression = input as MethodCallExpression;
