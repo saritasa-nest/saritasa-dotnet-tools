@@ -18,44 +18,35 @@
   },
   "frameworks": {
     "net452": {
-      "frameworkAssemblies": {
-        "System.Data": "",
-        "System.Runtime": "",
-        "System.Xml": ""
-      },
       "dependencies": {
-        "NLog": "4.3.10"
+        "NLog": "4.3.11"
       }
     },
     "net461": {
-      "frameworkAssemblies": {
-        "System.Data": "",
-        "System.Runtime": "",
-        "System.Xml": ""
-      },
       "dependencies": {
-        "NLog": "4.3.10"
+        "NLog": "4.3.11"
       }
     },
     "netcoreapp1.0": {
       "dependencies": {
-        "System.Data.Common": "4.1.0",
-        "NLog": "4.4.0-betaV15",
+        "NLog": "5.0.0-beta03",
         "NLog.Extensions.Logging": "1.0.0-rtm-alpha4",
-        "Microsoft.NETCore.App": "1.0.1"
+        "Microsoft.NETCore.App": "1.1.0",
+        "System.Threading": "4.3.0"
       }
     },
     "netstandard1.6": {
       "dependencies": {
-        "NETStandard.Library": "1.6.0",
+        "NETStandard.Library": "1.6.1",
         "System.Data.Common": "4.1.0",
+        "System.Threading": "4.3.0",
         "NLog": "4.4.0-betaV15",
         "NLog.Extensions.Logging": "1.0.0-rtm-alpha4"
       }
     }
   },
   "dependencies": {
-    "Microsoft.Extensions.Logging": "1.0.0"
+    "Microsoft.Extensions.Logging.Abstractions": "1.1.0"
   },
   "buildOptions": {
     "keyFile": "../../tools/SaritasaTools.snk",

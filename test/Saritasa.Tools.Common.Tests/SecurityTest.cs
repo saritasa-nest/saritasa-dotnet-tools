@@ -11,7 +11,6 @@ namespace Saritasa.Tools.Common.Tests
     /// </summary>
     public class SecurityTest
     {
-#if !PORTABLE
         [Fact]
         public void Test_all_hash_calls()
         {
@@ -36,6 +35,5 @@ namespace Saritasa.Tools.Common.Tests
             var isCorrect = SecurityUtils.CheckHash("mypassword", hash);
             Assert.True(isCorrect);
         }
-#endif
     }
 }
