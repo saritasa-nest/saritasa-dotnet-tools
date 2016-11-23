@@ -77,6 +77,16 @@ namespace Saritasa.Tools.Messages.Common.Expressions
         }
 
         /// <summary>
+        /// Generic reducing for useful api.
+        /// Providing same result as <see cref="Reduce(Expression)"/>
+        /// </summary>
+        public Expression<T> Reduce<T>(Expression<T> expression)
+        {
+            var reduceVisitor = reduceVisitorFactory.Create();
+            return (Expression<T>)reduceVisitor.VisitAndReduce(expression);
+        }
+
+        /// <summary>
         /// Dynamic execute for compiled expressions.
         /// </summary>
         /// <param name="info">info, used as key.</param>

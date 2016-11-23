@@ -25,9 +25,9 @@ namespace Saritasa.Tools.Tests.Expressions
             return first + second;
         }
 
-        public int SimpleReturn(int value, int value2)
+        public ExpressionExecutorTests SimpleReturn(int value, int value2)
         {
-            return value + value2;
+            return this;
         }
 
         [Fact]
@@ -35,7 +35,7 @@ namespace Saritasa.Tools.Tests.Expressions
         {
             // Arrange
             var executor = fixture.Create();
-            Expression<Func<ExpressionExecutorTests, int>> expression = (v) => SimpleReturn(10 + 1, 1 + 3);
+            Expression<Func<ExpressionExecutorTests, int>> expression = (v) => CompiledMethod(10 + 1, 1 + 3);
 
             // Act
             executor.CompiledCache.Clear();
@@ -121,7 +121,7 @@ namespace Saritasa.Tools.Tests.Expressions
             // Act
             executor.CompiledCache.Clear();
             var reduceResult = executor.Reduce(expression);
-            expression = (Expression<Func<ExpressionExecutorTests, int>>)reduceResult;
+            expression = reduceResult;
             executor.PreCompile(expression);
             executor.PreCompile(expression);
             executor.PreCompile(expression);
@@ -143,7 +143,7 @@ namespace Saritasa.Tools.Tests.Expressions
 
             // Act
             executor.CompiledCache.Clear();
-            expression = (Expression<Func<ExpressionExecutorTests, int>>)executor.Reduce(expression);
+            expression = executor.Reduce(expression);
             executor.PreCompile(expression);
             executor.PreCompile(expression);
             executor.PreCompile(expression);
@@ -168,9 +168,9 @@ namespace Saritasa.Tools.Tests.Expressions
 
             // Act
             executor.CompiledCache.Clear();
-            expression = (Expression<Func<ExpressionExecutorTests, int>>)executor.Reduce(expression);
-            expression2 = (Expression<Func<ExpressionExecutorTests, int>>)executor.Reduce(expression2);
-            expression3 = (Expression<Func<ExpressionExecutorTests, int>>)executor.Reduce(expression3);
+            expression = executor.Reduce(expression);
+            expression2 = executor.Reduce(expression2);
+            expression3 = executor.Reduce(expression3);
             executor.PreCompile(expression);
             executor.PreCompile(expression2);
             executor.PreCompile(expression3);
@@ -183,6 +183,27 @@ namespace Saritasa.Tools.Tests.Expressions
             Assert.Equal(4, executed);
             Assert.Equal(5, executed2);
             Assert.Equal(4, executed3);
+        }
+
+        [Fact]
+        public void Expression_reduce_and_execute_with_complex_outer_parameter_and_chain_method_should_reduce_and_execute_correctly()
+        {
+            // Arrange
+            var executor = fixture.Create();
+            var testClass = fixture.CreateTestObject();
+            var methodInfo = typeof(ExpressionExecutorTests).GetMethod("SimpleReturn");
+            Expression<Func<ExpressionExecutorTests, ExpressionExecutorTests>> expression = (v) => SimpleReturn(testClass.Value1 + 1, testClass.Value2)
+            .SimpleReturn(testClass.Value1, testClass.Value2)
+            .SimpleReturn(testClass.Value2 + 1, testClass.Value2 + 1);
+            Expression<Func<ExpressionExecutorTests, ExpressionExecutorTests>> expectedExpression = (v) => SimpleReturn(2, testClass.Value2)
+            .SimpleReturn(testClass.Value1, testClass.Value2)
+            .SimpleReturn(3, 3);
+
+            // Act
+            executor.CompiledCache.Clear();
+            expression = executor.Reduce(expression);
+
+            Assert.Equal(expectedExpression.ToString(), expression.ToString());
         }
     }
 }
