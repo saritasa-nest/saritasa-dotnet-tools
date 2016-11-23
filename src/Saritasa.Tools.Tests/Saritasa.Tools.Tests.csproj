@@ -65,8 +65,10 @@
     <Compile Include="DomainTests.cs" />
     <Compile Include="EmailsTests.cs" />
     <Compile Include="Expressions\ExpressionExecutorTests.cs" />
+    <Compile Include="Expressions\ExpressionReduceVisitorTests.cs" />
     <Compile Include="Expressions\ExpressionTransformVisitorTests.cs" />
     <Compile Include="Expressions\Fixtures\ExpressionExecutorFixture.cs" />
+    <Compile Include="Expressions\Fixtures\ExpressionReduceVisitorFixture.cs" />
     <Compile Include="Expressions\Fixtures\ExpressionTransformVisitorFixture.cs" />
     <Compile Include="SecurityTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

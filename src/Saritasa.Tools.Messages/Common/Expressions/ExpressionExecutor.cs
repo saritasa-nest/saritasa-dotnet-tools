@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Saritasa.Tools.Messages.Common.Expressions.Compilation;
+using Saritasa.Tools.Messages.Common.Expressions.Reduce;
 
 namespace Saritasa.Tools.Messages.Common.Expressions
 {
@@ -56,6 +56,7 @@ namespace Saritasa.Tools.Messages.Common.Expressions
 
         /// <summary>
         /// Compiling expression or skipping if already compiled.
+        /// If expression need transformation, it will be transformed.
         /// </summary>
         public void PreCompile(Expression expression)
         {
@@ -65,6 +66,14 @@ namespace Saritasa.Tools.Messages.Common.Expressions
                 var transformedExpression = transformer.Visit(expression);
                 return expressionCompilator.Compile(transformedExpression);
             });
+        }
+
+        /// <summary>
+        /// Reducing expression for collapse operations in query.
+        /// </summary>
+        public ExpressionReduceResult Reduce(Expression expression)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>

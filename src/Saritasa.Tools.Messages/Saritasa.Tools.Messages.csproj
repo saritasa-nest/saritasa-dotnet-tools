@@ -66,6 +66,8 @@
     <Compile Include="Common\Expressions\IExpressionTransformer.cs" />
     <Compile Include="Common\Expressions\IExpressionTransformVisitorFactory.cs" />
     <Compile Include="Common\Expressions\ExpressionTransformVisitorFactory.cs" />
+    <Compile Include="Common\Expressions\Reduce\ExpressionReduceResult.cs" />
+    <Compile Include="Common\Expressions\Reduce\ExpressionReduceVisitor.cs" />
     <Compile Include="Common\Expressions\Transformers\LambdaExpressionTransformer.cs" />
     <Compile Include="Common\Expressions\Transformers\MethodCallExpressionTransformer.cs" />
     <Compile Include="Common\HandlerSearchMethod.cs" />
