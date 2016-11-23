@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -17,6 +18,23 @@ namespace Saritasa.Tools.Messages.Common.Expressions
         private IExpressionTransformVisitorFactory transformVisitorFactory;
         private static ConcurrentDictionary<MethodInfo, MethodInfo> genericInvocationCache =
             new ConcurrentDictionary<MethodInfo, MethodInfo>();
+
+        private Dictionary<int, Func<dynamic, dynamic[], dynamic>> callDispatchers = new Dictionary<int, Func<dynamic, dynamic[], dynamic>>
+        {
+            [0] = (func, parameters) => func.Invoke(),
+            [1] = (func, parameters) => func.Invoke(parameters[0]),
+            [2] = (func, parameters) => func.Invoke(parameters[0], parameters[1]),
+            [3] = (func, parameters) => func.Invoke(parameters[0], parameters[1], parameters[2]),
+            [4] = (func, parameters) => func.Invoke(parameters[0], parameters[1], parameters[2], parameters[3]),
+            [5] = (func, parameters) => func.Invoke(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4]),
+            [6] = (func, parameters) => func.Invoke(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4], parameters[5]),
+            [7] = (func, parameters) => func.Invoke(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4], parameters[5], parameters[6]),
+            [8] = (func, parameters) => func.Invoke(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4], parameters[5], parameters[6], parameters[7]),
+            [9] = (func, parameters) => func.Invoke(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4], parameters[5], parameters[6], parameters[7], parameters[8]),
+            [10] = (func, parameters) => func.Invoke(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4], parameters[5], parameters[6], parameters[7], parameters[8], parameters[9]),
+            [11] = (func, parameters) => func.Invoke(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4], parameters[5], parameters[6], parameters[7], parameters[8], parameters[9], parameters[10]),
+            [12] = (func, parameters) => func.Invoke(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4], parameters[5], parameters[6], parameters[7], parameters[8], parameters[9], parameters[10], parameters[11])
+        };
 
         /// <summary>
         /// Ctor.
@@ -58,25 +76,9 @@ namespace Saritasa.Tools.Messages.Common.Expressions
         {
             dynamic func = compiledExpressionCache.Get(info);
 
-            if (parameters.Count() == 0)
+            if (callDispatchers.ContainsKey(parameters.Length))
             {
-                return func.Invoke();
-            }
-            if (parameters.Count() == 1)
-            {
-                return func.Invoke(parameters[0]);
-            }
-            else if (parameters.Count() == 2)
-            {
-                return func.Invoke(parameters[0], parameters[1]);
-            }
-            else if (parameters.Count() == 3)
-            {
-                return func.Invoke(parameters[0], parameters[1], parameters[2]);
-            }
-            else if (parameters.Count() == 4)
-            {
-                return func.Invoke(parameters[0], parameters[1], parameters[2], parameters[3]);
+                return callDispatchers[parameters.Length](func, parameters);
             }
 
             throw new NotSupportedException();
