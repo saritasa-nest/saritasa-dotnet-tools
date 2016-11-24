@@ -129,3 +129,5 @@ bundles
 *.SourceManifest.xml
 *.deploy-readme.txt
 *.deploy.cmd
+.sonar
+sonar-project.properties

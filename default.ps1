@@ -17,24 +17,17 @@ $env:PSModulePath += ";$PSScriptRoot\scripts\Modules"
 Import-Module Saritasa.Build
 Import-Module Saritasa.Test
 
-Properties `
-{
-    $SignKey = './saritasa-tools.snk'
-    $NuspecFile = './build/Saritasa.Tools.nuspec'
-    $LibDirectory = './build/lib'
-    $Configuration = 'Release'
-}
-
 # Global variable.
 $script:Version = '0.0.0'
 
-$builds = @(
-    @{Id = 'v4.5.2'; Framework = 'net452'; symbol = 'NET452'}
-    @{Id = 'v4.6.1'; Framework = 'net461'; symbol = 'NET461'}
-)
 $packages = @(
-    'Saritasa.Tools'
+    'Saritasa.Tools.Common'
+    'Saritasa.Tools.Domain'
     'Saritasa.Tools.Ef6'
+    'Saritasa.Tools.EfCore1'
+    'Saritasa.Tools.Emails'
+    'Saritasa.Tools.Messages'
+    'Saritasa.Tools.Misc'
     'Saritasa.Tools.Mvc5'
     'Saritasa.Tools.NLog4'
 )
@@ -46,48 +39,16 @@ function Get-PackageName([string]$package)
     If ([System.Char]::IsDigit($package[$package.Length-1])) {$package.Substring(0, $package.Length-1)} Else {$package}
 }
 
-Task pack -depends pre-build, get-version -description 'Build the library, test it and prepare nuget packages' `
+Task pack -description 'Build the library, test it and prepare nuget packages' `
 {
-    # build all versions, sign, test and prepare package directory
     foreach ($package in $packages)
     {
-        Get-PackageName($package)
-        Remove-Item $LibDirectory -Recurse -Force -ErrorAction SilentlyContinue
-        New-Item $LibDirectory -ItemType Directory
-        foreach ($build in $builds)
-        {
-            # build & sign
-            $id = $build.Id
-            $symbol = $build.symbol
-            $args = @("/p:TargetFrameworkVersion=$id", "/p:DefineConstants=$symbol")
-            if (Test-Path $SignKey)
-            {
-                $args += "/p:AssemblyOriginatorKeyFile=$SignKey" + '/p:SignAssembly=true'
-            }
-            Invoke-ProjectBuild -ProjectPath "./src/$package/$package.csproj" -Configuration $Configuration -BuildParams $args
-
-            # copy
-            New-Item (Join-Path $LibDirectory $build.Framework) -ItemType Directory
-            $packageFile = Get-PackageName $package
-            Copy-Item "./src/$package/bin/$Configuration/$packageFile.dll" (Join-Path $LibDirectory $build.Framework)
-            Copy-Item "./src/$package/bin/$Configuration/$packageFile.XML" (Join-Path $LibDirectory $build.Framework)
-        }
-
-        # pack, we already have nuget in current folder
-        $nugetExePath = "$PSScriptRoot\tools\nuget.exe"
-        $buildDirectory = (Get-Item $LibDirectory).Parent.FullName
-        &"$nugetExePath" @('pack', (Join-Path $buildDirectory "$package.nuspec"), '-Version', $Version, '-NonInteractive', '-Exclude', '*.snk')
+        &dotnet pack ".\src\$package" --configuration release --output '.'
         if ($LASTEXITCODE)
         {
             throw 'Nuget pack failed.'
         }
     }
-
-    # little clean up
-    Remove-Item $LibDirectory -Recurse -Force -ErrorAction SilentlyContinue
-
-    # build docs
-    CompileDocs
 }
 
 Task clean -description 'Clean solution' `

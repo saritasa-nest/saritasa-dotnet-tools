@@ -1,26 +1,20 @@
 Saritasa Tools
 ==============
 
-An infrastructure components and development tools for company projects. Read the documentation on [Read the Docs](http://saritasa-tools.readthedocs.io/en/latest/index.html).
+An infrastructure components and development tools for company projects. Read the latest documentation on [Read the Docs](http://saritasa-tools.readthedocs.io/en/latest/index.html).
 
 Overview
 --------
 
-1. Saritasa.Tools - _general assembly;_
-   - Messages (commands, queries, events) - _pipeline to process and log system queries/actions;_
-   - Unit of Work - _general interface for unit of work pattern;_
-   - Repository - _general interface for repository pattern;_
-   - Emails - _intefaces for system emails;_
-   - Logging - _general interfaces for logging;_
-   - Exceptions - _domain exception, validation;_
-   - Security - _password generator;_
-   - Pagination;
-1. Saritasa.Tools.Ef6 - _unit of work and repository implementation for Entity Framework 6;_
-1. Saritasa.Tools.EfCore1 - _unit of work and repository implementation for Entity Framework Core;_
-1. Saritasa.Tools.Mvc5 - _utilities for ASP.NET MVC 5;_
-    - CORS helper class;
-    - Razor helpers;
-1. Saritasa.Tools.NLog4 - _logger interface implementation for NLog 4;_
+1. [Saritasa.Tools.Common](https://www.nuget.org/packages/Saritasa.Tools.Common) - _various utilities (validation, flow, security, atomic), extensions (dict, datetime, string), pagination;_
+1. [Saritasa.Tools.Domain](https://www.nuget.org/packages/Saritasa.Tools.Domain) - _general interfaces: repository, unit of work, domian events; exceptions;_
+1. [Saritasa.Tools.Emails](https://www.nuget.org/packages/Saritasa.Tools.Emails) - _intefaces for system emails;_
+1. [Saritasa.Tools.Messages](https://www.nuget.org/packages/Saritasa.Tools.Messages) - _commands, queries, events: pipeline to process and log system queries/actions;_
+1. [Saritasa.Tools.Misc](https://www.nuget.org/packages/Saritasa.Tools.Misc) - _miscellaneous: password generation;_
+1. [Saritasa.Tools.Ef6](https://www.nuget.org/packages/Saritasa.Tools.Ef6) - _unit of work and repository implementation for Entity Framework 6;_
+1. [Saritasa.Tools.EfCore1](https://www.nuget.org/packages/Saritasa.Tools.EfCore1) - _unit of work and repository implementation for Entity Framework Core;_
+1. [Saritasa.Tools.Mvc5](https://www.nuget.org/packages/Saritasa.Tools.Mvc5) - _utilities for ASP.NET MVC 5;_
+1. [Saritasa.Tools.NLog4](https://www.nuget.org/packages/Saritasa.Tools.NLog4) - _Microsoft common logger abstractions implementation for NLog 4;_
 
 Goals
 -----
@@ -83,14 +77,19 @@ After that the "Saritasa Code Rules" will be available in "Code Analysis" in pro
 Commands
 --------
 
-* Build the library, test it and prepare nuget packages
+* Build the library, test it and prepare nuget packages.
 
 ```psake pack```
 
-* Generate documentation
+* Generate documentation.
 
 ```psake docs```
 
-* Clean project
+* Clean project.
 
 ```psake clean```
+
+Contributors
+------------
+
+* Saritasa http://www.saritasa.com

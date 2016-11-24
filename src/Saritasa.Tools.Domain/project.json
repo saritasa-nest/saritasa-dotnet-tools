@@ -1,6 +1,21 @@
 {
   "title": "Saritasa Tools Domain",
   "version": "0.1.0",
+  "authors": [ "Saritasa" ],
+  "description": "The package is a part of Saritasa Tools project. Saritasa.Tools.Domain contains abstractions for unit of work, repository, domain events. Also there are domain exceptions (not found, validation, security). The implementation can be found in Saritasa.Tools.EfCore1, Saritasa.Tools.Ef6 packages.",
+  "copyright": "Saritasa 2015-2016",
+  "packOptions": {
+    "iconUrl": "https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png",
+    "licenseUrl": "https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/LICENSE",
+    "projectUrl": "https://github.com/Saritasa/SaritasaTools",
+    "requireLicenseAcceptance": false,
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/Saritasa/SaritasaTools"
+    },
+    "summary": "Domain abstractions.",
+    "tags": [ "unit of work", "repository", "domain events" ]
+  },
   "frameworks": {
     "net452": {
       "frameworkAssemblies": {
@@ -29,7 +44,8 @@
       }
     }
   },
-  "dependencies": {
-    "Newtonsoft.Json": "9.0.1"
+  "buildOptions": {
+    "keyFile": "../../tools/SaritasaTools.snk",
+    "xmlDoc": true
   }
 }

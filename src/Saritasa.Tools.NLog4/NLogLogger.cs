@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.NLog4
+namespace Saritasa.Tools.NLog
 {
     using System;
     using Microsoft.Extensions.Logging;
@@ -11,9 +11,9 @@ namespace Saritasa.Tools.NLog4
     /// </summary>
     internal class NLogLogger : Microsoft.Extensions.Logging.ILogger
     {
-        private readonly NLog.Logger logger;
+        private readonly global::NLog.Logger logger;
 
-        public NLogLogger(NLog.Logger logger)
+        public NLogLogger(global::NLog.Logger logger)
         {
             this.logger = logger;
         }
@@ -32,7 +32,7 @@ namespace Saritasa.Tools.NLog4
                 if (!string.IsNullOrEmpty(message))
                 {
                     // message arguments are not needed as it is already checked that the loglevel is enabled.
-                    var eventInfo = NLog.LogEventInfo.Create(nLogLogLevel, logger.Name, message);
+                    var eventInfo = global::NLog.LogEventInfo.Create(nLogLogLevel, logger.Name, message);
                     eventInfo.Exception = exception;
                     eventInfo.Properties["EventId.Id"] = eventId.Id;
                     eventInfo.Properties["EventId.Name"] = eventId.Name;
@@ -56,7 +56,7 @@ namespace Saritasa.Tools.NLog4
         /// <summary>
         /// Is logging enabled for this logger at this <paramref name="logLevel" />?
         /// </summary>
-        private bool IsEnabled(NLog.LogLevel logLevel)
+        private bool IsEnabled(global::NLog.LogLevel logLevel)
         {
             return logger.IsEnabled(logLevel);
         }
@@ -66,26 +66,26 @@ namespace Saritasa.Tools.NLog4
         /// </summary>
         /// <param name="logLevel">Level to be converted.</param>
         /// <returns>Converted level.</returns>
-        private static NLog.LogLevel ConvertLogLevel(Microsoft.Extensions.Logging.LogLevel logLevel)
+        private static global::NLog.LogLevel ConvertLogLevel(Microsoft.Extensions.Logging.LogLevel logLevel)
         {
             switch (logLevel)
             {
                 case Microsoft.Extensions.Logging.LogLevel.Trace:
-                    return NLog.LogLevel.Trace;
+                    return global::NLog.LogLevel.Trace;
                 case Microsoft.Extensions.Logging.LogLevel.Debug:
-                    return NLog.LogLevel.Debug;
+                    return global::NLog.LogLevel.Debug;
                 case Microsoft.Extensions.Logging.LogLevel.Information:
-                    return NLog.LogLevel.Info;
+                    return global::NLog.LogLevel.Info;
                 case Microsoft.Extensions.Logging.LogLevel.Warning:
-                    return NLog.LogLevel.Warn;
+                    return global::NLog.LogLevel.Warn;
                 case Microsoft.Extensions.Logging.LogLevel.Error:
-                    return NLog.LogLevel.Error;
+                    return global::NLog.LogLevel.Error;
                 case Microsoft.Extensions.Logging.LogLevel.Critical:
-                    return NLog.LogLevel.Fatal;
+                    return global::NLog.LogLevel.Fatal;
                 case Microsoft.Extensions.Logging.LogLevel.None:
-                    return NLog.LogLevel.Off;
+                    return global::NLog.LogLevel.Off;
                 default:
-                    return NLog.LogLevel.Debug;
+                    return global::NLog.LogLevel.Debug;
             }
         }
 
@@ -95,7 +95,7 @@ namespace Saritasa.Tools.NLog4
             {
                 throw new ArgumentNullException(nameof(state));
             }
-            return NLog.NestedDiagnosticsContext.Push(state);
+            return global::NLog.NestedDiagnosticsContext.Push(state);
         }
     }
 }
