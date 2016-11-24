@@ -7,6 +7,12 @@
     "Saritasa.Tools.Emails",
     "Saritasa.Tools.Messages",
     "Saritasa.Tools.Misc",
-    "Saritasa.Tools.NLog4"
-  ]
+    "Saritasa.Tools.NLog4",
+    "Saritasa.Tools.Common.Tests",
+    "Saritasa.Tools.Messages.Tests",
+    "Saritasa.Tools.Tests"
+  ],
+  "sdk": {
+    "version": "1.0.0-preview2-003131"
+  }
 }
