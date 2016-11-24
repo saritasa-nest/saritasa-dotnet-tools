@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 using Saritasa.Tools.Tests.Expressions.Fixtures;
 using Xunit;
 
@@ -109,6 +104,7 @@ namespace Saritasa.Tools.Tests.Expressions
             // Act
             var result = visitor.VisitAndReduce(sumExpression);
 
+            // Assert
             Assert.Equal(expectedExpression.ToString(), result.ToString());
         }
     }

@@ -34,7 +34,6 @@ namespace Saritasa.Tools.Tests.Expressions
         public void Expression_executor_with_one_method_should_compile_and_reduce()
         {
             // Arrange
-            var executor = fixture.Create();
             Expression<Func<ExpressionExecutorTests, int>> expression = (v) => CompiledMethod(10 + 1, 1 + 3);
 
             // Act
@@ -52,7 +51,6 @@ namespace Saritasa.Tools.Tests.Expressions
         public void Expression_executor_with_one_method_and_outer_parameters_should_compile(int value0, int value1, int result)
         {
             // Arrange
-            var executor = fixture.Create();
             Expression<Func<ExpressionExecutorTests, int>> expression = (v) => CompiledMethod(value0, value1);
 
             // Act
@@ -70,7 +68,6 @@ namespace Saritasa.Tools.Tests.Expressions
         public void Expression_executor_with_one_method_and_outer_parameters_should_compile_and_execute_correctly(int value0, int value1, int result)
         {
             // Arrange
-            var executor = fixture.Create();
             Expression<Func<ExpressionExecutorTests, int>> expression = (v) => CompiledMethod(value0, value1);
             var methodInfo = typeof(ExpressionExecutorTests).GetMethod("CompiledMethod");
 
@@ -92,7 +89,6 @@ namespace Saritasa.Tools.Tests.Expressions
         public void Expression_execute_non_typed_with_one_method_and_outer_parameters_should_compile_and_execute_correctly(int value0, int value1, int result)
         {
             // Arrange
-            var executor = fixture.Create();
             Expression<Func<ExpressionExecutorTests, int>> expression = (v) => CompiledMethod(value0, value1);
             var methodInfo = typeof(ExpressionExecutorTests).GetMethod("CompiledMethod");
 
@@ -114,7 +110,6 @@ namespace Saritasa.Tools.Tests.Expressions
         public void Expression_reduce_and_execute_with_one_method_and_outer_parameters_should_compile_and_execute_correctly(int value0, int value1, int result)
         {
             // Arrange
-            var executor = fixture.Create();
             Expression<Func<ExpressionExecutorTests, int>> expression = (v) => CompiledMethod(value0 + 1, value1 + 2);
             var methodInfo = typeof(ExpressionExecutorTests).GetMethod("CompiledMethod");
 
@@ -137,7 +132,6 @@ namespace Saritasa.Tools.Tests.Expressions
         public void Expression_reduce_and_execute_with_one_method_and_outer_parameters_which_one_is_binary_should_compile_and_execute_correctly(int value0, int value1, int result)
         {
             // Arrange
-            var executor = fixture.Create();
             Expression<Func<ExpressionExecutorTests, int>> expression = (v) => CompiledMethod(value0 + 1, value1);
             var methodInfo = typeof(ExpressionExecutorTests).GetMethod("CompiledMethod");
 
@@ -159,7 +153,6 @@ namespace Saritasa.Tools.Tests.Expressions
         public void Expression_reduce_and_execute_with_complex_outer_parameter_should_reduce_correctly()
         {
             // Arrange
-            var executor = fixture.Create();
             var testClass = fixture.CreateTestObject();
             Expression<Func<ExpressionExecutorTests, int>> expression = (v) => CompiledMethod(testClass.Value1 + 1, testClass.Value2);
             Expression<Func<ExpressionExecutorTests, int>> expression2 = (v) => CompiledMethod(testClass.Value1 + 1, testClass.Value2 + 1);
@@ -189,7 +182,6 @@ namespace Saritasa.Tools.Tests.Expressions
         public void Expression_reduce_and_execute_with_complex_outer_parameter_and_chain_method_should_reduce_and_execute_correctly()
         {
             // Arrange
-            var executor = fixture.Create();
             var testClass = fixture.CreateTestObject();
             var methodInfo = typeof(ExpressionExecutorTests).GetMethod("SimpleReturn");
             Expression<Func<ExpressionExecutorTests, ExpressionExecutorTests>> expression = (v) => SimpleReturn(testClass.Value1 + 1, testClass.Value2)
@@ -203,6 +195,7 @@ namespace Saritasa.Tools.Tests.Expressions
             executor.CompiledCache.Clear();
             expression = executor.Reduce(expression);
 
+            // Assert
             Assert.Equal(expectedExpression.ToString(), expression.ToString());
         }
     }
