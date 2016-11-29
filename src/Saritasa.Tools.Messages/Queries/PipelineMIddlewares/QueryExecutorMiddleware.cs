@@ -38,7 +38,8 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
             var stopWatch = System.Diagnostics.Stopwatch.StartNew();
             try
             {
-                if (!TryInvokeExpression(queryMessage.Method, queryMessage.QueryObject, queryMessage.Parameters.Length, queryMessage.Parameters, out var result))
+                dynamic result;
+                if (!TryInvokeExpression(queryMessage.Method, queryMessage.QueryObject, queryMessage.Parameters.Length, queryMessage.Parameters, out result))
                 {
                     result = queryMessage.Method.Invoke(queryMessage.QueryObject, queryMessage.Parameters);
                 }
