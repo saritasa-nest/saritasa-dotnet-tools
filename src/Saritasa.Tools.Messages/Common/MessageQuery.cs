@@ -5,7 +5,6 @@ namespace Saritasa.Tools.Messages.Common
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq.Expressions;
     using System.Reflection;
 
     /// <summary>
@@ -14,59 +13,49 @@ namespace Saritasa.Tools.Messages.Common
     public class MessageQuery
     {
         /// <summary>
-        /// Always return true delegate that accepts one parameter.
+        /// Message guid to filter.
         /// </summary>
-        public static readonly Expression<Func<object, bool>> ReturnTrueExpression = (obj) => true;
+        public Guid? Id { get; private set; }
 
         /// <summary>
-        /// Always return true delegate that accepts one parameter.
+        /// Creation start date to filter.
         /// </summary>
-        public static readonly Expression<Func<Message, bool>> ReturnTrueMessageExpression = (obj) => true;
+        public DateTime? CreatedStartDate { get; private set; }
 
         /// <summary>
-        /// Always return true delegate that accepts one parameter.
+        /// Creation end date to filter.
         /// </summary>
-        public static readonly Expression<Func<IDictionary<string, string>, bool>> ReturnTrueDictExpression = (obj) => true;
+        public DateTime? CreatedEndDate { get; private set; }
 
         /// <summary>
-        /// Message selector. Contain main message criterias.
+        /// Content type to filter.
         /// </summary>
-        public Expression<Func<Message, bool>> MessageSelector { get; } = ReturnTrueMessageExpression;
+        public string ContentType { get; private set; }
 
         /// <summary>
-        /// Has message message selector.
+        /// Error type to filter.
         /// </summary>
-        public bool HasMessageSelector => MessageSelector != ReturnTrueMessageExpression;
+        public string ErrorType { get; private set; }
 
         /// <summary>
-        /// Message data selector. Data is just key-value string dictionary.
+        /// Message status to filter.
         /// </summary>
-        public Expression<Func<IDictionary<string, string>, bool>> DataSelector { get; private set; } = ReturnTrueDictExpression;
+        public Message.ProcessingStatus? Status { get; private set; }
 
         /// <summary>
-        /// Has query data selector.
+        /// Message type to filter.
         /// </summary>
-        public bool HasDataSelector => DataSelector != ReturnTrueDictExpression;
+        public byte? Type { get; private set; }
 
         /// <summary>
-        /// Internal message structure selector.
+        /// Message execution duration should be above or equal the value.
         /// </summary>
-        public LambdaExpression ContentSelector { get; private set; } = ReturnTrueExpression;
+        public int? ExecutionDurationAbove { get; private set; }
 
         /// <summary>
-        /// Has query content selector.
+        /// Message execution duration should be below or equal the value.
         /// </summary>
-        public bool HasContentSelector => ContentSelector != ReturnTrueExpression;
-
-        /// <summary>
-        /// Internal error structure selector.
-        /// </summary>
-        public LambdaExpression ErrorSelector { get; private set; } = ReturnTrueExpression;
-
-        /// <summary>
-        /// Has query error selector.
-        /// </summary>
-        public bool HasErrorSelector => ErrorSelector != ReturnTrueExpression;
+        public int? ExecutionDurationBelow { get; private set; }
 
         /// <summary>
         /// Assemblies to load types.
@@ -87,15 +76,6 @@ namespace Saritasa.Tools.Messages.Common
         {
         }
 
-        MessageQuery(Expression<Func<Message, bool>> messageSelector)
-        {
-            if (messageSelector == null)
-            {
-                throw new ArgumentNullException(nameof(messageSelector));
-            }
-            MessageSelector = messageSelector;
-        }
-
         /// <summary>
         /// Default create to retrieve all messages.
         /// </summary>
@@ -106,137 +86,137 @@ namespace Saritasa.Tools.Messages.Common
         }
 
         /// <summary>
-        /// Message query with message query.
+        /// Filter message since the specified creation date.
         /// </summary>
-        /// <param name="messageSelector">Message selector.</param>
+        /// <param name="startDate">Date since the message has been created.</param>
         /// <returns>Message query.</returns>
-        public static MessageQuery Create(Expression<Func<Message, bool>> messageSelector)
+        public MessageQuery WithCreatedStartDate(DateTime startDate)
         {
-            return new MessageQuery(messageSelector);
-        }
-
-        /// <summary>
-        /// Add type loader assemblies.
-        /// </summary>
-        /// <param name="assemblies">Assemblies.</param>
-        /// <returns>Message query.</returns>
-        public MessageQuery WithAssemblies(Assembly[] assemblies)
-        {
-            if (assemblies == null)
-            {
-                throw new ArgumentNullException(nameof(assemblies));
-            }
-            for (int i = 0; i < assemblies.Length; i++)
-            {
-                Assemblies.Add(assemblies[i]);
-            }
+            CreatedStartDate = startDate;
             return this;
         }
 
         /// <summary>
-        /// Add type loader assemblies.
+        /// Filters messages till the specified creation date.
         /// </summary>
-        /// <param name="assemblies">Assemblies.</param>
+        /// <param name="endDate">Date till the message has been created.</param>
         /// <returns>Message query.</returns>
-        public MessageQuery WithAssemblies(IEnumerable<Assembly> assemblies)
+        public MessageQuery WithCreatedEndDate(DateTime endDate)
         {
-            if (assemblies == null)
-            {
-                throw new ArgumentNullException(nameof(assemblies));
-            }
-            foreach (var assembly in assemblies)
-            {
-                Assemblies.Add(assembly);
-            }
-            return this;
-        }
-
-#if !NETCOREAPP1_0 && !NETSTANDARD1_6
-        /// <summary>
-        /// Add calling assembly as type loader assembly.
-        /// </summary>
-        /// <returns>Message query.</returns>
-        public MessageQuery WithCallingAssembly()
-        {
-            Assemblies.Add(Assembly.GetCallingAssembly());
-            return this;
-        }
-#endif
-
-        /// <summary>
-        /// Set content selector.
-        /// </summary>
-        /// <param name="contentSelector">Content selector.</param>
-        /// <returns>Message query.</returns>
-        public MessageQuery WithContent(LambdaExpression contentSelector)
-        {
-            if (contentSelector == null)
-            {
-                throw new ArgumentNullException(nameof(contentSelector));
-            }
-            ContentSelector = contentSelector;
+            CreatedEndDate = endDate;
             return this;
         }
 
         /// <summary>
-        /// Set content selector.
+        /// Filter only messages with specified content type.
         /// </summary>
-        /// <typeparam name="TContent">Content type.</typeparam>
-        /// <param name="contentSelector">Content selector.</param>
+        /// <typeparam name="TContent">Type of class for content.</typeparam>
         /// <returns>Message query.</returns>
-        public MessageQuery WithContent<TContent>(Expression<Func<TContent, bool>> contentSelector) where TContent : class
+        public MessageQuery WithContentType<TContent>()
         {
-            if (contentSelector == null)
+            return WithContentType(typeof(TContent).FullName);
+        }
+
+        /// <summary>
+        /// Filter only messages with specified content type.
+        /// </summary>
+        /// <param name="contentType">Class name for type.</param>
+        /// <returns>Message query.</returns>
+        public MessageQuery WithContentType(string contentType)
+        {
+            if (string.IsNullOrWhiteSpace(contentType))
             {
-                throw new ArgumentNullException(nameof(contentSelector));
+                throw new ArgumentException(nameof(contentType));
             }
-            ContentSelector = contentSelector;
+            ContentType = contentType;
             return this;
         }
 
         /// <summary>
-        /// Set data selector.
+        /// Filter only messages with specified error type.
         /// </summary>
-        /// <param name="dataSelector">Data selector.</param>
+        /// <typeparam name="TError">Type of class for error.</typeparam>
         /// <returns>Message query.</returns>
-        public MessageQuery WithData(Expression<Func<IDictionary<string, string>, bool>> dataSelector)
+        public MessageQuery WithErrorType<TError>()
         {
-            if (dataSelector == null)
+            return WithErrorType(typeof(TError).FullName);
+        }
+
+        /// <summary>
+        /// Filter only messages with specified error type.
+        /// </summary>
+        /// <param name="errorType">Class name for type.</param>
+        /// <returns>Message query.</returns>
+        public MessageQuery WithErrorType(string errorType)
+        {
+            if (string.IsNullOrWhiteSpace(errorType))
             {
-                throw new ArgumentNullException(nameof(dataSelector));
+                throw new ArgumentException(nameof(errorType));
             }
-            DataSelector = dataSelector;
+            ErrorType = errorType;
             return this;
         }
 
         /// <summary>
-        /// Set error selector.
+        /// Filter messages only with specified status.
         /// </summary>
-        /// <param name="errorSelector">Error selector.</param>
+        /// <param name="status">Status.</param>
         /// <returns>Message query.</returns>
-        public MessageQuery WithError(LambdaExpression errorSelector)
+        public MessageQuery WithStatus(Message.ProcessingStatus status)
         {
-            if (errorSelector == null)
-            {
-                throw new ArgumentNullException(nameof(errorSelector));
-            }
-            ErrorSelector = errorSelector;
+            Status = status;
             return this;
         }
 
         /// <summary>
-        /// Set error selector.
+        /// Select message by id. There should be only one message with specified id.
         /// </summary>
-        /// <typeparam name="TError">Error type.</typeparam>
-        /// <param name="errorSelector">Error selector.</param>
+        /// <param name="id">Guid.</param>
         /// <returns>Message query.</returns>
-        public MessageQuery WithError<TError>(Expression<Func<TError, bool>> errorSelector) where TError : Exception
+        public MessageQuery WithId(Guid id)
         {
-            if (errorSelector == null)
+            Id = id;
+            return this;
+        }
+
+        /// <summary>
+        /// Filter message only with specified type.
+        /// </summary>
+        /// <param name="type">Message type.</param>
+        /// <returns>Message query.</returns>
+        public MessageQuery WithType(byte type)
+        {
+            Type = type;
+            return this;
+        }
+
+        /// <summary>
+        /// Filter messages with execution duration above the limit.
+        /// </summary>
+        /// <param name="duration">Execution duration in ms.</param>
+        /// <returns>Message query.</returns>
+        public MessageQuery WithExecutionDurationAbove(int duration)
+        {
+            if (ExecutionDurationBelow.HasValue && ExecutionDurationBelow.Value > duration)
             {
-                throw new ArgumentNullException(nameof(errorSelector));
+                throw new ArgumentOutOfRangeException($"{nameof(duration)} must be greater than ${nameof(ExecutionDurationBelow)}");
             }
-            ErrorSelector = errorSelector;
+            ExecutionDurationAbove = duration;
+            return this;
+        }
+
+        /// <summary>
+        /// Filter messages with execution duration below the limit.
+        /// </summary>
+        /// <param name="duration">Execution duration in ms.</param>
+        /// <returns>Message query.</returns>
+        public MessageQuery WithExecutionDurationBelow(int duration)
+        {
+            if (ExecutionDurationAbove.HasValue && ExecutionDurationAbove.Value < duration)
+            {
+                throw new ArgumentOutOfRangeException($"{nameof(duration)} must be lower than ${nameof(ExecutionDurationAbove)}");
+            }
+            ExecutionDurationBelow = duration;
             return this;
         }
 
@@ -260,6 +240,53 @@ namespace Saritasa.Tools.Messages.Common
             Skip = skip;
             Take = take;
             return this;
+        }
+
+        /// <summary>
+        /// Does the message match criterias of query.
+        /// </summary>
+        /// <param name="message">Message.</param>
+        /// <returns>True if message matches criteries.</returns>
+        public bool Match(Message message)
+        {
+            if (Id.HasValue && message.Id != Id.Value)
+            {
+                return false;
+            }
+            if (CreatedStartDate.HasValue && message.CreatedAt < CreatedStartDate.Value)
+            {
+                return false;
+            }
+            if (CreatedEndDate.HasValue && message.CreatedAt > CreatedEndDate.Value)
+            {
+                return false;
+            }
+            if (!string.IsNullOrEmpty(ContentType) && message.ContentType != ContentType)
+            {
+                return false;
+            }
+            if (!string.IsNullOrEmpty(ErrorType) && message.ErrorType != ErrorType)
+            {
+                return false;
+            }
+            if (Status.HasValue && message.Status != Status.Value)
+            {
+                return false;
+            }
+            if (Type.HasValue && message.Type != Type.Value)
+            {
+                return false;
+            }
+            if (ExecutionDurationAbove.HasValue && message.ExecutionDuration < ExecutionDurationAbove.Value)
+            {
+                return false;
+            }
+            if (ExecutionDurationBelow.HasValue && message.ExecutionDuration > ExecutionDurationBelow.Value)
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

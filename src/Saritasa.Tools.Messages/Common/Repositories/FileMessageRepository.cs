@@ -155,22 +155,16 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <inheritdoc />
         public IEnumerable<Message> Get(MessageQuery messageQuery)
         {
-            // analyze expression
-            var visitor = new CreatedDateExpressionVisitor();
-            visitor.Visit(messageQuery.MessageSelector);
-            var compiledSelector = messageQuery.MessageSelector.Compile();
-            var compiledDataSelector = messageQuery.DataSelector.Compile();
-            var compiledContentSelector = (Func<object, bool>)messageQuery.ContentSelector.Compile();
-            var compiledErrorSelector = (Func<object, bool>)messageQuery.ErrorSelector.Compile();
-
             // collect all files in dir
             var allFiles =
                 Directory.GetFiles(LogsPath, GetSearchPattern()).OrderBy(f => f).Select(Path.GetFileName).ToArray();
             var allFilesHash = new HashSet<string>(allFiles);
 
-            // prepare first and last dates
-            var startDate = visitor.StartDate;
-            var endDate = visitor.EndDate;
+            // init first and last dates
+            var startDate = messageQuery.CreatedStartDate ?? DateTime.MinValue;
+            var endDate = messageQuery.CreatedEndDate ?? DateTime.MaxValue;
+
+            // correct start and end dates, so minimum date will be first file in list, and max date last file
             if (allFiles.Any())
             {
                 DateTime tmp;
@@ -183,7 +177,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                     System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat, System.Globalization.DateTimeStyles.None, out tmp))
                 {
                     tmp = tmp.AddDays(1);
-                    if (tmp < endDate)
+                    if (tmp < messageQuery.CreatedEndDate.Value)
                     {
                         endDate = tmp;
                     }
@@ -214,8 +208,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                         var commandSerializer = new MessageBinarySerializer(stream, serializer, messageQuery.Assemblies.ToArray());
                         for (Message message; (message = commandSerializer.Read()) != null;)
                         {
-                            if (compiledSelector(message) && compiledContentSelector(message.Content) &&
-                                compiledDataSelector(message.Data) && compiledErrorSelector(message.Error))
+                            if (messageQuery.Match(message))
                             {
                                 targetList.Add(message);
                             }
