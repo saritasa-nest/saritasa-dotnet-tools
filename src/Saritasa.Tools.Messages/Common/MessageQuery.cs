@@ -8,7 +8,7 @@ namespace Saritasa.Tools.Messages.Common
     using System.Reflection;
 
     /// <summary>
-    /// Message query parameters.
+    /// Message query parameters. Always filters with AND condition.
     /// </summary>
     public class MessageQuery
     {

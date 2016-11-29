@@ -14,7 +14,7 @@ namespace Saritasa.Tools.Common.Extensions
     /// </summary>
     public static class EnumExtensions
     {
-#if !PORTABLE && !NETSTANDARD1_6 && !NETCOREAPP1_0
+#if !PORTABLE && !NETSTANDARD1_2 && !NETSTANDARD1_6 && !NETCOREAPP1_0 && !NETCOREAPP1_1
         /// <summary>
         /// Gets the value of Description attribute.
         /// </summary>

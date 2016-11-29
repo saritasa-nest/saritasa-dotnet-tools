@@ -16,7 +16,7 @@ namespace Saritasa.Tools.Messages.Internal
     {
         static readonly object LockObj = new object();
 
-#if !NETCOREAPP1_0 && !NETSTANDARD1_6
+#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
         static readonly TraceSource TraceSource = new TraceSource("Saritasa.Tools");
 #endif
 
@@ -165,7 +165,7 @@ namespace Saritasa.Tools.Messages.Internal
                     Console.Write(sb.ToString());
                 }
 
-#if !NETCOREAPP1_0 && !NETSTANDARD1_6
+#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
                 if (LogToTrace)
                 {
                     TraceEventType eventType;

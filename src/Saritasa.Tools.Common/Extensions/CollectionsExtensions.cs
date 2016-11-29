@@ -98,7 +98,7 @@ namespace Saritasa.Tools.Common.Extensions
             }
         }
 
-#if !NETSTANDARD1_6
+#if !NETSTANDARD1_2 && !NETSTANDARD1_6
         /// <summary>
         /// Breaks a list of items into chunks of a specific size. Be aware that this method generates one additional
         /// sql query to get total number of collection elements.
@@ -145,7 +145,7 @@ namespace Saritasa.Tools.Common.Extensions
             while (hasRecords);
         }
 
-#if !NETSTANDARD1_6
+#if !NETSTANDARD1_2 && !NETSTANDARD1_6
         /// <summary>
         /// Breaks a list of items into chunks of a specific size and yeilds T items.
         /// </summary>

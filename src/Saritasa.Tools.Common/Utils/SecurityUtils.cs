@@ -14,7 +14,7 @@ namespace Saritasa.Tools.Common.Utils
     /// </summary>
     public static class SecurityUtils
     {
-#if !PORTABLE
+#if !PORTABLE && !NETSTANDARD1_2
         /// <summary>
         /// Returns string's MD5 hash (PHP-compatible).
         /// </summary>

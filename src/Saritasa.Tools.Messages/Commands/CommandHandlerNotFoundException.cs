@@ -8,7 +8,7 @@ namespace Saritasa.Tools.Messages.Commands
     /// <summary>
     /// Occures when command handler cannot be found.
     /// </summary>
-#if !NETCOREAPP1_0 && !NETSTANDARD1_6
+#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
     [Serializable]
 #endif
     public class CommandHandlerNotFoundException : Exception
@@ -31,7 +31,7 @@ namespace Saritasa.Tools.Messages.Commands
         {
         }
 
-    #if !NETCOREAPP1_0 && !NETSTANDARD1_6
+#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
         /// <summary>
         /// .ctor for deserialization.
         /// </summary>

@@ -9,6 +9,9 @@ namespace Saritasa.Tools.Messages.Internal
     using System.Reflection;
     using System.ComponentModel;
     using Common;
+#if NETCOREAPP1_1 || NETSTANDARD1_6
+    using System.Runtime.Loader;
+#endif
 
     /// <summary>
     /// Load types from assemblies. Also allows to load standard .NET types.
@@ -215,12 +218,46 @@ namespace Saritasa.Tools.Messages.Internal
                 return null;
             }
 
-#if !NETCOREAPP1_0 && !NETSTANDARD1_6
+#if !NETCOREAPP1_1 && !NETSTANDARD1_6
             var tc = TypeDescriptor.GetConverter(type);
             return tc.ConvertFrom(obj.ToString());
 #else
             return obj;
 #endif
+        }
+
+        internal static IEnumerable<Assembly> LoadAssembliesFromTypeName(string typeName)
+        {
+            var assemblies = new List<Assembly>();
+            var nsitems = typeName.Split('.');
+            if (nsitems.Length < 1)
+            {
+                return assemblies;
+            }
+            var currentAssemblyName = nsitems[0];
+            for (int i = 1; i < nsitems.Length; i++)
+            {
+                Assembly assembly = null;
+                try
+                {
+#if NETCOREAPP1_1 || NETSTANDARD1_6
+                    assembly = AssemblyLoadContext.Default.LoadFromAssemblyName(new AssemblyName(currentAssemblyName));
+#else
+                    assembly = Assembly.Load(currentAssemblyName);
+#endif
+                }
+                catch (Exception)
+                {
+                    // skip since it is possible that assembly with given name is not found
+                }
+
+                if (assembly != null)
+                {
+                    assemblies.Add(assembly);
+                }
+                currentAssemblyName += "." + nsitems[i];
+            }
+            return assemblies;
         }
     }
 }

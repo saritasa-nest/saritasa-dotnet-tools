@@ -31,16 +31,18 @@
         "System.ComponentModel.DataAnnotations": ""
       }
     },
-    "netcoreapp1.0": {
+    "netcoreapp1.1": {
       "dependencies": {
-        "Microsoft.NETCore.App": "1.0.1",
-        "System.Data.Common": "4.1.0"
+        "Microsoft.NETCore.App": "1.1.0",
+        "System.Data.Common": "4.1.0",
+        "System.Runtime.Loader": "4.0.0"
       }
     },
     "netstandard1.6": {
       "dependencies": {
         "NETStandard.Library": "1.6.0",
-        "System.Data.Common": "4.1.0"
+        "System.Data.Common": "4.1.0",
+        "System.Runtime.Loader": "4.0.0"
       }
     }
   },

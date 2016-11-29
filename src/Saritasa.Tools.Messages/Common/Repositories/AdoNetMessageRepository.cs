@@ -315,7 +315,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <returns>Message repository.</returns>
         public static IMessageRepository CreateFromState(IDictionary<string, object> dict)
         {
-#if NETCOREAPP1_0 || NETSTANDARD1_6
+#if NETCOREAPP1_1 || NETSTANDARD1_6
             throw new NotSupportedException("Not sure how to handle DbProviderFactories for .NET Core");
 #else
             return new AdoNetMessageRepository(
