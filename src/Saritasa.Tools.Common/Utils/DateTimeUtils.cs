@@ -13,12 +13,12 @@ namespace Saritasa.Tools.Common.Utils
     public static class DateTimeUtils
     {
         /// <summary>
-        /// Returns dates range.
+        /// Returns dates range. Uses lazy implementation.
         /// </summary>
         /// <param name="fromDate">From date.</param>
         /// <param name="toDate">To date.</param>
         /// <returns>Dates range.</returns>
-        private static IEnumerable<DateTime> Range(DateTime fromDate, DateTime toDate)
+        public static IEnumerable<DateTime> Range(DateTime fromDate, DateTime toDate)
         {
             return Enumerable.Range(0, toDate.Subtract(fromDate).Days + 1).Select(d => fromDate.AddDays(d));
         }

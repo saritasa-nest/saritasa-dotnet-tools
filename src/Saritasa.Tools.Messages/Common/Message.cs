@@ -27,17 +27,17 @@ namespace Saritasa.Tools.Messages.Common
         /// </summary>
         public const byte MessageTypeEvent = 3;
 
-        internal const int MessageFieldIdInd = 0;
-        internal const int MessageFieldTypeInd = 1;
-        internal const int MessageFieldContentTypeInd = 2;
-        internal const int MessageFieldContentInd = 3;
-        internal const int MessageFieldDataInd = 4;
-        internal const int MessageFieldErrorDetailsInd = 5;
-        internal const int MessageFieldErrorMessageInd = 6;
-        internal const int MessageFieldErrorTypeInd = 7;
-        internal const int MessageFieldCreatedAtInd = 8;
-        internal const int MessageFieldExecutionDurationInd = 9;
-        internal const int MessageFieldStatusInd = 10;
+        internal const int MessageFieldIdIndex = 0;
+        internal const int MessageFieldTypeIndex = 1;
+        internal const int MessageFieldContentTypeIndex = 2;
+        internal const int MessageFieldContentIndex = 3;
+        internal const int MessageFieldDataIndex = 4;
+        internal const int MessageFieldErrorDetailsIndex = 5;
+        internal const int MessageFieldErrorMessageIndex = 6;
+        internal const int MessageFieldErrorTypeIndex = 7;
+        internal const int MessageFieldCreatedAtIndex = 8;
+        internal const int MessageFieldExecutionDurationIndex = 9;
+        internal const int MessageFieldStatusIndex = 10;
 
         /// <summary>
         /// Commands status.

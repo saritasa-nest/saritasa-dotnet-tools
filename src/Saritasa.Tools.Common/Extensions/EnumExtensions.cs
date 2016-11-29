@@ -14,7 +14,7 @@ namespace Saritasa.Tools.Common.Extensions
     /// </summary>
     public static class EnumExtensions
     {
-#if !PORTABLE && !NETSTANDARD1_6 && !NETCOREAPP1_0
+#if !PORTABLE && !NETSTANDARD1_2 && !NETSTANDARD1_6 && !NETCOREAPP1_0 && !NETCOREAPP1_1
         /// <summary>
         /// Gets the value of Description attribute.
         /// </summary>
@@ -22,7 +22,7 @@ namespace Saritasa.Tools.Common.Extensions
         /// <returns>Description text.</returns>
         public static string GetDescription(this Enum target)
         {
-            if (target.GetType().IsEnum == false)
+            if (!target.GetType().IsEnum)
             {
                 throw new ArgumentOutOfRangeException(nameof(target), "Target is not enum");
             }

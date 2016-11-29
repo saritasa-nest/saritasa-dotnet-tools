@@ -15,6 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{C41050
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.Domain", "..\..\src\Saritasa.Tools.Domain\Saritasa.Tools.Domain.csproj", "{32A3A81C-A65C-4F78-8300-17151987697C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.NLog4", "..\..\src\Saritasa.Tools.NLog4\Saritasa.Tools.NLog4.csproj", "{83D4925B-B04F-4C9C-8BF1-9B6A6BE0A87D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{32A3A81C-A65C-4F78-8300-17151987697C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{32A3A81C-A65C-4F78-8300-17151987697C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{32A3A81C-A65C-4F78-8300-17151987697C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83D4925B-B04F-4C9C-8BF1-9B6A6BE0A87D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83D4925B-B04F-4C9C-8BF1-9B6A6BE0A87D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83D4925B-B04F-4C9C-8BF1-9B6A6BE0A87D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83D4925B-B04F-4C9C-8BF1-9B6A6BE0A87D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -46,5 +52,6 @@ Global
 		{D1AD1713-BC18-4340-B8DB-23D86D22FB7F} = {CBCC092D-4EF0-4F85-B377-0565A819E948}
 		{AEE65918-25DF-4A25-BFB8-56552FAA2A51} = {CBCC092D-4EF0-4F85-B377-0565A819E948}
 		{32A3A81C-A65C-4F78-8300-17151987697C} = {CBCC092D-4EF0-4F85-B377-0565A819E948}
+		{83D4925B-B04F-4C9C-8BF1-9B6A6BE0A87D} = {CBCC092D-4EF0-4F85-B377-0565A819E948}
 	EndGlobalSection
 EndGlobal

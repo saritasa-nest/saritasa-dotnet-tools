@@ -73,7 +73,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         string GetFileNameByDate(DateTime date, int count)
         {
             var name = $"{date:yyyyMMdd}-{count:000}.bin";
-            if (string.IsNullOrEmpty(prefix) == false)
+            if (!string.IsNullOrEmpty(prefix))
             {
                 name = prefix + "-" + name;
             }
@@ -155,38 +155,29 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <inheritdoc />
         public IEnumerable<Message> Get(MessageQuery messageQuery)
         {
-            // analyze expression
-            var visitor = new CreatedDateExpressionVisitor();
-            visitor.Visit(messageQuery.MessageSelector);
-            var compiledSelector = messageQuery.MessageSelector.Compile();
-            var compiledDataSelector = messageQuery.DataSelector.Compile();
-            var compiledContentSelector = (Func<object, bool>)messageQuery.ContentSelector.Compile();
-            var compiledErrorSelector = (Func<object, bool>)messageQuery.ErrorSelector.Compile();
-
             // collect all files in dir
             var allFiles =
                 Directory.GetFiles(LogsPath, GetSearchPattern()).OrderBy(f => f).Select(Path.GetFileName).ToArray();
             var allFilesHash = new HashSet<string>(allFiles);
 
-            // prepare first and last dates
-            var startDate = visitor.StartDate;
-            var endDate = visitor.EndDate;
+            // init first and last dates
+            var startDate = messageQuery.CreatedStartDate ?? DateTime.MinValue;
+            var endDate = messageQuery.CreatedEndDate ?? DateTime.MaxValue;
+
+            // correct start and end dates, so minimum date will be first file in list, and max date last file
             if (allFiles.Any())
             {
                 DateTime tmp;
                 if (DateTime.TryParseExact(GetFileDatePart(allFiles.First()), DateTimeFormat,
-                    System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat, System.Globalization.DateTimeStyles.None, out tmp))
+                    System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat, System.Globalization.DateTimeStyles.None, out tmp) && tmp > startDate)
                 {
-                    if (tmp > startDate)
-                    {
-                        startDate = tmp;
-                    }
+                    startDate = tmp;
                 }
                 if (DateTime.TryParseExact(GetFileDatePart(allFiles.Last()), DateTimeFormat,
                     System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat, System.Globalization.DateTimeStyles.None, out tmp))
                 {
                     tmp = tmp.AddDays(1);
-                    if (tmp < endDate)
+                    if (tmp < messageQuery.CreatedEndDate.Value)
                     {
                         endDate = tmp;
                     }
@@ -201,7 +192,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                 for (var i = 0; i < 1000; i++)
                 {
                     var fileName = GetFileNameByDate(currentDate, i);
-                    if (allFilesHash.Contains(fileName) == false)
+                    if (!allFilesHash.Contains(fileName))
                     {
                         break;
                     }
@@ -217,8 +208,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                         var commandSerializer = new MessageBinarySerializer(stream, serializer, messageQuery.Assemblies.ToArray());
                         for (Message message; (message = commandSerializer.Read()) != null;)
                         {
-                            if (compiledSelector(message) && compiledContentSelector(message.Content) &&
-                                compiledDataSelector(message.Data) && compiledErrorSelector(message.Error))
+                            if (messageQuery.Match(message))
                             {
                                 targetList.Add(message);
                             }

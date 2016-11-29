@@ -51,7 +51,7 @@ namespace Saritasa.Tools.Emails.Interceptors
         /// <inheritdoc />
         public void Sending(MailMessage mailMessage, IDictionary<string, object> data, ref bool cancel)
         {
-            if (AfterSend == false)
+            if (!AfterSend)
             {
                 Save(mailMessage);
             }

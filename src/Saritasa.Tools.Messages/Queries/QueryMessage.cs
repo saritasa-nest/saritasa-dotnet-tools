@@ -54,7 +54,7 @@ namespace Saritasa.Tools.Messages.Queries
         /// <summary>
         /// If true QueryObject has been created by Caller.
         /// </summary>
-        protected internal bool FakeQueryObject { get; set; } = false;
+        protected internal bool FakeQueryObject { get; set; }
 
         /// <summary>
         /// Function input parameters.

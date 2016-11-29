@@ -48,7 +48,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         /// <inheritdoc />
         public void Handle(Message message)
         {
-            if (filter != null && filter.IsMatch(message) == false)
+            if (filter != null && !filter.IsMatch(message))
             {
                 return;
             }

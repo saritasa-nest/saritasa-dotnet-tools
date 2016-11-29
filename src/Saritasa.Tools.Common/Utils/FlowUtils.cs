@@ -7,7 +7,7 @@ namespace Saritasa.Tools.Common.Utils
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
-#if PORTABLE || NETSTANDARD1_6 || NETCOREAPP1_0
+#if PORTABLE || NETSTANDARD1_2 || NETSTANDARD1_6 || NETCOREAPP1_0 || NETCOREAPP1_1
     using System.Reflection;
 #endif
 
@@ -56,7 +56,7 @@ namespace Saritasa.Tools.Common.Utils
                 catch (Exception executedException)
                 {
                     bool isTransient = IsSubtypeOf(executedException, transientExceptions);
-                    if (isTransient == false)
+                    if (!isTransient)
                     {
                         throw;
                     }
@@ -65,11 +65,11 @@ namespace Saritasa.Tools.Common.Utils
                     bool shouldStop = retryStrategy(attemptCount, executedException, out delay);
                     if (shouldStop)
                     {
-                        break;
+                        throw;
                     }
                     if (delay.TotalMilliseconds > 0)
                     {
-#if PORTABLE || NETCOREAPP1_0 || NETSTANDARD1_6
+#if PORTABLE || NETCOREAPP1_0 || NETSTANDARD1_6 || NETSTANDARD1_2
                         System.Threading.Tasks.Task.Delay(delay).Wait();
 #else
                         Thread.Sleep((int)delay.TotalMilliseconds);
@@ -77,7 +77,6 @@ namespace Saritasa.Tools.Common.Utils
                     }
                 }
             }
-            return default(T);
         }
 
         /// <summary>
@@ -126,7 +125,7 @@ namespace Saritasa.Tools.Common.Utils
 #else
                 var tcs = new TaskCompletionSource<T>();
                 tcs.SetCanceled();
-                return await tcs.Task;
+                return await tcs.Task.ConfigureAwait(false);
 #endif
             }
 
@@ -136,12 +135,12 @@ namespace Saritasa.Tools.Common.Utils
                 attemptCount++;
                 try
                 {
-                    return await action();
+                    return await action().ConfigureAwait(false);
                 }
                 catch (Exception executedException)
                 {
                     bool isTransient = IsSubtypeOf(executedException, transientExceptions);
-                    if (isTransient == false)
+                    if (!isTransient)
                     {
                         throw;
                     }
@@ -150,15 +149,14 @@ namespace Saritasa.Tools.Common.Utils
                     bool shouldStop = retryStrategy(attemptCount, executedException, out delay);
                     if (shouldStop)
                     {
-                        break;
+                        throw;
                     }
                     if (delay.TotalMilliseconds > 0)
                     {
-                        await Task.Delay(delay, cancellationToken);
+                        await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
                     }
                 }
             }
-            return default(T);
         }
 
         /// <summary>
@@ -177,7 +175,7 @@ namespace Saritasa.Tools.Common.Utils
             Type executedExceptionType = executedException.GetType();
             foreach (var exceptionType in exceptionsTypes)
             {
-#if PORTABLE || NETSTANDARD1_6 || NETCOREAPP1_0
+#if PORTABLE || NETSTANDARD1_2 || NETSTANDARD1_6 || NETCOREAPP1_0 || NETCOREAPP1_1
                 if (executedExceptionType.Equals(exceptionType) || executedExceptionType.GetTypeInfo().IsSubclassOf(exceptionType))
 #else
                 if (executedExceptionType == exceptionType || executedExceptionType.IsSubclassOf(exceptionType))
@@ -354,7 +352,7 @@ namespace Saritasa.Tools.Common.Utils
         public static void Raise<TEventArgs>(object sender, TEventArgs e, ref EventHandler<TEventArgs> eventDelegate)
         {
             var temp = Volatile.Read(ref eventDelegate);
-#if !PORTABLE && !NETSTANDARD1_6 && !NETCOREAPP1_0
+#if !PORTABLE && !NETSTANDARD1_2 && !NETSTANDARD1_6 && !NETCOREAPP1_0 && !NETCOREAPP1_1
             Thread.MemoryBarrier();
 #endif
             temp?.Invoke(sender, e);
@@ -367,7 +365,7 @@ namespace Saritasa.Tools.Common.Utils
         public static void RaiseAll<TEventArgs>(object sender, TEventArgs e, ref EventHandler<TEventArgs> eventDelegate)
         {
             var temp = Volatile.Read(ref eventDelegate);
-#if !PORTABLE && !NETSTANDARD1_6 && !NETCOREAPP1_0
+#if !PORTABLE && !NETSTANDARD1_2 && !NETSTANDARD1_6 && !NETCOREAPP1_0 && !NETCOREAPP1_1
             Thread.MemoryBarrier();
 #endif
             if (temp == null)
@@ -401,7 +399,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Throw the exception to skip item memoization.
         /// </summary>
-#if !PORTABLE && !NETSTANDARD1_6 && !NETCOREAPP1_0
+#if !PORTABLE && !NETSTANDARD1_2 && !NETSTANDARD1_6 && !NETCOREAPP1_0 && !NETCOREAPP1_1
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "GetObjectData is not needed")]
         [Serializable]
 #endif
@@ -468,8 +466,8 @@ namespace Saritasa.Tools.Common.Utils
 
             return (key, dict, notInCache) =>
             {
-                DateTime dt = default(DateTime);
-                bool cached = false;
+                DateTime dt;
+                bool cached;
                 lock (lockobj)
                 {
                     cached = timestampsStorage.TryGetValue(key, out dt);

@@ -77,7 +77,7 @@ namespace Saritasa.Tools.Messages.Benchmark
 
             public void HandleCreateUser(CreateUserCommand command, IUowFactory uowFactory)
             {
-                if (usersService == null)
+                if (uowFactory == null)
                 {
                     throw new ArgumentNullException(nameof(uowFactory));
                 }

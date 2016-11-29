@@ -40,16 +40,16 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <inheritdoc />
         public IEnumerable<Message> Get(MessageQuery messageQuery)
         {
-            var func = messageQuery.MessageSelector.Compile();
             lock (objLock)
             {
-                return Messages.Where(func).ToList();
+                return Messages.Where(messageQuery.Match).ToList();
             }
         }
 
         /// <inheritdoc />
         public void SaveState(IDictionary<string, object> dict)
         {
+            // no need to implement since repository does not have state
         }
 
         /// <summary>

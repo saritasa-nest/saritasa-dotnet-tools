@@ -46,7 +46,7 @@ namespace Saritasa.Tools.Messages.Events
         /// <summary>
         /// Empty event pipeline;
         /// </summary>
-        public static EventPipeline Empty = new EventPipeline();
+        public static readonly EventPipeline Empty = new EventPipeline();
 #pragma warning restore SA1401
 
         /// <inheritdoc />

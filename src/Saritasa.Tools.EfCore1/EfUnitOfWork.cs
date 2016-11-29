@@ -33,23 +33,34 @@ namespace Saritasa.Tools.EfCore
             Context = context;
         }
 
+        private bool disposed;
+
         /// <summary>
         /// Dispose object.
         /// </summary>
-        /// <param name="disposing">Dispone managed resources.</param>
+        /// <param name="disposing">Dispose managed resources.</param>
         protected virtual void Dispose(bool disposing)
         {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    if (Context != null)
+                    {
+                        Context.Dispose();
+                        Context = null;
+                    }
+                }
+                disposed = true;
+            }
             Dispose();
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
-            if (Context != null)
-            {
-                Context.Dispose();
-                Context = null;
-            }
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         /// <inheritdoc />

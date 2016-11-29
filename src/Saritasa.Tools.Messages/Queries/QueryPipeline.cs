@@ -24,7 +24,7 @@ namespace Saritasa.Tools.Messages.Queries
 
         static QueryMessage CreateMessage(Delegate func, params object[] args)
         {
-#if !NETCOREAPP1_0 && !NETSTANDARD1_6
+#if !NETCOREAPP1_1 && !NETSTANDARD1_6
             var method = func.Method;
 #else
             var method = func.GetInvocationList()[0].GetMethodInfo();
@@ -174,7 +174,6 @@ namespace Saritasa.Tools.Messages.Queries
         /// <inheritdoc />
         public override void ProcessRaw(Message message)
         {
-#if !NETCOREAPP1_0 && !NETSTANDARD1_6
             if (message == null)
             {
                 throw new ArgumentNullException(nameof(message));
@@ -189,18 +188,26 @@ namespace Saritasa.Tools.Messages.Queries
             }
 
             var objectTypeName = message.ContentType.Substring(0, message.ContentType.LastIndexOf(".", StringComparison.Ordinal));
+#if NETCOREAPP1_1 || NETSTANDARD1_6
+            var objectType = TypeHelpers.LoadType(objectTypeName, TypeHelpers.LoadAssembliesFromTypeName(objectTypeName).ToArray());
+#else
             var objectType = TypeHelpers.LoadType(objectTypeName, AppDomain.CurrentDomain.GetAssemblies());
+#endif
+            if (objectType == null)
+            {
+                throw new InvalidOperationException($"Cannot load type {objectTypeName}");
+            }
             var obj = CreateObjectFromType(objectType);
 
             var methodName = message.ContentType.Substring(message.ContentType.LastIndexOf(".", StringComparison.Ordinal) + 1);
-            var method = objectType.GetMethod(methodName);
+            var method = objectType.GetTypeInfo().GetMethod(methodName);
             if (method == null)
             {
-                throw new ArgumentException($"Cannot find method {methodName}");
+                throw new InvalidOperationException($"Cannot find method {methodName}");
             }
             var delegateType = Expression.GetDelegateType(
                 method.GetParameters().Select(p => p.ParameterType).Concat(new[] { method.ReturnType }).ToArray());
-            var @delegate = obj.GetType().GetMethod(methodName).CreateDelegate(delegateType, obj);
+            var @delegate = obj.GetType().GetTypeInfo().GetMethod(methodName).CreateDelegate(delegateType, obj);
             if (@delegate == null)
             {
                 throw new Exception("Cannot create delegate");
@@ -219,7 +226,6 @@ namespace Saritasa.Tools.Messages.Queries
             message.Status = queryMessage.Status;
             message.ExecutionDuration = queryMessage.ExecutionDuration;
             message.Data = queryMessage.Data;
-#endif
         }
 
         /// <summary>
@@ -229,7 +235,7 @@ namespace Saritasa.Tools.Messages.Queries
         /// <returns>Created object.</returns>
         private static object CreateObjectFromType(Type t)
         {
-#if !NETCOREAPP1_0 && !NETSTANDARD1_6
+#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
             var ctor = t.GetTypeInfo().GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
                 null, new Type[] { }, null);
 #else

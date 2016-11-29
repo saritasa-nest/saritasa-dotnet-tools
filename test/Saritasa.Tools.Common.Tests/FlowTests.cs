@@ -141,9 +141,9 @@ namespace Saritasa.Tools.Common.Tests
         public void Repeat_with_fixed_retry_strategy_should_throw_exceptions()
         {
             // fixed throw exception
-            FlowUtils.Retry(CustomMethodReturnWithCustomException, FlowUtils.CreateFixedDelayRetryStrategy());
+            Assert.Throws<CustomException>(() => FlowUtils.Retry(CustomMethodReturnWithCustomException, FlowUtils.CreateFixedDelayRetryStrategy()));
             Assert.Throws<CustomException>(() => FlowUtils.Retry(CustomMethodReturnWithCustomException, FlowUtils.CreateFixedDelayRetryStrategy(), typeof(InvalidOperationException)));
-            FlowUtils.Retry(CustomMethodReturnWithCustomException, FlowUtils.CreateFixedDelayRetryStrategy(), typeof(CustomException));
+            Assert.Throws<CustomException>(() => FlowUtils.Retry(CustomMethodReturnWithCustomException, FlowUtils.CreateFixedDelayRetryStrategy(), typeof(CustomException)));
         }
 
         [Fact]
@@ -152,7 +152,14 @@ namespace Saritasa.Tools.Common.Tests
             // fixed delay
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            FlowUtils.Retry(CustomMethodReturnWithCustomException, FlowUtils.CreateFixedDelayRetryStrategy(3, TimeSpan.FromMilliseconds(50)), typeof(CustomException));
+            try
+            {
+                FlowUtils.Retry(CustomMethodReturnWithCustomException, FlowUtils.CreateFixedDelayRetryStrategy(3, TimeSpan.FromMilliseconds(50)), typeof(CustomException));
+            }
+            catch (CustomException)
+            {
+                // suppress our specific exception
+            }
             stopwatch.Stop();
             Assert.True(stopwatch.ElapsedMilliseconds >= 100);
         }
@@ -163,11 +170,18 @@ namespace Saritasa.Tools.Common.Tests
             // fixed delay
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            FlowUtils.Retry(
-                CustomMethodReturnWithCustomException,
-                FlowUtils.CreateFixedDelayRetryStrategy(4, TimeSpan.FromMilliseconds(50), true),
-                typeof(CustomException)
-            );
+            try
+            {
+                FlowUtils.Retry(
+                    CustomMethodReturnWithCustomException,
+                    FlowUtils.CreateFixedDelayRetryStrategy(4, TimeSpan.FromMilliseconds(50), true),
+                    typeof(CustomException)
+                );
+            }
+            catch (CustomException)
+            {
+                // suppress our specific exception
+            }
             stopwatch.Stop();
             Assert.True(stopwatch.ElapsedMilliseconds >= 100);
         }
@@ -180,10 +194,17 @@ namespace Saritasa.Tools.Common.Tests
             {
                 totalAttempts = a;
             });
-            FlowUtils.Retry(
-                CustomMethodReturnWithCustomException,
-                FlowUtils.CreateCallbackRetryStrategy(callback) + FlowUtils.CreateFixedDelayRetryStrategy(2)
-            );
+            try
+            {
+                FlowUtils.Retry(
+                    CustomMethodReturnWithCustomException,
+                    FlowUtils.CreateCallbackRetryStrategy(callback) + FlowUtils.CreateFixedDelayRetryStrategy(2)
+                );
+            }
+            catch (CustomException)
+            {
+                // suppress our specific exception
+            }
             Assert.Equal(2, totalAttempts);
         }
 

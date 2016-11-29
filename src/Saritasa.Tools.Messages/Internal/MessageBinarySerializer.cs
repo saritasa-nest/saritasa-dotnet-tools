@@ -67,18 +67,28 @@ namespace Saritasa.Tools.Messages.Internal
         {
             var header = new byte[1 + sizeof(int)];
             var n = stream.Read(header, 0, 1);
-            if (header[0] == TokenBeginOfCommand || header[0] == TokenEndOfCommand)
-            {
-                return new Tuple<byte, byte[]>(header[0], null);
-            }
             if (n == 0)
             {
                 return NullChunk;
             }
-            stream.Read(header, 1, sizeof(int));
+            if (header[0] == TokenBeginOfCommand || header[0] == TokenEndOfCommand)
+            {
+                return new Tuple<byte, byte[]>(header[0], null);
+            }
+
+            n = stream.Read(header, 1, sizeof(int));
+            if (n == 0)
+            {
+                return NullChunk;
+            }
             var length = BitConverter.ToInt32(header, 1);
             var content = new byte[length];
-            stream.Read(content, 0, content.Length);
+
+            n = stream.Read(content, 0, content.Length);
+            if (n == 0)
+            {
+                return NullChunk;
+            }
             return new Tuple<byte, byte[]>(header[0], content);
         }
 

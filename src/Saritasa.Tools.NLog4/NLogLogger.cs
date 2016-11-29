@@ -4,6 +4,7 @@
 namespace Saritasa.Tools.NLog
 {
     using System;
+    using System.Text;
     using Microsoft.Extensions.Logging;
 
     /// <summary>
@@ -12,6 +13,11 @@ namespace Saritasa.Tools.NLog
     internal class NLogLogger : Microsoft.Extensions.Logging.ILogger
     {
         private readonly global::NLog.Logger logger;
+
+        /// <summary>
+        /// Outputs current scopes in format: Info => scope1 => scope2 $(message). Enabled by default.
+        /// </summary>
+        public bool IncludeScopes { get; set; } = true;
 
         public NLogLogger(global::NLog.Logger logger)
         {
@@ -29,17 +35,48 @@ namespace Saritasa.Tools.NLog
                 }
                 var message = formatter(state, exception);
 
+                if (IncludeScopes)
+                {
+                    message = GetScopeInformation() + message;
+                }
+
                 if (!string.IsNullOrEmpty(message))
                 {
                     // message arguments are not needed as it is already checked that the loglevel is enabled.
                     var eventInfo = global::NLog.LogEventInfo.Create(nLogLogLevel, logger.Name, message);
                     eventInfo.Exception = exception;
-                    eventInfo.Properties["EventId.Id"] = eventId.Id;
-                    eventInfo.Properties["EventId.Name"] = eventId.Name;
+                    eventInfo.Properties["EventId_Id"] = eventId.Id;
+                    eventInfo.Properties["EventId_Name"] = eventId.Name;
                     eventInfo.Properties["EventId"] = eventId;
                     logger.Log(eventInfo);
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets information from scopes in format A => B.
+        /// </summary>
+        /// <remarks>
+        /// Implementation based on https://github.com/aspnet/Logging/blob/dev/src/Microsoft.Extensions.Logging.Console/ConsoleLogger.cs#L246 .
+        /// </remarks>
+        private string GetScopeInformation()
+        {
+            var builder = new StringBuilder();
+            var current = LoggerScope.Current;
+            string scopeLog = string.Empty;
+            var length = builder.Length;
+
+            while (current != null)
+            {
+                scopeLog = length == builder.Length ? $"=> {current}" : $"=> {current} ";
+                builder.Insert(length, scopeLog);
+                current = current.Parent;
+            }
+            if (builder.Length > length)
+            {
+                builder.AppendLine();
+            }
+            return builder.ToString();
         }
 
         /// <summary>
@@ -95,7 +132,7 @@ namespace Saritasa.Tools.NLog
             {
                 throw new ArgumentNullException(nameof(state));
             }
-            return global::NLog.NestedDiagnosticsContext.Push(state);
+            return LoggerScope.Push(state);
         }
     }
 }

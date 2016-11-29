@@ -8,7 +8,7 @@ namespace Saritasa.Tools.Messages.Common
     /// <summary>
     /// Middleware not found exception.
     /// </summary>
-#if !NETCOREAPP1_0 && !NETSTANDARD1_6
+#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
     [Serializable]
 #endif
     public class MiddlewareNotFoundException : Exception
@@ -20,7 +20,7 @@ namespace Saritasa.Tools.Messages.Common
         {
         }
 
-#if !NETCOREAPP1_0 && !NETSTANDARD1_6
+#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
         /// <summary>
         /// .ctor for deserialization.
         /// </summary>

@@ -388,7 +388,7 @@ namespace Saritasa.Tools.Misc.Security
             }
 
             var passwordLower = password.ToLowerInvariant();
-            int score = 0;
+            int score;
             int alphasUpperCount = 0, alphasLowerCount = 0, digitsCount = 0, symbolsCount = 0, middleCharsCount = 0,
                 requirements = 0, alphasOnlyCount = 0, numbersOnlyCount = 0, uniqueCharsCount = 0, repeatCharsCount = 0,
                 consequenceAlphasUpperCount = 0, consequenceAlphasLowerCount = 0, consequenceDigitsCount = 0, consequenceSymbolsCount = 0, consequenceCharsTypeCount = 0,
@@ -598,21 +598,9 @@ namespace Saritasa.Tools.Misc.Security
             var arrChars = new[] { password.Length, alphasUpperCount, alphasLowerCount, digitsCount, symbolsCount };
             for (var c = 0; c < arrChars.Length; c++)
             {
-                var minValue = 0;
                 // password length
-                if (c == 0)
-                {
-                    minValue = MinimumPasswordLength - 1;
-                }
-                else
-                {
-                    minValue = 0;
-                }
-                if (arrChars[c] == minValue + 1)
-                {
-                    requiredCharsCount++;
-                }
-                else if (arrChars[c] > minValue + 1)
+                int minValue = c == 0 ? MinimumPasswordLength - 1 : 0;
+                if (arrChars[c] == minValue + 1 || arrChars[c] > minValue + 1)
                 {
                     requiredCharsCount++;
                 }
@@ -662,7 +650,7 @@ namespace Saritasa.Tools.Misc.Security
         /// <returns>Estimated score.</returns>
         public static int EstimatePasswordStrength(string password)
         {
-            IDictionary<Addition, int> additions = null;
+            IDictionary<Addition, int> additions;
             return EstimatePasswordStrength(password, out additions);
         }
 
@@ -683,7 +671,7 @@ namespace Saritasa.Tools.Misc.Security
             if (CharacterClasses.HasFlag(CharacterClass.UpperLetters))
             {
                 chars.AddRange(PoolUpperCase.ToCharArray());
-                if (GeneratorFlags.HasFlag(GeneratorFlag.ExcludeLookAlike) == false)
+                if (!GeneratorFlags.HasFlag(GeneratorFlag.ExcludeLookAlike))
                 {
                     chars.AddRange(PoolUpperCaseConflict.ToCharArray());
                 }
@@ -691,7 +679,7 @@ namespace Saritasa.Tools.Misc.Security
             if (this.CharacterClasses.HasFlag(CharacterClass.LowerLetters))
             {
                 chars.AddRange(PoolLowerCase.ToCharArray());
-                if (GeneratorFlags.HasFlag(GeneratorFlag.ExcludeLookAlike) == false)
+                if (!GeneratorFlags.HasFlag(GeneratorFlag.ExcludeLookAlike))
                 {
                     chars.AddRange(PoolLowerCaseConflict.ToCharArray());
                 }
@@ -699,7 +687,7 @@ namespace Saritasa.Tools.Misc.Security
             if (this.CharacterClasses.HasFlag(CharacterClass.Digits))
             {
                 chars.AddRange(PoolDigits.ToCharArray());
-                if (GeneratorFlags.HasFlag(GeneratorFlag.ExcludeLookAlike) == false)
+                if (!GeneratorFlags.HasFlag(GeneratorFlag.ExcludeLookAlike))
                 {
                     chars.AddRange(PoolDigitsConflict.ToCharArray());
                 }
@@ -707,7 +695,7 @@ namespace Saritasa.Tools.Misc.Security
             if (this.CharacterClasses.HasFlag(CharacterClass.SpecialCharacters))
             {
                 chars.AddRange(PoolSpecial.ToCharArray());
-                if (GeneratorFlags.HasFlag(GeneratorFlag.ExcludeLookAlike) == false)
+                if (!GeneratorFlags.HasFlag(GeneratorFlag.ExcludeLookAlike))
                 {
                     chars.AddRange(PoolSpecialConflict.ToCharArray());
                 }

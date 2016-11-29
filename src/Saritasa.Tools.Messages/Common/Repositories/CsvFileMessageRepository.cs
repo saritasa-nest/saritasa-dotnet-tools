@@ -55,7 +55,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             this.buffer = buffer;
             Directory.CreateDirectory(LogsPath);
 
-            if (this.serializer.IsText == false)
+            if (!this.serializer.IsText)
             {
                 throw new ArgumentException("Serializer should be text-based");
             }
@@ -64,7 +64,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         string GetFileNameByDate(DateTime date, int count)
         {
             var name = $"{date:yyyyMMdd}-{count:000}.csv";
-            if (string.IsNullOrEmpty(prefix) == false)
+            if (!string.IsNullOrEmpty(prefix))
             {
                 name = prefix + "-" + name;
             }
@@ -108,11 +108,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
         static void WriteBytes(string str, Stream stream, bool prepareString = true, bool last = false)
         {
-            if (prepareString)
-            {
-                str = PrepareString(str);
-            }
-            var bytes = Encoding.UTF8.GetBytes(str);
+            var bytes = Encoding.UTF8.GetBytes(prepareString ? PrepareString(str) : str);
             stream.Write(bytes, 0, bytes.Length);
             if (!last)
             {
@@ -214,15 +210,14 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <inheritdoc />
         protected virtual void Dispose(bool disposing)
         {
-            if (disposed)
+            if (!disposed)
             {
-                return;
+                if (disposing)
+                {
+                    Close();
+                }
+                disposed = true;
             }
-            if (!disposing)
-            {
-                Close();
-            }
-            disposed = true;
         }
 
         /// <inheritdoc />

@@ -1,2 +1,9 @@
-﻿0.1.0 [TBD]
+﻿0.1.1 [TBD]
+[+] FlowUtils.RetryAsync now uses ConfigureAwait false to call action.
+[+] FlowUtils.RetryAsync now throws exception if retry limit is reached.
+[*] Made DateTimeUtils.Range function public.
+[*] Removed dependency System.Data.Common and some other extra dependencies.
+[+] Add support for .NET Core 1.1, .NET Standard 1.2 .
+
+0.1.0 [2016-11-13]
 [+] Initial release.

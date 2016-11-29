@@ -15,6 +15,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <inheritdoc />
         public void Add(Message message)
         {
+            // no need to implement since repository should not persist messages
         }
 
         /// <inheritdoc />
@@ -26,6 +27,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <inheritdoc />
         public void SaveState(IDictionary<string, object> dict)
         {
+            // no need to implement since repository does not have state
         }
 
         #endregion

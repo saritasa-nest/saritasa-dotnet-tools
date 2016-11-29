@@ -14,7 +14,11 @@ namespace Saritasa.Tools.Common.Utils
     /// </summary>
     public static class Guard
     {
+#if NETSTANDARD1_2
+        internal const RegexOptions Options = RegexOptions.Singleline;
+#else
         internal const RegexOptions Options = RegexOptions.Singleline | RegexOptions.Compiled;
+#endif
 
         /// <summary>
         /// Email check regular expression.
@@ -328,7 +332,7 @@ namespace Saritasa.Tools.Common.Utils
         {
             IsNotEmpty(argument, argumentName);
 
-            if (EmailExpression.IsMatch(argument) == false)
+            if (!EmailExpression.IsMatch(argument))
             {
                 throw new ArgumentException("\"{0}\" is not a valid email address.".FormatWith(argumentName), argumentName);
             }

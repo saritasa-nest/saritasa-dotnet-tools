@@ -107,6 +107,7 @@ namespace SandBox
         {
             Init();
             Test();
+            LoggingBox.Test();
             Console.ReadKey();
         }
     }

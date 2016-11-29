@@ -23,12 +23,12 @@ namespace Saritasa.Tools.Messages.Common
         /// <summary>
         /// If true the middleware will resolve project using internal resolver.
         /// </summary>
-        public bool UseInternalObjectResolver { get; set; } = false;
+        public bool UseInternalObjectResolver { get; set; }
 
         /// <summary>
         /// If true the middleware will try to resolve executing method parameters. Default is false.
         /// </summary>
-        public bool UseParametersResolve { get; set; } = false;
+        public bool UseParametersResolve { get; set; }
 
         /// <summary>
         /// .ctor
