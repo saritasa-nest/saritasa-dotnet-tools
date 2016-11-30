@@ -2,32 +2,30 @@
   "description": "",
   "title": "Saritasa Tools Utils and Extensions Tests",
   "dependencies": {
+    "Microsoft.NETCore.Platforms": "1.1.0",
     "xunit": "2.2.0-beta4-build3444",
     "dotnet-test-xunit": "2.2.0-preview2-build1029",
     "Saritasa.Tools.Common": "*"
   },
   "frameworks": {
+    "net452": {
+    },
+    "net461": {
+    },
     "netcoreapp1.0": {
       "dependencies": {
         "Microsoft.NETCore.App": {
           "version": "1.0.1",
           "type": "platform"
-        },
-        "System.Data.Common": "4.1.0"
+        }
       }
     },
-    "net452": {
-      "frameworkAssemblies": {
-        "System.Data": "",
-        "System.Xml": "",
-        "System.ComponentModel.DataAnnotations": ""
-      }
-    },
-    "net461": {
-      "frameworkAssemblies": {
-        "System.Data": "",
-        "System.Xml": "",
-        "System.ComponentModel.DataAnnotations": ""
+    "netcoreapp1.1": {
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "version": "1.1.0",
+          "type": "platform"
+        }
       }
     }
   },

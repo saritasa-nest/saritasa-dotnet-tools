@@ -31,7 +31,7 @@ Installation
 ------------
 
 ```
-PM> Install-Package Saritasa.Tools
+PM> Install-Package Saritasa.Tools.<PackageName>
 ```
 
 Project Setup
