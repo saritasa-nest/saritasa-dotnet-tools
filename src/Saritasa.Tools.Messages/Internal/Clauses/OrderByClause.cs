@@ -5,8 +5,10 @@ namespace Saritasa.Tools.Messages.Internal.Clauses
     /// <summary>
     /// Represents a ORDER BY clause to be used with SELECT statements
     /// </summary>
-    public struct OrderByClause
+    public class OrderByClause
     {
+        private readonly SelectStringBuilder builder;
+
         /// <summary>
         /// Gets the name of the column.
         /// </summary>
@@ -26,20 +28,21 @@ namespace Saritasa.Tools.Messages.Internal.Clauses
         /// <summary>
         /// Initializes a new instance of the <see cref="OrderByClause"/> struct.
         /// </summary>
+        /// <param name="builder">The builder.</param>
         /// <param name="column">The column.</param>
-        public OrderByClause(string column)
+        public OrderByClause(SelectStringBuilder builder, string column) : this(builder, column, SortingOperator.Ascending)
         {
-            ColumnName = column;
-            SortOrder = SortingOperator.Ascending;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OrderByClause"/> struct.
         /// </summary>
+        /// <param name="builder">The builder.</param>
         /// <param name="column">The column.</param>
         /// <param name="order">The order.</param>
-        public OrderByClause(string column, SortingOperator order)
+        public OrderByClause(SelectStringBuilder builder, string column, SortingOperator order)
         {
+            this.builder = builder;
             ColumnName = column;
             SortOrder = order;
         }

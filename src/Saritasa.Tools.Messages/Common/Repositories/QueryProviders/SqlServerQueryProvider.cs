@@ -98,63 +98,56 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
             {
                 throw new ArgumentNullException(nameof(messageQuery));
             }
+            
+            var ssb = new SqlServerSelectStringBuilder();
+            ssb.SelectAll().From(TableName);
 
-            var sb = new StringBuilder();
-            sb.Append($"SELECT * FROM [{TableName}]");
-
-            var ssb = new SelectStringBuilder();
-            ssb.From(TableName).Select("test");
-
-            var conditions = new List<string>();
             if (messageQuery.Id != null)
             {
-                conditions.Add($"([{nameof(messageQuery.Id)}] = '{messageQuery.Id}')");
                 ssb.Where(nameof(messageQuery.Id)).EqualsTo(messageQuery.Id);
             }
             if (messageQuery.CreatedStartDate != null)
             {
-                conditions.Add($"([{nameof(messageQuery.CreatedStartDate)}] = '{messageQuery.CreatedStartDate:yyyy-MM-dd}')");
                 ssb.Where(nameof(messageQuery.CreatedStartDate)).EqualsTo(messageQuery.CreatedStartDate);
             }
             if (messageQuery.CreatedEndDate != null)
             {
-                conditions.Add($"([{nameof(messageQuery.CreatedEndDate)}] = '{messageQuery.CreatedEndDate:yyyy-MM-dd}')");
+                ssb.Where(nameof(messageQuery.CreatedEndDate)).EqualsTo(messageQuery.CreatedEndDate);
             }
             if (messageQuery.ContentType != null)
             {
-                conditions.Add($"([{nameof(messageQuery.ContentType)}] = '{messageQuery.ContentType}')");
+                ssb.Where(nameof(messageQuery.ContentType)).EqualsTo(messageQuery.ContentType);
             }
             if (messageQuery.ErrorType != null)
             {
-                conditions.Add($"([{nameof(messageQuery.ErrorType)}] = '{messageQuery.ErrorType}')");
+                ssb.Where(nameof(messageQuery.ErrorType)).EqualsTo(messageQuery.ErrorType);
             }
             if (messageQuery.Status != null)
             {
-                conditions.Add($"([{nameof(messageQuery.Status)}] = '{messageQuery.Status}')");
+                ssb.Where(nameof(messageQuery.Status)).EqualsTo(messageQuery.Status);
             }
             if (messageQuery.Type != null)
             {
-                conditions.Add($"([{nameof(messageQuery.Type)}] = {messageQuery.Type})");
+                ssb.Where(nameof(messageQuery.Type)).EqualsTo(messageQuery.Type);
             }
             if (messageQuery.ExecutionDurationAbove != null)
             {
-                conditions.Add($"([{nameof(messageQuery.ExecutionDurationAbove)}] = {messageQuery.ExecutionDurationAbove})");
+                ssb.Where(nameof(messageQuery.ExecutionDurationAbove)).EqualsTo(messageQuery.ExecutionDurationAbove);
             }
             if (messageQuery.ExecutionDurationBelow != null)
             {
-                conditions.Add($"([{nameof(messageQuery.ExecutionDurationBelow)}] = {messageQuery.ExecutionDurationBelow})");
+                ssb.Where(nameof(messageQuery.ExecutionDurationBelow)).EqualsTo(messageQuery.ExecutionDurationBelow);
             }
-
-            for (var i = 0; i < conditions.Count; i++)
+            if (messageQuery.Skip > 0)
             {
-                var condition = conditions[i];
-                sb.Append(i == 0 ? " WHERE " : " AND ");
-                sb.Append(condition);
+                ssb.OrderBy(nameof(messageQuery.Id)).Offset(messageQuery.Skip);
+            }
+            if (messageQuery.Take > 0)
+            {
+                ssb.Limit(messageQuery.Take);
             }
 
-            var res = ssb.BuildQuery();
-
-            return sb.ToString();
+            return ssb.BuildQuery();
         }
     }
 }

@@ -11,9 +11,9 @@ namespace Saritasa.Tools.Messages.Internal
     /// <summary>
     /// 
     /// </summary>
-    public class SelectStringBuilder
+    public abstract class SelectStringBuilder
     {
-        private DbProviderFactory dbProviderFactory;
+        protected DbProviderFactory dbProviderFactory;
 
         protected IList<string> selectedColumns;	// array of string
         protected IList<JoinClause> joins;	// array of JoinClause
@@ -31,7 +31,7 @@ namespace Saritasa.Tools.Messages.Internal
         /// <summary>
         /// Initializes a new instance of the <see cref="SelectStringBuilder"/> class.
         /// </summary>
-        public SelectStringBuilder()
+        protected SelectStringBuilder()
         {
             Distinct = false;
             TopClause = new TopClause(100, TopUnit.Percent);
@@ -48,7 +48,7 @@ namespace Saritasa.Tools.Messages.Internal
         /// Initializes a new instance of the <see cref="SelectStringBuilder"/> class.
         /// </summary>
         /// <param name="factory">The database provider factory.</param>
-        public SelectStringBuilder(DbProviderFactory factory) : this()
+        protected SelectStringBuilder(DbProviderFactory factory) : this()
         {
             SetDbProviderFactory(factory);
         }
@@ -107,6 +107,10 @@ namespace Saritasa.Tools.Messages.Internal
         /// The selected tables.
         /// </value>
         public IList<string> SelectedTables { get; }
+
+        protected int? offset { get; set; }
+
+        protected int? fetch { get; set; }
 
         /// <summary>
         /// Selects all columns.
@@ -275,8 +279,63 @@ namespace Saritasa.Tools.Messages.Internal
         /// <param name="order">The order.</param>
         public SelectStringBuilder OrderBy(string field, SortingOperator order)
         {
-            var newOrderByClause = new OrderByClause(field, order);
-            orderByStatement.Add(newOrderByClause);
+            var clause = new OrderByClause(this, field, order);
+            orderByStatement.Add(clause);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds the order by.
+        /// </summary>
+        /// <param name="field">The field.</param>
+        /// <returns></returns>
+        public SelectStringBuilder OrderBy(string field)
+        {
+            var clause = new OrderByClause(this, field);
+            orderByStatement.Add(clause);
+            return this;
+        }
+
+        /// <summary>
+        /// Offsets the specified rows.
+        /// </summary>
+        /// <param name="rows">The rows.</param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentOutOfRangeException">orderByStatement - First you should specify the OrderBy statement.</exception>
+        public SelectStringBuilder Offset(int rows)
+        {
+            if (!orderByStatement.Any())
+            {
+                throw new ArgumentOutOfRangeException(nameof(orderByStatement), "You should specify the OrderBy statement.");
+            }
+
+            offset = rows;
+            return this;
+        }
+
+        /// <summary>
+        /// Fetches the specified rows.
+        /// </summary>
+        /// <param name="rows">The rows.</param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentOutOfRangeException">
+        /// orderByStatement - You should specify the OrderBy statement.
+        /// or
+        /// offset - You should specify the offset value.
+        /// </exception>
+        public SelectStringBuilder Fetch(int rows)
+        {
+            if (!orderByStatement.Any())
+            {
+                throw new ArgumentOutOfRangeException(nameof(orderByStatement), "You should specify the OrderBy statement.");
+            }
+
+            if (!offset.HasValue)
+            {
+                throw new ArgumentOutOfRangeException(nameof(offset), "You should specify the offset value.");
+            }
+
+            fetch = rows;
             return this;
         }
 
@@ -363,151 +422,12 @@ namespace Saritasa.Tools.Messages.Internal
         /// Builds the command.
         /// </summary>
         /// <returns></returns>
-        public DbCommand BuildCommand()
-        {
-            return (DbCommand)this.BuildQuery(true);
-        }
+        public abstract DbCommand BuildCommand();
 
         /// <summary>
         /// Builds the query.
         /// </summary>
         /// <returns></returns>
-        public string BuildQuery()
-        {
-            return (string)this.BuildQuery(false);
-        }
-
-        /// <summary>
-        /// Builds the select query
-        /// </summary>
-        /// <returns>Returns a string containing the query, or a DbCommand containing a command with parameters</returns>
-        private object BuildQuery(bool buildCommand)
-        {
-            if (buildCommand && dbProviderFactory == null)
-                throw new Exception("Cannot build a command when the Db Factory hasn't been specified. Call SetDbProviderFactory first.");
-
-            DbCommand command = null;
-            if (buildCommand)
-                command = dbProviderFactory.CreateCommand();
-
-            var sb = new StringBuilder("SELECT ");
-
-            // Output Distinct
-            if (Distinct)
-            {
-                sb.Append("DISTINCT ");
-            }
-
-            // Output Top clause
-            if (!(TopClause.Quantity == 100 && TopClause.Unit == TopUnit.Percent))
-            {
-                sb.Append($"TOP {TopClause.Quantity} ");
-                if (TopClause.Unit == TopUnit.Percent)
-                {
-                    sb.Append("PERCENT ");
-                }
-            }
-
-            // Output column names
-            if (selectedColumns.Any())
-            {
-                sb.Append(string.Join(", ", selectedColumns));
-            }
-            else
-            {
-                if (SelectedTables.Count == 1)
-                {
-                    // By default only select * from the table that was selected. If there are any joins, it is the responsibility of the user to select the needed columns.
-                    sb.Append(SelectedTables[0] + ".");
-                }
-                sb.Append("*");
-            }
-
-            // Output table names
-            if (SelectedTables.Count > 0)
-            {
-                sb.Append($" FROM {string.Join(", ", SelectedTables)}");
-            }
-
-            // Output joins
-            if (joins.Count > 0)
-            {
-                foreach (var clause in joins)
-                {
-                    switch (clause.JoinType)
-                    {
-                        case JoinType.InnerJoin: sb.Append(" INNER JOIN"); break;
-                        case JoinType.OuterJoin: sb.Append(" OUTER JOIN"); break;
-                        case JoinType.LeftJoin: sb.Append(" LEFT JOIN"); break;
-                        case JoinType.RightJoin: sb.Append(" RIGHT JOIN"); break;
-                    }
-                    sb.Append($" {clause.ToTable} ON ");
-                    sb.Append(WhereStatement.CreateComparisonClause(
-                        $"{clause.FromTable}.{clause.FromColumn}",
-                        clause.ComparisonOperator, 
-                        new SqlLiteral($"{clause.ToTable}.{clause.ToColumn}")));
-                    sb.Append(' ');
-                }
-            }
-
-            // Output where statement
-            if (WhereStatement.ClauseLevels > 0)
-            {
-                if (buildCommand)
-                    sb.Append(" WHERE " + WhereStatement.BuildWhereStatement(() => command));
-                else
-                    sb.Append(" WHERE " + WhereStatement.BuildWhereStatement());
-            }
-
-            // Output GroupBy statement
-            if (groupByColumns.Count > 0)
-            {
-                sb.Append($" GROUP BY {string.Join(", ", groupByColumns)} ");
-            }
-
-            // Output having statement
-            if (Having.ClauseLevels > 0)
-            {
-                // Check if a Group By Clause was set
-                if (groupByColumns.Count == 0)
-                {
-                    throw new Exception("Having statement was set without Group By");
-                }
-                if (buildCommand)
-                    sb.Append(" HAVING " + Having.BuildWhereStatement(() => command));
-                else
-                    sb.Append(" HAVING " + Having.BuildWhereStatement());
-            }
-
-            // Output OrderBy statement
-            if (orderByStatement.Count > 0)
-            {
-                sb.Append(" ORDER BY ");
-                sb.Append(string.Join(",", orderByStatement.Select(clause =>
-                {
-                    switch (clause.SortOrder)
-                    {
-                        case SortingOperator.Ascending:
-                            return $"{clause.ColumnName} ASC";
-                        case SortingOperator.Descending:
-                            return $"{clause.ColumnName} DESC";
-                        default:
-                            return "";
-                    }
-                })));
-                sb.Append(' ');
-            }
-
-            if (buildCommand)
-            {
-                // Return the build command
-                command.CommandText = sb.ToString();
-                return command;
-            }
-
-            // Return the built query
-            return sb.ToString();
-        }
+        public abstract string BuildQuery();
     }
-
 }

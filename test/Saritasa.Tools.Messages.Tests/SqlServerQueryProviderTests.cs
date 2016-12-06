@@ -15,7 +15,7 @@ namespace Saritasa.Tools.Messages.Tests
             var guid = Guid.NewGuid();
             var ser = new JsonObjectSerializer();
             var provider = new SqlServerQueryProvider(ser);
-            var query = MessageQuery.Create().WithId(guid).WithCreatedStartDate(DateTime.Now);
+            var query = MessageQuery.Create().WithId(guid).WithCreatedStartDate(DateTime.Now).WithRange(10);
 
             // Act
             var result = provider.GetFilterScript(query);
