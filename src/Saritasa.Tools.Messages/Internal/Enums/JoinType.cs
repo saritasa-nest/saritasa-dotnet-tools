@@ -3,7 +3,7 @@ namespace Saritasa.Tools.Messages.Internal.Enums
     /// <summary>
     /// Represents operators for JOIN clauses
     /// </summary>
-    public enum JoinType
+    internal enum JoinType
     {
         /// <summary>
         /// The inner join

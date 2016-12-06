@@ -6,14 +6,6 @@ namespace Saritasa.Tools.Messages.Internal
     public class SqlLiteral
     {
         /// <summary>
-        /// Gets or sets the statement rows affected.
-        /// </summary>
-        /// <value>
-        /// The statement rows affected.
-        /// </value>
-        public static string StatementRowsAffected { get; set; } = "SELECT @@ROWCOUNT";
-
-        /// <summary>
         /// Gets or sets the value.
         /// </summary>
         /// <value>

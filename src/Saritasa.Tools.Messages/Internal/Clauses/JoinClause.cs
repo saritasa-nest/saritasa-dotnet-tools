@@ -5,7 +5,7 @@ namespace Saritasa.Tools.Messages.Internal.Clauses
     /// <summary>
     /// Represents a JOIN clause to be used with SELECT statements
     /// </summary>
-    public struct JoinClause
+    internal struct JoinClause
     {
         /// <summary>
         /// Gets the type of a JOIN clause.

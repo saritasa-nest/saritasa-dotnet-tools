@@ -3,7 +3,7 @@ namespace Saritasa.Tools.Messages.Internal.Enums
     /// <summary>
     /// Represents sorting operators for SELECT statements
     /// </summary>
-    public enum SortingOperator
+    internal enum SortingOperator
     {
         /// <summary>
         /// Sorting operator Ascending

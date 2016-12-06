@@ -5,10 +5,8 @@ namespace Saritasa.Tools.Messages.Internal.Clauses
     /// <summary>
     /// Represents a ORDER BY clause to be used with SELECT statements
     /// </summary>
-    public class OrderByClause
+    internal class OrderByClause
     {
-        private readonly SelectStringBuilder builder;
-
         /// <summary>
         /// Gets the name of the column.
         /// </summary>
@@ -26,23 +24,20 @@ namespace Saritasa.Tools.Messages.Internal.Clauses
         public SortingOperator SortOrder { get; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OrderByClause"/> struct.
+        /// Initializes a new instance of the <see cref="OrderByClause"/> class.
         /// </summary>
-        /// <param name="builder">The builder.</param>
         /// <param name="column">The column.</param>
-        public OrderByClause(SelectStringBuilder builder, string column) : this(builder, column, SortingOperator.Ascending)
+        public OrderByClause(string column) : this(column, SortingOperator.Ascending)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OrderByClause"/> struct.
+        /// Initializes a new instance of the <see cref="OrderByClause"/> class.
         /// </summary>
-        /// <param name="builder">The builder.</param>
         /// <param name="column">The column.</param>
-        /// <param name="order">The order.</param>
-        public OrderByClause(SelectStringBuilder builder, string column, SortingOperator order)
+        /// <param name="order">The sort order.</param>
+        public OrderByClause(string column, SortingOperator order)
         {
-            this.builder = builder;
             ColumnName = column;
             SortOrder = order;
         }

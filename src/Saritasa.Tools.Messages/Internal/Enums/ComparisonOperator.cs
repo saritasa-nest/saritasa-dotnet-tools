@@ -3,7 +3,7 @@ namespace Saritasa.Tools.Messages.Internal.Enums
     /// <summary>
     /// Represents comparison operators for WHERE, HAVING and JOIN clauses
     /// </summary>
-    public enum ComparisonOperator
+    internal enum ComparisonOperator
     {
         /// <summary>
         /// The comparison operator Equals
