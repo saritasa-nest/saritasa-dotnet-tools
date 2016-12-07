@@ -4,11 +4,7 @@
 namespace Saritasa.Tools.Common.Extensions
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Globalization;
-    using System.Linq;
-    using System.Text.RegularExpressions;
 
     /// <summary>
     /// String class extensions.

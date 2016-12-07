@@ -53,7 +53,6 @@ namespace Saritasa.Tools.EfCore
                 }
                 disposed = true;
             }
-            Dispose();
         }
 
         /// <inheritdoc />

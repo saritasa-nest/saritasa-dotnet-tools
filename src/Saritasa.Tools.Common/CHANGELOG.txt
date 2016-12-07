@@ -4,6 +4,7 @@
 [*] Made DateTimeUtils.Range function public.
 [*] Removed dependency System.Data.Common and some other extra dependencies.
 [+] Add support for .NET Core 1.1, .NET Standard 1.2 .
+[+] DictionaryExtensions.GetValueDefault now has defaultValue as default(TValue).
 
 0.1.0 [2016-11-13]
 [+] Initial release.

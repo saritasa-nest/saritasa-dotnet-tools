@@ -73,38 +73,7 @@ namespace Saritasa.Tools.EfCore
         /// </remarks>
         public virtual TEntity Get(params object[] keyValues)
         {
-            var set = Context.Set<TEntity>();
-            var entityType = Context.Model.FindEntityType(typeof(TEntity));
-            var key = entityType.FindPrimaryKey();
-            var entries = Context.ChangeTracker.Entries<TEntity>();
-
-            var i = 0;
-            foreach (var property in key.Properties)
-            {
-                var keyValue = keyValues[i];
-                entries = entries.Where(e => e.Property(property.Name).CurrentValue == keyValue);
-                i++;
-            }
-
-            var entry = entries.FirstOrDefault();
-            if (entry != null)
-            {
-                // return the local object if it exists.
-                return entry.Entity;
-            }
-
-            // TODO: Build the real LINQ Expression
-            // set.Where(x => x.Id == keyValues[0]);
-            var parameter = Expression.Parameter(typeof(TEntity), "x");
-            var query = Queryable.Where(set, (Expression<Func<TEntity, bool>>)
-                Expression.Lambda(
-                    Expression.Equal(
-                        Expression.Property(parameter, "Id"),
-                        Expression.Constant(keyValues[0])),
-                    parameter));
-
-            // look in the database
-            return query.FirstOrDefault();
+            return Context.Set<TEntity>().Find(keyValues);
         }
 
         /// <inheritdoc />

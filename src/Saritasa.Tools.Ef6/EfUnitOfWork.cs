@@ -53,7 +53,6 @@ namespace Saritasa.Tools.Ef
                 }
                 disposed = true;
             }
-            Dispose();
         }
 
         /// <inheritdoc />

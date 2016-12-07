@@ -160,6 +160,27 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
+        /// Provides the async implementation of the retry mechanism for unreliable actions and transient conditions.
+        /// </summary>
+        /// <param name="action">Unreliable action to execute.</param>
+        /// <param name="retryStrategy">Retry strategy.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <param name="transientExceptions">Transient exceptions.</param>
+        /// <returns>Task that specified when action executed successfully or with error after all retries.</returns>
+        public static async Task RetryAsync(
+            Func<Task> action,
+            RetryStrategy retryStrategy,
+            CancellationToken cancellationToken = default(CancellationToken),
+            params Type[] transientExceptions)
+        {
+            await RetryAsync<int>(async () =>
+            {
+                await action();
+                return 0;
+            }, retryStrategy, cancellationToken, transientExceptions);
+        }
+
+        /// <summary>
         /// Returns true if executedException is type of subtype one of exceptionsTypes.
         /// </summary>
         /// <param name="executedException">Exception to check.</param>

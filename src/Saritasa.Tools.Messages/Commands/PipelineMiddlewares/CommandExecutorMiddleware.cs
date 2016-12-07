@@ -4,6 +4,7 @@
 namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
 {
     using System;
+    using System.Reflection;
     using Common;
     using Internal;
 
@@ -61,20 +62,32 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
                 ExecuteHandler(handler, commandMessage.Content, commandMessage.HandlerMethod);
                 commandMessage.Status = Message.ProcessingStatus.Completed;
             }
+            catch (TargetInvocationException ex)
+            {
+                InternalLogger.Warn($"TargetInvocationException while process command \"{handler}\": {ex}", nameof(CommandExecutorMiddleware));
+                commandMessage.Status = Message.ProcessingStatus.Failed;
+                if (ex.InnerException != null)
+                {
+                    commandMessage.Error = ex.InnerException;
+                    commandMessage.ErrorDispatchInfo = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex.InnerException);
+                }
+            }
+            catch (TargetException ex)
+            {
+                InternalLogger.Warn($"TargetException while process command \"{handler}\": {ex}", nameof(CommandExecutorMiddleware));
+                commandMessage.Status = Message.ProcessingStatus.Failed;
+                if (ex.InnerException != null)
+                {
+                    commandMessage.Error = ex.InnerException;
+                    commandMessage.ErrorDispatchInfo = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex.InnerException);
+                }
+            }
             catch (Exception ex)
             {
-                InternalLogger.Warn($"Exception while process \"{handler}\": {ex}", nameof(CommandExecutorMiddleware));
+                InternalLogger.Warn($"Exception while process command \"{handler}\": {ex}", nameof(CommandExecutorMiddleware));
                 commandMessage.Status = Message.ProcessingStatus.Failed;
-                var innerException = ex.InnerException;
-                if (innerException != null)
-                {
-                    commandMessage.Error = innerException;
-                    commandMessage.ErrorDispatchInfo = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(innerException);
-                }
-                else
-                {
-                    InternalLogger.Warn($"For some reason InnerException is null. Type: {ex.GetType()}.", nameof(CommandExecutorMiddleware));
-                }
+                commandMessage.Error = ex;
+                commandMessage.ErrorDispatchInfo = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex);
             }
             finally
             {
