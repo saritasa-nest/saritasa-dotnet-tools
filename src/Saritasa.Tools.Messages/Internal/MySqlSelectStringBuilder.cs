@@ -67,15 +67,9 @@ namespace Saritasa.Tools.Messages.Internal
 
         private static string BuildOrderByClauseString(OrderByClause clause)
         {
-            switch (clause.SortOrder)
-            {
-                case SortingOperator.Ascending:
-                    return $"`{clause.ColumnName}` ASC";
-                case SortingOperator.Descending:
-                    return $"`{clause.ColumnName}` DESC";
-                default:
-                    return $"`{clause.ColumnName}`";
-            }
+            return clause.SortOrder == SortingOperator.Descending
+                ? $"`{clause.ColumnName}` DESC"
+                : $"`{clause.ColumnName}`";
         }
 
         private static string BuildWhereClauseString(WhereClause clause)

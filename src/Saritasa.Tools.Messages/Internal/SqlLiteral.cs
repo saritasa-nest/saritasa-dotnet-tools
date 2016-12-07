@@ -1,9 +1,9 @@
 namespace Saritasa.Tools.Messages.Internal
 {
     /// <summary>
-    /// 
+    /// Wrap the string value as SQL source code literal (that is a string value will be recorded without quotes)
     /// </summary>
-    public class SqlLiteral
+    internal class SqlLiteral
     {
         /// <summary>
         /// Gets or sets the value.
