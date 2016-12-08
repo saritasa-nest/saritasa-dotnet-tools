@@ -37,12 +37,7 @@ namespace Saritasa.Tools.NLog
             get
             {
                 var handle = CallContext.LogicalGetData(FieldKey) as ObjectHandle;
-                if (handle == null)
-                {
-                    return default(LoggerScope);
-                }
-
-                return (LoggerScope)handle.Unwrap();
+                return (LoggerScope) handle?.Unwrap();
             }
             set
             {
@@ -93,10 +88,7 @@ namespace Saritasa.Tools.NLog
         }
 
         /// <inheritdoc />
-        public override string ToString()
-        {
-            return state?.ToString();
-        }
+        public override string ToString() => state?.ToString();
 
         /// <summary>
         /// Dummy class to pop scope stack.
