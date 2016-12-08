@@ -18,6 +18,7 @@ namespace Saritasa.Tools.Messages.Internal
             SelectedColumns = new List<string>();
             SelectedTables = new List<string>();
             WhereStatement = new List<WhereClause>();
+            GroupByColumns = new List<string>();
             OrderByStatement = new List<OrderByClause>();
         }
 
@@ -29,6 +30,8 @@ namespace Saritasa.Tools.Messages.Internal
         public IList<string> SelectedTables { get; }
         /// <inheritdoc />
         public IList<WhereClause> WhereStatement { get; }
+        /// <inheritdoc />
+        public IList<string> GroupByColumns { get; }
         /// <inheritdoc />
         public IList<OrderByClause> OrderByStatement { get; }
         /// <inheritdoc />
@@ -78,6 +81,16 @@ namespace Saritasa.Tools.Messages.Internal
             foreach (var table in tableNames)
             {
                 SelectedTables.Add(table);
+            }
+            return this;
+        }
+
+        /// <inheritdoc />
+        public ISelectStringBuilder GroupBy(params string[] columnNames)
+        {
+            foreach (var columnName in columnNames)
+            {
+                GroupByColumns.Add(columnName);
             }
             return this;
         }

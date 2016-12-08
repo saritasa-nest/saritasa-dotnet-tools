@@ -1,21 +1,15 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-//[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Saritasa.Tools.Messages.Tests")]
-
-using System.Collections.Generic;
-using Saritasa.Tools.Messages.Internal;
-using Saritasa.Tools.Messages.Internal.Enums;
-
 namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
 {
     using System;
-    using System.Text;
+    using Internal;
 
     /// <summary>
     /// SQL Server sql scripts.
     /// </summary>
-    public class SqlServerQueryProvider : IMessageQueryProvider
+    internal class SqlServerQueryProvider : IMessageQueryProvider
     {
         const string TableName = "SaritasaMessages";
 

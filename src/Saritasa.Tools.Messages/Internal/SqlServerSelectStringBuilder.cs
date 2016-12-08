@@ -103,11 +103,12 @@ namespace Saritasa.Tools.Messages.Internal
                 sb.Append($"WHERE {string.Join(" AND ", WhereStatement.Select(BuildWhereClauseString))}");
             }
 
-            // TODO Output GroupBy statement
-            //if (groupByColumns.Count > 0)
-            //{
-            //    sb.Append($" GROUP BY {string.Join(", ", groupByColumns)} ");
-            //}
+            // Output GroupBy statement
+            if (GroupByColumns.Count > 0)
+            {
+                sb.AppendLine();
+                sb.Append($"GROUP BY {string.Join(", ", GroupByColumns.Select(WrapVariable))}");
+            }
 
             // TODO Output having statement
             //if (Having.ClauseLevels > 0)

@@ -38,6 +38,13 @@ namespace Saritasa.Tools.Messages.Internal
         /// </value>
         IList<WhereClause> WhereStatement { get; }
         /// <summary>
+        /// Gets the GROUP BY columns.
+        /// </summary>
+        /// <value>
+        /// The GROUP BY columns.
+        /// </value>
+        IList<string> GroupByColumns { get; }
+        /// <summary>
         /// Gets the ORDER BY statement.
         /// </summary>
         /// <value>
@@ -87,6 +94,12 @@ namespace Saritasa.Tools.Messages.Internal
         /// <param name="tableNames">The table names.</param>
         /// <returns></returns>
         ISelectStringBuilder From(params string[] tableNames);
+        /// <summary>
+        /// Sets GROUP BY columns.
+        /// </summary>
+        /// <param name="columnNames">The column names.</param>
+        /// <returns></returns>
+        ISelectStringBuilder GroupBy(params string[] columnNames);
         /// <summary>
         /// Sets WHERE statement for the specified column.
         /// </summary>

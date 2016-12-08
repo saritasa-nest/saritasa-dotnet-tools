@@ -39,6 +39,13 @@ namespace Saritasa.Tools.Messages.Internal
                 sb.Append($"WHERE {string.Join(" AND ", WhereStatement.Select(BuildWhereClauseString))}");
             }
 
+            // Output GroupBy statement
+            if (GroupByColumns.Count > 0)
+            {
+                sb.AppendLine();
+                sb.Append($"GROUP BY {string.Join(", ", GroupByColumns.Select(WrapVariable))}");
+            }
+
             // Output OrderBy statement
             if (OrderByStatement.Any())
             {

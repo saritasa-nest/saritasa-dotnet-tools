@@ -3,8 +3,6 @@
 
 namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
 {
-    using System.Text;
-
     /// <summary>
     /// Sql query provider for AdoNetMessageRepository.
     /// </summary>

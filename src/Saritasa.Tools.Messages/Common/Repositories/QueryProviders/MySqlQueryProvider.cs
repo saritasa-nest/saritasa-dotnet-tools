@@ -1,17 +1,15 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-using Saritasa.Tools.Messages.Internal;
-
 namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
 {
     using System;
-    using System.Text;
+    using Internal;
 
     /// <summary>
     /// MySql sql scripts.
     /// </summary>
-    public class MySqlQueryProvider : IMessageQueryProvider
+    internal class MySqlQueryProvider : IMessageQueryProvider
     {
         const string TableName = "saritasa_messages";
 
