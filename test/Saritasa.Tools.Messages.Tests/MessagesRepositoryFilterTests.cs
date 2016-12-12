@@ -6,8 +6,8 @@ namespace Saritasa.Tools.Messages.Tests
     using System;
     using System.Text.RegularExpressions;
     using Xunit;
-    using Messages.Common.PipelineMiddlewares;
-    using Messages.Common;
+    using Common.PipelineMiddlewares;
+    using Common;
 
     public class MessagesRepositoryFilterTests
     {

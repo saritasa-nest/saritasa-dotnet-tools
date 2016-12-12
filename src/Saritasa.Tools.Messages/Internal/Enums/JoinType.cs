@@ -1,24 +1,30 @@
+// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+// Licensed under the BSD license. See LICENSE file in the project root for full license information.
+
 namespace Saritasa.Tools.Messages.Internal.Enums
 {
     /// <summary>
-    /// Represents operators for JOIN clauses
+    /// Represents operators for JOIN clauses.
     /// </summary>
     internal enum JoinType
     {
         /// <summary>
-        /// The inner join
+        /// The inner join.
         /// </summary>
         InnerJoin,
+
         /// <summary>
-        /// The outer join
+        /// The outer join.
         /// </summary>
         OuterJoin,
+
         /// <summary>
-        /// The left join
+        /// The left join.
         /// </summary>
         LeftJoin,
+
         /// <summary>
-        /// The right join
+        /// The right join.
         /// </summary>
         RightJoin
     }

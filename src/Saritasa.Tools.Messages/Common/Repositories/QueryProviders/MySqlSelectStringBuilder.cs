@@ -1,11 +1,15 @@
-﻿using System;
-using System.Linq;
-using System.Text;
-using Saritasa.Tools.Messages.Internal.Clauses;
-using Saritasa.Tools.Messages.Internal.Enums;
+﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+// Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.Messages.Internal
+namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
 {
+    using System;
+    using System.Linq;
+    using System.Text;
+    using Internal;
+    using Internal.Clauses;
+    using Internal.Enums;
+
     /// <summary>
     /// The SELECT statement MySQL builder.
     /// </summary>
@@ -51,7 +55,6 @@ namespace Saritasa.Tools.Messages.Internal
             {
                 sb.AppendLine();
                 sb.Append($"ORDER BY {string.Join(", ", OrderByStatement.Select(BuildOrderByClauseString))}");
-
             }
 
             if (TakeRows.HasValue)

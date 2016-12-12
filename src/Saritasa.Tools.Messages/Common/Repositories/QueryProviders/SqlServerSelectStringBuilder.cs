@@ -1,11 +1,15 @@
-﻿using System;
-using System.Linq;
-using System.Text;
-using Saritasa.Tools.Messages.Internal.Clauses;
-using Saritasa.Tools.Messages.Internal.Enums;
+﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+// Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.Messages.Internal
+namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
 {
+    using System;
+    using System.Linq;
+    using System.Text;
+    using Internal;
+    using Internal.Clauses;
+    using Internal.Enums;
+
     /// <summary>
     /// The SELECT statement SQL server builder.
     /// </summary>
@@ -67,7 +71,7 @@ namespace Saritasa.Tools.Messages.Internal
                 sb.Append($" FROM {string.Join(", ", SelectedTables.Select(WrapVariable))}");
             }
 
-            // TODO Output joins
+            // TODO: Output joins
             //if (joins.Count > 0)
             //{
             //    foreach (var clause in joins)
@@ -110,7 +114,7 @@ namespace Saritasa.Tools.Messages.Internal
                 sb.Append($"GROUP BY {string.Join(", ", GroupByColumns.Select(WrapVariable))}");
             }
 
-            // TODO Output having statement
+            // TODO: Output having statement
             //if (Having.ClauseLevels > 0)
             //{
             //    // Check if a Group By Clause was set
@@ -144,14 +148,14 @@ namespace Saritasa.Tools.Messages.Internal
                 }
             }
 
-            // Return the built query
+            // return the built query
             return sb.ToString();
         }
 
         private static string BuildOrderByClauseString(OrderByClause clause)
         {
-            return clause.SortOrder == SortingOperator.Descending 
-                ? $"[{clause.ColumnName}] DESC" 
+            return clause.SortOrder == SortingOperator.Descending
+                ? $"[{clause.ColumnName}] DESC"
                 : $"[{clause.ColumnName}]";
         }
 

@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
-using Saritasa.Tools.Messages.Internal.Clauses;
-using Saritasa.Tools.Messages.Internal.Enums;
+﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+// Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Messages.Internal
 {
+    using System.Collections.Generic;
+    using Clauses;
+    using Enums;
+
     /// <summary>
     /// The SELECT statement abstract builder.
     /// </summary>
@@ -24,18 +27,25 @@ namespace Saritasa.Tools.Messages.Internal
 
         /// <inheritdoc />
         public IList<string> SelectedColumns { get; }
+
         /// <inheritdoc />
         public bool IsDistinct { get; set; }
+
         /// <inheritdoc />
         public IList<string> SelectedTables { get; }
+
         /// <inheritdoc />
         public IList<WhereClause> WhereStatement { get; }
+
         /// <inheritdoc />
         public IList<string> GroupByColumns { get; }
+
         /// <inheritdoc />
         public IList<OrderByClause> OrderByStatement { get; }
+
         /// <inheritdoc />
         public int? SkipRows { get; set; }
+
         /// <inheritdoc />
         public int? TakeRows { get; set; }
 

@@ -70,21 +70,6 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
             ";
         }
 
-        static readonly string[] FieldsList =
-        {
-            "ContentId",
-            "Type",
-            "ContentType",
-            "Content",
-            "Data",
-            "ErrorDetails",
-            "ErrorMessage",
-            "ErrorType",
-            "CreatedAt",
-            "ExecutionDuration",
-            "Status",
-        };
-
         /// <inheritdoc />
         public string GetFilterScript(MessageQuery messageQuery)
         {
@@ -92,7 +77,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
             {
                 throw new ArgumentNullException(nameof(messageQuery));
             }
-            
+
             return BuildSelectString(messageQuery, new SqlServerSelectStringBuilder());
         }
 

@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Saritasa.Tools.Messages.Common;
-using Xunit;
+﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+// Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Messages.Tests
 {
+    using System;
+    using Xunit;
+    using Common;
+
     public class MessageQueryTests
     {
         [Fact]

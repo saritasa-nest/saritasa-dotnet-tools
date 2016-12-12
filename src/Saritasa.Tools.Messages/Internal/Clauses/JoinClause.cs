@@ -1,9 +1,12 @@
-using Saritasa.Tools.Messages.Internal.Enums;
+// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+// Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Messages.Internal.Clauses
 {
+    using Enums;
+
     /// <summary>
-    /// Represents a JOIN clause to be used with SELECT statements
+    /// Represents a JOIN clause to be used with SELECT statements.
     /// </summary>
     internal struct JoinClause
     {
@@ -56,7 +59,7 @@ namespace Saritasa.Tools.Messages.Internal.Clauses
         public string ToColumn { get; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="JoinClause"/> struct.
+        /// Initializes a new instance of the <see cref="JoinClause" /> struct.
         /// </summary>
         /// <param name="join">The join.</param>
         /// <param name="toTableName">Name of to table.</param>
@@ -64,7 +67,8 @@ namespace Saritasa.Tools.Messages.Internal.Clauses
         /// <param name="operator">The operator.</param>
         /// <param name="fromTableName">Name of from table.</param>
         /// <param name="fromColumnName">Name of from column.</param>
-        public JoinClause(JoinType join, string toTableName, string toColumnName, ComparisonOperator @operator, string fromTableName, string fromColumnName)
+        public JoinClause(JoinType join, string toTableName, string toColumnName, ComparisonOperator @operator,
+            string fromTableName, string fromColumnName)
         {
             JoinType = join;
             FromTable = fromTableName;

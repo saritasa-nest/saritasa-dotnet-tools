@@ -1,11 +1,14 @@
-﻿using System;
-using Saritasa.Tools.Messages.Common;
-using Saritasa.Tools.Messages.Common.ObjectSerializers;
-using Saritasa.Tools.Messages.Common.Repositories.QueryProviders;
-using Xunit;
+﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+// Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Messages.Tests
 {
+    using System;
+    using Xunit;
+    using Common;
+    using Common.ObjectSerializers;
+    using Common.Repositories.QueryProviders;
+
     public class QueryProviderTests
     {
         [Fact]
