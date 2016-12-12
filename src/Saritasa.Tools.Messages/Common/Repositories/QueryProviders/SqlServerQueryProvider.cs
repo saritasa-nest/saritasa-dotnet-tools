@@ -4,7 +4,7 @@
 namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
 {
     using System;
-    using System.Text;
+    using Internal;
 
     /// <summary>
     /// SQL Server sql scripts.
@@ -88,10 +88,64 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
         /// <inheritdoc />
         public string GetFilterScript(MessageQuery messageQuery)
         {
-            // TODO:
-            var sb = new StringBuilder();
-            sb.Append($"SELECT * FROM [{TableName}]");
-            return sb.ToString();
+            if (messageQuery == null)
+            {
+                throw new ArgumentNullException(nameof(messageQuery));
+            }
+            
+            return BuildSelectString(messageQuery, new SqlServerSelectStringBuilder());
+        }
+
+        private static string BuildSelectString(MessageQuery messageQuery, ISelectStringBuilder ssb)
+        {
+            ssb.SelectAll().From(TableName);
+
+            if (messageQuery.Id != null)
+            {
+                ssb.Where("ContentId").EqualsTo(messageQuery.Id);
+            }
+            if (messageQuery.CreatedStartDate != null)
+            {
+                ssb.Where("CreatedAt").GreaterOrEqualsTo(messageQuery.CreatedStartDate);
+            }
+            if (messageQuery.CreatedEndDate != null)
+            {
+                ssb.Where("CreatedAt").LessOrEqualsTo(messageQuery.CreatedEndDate);
+            }
+            if (messageQuery.ContentType != null)
+            {
+                ssb.Where("ContentType").EqualsTo(messageQuery.ContentType);
+            }
+            if (messageQuery.ErrorType != null)
+            {
+                ssb.Where("ErrorType").EqualsTo(messageQuery.ErrorType);
+            }
+            if (messageQuery.Status != null)
+            {
+                ssb.Where("Status").EqualsTo(messageQuery.Status);
+            }
+            if (messageQuery.Type != null)
+            {
+                ssb.Where("Type").EqualsTo(messageQuery.Type);
+            }
+            if (messageQuery.ExecutionDurationAbove != null)
+            {
+                ssb.Where("ExecutionDuration").GreaterOrEqualsTo(messageQuery.ExecutionDurationAbove);
+            }
+            if (messageQuery.ExecutionDurationBelow != null)
+            {
+                ssb.Where("ExecutionDuration").LessOrEqualsTo(messageQuery.ExecutionDurationBelow);
+            }
+            if (messageQuery.Skip > 0)
+            {
+                ssb.OrderBy("ContentId").Skip(messageQuery.Skip);
+            }
+            if (messageQuery.Take > 0)
+            {
+                ssb.Take(messageQuery.Take);
+            }
+
+            return ssb.Build();
         }
     }
 }
