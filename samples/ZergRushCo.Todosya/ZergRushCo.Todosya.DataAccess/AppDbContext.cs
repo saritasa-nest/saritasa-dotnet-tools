@@ -26,8 +26,11 @@ namespace ZergRushCo.Todosya.DataAccess
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            var sqliteConnectionInitializer = new SqliteCreateDatabaseIfNotExists<AppDbContext>(modelBuilder);
-            Database.SetInitializer(sqliteConnectionInitializer);
+            if (Database.Connection is System.Data.SQLite.SQLiteConnection)
+            {
+                var sqliteConnectionInitializer = new SqliteCreateDatabaseIfNotExists<AppDbContext>(modelBuilder);
+                Database.SetInitializer(sqliteConnectionInitializer);
+            }
 
             modelBuilder.Entity<Task>()
                 .HasRequired(c => c.User)

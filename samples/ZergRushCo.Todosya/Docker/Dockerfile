@@ -1,7 +1,7 @@
 FROM microsoft/iis
 SHELL ["powershell"]
 
-RUN Install-WindowsFeature NET-Framework-45-ASPNET; \ 
+RUN Install-WindowsFeature NET-Framework-45-ASPNET; \
     Install-WindowsFeature Web-Asp-Net45
 
 RUN $env:chocolateyUseWindowsCompression = 'false'; \
