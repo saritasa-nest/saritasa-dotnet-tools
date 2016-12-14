@@ -9,8 +9,8 @@ services:
       - default
   web:
     build:
-      context: .
-      dockerfile: ./Docker/Dockerfile
+      context: ./Docker
+      dockerfile: Dockerfile
     depends_on:
       - "db"
     ports:
