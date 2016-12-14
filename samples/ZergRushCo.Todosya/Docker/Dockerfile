@@ -1,5 +1,7 @@
 FROM microsoft/iis
-SHELL ["powershell"]
+SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop';"]
+
+RUN Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters' -Name ServerPriorityTimeLimit -Value 0 -Type DWord
 
 RUN Install-WindowsFeature NET-Framework-45-ASPNET; \
     Install-WindowsFeature Web-Asp-Net45
