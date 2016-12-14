@@ -5,6 +5,8 @@ services:
     environment:
       sa_password: "29hHzGtB"
       ACCEPT_EULA: "Y"
+    networks:
+      - default
   web:
     build:
       context: .
@@ -12,7 +14,7 @@ services:
     depends_on:
       - "db"
     ports:
-      - "5000:80"
+      - "5001:80"
     
 networks:
   default:
