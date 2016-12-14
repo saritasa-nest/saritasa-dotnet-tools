@@ -15,8 +15,14 @@ services:
       - "db"
     ports:
       - "5001:80"
+    volumes:
+      - "temp:C:/Temp2"
     
 networks:
   default:
     external:
       name: nat
+
+volumes:
+  temp:
+
