@@ -68,11 +68,11 @@ There are built in repositories.
 
     .. class:: CsvFileMessageRepository
 
-        Stores messages to csv file.
+        Stores messages in csv files.
 
     .. class:: FileMessageRepository
 
-        Stores message in files.
+        Stores messages in files.
 
     .. class:: InMemoryMessageRepository
 
