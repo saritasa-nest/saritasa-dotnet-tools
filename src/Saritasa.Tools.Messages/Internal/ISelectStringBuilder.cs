@@ -37,6 +37,14 @@ namespace Saritasa.Tools.Messages.Internal
         IList<string> SelectedTables { get; }
 
         /// <summary>
+        /// Gets the JOIN statement.
+        /// </summary>
+        /// <value>
+        /// The JOIN statement.
+        /// </value>
+        IList<JoinClause> JoinStatement { get; }
+
+        /// <summary>
         /// Gets the WHERE statement.
         /// </summary>
         /// <value>
@@ -110,6 +118,42 @@ namespace Saritasa.Tools.Messages.Internal
         ISelectStringBuilder From(params string[] tableNames);
 
         /// <summary>
+        /// Joins the specified table.
+        /// </summary>
+        /// <param name="tableName">Name of the table.</param>
+        /// <param name="joinType">Type of the join clause.</param>
+        /// <returns>Join clause.</returns>
+        JoinClause Join(string tableName, JoinType joinType = JoinType.InnerJoin);
+
+        /// <summary>
+        /// Joins the specified table with inner join type.
+        /// </summary>
+        /// <param name="tableName">Name of the table.</param>
+        /// <returns>Join clause.</returns>
+        JoinClause InnerJoin(string tableName);
+
+        /// <summary>
+        /// Joins the specified table with left join type.
+        /// </summary>
+        /// <param name="tableName">Name of the table.</param>
+        /// <returns>Join clause.</returns>
+        JoinClause LeftJoin(string tableName);
+
+        /// <summary>
+        /// Joins the specified table with right join type.
+        /// </summary>
+        /// <param name="tableName">Name of the table.</param>
+        /// <returns>Join clause.</returns>
+        JoinClause RightJoin(string tableName);
+
+        /// <summary>
+        /// Joins the specified table with full outer join type.
+        /// </summary>
+        /// <param name="tableName">Name of the table.</param>
+        /// <returns>Join clause.</returns>
+        JoinClause OuterJoin(string tableName);
+
+        /// <summary>
         /// Sets GROUP BY columns.
         /// </summary>
         /// <param name="columnNames">The column names.</param>
@@ -120,7 +164,7 @@ namespace Saritasa.Tools.Messages.Internal
         /// Sets WHERE statement for the specified column.
         /// </summary>
         /// <param name="columnName">Name of the column.</param>
-        /// <returns>Select string builder.</returns>
+        /// <returns>Where clause.</returns>
         WhereClause Where(string columnName);
 
         /// <summary>
@@ -164,7 +208,7 @@ namespace Saritasa.Tools.Messages.Internal
         /// <summary>
         /// Builds the SELECT statement.
         /// </summary>
-        /// <returns>Select string builder.</returns>
+        /// <returns>The SELECT statement string.</returns>
         string Build();
     }
 }

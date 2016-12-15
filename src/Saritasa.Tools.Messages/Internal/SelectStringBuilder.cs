@@ -20,6 +20,7 @@ namespace Saritasa.Tools.Messages.Internal
         {
             SelectedColumns = new List<string>();
             SelectedTables = new List<string>();
+            JoinStatement = new List<JoinClause>();
             WhereStatement = new List<WhereClause>();
             GroupByColumns = new List<string>();
             OrderByStatement = new List<OrderByClause>();
@@ -33,6 +34,8 @@ namespace Saritasa.Tools.Messages.Internal
 
         /// <inheritdoc />
         public IList<string> SelectedTables { get; }
+
+        public IList<JoinClause> JoinStatement { get; }
 
         /// <inheritdoc />
         public IList<WhereClause> WhereStatement { get; }
@@ -60,11 +63,7 @@ namespace Saritasa.Tools.Messages.Internal
         public ISelectStringBuilder Select(params string[] columnNames)
         {
             SelectedColumns.Clear();
-            foreach (var columnName in columnNames)
-            {
-                SelectedColumns.Add(columnName);
-            }
-            return this;
+            return AddSelect(columnNames);
         }
 
         /// <inheritdoc />
@@ -93,6 +92,38 @@ namespace Saritasa.Tools.Messages.Internal
                 SelectedTables.Add(table);
             }
             return this;
+        }
+
+        /// <inheritdoc />
+        public JoinClause Join(string tableName, JoinType joinType = JoinType.InnerJoin)
+        {
+            var clause = new JoinClause(this, joinType, tableName);
+            JoinStatement.Add(clause);
+            return clause;
+        }
+
+        /// <inheritdoc />
+        public JoinClause InnerJoin(string tableName)
+        {
+            return Join(tableName, JoinType.InnerJoin);
+        }
+
+        /// <inheritdoc />
+        public JoinClause LeftJoin(string tableName)
+        {
+            return Join(tableName, JoinType.LeftJoin);
+        }
+
+        /// <inheritdoc />
+        public JoinClause RightJoin(string tableName)
+        {
+            return Join(tableName, JoinType.RightJoin);
+        }
+
+        /// <inheritdoc />
+        public JoinClause OuterJoin(string tableName)
+        {
+            return Join(tableName, JoinType.OuterJoin);
         }
 
         /// <inheritdoc />

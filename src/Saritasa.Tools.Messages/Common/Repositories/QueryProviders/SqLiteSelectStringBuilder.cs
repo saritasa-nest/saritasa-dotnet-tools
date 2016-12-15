@@ -36,6 +36,31 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
                 sb.Append($" FROM {string.Join(", ", SelectedTables.Select(WrapVariable))}");
             }
 
+            // Output joins
+            if (JoinStatement.Any())
+            {
+                foreach (var clause in JoinStatement)
+                {
+                    sb.AppendLine();
+                    switch (clause.JoinType)
+                    {
+                        case JoinType.InnerJoin:
+                            sb.Append("INNER JOIN ");
+                            break;
+                        case JoinType.LeftJoin:
+                            sb.Append("LEFT OUTER JOIN ");
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(clause.JoinType), $"SqLite doesn't support {clause.JoinType} join type.");
+                    }
+                    sb.Append($"{clause.ToTable} ON ");
+                    sb.Append(CreateComparisonClause(
+                        $"{clause.ToTable}.{clause.ToColumn}",
+                        clause.ComparisonOperator,
+                        new SqlLiteral($"{clause.FromTable}.{clause.FromColumn}")));
+                }
+            }
+
             // Output where statement
             if (WhereStatement.Any())
             {
