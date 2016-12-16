@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Saritasa.Tools.Messages.Common.Expressions.Reduce
 {
@@ -9,6 +11,12 @@ namespace Saritasa.Tools.Messages.Common.Expressions.Reduce
     /// </summary>
     public class ExpressionReduceVisitor : ExpressionVisitor, IExpressionReduceVisitor
     {
+        private Dictionary<MemberTypes, Func<MemberInfo, Type>> typeGetters = new Dictionary<MemberTypes, Func<MemberInfo, Type>>(2)
+        {
+            [MemberTypes.Field] = (memberInfo) => RetrieveFieldType(memberInfo),
+            [MemberTypes.Property] = (memberInfo) => RetrievePropertyType(memberInfo)
+        };
+
         /// <summary>
         /// Visiting node and reducing if we need this.
         /// </summary>
@@ -25,31 +33,42 @@ namespace Saritasa.Tools.Messages.Common.Expressions.Reduce
             var argumentIndex = 0;
             var reducedArguments = new Dictionary<int, ConstantExpression>();
 
-            foreach (var arg in arguments)
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (int index = 0; index < arguments.Count; index++)
             {
+                var arg = arguments[index];
                 var canReduce = false;
 
                 if (arg is BinaryExpression)
                 {
                     var binaryExpression = arg as BinaryExpression;
 
-                    canReduce |= binaryExpression.Left.NodeType == ExpressionType.MemberAccess && binaryExpression.Right.NodeType == ExpressionType.MemberAccess;
-                    canReduce |= binaryExpression.Left.NodeType == ExpressionType.Constant && binaryExpression.Right.NodeType != ExpressionType.Constant;
-                    canReduce |= binaryExpression.Left.NodeType != ExpressionType.Constant && binaryExpression.Right.NodeType == ExpressionType.Constant;
+                    canReduce |= binaryExpression.Left.NodeType == ExpressionType.MemberAccess &&
+                                 binaryExpression.Right.NodeType == ExpressionType.MemberAccess;
+                    canReduce |= binaryExpression.Left.NodeType == ExpressionType.Constant &&
+                                 binaryExpression.Right.NodeType != ExpressionType.Constant;
+                    canReduce |= binaryExpression.Left.NodeType != ExpressionType.Constant &&
+                                 binaryExpression.Right.NodeType == ExpressionType.Constant;
 
                     if (canReduce)
                     {
-                        var leftMemberExpression = binaryExpression.Left as MemberExpression;
-                        var rightMemberExpression = binaryExpression.Right as MemberExpression;
+                        var typeOfLeftExpression = RetrieveMemberType(binaryExpression.Left);
+                        var typeOfFunc = Expression.GetFuncType(typeOfLeftExpression);
 
-                        var compiled = Expression.Lambda(arg).Compile();
-                        var result = compiled.DynamicInvoke();
+                        dynamic compiled = Expression.Lambda(typeOfFunc, arg).Compile();
+
+                        var result = compiled.Invoke();
 
                         reducedArguments.Add(argumentIndex, Expression.Constant(result));
                     }
                 }
 
                 argumentIndex++;
+            }
+
+            if (reducedArguments.Count == 0)
+            {
+                return base.VisitMethodCall(node);
             }
 
             var reducedArgs = new List<Expression>();
@@ -67,6 +86,36 @@ namespace Saritasa.Tools.Messages.Common.Expressions.Reduce
             }
 
             return base.VisitMethodCall(Expression.Call(node.Object, node.Method, reducedArgs));
+        }
+
+        private Type RetrieveMemberType(Expression expression)
+        {
+            if (expression is MemberExpression && typeGetters.ContainsKey((expression as MemberExpression).Member.MemberType))
+            {
+                var memberExpression = expression as MemberExpression;
+                return typeGetters[memberExpression.Member.MemberType](memberExpression.Member);
+            }
+            else if (expression is ConstantExpression)
+            {
+                var constantExpression = expression as ConstantExpression;
+                return constantExpression.Value.GetType();
+            }
+
+            return null;
+        }
+
+        private static Type RetrieveFieldType(MemberInfo info)
+        {
+            var fieldInfo = info as FieldInfo;
+
+            return fieldInfo.FieldType;
+        }
+
+        private static Type RetrievePropertyType(MemberInfo info)
+        {
+            var propertyInfo = info as PropertyInfo;
+
+            return propertyInfo.PropertyType;
         }
     }
 }

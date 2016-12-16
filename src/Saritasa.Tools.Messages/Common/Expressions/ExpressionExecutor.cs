@@ -16,7 +16,7 @@ namespace Saritasa.Tools.Messages.Common.Expressions
         private IExpressionTransformVisitorFactory transformVisitorFactory;
         private IExpressionReduceVisitorFactory reduceVisitorFactory;
 
-        private Dictionary<int, Func<dynamic, dynamic[], dynamic>> callDispatchers = new Dictionary<int, Func<dynamic, dynamic[], dynamic>>
+        private Dictionary<int, Func<dynamic, dynamic[], dynamic>> callDispatchers = new Dictionary<int, Func<dynamic, dynamic[], dynamic>>(13)
         {
             [0] = (func, parameters) => func.Invoke(),
             [1] = (func, parameters) => func.Invoke(parameters[0]),

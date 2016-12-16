@@ -10,6 +10,9 @@ namespace Saritasa.Tools.Messages.Common.Expressions
 {
     public class ExpressionExecutorServices
     {
+        private static ExpressionExecutorServices instance;
+        private static object @lock = new object();
+
         public ExpressionExecutorServices()
         {
             CompiledCache = new CompiledExpressionCache();
@@ -29,5 +32,16 @@ namespace Saritasa.Tools.Messages.Common.Expressions
         public IExpressionTransformVisitorFactory TransformVisitorFactory { get; set; }
 
         public IExpressionReduceVisitorFactory ReduceVisitorFactory { get; set; }
+
+        public static ExpressionExecutorServices Instance
+        {
+            get
+            {
+                lock (@lock)
+                {
+                    return instance ?? (instance = new ExpressionExecutorServices());
+                }
+            }
+        }
     }
 }

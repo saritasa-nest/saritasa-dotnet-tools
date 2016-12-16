@@ -9,6 +9,7 @@ using Saritasa.Tools.Emails.Interceptors;
 using Autofac;
 using Autofac.Integration.Mvc;
 using Microsoft.Extensions.Logging;
+using ZergRushCo.Todosya.Domain;
 
 namespace ZergRushCo.Todosya.Web
 {
@@ -97,7 +98,7 @@ namespace ZergRushCo.Todosya.Web
             builder.RegisterInstance(emailSender).AsImplementedInterfaces().SingleInstance();
 
             // logger
-            var loggerFactory = new Saritasa.Tools.NLog.NLogLoggerProvider();
+            var loggerFactory = new AppLogging.NullLogger();
             builder.RegisterInstance(loggerFactory).AsImplementedInterfaces().SingleInstance();
 
             // set the dependency resolver to be Autofac

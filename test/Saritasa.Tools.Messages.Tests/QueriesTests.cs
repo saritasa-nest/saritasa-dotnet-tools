@@ -105,7 +105,7 @@ namespace Saritasa.Tools.Messages.Tests
                 }
             };
             qp.ProcessRaw(message);
-            Assert.IsType<Dictionary<string, object>>(message.Content);
+            Assert.IsType<List<int>>(message.Content);
         }
 
         #region Can_run_query_with_private_object_ctor

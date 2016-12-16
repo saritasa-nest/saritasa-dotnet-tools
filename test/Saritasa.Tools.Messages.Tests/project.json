@@ -15,13 +15,6 @@
         "System.Data.Common": "4.1.0"
       }
     },
-    "net452": {
-      "frameworkAssemblies": {
-        "System.Data": "",
-        "System.Xml": "",
-        "System.ComponentModel.DataAnnotations": ""
-      }
-    },
     "net461": {
       "frameworkAssemblies": {
         "System.Data": "",

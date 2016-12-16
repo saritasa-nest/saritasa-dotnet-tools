@@ -68,7 +68,6 @@
     <Compile Include="Common\Expressions\IExpressionTransformer.cs" />
     <Compile Include="Common\Expressions\IExpressionTransformVisitorFactory.cs" />
     <Compile Include="Common\Expressions\ExpressionTransformVisitorFactory.cs" />
-    <Compile Include="Common\Expressions\Reduce\ExpressionReduceResult.cs" />
     <Compile Include="Common\Expressions\Reduce\ExpressionReduceVisitor.cs" />
     <Compile Include="Common\Expressions\Reduce\IExpressionReduceVisitor.cs" />
     <Compile Include="Common\Expressions\Transformers\LambdaExpressionTransformer.cs" />
@@ -99,7 +98,6 @@
     <Compile Include="Internal\InternalLogger.cs" />
     <Compile Include="Internal\MessageBinarySerializer.cs" />
     <Compile Include="Internal\MessageParseExpressionVisitor.cs" />
-    <Compile Include="Internal\ServiceProviderExtension.cs" />
     <Compile Include="Internal\TypeHelpers.cs" />
     <Compile Include="Common\PipelineMiddlewares\DataMiddleware.cs" />
     <Compile Include="Common\PipelineMiddlewares\PerformanceCounterMiddleware.cs" />

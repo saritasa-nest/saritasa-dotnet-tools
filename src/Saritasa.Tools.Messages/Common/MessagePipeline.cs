@@ -128,8 +128,10 @@ namespace Saritasa.Tools.Messages.Common
         /// <param name="message">The message.</param>
         protected void ProcessMiddlewares(Message message)
         {
-            foreach (var handler in Middlewares)
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (var i = 0; i < Middlewares.Count; i++)
             {
+                var handler = Middlewares[i];
                 handler.Handle(message);
             }
         }

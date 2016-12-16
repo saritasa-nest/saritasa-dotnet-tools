@@ -4,11 +4,10 @@
 namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
     using Common;
-    using Saritasa.Tools.Messages.Common.Expressions;
+    using Common.Expressions;
 
     /// <summary>
     /// Executes query delegate.
@@ -17,9 +16,12 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
     {
         private readonly ExpressionExecutorFactory expressionExecutorFactory;
 
+        /// <summary>
+        /// Ctor.
+        /// </summary>
         public QueryExecutorMiddleware()
         {
-            this.expressionExecutorFactory = new ExpressionExecutorFactory(new ExpressionExecutorServices());
+            expressionExecutorFactory = new ExpressionExecutorFactory(ExpressionExecutorServices.Instance);
         }
 
         /// <inheritdoc />
@@ -38,8 +40,9 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
             var stopWatch = System.Diagnostics.Stopwatch.StartNew();
             try
             {
+
                 dynamic result;
-                if (!TryInvokeExpression(queryMessage.Method, queryMessage.QueryObject, queryMessage.Parameters.Length, queryMessage.Parameters, out result))
+                if (!TryInvokeExpression(queryMessage.Method, queryMessage.QueryObject, queryMessage.Parameters, out result))
                 {
                     result = queryMessage.Method.Invoke(queryMessage.QueryObject, queryMessage.Parameters);
                 }
@@ -64,26 +67,27 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
             }
         }
 
-        private bool TryInvokeExpression(MethodInfo info, dynamic input, int parametersCount, dynamic[] parameters, out dynamic result)
+        private bool TryInvokeExpression(MethodInfo info, dynamic input, dynamic[] parameters, out dynamic result)
         {
             result = null;
-            try
-            {
-                var executor = expressionExecutorFactory.Create();
-                var @params = new[] { input }.Concat(parameters).ToArray();
 
-                result = executor.Execute(info, @params);
-
-                return true;
-            }
-            catch (Exception)
+            var executor = expressionExecutorFactory.Create();
+            if (!executor.CompiledCache.HasKey(info))
             {
-#if !DEBUG
                 return false;
-#else
-                throw;
-#endif
             }
+
+            var @params = new dynamic[parameters.Length + 1];
+            @params[0] = input;
+
+            for (int paramsIndex = 1, parametersIndex = 0; parametersIndex < parameters.Length; paramsIndex++, parametersIndex++)
+            {
+                @params[paramsIndex] = parameters[parametersIndex];
+            }
+
+            result = executor.Execute(info, @params);
+
+            return true;
         }
     }
 }

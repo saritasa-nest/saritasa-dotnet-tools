@@ -130,7 +130,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
         {
             while (true)
             {
-                var taskContext = listener.GetContextAsync();
+                var taskContext = listener.GetContextAsync(); // OutOfMemoryException here
                 taskContext.Wait(DefaultConnectionWaitTime);
                 taskContext.ContinueWith(t =>
                 {

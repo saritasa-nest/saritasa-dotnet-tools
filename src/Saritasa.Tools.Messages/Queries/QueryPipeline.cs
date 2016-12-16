@@ -69,7 +69,7 @@ namespace Saritasa.Tools.Messages.Queries
                 this.query = null;
                 this.queryPipeline = queryPipeline;
 
-                this.expressionExecutorFactory = new ExpressionExecutorFactory(new ExpressionExecutorServices());
+                this.expressionExecutorFactory = new ExpressionExecutorFactory(ExpressionExecutorServices.Instance);
             }
 
             /// <summary>
@@ -97,6 +97,7 @@ namespace Saritasa.Tools.Messages.Queries
                 }
 
                 var expressionExecutor = expressionExecutorFactory.Create();
+                expression = expressionExecutor.Reduce(expression);
                 expressionExecutor.PreCompile(expression);
 
                 var mce = expression.Body as MethodCallExpression;
