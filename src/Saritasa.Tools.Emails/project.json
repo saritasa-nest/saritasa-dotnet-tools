@@ -37,6 +37,12 @@
         "System.Data.Common": "4.1.0"
       }
     },
+    "netcoreapp1.1": {
+      "dependencies": {
+        "Microsoft.NETCore.App": "1.1.0",
+        "System.Data.Common": "4.1.0"
+      }
+    },
     "netstandard1.6": {
       "dependencies": {
         "NETStandard.Library": "1.6.0",

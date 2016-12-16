@@ -172,7 +172,7 @@ namespace Saritasa.Tools.Messages.Queries
             return queryPipeline;
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc cref="IMessagePipeline.ProcessRaw" />
         public override void ProcessRaw(Message message)
         {
             if (message == null)

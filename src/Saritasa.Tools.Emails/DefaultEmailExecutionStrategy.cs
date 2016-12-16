@@ -4,7 +4,7 @@
 namespace Saritasa.Tools.Emails
 {
     using System;
-#if !NETCOREAPP1_0 && !NETSTANDARD1_6
+#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
     using System.Net.Mail;
 #endif
     using System.Threading;

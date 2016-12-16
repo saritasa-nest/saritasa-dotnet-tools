@@ -34,7 +34,7 @@ String utils.
 
     Convert string value to enum value or return default.
 
-.. function:: Parse
+.. function:: ParseDefault
 
     Sometimes when we try to convert some type from string to another one (`int.Parse` for example) we don't need to know if is it possible to do that or not. Having default value in that case is good for us. This set of methods `TryParseXDefault` try to parse input value and if it is not possible return default one.
 
@@ -47,3 +47,5 @@ String utils.
 
         // with Saritasa extensions:
         int val = StringUtils.ParseDefault("1q", 1);
+
+    .. note:: There is extended behavior for boolean parse. Following values will be at ``True``: ``T``, ``t``, ``1``, ``Y``, ``y``. The values ``F``, ``f``, ``0``, ``N``, ``n`` will be parse as ``False``.

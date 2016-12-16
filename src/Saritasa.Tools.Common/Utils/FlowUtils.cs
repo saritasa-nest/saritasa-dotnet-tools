@@ -99,6 +99,154 @@ namespace Saritasa.Tools.Common.Utils
             );
         }
 
+#if NET40
+        /// <summary>
+        /// Provides the async implementation of the retry mechanism for unreliable actions and transient conditions.
+        /// </summary>
+        /// <typeparam name="T">Result type.</typeparam>
+        /// <param name="action">Unreliable action to execute.</param>
+        /// <param name="retryStrategy">Retry strategy.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <param name="transientExceptions">Transient exceptions.</param>
+        /// <returns>Task that specified when action executed successfully or with error after all retries.</returns>
+        public static Task<T> RetryAsync<T>(
+            Func<Task<T>> action,
+            RetryStrategy retryStrategy,
+            CancellationToken cancellationToken = default(CancellationToken),
+            params Type[] transientExceptions)
+        {
+            Guard.IsNotNull(action, nameof(action));
+            Guard.IsNotNull(retryStrategy, nameof(retryStrategy));
+            return RetryAsyncInternal(action, 1, retryStrategy, cancellationToken, transientExceptions);
+        }
+
+        internal static Task<T> RetryAsyncInternal<T>(
+            Func<Task<T>> action,
+            int attemptCount,
+            RetryStrategy retryStrategy,
+            CancellationToken cancellationToken = default(CancellationToken),
+            params Type[] transientExceptions)
+        {
+            // based on TPL police we should check whether action already cancelled
+            if (cancellationToken.IsCancellationRequested)
+            {
+                var tcs1 = new TaskCompletionSource<T>();
+                tcs1.SetCanceled();
+                return tcs1.Task;
+            }
+
+            Task<T> task = null;
+            try
+            {
+                task = action();
+            }
+            catch (Exception executedException)
+            {
+                // check sync call, if exception occures before task creation
+                bool isSubclass = IsSubtypeOf(executedException, transientExceptions);
+                if (isSubclass == false)
+                {
+                    throw;
+                }
+                var tcs2 = new TaskCompletionSource<T>();
+                tcs2.SetCanceled();
+                return tcs2.Task;
+            }
+
+            // success case
+            if (task.Status == TaskStatus.RanToCompletion)
+            {
+                return task;
+            }
+
+            return task.ContinueWith(
+                new Func<Task<T>, Task<T>>((Task<T> runningTask) =>
+                {
+                    // success case
+                    if (!runningTask.IsFaulted || cancellationToken.IsCancellationRequested)
+                    {
+                        return runningTask;
+                    }
+
+                    Exception executedException = runningTask.Exception.InnerException;
+                    TimeSpan delay;
+                    bool isTransient = IsSubtypeOf(executedException, transientExceptions);
+                    bool shouldStop = retryStrategy(attemptCount, executedException, out delay);
+                    if (isTransient == false || shouldStop)
+                    {
+                        var tcs1 = new TaskCompletionSource<T>();
+                        if (executedException != null)
+                        {
+                            tcs1.TrySetException(executedException);
+                        }
+                        else
+                        {
+                            tcs1.TrySetCanceled();
+                        }
+                        return tcs1.Task;
+                    }
+
+                    if (delay.TotalMilliseconds > 0)
+                    {
+#if PORTABLE
+                        System.Threading.Tasks.Task.Delay((int)delay.TotalMilliseconds).Wait();
+#else
+                        Thread.Sleep((int)delay.TotalMilliseconds);
+#endif
+                    }
+
+                    return RetryAsyncInternal(action, ++attemptCount, retryStrategy, cancellationToken, transientExceptions);
+                }),
+                CancellationToken.None,
+                TaskContinuationOptions.None,
+                TaskScheduler.Default
+            ).Unwrap();
+        }
+#endif
+
+#if NET40
+        /// <summary>
+        /// Provides the async implementation of the retry mechanism for unreliable actions and transient conditions.
+        /// </summary>
+        /// <param name="action">Unreliable action to execute.</param>
+        /// <param name="retryStrategy">Retry strategy.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <param name="transientExceptions">Transient exceptions.</param>
+        /// <returns>Task that specified when action executed successfully or with error after all retries.</returns>
+        public static Task RetryAsync(
+            Func<Task> action,
+            RetryStrategy retryStrategy,
+            CancellationToken cancellationToken = default(CancellationToken),
+            params Type[] transientExceptions)
+        {
+            Guard.IsNotNull(action, nameof(action));
+            Guard.IsNotNull(retryStrategy, nameof(retryStrategy));
+            // try to convert generic task to non-generic
+            Func<Task<int>> nonGenericAction = () =>
+            {
+                var tcs = new TaskCompletionSource<int>();
+                action().ContinueWith(t =>
+                {
+                    if (t.IsFaulted)
+                    {
+                        tcs.TrySetException(t.Exception.InnerExceptions);
+                    }
+                    else if (t.IsCanceled)
+                    {
+                        tcs.TrySetCanceled();
+                    }
+                    else if (t.IsCompleted)
+                    {
+                        tcs.SetResult(0);
+                    }
+                }, cancellationToken, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Current);
+                return tcs.Task;
+            };
+            return RetryAsyncInternal<int>(nonGenericAction, 1, retryStrategy, cancellationToken, transientExceptions);
+        }
+#endif
+
+#if !NET40
         /// <summary>
         /// Provides the async implementation of the retry mechanism for unreliable actions and transient conditions.
         /// </summary>
@@ -158,6 +306,30 @@ namespace Saritasa.Tools.Common.Utils
                 }
             }
         }
+#endif
+
+#if !NET40
+        /// <summary>
+        /// Provides the async implementation of the retry mechanism for unreliable actions and transient conditions.
+        /// </summary>
+        /// <param name="action">Unreliable action to execute.</param>
+        /// <param name="retryStrategy">Retry strategy.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <param name="transientExceptions">Transient exceptions.</param>
+        /// <returns>Task that specified when action executed successfully or with error after all retries.</returns>
+        public static async Task RetryAsync(
+            Func<Task> action,
+            RetryStrategy retryStrategy,
+            CancellationToken cancellationToken = default(CancellationToken),
+            params Type[] transientExceptions)
+        {
+            await RetryAsync<int>(async () =>
+            {
+                await action();
+                return 0;
+            }, retryStrategy, cancellationToken, transientExceptions);
+        }
+#endif
 
         /// <summary>
         /// Returns true if executedException is type of subtype one of exceptionsTypes.
@@ -350,8 +522,15 @@ namespace Saritasa.Tools.Common.Utils
         /// It is null-safe and thread-safe way to raise event.
         /// </summary>
         public static void Raise<TEventArgs>(object sender, TEventArgs e, ref EventHandler<TEventArgs> eventDelegate)
+#if NET40 || NET35
+            where TEventArgs : EventArgs
+#endif
         {
+#if !NET40 && !NET35
             var temp = Volatile.Read(ref eventDelegate);
+#else
+            var temp = eventDelegate;
+#endif
 #if !PORTABLE && !NETSTANDARD1_2 && !NETSTANDARD1_6 && !NETCOREAPP1_0 && !NETCOREAPP1_1
             Thread.MemoryBarrier();
 #endif
@@ -363,8 +542,15 @@ namespace Saritasa.Tools.Common.Utils
         /// If any handler throws an error the AggregateException will be thrown.
         /// </summary>
         public static void RaiseAll<TEventArgs>(object sender, TEventArgs e, ref EventHandler<TEventArgs> eventDelegate)
+#if NET40 || NET35
+            where TEventArgs : EventArgs
+#endif
         {
+#if !NET40 && !NET35
             var temp = Volatile.Read(ref eventDelegate);
+#else
+            var temp = eventDelegate;
+#endif
 #if !PORTABLE && !NETSTANDARD1_2 && !NETSTANDARD1_6 && !NETCOREAPP1_0 && !NETCOREAPP1_1
             Thread.MemoryBarrier();
 #endif
@@ -524,7 +710,7 @@ namespace Saritasa.Tools.Common.Utils
             return CreateMaxAgeCacheStrategy<Tuple<T1, T2, T3>, TResult>(maxAge);
         }
 
-        #endregion
+#endregion
 
         #region MaxCountCacheStrategy
 

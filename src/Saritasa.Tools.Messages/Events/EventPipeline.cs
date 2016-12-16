@@ -27,7 +27,7 @@ namespace Saritasa.Tools.Messages.Events
         /// Creates default pipeline with events executor.
         /// </summary>
         /// <returns>Event pipeline.</returns>
-        public static EventPipeline CreateDefaultPipeline(Func<Type, object> resolver, params Assembly[] assemblies)
+        public static IEventPipeline CreateDefaultPipeline(Func<Type, object> resolver, params Assembly[] assemblies)
         {
             var eventPipeline = new EventPipeline();
             if (assemblies == null || assemblies.Length < 1)

@@ -1,0 +1,13 @@
+﻿{
+  "frameworks": {
+    "net40": {},
+    "net452": {},
+    "net461": {}
+  },
+  "runtimes": {
+    "win": {}
+  },
+  "dependencies": {
+    "StyleCop.Analyzers": "1.0.0"
+  }
+}

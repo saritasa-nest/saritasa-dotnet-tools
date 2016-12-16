@@ -38,7 +38,7 @@ namespace Saritasa.Tools.Messages.Events
         public static IEventPipeline UseHandlerSearchMethod(this IEventPipeline eventPipeline,
             HandlerSearchMethod searchMethod)
         {
-            var middleware = (PipelineMiddlewares.EventHandlerLocatorMiddleware)eventPipeline.GetMiddlewareById("EventHandlerLocator");
+            var middleware = (PipelineMiddlewares.EventHandlerLocatorMiddleware)eventPipeline.GetMiddlewareById("EventLocator");
             if (middleware == null)
             {
                 throw new MiddlewareNotFoundException();

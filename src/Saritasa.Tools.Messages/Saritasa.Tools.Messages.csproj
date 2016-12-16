@@ -73,6 +73,7 @@
     <Compile Include="Common\Expressions\Transformers\LambdaExpressionTransformer.cs" />
     <Compile Include="Common\Expressions\Transformers\MethodCallExpressionTransformer.cs" />
     <Compile Include="Common\HandlerSearchMethod.cs" />
+    <Compile Include="Common\Repositories\QueryProviders\SqlServerQueryProvider.cs" />
     <Compile Include="Events\EventHandlersAttribute.cs" />
     <Compile Include="Events\EventMessage.cs" />
     <Compile Include="Events\EventPipeline.cs" />
@@ -94,10 +95,22 @@
     <Compile Include="Common\ObjectSerializers\BinaryObjectSerializer.cs" />
     <Compile Include="Common\ObjectSerializers\JsonObjectSerializer.cs" />
     <Compile Include="Common\ObjectSerializers\XmlObjectSerializer.cs" />
+    <Compile Include="Internal\Clauses\JoinClause.cs" />
+    <Compile Include="Internal\Clauses\OrderByClause.cs" />
+    <Compile Include="Internal\Clauses\WhereClause.cs" />
+    <Compile Include="Internal\Enums\ComparisonOperator.cs" />
+    <Compile Include="Internal\Enums\JoinType.cs" />
+    <Compile Include="Internal\Enums\LogicOperator.cs" />
+    <Compile Include="Internal\Enums\SortingOperator.cs" />
     <Compile Include="Common\Expressions\ExpressionTransformVisitor.cs" />
     <Compile Include="Internal\InternalLogger.cs" />
+    <Compile Include="Internal\ISelectStringBuilder.cs" />
     <Compile Include="Internal\MessageBinarySerializer.cs" />
-    <Compile Include="Internal\MessageParseExpressionVisitor.cs" />
+    <Compile Include="Common\Repositories\QueryProviders\MySqlSelectStringBuilder.cs" />
+    <Compile Include="Internal\SelectStringBuilder.cs" />
+    <Compile Include="Common\Repositories\QueryProviders\SqLiteSelectStringBuilder.cs" />
+    <Compile Include="Internal\SqlLiteral.cs" />
+    <Compile Include="Common\Repositories\QueryProviders\SqlServerSelectStringBuilder.cs" />
     <Compile Include="Internal\TypeHelpers.cs" />
     <Compile Include="Common\PipelineMiddlewares\DataMiddleware.cs" />
     <Compile Include="Common\PipelineMiddlewares\PerformanceCounterMiddleware.cs" />
@@ -119,7 +132,6 @@
     <Compile Include="Common\Repositories\QueryProviders\IMessageQueryProvider.cs" />
     <Compile Include="Common\Repositories\QueryProviders\MySqlQueryProvider.cs" />
     <Compile Include="Common\Repositories\QueryProviders\SqLiteQueryProvider.cs" />
-    <Compile Include="Common\Repositories\QueryProviders\SqlServerSqlProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Saritasa.Tools.Domain\Saritasa.Tools.Domain.csproj">

@@ -12,7 +12,16 @@
           "version": "1.0.1",
           "type": "platform"
         },
-        "System.Data.Common": "4.1.0"
+        "System.Data.Common": "4.3.0"
+      }
+    },
+    "netcoreapp1.1": {
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "version": "1.1.0",
+          "type": "platform"
+        },
+        "System.Data.Common": "4.3.0"
       }
     },
     "net461": {
@@ -23,5 +32,8 @@
       }
     }
   },
-  "testRunner": "xunit"
+  "testRunner": "xunit",
+  "buildOptions": {
+    "keyFile": "../../tools/SaritasaTools.snk"
+  }
 }

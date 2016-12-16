@@ -30,7 +30,6 @@
     "netcoreapp1.0": {
       "dependencies": {
         "NLog": "5.0.0-beta03",
-        "NLog.Extensions.Logging": "1.0.0-rtm-alpha4",
         "Microsoft.NETCore.App": "1.1.0",
         "System.Threading": "4.3.0"
       }
@@ -40,8 +39,7 @@
         "NETStandard.Library": "1.6.1",
         "System.Data.Common": "4.1.0",
         "System.Threading": "4.3.0",
-        "NLog": "4.4.0-betaV15",
-        "NLog.Extensions.Logging": "1.0.0-rtm-alpha4"
+        "NLog": "5.0.0-beta03"
       }
     }
   },
