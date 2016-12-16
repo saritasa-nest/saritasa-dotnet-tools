@@ -17,6 +17,8 @@
     "tags": [ "flow", "datetime", "parsing", "validation", "pagination", "memoize", "cas" ]
   },
   "frameworks": {
+    "net40": {
+    },
     "net452": {
     },
     "net461": {

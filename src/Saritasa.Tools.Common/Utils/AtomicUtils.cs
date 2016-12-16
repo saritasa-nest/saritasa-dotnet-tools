@@ -18,7 +18,9 @@ namespace Saritasa.Tools.Common.Utils
         /// <typeparam name="T"></typeparam>
         /// <param name="item1">Variable 1.</param>
         /// <param name="item2">Variable 2.</param>
+#if !NET40 && !NET35
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public static void Swap<T>(ref T item1, ref T item2)
         {
             T tmp = item1;
@@ -34,7 +36,9 @@ namespace Saritasa.Tools.Common.Utils
         /// <typeparam name="T">Variables type.</typeparam>
         /// <param name="item1">Variable 1.</param>
         /// <param name="item2">Variable 2.</param>
+#if !NET40 && !NET35
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public static void SafeSwap<T>(ref T item1, ref T item2)
         {
             lock (LockObject)
