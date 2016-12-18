@@ -14,7 +14,7 @@ namespace Saritasa.Tools.Common.Extensions
     /// </summary>
     public static class EnumExtensions
     {
-#if !PORTABLE && !NETSTANDARD1_2 && !NETSTANDARD1_6 && !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NET40 && !NET35
+#if !PORTABLE && !NETSTANDARD1_2 && !NETSTANDARD1_6 && !NETCOREAPP1_0 && !NETCOREAPP1_1
         /// <summary>
         /// Gets the value of Description attribute.
         /// </summary>
@@ -32,10 +32,14 @@ namespace Saritasa.Tools.Common.Extensions
             {
                 return null;
             }
-
+#if !NET35 && !NET40
             IEnumerable<DescriptionAttribute> attributes = fieldInfo.GetCustomAttributes<DescriptionAttribute>(false);
+#else
+            IEnumerable<DescriptionAttribute> attributes =
+                (IEnumerable<DescriptionAttribute>)fieldInfo.GetCustomAttributes(typeof(DescriptionAttribute), false);
+#endif
             return attributes.Any() ? attributes.First().Description : target.ToString();
         }
 #endif
-    }
+        }
 }

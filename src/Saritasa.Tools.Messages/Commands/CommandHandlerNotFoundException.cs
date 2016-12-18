@@ -13,21 +13,22 @@ namespace Saritasa.Tools.Messages.Commands
 #endif
     public class CommandHandlerNotFoundException : Exception
     {
-        const string DefaultMessage = "Cannot find command handler or it cannot be resolved. Make sure it has default public parameterless " +
-            "constructor or registered with your dependency injection container.";
 
         /// <summary>
         /// .ctor
         /// </summary>
-        public CommandHandlerNotFoundException() : base(DefaultMessage)
+        private CommandHandlerNotFoundException() : base()
         {
         }
 
         /// <summary>
         /// .ctor
         /// </summary>
-        /// <param name="message">Exception message.</param>
-        public CommandHandlerNotFoundException(string message) : base(message)
+        /// <param name="commandName">Command name.</param>
+        public CommandHandlerNotFoundException(string commandName) : base(
+            $"Cannot find command handler {commandName} or it cannot be resolved. "
+            + "Make sure it has default public parameterless "
+            + "constructor or registered with your dependency injection container.")
         {
         }
 

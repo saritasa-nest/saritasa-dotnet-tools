@@ -118,7 +118,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
                 var assembliesStr = string.Join(",", assemblies.Select(a => a.FullName));
                 InternalLogger.Warn($"Cannot find command handler for command {cmdtype.Name} in assemblies {assembliesStr}",
                     nameof(CommandHandlerLocatorMiddleware));
-                throw new CommandHandlerNotFoundException();
+                throw new CommandHandlerNotFoundException(cmdtype.Name);
             }
             if (InternalLogger.IsDebugEnabled)
             {

@@ -52,7 +52,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             if (handler == null)
             {
                 commandMessage.Status = Message.ProcessingStatus.Rejected;
-                throw new CommandHandlerNotFoundException();
+                throw new CommandHandlerNotFoundException(commandMessage.Content.GetType().Name);
             }
 
             // invoke method and resolve parameters if needed

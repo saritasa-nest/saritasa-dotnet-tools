@@ -1,4 +1,7 @@
-﻿0.1.1 [2016-12-16]
+﻿0.1.2 [TBD]
+[+] EnumExtensions.GetDescription for .NET 4.0 .
+
+0.1.1 [2016-12-16]
 [+] FlowUtils.RetryAsync now uses ConfigureAwait false to call action.
 [+] FlowUtils.RetryAsync now throws exception if retry limit is reached.
 [*] Make DateTimeUtils.Range function public.
