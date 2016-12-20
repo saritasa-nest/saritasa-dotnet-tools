@@ -1,7 +1,9 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+
 #if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
+
 namespace Saritasa.Tools.Emails
 {
     using System;
@@ -13,7 +15,7 @@ namespace Saritasa.Tools.Emails
 
     /// <summary>
     /// Send email using SmtpClient. The class is thread safe and allows multiple calls
-    /// of Send method.
+    /// of SendAsync method.
     /// </summary>
     public class SmtpClientEmailSender : EmailSender, IDisposable
     {
@@ -57,7 +59,7 @@ namespace Saritasa.Tools.Emails
         /// <summary>
         /// Instance of SmtpClient.
         /// </summary>
-        public SmtpClient Client { get; }
+        public SmtpClient Client { get; private set; }
 
         /// <summary>
         /// Maximum queue size. If queue size for some reason is exceeded the
@@ -138,24 +140,32 @@ namespace Saritasa.Tools.Emails
                 if (queue.TryDequeue(out messageTask))
                 {
                     isBusy = true;
-                    Client.SendMailAsync(messageTask.MailMessage).ContinueWith(t =>
+                    try
+                    {
+                        Client.SendMailAsync(messageTask.MailMessage).ContinueWith(t =>
+                        {
+                            isBusy = false;
+
+                            // sync current task status (from email) with one that is waited by user
+                            if (t.IsFaulted && t.Exception?.InnerExceptions != null)
+                            {
+                                // TODO
+                                messageTask.TaskCompletionSource.SetException(t.Exception.InnerExceptions);
+                            }
+                            else if (t.IsCanceled)
+                            {
+                                messageTask.TaskCompletionSource.SetCanceled();
+                            }
+                            else if (t.IsCompleted)
+                            {
+                                messageTask.TaskCompletionSource.SetResult(0);
+                            }
+                        });
+                    }
+                    catch (Exception)
                     {
                         isBusy = false;
-
-                        // sync current task status (from email) with one that is waited by user
-                        if (t.IsFaulted && t.Exception?.InnerExceptions != null)
-                        {
-                            messageTask.TaskCompletionSource.SetException(t.Exception.InnerExceptions);
-                        }
-                        else if (t.IsCanceled)
-                        {
-                            messageTask.TaskCompletionSource.SetCanceled();
-                        }
-                        else if (t.IsCompleted)
-                        {
-                            messageTask.TaskCompletionSource.SetResult(0);
-                        }
-                    });
+                    }
                 }
             }
         }
@@ -181,7 +191,9 @@ namespace Saritasa.Tools.Emails
             {
                 if (disposing)
                 {
+                    Client.SendCompleted -= OnEmailSent;
                     Client.Dispose();
+                    Client = null;
                 }
                 disposed = true;
             }

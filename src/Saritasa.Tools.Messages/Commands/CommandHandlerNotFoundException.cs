@@ -6,7 +6,7 @@ namespace Saritasa.Tools.Messages.Commands
     using System;
 
     /// <summary>
-    /// Occures when command handler cannot be found.
+    /// Occurs when command handler cannot be found.
     /// </summary>
 #if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
     [Serializable]

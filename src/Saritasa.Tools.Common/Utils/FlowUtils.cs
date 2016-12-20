@@ -34,11 +34,11 @@ namespace Saritasa.Tools.Common.Utils
 
         /// <summary>
         /// Every call of action retries up to numberOfTries times if any subclass of exceptions
-        /// occures.
+        /// occurs.
         /// </summary>
         /// <param name="action">Action to execute.</param>
         /// <param name="retryStrategy">Retry strategy to use.</param>
-        /// <param name="transientExceptions">Set of exceptions on which repeat occures. If null retry will appear on any exception.</param>
+        /// <param name="transientExceptions">Set of exceptions on which repeat occurs. If null retry will appear on any exception.</param>
         /// <returns>Specified user type.</returns>
         public static T Retry<T>(Func<T> action, RetryStrategy retryStrategy, params Type[] transientExceptions)
         {
@@ -81,11 +81,11 @@ namespace Saritasa.Tools.Common.Utils
 
         /// <summary>
         /// Every call of action retries up to numberOfTries times if any subclass of exceptions
-        /// occures.
+        /// occurs.
         /// </summary>
         /// <param name="action">Action to execute.</param>
         /// <param name="retryStrategy">Retry strategy.</param>
-        /// <param name="transientExceptions">Set of exceptions on which repeat occures. If null retry will appear on any exception.</param>
+        /// <param name="transientExceptions">Set of exceptions on which repeat occurs. If null retry will appear on any exception.</param>
         public static void Retry(Action action, RetryStrategy retryStrategy, params Type[] transientExceptions)
         {
             FlowUtils.Retry(
@@ -142,7 +142,7 @@ namespace Saritasa.Tools.Common.Utils
             }
             catch (Exception executedException)
             {
-                // check sync call, if exception occures before task creation
+                // check sync call, if exception occurs before task creation
                 bool isSubclass = IsSubtypeOf(executedException, transientExceptions);
                 if (isSubclass == false)
                 {
