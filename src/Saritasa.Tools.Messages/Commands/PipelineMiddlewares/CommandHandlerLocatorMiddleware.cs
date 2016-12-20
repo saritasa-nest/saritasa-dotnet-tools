@@ -7,7 +7,6 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
     using System.Collections.Generic;
     using System.Reflection;
     using System.Linq;
-    using System.Linq.Expressions;
     using Common;
     using Internal;
 
@@ -23,11 +22,13 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
 
         readonly Assembly[] assemblies;
 
-        // TODO: [IK] need to implement caching to improve speed
-        IDictionary<Type, Expression<Func<object>>> cache =
-            new System.Collections.Concurrent.ConcurrentDictionary<Type, Expression<Func<object>>>(4, 150);
+        /// <summary>
+        /// Commands methods cache. Type is for command type, MethodInfo is for actual handler.
+        /// </summary>
+        readonly System.Collections.Concurrent.ConcurrentDictionary<Type, MethodInfo> cache =
+            new System.Collections.Concurrent.ConcurrentDictionary<Type, MethodInfo>();
 
-        IList<MethodInfo> commandHandlers;
+        ICollection<MethodInfo> commandHandlers;
 
         HandlerSearchMethod handlerSearchMethod = HandlerSearchMethod.ClassAttribute;
 
@@ -101,14 +102,18 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
                 throw new NotSupportedException("Message should be CommandMessage type");
             }
 
-            // find handler method
+            // find handler method, first try to find cached value
             var cmdtype = commandMessage.Content.GetType();
+            var method = cache.GetOrAdd(cmdtype, (handlerCmdType) =>
+            {
+                return commandHandlers
+                    .FirstOrDefault(m => m.GetParameters().Any(pt => pt.ParameterType == handlerCmdType));
+            });
+
             if (InternalLogger.IsDebugEnabled)
             {
                 InternalLogger.Debug($"Finding command handler for type {cmdtype.Name}", nameof(CommandHandlerLocatorMiddleware));
             }
-            var method = commandHandlers
-                .FirstOrDefault(m => m.GetParameters().Any(pt => pt.ParameterType == cmdtype));
             if (method == null)
             {
                 method = cmdtype.GetTypeInfo().GetMethod(HandlerPrefix);

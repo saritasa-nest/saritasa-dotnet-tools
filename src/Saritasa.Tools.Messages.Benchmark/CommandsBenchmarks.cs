@@ -10,7 +10,7 @@ namespace Saritasa.Tools.Messages.Benchmark
     /// </summary>
     public class CommandsBenchmarks
     {
-        const int NumberOfInterations = 10000;
+        const int NumberOfInterations = 100000;
 
         #region Interfaces
 
@@ -106,7 +106,8 @@ namespace Saritasa.Tools.Messages.Benchmark
         public void RunCommandWithPipeline()
         {
             var commandsPipeline = CommandPipeline.CreateDefaultPipeline(InterfacesResolver,
-                Assembly.GetAssembly(typeof(CreateUserCommand)));
+                Assembly.GetAssembly(typeof(CreateUserCommand)))
+                .UseInternalResolver(true);
             for (int i = 0; i < NumberOfInterations; i++)
             {
                 var cmd = new CreateUserCommand()

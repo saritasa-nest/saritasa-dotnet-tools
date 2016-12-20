@@ -12,10 +12,10 @@ namespace Saritasa.Tools.Messages.Commands
     /// </summary>
     public class CommandPipeline : MessagePipeline, ICommandPipeline
     {
-        static readonly byte[] AvailableMessageTypes = { Message.MessageTypeCommand };
+        static readonly byte[] availableMessageTypes = { Message.MessageTypeCommand };
 
         /// <inheritdoc />
-        public override byte[] MessageTypes => AvailableMessageTypes;
+        public override byte[] MessageTypes => availableMessageTypes;
 
         /// <summary>
         /// Execute command.
