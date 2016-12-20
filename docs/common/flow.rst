@@ -1,7 +1,7 @@
-FlowsUtils
-==========
+FlowUtils
+=========
 
-Contains method to affect application flow.
+Method to affect application flow.
 
 .. function:: T Retry<T>(Func<T> action, RetryStrategy retryStrategy, params Type[] transientExceptions)
 .. function:: Task<T> RetryAsync<T>(Func<Task<T>> action, RetryStrategy retryStrategy, CancellationToken cancellationToken, params Type[] transientExceptions)

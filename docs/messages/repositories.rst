@@ -64,19 +64,73 @@ There are built in repositories.
 
     .. class:: AdoNetMessageRepository
 
-        Stores in data source that supports ADO.NET provider.
+        Store messages in data source that supports ADO.NET provider. Following parameters are required:
+
+            .. attribute:: DbProviderFactory factory
+
+                Database factory class to be used. For example ``DbProviderFactories.GetFactory("MySql.Data.MySqlClient")``, ``DbProviderFactories.GetFactory("System.Data.SqlClient")``.
+
+            .. attribute:: string connectionString
+
+                Connection string. For example ``Server=127.0.0.1;Database=commands;Uid=root;Pwd=123;`` for MySQL or ``data source=.;initial catalog=Project.Development;user id=sa;password=123;``.
+
+            .. attribute:: Dialect dialect
+
+                SQL dialect. By default (Auto) will be determined from ``DbProviderFactory``. Following SQL providers are supoorted: ``SqlServer``, ``MySql``, ``Sqlite``.
+
+            .. attribute:: IObjectSerializer serializer
+
+                Serializer to be used to serialize message and error contents. JSON by default.
 
     .. class:: CsvFileMessageRepository
 
-        Stores messages in csv files.
+        Store messages in csv files. File name format is ``{prefix}-yyyyMMdd-XXX.csv`` (for example ``backend-20170101-001.csv``).
+
+            .. attribute:: string logsPath
+
+                Directory to store files.
+
+            .. attribute:: IObjectSerializer serializer
+
+                Serializer to be used to serialize message and error contents. JSON by default.
+
+            .. attribute:: string prefix
+
+                File name prefix.
+
+            .. attribute:: bool buffer = true
+
+                Should the output stream be buffered.
 
     .. class:: FileMessageRepository
 
-        Stores messages in files.
+        Store messages into binary files. File name format is ``{prefix}-yyyyMMdd-XXX.csv`` (for example ``backend-20170101-001.bin``).
+
+            .. attribute:: string logsPath
+
+                Directory to store files.
+
+            .. attribute:: IObjectSerializer serializer
+
+                Serializer to be used to serialize message and error contents. JSON by default.
+
+            .. attribute:: string prefix
+
+                File name prefix.
+
+            .. attribute:: bool buffer = true
+
+                Should the output stream be buffered.
+
+            .. attribute:: bool compress = false
+
+                Use GZip to compress files.
+
+            .. note:: If compression is used files will have ``.zip`` extension.
 
     .. class:: InMemoryMessageRepository
 
-        Stores all messages in plain list.
+        Store messages to plain in memory list. There is ``Dump`` method that returns all data in string.
 
     .. class:: NullMessageRepository
 

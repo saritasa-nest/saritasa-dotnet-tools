@@ -15,3 +15,14 @@ We tried to collect such little things in one place to be able to use it in all 
     pagination
     security
     string
+
+Frameworks
+----------
+
+* .NET 4.0
+* .NET 4.5.2
+* .NET 4.6.1
+* .NET Core 1.0
+* .NET Core 1.1
+* .NET Standard 1.2
+* .NET Standard 1.6

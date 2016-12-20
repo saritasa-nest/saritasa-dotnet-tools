@@ -67,7 +67,7 @@ StringExtensions
 
     These are extension methods that applied to String type.
 
-    .. function:: String.FormatWith(params Object[] args)
+    .. function:: String.FormatWith(params object[] args)
 
         With this extension you can easly append parameters to any string.
 
