@@ -32,6 +32,18 @@ Email Senders
 
 Right now only ``SmtpClientEmailSender`` is available that uses ``SmtpClient`` to send emails. In future we will probably add providers for SendGrid and AWS.
 
+    .. class:: SmtpClientEmailSender
+
+        Utilizes``SmtpClient`` to send emails. Unlike standard ``SmtpClient`` you can call send message method without any synchronization. It puts them to queue before sending. Thread safe.
+
+            .. attribute:: MaxQueueSize
+
+                Max queue size. If queue size for some reason is exceeded the ``EmailQueueExceededException`` exception will be thrown. Default value is 10240.
+
+    .. class:: MultiSmtpClientEmailSender
+
+        Handles several smtp clients to send emails using round-robin method. The main parameter is ``smtpClientInstancesCount`` that specifies how many smtp clients to use (default is 2) to send emails simultaneously.
+
 Interceptors
 ------------
 
@@ -47,7 +59,7 @@ Now only emails to saritasa.com and saritasa-hosting.com domains will be accepte
 
     .. class:: FilterEmailInterceptor
 
-        Filters users to whom send an email. You can ``*`` and ``?`` special characters to apply mask. The symbols ``,``, ``;`` and space can be used as separator.
+        Filters users to whom send an email. You can ``*`` and ``?`` special characters to apply mask. The symbols ``,``, ``;`` and space can be used as separator. For example: ``*@yandex.ru;*+test@saritasa.com``.
 
     .. class:: SaveToFileEmailInterceptor
 
