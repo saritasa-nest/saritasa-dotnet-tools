@@ -11,7 +11,7 @@ namespace Saritasa.Tools.Messages.Common.Expressions.Reduce
     /// </summary>
     public class ExpressionReduceVisitor : ExpressionVisitor, IExpressionReduceVisitor
     {
-        private static Dictionary<MemberTypes, Func<MemberInfo, Type>> typeGetters = new Dictionary<MemberTypes, Func<MemberInfo, Type>>(2)
+        private static readonly Dictionary<MemberTypes, Func<MemberInfo, Type>> TypeGetters = new Dictionary<MemberTypes, Func<MemberInfo, Type>>(2)
         {
             [MemberTypes.Field] = (memberInfo) => RetrieveFieldType(memberInfo),
             [MemberTypes.Property] = (memberInfo) => RetrievePropertyType(memberInfo)
@@ -71,10 +71,11 @@ namespace Saritasa.Tools.Messages.Common.Expressions.Reduce
                 return base.VisitMethodCall(node);
             }
 
-            var reducedArgs = new List<Expression>();
+            var reducedArgs = new List<Expression>(arguments.Count);
 
             for (int i = 0; i < arguments.Count; i++)
             {
+                // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
                 if (reducedArguments.ContainsKey(i))
                 {
                     reducedArgs.Add(reducedArguments[i]);
@@ -88,16 +89,16 @@ namespace Saritasa.Tools.Messages.Common.Expressions.Reduce
             return base.VisitMethodCall(Expression.Call(node.Object, node.Method, reducedArgs));
         }
 
-        private Type RetrieveMemberType(Expression expression)
+        private static Type RetrieveMemberType(Expression expression)
         {
-            if (expression is MemberExpression && typeGetters.ContainsKey((expression as MemberExpression).Member.MemberType))
+            if (expression is MemberExpression && TypeGetters.ContainsKey(((MemberExpression)expression).Member.MemberType))
             {
-                var memberExpression = expression as MemberExpression;
-                return typeGetters[memberExpression.Member.MemberType](memberExpression.Member);
+                var memberExpression = (MemberExpression)expression;
+                return TypeGetters[memberExpression.Member.MemberType](memberExpression.Member);
             }
-            else if (expression is ConstantExpression)
+            if (expression is ConstantExpression)
             {
-                var constantExpression = expression as ConstantExpression;
+                var constantExpression = (ConstantExpression)expression;
                 return constantExpression.Value.GetType();
             }
 
@@ -106,14 +107,14 @@ namespace Saritasa.Tools.Messages.Common.Expressions.Reduce
 
         private static Type RetrieveFieldType(MemberInfo info)
         {
-            var fieldInfo = info as FieldInfo;
+            var fieldInfo = (FieldInfo)info;
 
             return fieldInfo.FieldType;
         }
 
         private static Type RetrievePropertyType(MemberInfo info)
         {
-            var propertyInfo = info as PropertyInfo;
+            var propertyInfo = (PropertyInfo)info;
 
             return propertyInfo.PropertyType;
         }
