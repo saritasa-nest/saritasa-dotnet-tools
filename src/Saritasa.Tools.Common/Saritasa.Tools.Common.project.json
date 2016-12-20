@@ -8,7 +8,6 @@
     "win": {}
   },
   "dependencies": {
-    "StructureMap": "4.4.1",
     "StyleCop.Analyzers": "1.0.0"
   }
 }

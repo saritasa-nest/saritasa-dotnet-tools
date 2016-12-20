@@ -8,12 +8,9 @@ namespace Saritasa.Tools.Messages.Common.Expressions.Transformers
     /// <summary>
     /// Method call tranformer.
     /// </summary>
-    /// <remarks>
-    /// TODO: add transform for Get(10 + 1, 20 + 2)
-    /// </remarks>
     public class MethodCallExpressionTransformer : IExpressionTransformer
     {
-        private Dictionary<MemberTypes, Func<MemberInfo, Type>> typeGetters = new Dictionary<MemberTypes, Func<MemberInfo, Type>>
+        private static Dictionary<MemberTypes, Func<MemberInfo, Type>> typeGetters = new Dictionary<MemberTypes, Func<MemberInfo, Type>>(2)
         {
             [MemberTypes.Field] = (memberInfo) => RetrieveFieldType(memberInfo),
             [MemberTypes.Property] = (memberInfo) => RetrievePropertyType(memberInfo)
@@ -34,7 +31,7 @@ namespace Saritasa.Tools.Messages.Common.Expressions.Transformers
                 throw new ArgumentException("Can't cast input to method call expression.");
             }
 
-            var parameters = new List<Expression>();
+            var parameters = new List<Expression>(methodCallExpression.Arguments.Count);
             var argumentIndex = 0;
 
             foreach (var methodCallArgument in methodCallExpression.Arguments)

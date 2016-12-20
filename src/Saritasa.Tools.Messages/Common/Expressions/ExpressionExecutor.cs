@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 using Saritasa.Tools.Messages.Common.Expressions.Compilation;
+using Saritasa.Tools.Messages.Common.Expressions.Reduce;
 
 namespace Saritasa.Tools.Messages.Common.Expressions
 {
@@ -14,9 +15,9 @@ namespace Saritasa.Tools.Messages.Common.Expressions
         private ICompiledExpressionCache compiledExpressionCache;
         private IExpressionCompilator expressionCompilator;
         private IExpressionTransformVisitorFactory transformVisitorFactory;
-        private IExpressionReduceVisitorFactory reduceVisitorFactory;
+        private IExpressionReduceVisitor reduceVisitor;
 
-        private Dictionary<int, Func<dynamic, dynamic[], dynamic>> callDispatchers = new Dictionary<int, Func<dynamic, dynamic[], dynamic>>(13)
+        private static Dictionary<int, Func<dynamic, dynamic[], dynamic>> callDispatchers = new Dictionary<int, Func<dynamic, dynamic[], dynamic>>(13)
         {
             [0] = (func, parameters) => func.Invoke(),
             [1] = (func, parameters) => func.Invoke(parameters[0]),
@@ -40,12 +41,12 @@ namespace Saritasa.Tools.Messages.Common.Expressions
             ICompiledExpressionCache expressionProvider,
             IExpressionCompilator expressionCompilator,
             IExpressionTransformVisitorFactory transformVisitorFactory,
-            IExpressionReduceVisitorFactory reduceVisitorFactory)
+            IExpressionReduceVisitor reduceVisitor)
         {
             this.expressionCompilator = expressionCompilator;
             this.compiledExpressionCache = expressionProvider;
             this.transformVisitorFactory = transformVisitorFactory;
-            this.reduceVisitorFactory = reduceVisitorFactory;
+            this.reduceVisitor = reduceVisitor;
         }
 
         /// <summary>
@@ -59,7 +60,22 @@ namespace Saritasa.Tools.Messages.Common.Expressions
         /// </summary>
         public void PreCompile(Expression expression)
         {
-            compiledExpressionCache.GetOrAdd(GetMethodInfo(expression), () =>
+            compiledExpressionCache.Add(GetMethodInfo(expression), () =>
+            {
+                var transformer = transformVisitorFactory.Create();
+                var transformedExpression = transformer.Visit(expression);
+                return expressionCompilator.Compile(transformedExpression);
+            });
+        }
+
+        /// <summary>
+        /// Compiling expression or skipping if already compiled.
+        /// If expression need transformation, it will be transformed.
+        /// Using provided <see cref="MethodInfo"/> as key in cache.
+        /// </summary>
+        public void PreCompile(Expression expression, MethodInfo info)
+        {
+            compiledExpressionCache.Add(info, () =>
             {
                 var transformer = transformVisitorFactory.Create();
                 var transformedExpression = transformer.Visit(expression);
@@ -72,7 +88,6 @@ namespace Saritasa.Tools.Messages.Common.Expressions
         /// </summary>
         public Expression Reduce(Expression expression)
         {
-            var reduceVisitor = reduceVisitorFactory.Create();
             return reduceVisitor.VisitAndReduce(expression);
         }
 
@@ -82,7 +97,6 @@ namespace Saritasa.Tools.Messages.Common.Expressions
         /// </summary>
         public Expression<T> Reduce<T>(Expression<T> expression)
         {
-            var reduceVisitor = reduceVisitorFactory.Create();
             return (Expression<T>)reduceVisitor.VisitAndReduce(expression);
         }
 

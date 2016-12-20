@@ -33,9 +33,9 @@ namespace Saritasa.Tools.Messages.Common.Expressions.Compilation
         }
 
         /// <inheritdoc />
-        public Delegate GetOrAdd(MethodInfo methodInfo, Func<Delegate> factory)
+        public void Add(MethodInfo methodInfo, Func<Delegate> factory)
         {
-            return cache.GetOrAdd(methodInfo, (source) => factory());
+            cache.GetOrAdd(methodInfo, (source) => factory());
         }
 
         /// <inheritdoc/>

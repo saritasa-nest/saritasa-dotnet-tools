@@ -47,6 +47,8 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
                     result = queryMessage.Method.Invoke(queryMessage.QueryObject, queryMessage.Parameters);
                 }
 
+                //var result = queryMessage.Method.Invoke(queryMessage.QueryObject, queryMessage.Parameters);
+
                 queryMessage.Result = result;
                 queryMessage.Status = Message.ProcessingStatus.Completed;
             }

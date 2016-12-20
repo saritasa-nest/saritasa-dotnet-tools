@@ -63,8 +63,6 @@
     <Compile Include="Common\Expressions\ExpressionExecutor.cs" />
     <Compile Include="Common\Expressions\ExpressionExecutorFactory.cs" />
     <Compile Include="Common\Expressions\ExpressionExecutorServices.cs" />
-    <Compile Include="Common\Expressions\ExpressionReduceVisitorFactory.cs" />
-    <Compile Include="Common\Expressions\IExpressionReduceVisitorFactory.cs" />
     <Compile Include="Common\Expressions\IExpressionTransformer.cs" />
     <Compile Include="Common\Expressions\IExpressionTransformVisitorFactory.cs" />
     <Compile Include="Common\Expressions\ExpressionTransformVisitorFactory.cs" />

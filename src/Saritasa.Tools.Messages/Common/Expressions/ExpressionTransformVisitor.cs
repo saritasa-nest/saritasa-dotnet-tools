@@ -30,12 +30,17 @@ namespace Saritasa.Tools.Messages.Common.Expressions
 
         private IExpressionTransformer GetTransfomer(Expression node)
         {
-            return transformers.FirstOrDefault(transfomer => transfomer.SupportTransform(node.NodeType));
-        }
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (int i = 0; i < transformers.Count; i++)
+            {
+                var transformer = transformers[i];
+                if (transformer.SupportTransform(node.NodeType))
+                {
+                    return transformer;
+                }
+            }
 
-        private bool HasSupportingTransformer(Expression node)
-        {
-            return transformers.Any(transformer => transformer.SupportTransform(node.NodeType));
+            return null;
         }
 
         /// <inheritdoc/>
@@ -47,19 +52,13 @@ namespace Saritasa.Tools.Messages.Common.Expressions
         }
 
         /// <inheritdoc/>
-        protected override Expression VisitParameter(ParameterExpression node)
-        {
-            return base.VisitParameter(node);
-        }
-
-        /// <inheritdoc/>
         protected override Expression VisitLambda<T>(Expression<T> node)
         {
             var visitedLambda = base.VisitLambda<T>(node);
 
-            if (HasSupportingTransformer(node))
+            var transformer = GetTransfomer(node);
+            if (transformer != null)
             {
-                var transformer = GetTransfomer(node);
                 return transformer.Transform(visitedLambda, this);
             }
 
@@ -69,9 +68,9 @@ namespace Saritasa.Tools.Messages.Common.Expressions
         /// <inheritdoc/>
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            if (HasSupportingTransformer(node))
+            var transfomer = GetTransfomer(node);
+            if (transfomer != null)
             {
-                var transfomer = GetTransfomer(node);
                 return transfomer.Transform(node, this);
             }
 

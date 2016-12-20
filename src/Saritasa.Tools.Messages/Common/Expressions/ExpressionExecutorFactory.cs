@@ -14,9 +14,9 @@
             var compiledExpressionProvider = executorServices.CompiledCache;
             var expressionCompilator = executorServices.ExpressionCompilator;
             var transformVisitorFactory = executorServices.TransformVisitorFactory;
-            var reduceVisitorFactory = executorServices.ReduceVisitorFactory;
+            var expressionReduceVisitor = executorServices.ReduceVisitor;
 
-            return new ExpressionExecutor(compiledExpressionProvider, expressionCompilator, transformVisitorFactory, reduceVisitorFactory);
+            return new ExpressionExecutor(compiledExpressionProvider, expressionCompilator, transformVisitorFactory, expressionReduceVisitor);
         }
     }
 }

@@ -96,13 +96,14 @@ namespace Saritasa.Tools.Messages.Queries
                     fakeQueryObject = true;
                 }
 
-                var expressionExecutor = expressionExecutorFactory.Create();
-                expression = expressionExecutor.Reduce(expression);
-                expressionExecutor.PreCompile(expression);
-
                 var mce = expression.Body as MethodCallExpression;
                 var args = mce.Arguments.Select(PartiallyEvaluateExpression).ToArray();
                 var method = mce.Method;
+
+                var expressionExecutor = expressionExecutorFactory.Create();
+                expression = expressionExecutor.Reduce(expression);
+                expressionExecutor.PreCompile(expression, method);
+
                 var message = new QueryMessage()
                 {
                     ContentType = method.DeclaringType.FullName + "." + method.Name,

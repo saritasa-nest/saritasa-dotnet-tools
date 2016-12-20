@@ -11,7 +11,7 @@ namespace Saritasa.Tools.Messages.Common.Expressions.Reduce
     /// </summary>
     public class ExpressionReduceVisitor : ExpressionVisitor, IExpressionReduceVisitor
     {
-        private Dictionary<MemberTypes, Func<MemberInfo, Type>> typeGetters = new Dictionary<MemberTypes, Func<MemberInfo, Type>>(2)
+        private static Dictionary<MemberTypes, Func<MemberInfo, Type>> typeGetters = new Dictionary<MemberTypes, Func<MemberInfo, Type>>(2)
         {
             [MemberTypes.Field] = (memberInfo) => RetrieveFieldType(memberInfo),
             [MemberTypes.Property] = (memberInfo) => RetrievePropertyType(memberInfo)

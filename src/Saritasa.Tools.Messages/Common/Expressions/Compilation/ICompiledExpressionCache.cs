@@ -16,7 +16,7 @@ namespace Saritasa.Tools.Messages.Common.Expressions.Compilation
         /// <summary>
         /// Getting of adding delegate.
         /// </summary>
-        Delegate GetOrAdd(MethodInfo methodInfo, Func<Delegate> factory);
+        void Add(MethodInfo methodInfo, Func<Delegate> factory);
 
         /// <summary>
         /// Getting already containing delegate.

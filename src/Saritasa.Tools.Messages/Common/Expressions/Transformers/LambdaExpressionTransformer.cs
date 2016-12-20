@@ -10,14 +10,16 @@ namespace Saritasa.Tools.Messages.Common.Expressions.Transformers
     /// </summary>
     public class LambdaExpressionTransformer : IExpressionTransformer
     {
+        /// <inheritdoc/>
         public bool SupportTransform(ExpressionType nodeFrom)
         {
             return nodeFrom == ExpressionType.Lambda;
         }
 
+        /// <inheritdoc/>
         public Expression Transform(Expression input, ExpressionTransformVisitor visitor)
         {
-            if (!visitor.TransformedParameterExpressions.Any())
+            if (visitor.TransformedParameterExpressions.Count == 0)
             {
                 return input;
             }
@@ -28,7 +30,8 @@ namespace Saritasa.Tools.Messages.Common.Expressions.Transformers
                 throw new ArgumentException("Can't convert input expression to lambda expression.");
             }
 
-            var parameters = new List<ParameterExpression>(lamdaExpression.Parameters);
+            var parameters = new List<ParameterExpression>(lamdaExpression.Parameters.Count + visitor.TransformedParameterExpressions.Count);
+            parameters.AddRange(lamdaExpression.Parameters);
             parameters.AddRange(visitor.TransformedParameterExpressions);
 
             return Expression.Lambda(lamdaExpression.Body, parameters);
