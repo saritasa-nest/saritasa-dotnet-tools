@@ -4,14 +4,14 @@
 namespace Saritasa.Tools.Domain.Exceptions
 {
     using System;
-#if !NETCOREAPP1_0 && !NETSTANDARD1_6
+#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
     using System.Runtime.Serialization;
 #endif
 
     /// <summary>
     /// Validation exception.
     /// </summary>
-#if !NETCOREAPP1_0 && !NETSTANDARD1_6
+#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
     [Serializable]
 #endif
     public class ValidationException : DomainException
@@ -40,7 +40,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         {
         }
 
-#if !NETCOREAPP1_0 && !NETSTANDARD1_6
+#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
         /// <summary>
         /// .ctor for deserialization.
         /// </summary>

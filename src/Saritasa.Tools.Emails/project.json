@@ -18,35 +18,22 @@
   },
   "frameworks": {
     "net452": {
-      "frameworkAssemblies": {
-        "System.Data": "",
-        "System.Xml": "",
-        "System.ComponentModel.DataAnnotations": ""
-      }
     },
     "net461": {
-      "frameworkAssemblies": {
-        "System.Data": "",
-        "System.Xml": "",
-        "System.ComponentModel.DataAnnotations": ""
-      }
     },
     "netcoreapp1.0": {
       "dependencies": {
-        "Microsoft.NETCore.App": "1.0.1",
-        "System.Data.Common": "4.1.0"
+        "Microsoft.NETCore.App": "1.0.1"
       }
     },
     "netcoreapp1.1": {
       "dependencies": {
-        "Microsoft.NETCore.App": "1.1.0",
-        "System.Data.Common": "4.1.0"
+        "Microsoft.NETCore.App": "1.1.0"
       }
     },
     "netstandard1.6": {
       "dependencies": {
-        "NETStandard.Library": "1.6.0",
-        "System.Data.Common": "4.1.0"
+        "NETStandard.Library": "1.6.1"
       }
     }
   },

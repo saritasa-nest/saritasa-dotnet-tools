@@ -21,17 +21,11 @@
   },
   "frameworks": {
     "net452": {
-      "frameworkAssemblies": {
-        "System.Data": ""
-      },
       "dependencies": {
         "EntityFramework": "6.1.3"
       }
     },
     "net461": {
-      "frameworkAssemblies": {
-        "System.Data": ""
-      },
       "dependencies": {
         "EntityFramework": "6.1.3"
       }
