@@ -58,6 +58,7 @@
     <Compile Include="Common\Endpoints\WebEndpoint.cs" />
     <Compile Include="Common\HandlerSearchMethod.cs" />
     <Compile Include="Common\Repositories\QueryProviders\SqlServerQueryProvider.cs" />
+    <Compile Include="Common\Repositories\ElasticsearchRepository.cs" />
     <Compile Include="Events\EventHandlersAttribute.cs" />
     <Compile Include="Events\EventMessage.cs" />
     <Compile Include="Events\EventPipeline.cs" />
@@ -82,6 +83,17 @@
     <Compile Include="Internal\Clauses\JoinClause.cs" />
     <Compile Include="Internal\Clauses\OrderByClause.cs" />
     <Compile Include="Internal\Clauses\WhereClause.cs" />
+    <Compile Include="Internal\Elasticsearch\Query\IFieldNameQuery.cs" />
+    <Compile Include="Internal\Elasticsearch\Query\SearchQuerySerializer.cs" />
+    <Compile Include="Internal\Elasticsearch\Query\RangeQuerySerializer.cs" />
+    <Compile Include="Internal\Elasticsearch\Query\TermQuerySerializer.cs" />
+    <Compile Include="Internal\Elasticsearch\Query\SearchQuery.cs" />
+    <Compile Include="Internal\Elasticsearch\Query\RangeQuery.cs" />
+    <Compile Include="Internal\Elasticsearch\Query\TermQuery.cs" />
+    <Compile Include="Internal\Elasticsearch\SearchResult\Hit.cs" />
+    <Compile Include="Internal\Elasticsearch\SearchResult\Hits.cs" />
+    <Compile Include="Internal\Elasticsearch\SearchResult\Root.cs" />
+    <Compile Include="Internal\Elasticsearch\SearchResult\Shards.cs" />
     <Compile Include="Internal\Enums\ComparisonOperator.cs" />
     <Compile Include="Internal\Enums\JoinType.cs" />
     <Compile Include="Internal\Enums\LogicOperator.cs" />
