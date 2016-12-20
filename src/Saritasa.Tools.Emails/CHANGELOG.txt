@@ -1,2 +1,6 @@
-﻿0.1.0 [2016-12-20]
+﻿0.1.1 [TBD]
+[*] SmtpClientEmailSender now supports multithread mode.
+[+] Add MultiSmtpClientEmailSender class.
+
+0.1.0 [2016-12-20]
 [+] Initial release.
