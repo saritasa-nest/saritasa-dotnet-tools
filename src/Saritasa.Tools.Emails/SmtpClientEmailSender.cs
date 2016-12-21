@@ -152,8 +152,6 @@ namespace Saritasa.Tools.Emails
                     {
                         Client.SendMailAsync(messageTask.MailMessage).ContinueWith(t =>
                         {
-                            isBusy = false;
-
                             // sync current task status (from email) with one that is waited by user
                             if (t.IsFaulted)
                             {

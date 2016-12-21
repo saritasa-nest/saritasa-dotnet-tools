@@ -25,6 +25,8 @@ namespace Saritasa.Tools.Emails.Interceptors
         /// </summary>
         public bool AfterSend { get; }
 
+        private static readonly object @lock = new object();
+
         /// <summary>
         /// .ctor
         /// </summary>
@@ -42,8 +44,16 @@ namespace Saritasa.Tools.Emails.Interceptors
 
         void Save(MailMessage message)
         {
-            var path = Path.Combine(Directory, $"{DateTime.Now:yyyyMMdd-hhmmss}.msg");
-            SaveMailMessage(message, path);
+            // sometimes we have emails sending at the same second, add postfix in that case
+            lock (@lock)
+            {
+                var path = Path.Combine(Directory, $"{DateTime.Now:yyyyMMdd-hhmmss}.msg");
+                for (int i = 0; File.Exists(path); i++)
+                {
+                    path = Path.Combine(Directory, $"{DateTime.Now:yyyyMMdd-hhmmss}-{i:000}.msg");
+                }
+                SaveMailMessage(message, path);
+            }
         }
 
         #region IEmailInterceptor implementation

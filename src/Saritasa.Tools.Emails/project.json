@@ -1,6 +1,6 @@
 {
   "title": "Saritasa Tools Emails",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "authors": [ "Saritasa" ],
   "description": "The package is a part of Saritasa Tools project. Saritasa.Tools.Emails contains emails sending pipeline and interceptors.",
   "copyright": "Saritasa 2015-2016",

@@ -37,6 +37,7 @@ namespace Saritasa.Tools.Emails
             {
                 var clonedSmtpClient = CloneSmtpClient(smtpClient);
                 clientInstances[i] = new SmtpClientEmailSender(clonedSmtpClient);
+                clientInstances[i].Client.ServicePoint.ConnectionLimit = smtpClientInstancesCount;
             }
         }
 

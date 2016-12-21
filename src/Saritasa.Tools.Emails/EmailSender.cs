@@ -59,7 +59,7 @@ namespace Saritasa.Tools.Emails
             }
 
             // send email and run post process interceptors
-            return ExecutionStrategy.Execute(Process, message, data, CancellationToken).ContinueWith((task) =>
+            return ExecutionStrategy.Execute(Process, message, data, CancellationToken).ContinueWith(task =>
             {
                 if (!task.IsFaulted)
                 {

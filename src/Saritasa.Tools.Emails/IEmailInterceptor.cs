@@ -15,7 +15,7 @@ namespace Saritasa.Tools.Emails
     public interface IEmailInterceptor
     {
         /// <summary>
-        /// The method is called after email sending.
+        /// The method is called after success email sending.
         /// </summary>
         /// <param name="mailMessage">Mail message.</param>
         /// <param name="data">Additional data.</param>
