@@ -10,23 +10,23 @@ Method to affect application flow.
 
     .. function:: CreateFixedDelayRetryStrategy(int numberOfTries, TimeSpan? delay, bool firstFastRetry)
 
-    There will be fixed time delay between every failed action call.
+        There will be fixed time delay between every failed action call.
 
     .. function:: CreateIncrementDelayRetryStrategy(int numberOfTries, TimeSpan? delay, TimeSpan? increment, bool firstFastRetry)
 
-    There will be incremented delay between every failed action call.
+        There will be incremented delay between every failed action call.
 
     .. function::  CreateExponentialBackoffDelayRetryStrategy(int numberOfTries, TimeSpan? minBackoff, TimeSpan? maxBackoff, TimeSpan? deltaBackoff, bool firstFastRetry)
 
-    A retry strategy with backoff parameters for calculating the exponential delay between retries.
+        A retry strategy with backoff parameters for calculating the exponential delay between retries.
 
     .. function:: CreateCallbackRetryStrategy(RetryCallback callback)
 
-    Creates wrapper delegate around "RetryCallback". Can be used for loggin or debug purpose. Please note that this delegate should be passed first when combine with RetryStrategyDelegate.
+        Creates wrapper delegate around "RetryCallback". Can be used for loggin or debug purpose. Please note that this delegate should be passed first when combine with RetryStrategyDelegate.
 
     Here are several examples of usage:
 
-        .. code-block:: c#
+    .. code-block:: c#
 
             // async repeat with fixed delay strategy
             FlowUtils.RetryAsync(() =>
@@ -60,17 +60,17 @@ Method to affect application flow.
 
     .. function:: CacheStrategy<TKey, TResult> CreateMaxAgeCacheStrategy<TKey, TResult>(TimeSpan maxAge, IDictionary<TKey, DateTime> timestampsStorage)
 
-    Example of usage:
+        Example of usage:
 
-        .. code-block:: c#
+            .. code-block:: c#
 
-            var memoized1 = FlowUtils.Memoize(
-                new Func<int, int>((int a) =>
-                {
-                    return value; // some processing here
-                }),
-                FlowUtils.CreateMaxCountCacheStrategy<int, int>(maxCount: 3, removeCount: 2)
-            );
+                var memoized1 = FlowUtils.Memoize(
+                    new Func<int, int>((int a) =>
+                    {
+                        return value; // some processing here
+                    }),
+                    FlowUtils.CreateMaxCountCacheStrategy<int, int>(maxCount: 3, removeCount: 2)
+                );
 
 .. function:: void Raise<TEventArgs>(object sender, TEventArgs e, ref EventHandler<TEventArgs> eventDelegate)
 

@@ -1,9 +1,7 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-
 #if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
-
 namespace Saritasa.Tools.Emails
 {
     using System;
@@ -28,7 +26,7 @@ namespace Saritasa.Tools.Emails
             /// <summary>
             /// Completion source for task.
             /// </summary>
-            public TaskCompletionSource<int> TaskCompletionSource { get; }
+            public TaskCompletionSource<bool> TaskCompletionSource { get; }
 
             /// <summary>
             /// Mail message.
@@ -42,10 +40,13 @@ namespace Saritasa.Tools.Emails
             public MailMessageWithTaskSource(MailMessage mailMessage)
             {
                 MailMessage = mailMessage;
-                TaskCompletionSource = new TaskCompletionSource<int>();
+                TaskCompletionSource = new TaskCompletionSource<bool>();
             }
         }
 
+        /// <summary>
+        /// Pending email messages queue.
+        /// </summary>
         readonly ConcurrentQueue<MailMessageWithTaskSource> queue =
             new ConcurrentQueue<MailMessageWithTaskSource>();
 
@@ -129,6 +130,13 @@ namespace Saritasa.Tools.Emails
 
         private void ProcessInternal()
         {
+            /*
+             * Lock should be used since there possible race condition when we check isBusy field
+             * and set if to true. If another thread sends email and isBusy is true no need to
+             * actually call Client.SendMailAsync() since it means that OnEmailSent will be called later and
+             * ProcessInternal will be called anyway. Because actual email sending can be delayed we return to user
+             * our own Task and sync its status with on is returned by Client.SendMailAsync() call.
+             * */
             lock (@lock)
             {
                 if (isBusy)
@@ -147,10 +155,17 @@ namespace Saritasa.Tools.Emails
                             isBusy = false;
 
                             // sync current task status (from email) with one that is waited by user
-                            if (t.IsFaulted && t.Exception?.InnerExceptions != null)
+                            if (t.IsFaulted)
                             {
-                                // TODO
-                                messageTask.TaskCompletionSource.SetException(t.Exception.InnerExceptions);
+                                if (t.Exception?.InnerExceptions != null)
+                                {
+                                    messageTask.TaskCompletionSource.SetException(t.Exception.InnerExceptions);
+                                }
+                                else
+                                {
+                                    messageTask.TaskCompletionSource.SetException(
+                                        new InvalidOperationException("Unexpected exception"));
+                                }
                             }
                             else if (t.IsCanceled)
                             {
@@ -158,7 +173,7 @@ namespace Saritasa.Tools.Emails
                             }
                             else if (t.IsCompleted)
                             {
-                                messageTask.TaskCompletionSource.SetResult(0);
+                                messageTask.TaskCompletionSource.SetResult(true);
                             }
                         });
                     }
