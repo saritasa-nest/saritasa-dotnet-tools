@@ -16,6 +16,43 @@ We tried to collect such little things in one place to be able to use it in all 
     security
     string
 
+Overview
+--------
+
+Here are some examples to use. Calculate SHA256 hash for password:
+
+    .. code-block:: c#
+
+        SecurityUtils.Sha256("mypassword");
+
+Set of functions to parse or get value or default:
+
+    .. code-block:: c#
+
+        StringUtils.ParseDefault("incorrect", 1); // returns 1
+        StringUtils.ParseDefault("incorrect", false) // returns false
+        dict.GetValueDefault(5, "default") // default if dict has no 5 key
+
+Format string:
+
+    .. code-block:: c#
+    
+        "{0} + {1} = {2}".FormatWith(2, 2, 4)  // returns "2 + 2 = 4"
+
+String handy extensions to check for empty/not empty that easier to read:
+
+    .. code-block:: c#
+
+        if (str.IsNotEmpty()) ...
+        if (str.IsEmpty()) ...
+        dbuser.name = user.name.NullSafe() ...
+
+Chunk select:
+
+    .. code-block:: c#
+
+        foreach (var item in list.ChunkSelect(50)) ...  // returns items from source by 50
+
 Frameworks
 ----------
 

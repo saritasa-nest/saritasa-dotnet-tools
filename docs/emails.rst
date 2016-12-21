@@ -68,3 +68,40 @@ Now only emails to saritasa.com and saritasa-hosting.com domains will be accepte
     .. class:: CountEmailsInterceptor
 
         Contains counters of sending and sent emails. Thread safe.
+
+Using with ASP.NET
+------------------
+
+ThreadPool is not a safe place to keep emails processing. See the article `QueueBackgroundWorkItem to reliably schedule and run background processes in ASP.NET <https://blogs.msdn.microsoft.com/webdev/2014/06/04/queuebackgroundworkitem-to-reliably-schedule-and-run-background-processes-in-asp-net/>`_. You should implement you own decarator class to do that:
+
+    .. code-block:: c#
+
+        /// <summary>
+        /// The email sender decorates <see cref="IEmailSender" /> class. It adds messages to queue
+        /// using <see cref="HostingEnvironment.QueueBackgroundWorkItem(Action{System.Threading.CancellationToken})" />
+        /// method.
+        /// </summary>
+        public class AspNetSmtpEmailSender : IEmailSender
+        {
+            readonly IEmailSender actualSender;
+
+            /// <summary>
+            /// .ctor
+            /// </summary>
+            /// <param name="actualSender">Actual sender need to decorate.</param>
+            public AspNetSmtpEmailSender(IEmailSender actualSender)
+            {
+                Guard.IsNotNull(actualSender, nameof(actualSender));
+                this.actualSender = actualSender;
+            }
+
+            /// <inheritdoc />
+            public Task SendAsync(MailMessage message)
+            {
+                HostingEnvironment.QueueBackgroundWorkItem(async ct =>
+                {
+                    await actualSender.SendAsync(message).ConfigureAwait(false);
+                });
+                return Task.FromResult(true);
+            }
+        }
