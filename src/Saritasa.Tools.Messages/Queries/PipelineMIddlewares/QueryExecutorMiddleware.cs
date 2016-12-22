@@ -4,13 +4,26 @@
 namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
 {
     using System;
+    using System.Linq;
+    using System.Reflection;
     using Common;
+    using Common.Expressions;
 
     /// <summary>
     /// Executes query delegate.
     /// </summary>
     public class QueryExecutorMiddleware : IMessagePipelineMiddleware
     {
+        private readonly ExpressionExecutorFactory expressionExecutorFactory;
+
+        /// <summary>
+        /// Ctor.
+        /// </summary>
+        public QueryExecutorMiddleware()
+        {
+            expressionExecutorFactory = new ExpressionExecutorFactory(ExpressionExecutorServices.Instance);
+        }
+
         /// <inheritdoc />
         public string Id => "QueryExecutor";
 
@@ -27,7 +40,16 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
             var stopWatch = System.Diagnostics.Stopwatch.StartNew();
             try
             {
-                queryMessage.Result = queryMessage.Method.Invoke(queryMessage.QueryObject, queryMessage.Parameters);
+
+                dynamic result;
+                if (!TryInvokeExpression(queryMessage.Method, queryMessage.QueryObject, queryMessage.Parameters, out result))
+                {
+                    result = queryMessage.Method.Invoke(queryMessage.QueryObject, queryMessage.Parameters);
+                }
+
+                //var result = queryMessage.Method.Invoke(queryMessage.QueryObject, queryMessage.Parameters);
+
+                queryMessage.Result = result;
                 queryMessage.Status = Message.ProcessingStatus.Completed;
             }
             catch (Exception ex)
@@ -45,6 +67,29 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
                 stopWatch.Stop();
                 queryMessage.ExecutionDuration = (int)stopWatch.ElapsedMilliseconds;
             }
+        }
+
+        private bool TryInvokeExpression(MethodInfo info, dynamic input, dynamic[] parameters, out dynamic result)
+        {
+            result = null;
+
+            var executor = expressionExecutorFactory.Create();
+            if (!executor.CompiledCache.HasKey(info))
+            {
+                return false;
+            }
+
+            var @params = new dynamic[parameters.Length + 1];
+            @params[0] = input;
+
+            for (int paramsIndex = 1, parametersIndex = 0; parametersIndex < parameters.Length; paramsIndex++, parametersIndex++)
+            {
+                @params[paramsIndex] = parameters[parametersIndex];
+            }
+
+            result = executor.Execute(info, @params);
+
+            return true;
         }
     }
 }

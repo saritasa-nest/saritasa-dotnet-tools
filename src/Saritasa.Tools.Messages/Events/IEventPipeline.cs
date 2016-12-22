@@ -3,7 +3,6 @@
 
 namespace Saritasa.Tools.Messages.Events
 {
-    using System;
     using Common;
 
     /// <summary>

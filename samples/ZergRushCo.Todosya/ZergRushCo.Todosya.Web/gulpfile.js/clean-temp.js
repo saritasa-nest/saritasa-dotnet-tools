@@ -11,7 +11,7 @@ var gulp = require('gulp'),
     config = require('../config.js');
 
 gulp.task('clean-temp', function (cb) {
-    let fs = require('fs');
+    var fs = require('fs');
     if (!fs.existsSync(config.tempDir)) {
         del([path.join(config.tempDir, '**')], cb);
     }

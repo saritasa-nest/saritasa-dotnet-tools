@@ -3,7 +3,6 @@
 
 namespace Saritasa.Tools.Messages.Tests
 {
-    using System;
     using System.Text.RegularExpressions;
     using Xunit;
     using Common.PipelineMiddlewares;

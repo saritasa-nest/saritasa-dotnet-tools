@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Saritasa.Tools.Messages.Common;
+﻿using System.Runtime.InteropServices;
 using Saritasa.Tools.Messages.Queries;
 using BenchmarkDotNet.Attributes;
 
@@ -14,7 +9,7 @@ namespace Saritasa.Tools.Messages.Benchmark
     /// </summary>
     public class QueriesBenchmarks
     {
-        const int NumberOfInterations = 250;
+        const int NumberOfInterations = 10000;
 
         [QueryHandlers]
         public sealed class MathQueryHandlers
@@ -41,10 +36,13 @@ namespace Saritasa.Tools.Messages.Benchmark
         {
             decimal result = 0;
             var queryPipeline = QueryPipeline.CreateDefaultPipeline(QueryPipeline.NullResolver);
+            queryPipeline.UseInternalResolver(true);
+
             for (int i = 0; i < NumberOfInterations; i++)
             {
                 result += queryPipeline.Query<MathQueryHandlers>().With(q => q.Sum(2, 3));
             }
+
             return result;
         }
     }

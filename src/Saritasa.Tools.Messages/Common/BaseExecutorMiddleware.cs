@@ -72,6 +72,7 @@ namespace Saritasa.Tools.Messages.Common
             {
                 var parameters = handlerMethod.GetParameters();
                 var paramsarr = new object[parameters.Length];
+
                 if (parameters.Length > 1)
                 {
                     if (handlerMethod.DeclaringType != obj.GetType())
@@ -89,6 +90,7 @@ namespace Saritasa.Tools.Messages.Common
                             paramsarr[i] = Resolver(parameters[i].ParameterType);
                         }
                     }
+
                     handlerMethod.Invoke(handler, paramsarr);
                 }
                 else
@@ -97,6 +99,7 @@ namespace Saritasa.Tools.Messages.Common
                     {
                         paramsarr[0] = obj;
                     }
+
                     handlerMethod.Invoke(handler, paramsarr);
                 }
             }

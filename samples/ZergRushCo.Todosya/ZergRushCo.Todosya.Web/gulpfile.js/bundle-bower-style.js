@@ -24,7 +24,7 @@ gulp.task('bundle-bower-style', function () {
     var mainbowerfiles = require('main-bower-files'),
         postcss = config.useCssMin ? require('gulp-postcss') : empty,
         sass = config.useSass ? require('gulp-sass') : empty;
-    let bowerfiles = mainbowerfiles({
+    var bowerfiles = mainbowerfiles({
         base: config.bowerDir,
         filter: '**/*.?(scss|css)'
     });

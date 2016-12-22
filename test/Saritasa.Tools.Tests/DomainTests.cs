@@ -3,7 +3,6 @@
 
 namespace Saritasa.Tools.Tests
 {
-    using System;
     using System.IO;
 #if !NETCOREAPP1_0 && !NETSTANDARD1_6
     using System.Runtime.Serialization.Formatters.Binary;

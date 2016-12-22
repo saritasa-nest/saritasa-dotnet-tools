@@ -1,0 +1,64 @@
+{
+  "title": "Saritasa Tools NLog4",
+  "version": "0.1.0",
+  "authors": [ "Saritasa" ],
+  "description": "The package is a part of Saritasa Tools project. Saritasa.Tools.NLog4 contains implementation for Microsoft common logging infrastructure for NLog.",
+  "copyright": "Saritasa 2015-2016",
+  "packOptions": {
+    "iconUrl": "https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png",
+    "licenseUrl": "https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/LICENSE",
+    "projectUrl": "https://github.com/Saritasa/SaritasaTools",
+    "requireLicenseAcceptance": false,
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/Saritasa/SaritasaTools"
+    },
+    "summary": "NLog4 implementation for Microsoft common logging infrastructure.",
+    "tags": [ "nlog", "logging" ]
+  },
+  "frameworks": {
+    "net452": {
+      "frameworkAssemblies": {
+        "System.Data": "",
+        "System.Runtime": "",
+        "System.Xml": ""
+      },
+      "dependencies": {
+        "NLog": "4.3.10"
+      }
+    },
+    "net461": {
+      "frameworkAssemblies": {
+        "System.Data": "",
+        "System.Runtime": "",
+        "System.Xml": ""
+      },
+      "dependencies": {
+        "NLog": "4.3.10"
+      }
+    },
+    "netcoreapp1.0": {
+      "dependencies": {
+        "System.Data.Common": "4.1.0",
+        "NLog": "4.4.0-betaV15",
+        "NLog.Extensions.Logging": "1.0.0-rtm-alpha4",
+        "Microsoft.NETCore.App": "1.0.1"
+      }
+    },
+    "netstandard1.6": {
+      "dependencies": {
+        "NETStandard.Library": "1.6.0",
+        "System.Data.Common": "4.1.0",
+        "NLog": "4.4.0-betaV15",
+        "NLog.Extensions.Logging": "1.0.0-rtm-alpha4"
+      }
+    }
+  },
+  "dependencies": {
+    "Microsoft.Extensions.Logging": "1.0.0"
+  },
+  "buildOptions": {
+    "keyFile": "../../tools/SaritasaTools.snk",
+    "xmlDoc": true
+  }
+}

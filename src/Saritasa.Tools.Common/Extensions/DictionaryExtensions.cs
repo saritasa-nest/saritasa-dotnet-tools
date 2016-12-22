@@ -3,7 +3,6 @@
 
 namespace Saritasa.Tools.Common.Extensions
 {
-    using System;
     using System.Collections.Generic;
 
     /// <summary>

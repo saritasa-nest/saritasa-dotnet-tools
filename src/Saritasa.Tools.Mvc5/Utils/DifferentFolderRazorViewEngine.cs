@@ -3,7 +3,6 @@
 
 namespace Saritasa.Tools.Mvc.Utils
 {
-    using System;
     using System.Web.Mvc;
 
     /// <summary>

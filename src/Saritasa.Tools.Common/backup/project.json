@@ -1,0 +1,51 @@
+{
+  "title": "Saritasa Tools Utils and Extensions",
+  "version": "0.1.0",
+  "authors": [ "Saritasa" ],
+  "description": "The package is a part of Saritasa Tools project. Saritasa.Tools.Common contains various utilities and extensions for DateTime convertion, strings manipulation, validation utils (Guard), parse with default, flow (memoize, retry), collection processing (chunk select), atomic (CAS, swap), strings hash (md5, sha1, sha2), paged enumerable.",
+  "copyright": "Saritasa 2015-2016",
+  "packOptions": {
+    "iconUrl": "https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png",
+    "licenseUrl": "https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/LICENSE",
+    "projectUrl": "https://github.com/Saritasa/SaritasaTools",
+    "requireLicenseAcceptance": false,
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/Saritasa/SaritasaTools"
+    },
+    "summary": "Various handy extensions and utils.",
+    "tags": [ "flow", "datetime", "parsing", "validation", "pagination", "memoize", "cas" ]
+  },
+  "frameworks": {
+    "net452": {
+      "frameworkAssemblies": {
+        "System.Data": "",
+        "System.Xml": "",
+        "System.ComponentModel.DataAnnotations": ""
+      }
+    },
+    "net461": {
+      "frameworkAssemblies": {
+        "System.Data": "",
+        "System.Xml": "",
+        "System.ComponentModel.DataAnnotations": ""
+      }
+    },
+    "netcoreapp1.0": {
+      "dependencies": {
+        "Microsoft.NETCore.App": "1.0.1",
+        "System.Data.Common": "4.1.0"
+      }
+    },
+    "netstandard1.6": {
+      "dependencies": {
+        "NETStandard.Library": "1.6.0",
+        "System.Data.Common": "4.1.0"
+      }
+    }
+  },
+  "buildOptions": {
+    "keyFile": "../../tools/SaritasaTools.snk",
+    "xmlDoc": true
+  }
+}

@@ -56,6 +56,20 @@
     <Compile Include="Commands\PipelineMiddlewares\CommandHandlerLocatorMiddleware.cs" />
     <Compile Include="Commands\PipelineMiddlewares\CommandValidationMiddleware.cs" />
     <Compile Include="Common\Endpoints\WebEndpoint.cs" />
+    <Compile Include="Common\Expressions\Compilation\CompiledExpressionCache.cs" />
+    <Compile Include="Common\Expressions\Compilation\ExpressionCompilator.cs" />
+    <Compile Include="Common\Expressions\Compilation\ICompiledExpressionCache.cs" />
+    <Compile Include="Common\Expressions\Compilation\IExpressionCompilator.cs" />
+    <Compile Include="Common\Expressions\ExpressionExecutor.cs" />
+    <Compile Include="Common\Expressions\ExpressionExecutorFactory.cs" />
+    <Compile Include="Common\Expressions\ExpressionExecutorServices.cs" />
+    <Compile Include="Common\Expressions\IExpressionTransformer.cs" />
+    <Compile Include="Common\Expressions\IExpressionTransformVisitorFactory.cs" />
+    <Compile Include="Common\Expressions\ExpressionTransformVisitorFactory.cs" />
+    <Compile Include="Common\Expressions\Reduce\ExpressionReduceVisitor.cs" />
+    <Compile Include="Common\Expressions\Reduce\IExpressionReduceVisitor.cs" />
+    <Compile Include="Common\Expressions\Transformers\LambdaExpressionTransformer.cs" />
+    <Compile Include="Common\Expressions\Transformers\MethodCallExpressionTransformer.cs" />
     <Compile Include="Common\HandlerSearchMethod.cs" />
     <Compile Include="Common\Repositories\QueryProviders\SqlServerQueryProvider.cs" />
     <Compile Include="Common\Repositories\ElasticsearchRepository.cs" />
@@ -98,6 +112,7 @@
     <Compile Include="Internal\Enums\JoinType.cs" />
     <Compile Include="Internal\Enums\LogicOperator.cs" />
     <Compile Include="Internal\Enums\SortingOperator.cs" />
+    <Compile Include="Common\Expressions\ExpressionTransformVisitor.cs" />
     <Compile Include="Internal\InternalLogger.cs" />
     <Compile Include="Internal\ISelectStringBuilder.cs" />
     <Compile Include="Internal\MessageBinarySerializer.cs" />
@@ -135,6 +150,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Common\Expressions\ExpressionExecutor.dgml" />
     <None Include="packages.config" />
     <None Include="Saritasa.Tools.Messages.project.json" />
   </ItemGroup>
