@@ -1,12 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Newtonsoft.Json;
+﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+// Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Messages.Internal.Elasticsearch.Query
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Newtonsoft.Json;
+
     [JsonConverter(typeof(SearchQuerySerializer))]
-    public class SearchQuery
+    internal class SearchQuery
     {
         public SearchQuery(IEnumerable<IFieldNameQuery> fieldQueries)
         {
@@ -21,7 +24,7 @@ namespace Saritasa.Tools.Messages.Internal.Elasticsearch.Query
         {
             if (from < 0)
             {
-                throw new ArgumentException(nameof(from));
+                throw new ArgumentOutOfRangeException(nameof(from));
             }
             From = from;
             return this;
@@ -31,7 +34,7 @@ namespace Saritasa.Tools.Messages.Internal.Elasticsearch.Query
         {
             if (size <= 0)
             {
-                throw new ArgumentException(nameof(size));
+                throw new ArgumentOutOfRangeException(nameof(size));
             }
 
             Size = size;

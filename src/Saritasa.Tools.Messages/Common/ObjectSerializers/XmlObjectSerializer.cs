@@ -14,7 +14,7 @@ namespace Saritasa.Tools.Messages.Common.ObjectSerializers
     /// </summary>
     public class XmlObjectSerializer : IObjectSerializer
     {
-        static readonly XmlWriterSettings XmlWriterSettings = new XmlWriterSettings()
+        static readonly XmlWriterSettings xmlWriterSettings = new XmlWriterSettings()
         {
             CheckCharacters = false,
             Indent = false,
@@ -40,7 +40,7 @@ namespace Saritasa.Tools.Messages.Common.ObjectSerializers
             try
             {
                 stream = new MemoryStream();
-                using (var xmlWriter = XmlWriter.Create(stream, XmlWriterSettings))
+                using (var xmlWriter = XmlWriter.Create(stream, xmlWriterSettings))
                 {
                     xmlSerializer.Serialize(xmlWriter, obj);
                     bytes = stream.ToArray();

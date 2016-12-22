@@ -1,21 +1,27 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+// Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Messages.Internal.Elasticsearch.Query
 {
+    using System;
+    using Newtonsoft.Json;
+
     /// <summary>
     /// Custom JsonConverter for RangeQuery
     /// </summary>
-    public class RangeQuerySerializer : JsonConverter
+    internal class RangeQuerySerializer : JsonConverter
     {
+        /// <inheritdoc />
         public override bool CanWrite => true;
 
+        /// <inheritdoc />
         public override bool CanRead => false;
 
+        /// <inheritdoc />
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             var range = value as RangeQuery;
-            if (range == null || string.IsNullOrEmpty(range.Field))
+            if (string.IsNullOrEmpty(range?.Field))
             {
                 return;
             }
@@ -51,11 +57,13 @@ namespace Saritasa.Tools.Messages.Internal.Elasticsearch.Query
             writer.WriteEndObject();
         }
 
+        /// <inheritdoc />
         public override bool CanConvert(Type objectType)
         {
             return objectType == typeof(RangeQuery);
         }
 
+        /// <inheritdoc />
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             throw new NotImplementedException();

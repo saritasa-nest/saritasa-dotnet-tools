@@ -1,9 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+// Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Messages.Internal.Elasticsearch.Query
 {
+    using Newtonsoft.Json;
+
     [JsonConverter(typeof(RangeQuerySerializer))]
-    public class RangeQuery : IFieldNameQuery
+    internal class RangeQuery : IFieldNameQuery
     {
         public string Field { get; set; }
 

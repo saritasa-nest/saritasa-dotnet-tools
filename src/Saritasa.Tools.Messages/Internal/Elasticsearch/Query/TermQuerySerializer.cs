@@ -1,21 +1,27 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+// Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Messages.Internal.Elasticsearch.Query
 {
+    using System;
+    using Newtonsoft.Json;
+
     /// <summary>
-    /// Custom JsonConverter for TermQuery
+    /// Custom JsonConverter for TermQuery.
     /// </summary>
-    public class TermQuerySerializer : JsonConverter
+    internal class TermQuerySerializer : JsonConverter
     {
+        /// <inheritdoc />
         public override bool CanWrite => true;
 
+        /// <inheritdoc />
         public override bool CanRead => false;
 
+        /// <inheritdoc />
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             var term = value as TermQuery;
-            if (term == null || string.IsNullOrEmpty(term.Field) || term.Value == null)
+            if (string.IsNullOrEmpty(term?.Field) || term.Value == null)
             {
                 return;
             }
@@ -30,12 +36,15 @@ namespace Saritasa.Tools.Messages.Internal.Elasticsearch.Query
             writer.WriteEndObject();
         }
 
+        /// <inheritdoc />
         public override bool CanConvert(Type objectType)
         {
             return objectType == typeof(TermQuery);
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        /// <inheritdoc />
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
+            JsonSerializer serializer)
         {
             throw new NotImplementedException();
         }

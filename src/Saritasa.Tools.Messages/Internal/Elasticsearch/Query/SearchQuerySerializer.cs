@@ -1,28 +1,33 @@
-﻿using System;
-using System.Linq;
-using Newtonsoft.Json;
+﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+// Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Messages.Internal.Elasticsearch.Query
 {
+    using System;
+    using System.Linq;
+    using Newtonsoft.Json;
+
     /// <summary>
-    /// Custom JsonConverter for SearchQuery
+    /// Custom JsonConverter for SearchQuery.
     /// </summary>
     internal class SearchQuerySerializer : JsonConverter
     {
+        /// <inheritdoc />
         public override bool CanRead => false;
 
+        /// <inheritdoc />
         public override bool CanWrite => true;
 
+        /// <inheritdoc />
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             var query = value as SearchQuery;
-            if (value == null)
+            if (query == null)
             {
                 return;
             }
 
             // write query in Elasticsearch format
-
             writer.WriteStartObject(); // root
 
             writer.WritePropertyName("from");
@@ -63,11 +68,13 @@ namespace Saritasa.Tools.Messages.Internal.Elasticsearch.Query
             writer.WriteEndObject(); // of root
         }
 
+        /// <inheritdoc />
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc />
         public override bool CanConvert(Type objectType)
         {
             return objectType == typeof(SearchQuery);
