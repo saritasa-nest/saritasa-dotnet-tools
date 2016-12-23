@@ -11,6 +11,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
     using System.Threading;
     using System.Threading.Tasks;
     using Newtonsoft.Json;
+    using Abstractions;
     using Internal;
 
     /// <summary>

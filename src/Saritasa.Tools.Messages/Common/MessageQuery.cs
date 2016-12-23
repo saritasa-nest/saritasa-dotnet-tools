@@ -6,6 +6,7 @@ namespace Saritasa.Tools.Messages.Common
     using System;
     using System.Collections.Generic;
     using System.Reflection;
+    using Abstractions;
 
     /// <summary>
     /// Message query parameters. Always filters with AND condition.
@@ -40,7 +41,7 @@ namespace Saritasa.Tools.Messages.Common
         /// <summary>
         /// Message status to filter.
         /// </summary>
-        public Message.ProcessingStatus? Status { get; private set; }
+        public ProcessingStatus? Status { get; private set; }
 
         /// <summary>
         /// Message type to filter.
@@ -162,7 +163,7 @@ namespace Saritasa.Tools.Messages.Common
         /// </summary>
         /// <param name="status">Status.</param>
         /// <returns>Message query.</returns>
-        public MessageQuery WithStatus(Message.ProcessingStatus status)
+        public MessageQuery WithStatus(ProcessingStatus status)
         {
             Status = status;
             return this;
@@ -247,7 +248,7 @@ namespace Saritasa.Tools.Messages.Common
         /// </summary>
         /// <param name="message">Message.</param>
         /// <returns>True if message matches criteries.</returns>
-        public bool Match(Message message)
+        public bool Match(IMessage message)
         {
             if (Id.HasValue && message.Id != Id.Value)
             {

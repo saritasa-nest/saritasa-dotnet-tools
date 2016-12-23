@@ -50,6 +50,7 @@
   },
   "dependencies": {
     "Newtonsoft.Json": "9.0.1",
+    "Saritasa.Tools.Messages.Abstractions": "*",
     "Saritasa.Tools.Domain": "*"
   },
   "buildOptions": {

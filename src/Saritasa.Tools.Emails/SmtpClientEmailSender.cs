@@ -66,7 +66,7 @@ namespace Saritasa.Tools.Emails
         /// Maximum queue size. If queue size for some reason is exceeded the
         /// <see cref="EmailQueueExceededException" /> exception will be thrown.
         /// </summary>
-        public int MaxQueueSize = 10240;
+        public int MaxQueueSize { get; set; } = 10240;
 
         /// <summary>
         /// .ctor

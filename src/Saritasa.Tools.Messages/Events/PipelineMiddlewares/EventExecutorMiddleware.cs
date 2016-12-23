@@ -6,6 +6,7 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Abstractions;
     using Common;
     using Internal;
 
@@ -24,7 +25,7 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public override void Handle(Message message)
+        public override void Handle(IMessage message)
         {
             var eventMessage = message as EventMessage;
             if (eventMessage == null)
@@ -33,7 +34,7 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
             }
 
             // rejected events are not needed to process
-            if (eventMessage.Status == Message.ProcessingStatus.Rejected)
+            if (eventMessage.Status == ProcessingStatus.Rejected)
             {
                 return;
             }
@@ -95,7 +96,7 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
                 eventMessage.ErrorMessage = string.Join(";", exceptions.Select(e => e.Message));
             }
             eventMessage.ExecutionDuration = (int)stopWatch.ElapsedMilliseconds;
-            eventMessage.Status = Message.ProcessingStatus.Completed;
+            eventMessage.Status = ProcessingStatus.Completed;
         }
     }
 }

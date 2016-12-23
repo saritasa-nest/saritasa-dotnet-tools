@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Common;
 using Saritasa.Tools.Messages.Common.Repositories;
 
@@ -41,7 +42,7 @@ namespace ZergRushCo.Todosya.Tests
                 },
                 CreatedAt = DateTime.Now,
                 ExecutionDuration = 232720,
-                Status = Message.ProcessingStatus.Completed
+                Status = ProcessingStatus.Completed
             };
 
             //await repository.SaveMessageAsync(message);
@@ -60,7 +61,7 @@ namespace ZergRushCo.Todosya.Tests
             var messageQuery = MessageQuery.Create()
                 .WithId(messageId)
                 .WithContentType("ZergRushCo.Todosya.Domain.Tasks.Queries.ProjectsQueries.GetByUser")
-                .WithStatus(Message.ProcessingStatus.Completed)
+                .WithStatus(ProcessingStatus.Completed)
                 .WithType(2)
                 .WithExecutionDurationAbove(232720)
                 .WithExecutionDurationBelow(232720);

@@ -4,6 +4,7 @@
 namespace Saritasa.Tools.Messages.Queries
 {
     using Common;
+    using Abstractions;
 
     /// <summary>
     /// Query pipeline extensions.

@@ -4,6 +4,7 @@
 namespace Saritasa.Tools.Messages.Events
 {
     using Common;
+    using Abstractions;
 
     /// <summary>
     /// Event pipeline extensions.

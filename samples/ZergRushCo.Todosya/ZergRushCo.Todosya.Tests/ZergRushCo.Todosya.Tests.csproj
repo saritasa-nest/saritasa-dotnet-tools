@@ -91,6 +91,10 @@
       <Project>{d1ad1713-bc18-4340-b8db-23d86d22fb7f}</Project>
       <Name>Saritasa.Tools.Ef6</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\src\Saritasa.Tools.Messages.Abstractions\Saritasa.Tools.Messages.Abstractions.csproj">
+      <Project>{e16b2300-a1d4-49bb-b3fc-c2891e7d1177}</Project>
+      <Name>Saritasa.Tools.Messages.Abstractions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\src\Saritasa.Tools.Messages\Saritasa.Tools.Messages.csproj">
       <Project>{aee65918-25df-4a25-bfb8-56552faa2a51}</Project>
       <Name>Saritasa.Tools.Messages</Name>

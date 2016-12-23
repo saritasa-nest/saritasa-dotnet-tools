@@ -135,3 +135,11 @@ There are built in repositories.
     .. class:: NullMessageRepository
 
         Does nothing, for testing purposes.
+
+    .. class:: Elasticsearch
+
+        Store messages to Elasticsearch.
+
+            .. attribute:: uri
+
+                Uri to Elasticsearch instance.

@@ -2,8 +2,7 @@
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
-using Saritasa.Tools.Messages.Queries;
-using Saritasa.Tools.Messages.Commands;
+using Saritasa.Tools.Messages.Abstractions;
 using ZergRushCo.Todosya.Web.Models;
 using ZergRushCo.Todosya.Domain.Users.Services;
 using ZergRushCo.Todosya.Web.Core.Identity;

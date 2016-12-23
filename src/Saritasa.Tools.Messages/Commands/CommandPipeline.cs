@@ -5,6 +5,7 @@ namespace Saritasa.Tools.Messages.Commands
 {
     using System;
     using System.Reflection;
+    using Abstractions;
     using Common;
 
     /// <summary>
@@ -63,7 +64,7 @@ namespace Saritasa.Tools.Messages.Commands
         }
 
         /// <inheritdoc />
-        public override void ProcessRaw(Message message)
+        public override void ProcessRaw(IMessage message)
         {
             var commandMessage = new CommandMessage(message.Content);
             ProcessMiddlewares(commandMessage);

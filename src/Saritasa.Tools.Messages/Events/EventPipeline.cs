@@ -5,6 +5,7 @@ namespace Saritasa.Tools.Messages.Events
 {
     using System;
     using System.Reflection;
+    using Abstractions;
     using Common;
 
     /// <summary>
@@ -50,7 +51,7 @@ namespace Saritasa.Tools.Messages.Events
 #pragma warning restore SA1401
 
         /// <inheritdoc />
-        public override void ProcessRaw(Message message)
+        public override void ProcessRaw(IMessage message)
         {
             throw new NotImplementedException();
         }

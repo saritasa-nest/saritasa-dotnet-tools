@@ -6,6 +6,7 @@ namespace Saritasa.Tools.Messages.Tests
     using System;
     using System.Text.RegularExpressions;
     using Xunit;
+    using Abstractions;
     using Common.PipelineMiddlewares;
     using Common;
 
@@ -14,18 +15,18 @@ namespace Saritasa.Tools.Messages.Tests
         [Fact]
         public void Repository_should_filter_by_status()
         {
-            var filter = RepositoryMessagesFilter.Create().WithStatus(Message.ProcessingStatus.Completed);
+            var filter = RepositoryMessagesFilter.Create().WithStatus(ProcessingStatus.Completed);
             var msg1 = new Message()
             {
-                Status = Message.ProcessingStatus.Failed,
+                Status = ProcessingStatus.Failed,
             };
             Assert.False(filter.IsMatch(msg1));
             var msg2 = new Message()
             {
-                Status = Message.ProcessingStatus.Completed,
+                Status = ProcessingStatus.Completed,
             };
             Assert.True(filter.IsMatch(msg2));
-            filter = filter.WithStatus(Message.ProcessingStatus.Failed);
+            filter = filter.WithStatus(ProcessingStatus.Failed);
             Assert.True(filter.IsMatch(msg1));
         }
 

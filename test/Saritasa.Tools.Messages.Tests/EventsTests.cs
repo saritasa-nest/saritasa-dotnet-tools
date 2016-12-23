@@ -7,6 +7,7 @@ namespace Saritasa.Tools.Messages.Tests
     using System.Reflection;
     using Xunit;
     using Domain;
+    using Abstractions;
     using Events;
     using Events.PipelineMiddlewares;
 

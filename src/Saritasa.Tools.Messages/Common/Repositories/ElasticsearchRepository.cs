@@ -8,6 +8,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
     using System.Linq;
     using System.Threading.Tasks;
     using System.Net.Http;
+    using Abstractions;
     using ObjectSerializers;
     using Internal.Elasticsearch.Query;
     using Internal.Elasticsearch.SearchResult;
@@ -52,13 +53,13 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <inheritdoc />
-        public void Add(Message message)
+        public void Add(IMessage message)
         {
             SaveMessageAsync(message);
         }
 
         /// <inheritdoc />
-        public IEnumerable<Message> Get(MessageQuery messageQuery)
+        public IEnumerable<IMessage> Get(MessageQuery messageQuery)
         {
             return GetAsync(messageQuery).Result;
         }
@@ -79,7 +80,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             return new ElasticsearchRepository(dict[nameof(uri)].ToString());
         }
 
-        private async void SaveMessageAsync(Message message)
+        private async void SaveMessageAsync(IMessage message)
         {
             using (var client = new HttpClient())
             {

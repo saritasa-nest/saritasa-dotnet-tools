@@ -46,12 +46,10 @@
   <ItemGroup>
     <Compile Include="Common\BaseExecutorMiddleware.cs" />
     <Compile Include="Commands\CommandHandlerNotFoundException.cs" />
-    <Compile Include="Commands\CommandHandlersAttribute.cs" />
     <Compile Include="Commands\CommandMessage.cs" />
     <Compile Include="Commands\CommandPipeline.cs" />
     <Compile Include="Commands\CommandPipelineExtensions.cs" />
     <Compile Include="Commands\CommandValidationException.cs" />
-    <Compile Include="Commands\ICommandPipeline.cs" />
     <Compile Include="Commands\PipelineMiddlewares\CommandExecutorMiddleware.cs" />
     <Compile Include="Commands\PipelineMiddlewares\CommandHandlerLocatorMiddleware.cs" />
     <Compile Include="Commands\PipelineMiddlewares\CommandValidationMiddleware.cs" />
@@ -59,21 +57,16 @@
     <Compile Include="Common\HandlerSearchMethod.cs" />
     <Compile Include="Common\Repositories\QueryProviders\SqlServerQueryProvider.cs" />
     <Compile Include="Common\Repositories\ElasticsearchRepository.cs" />
-    <Compile Include="Events\EventHandlersAttribute.cs" />
     <Compile Include="Events\EventMessage.cs" />
     <Compile Include="Events\EventPipeline.cs" />
     <Compile Include="Events\EventPipelineExtensions.cs" />
-    <Compile Include="Events\IEventPipeline.cs" />
     <Compile Include="Events\PipelineMiddlewares\DomainEventLocatorMiddleware.cs" />
     <Compile Include="Events\PipelineMiddlewares\EventExecutorMiddleware.cs" />
     <Compile Include="Events\PipelineMiddlewares\EventHandlerLocatorMiddleware.cs" />
     <Compile Include="Common\IMessageEndpoint.cs" />
-    <Compile Include="Common\IMessagePipeline.cs" />
-    <Compile Include="Common\IMessagePipelineMiddleware.cs" />
     <Compile Include="Common\IMessageRepository.cs" />
     <Compile Include="Common\IObjectSerializer.cs" />
     <Compile Include="Common\Message.cs" />
-    <Compile Include="Common\MessageHandlersAttribute.cs" />
     <Compile Include="Common\MessagePipeline.cs" />
     <Compile Include="Common\MessageQuery.cs" />
     <Compile Include="Common\MiddlewareNotFoundException.cs" />
@@ -112,10 +105,8 @@
     <Compile Include="Common\PipelineMiddlewares\RepositoryMessagesFilter.cs" />
     <Compile Include="Common\PipelineMiddlewares\RepositoryMiddleware.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Queries\IQueryPipeline.cs" />
     <Compile Include="Queries\PipelineMIddlewares\QueryExecutorMiddleware.cs" />
     <Compile Include="Queries\PipelineMIddlewares\QueryObjectResolverMiddleware.cs" />
-    <Compile Include="Queries\QueryHandlersAttribute.cs" />
     <Compile Include="Queries\QueryMessage.cs" />
     <Compile Include="Queries\QueryPipeline.cs" />
     <Compile Include="Queries\QueryPipelineExtensions.cs" />
@@ -132,6 +123,10 @@
     <ProjectReference Include="..\Saritasa.Tools.Domain\Saritasa.Tools.Domain.csproj">
       <Project>{32a3a81c-a65c-4f78-8300-17151987697c}</Project>
       <Name>Saritasa.Tools.Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Saritasa.Tools.Messages.Abstractions\Saritasa.Tools.Messages.Abstractions.csproj">
+      <Project>{e16b2300-a1d4-49bb-b3fc-c2891e7d1177}</Project>
+      <Name>Saritasa.Tools.Messages.Abstractions</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

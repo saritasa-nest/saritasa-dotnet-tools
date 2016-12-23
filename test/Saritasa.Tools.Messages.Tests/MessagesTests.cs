@@ -7,6 +7,7 @@ namespace Saritasa.Tools.Messages.Tests
     using System.Linq;
     using System.Reflection;
     using Xunit;
+    using Abstractions;
     using Common;
     using Commands;
     using Commands.PipelineMiddlewares;
@@ -19,7 +20,7 @@ namespace Saritasa.Tools.Messages.Tests
         {
             public string Id => "Test1";
 
-            public void Handle(Message message)
+            public void Handle(IMessage message)
             {
             }
         }
@@ -28,7 +29,7 @@ namespace Saritasa.Tools.Messages.Tests
         {
             public string Id => "Test2";
 
-            public void Handle(Message message)
+            public void Handle(IMessage message)
             {
             }
         }
@@ -37,7 +38,7 @@ namespace Saritasa.Tools.Messages.Tests
         {
             public string Id => "Test3";
 
-            public void Handle(Message message)
+            public void Handle(IMessage message)
             {
             }
         }

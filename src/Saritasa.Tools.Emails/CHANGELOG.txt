@@ -1,6 +1,7 @@
 ﻿0.1.2 [TBD]
 [*] MultiSmtpClientEmailSender now sets ServicePoint.ConnectionLimit to make separates connections.
 [*] Make SaveToFileEmailInterceptor thread safe.
+[+] Fix SmtpClientEmailSender.MaxQueueSize property declaration.
 
 0.1.1 [2016-12-21]
 [*] SmtpClientEmailSender now supports multithread mode.

@@ -8,6 +8,7 @@ namespace Saritasa.Tools.Messages.Internal
     using System.IO;
     using System.Text;
     using System.Reflection;
+    using Abstractions;
     using Common;
 
     internal class MessageBinarySerializer
@@ -151,7 +152,7 @@ namespace Saritasa.Tools.Messages.Internal
                             result.ErrorType = Encoding.UTF8.GetString(chunk.Item2);
                             break;
                         case TokenStatus:
-                            result.Status = (Message.ProcessingStatus)chunk.Item2[0];
+                            result.Status = (ProcessingStatus)chunk.Item2[0];
                             break;
                         case TokenEndOfCommand:
                             var t = TypeHelpers.LoadType(result.ContentType, assemblies);
@@ -167,29 +168,35 @@ namespace Saritasa.Tools.Messages.Internal
         /// Writes the message to stream.
         /// </summary>
         /// <param name="message">Message.</param>
-        public void Write(Message message)
+        public void Write(IMessage message)
         {
-            var messageBytes = serializer.Serialize(message.Content);
-            var errorBytes = message.Error != null ? serializer.Serialize(message.Error) : EmptyBytes;
-            var dataBytes = message.Data != null ? serializer.Serialize(message.Data) : EmptyBytes;
+            var baseMessage = message as Message;
+            if (baseMessage == null)
+            {
+                throw new ArgumentException($"{message} must be {nameof(Message)} type");
+            }
+
+            var messageBytes = serializer.Serialize(baseMessage.Content);
+            var errorBytes = baseMessage.Error != null ? serializer.Serialize(baseMessage.Error) : EmptyBytes;
+            var dataBytes = baseMessage.Data != null ? serializer.Serialize(baseMessage.Data) : EmptyBytes;
 
             lock (objLock)
             {
                 WriteChunk(TokenBeginOfCommand);
-                WriteChunk(TokenId, message.Id.ToByteArray()); // id
-                WriteChunk(TokenType, BitConverter.GetBytes(message.Type)); // type
-                WriteChunk(TokenContentType, Encoding.UTF8.GetBytes(message.ContentType)); // message type
-                WriteChunk(TokenCreated, BitConverter.GetBytes(message.CreatedAt.ToBinary())); // created
-                WriteChunk(TokenExecutionDuration, BitConverter.GetBytes(message.ExecutionDuration)); // completed
-                WriteChunk(TokenStatus, BitConverter.GetBytes((byte)message.Status)); // status
-                if (message.Error != null)
+                WriteChunk(TokenId, baseMessage.Id.ToByteArray()); // id
+                WriteChunk(TokenType, BitConverter.GetBytes(baseMessage.Type)); // type
+                WriteChunk(TokenContentType, Encoding.UTF8.GetBytes(baseMessage.ContentType)); // message type
+                WriteChunk(TokenCreated, BitConverter.GetBytes(baseMessage.CreatedAt.ToBinary())); // created
+                WriteChunk(TokenExecutionDuration, BitConverter.GetBytes(baseMessage.ExecutionDuration)); // completed
+                WriteChunk(TokenStatus, BitConverter.GetBytes((byte)baseMessage.Status)); // status
+                if (baseMessage.Error != null)
                 {
                     WriteChunk(TokenErrorDetails, errorBytes); // error
                 }
-                WriteChunk(TokenErrorMessage, Encoding.UTF8.GetBytes(message.ErrorMessage)); // error message
-                WriteChunk(TokenErrorType, Encoding.UTF8.GetBytes(message.ErrorType)); // error type
+                WriteChunk(TokenErrorMessage, Encoding.UTF8.GetBytes(baseMessage.ErrorMessage)); // error message
+                WriteChunk(TokenErrorType, Encoding.UTF8.GetBytes(baseMessage.ErrorType)); // error type
                 WriteChunk(TokenContent, messageBytes); // message object
-                if (message.HasData)
+                if (baseMessage.HasData)
                 {
                     WriteChunk(TokenData, dataBytes);
                 }

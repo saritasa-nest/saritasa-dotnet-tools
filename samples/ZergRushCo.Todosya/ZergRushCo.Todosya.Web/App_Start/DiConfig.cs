@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.Web;
 using System.Web.Mvc;
+using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Commands;
 using Saritasa.Tools.Messages.Queries;
 using Saritasa.Tools.Messages.Events;

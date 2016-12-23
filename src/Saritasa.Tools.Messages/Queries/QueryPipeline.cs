@@ -9,6 +9,7 @@ namespace Saritasa.Tools.Messages.Queries
     using System.Linq;
     using System.Reflection;
     using Internal;
+    using Abstractions;
     using Common;
 
     /// <summary>
@@ -34,7 +35,7 @@ namespace Saritasa.Tools.Messages.Queries
                 ContentType = method.DeclaringType.FullName + "." + method.Name,
                 Content = method.GetParameters().ToDictionary(p => p.Name, v => args[v.Position]),
                 CreatedAt = DateTime.Now,
-                Status = Message.ProcessingStatus.Processing,
+                Status = ProcessingStatus.Processing,
                 Parameters = args,
                 Method = method,
                 QueryObject = CreateObjectFromType(method.GetBaseDefinition().DeclaringType),
@@ -93,14 +94,22 @@ namespace Saritasa.Tools.Messages.Queries
                 }
 
                 var mce = expression.Body as MethodCallExpression;
+                if (mce == null)
+                {
+                    throw new InvalidOperationException("Expression must have Body of type MethodCallExpression");
+                }
                 var args = mce.Arguments.Select(PartiallyEvaluateExpression).ToArray();
                 var method = mce.Method;
+                if (method.DeclaringType == null)
+                {
+                    throw new InvalidOperationException("Method does not declare type");
+                }
                 var message = new QueryMessage()
                 {
                     ContentType = method.DeclaringType.FullName + "." + method.Name,
                     Content = method.GetParameters().ToDictionary(p => p.Name, v => args[v.Position]),
                     CreatedAt = DateTime.Now,
-                    Status = Message.ProcessingStatus.Processing,
+                    Status = ProcessingStatus.Processing,
                     Parameters = args,
                     QueryObject = query,
                     FakeQueryObject = fakeQueryObject,
@@ -165,7 +174,7 @@ namespace Saritasa.Tools.Messages.Queries
         }
 
         /// <inheritdoc cref="IMessagePipeline.ProcessRaw" />
-        public override void ProcessRaw(Message message)
+        public override void ProcessRaw(IMessage message)
         {
             if (message == null)
             {

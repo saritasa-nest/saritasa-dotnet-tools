@@ -7,6 +7,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
     using System;
     using System.ComponentModel.DataAnnotations;
     using System.Collections.Generic;
+    using Abstractions;
     using Common;
 
     /// <summary>
@@ -23,7 +24,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         public bool ThrowException { get; set; } = true;
 
         /// <inheritdoc />
-        public void Handle(Message message)
+        public void Handle(IMessage message)
         {
             var commandMessage = message as CommandMessage;
             if (commandMessage == null)
@@ -36,7 +37,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             bool isValid = Validator.TryValidateObject(commandMessage.Content, context, results);
             if (!isValid)
             {
-                commandMessage.Status = Message.ProcessingStatus.Rejected;
+                commandMessage.Status = ProcessingStatus.Rejected;
                 if (ThrowException)
                 {
                     throw new CommandValidationException(results);

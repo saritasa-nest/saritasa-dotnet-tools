@@ -4,6 +4,7 @@
 namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
 {
     using System;
+    using Abstractions;
 
     /// <summary>
     /// Saves the command execution context to repository.
@@ -46,7 +47,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public void Handle(Message message)
+        public void Handle(IMessage message)
         {
             if (filter != null && !filter.IsMatch(message))
             {

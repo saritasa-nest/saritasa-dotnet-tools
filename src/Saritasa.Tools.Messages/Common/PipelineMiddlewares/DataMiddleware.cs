@@ -5,6 +5,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
 {
     using System;
     using System.Collections.Generic;
+    using Abstractions;
 
     /// <summary>
     /// Appends additional data to message.
@@ -30,7 +31,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public void Handle(Message context)
+        public void Handle(IMessage context)
         {
             action(context.Data);
         }

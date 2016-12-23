@@ -8,7 +8,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
     using System.Linq;
     using System.Text;
     using Newtonsoft.Json;
-    using ObjectSerializers;
+    using Abstractions;
 
     /// <summary>
     /// Simple in memory message repository.
@@ -18,7 +18,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <summary>
         /// All stored messages.
         /// </summary>
-        public IList<Message> Messages { get; }
+        public IList<IMessage> Messages { get; }
 
         readonly object objLock = new object();
 
@@ -27,11 +27,11 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// </summary>
         public InMemoryMessageRepository()
         {
-            Messages = new List<Message>();
+            Messages = new List<IMessage>();
         }
 
         /// <inheritdoc />
-        public void Add(Message message)
+        public void Add(IMessage message)
         {
             lock (objLock)
             {
@@ -40,7 +40,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <inheritdoc />
-        public IEnumerable<Message> Get(MessageQuery messageQuery)
+        public IEnumerable<IMessage> Get(MessageQuery messageQuery)
         {
             lock (objLock)
             {

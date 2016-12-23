@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using BenchmarkDotNet.Attributes;
+using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Commands;
 
 namespace Saritasa.Tools.Messages.Benchmark

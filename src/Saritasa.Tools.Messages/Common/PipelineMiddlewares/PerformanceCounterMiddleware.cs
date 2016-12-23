@@ -6,6 +6,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
 {
     using System;
     using System.Diagnostics;
+    using Abstractions;
 
     /// <summary>
     /// Represents performance counter that count total messages passed.
@@ -85,7 +86,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public void Handle(Message message)
+        public void Handle(IMessage message)
         {
             if (!initialized)
             {

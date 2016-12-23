@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
-using Saritasa.Tools.Messages.Events;
+using Saritasa.Tools.Messages.Abstractions;
 using ZergRushCo.Todosya.Domain.Users.Events;
 
 namespace ZergRushCo.Todosya.Domain.Users.Handlers

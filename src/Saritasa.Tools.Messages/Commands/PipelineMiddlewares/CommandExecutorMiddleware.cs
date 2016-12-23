@@ -5,6 +5,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
 {
     using System;
     using System.Reflection;
+    using Abstractions;
     using Common;
     using Internal;
 
@@ -23,7 +24,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public override void Handle(Message message)
+        public override void Handle(IMessage message)
         {
             var commandMessage = message as CommandMessage;
             if (commandMessage == null)
@@ -32,7 +33,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             }
 
             // rejected commands are not needed to process
-            if (commandMessage.Status == Message.ProcessingStatus.Rejected)
+            if (commandMessage.Status == ProcessingStatus.Rejected)
             {
                 return;
             }
@@ -51,7 +52,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             // if we don't have handler - throw exception
             if (handler == null)
             {
-                commandMessage.Status = Message.ProcessingStatus.Rejected;
+                commandMessage.Status = ProcessingStatus.Rejected;
                 throw new CommandHandlerNotFoundException(commandMessage.Content.GetType().Name);
             }
 
@@ -60,12 +61,12 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             try
             {
                 ExecuteHandler(handler, commandMessage.Content, commandMessage.HandlerMethod);
-                commandMessage.Status = Message.ProcessingStatus.Completed;
+                commandMessage.Status = ProcessingStatus.Completed;
             }
             catch (TargetInvocationException ex)
             {
                 InternalLogger.Warn($"TargetInvocationException while process command \"{handler}\": {ex}", nameof(CommandExecutorMiddleware));
-                commandMessage.Status = Message.ProcessingStatus.Failed;
+                commandMessage.Status = ProcessingStatus.Failed;
                 if (ex.InnerException != null)
                 {
                     commandMessage.Error = ex.InnerException;
@@ -75,7 +76,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             catch (TargetException ex)
             {
                 InternalLogger.Warn($"TargetException while process command \"{handler}\": {ex}", nameof(CommandExecutorMiddleware));
-                commandMessage.Status = Message.ProcessingStatus.Failed;
+                commandMessage.Status = ProcessingStatus.Failed;
                 if (ex.InnerException != null)
                 {
                     commandMessage.Error = ex.InnerException;
@@ -85,7 +86,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             catch (Exception ex)
             {
                 InternalLogger.Warn($"Exception while process command \"{handler}\": {ex}", nameof(CommandExecutorMiddleware));
-                commandMessage.Status = Message.ProcessingStatus.Failed;
+                commandMessage.Status = ProcessingStatus.Failed;
                 commandMessage.Error = ex;
                 commandMessage.ErrorDispatchInfo = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex);
             }

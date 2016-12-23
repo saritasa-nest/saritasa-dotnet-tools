@@ -6,14 +6,15 @@ namespace Saritasa.Tools.Messages.Common
     using System;
     using System.Collections.Generic;
     using Newtonsoft.Json;
+    using Abstractions;
 
     /// <summary>
-    /// Command execution result.
+    /// Message execution context.
     /// </summary>
-    public class Message
+    public class Message : IMessage
     {
         /// <summary>
-        /// Comamnd type.
+        /// Command type.
         /// </summary>
         public const byte MessageTypeCommand = 1;
 
@@ -39,45 +40,11 @@ namespace Saritasa.Tools.Messages.Common
         internal const int MessageFieldExecutionDurationIndex = 9;
         internal const int MessageFieldStatusIndex = 10;
 
-        /// <summary>
-        /// Commands status.
-        /// </summary>
-        public enum ProcessingStatus : byte
-        {
-            /// <summary>
-            /// Default command state.
-            /// </summary>
-            NotInitialized,
-
-            /// <summary>
-            /// The command in a processing state.
-            /// </summary>
-            Processing,
-
-            /// <summary>
-            /// Command has been completed.
-            /// </summary>
-            Completed,
-
-            /// <summary>
-            /// Command has been failed while execution. Mostly exception occured
-            /// in handler.
-            /// </summary>
-            Failed,
-
-            /// <summary>
-            /// Command has been rejected. It may be validation error.
-            /// </summary>
-            Rejected,
-        }
-
         IDictionary<string, string> data;
 
         Guid id;
 
-        /// <summary>
-        /// Unique message id.
-        /// </summary>
+        /// <inheritdoc />
         public virtual Guid Id
         {
             get
@@ -95,24 +62,16 @@ namespace Saritasa.Tools.Messages.Common
             }
         }
 
-        /// <summary>
-        /// Message type.
-        /// </summary>
+        /// <inheritdoc />
         public byte Type { get; set; }
 
-        /// <summary>
-        /// Message name.
-        /// </summary>
+        /// <inheritdoc />
         public virtual string ContentType { get; set; }
 
-        /// <summary>
-        /// Message content. May be command object, or event object.
-        /// </summary>
+        /// <inheritdoc />
         public object Content { get; set; }
 
-        /// <summary>
-        /// Custom data.
-        /// </summary>
+        /// <inheritdoc />
         public virtual IDictionary<string, string> Data
         {
             get { return data ?? (data = new Dictionary<string, string>()); }
@@ -123,34 +82,22 @@ namespace Saritasa.Tools.Messages.Common
             }
         }
 
-        /// <summary>
-        /// Contains exception if any error occured during message processing.
-        /// </summary>
+        /// <inheritdoc />
         public virtual Exception Error { get; set; }
 
-        /// <summary>
-        /// Error text message.
-        /// </summary>
+        /// <inheritdoc />
         public virtual string ErrorMessage { get; set; }
 
-        /// <summary>
-        /// Error type.
-        /// </summary>
+        /// <inheritdoc />
         public virtual string ErrorType { get; set; }
 
-        /// <summary>
-        /// When message has been created.
-        /// </summary>
+        /// <inheritdoc />
         public DateTime CreatedAt { get; set; }
 
-        /// <summary>
-        /// Message execution duration, in ms.
-        /// </summary>
+        /// <inheritdoc />
         public int ExecutionDuration { get; set; }
 
-        /// <summary>
-        /// Processing status.
-        /// </summary>
+        /// <inheritdoc />
         public ProcessingStatus Status { get; set; }
 
         /// <summary>

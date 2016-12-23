@@ -20,8 +20,7 @@ namespace Saritasa.Tools.Emails
         /// .ctor
         /// </summary>
         /// <param name="maxSize">Max queue size that has been exceeded.</param>
-        public EmailQueueExceededException(int maxSize) :
-            base($"Maximum email queue size {maxSize} exceeded.")
+        public EmailQueueExceededException(int maxSize) : base($"Maximum email queue size {maxSize} exceeded.")
         {
         }
 

@@ -9,6 +9,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
     using System.IO.Compression;
     using System.Linq;
     using System.Linq.Expressions;
+    using Abstractions;
     using Internal;
     using ObjectSerializers;
     using System.Reflection;
@@ -43,7 +44,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
         readonly bool compress;
 
-        static readonly object ObjLock = new object();
+        static readonly object objLock = new object();
 
         Stream CurrentStream => currentGZipStream ?? (Stream)currentFileStream;
 
@@ -109,14 +110,14 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         #region IMessageRepository
 
         /// <inheritdoc />
-        public void Add(Message context)
+        public void Add(IMessage context)
         {
             if (disposed)
             {
                 throw new ObjectDisposedException(null);
             }
 
-            lock (ObjLock)
+            lock (objLock)
             {
                 string name = GetAvailableFileNameByDate(DateTime.Now);
                 if (currentFileStream == null || Path.GetFileName(currentFileStream.Name) != name)
@@ -134,7 +135,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
             if (!buffer)
             {
-                lock (ObjLock)
+                lock (objLock)
                 {
                     currentGZipStream?.Flush();
                     currentFileStream.FlushAsync();
@@ -153,7 +154,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <inheritdoc />
-        public IEnumerable<Message> Get(MessageQuery messageQuery)
+        public IEnumerable<IMessage> Get(MessageQuery messageQuery)
         {
             // collect all files in dir
             var allFiles =

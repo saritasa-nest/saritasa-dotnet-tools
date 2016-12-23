@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.Messages.Common
+namespace Saritasa.Tools.Messages.Abstractions
 {
     using System;
     using System.Collections.Generic;
@@ -61,6 +61,6 @@ namespace Saritasa.Tools.Messages.Common
         /// Process raw message, for example, from deserialization.
         /// </summary>
         /// <param name="message">Message.</param>
-        void ProcessRaw(Message message);
+        void ProcessRaw(IMessage message);
     }
 }

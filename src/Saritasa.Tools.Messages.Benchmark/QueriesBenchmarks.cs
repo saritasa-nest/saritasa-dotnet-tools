@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Saritasa.Tools.Messages.Common;
-using Saritasa.Tools.Messages.Queries;
 using BenchmarkDotNet.Attributes;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Queries;
 
 namespace Saritasa.Tools.Messages.Benchmark
 {

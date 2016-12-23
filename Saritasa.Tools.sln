@@ -1,5 +1,4 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -24,6 +23,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{59041E71-0E53-412B-9248-19C37CC3ACAF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{E61EC742-F3B0-478C-89A7-DBD95587388D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.Messages.Abstractions", "src\Saritasa.Tools.Messages.Abstractions\Saritasa.Tools.Messages.Abstractions.csproj", "{E16B2300-A1D4-49BB-B3FC-C2891E7D1177}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -105,6 +106,14 @@ Global
 		{2900D88A-2522-4299-8D51-6AF26B74C91C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2900D88A-2522-4299-8D51-6AF26B74C91C}.Release|x86.ActiveCfg = Release|Any CPU
 		{2900D88A-2522-4299-8D51-6AF26B74C91C}.Release|x86.Build.0 = Release|Any CPU
+		{E16B2300-A1D4-49BB-B3FC-C2891E7D1177}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E16B2300-A1D4-49BB-B3FC-C2891E7D1177}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E16B2300-A1D4-49BB-B3FC-C2891E7D1177}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E16B2300-A1D4-49BB-B3FC-C2891E7D1177}.Debug|x86.Build.0 = Debug|Any CPU
+		{E16B2300-A1D4-49BB-B3FC-C2891E7D1177}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E16B2300-A1D4-49BB-B3FC-C2891E7D1177}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E16B2300-A1D4-49BB-B3FC-C2891E7D1177}.Release|x86.ActiveCfg = Release|Any CPU
+		{E16B2300-A1D4-49BB-B3FC-C2891E7D1177}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -119,5 +128,6 @@ Global
 		{BAAF1392-6BAC-4220-8149-B207BEFE2FDD} = {59041E71-0E53-412B-9248-19C37CC3ACAF}
 		{32A3A81C-A65C-4F78-8300-17151987697C} = {59041E71-0E53-412B-9248-19C37CC3ACAF}
 		{2900D88A-2522-4299-8D51-6AF26B74C91C} = {59041E71-0E53-412B-9248-19C37CC3ACAF}
+		{E16B2300-A1D4-49BB-B3FC-C2891E7D1177} = {59041E71-0E53-412B-9248-19C37CC3ACAF}
 	EndGlobalSection
 EndGlobal

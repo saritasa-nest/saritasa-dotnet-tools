@@ -1,11 +1,10 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.Messages.Queries
+namespace Saritasa.Tools.Messages.Abstractions
 {
     using System;
     using System.Linq.Expressions;
-    using Common;
 
     /// <summary>
     /// The interface should be used to make actual calls to query methods.

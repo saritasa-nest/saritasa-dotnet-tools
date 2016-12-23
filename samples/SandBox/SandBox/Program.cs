@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Commands;
 using Saritasa.Tools.Messages.Commands.PipelineMiddlewares;
 using Saritasa.Tools.Messages.Events;

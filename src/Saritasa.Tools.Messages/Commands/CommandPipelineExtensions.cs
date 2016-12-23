@@ -4,6 +4,7 @@
 namespace Saritasa.Tools.Messages.Commands
 {
     using System;
+    using Abstractions;
     using Common;
 
     /// <summary>

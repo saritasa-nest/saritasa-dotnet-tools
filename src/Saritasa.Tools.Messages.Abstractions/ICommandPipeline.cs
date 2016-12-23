@@ -1,20 +1,19 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.Messages.Events
+namespace Saritasa.Tools.Messages.Abstractions
 {
     using System;
-    using Common;
 
     /// <summary>
-    /// Events specific pipeline.
+    /// Commands specific pipeline.
     /// </summary>
-    public interface IEventPipeline : IMessagePipeline
+    public interface ICommandPipeline : IMessagePipeline
     {
         /// <summary>
-        /// Raise event.
+        /// Execute command.
         /// </summary>
-        /// <param name="event">Event to raise.</param>
-        void Raise(object @event);
+        /// <param name="command">Command to execute.</param>
+        void Handle(object command);
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Saritasa.Tools.Messages.Commands;
+using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Domain.Exceptions;
 using ZergRushCo.Todosya.Domain.Tasks.Commands;
 

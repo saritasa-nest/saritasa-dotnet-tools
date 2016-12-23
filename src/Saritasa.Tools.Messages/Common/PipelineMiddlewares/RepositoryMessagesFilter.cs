@@ -7,6 +7,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
     using System.Collections.Generic;
     using System.Linq;
     using System.Text.RegularExpressions;
+    using Abstractions;
 
     /// <summary>
     /// Repository messages filter.
@@ -23,14 +24,14 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         /// <summary>
         /// Custom predicate that filters incoming messages.
         /// </summary>
-        public Predicate<Message> Predicate { get; private set; }
+        public Predicate<IMessage> Predicate { get; private set; }
 
-        Message.ProcessingStatus[] statuses;
+        ProcessingStatus[] statuses;
 
         /// <summary>
         /// Only messages with specified statuses will be stored.
         /// </summary>
-        public Message.ProcessingStatus[] Statuses => statuses;
+        public ProcessingStatus[] Statuses => statuses;
 
         /// <summary>
         /// Only messages with execution time above will be stored.
@@ -63,7 +64,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         /// </summary>
         /// <param name="message">Message to match.</param>
         /// <returns>True if matches, otherwise false.</returns>
-        public bool IsMatch(Message message)
+        public bool IsMatch(IMessage message)
         {
             if (Predicate?.Invoke(message) == false ||
                 Statuses?.Contains(message.Status) == false ||
@@ -91,7 +92,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         /// </summary>
         /// <param name="predicate">Preducate action.</param>
         /// <returns>Current repository messages filter.</returns>
-        public RepositoryMessagesFilter WithPredicate(Predicate<Message> predicate)
+        public RepositoryMessagesFilter WithPredicate(Predicate<IMessage> predicate)
         {
             Predicate = predicate;
             return this;
@@ -102,11 +103,11 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         /// </summary>
         /// <param name="status">Message status.</param>
         /// <returns>Current repository messages filter.</returns>
-        public RepositoryMessagesFilter WithStatus(Message.ProcessingStatus status)
+        public RepositoryMessagesFilter WithStatus(ProcessingStatus status)
         {
             if (statuses == null)
             {
-                statuses = new Message.ProcessingStatus[1];
+                statuses = new ProcessingStatus[1];
             }
             else
             {

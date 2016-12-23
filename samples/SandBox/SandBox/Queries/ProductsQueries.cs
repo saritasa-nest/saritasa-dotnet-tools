@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Saritasa.Tools.Messages.Queries;
+using Saritasa.Tools.Messages.Abstractions;
 
 namespace SandBox.Queries
 {

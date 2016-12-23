@@ -5,6 +5,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 {
     using System;
     using System.Collections.Generic;
+    using Abstractions;
 
     /// <summary>
     /// Discards messages. Used mainly for debugging and benchmarking.
@@ -14,13 +15,13 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         #region IMessageRepository
 
         /// <inheritdoc />
-        public void Add(Message message)
+        public void Add(IMessage message)
         {
             // no need to implement since repository should not persist messages
         }
 
         /// <inheritdoc />
-        public IEnumerable<Message> Get(MessageQuery messageQuery)
+        public IEnumerable<IMessage> Get(MessageQuery messageQuery)
         {
             return new List<Message>();
         }

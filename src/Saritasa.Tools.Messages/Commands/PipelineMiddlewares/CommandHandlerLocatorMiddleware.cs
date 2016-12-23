@@ -7,6 +7,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
     using System.Collections.Generic;
     using System.Reflection;
     using System.Linq;
+    using Abstractions;
     using Common;
     using Internal;
 
@@ -94,7 +95,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public void Handle(Message message)
+        public void Handle(IMessage message)
         {
             var commandMessage = message as CommandMessage;
             if (commandMessage == null)

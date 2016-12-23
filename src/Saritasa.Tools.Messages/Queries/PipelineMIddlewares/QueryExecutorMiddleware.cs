@@ -5,6 +5,7 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
 {
     using System;
     using Common;
+    using Abstractions;
 
     /// <summary>
     /// Executes query delegate.
@@ -15,7 +16,7 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
         public string Id => "QueryExecutor";
 
         /// <inheritdoc />
-        public void Handle(Message message)
+        public void Handle(IMessage message)
         {
             var queryMessage = message as QueryMessage;
             if (queryMessage == null)
@@ -28,11 +29,11 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
             try
             {
                 queryMessage.Result = queryMessage.Method.Invoke(queryMessage.QueryObject, queryMessage.Parameters);
-                queryMessage.Status = Message.ProcessingStatus.Completed;
+                queryMessage.Status = ProcessingStatus.Completed;
             }
             catch (Exception ex)
             {
-                queryMessage.Status = Message.ProcessingStatus.Failed;
+                queryMessage.Status = ProcessingStatus.Failed;
                 var innerException = ex.InnerException;
                 if (innerException != null)
                 {

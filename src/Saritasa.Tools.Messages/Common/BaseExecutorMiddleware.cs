@@ -5,6 +5,7 @@ namespace Saritasa.Tools.Messages.Common
 {
     using System;
     using System.Reflection;
+    using Abstractions;
     using Internal;
 
     /// <summary>
@@ -44,7 +45,7 @@ namespace Saritasa.Tools.Messages.Common
         }
 
         /// <inheritdoc />
-        public abstract void Handle(Message message);
+        public abstract void Handle(IMessage message);
 
         /// <summary>
         /// If UseInternalObjectResolver is turned off internal IoC container is used. Otherwise

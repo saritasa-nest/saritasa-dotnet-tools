@@ -13,7 +13,6 @@ namespace Saritasa.Tools.Messages.Commands
 #endif
     public class CommandHandlerNotFoundException : Exception
     {
-
         /// <summary>
         /// .ctor
         /// </summary>

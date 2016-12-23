@@ -6,6 +6,7 @@ namespace Saritasa.Tools.Messages.Common
     using System;
     using System.Linq;
     using System.Collections.Generic;
+    using Abstractions;
 
     /// <summary>
     /// Messages processing pipeline.
@@ -115,7 +116,7 @@ namespace Saritasa.Tools.Messages.Common
         }
 
         /// <inheritdoc />
-        public virtual void ProcessRaw(Message message)
+        public virtual void ProcessRaw(IMessage message)
         {
             throw new NotImplementedException();
         }
@@ -126,7 +127,7 @@ namespace Saritasa.Tools.Messages.Common
         /// Processes the message thru all middlewares.
         /// </summary>
         /// <param name="message">The message.</param>
-        protected void ProcessMiddlewares(Message message)
+        protected void ProcessMiddlewares(IMessage message)
         {
             foreach (var handler in Middlewares)
             {

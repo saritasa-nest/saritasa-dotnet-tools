@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using Saritasa.Tools.Messages.Abstractions;
 
 namespace ZergRushCo.Todosya.Web
 {
@@ -25,9 +26,9 @@ namespace ZergRushCo.Todosya.Web
             {
                 WebEndpoint = new Saritasa.Tools.Messages.Common.Endpoints.WebEndpoint();
                 WebEndpoint.RegisterPipelines(
-                    DependencyResolver.Current.GetService<Saritasa.Tools.Messages.Commands.ICommandPipeline>(),
-                    DependencyResolver.Current.GetService<Saritasa.Tools.Messages.Events.IEventPipeline>(),
-                    DependencyResolver.Current.GetService<Saritasa.Tools.Messages.Queries.IQueryPipeline>()
+                    DependencyResolver.Current.GetService<ICommandPipeline>(),
+                    DependencyResolver.Current.GetService<IEventPipeline>(),
+                    DependencyResolver.Current.GetService<IQueryPipeline>()
                 );
                 WebEndpoint.Start();
             }
@@ -37,9 +38,9 @@ namespace ZergRushCo.Todosya.Web
             {
                 var fileMessageRepository = new Saritasa.Tools.Messages.Common.Repositories.FileMessageRepository(settingValue);
                 var fileRepositoryMiddleware = new Saritasa.Tools.Messages.Common.PipelineMiddlewares.RepositoryMiddleware(fileMessageRepository);
-                DependencyResolver.Current.GetService<Saritasa.Tools.Messages.Commands.ICommandPipeline>().AppendMiddlewares(fileRepositoryMiddleware);
-                DependencyResolver.Current.GetService<Saritasa.Tools.Messages.Events.IEventPipeline>().AppendMiddlewares(fileRepositoryMiddleware);
-                DependencyResolver.Current.GetService<Saritasa.Tools.Messages.Queries.IQueryPipeline>().AppendMiddlewares(fileRepositoryMiddleware);
+                DependencyResolver.Current.GetService<ICommandPipeline>().AppendMiddlewares(fileRepositoryMiddleware);
+                DependencyResolver.Current.GetService<IEventPipeline>().AppendMiddlewares(fileRepositoryMiddleware);
+                DependencyResolver.Current.GetService<IQueryPipeline>().AppendMiddlewares(fileRepositoryMiddleware);
             }
         }
     }

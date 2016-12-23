@@ -3,7 +3,8 @@
   "dependencies": {
     "xunit": "2.2.0-*",
     "dotnet-test-xunit": "2.2.0-*",
-    "Saritasa.Tools.Messages": "*"
+    "Saritasa.Tools.Messages": "*",
+    "Saritasa.Tools.Messages.Abstractions": "*"
   },
   "frameworks": {
     "netcoreapp1.0": {

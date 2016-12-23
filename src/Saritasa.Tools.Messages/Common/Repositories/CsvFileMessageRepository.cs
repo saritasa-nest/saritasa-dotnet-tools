@@ -9,6 +9,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
     using System.Linq.Expressions;
     using System.Reflection;
     using System.Text;
+    using Abstractions;
     using ObjectSerializers;
 
     /// <summary>
@@ -35,7 +36,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
         readonly bool buffer;
 
-        static readonly object ObjLock = new object();
+        static readonly object objLock = new object();
 
         /// <summary>
         /// .ctor
@@ -83,8 +84,8 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             return GetFileNameByDate(date, 0);
         }
 
-        static readonly byte[] Comma = Encoding.UTF8.GetBytes(",");
-        static readonly byte[] NewLine = Encoding.UTF8.GetBytes(Environment.NewLine);
+        static readonly byte[] comma = Encoding.UTF8.GetBytes(",");
+        static readonly byte[] newLine = Encoding.UTF8.GetBytes(Environment.NewLine);
 
         private static string PrepareString(string str)
         {
@@ -114,11 +115,11 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             stream.Write(bytes, 0, bytes.Length);
             if (!last)
             {
-                stream.Write(Comma, 0, Comma.Length);
+                stream.Write(comma, 0, comma.Length);
             }
             else
             {
-                stream.Write(NewLine, 0, NewLine.Length);
+                stream.Write(newLine, 0, newLine.Length);
             }
         }
 
@@ -127,7 +128,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             stream.WriteByte(bt);
         }
 
-        void WriteToFile(Message message)
+        void WriteToFile(IMessage message)
         {
             // Id,Type,CreatedAt,Status,ContentType,Content,Data,ErrorType,ErrorMessage,ErrorDetails,ExecutionDuration
             if (needWriteHeader)
@@ -152,14 +153,14 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         #region IMessageRepository
 
         /// <inheritdoc />
-        public void Add(Message message)
+        public void Add(IMessage message)
         {
             if (disposed)
             {
                 throw new ObjectDisposedException("The repository has been disposed.");
             }
 
-            lock (ObjLock)
+            lock (objLock)
             {
                 string name = GetAvailableFileNameByDate(DateTime.Now);
                 if (currentFileStream == null || Path.GetFileName(currentFileStream.Name) != name)
@@ -173,7 +174,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
             if (!buffer)
             {
-                lock (ObjLock)
+                lock (objLock)
                 {
                     currentFileStream.FlushAsync();
                 }
@@ -181,7 +182,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <inheritdoc />
-        public IEnumerable<Message> Get(MessageQuery messageQuery)
+        public IEnumerable<IMessage> Get(MessageQuery messageQuery)
         {
             throw new NotImplementedException();
         }

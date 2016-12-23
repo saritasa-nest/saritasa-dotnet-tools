@@ -9,6 +9,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
     using System.Data.Common;
     using System.Linq;
     using System.Text;
+    using Abstractions;
     using ObjectSerializers;
     using QueryProviders;
     using Internal;
@@ -135,7 +136,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <inheritdoc />
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities",
             Justification = "Parameters are used")]
-        public void Add(Message result)
+        public void Add(IMessage result)
         {
             if (disposed)
             {
@@ -256,7 +257,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <inheritdoc />
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities",
             Justification = "Parameters are used")]
-        public IEnumerable<Message> Get(MessageQuery messageQuery)
+        public IEnumerable<IMessage> Get(MessageQuery messageQuery)
         {
             if (disposed)
             {
@@ -288,7 +289,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                         message.ErrorType = reader.GetString(8);
                         message.CreatedAt = reader.GetDateTime(9);
                         message.ExecutionDuration = reader.GetInt32(10);
-                        message.Status = (Message.ProcessingStatus)reader.GetByte(11);
+                        message.Status = (ProcessingStatus)reader.GetByte(11);
 
                         messages.Add(message);
                     }

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using Saritasa.Tools.Messages.Commands;
-using Saritasa.Tools.Messages.Events;
+using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Domain.Exceptions;
 using ZergRushCo.Todosya.Domain.Users.Commands;
 using ZergRushCo.Todosya.Domain.Users.Entities;

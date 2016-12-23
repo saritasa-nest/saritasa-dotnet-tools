@@ -3,6 +3,8 @@
 
 namespace Saritasa.Tools.Messages.Common
 {
+    using Abstractions;
+
     /// <summary>
     /// Endpoint to enter messages to system.
     /// </summary>

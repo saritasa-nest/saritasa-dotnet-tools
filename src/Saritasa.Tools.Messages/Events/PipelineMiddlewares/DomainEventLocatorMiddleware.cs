@@ -6,6 +6,7 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
     using System;
     using System.Collections.Generic;
     using System.Reflection;
+    using Abstractions;
     using Domain;
     using Common;
 
@@ -33,7 +34,7 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public void Handle(Message message)
+        public void Handle(IMessage message)
         {
             var eventMessage = message as EventMessage;
             if (eventMessage == null)

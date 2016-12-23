@@ -4,6 +4,7 @@
 namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
 {
     using System;
+    using Abstractions;
     using Internal;
     using Common;
 
@@ -22,7 +23,7 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public override void Handle(Message message)
+        public override void Handle(IMessage message)
         {
             var queryMessage = message as QueryMessage;
             if (queryMessage == null)
