@@ -150,15 +150,11 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
-    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Saritasa.Tools.Messages.Abstractions\Saritasa.Tools.Messages.Abstractions.csproj">
+    <ProjectReference Include="..\..\src\Saritasa.Tools.Messages.Abstractions\Saritasa.Tools.Messages.Abstractions.csproj">
       <Project>{e16b2300-a1d4-49bb-b3fc-c2891e7d1177}</Project>
       <Name>Saritasa.Tools.Messages.Abstractions</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Saritasa.Tools.Messages\Saritasa.Tools.Messages.csproj">
+    <ProjectReference Include="..\..\src\Saritasa.Tools.Messages\Saritasa.Tools.Messages.csproj">
       <Project>{aee65918-25df-4a25-bfb8-56552faa2a51}</Project>
       <Name>Saritasa.Tools.Messages</Name>
     </ProjectReference>

@@ -8,7 +8,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.Mvc5", "src\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.NLog4", "src\Saritasa.Tools.NLog4\Saritasa.Tools.NLog4.csproj", "{83D4925B-B04F-4C9C-8BF1-9B6A6BE0A87D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.Messages.Benchmark", "src\Saritasa.Tools.Messages.Benchmark\Saritasa.Tools.Messages.Benchmark.csproj", "{6A11CB78-CB88-448A-86F3-C4AFEFEB413A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.Messages.Benchmark", "test\Saritasa.Tools.Messages.Benchmark\Saritasa.Tools.Messages.Benchmark.csproj", "{6A11CB78-CB88-448A-86F3-C4AFEFEB413A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.Messages", "src\Saritasa.Tools.Messages\Saritasa.Tools.Messages.csproj", "{AEE65918-25DF-4A25-BFB8-56552FAA2A51}"
 EndProject
