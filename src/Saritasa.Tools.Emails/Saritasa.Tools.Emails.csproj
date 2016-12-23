@@ -49,6 +49,7 @@
     <Compile Include="DummyEmailSender.cs" />
     <Compile Include="EmailQueueExceededException.cs" />
     <Compile Include="EmailSender.cs" />
+    <Compile Include="EmailSenderExtensions.cs" />
     <Compile Include="IEmailExecutionStrategy.cs" />
     <Compile Include="IEmailInterceptor.cs" />
     <Compile Include="IEmailSender.cs" />
