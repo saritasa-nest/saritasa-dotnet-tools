@@ -11,7 +11,7 @@ namespace Saritasa.Tools.Messages.Common
     /// <summary>
     /// Message execution context.
     /// </summary>
-    public class Message : IMessage
+    public class Message : IMessage, ICloneable
     {
         /// <summary>
         /// Command type.
@@ -127,6 +127,18 @@ namespace Saritasa.Tools.Messages.Common
             Content = message;
             Type = type;
             CreatedAt = DateTime.Now;
+        }
+
+        /// <inheritdoc />
+        public object Clone()
+        {
+            return MemberwiseClone();
+        }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return $"{Id}: {ContentType} [{Status}]";
         }
     }
 }
