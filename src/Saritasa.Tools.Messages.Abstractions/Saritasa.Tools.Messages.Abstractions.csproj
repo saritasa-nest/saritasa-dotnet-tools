@@ -47,6 +47,7 @@
     <Compile Include="ICommandPipeline.cs" />
     <Compile Include="IEventPipeline.cs" />
     <Compile Include="IMessage.cs" />
+    <Compile Include="MessageExecutionContext.cs" />
     <Compile Include="IMessagePipeline.cs" />
     <Compile Include="IMessagePipelineMiddleware.cs" />
     <Compile Include="IQueryPipeline.cs" />

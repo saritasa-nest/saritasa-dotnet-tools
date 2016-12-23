@@ -11,7 +11,13 @@ namespace Saritasa.Tools.Messages.Common
     /// <summary>
     /// Message execution context.
     /// </summary>
-    public class Message : IMessage, ICloneable
+#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
+    [Serializable]
+#endif
+    public class Message : IMessage
+#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
+        ,ICloneable
+#endif
     {
         /// <summary>
         /// Command type.

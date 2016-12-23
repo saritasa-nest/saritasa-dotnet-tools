@@ -129,6 +129,10 @@ namespace Saritasa.Tools.Messages.Common
         /// <param name="message">The message.</param>
         protected void ProcessMiddlewares(IMessage message)
         {
+            // set execution context
+            MessageExecutionContext.Current = new MessageExecutionContext(message, this);
+
+            // execute message thru all middlewares
             foreach (var handler in Middlewares)
             {
                 handler.Handle(message);

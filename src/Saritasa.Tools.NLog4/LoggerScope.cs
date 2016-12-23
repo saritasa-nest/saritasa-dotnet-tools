@@ -1,16 +1,16 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-using System;
-#if NET452
-using System.Runtime.Remoting;
-using System.Runtime.Remoting.Messaging;
-#else
-using System.Threading;
-#endif
-
 namespace Saritasa.Tools.NLog
 {
+    using System;
+#if NET452
+    using System.Runtime.Remoting;
+    using System.Runtime.Remoting.Messaging;
+#else
+    using System.Threading;
+#endif
+
     /// <summary>
     /// Scope implementation.
     /// </summary>

@@ -14,10 +14,10 @@ namespace Saritasa.Tools.Messages.Internal
     /// </summary>
     public static class InternalLogger
     {
-        static readonly object LockObj = new object();
+        static readonly object lockObj = new object();
 
 #if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
-        static readonly TraceSource TraceSource = new TraceSource("Saritasa.Tools");
+        static readonly TraceSource traceSource = new TraceSource("Saritasa.Tools");
 #endif
 
         /// <summary>
@@ -154,7 +154,7 @@ namespace Saritasa.Tools.Messages.Internal
 
                 if (!string.IsNullOrEmpty(LogFile))
                 {
-                    lock (LockObj)
+                    lock (lockObj)
                     {
                         File.AppendAllText(LogFile, sb.ToString());
                     }
@@ -186,7 +186,7 @@ namespace Saritasa.Tools.Messages.Internal
                             eventType = TraceEventType.Information;
                             break;
                     }
-                    TraceSource.TraceEvent(eventType, 0, sb.ToString());
+                    traceSource.TraceEvent(eventType, 0, sb.ToString());
                 }
 #endif
             }
