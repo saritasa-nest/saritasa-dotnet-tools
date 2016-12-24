@@ -55,7 +55,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <inheritdoc />
         public void Add(IMessage message)
         {
-            SaveMessageAsync(message);
+            SaveMessageAsync((Message)message);
         }
 
         /// <inheritdoc />
@@ -80,14 +80,15 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             return new ElasticsearchRepository(dict[nameof(uri)].ToString());
         }
 
-        private async void SaveMessageAsync(IMessage message)
+        private void SaveMessageAsync(Message message)
         {
             using (var client = new HttpClient())
             {
-                await client
+                client
                     .PutAsync($"{uri}/{IndexName}/{IndexTypeName}/{message.Id}",
-                        new ByteArrayContent(serializer.Serialize(message)))
-                    .ConfigureAwait(false);
+                        new ByteArrayContent(serializer.Serialize(message.CloneToMessage())))
+                    .ConfigureAwait(false)
+                    .GetAwaiter().GetResult();
             }
         }
 

@@ -11,7 +11,7 @@ namespace Saritasa.Tools.Messages.Common.ObjectSerializers
     /// </summary>
     public class JsonObjectSerializer : IObjectSerializer
     {
-        static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings()
+        static readonly JsonSerializerSettings jsonSerializerSettings = new JsonSerializerSettings()
         {
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
         };
@@ -25,7 +25,7 @@ namespace Saritasa.Tools.Messages.Common.ObjectSerializers
         /// <inheritdoc />
         public byte[] Serialize(object obj)
         {
-            var str = JsonConvert.SerializeObject(obj, Formatting.None, JsonSerializerSettings);
+            var str = JsonConvert.SerializeObject(obj, Formatting.None, jsonSerializerSettings);
             return System.Text.Encoding.UTF8.GetBytes(str);
         }
 

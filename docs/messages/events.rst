@@ -53,12 +53,19 @@ Middlewares
 
     .. class:: DomainEventLocatorMiddleware
 
-        Uses domain events manager to raise events.
+        Uses domain events manager to raise events. Id is ``DomainEventLocator``.
 
     .. class:: EventExecutorMiddleware
 
-        Included to default pipeline. Default event executor. It does not process events with Rejected status.
+        Included to default pipeline. Default event executor. It does not process events with Rejected status. Id is ``EventExecutor``.
 
     .. class:: EventHandlerLocatorMiddleware
 
-        Included to default pipeline. Locates command hanlder.
+        Included to default pipeline. Locates command hanlder. Id is ``EventLocator``.
+
+Default Pipeline
+----------------
+
+    ::
+
+        EventHandlerLocatorMiddleware [EventLocator] ---> EventExecutorMiddleware [EventExecutor]

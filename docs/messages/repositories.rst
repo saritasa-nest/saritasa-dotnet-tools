@@ -55,7 +55,7 @@ To use it you should call ``AppendMiddleware`` on your message pipeline and pass
         var inMemoryMessageRepository = new InMemoryMessageRepository();
         QueryPipeline.AppendMiddlewares(new RepositoryMiddleware(inMemoryMessageRepository));  
 
-You can also set ``RepositoryMessagesFilter`` to filter what messages to store.
+You can also set ``RepositoryMessagesFilter`` to filter what messages to store. Repository middleware's name is the type name of repository type. For example if you use ``InMemoryMessageRepository`` the name of ``RepositoryMiddleware`` will be ``InMemoryMessageRepository`` as well.
 
 Repositories
 ------------
@@ -136,10 +136,10 @@ There are built in repositories.
 
         Does nothing, for testing purposes.
 
-    .. class:: Elasticsearch
+    .. class:: ElasticsearchRepository
 
         Store messages to Elasticsearch.
 
             .. attribute:: uri
 
-                Uri to Elasticsearch instance.
+                Uri to Elasticsearch instance. For example default installed instance has ``http://localhost:9200`` address.

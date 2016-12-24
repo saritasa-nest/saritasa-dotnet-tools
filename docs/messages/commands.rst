@@ -64,12 +64,19 @@ Middlewares
 
     .. class:: CommandHandlerLocatorMiddleware
 
-        Included to default pipeline. Locates for command handler class.
+        Included to default pipeline. Locates for command handler class. Default id is ``CommandHandlerLocator``.
 
     .. class:: CommandExecutorMiddleware
 
-        Included to default pipeline. Executes command against found command handler.
+        Included to default pipeline. Executes command against found command handler. Default id is ``CommandExecutor``.
 
     .. class:: CommandValidationMiddleware
 
-        Validates command against data annotation attributes. Generates ``CommandValidationException``.
+        Validates command against data annotation attributes. Generates ``CommandValidationException``. Id is ``CommandValidation``.
+
+Default Pipeline
+----------------
+
+    ::
+
+        CommandHandlerLocatorMiddleware [CommandHandlerLocator] ---> CommandExecutorMiddleware [CommandExecutor]

@@ -8,7 +8,6 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
     using System.Reflection;
     using Abstractions;
     using Domain;
-    using Common;
 
     /// <summary>
     /// Uses domain events manager to raise events.

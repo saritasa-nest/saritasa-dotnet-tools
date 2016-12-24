@@ -148,6 +148,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Saritasa.Tools.Common\Saritasa.Tools.Common.csproj">
+      <Project>{2900d88a-2522-4299-8d51-6af26b74c91c}</Project>
+      <Name>Saritasa.Tools.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\src\Saritasa.Tools.Domain\Saritasa.Tools.Domain.csproj">
       <Project>{32a3a81c-a65c-4f78-8300-17151987697c}</Project>
       <Name>Saritasa.Tools.Domain</Name>

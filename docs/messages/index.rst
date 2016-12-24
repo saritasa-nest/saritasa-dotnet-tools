@@ -54,7 +54,7 @@ There are general middlewares that can be used in pipeline.
 
     .. class:: DataMiddleware
 
-        Requires action to update ``Message.Data`` dictionary.
+        Requires action to update ``Message.Data`` dictionary. Id is ``Data``.
 
     .. class:: PerformanceCounterMiddleware
 
@@ -64,9 +64,25 @@ There are general middlewares that can be used in pipeline.
             - Messages per Second Processed;
             - Average Message Processing Duration;
 
+        Default id is ``PerformanceCounter``.
+
     .. class:: RepositoryMiddleware
 
         Stores message to repository. See repository section for more details.
+
+Object Serializers
+------------------
+
+To store message content and error we need to serialize it to string. Not all middlerwares and repositories support all object serializers. You can create your own serializer by implementing ``IObjectSerializer``. There are following serializers built-in:
+
+- ``JsonObjectSerializer`` - Uses ``Newtonsoft.Json`` to convert to JSON string.
+- ``XmlObjectSerializer`` - Convert to xml string. Is not supported for .NET Core.
+- ``BinaryObjectSerializer`` - Convert to bytes array. Is not supported for .NET Core.
+
+Execution Context
+-----------------
+
+Sometimes you need to access to message or message pipeline that process it. Use ``MessageExecutionContext.Current`` for that. Make sure it is initialized by checking ``MessageExecutionContext.IsInitialized`` property.
 
 Frameworks
 ----------

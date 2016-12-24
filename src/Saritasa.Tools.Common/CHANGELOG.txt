@@ -1,5 +1,8 @@
 ﻿0.1.2 [TBD]
 [+] EnumExtensions.GetDescription for .NET 4.0 .
+[+] Add DateTimePeriod.Week and DateTimePeriod.Year.
+[+] Add CombineDateTime, BeginOf, EndOf, IsBetween and unix time stamp functions to DateTimeUtils.
+[-] Remove BeginOfMonth and EndOfMonth functions in DateTimeUtils.
 
 0.1.1 [2016-12-16]
 [+] FlowUtils.RetryAsync now uses ConfigureAwait false to call action.

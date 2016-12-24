@@ -100,14 +100,34 @@ DateTimeExtensions
 
         Just checkes is this a Saturday or Sunday.
 
-    .. function:: DateTime BeginOfMonth(DateTime target)
-
-        Returns begin of month for specified date.
-
-    .. function:: DateTime EndOfMonth(DateTime target)
-
-        Returns end of month for specified date.
-
     .. function:: DateTime Truncate(DateTime target, DateTimeTruncation truncation)
 
         Trancates the date by seconds, minutes, hours, days or months.
+
+    .. function:: bool IsBetween(DateTime date, DateTime startDate, DateTime endDate)
+
+        Is date between two startDate and endDate dates.
+
+    .. function:: IEnumerable<DateTime> Range(DateTime fromDate, DateTime toDate)
+
+        Returns dates range.
+
+    .. function:: DateTime CombineDateTime(DateTime date, DateTime time)
+
+        Combines date part from first date and time from another.
+
+    .. function:: DateTime BeginOf(DateTime target, DateTimePeriod period)
+
+        Begin datetime of period.
+
+    .. function:: DateTime EndOf(DateTime target, DateTimePeriod period)
+
+        End datetime of period.
+
+    .. function:: DateTime FromUnixTimestamp(double unixTimeStamp)
+
+        Converts from unix time stamp to DateTime.
+
+    .. function:: double ToUnixTimestamp(DateTime target)
+
+        Converts DateTime to unix time stamp.
