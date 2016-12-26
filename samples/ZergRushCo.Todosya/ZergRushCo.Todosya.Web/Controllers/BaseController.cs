@@ -8,9 +8,15 @@ namespace ZergRushCo.Todosya.Web.Controllers
     /// </summary>
     public class BaseController : Controller
     {
-        protected readonly ICommandPipeline CommandPipeline;
-        protected readonly IQueryPipeline QueryPipeline;
+        protected ICommandPipeline CommandPipeline { get; }
 
+        protected IQueryPipeline QueryPipeline { get; }
+
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        /// <param name="commandPipeline">Command pipeline.</param>
+        /// <param name="queryPipeline">Query pipeline.</param>
         public BaseController(ICommandPipeline commandPipeline, IQueryPipeline queryPipeline)
         {
             CommandPipeline = commandPipeline;

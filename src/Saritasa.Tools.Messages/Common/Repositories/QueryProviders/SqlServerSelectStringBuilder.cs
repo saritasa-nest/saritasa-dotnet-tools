@@ -115,18 +115,24 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
             }
 
             // TODO: Output having statement
-            //if (Having.ClauseLevels > 0)
-            //{
-            //    // Check if a Group By Clause was set
-            //    if (groupByColumns.Count == 0)
-            //    {
-            //        throw new Exception("Having statement was set without Group By");
-            //    }
-            //    if (buildCommand)
-            //        sb.Append(" HAVING " + Having.BuildWhereStatement(() => command));
-            //    else
-            //        sb.Append(" HAVING " + Having.BuildWhereStatement());
-            //}
+            /*
+            if (Having.ClauseLevels > 0)
+            {
+                // Check if a Group By Clause was set
+                if (groupByColumns.Count == 0)
+                {
+                    throw new Exception("Having statement was set without Group By");
+                }
+                if (buildCommand)
+                {
+                    sb.Append(" HAVING " + Having.BuildWhereStatement(() => command));
+                }
+                else
+                {
+                    sb.Append(" HAVING " + Having.BuildWhereStatement());
+                }
+            }
+            */
 
             // Output OrderBy statement
             if (OrderByStatement.Any())

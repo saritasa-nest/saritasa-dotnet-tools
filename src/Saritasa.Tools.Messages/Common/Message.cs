@@ -16,7 +16,9 @@ namespace Saritasa.Tools.Messages.Common
 #endif
     public class Message : IMessage
 #if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
-        ,ICloneable
+#pragma warning disable SA1001 // Commas must be spaced correctly
+        , ICloneable
+#pragma warning restore SA1001 // Commas must be spaced correctly
 #endif
     {
         /// <summary>

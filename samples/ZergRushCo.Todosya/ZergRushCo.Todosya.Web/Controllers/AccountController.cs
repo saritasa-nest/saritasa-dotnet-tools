@@ -85,7 +85,7 @@ namespace ZergRushCo.Todosya.Web.Controllers
                 var result = await userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    await signInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
+                    await signInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
                     return RedirectToAction("Index", "Home");
                 }
                 foreach (var error in result.Errors)

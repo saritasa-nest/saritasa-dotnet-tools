@@ -19,17 +19,17 @@
   "frameworks": {
     "net452": {
       "dependencies": {
-        "NLog": "4.3.11"
+        "NLog": "4.4.1"
       }
     },
     "net461": {
       "dependencies": {
-        "NLog": "4.3.11"
+        "NLog": "4.4.1"
       }
     },
     "netcoreapp1.0": {
       "dependencies": {
-        "NLog": "5.0.0-beta03",
+        "NLog": "5.0.0-beta04",
         "Microsoft.NETCore.App": "1.1.0",
         "System.Threading": "4.3.0"
       }
@@ -37,9 +37,8 @@
     "netstandard1.6": {
       "dependencies": {
         "NETStandard.Library": "1.6.1",
-        "System.Data.Common": "4.1.0",
         "System.Threading": "4.3.0",
-        "NLog": "5.0.0-beta03"
+        "NLog": "5.0.0-beta04"
       }
     }
   },
