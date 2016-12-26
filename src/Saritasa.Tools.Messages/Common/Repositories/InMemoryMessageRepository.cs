@@ -7,6 +7,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
+    using System.Threading.Tasks;
     using Newtonsoft.Json;
     using Abstractions;
 
@@ -22,6 +23,10 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
         readonly object objLock = new object();
 
+        #region IMessageRepository
+
+        readonly Task<bool> completedTask = Task.FromResult(true);
+
         /// <summary>
         /// .ctor
         /// </summary>
@@ -31,22 +36,25 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <inheritdoc />
-        public void Add(IMessage message)
+        public Task AddAsync(IMessage message)
         {
             lock (objLock)
             {
                 Messages.Add(message);
             }
+            return completedTask;
         }
 
         /// <inheritdoc />
-        public IEnumerable<IMessage> Get(MessageQuery messageQuery)
+        public Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery)
         {
             lock (objLock)
             {
-                return Messages.Where(messageQuery.Match).ToList();
+                return Task.FromResult(Messages.Where(messageQuery.Match));
             }
         }
+
+        #endregion
 
         /// <inheritdoc />
         public void SaveState(IDictionary<string, object> dict)

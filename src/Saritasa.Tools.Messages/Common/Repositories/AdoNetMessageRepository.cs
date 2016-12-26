@@ -9,6 +9,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
     using System.Data.Common;
     using System.Linq;
     using System.Text;
+    using System.Threading.Tasks;
     using Abstractions;
     using ObjectSerializers;
     using QueryProviders;
@@ -59,7 +60,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
         bool isInitialized;
 
-        IDbConnection activeConnection;
+        DbConnection activeConnection;
 
         readonly DbProviderFactory factory;
 
@@ -136,7 +137,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <inheritdoc />
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities",
             Justification = "Parameters are used")]
-        public void Add(IMessage result)
+        public async Task AddAsync(IMessage result)
         {
             if (disposed)
             {
@@ -148,7 +149,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                 isInitialized = true;
             }
 
-            IDbConnection connection = null;
+            DbConnection connection = null;
             try
             {
                 connection = GetConnection();
@@ -166,7 +167,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                     AddParameter(command, "@CreatedAt", result.CreatedAt);
                     AddParameter(command, "@ExecutionDuration", result.ExecutionDuration);
                     AddParameter(command, "@Status", (byte)result.Status);
-                    command.ExecuteNonQuery();
+                    await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                 }
             }
             finally
@@ -224,7 +225,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             }
         }
 
-        IDbConnection GetConnection()
+        DbConnection GetConnection()
         {
             lock (objLock)
             {
@@ -257,7 +258,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <inheritdoc />
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities",
             Justification = "Parameters are used")]
-        public IEnumerable<IMessage> Get(MessageQuery messageQuery)
+        public async Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery)
         {
             if (disposed)
             {
@@ -270,9 +271,9 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = queryProvider.GetFilterScript(messageQuery);
-                using (var reader = command.ExecuteReader())
+                using (var reader = await command.ExecuteReaderAsync())
                 {
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         var message = new Message()
                         {

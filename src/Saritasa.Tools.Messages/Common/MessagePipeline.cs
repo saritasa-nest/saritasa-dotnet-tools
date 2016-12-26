@@ -11,7 +11,7 @@ namespace Saritasa.Tools.Messages.Common
     /// <summary>
     /// Messages processing pipeline.
     /// </summary>
-    public class MessagePipeline : IMessagePipeline
+    public class MessagePipeline : IMessagePipeline, IDisposable
     {
         /// <summary>
         /// Middlewares list.
@@ -138,5 +138,37 @@ namespace Saritasa.Tools.Messages.Common
                 handler.Handle(message);
             }
         }
+
+        #region Dispose
+
+        bool disposed;
+
+        /// <inheritdoc />
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    foreach (var middleware in Middlewares)
+                    {
+                        var disposableMiddleware = middleware as IDisposable;
+                        disposableMiddleware?.Dispose();
+                    }
+                    Middlewares.Clear();
+                    Middlewares = null;
+                }
+                disposed = true;
+            }
+        }
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        #endregion
     }
 }

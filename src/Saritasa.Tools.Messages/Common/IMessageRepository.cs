@@ -5,6 +5,7 @@ namespace Saritasa.Tools.Messages.Common
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
     using Abstractions;
 
     /// <summary>
@@ -16,14 +17,14 @@ namespace Saritasa.Tools.Messages.Common
         /// Add message.
         /// </summary>
         /// <param name="message">Message.</param>
-        void Add(IMessage message);
+        Task AddAsync(IMessage message);
 
         /// <summary>
         /// Get messages filtered by expression.
         /// </summary>
         /// <param name="messageQuery">Query.</param>
         /// <returns>Enumerable of messages.</returns>
-        IEnumerable<IMessage> Get(MessageQuery messageQuery);
+        Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery);
 
         /// <summary>
         /// Save internal state to dict. The methpd represents the ability of message repository to

@@ -53,7 +53,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
             {
                 return;
             }
-            repository.Add(message);
+            repository.AddAsync(message).ConfigureAwait(false).GetAwaiter().GetResult();
         }
     }
 }

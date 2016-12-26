@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System.Net.Http.Headers;
+
 namespace Saritasa.Tools.Messages.Common.Repositories
 {
     using System;
@@ -34,9 +36,14 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         private readonly string uri;
 
         /// <summary>
-        /// JsonSerializer
+        /// Json serializer.
         /// </summary>
         private readonly JsonObjectSerializer serializer;
+
+        /// <summary>
+        /// Client to be used to make queries to storage.
+        /// </summary>
+        private HttpClient client = new HttpClient();
 
         /// <summary>
         /// .ctor
@@ -50,26 +57,44 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             }
             this.uri = uri.TrimEnd('/');
             this.serializer = new JsonObjectSerializer();
+            this.client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(new ProductHeaderValue("SaritasaTools")));
         }
 
         /// <inheritdoc />
-        public void Add(IMessage message)
+        public async Task AddAsync(IMessage message)
         {
             if (disposed)
             {
                 throw new ObjectDisposedException(null);
             }
-            SaveMessageAsync((Message)message);
+
+            await client
+                .PutAsync($"{uri}/{IndexName}/{IndexTypeName}/{message.Id}",
+                    new ByteArrayContent(serializer.Serialize(((Message)message).CloneToMessage())))
+                .ConfigureAwait(false);
         }
 
         /// <inheritdoc />
-        public IEnumerable<IMessage> Get(MessageQuery messageQuery)
+        public async Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery)
         {
             if (disposed)
             {
                 throw new ObjectDisposedException(null);
             }
-            return GetAsync(messageQuery).Result;
+
+            var searchQuery =
+                new SearchQuery(CreateFieldQueries(messageQuery))
+                    .WithFrom(messageQuery.Skip)
+                    .WithSize(messageQuery.Take);
+
+            var response = await client.PostAsync($"{uri}/{IndexName}/{IndexTypeName}/_search",
+                new ByteArrayContent(serializer.Serialize(searchQuery)));
+
+            var result = await response.Content.ReadAsByteArrayAsync();
+            var root = (Root)serializer.Deserialize(result, typeof(Root));
+            var messages = root.Hits.Items.Select(x => x.Source).ToArray(); // message.Content deserialized as JObject
+
+            return messages;
         }
 
         /// <inheritdoc />
@@ -86,40 +111,6 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         public static IMessageRepository CreateFromState(IDictionary<string, object> dict)
         {
             return new ElasticsearchRepository(dict[nameof(uri)].ToString());
-        }
-
-        private HttpClient client = new HttpClient();
-
-        private void SaveMessageAsync(Message message)
-        {
-            //using (var client = new HttpClient())
-            {
-                client
-                    .PutAsync($"{uri}/{IndexName}/{IndexTypeName}/{message.Id}",
-                        new ByteArrayContent(serializer.Serialize(message.CloneToMessage())))
-                    .ConfigureAwait(false)
-                    .GetAwaiter().GetResult();
-            }
-        }
-
-        private async Task<IEnumerable<Message>> GetAsync(MessageQuery messageQuery)
-        {
-            using (var client = new HttpClient())
-            {
-                var searchQuery =
-                    new SearchQuery(CreateFieldQueries(messageQuery))
-                        .WithFrom(messageQuery.Skip)
-                        .WithSize(messageQuery.Take);
-
-                var response = await client.PostAsync($"{uri}/{IndexName}/{IndexTypeName}/_search",
-                    new ByteArrayContent(serializer.Serialize(searchQuery)));
-
-                var result = await response.Content.ReadAsByteArrayAsync();
-                var root = (Root)serializer.Deserialize(result, typeof(Root));
-                var messages = root.Hits.Items.Select(x => x.Source).ToArray(); // message.Content deserialized as JObject
-
-                return messages;
-            }
         }
 
         private IEnumerable<IFieldNameQuery> CreateFieldQueries(MessageQuery messageQuery)
@@ -175,7 +166,8 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             {
                 if (disposing)
                 {
-                    //Close();
+                    client.Dispose();
+                    client = null;
                 }
                 disposed = true;
             }

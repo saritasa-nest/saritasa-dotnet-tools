@@ -5,6 +5,8 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
     using Abstractions;
 
     /// <summary>
@@ -14,16 +16,19 @@ namespace Saritasa.Tools.Messages.Common.Repositories
     {
         #region IMessageRepository
 
+        readonly Task<bool> completedTask = Task.FromResult(true);
+
         /// <inheritdoc />
-        public void Add(IMessage message)
+        public Task AddAsync(IMessage message)
         {
             // no need to implement since repository should not persist messages
+            return completedTask;
         }
 
         /// <inheritdoc />
-        public IEnumerable<IMessage> Get(MessageQuery messageQuery)
+        public Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery)
         {
-            return new List<Message>();
+            return Task.FromResult(new List<Message>().Cast<IMessage>());
         }
 
         /// <inheritdoc />

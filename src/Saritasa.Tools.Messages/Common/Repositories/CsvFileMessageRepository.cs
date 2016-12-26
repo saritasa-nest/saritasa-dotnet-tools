@@ -7,6 +7,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
     using System.Collections.Generic;
     using System.IO;
     using System.Text;
+    using System.Threading.Tasks;
     using Abstractions;
     using ObjectSerializers;
 
@@ -148,8 +149,10 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
         #region IMessageRepository
 
+        readonly Task<bool> completedTask = Task.FromResult(true);
+
         /// <inheritdoc />
-        public void Add(IMessage message)
+        public Task AddAsync(IMessage message)
         {
             if (disposed)
             {
@@ -175,10 +178,12 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                     currentFileStream.FlushAsync();
                 }
             }
+
+            return completedTask;
         }
 
         /// <inheritdoc />
-        public IEnumerable<IMessage> Get(MessageQuery messageQuery)
+        public Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery)
         {
             throw new NotImplementedException();
         }
@@ -206,6 +211,8 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             }
         }
 
+        #region Dispose
+
         bool disposed;
 
         /// <inheritdoc />
@@ -227,6 +234,8 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
+        #endregion
 
         /// <summary>
         /// Create repository from dictionary.

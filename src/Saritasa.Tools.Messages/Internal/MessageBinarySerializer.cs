@@ -27,9 +27,9 @@ namespace Saritasa.Tools.Messages.Internal
         const byte TokenErrorType = 0x23;
         const byte TokenEndOfCommand = 0x50;
 
-        static readonly Tuple<byte, byte[]> NullChunk = new Tuple<byte, byte[]>(0, null);
+        static readonly Tuple<byte, byte[]> nullChunk = new Tuple<byte, byte[]>(0, null);
 
-        static readonly byte[] EmptyBytes = new byte[] { };
+        static readonly byte[] emptyBytes = new byte[] { };
 
         readonly IObjectSerializer serializer;
 
@@ -70,7 +70,7 @@ namespace Saritasa.Tools.Messages.Internal
             var n = stream.Read(header, 0, 1);
             if (n == 0)
             {
-                return NullChunk;
+                return nullChunk;
             }
             if (header[0] == TokenBeginOfCommand || header[0] == TokenEndOfCommand)
             {
@@ -80,7 +80,7 @@ namespace Saritasa.Tools.Messages.Internal
             n = stream.Read(header, 1, sizeof(int));
             if (n == 0)
             {
-                return NullChunk;
+                return nullChunk;
             }
             var length = BitConverter.ToInt32(header, 1);
             var content = new byte[length];
@@ -88,7 +88,7 @@ namespace Saritasa.Tools.Messages.Internal
             n = stream.Read(content, 0, content.Length);
             if (n == 0)
             {
-                return NullChunk;
+                return nullChunk;
             }
             return new Tuple<byte, byte[]>(header[0], content);
         }
@@ -107,7 +107,7 @@ namespace Saritasa.Tools.Messages.Internal
             lock (objLock)
             {
                 Tuple<byte, byte[]> chunk;
-                while (!Equals(chunk = ReadChunk(), NullChunk))
+                while (!Equals(chunk = ReadChunk(), nullChunk))
                 {
                     if (chunk.Item1 == TokenBeginOfCommand)
                     {
@@ -177,8 +177,8 @@ namespace Saritasa.Tools.Messages.Internal
             }
 
             var messageBytes = serializer.Serialize(baseMessage.Content);
-            var errorBytes = baseMessage.Error != null ? serializer.Serialize(baseMessage.Error) : EmptyBytes;
-            var dataBytes = baseMessage.Data != null ? serializer.Serialize(baseMessage.Data) : EmptyBytes;
+            var errorBytes = baseMessage.Error != null ? serializer.Serialize(baseMessage.Error) : emptyBytes;
+            var dataBytes = baseMessage.Data != null ? serializer.Serialize(baseMessage.Data) : emptyBytes;
 
             lock (objLock)
             {

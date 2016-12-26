@@ -9,10 +9,11 @@ namespace Saritasa.Tools.Messages.Common.Repositories
     using System.IO.Compression;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Reflection;
+    using System.Threading.Tasks;
     using Abstractions;
     using Internal;
     using ObjectSerializers;
-    using System.Reflection;
 
     /// <summary>
     /// Stores to file message.
@@ -109,8 +110,10 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
         #region IMessageRepository
 
+        readonly Task<bool> completedTask = Task.FromResult(true);
+
         /// <inheritdoc />
-        public void Add(IMessage context)
+        public Task AddAsync(IMessage context)
         {
             if (disposed)
             {
@@ -141,6 +144,8 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                     currentFileStream.FlushAsync();
                 }
             }
+
+            return completedTask;
         }
 
         string GetSearchPattern()
@@ -154,7 +159,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <inheritdoc />
-        public IEnumerable<IMessage> Get(MessageQuery messageQuery)
+        public Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery)
         {
             // collect all files in dir
             var allFiles =
@@ -222,7 +227,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                 }
                 currentDate = currentDate.AddDays(1);
             }
-            return targetList;
+            return Task.FromResult(targetList.Cast<IMessage>());
         }
 
         /// <inheritdoc />
