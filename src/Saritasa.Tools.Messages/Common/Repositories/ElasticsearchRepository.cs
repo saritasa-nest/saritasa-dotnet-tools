@@ -16,7 +16,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
     /// <summary>
     /// Use ElasticSearch to store messages.
     /// </summary>
-    public class ElasticsearchRepository : IMessageRepository
+    public class ElasticsearchRepository : IMessageRepository, IDisposable
     {
         /// <summary>
         /// Elasticsearch index.
@@ -55,12 +55,20 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <inheritdoc />
         public void Add(IMessage message)
         {
+            if (disposed)
+            {
+                throw new ObjectDisposedException(null);
+            }
             SaveMessageAsync((Message)message);
         }
 
         /// <inheritdoc />
         public IEnumerable<IMessage> Get(MessageQuery messageQuery)
         {
+            if (disposed)
+            {
+                throw new ObjectDisposedException(null);
+            }
             return GetAsync(messageQuery).Result;
         }
 
@@ -80,9 +88,11 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             return new ElasticsearchRepository(dict[nameof(uri)].ToString());
         }
 
+        private HttpClient client = new HttpClient();
+
         private void SaveMessageAsync(Message message)
         {
-            using (var client = new HttpClient())
+            //using (var client = new HttpClient())
             {
                 client
                     .PutAsync($"{uri}/{IndexName}/{IndexTypeName}/{message.Id}",
@@ -154,6 +164,28 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                 });
             }
             return filterQueries;
+        }
+
+        bool disposed;
+
+        /// <inheritdoc />
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    //Close();
+                }
+                disposed = true;
+            }
+        }
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

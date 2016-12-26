@@ -19,7 +19,7 @@ namespace Saritasa.Tools.Messages.Commands
         /// <param name="resolveMethodParameters">Resolve method parameters.</param>
         /// <returns>Command pipeline.</returns>
         public static ICommandPipeline UseInternalResolver(this ICommandPipeline commandPipeline,
-            bool resolveMethodParameters = false)
+            bool resolveMethodParameters = true)
         {
             var middleware = (PipelineMiddlewares.CommandExecutorMiddleware)commandPipeline.GetMiddlewareById("CommandExecutor");
             if (middleware == null)

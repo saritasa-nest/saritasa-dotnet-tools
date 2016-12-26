@@ -113,6 +113,12 @@ namespace Saritasa.Tools.Messages.Common
         public bool HasData => data != null;
 
         /// <summary>
+        /// Does message contain error.
+        /// </summary>
+        [JsonIgnore]
+        public bool HasError => Error != null;
+
+        /// <summary>
         /// .ctor
         /// </summary>
         public Message()
@@ -160,9 +166,12 @@ namespace Saritasa.Tools.Messages.Common
                 Status = this.Status,
                 Type = this.Type
             };
-            foreach (var item in this.data)
+            if (HasData)
             {
-                message.Data[item.Key] = item.Value;
+                foreach (var item in data)
+                {
+                    message.Data[item.Key] = item.Value;
+                }
             }
             return message;
         }

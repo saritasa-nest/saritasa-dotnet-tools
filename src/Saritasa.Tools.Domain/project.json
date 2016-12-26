@@ -1,6 +1,6 @@
 {
   "title": "Saritasa Tools Domain",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "authors": [ "Saritasa" ],
   "description": "The package is a part of Saritasa Tools project. Saritasa.Tools.Domain contains abstractions for unit of work, repository, domain events. Also there are domain exceptions (not found, validation, security). The implementation can be found in Saritasa.Tools.EfCore1, Saritasa.Tools.Ef6 packages.",
   "copyright": "Saritasa 2015-2016",

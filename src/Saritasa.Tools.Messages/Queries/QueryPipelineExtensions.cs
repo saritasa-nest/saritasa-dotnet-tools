@@ -18,7 +18,7 @@ namespace Saritasa.Tools.Messages.Queries
         /// <param name="resolveMethodParameters">Resolve method parameters.</param>
         /// <returns>Query pipeline.</returns>
         public static IQueryPipeline UseInternalResolver(this IQueryPipeline queryPipeline,
-            bool resolveMethodParameters = false)
+            bool resolveMethodParameters = true)
         {
             var middleware = (PipelineMiddlewares.QueryObjectResolverMiddleware)queryPipeline.GetMiddlewareById("QueryResolver");
             if (middleware == null)

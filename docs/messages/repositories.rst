@@ -138,7 +138,7 @@ There are built in repositories.
 
     .. class:: ElasticsearchRepository
 
-        Store messages to Elasticsearch.
+        Store messages to Elasticsearch. Index name is ``saritasa.messages``.
 
             .. attribute:: uri
 

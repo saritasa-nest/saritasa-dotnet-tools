@@ -6,8 +6,6 @@ namespace Saritasa.Tools.Messages.Common.Repositories
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq.Expressions;
-    using System.Reflection;
     using System.Text;
     using Abstractions;
     using ObjectSerializers;
@@ -23,8 +21,6 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// Logs path.
         /// </summary>
         public string LogsPath { get; } = string.Empty;
-
-        bool disposed;
 
         bool needWriteHeader;
 
@@ -209,6 +205,8 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                 currentFileStream = null;
             }
         }
+
+        bool disposed;
 
         /// <inheritdoc />
         protected virtual void Dispose(bool disposing)

@@ -17,7 +17,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
     /// <summary>
     /// Stores to file message.
     /// </summary>
-    public class FileMessageRepository : IMessageRepository, IDisposable
+    public class FileMessageRepository : IMessageRepository
     {
         const string DateTimeFormat = "yyyyMMdd";
 

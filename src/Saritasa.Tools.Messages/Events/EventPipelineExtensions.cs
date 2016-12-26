@@ -18,7 +18,7 @@ namespace Saritasa.Tools.Messages.Events
         /// <param name="resolveMethodParameters">Resolve method parameters.</param>
         /// <returns>Event pipeline.</returns>
         public static IEventPipeline UseInternalResolver(this IEventPipeline eventPipeline,
-            bool resolveMethodParameters = false)
+            bool resolveMethodParameters = true)
         {
             var middleware = (PipelineMiddlewares.EventExecutorMiddleware)eventPipeline.GetMiddlewareById("EventExecutor");
             if (middleware == null)

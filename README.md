@@ -10,6 +10,7 @@ Overview
 1. [Saritasa.Tools.Domain](https://www.nuget.org/packages/Saritasa.Tools.Domain) - _general interfaces: repository, unit of work, domian events; exceptions;_
 1. [Saritasa.Tools.Emails](https://www.nuget.org/packages/Saritasa.Tools.Emails) - _intefaces for system emails;_
 1. [Saritasa.Tools.Messages](https://www.nuget.org/packages/Saritasa.Tools.Messages) - _commands, queries, events: pipeline to process and log system queries/actions;_
+1. [Saritasa.Tools.Messages.Abstractions](https://www.nuget.org/packages/Saritasa.Tools.Messages.Abstractions) - _contains interfaces and base classes for package above with minimum dependencies;_
 1. [Saritasa.Tools.Misc](https://www.nuget.org/packages/Saritasa.Tools.Misc) - _miscellaneous: password generation;_
 1. [Saritasa.Tools.Ef6](https://www.nuget.org/packages/Saritasa.Tools.Ef6) - _unit of work and repository implementation for Entity Framework 6;_
 1. [Saritasa.Tools.EfCore1](https://www.nuget.org/packages/Saritasa.Tools.EfCore1) - _unit of work and repository implementation for Entity Framework Core;_
@@ -21,11 +22,11 @@ Goals
 
 1. Provide common infrastructure for our projects. Make the same or similar vision of current patterns like Repository, Unit of Work, etc.
 
-1. Provide flexible and extensible infrastructure to manage business requirements.
+2. Provide flexible and extensible infrastructure to manage business requirements.
 
-1. Provide common logging infrastructure to easily track application activity and system bottlenecks.
+3. Provide common logging infrastructure to easily track application activity and system bottlenecks.
 
-1. Arrange best practices and common functionality among our projects.
+4. Arrange best practices and common functionality among our projects.
 
 Installation
 ------------

@@ -12,7 +12,6 @@ using Saritasa.Tools.Messages.Queries.PipelineMiddlewares;
 using SandBox.Commands;
 using SandBox.Events;
 using SandBox.Queries;
-using Saritasa.Tools.Common.Extensions;
 
 namespace SandBox
 {
@@ -26,7 +25,7 @@ namespace SandBox
 
         static InMemoryMessageRepository inMemoryMessageRepository;
 
-        static IProductsRepository productsRepository = new ProductsRepository();
+        static readonly IProductsRepository productsRepository = new ProductsRepository();
 
         /// <summary>
         /// Simple dependency injection resolver.
