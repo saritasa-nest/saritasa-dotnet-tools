@@ -1,20 +1,21 @@
 ﻿using System.Data.Common;
 using System.Data.Entity;
+using Microsoft.AspNet.Identity.EntityFramework;
 using SQLite.CodeFirst;
-using ZergRushCo.Todosya.Domain.Tasks.Entities;
-using ZergRushCo.Todosya.Domain.Users.Entities;
+using ZergRushCo.Todosya.Domain.TaskContext.Entities;
+using ZergRushCo.Todosya.Domain.UserContext.Entities;
 
 namespace ZergRushCo.Todosya.DataAccess
 {
     /// <summary>
     /// Application database context.
     /// </summary>
-    public class AppDbContext : DbContext
+    public class AppDbContext : IdentityDbContext<User>
     {
         /// <summary>
         /// .ctor
         /// </summary>
-        public AppDbContext()
+        public AppDbContext() : base("AppDbContext")
         {
         }
 
@@ -38,11 +39,6 @@ namespace ZergRushCo.Todosya.DataAccess
         /// Use Sqlite database initializer. True by default. We don't need it for testing.
         /// </summary>
         public bool UseSqliteDatabase { get; set; } = true;
-
-        /// <summary>
-        /// Users database set.
-        /// </summary>
-        public DbSet<User> Users { get; set; }
 
         /// <summary>
         /// Tasks database set.
@@ -75,6 +71,8 @@ namespace ZergRushCo.Todosya.DataAccess
                 .HasRequired(c => c.User)
                 .WithMany()
                 .WillCascadeOnDelete(false);
+
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

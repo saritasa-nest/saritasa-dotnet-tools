@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
 using NUnit.Framework;
-using ZergRushCo.Todosya.Domain.Tasks.Commands;
-using ZergRushCo.Todosya.Domain.Tasks.Handlers;
+using ZergRushCo.Todosya.Domain.TaskContext.Commands;
+using ZergRushCo.Todosya.Domain.TaskContext.Handlers;
 
 namespace ZergRushCo.Todosya.Tests
 {
@@ -32,7 +32,7 @@ namespace ZergRushCo.Todosya.Tests
             new ProjectHandlers().HandleRemoveProject(new RemoveProjectCommand()
             {
                 ProjectId = 1,
-                UpdatedByUserId = 1
+                UpdatedByUserId = "1"
             }, uowFactory);
 
             // check after

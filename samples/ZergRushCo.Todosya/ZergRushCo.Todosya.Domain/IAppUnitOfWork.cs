@@ -1,6 +1,6 @@
 ﻿using Saritasa.Tools.Domain;
-using ZergRushCo.Todosya.Domain.Tasks.Entities;
-using ZergRushCo.Todosya.Domain.Users.Repositories;
+using ZergRushCo.Todosya.Domain.TaskContext.Entities;
+using ZergRushCo.Todosya.Domain.UserContext.Repositories;
 
 namespace ZergRushCo.Todosya.Domain
 {

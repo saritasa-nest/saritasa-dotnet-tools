@@ -53,7 +53,7 @@
                     </li>
                     @if (Request.IsAuthenticated)
                     {
-                        <li @GetActiveTabClass("projects")>@Html.ActionLink("Projects", "Index", "Projects")</li>
+                        <li @GetActiveTabClass("projects")>@Html.ActionLink("Projects", "Index", "Project")</li>
                     }
                     <li @GetActiveTabClass("about")>@Html.ActionLink("About", "About", "Home")</li>
                     <li @GetActiveTabClass("contact")>@Html.ActionLink("Contact", "Contact", "Home")</li>

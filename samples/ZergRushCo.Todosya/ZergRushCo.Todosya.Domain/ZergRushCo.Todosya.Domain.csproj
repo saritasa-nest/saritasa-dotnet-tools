@@ -36,8 +36,20 @@
       <HintPath>..\packages\Candy.0.6.1\lib\net46\Candy.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.0\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.EntityFramework, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.EntityFramework.2.2.1\lib\net45\Microsoft.AspNet.Identity.EntityFramework.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=1.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
@@ -129,37 +141,41 @@
     <Compile Include="IAppUnitOfWork.cs" />
     <Compile Include="IAppUnitOfWorkFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tasks\ColorValidationAttribute.cs" />
-    <Compile Include="Tasks\Commands\CheckTaskCommand.cs" />
-    <Compile Include="Tasks\Commands\CreateProjectCommand.cs" />
-    <Compile Include="Tasks\Commands\RemoveProjectCommand.cs" />
-    <Compile Include="Tasks\Commands\UpdateProjectCommand.cs" />
-    <Compile Include="Tasks\Commands\CreateTaskCommand.cs" />
-    <Compile Include="Tasks\Commands\RemoveTaskCommand.cs" />
-    <Compile Include="Tasks\Commands\UpdateTaskCommand.cs" />
-    <Compile Include="Tasks\Dtos\ProjectDto.cs" />
-    <Compile Include="Tasks\Dtos\TaskDto.cs" />
-    <Compile Include="Tasks\Entities\Project.cs" />
-    <Compile Include="Tasks\Entities\Task.cs" />
-    <Compile Include="Tasks\Handlers\ProjectHandlers.cs" />
-    <Compile Include="Tasks\Handlers\TaskHandlers.cs" />
-    <Compile Include="Tasks\Queries\ProjectsQueries.cs" />
-    <Compile Include="Tasks\Queries\TasksQueries.cs" />
-    <Compile Include="Tasks\Repositories\IProjectRepository.cs" />
-    <Compile Include="Tasks\Repositories\ITaskRepository.cs" />
-    <Compile Include="Users\Commands\UpdateUserRawCommand.cs" />
-    <Compile Include="Users\Commands\UpdateUserCommand.cs" />
-    <Compile Include="Users\Commands\RegisterUserCommand.cs" />
-    <Compile Include="Users\Entities\Role.cs" />
-    <Compile Include="Users\Entities\User.cs" />
-    <Compile Include="Users\Events\UserCreatedEvent.cs" />
-    <Compile Include="Users\Handlers\UserEventsHandlers.cs" />
-    <Compile Include="Users\Handlers\UserHandlers.cs" />
-    <Compile Include="Users\Queries\UsersQueries.cs" />
-    <Compile Include="Users\Repositories\IUserRepository.cs" />
-    <Compile Include="Users\Services\AppUserManager.cs" />
-    <Compile Include="Users\Services\AppPasswordHasher.cs" />
-    <Compile Include="Users\Services\UserStoreService.cs" />
+    <Compile Include="TaskContext\ColorValidationAttribute.cs" />
+    <Compile Include="TaskContext\Commands\CheckTaskCommand.cs" />
+    <Compile Include="TaskContext\Commands\CreateProjectCommand.cs" />
+    <Compile Include="TaskContext\Commands\RemoveProjectCommand.cs" />
+    <Compile Include="TaskContext\Commands\UpdateProjectCommand.cs" />
+    <Compile Include="TaskContext\Commands\CreateTaskCommand.cs" />
+    <Compile Include="TaskContext\Commands\RemoveTaskCommand.cs" />
+    <Compile Include="TaskContext\Commands\UpdateTaskCommand.cs" />
+    <Compile Include="TaskContext\Dtos\ProjectDto.cs" />
+    <Compile Include="TaskContext\Dtos\TaskDto.cs" />
+    <Compile Include="TaskContext\Entities\Project.cs" />
+    <Compile Include="TaskContext\Entities\Task.cs" />
+    <Compile Include="TaskContext\Handlers\ProjectHandlers.cs" />
+    <Compile Include="TaskContext\Handlers\TaskHandlers.cs" />
+    <Compile Include="TaskContext\Queries\ProjectsQueries.cs" />
+    <Compile Include="TaskContext\Queries\TasksQueries.cs" />
+    <Compile Include="TaskContext\Repositories\IProjectRepository.cs" />
+    <Compile Include="TaskContext\Repositories\ITaskRepository.cs" />
+    <Compile Include="UserContext\Commands\ForgotPasswordCommand.cs" />
+    <Compile Include="UserContext\Commands\LoginCommand.cs" />
+    <Compile Include="UserContext\Commands\ResetPasswordCommand.cs" />
+    <Compile Include="UserContext\Commands\UpdateUserCommand.cs" />
+    <Compile Include="UserContext\Commands\RegisterUserCommand.cs" />
+    <Compile Include="UserContext\Commands\UpdateUserPassword.cs" />
+    <Compile Include="UserContext\Entities\Role.cs" />
+    <Compile Include="UserContext\Entities\User.cs" />
+    <Compile Include="UserContext\Entities\UserRole.cs" />
+    <Compile Include="UserContext\Events\UserCreatedEvent.cs" />
+    <Compile Include="UserContext\Exceptions\IdentityException.cs" />
+    <Compile Include="UserContext\Handlers\UserEventsHandlers.cs" />
+    <Compile Include="UserContext\Handlers\UserHandlers.cs" />
+    <Compile Include="UserContext\Queries\UsersQueries.cs" />
+    <Compile Include="UserContext\Repositories\IUserRepository.cs" />
+    <Compile Include="UserContext\Services\AppUserManager.cs" />
+    <Compile Include="UserContext\Services\AppPasswordHasher.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Saritasa.Tools.Common\Saritasa.Tools.Common.csproj">

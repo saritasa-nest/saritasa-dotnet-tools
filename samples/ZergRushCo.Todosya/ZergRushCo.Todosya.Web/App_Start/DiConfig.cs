@@ -9,7 +9,10 @@ using Saritasa.Tools.Messages.Events;
 using Saritasa.Tools.Emails.Interceptors;
 using Autofac;
 using Autofac.Integration.Mvc;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Extensions.Logging;
+using ZergRushCo.Todosya.DataAccess;
 
 namespace ZergRushCo.Todosya.Web
 {
@@ -43,19 +46,21 @@ namespace ZergRushCo.Todosya.Web
                 AppDomain.CurrentDomain.BaseDirectory);
             builder.RegisterType<DataAccess.AppUnitOfWork>().AsImplementedInterfaces();
             builder.RegisterType<DataAccess.AppUnitOfWorkFactory>().AsImplementedInterfaces().SingleInstance();
-            builder.RegisterType<DataAccess.AppDbContext>().AsSelf();
-            builder.Register(c =>
-                new Domain.Users.Services.UserStoreService(
-                    c.Resolve<Domain.Users.Repositories.IUserRepository>(),
-                    c.Resolve<ICommandPipeline>()
-                )).AsImplementedInterfaces();
-            builder.Register(c =>
-                new Core.Identity.AppSignInManager(
-                    c.Resolve<Domain.Users.Services.AppUserManager>(),
-                    HttpContext.Current.GetOwinContext().Authentication
-                )).AsSelf();
+            builder.Register<DataAccess.AppDbContext>(c => new AppDbContext())
+                .AsSelf();
+            builder.Register<IUserStore<Domain.UserContext.Entities.User>>(
+                c => new UserStore<Domain.UserContext.Entities.User>(c.Resolve<AppDbContext>()))
+                    .AsImplementedInterfaces();
+            builder.Register(
+                c => new Domain.UserContext.Services.AppUserManager(
+                    c.Resolve<IUserStore<Domain.UserContext.Entities.User>>()))
+                        .AsImplementedInterfaces();
+            builder.Register(
+                c => new Microsoft.AspNet.Identity.Owin.SignInManager<Domain.UserContext.Entities.User, string>(
+                    c.Resolve<Domain.UserContext.Services.AppUserManager>(),
+                    HttpContext.Current.GetOwinContext().Authentication));
             builder.RegisterType<DataAccess.Repositories.UserRepository>().AsImplementedInterfaces();
-            builder.RegisterType<Domain.Users.Services.AppUserManager>().AsSelf();
+            builder.RegisterType<Domain.UserContext.Services.AppUserManager>().AsSelf();
 
             // make container
             var container = builder.Build();
@@ -68,28 +73,28 @@ namespace ZergRushCo.Todosya.Web
 
             // command pipeline
             var commandPipeline = CommandPipeline.CreateDefaultPipeline(container.Resolve,
-                System.Reflection.Assembly.GetAssembly(typeof(Domain.Users.Entities.User)));
+                System.Reflection.Assembly.GetAssembly(typeof(Domain.UserContext.Entities.User)));
             commandPipeline.AppendMiddlewares(repositoryMiddleware);
-            commandPipeline.UseInternalResolver(true);
+            commandPipeline.UseInternalResolver();
             builder = new ContainerBuilder();
             builder.RegisterInstance(commandPipeline).AsImplementedInterfaces().SingleInstance();
 
             // query pipeline
             var queryPipeline = QueryPipeline.CreateDefaultPipeline(container.Resolve);
             queryPipeline.AppendMiddlewares(repositoryMiddleware);
-            queryPipeline.UseInternalResolver(true);
+            queryPipeline.UseInternalResolver();
             builder.RegisterInstance(queryPipeline).AsImplementedInterfaces().SingleInstance();
 
             // events pipeline
             var eventsPipeline = EventPipeline.CreateDefaultPipeline(container.Resolve,
-                System.Reflection.Assembly.GetAssembly(typeof(Domain.Users.Entities.User)));
-            eventsPipeline.UseInternalResolver(true);
+                System.Reflection.Assembly.GetAssembly(typeof(Domain.UserContext.Entities.User)));
+            eventsPipeline.UseInternalResolver();
             builder.RegisterInstance(eventsPipeline).AsImplementedInterfaces().SingleInstance();
 
             // register queries as separate objects
-            builder.RegisterType<Domain.Users.Queries.UsersQueries>().AsSelf();
-            builder.RegisterType<Domain.Tasks.Queries.TasksQueries>().AsSelf();
-            builder.RegisterType<Domain.Tasks.Queries.ProjectsQueries>().AsSelf();
+            builder.RegisterType<Domain.UserContext.Queries.UsersQueries>().AsSelf();
+            builder.RegisterType<Domain.TaskContext.Queries.TasksQueries>().AsSelf();
+            builder.RegisterType<Domain.TaskContext.Queries.ProjectsQueries>().AsSelf();
 
             // emails
             var emailSender = new Saritasa.Tools.Emails.SmtpClientEmailSender();
@@ -98,7 +103,9 @@ namespace ZergRushCo.Todosya.Web
             builder.RegisterInstance(emailSender).AsImplementedInterfaces().SingleInstance();
 
             // logger
-            var loggerFactory = new Saritasa.Tools.NLog.NLogLoggerProvider();
+            var nlogProvider = new Saritasa.Tools.NLog.NLogLoggerProvider();
+            var loggerFactory = new LoggerFactory();
+            loggerFactory.AddProvider(nlogProvider);
             builder.RegisterInstance(loggerFactory).AsImplementedInterfaces().SingleInstance();
 
             // set the dependency resolver to be Autofac

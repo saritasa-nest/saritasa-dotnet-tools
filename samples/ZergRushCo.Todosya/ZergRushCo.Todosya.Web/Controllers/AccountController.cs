@@ -3,11 +3,12 @@ using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
+using Microsoft.Extensions.Logging;
+using Saritasa.Tools.Messages.Abstractions;
 using ZergRushCo.Todosya.Web.Models;
-using ZergRushCo.Todosya.Domain.Users.Services;
-using ZergRushCo.Todosya.Web.Core.Identity;
-using ZergRushCo.Todosya.Domain.Users.Entities;
-using ZergRushCo.Todosya.Domain.Users.Commands;
+using ZergRushCo.Todosya.Domain.UserContext.Services;
+using ZergRushCo.Todosya.Domain.UserContext.Entities;
+using ZergRushCo.Todosya.Domain.UserContext.Commands;
 
 namespace ZergRushCo.Todosya.Web.Controllers
 {
@@ -15,21 +16,20 @@ namespace ZergRushCo.Todosya.Web.Controllers
     /// User account controller.
     /// </summary>
     [Authorize]
-    public class AccountController : Controller
+    public class AccountController : BaseController
     {
-        readonly AppSignInManager signInManager;
-        readonly AppUserManager userManager;
+        readonly SignInManager<User, string> signInManager;
 
-        public AccountController()
+        public AccountController(
+            ICommandPipeline commandPipeline,
+            IQueryPipeline queryPipeline,
+            ILoggerFactory loggerFactory,
+            SignInManager<User, string> signInManager) : base(commandPipeline, queryPipeline, loggerFactory)
         {
-        }
-
-        public AccountController(AppUserManager userManager, AppSignInManager signInManager)
-        {
-            this.userManager = userManager;
             this.signInManager = signInManager;
         }
 
+        // GET: /Account/Login
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {
@@ -37,10 +37,11 @@ namespace ZergRushCo.Todosya.Web.Controllers
             return View();
         }
 
+        // POST: /Account/Login
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
+        public async Task<ActionResult> Login(LoginCommand model, string returnUrl)
         {
             if (!ModelState.IsValid)
             {
@@ -59,52 +60,37 @@ namespace ZergRushCo.Todosya.Web.Controllers
             }
         }
 
+        // GET: /Account/Register
         [AllowAnonymous]
         public ActionResult Register()
         {
             return View();
         }
 
+        // POST: /Account/Register
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Register(RegisterUserCommand model)
+        public async Task<ActionResult> Register(RegisterUserCommand command)
         {
-            if (ModelState.IsValid)
+            await HandleCommandAsync(command);
+            if (!ModelState.IsValid)
             {
-                var user = new User
-                {
-                    PasswordHash = model.Password,
-                    UserName = model.Email,
-                    FirstName = model.FirstName,
-                    LastName = model.LastName,
-                    City = model.City,
-                    Country = model.Country,
-                    BirthDay = model.BirthDay,
-                };
-                var result = await userManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
-                {
-                    await signInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
-                    return RedirectToAction("Index", "Home");
-                }
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error);
-                }
+                return View(command);
             }
 
-            return View(model);
+            await signInManager.SignInAsync(command.User, isPersistent: false, rememberBrowser: false);
+            return RedirectToAction("Index", "Home");
         }
 
         [AllowAnonymous]
-        public async Task<ActionResult> ConfirmEmail(int userId, string code)
+        public async Task<ActionResult> ConfirmEmail(string userId, string code)
         {
-            if (userId > 0 || code == null)
+            if (string.IsNullOrEmpty(userId) || code == null)
             {
                 return View("Error");
             }
-            var result = await userManager.ConfirmEmailAsync(userId, code);
+            var result = await signInManager.UserManager.ConfirmEmailAsync(userId, code);
             return View(result.Succeeded ? "ConfirmEmail" : "Error");
         }
 
@@ -117,18 +103,18 @@ namespace ZergRushCo.Todosya.Web.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        public async Task<ActionResult> ForgotPassword(ForgotPasswordCommand command)
         {
             if (ModelState.IsValid)
             {
-                var user = await userManager.FindByNameAsync(model.Email);
-                if (user == null || !(await userManager.IsEmailConfirmedAsync(user.Id)))
+                var user = await signInManager.UserManager.FindByNameAsync(command.Email);
+                if (user == null || !(await signInManager.UserManager.IsEmailConfirmedAsync(user.Id)))
                 {
                     return View("ForgotPasswordConfirmation");
                 }
             }
 
-            return View(model);
+            return View(command);
         }
 
         [AllowAnonymous]
@@ -146,19 +132,19 @@ namespace ZergRushCo.Todosya.Web.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ResetPassword(ResetPasswordViewModel model)
+        public async Task<ActionResult> ResetPassword(ResetPasswordCommand command)
         {
             if (!ModelState.IsValid)
             {
-                return View(model);
+                return View(command);
             }
-            var user = await userManager.FindByNameAsync(model.Email);
+            var user = await signInManager.UserManager.FindByNameAsync(command.Email);
             if (user == null)
             {
                 // Don't reveal that the user does not exist
                 return RedirectToAction("ResetPasswordConfirmation", "Account");
             }
-            var result = await userManager.ResetPasswordAsync(user.Id, model.Code, model.Password);
+            var result = await signInManager.UserManager.ResetPasswordAsync(user.Id, command.Code, command.Password);
             if (result.Succeeded)
             {
                 return RedirectToAction("ResetPasswordConfirmation", "Account");
@@ -188,7 +174,6 @@ namespace ZergRushCo.Todosya.Web.Controllers
         {
             if (disposing)
             {
-                userManager?.Dispose();
                 signInManager?.Dispose();
             }
 

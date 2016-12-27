@@ -2,8 +2,8 @@
 using Saritasa.Tools.Ef;
 using ZergRushCo.Todosya.DataAccess.Repositories;
 using ZergRushCo.Todosya.Domain;
-using ZergRushCo.Todosya.Domain.Users.Repositories;
-using ZergRushCo.Todosya.Domain.Tasks.Entities;
+using ZergRushCo.Todosya.Domain.UserContext.Repositories;
+using ZergRushCo.Todosya.Domain.TaskContext.Entities;
 
 namespace ZergRushCo.Todosya.DataAccess
 {

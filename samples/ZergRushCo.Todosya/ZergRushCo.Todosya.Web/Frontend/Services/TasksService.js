@@ -11,7 +11,7 @@ define(['App', 'jquery', 'knockout'], function (App, $, ko) {
          */
         get: function () {
             return $.ajax({
-                url: '/json/tasks'
+                url: '/api/tasks'
             });
         },
 
@@ -20,7 +20,7 @@ define(['App', 'jquery', 'knockout'], function (App, $, ko) {
          */
         getProjects: function () {
             return $.ajax({
-                url: '/json/projects'
+                url: '/api/projects'
             });
         },
 
@@ -29,7 +29,7 @@ define(['App', 'jquery', 'knockout'], function (App, $, ko) {
          */
         create: function (task) {
             return $.ajax({
-                url: '/json/tasks',
+                url: '/api/tasks',
                 type: 'post',
                 contentType: App.contentTypeJson,
                 data: JSON.stringify(ko.toJS(task))
@@ -41,7 +41,7 @@ define(['App', 'jquery', 'knockout'], function (App, $, ko) {
          */
         update: function (task) {
             return $.ajax({
-                url: '/json/tasks',
+                url: '/api/tasks',
                 type: 'put',
                 contentType: App.contentTypeJson,
                 data: JSON.stringify(ko.toJS(task))
@@ -53,7 +53,7 @@ define(['App', 'jquery', 'knockout'], function (App, $, ko) {
          */
         remove: function (id) {
             return $.ajax({
-                url: '/json/tasks/' + id,
+                url: '/api/tasks/' + id,
                 type: 'delete'
             });
         },
@@ -63,7 +63,7 @@ define(['App', 'jquery', 'knockout'], function (App, $, ko) {
          */
         check: function (id, isDone) {
             return $.ajax({
-                url: '/json/tasks/' + id + '/check',
+                url: '/api/tasks/' + id + '/check',
                 type: 'post',
                 data: JSON.stringify({
                     taskId: id,

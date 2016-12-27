@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Transactions;
 using NUnit.Framework;
 using ZergRushCo.Todosya.DataAccess;
-using ZergRushCo.Todosya.Domain.Users.Entities;
+using ZergRushCo.Todosya.Domain.UserContext.Entities;
 
 namespace ZergRushCo.Todosya.Tests
 {
@@ -19,7 +19,8 @@ namespace ZergRushCo.Todosya.Tests
         [Test]
         public void Omitting_SaveChanges_should_not_add_to_context()
         {
-            var connection = Effort.DbConnectionFactory.CreatePersistent("Omitting_SaveChanges_should_not_add_to_context");
+            var connection =
+                Effort.DbConnectionFactory.CreatePersistent("Omitting_SaveChanges_should_not_add_to_context");
 
             // create user1
             using (var dbcontext = new AppDbContext(connection))
@@ -53,8 +54,7 @@ namespace ZergRushCo.Todosya.Tests
                     FirstName = "First2",
                     LastName = "Last2",
                     Email = "test2@saritasa.com",
-                    UserName = "test2@saritasa.com",
-                    PasswordHash = "123",
+                    UserName = "test2@saritasa.com"
                 });
             }
 
