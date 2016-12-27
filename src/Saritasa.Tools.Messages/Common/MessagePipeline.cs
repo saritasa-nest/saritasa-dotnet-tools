@@ -6,6 +6,7 @@ namespace Saritasa.Tools.Messages.Common
     using System;
     using System.Linq;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
     using Abstractions;
 
     /// <summary>
@@ -136,6 +137,32 @@ namespace Saritasa.Tools.Messages.Common
             foreach (var handler in Middlewares)
             {
                 handler.Handle(message);
+            }
+        }
+
+        /// <summary>
+        /// Processes the message thru all middlewares in async mode. Middleware should support
+        /// <see cref="IAsyncMessagePipelineMiddleware" /> interface. Otherwise it will be called
+        /// in sync mode.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        protected async Task ProcessMiddlewaresAsync(IMessage message)
+        {
+            // set execution context
+            MessageExecutionContext.Current = new MessageExecutionContext(message, this);
+
+            // execute message thru all middlewares
+            foreach (var handler in Middlewares)
+            {
+                var asyncHandler = handler as IAsyncMessagePipelineMiddleware;
+                if (asyncHandler != null)
+                {
+                    await asyncHandler.HandleAsync(message).ConfigureAwait(false);
+                }
+                else
+                {
+                    handler.Handle(message);
+                }
             }
         }
 

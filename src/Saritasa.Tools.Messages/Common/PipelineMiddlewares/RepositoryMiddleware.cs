@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System.Threading.Tasks;
+
 namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
 {
     using System;
@@ -9,7 +11,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
     /// <summary>
     /// Saves the command execution context to repository.
     /// </summary>
-    public class RepositoryMiddleware : IMessagePipelineMiddleware
+    public class RepositoryMiddleware : IMessagePipelineMiddleware, IAsyncMessagePipelineMiddleware
     {
         /// <inheritdoc />
         public string Id { get; set; }
@@ -54,6 +56,16 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
                 return;
             }
             repository.AddAsync(message).ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+
+        /// <inheritdoc />
+        public async Task HandleAsync(IMessage message)
+        {
+            if (filter != null && !filter.IsMatch(message))
+            {
+                return;
+            }
+            await repository.AddAsync(message).ConfigureAwait(false);
         }
     }
 }

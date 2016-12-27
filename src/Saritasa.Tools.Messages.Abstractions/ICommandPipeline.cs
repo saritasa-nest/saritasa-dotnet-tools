@@ -4,6 +4,7 @@
 namespace Saritasa.Tools.Messages.Abstractions
 {
     using System;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// Commands specific pipeline.
@@ -15,5 +16,11 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// </summary>
         /// <param name="command">Command to execute.</param>
         void Handle(object command);
+
+        /// <summary>
+        /// Execute command asynchronously.
+        /// </summary>
+        /// <param name="command">Command to execute.</param>
+        Task HandleAsync(object command);
     }
 }

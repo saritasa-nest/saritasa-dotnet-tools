@@ -6,6 +6,7 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
     using Abstractions;
     using Common;
     using Internal;
@@ -24,21 +25,8 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
             Id = "EventExecutor";
         }
 
-        /// <inheritdoc />
-        public override void Handle(IMessage message)
+        private async Task InternalHandle(EventMessage eventMessage, bool async = false)
         {
-            var eventMessage = message as EventMessage;
-            if (eventMessage == null)
-            {
-                throw new NotSupportedException("Message should be EventMessage type");
-            }
-
-            // rejected events are not needed to process
-            if (eventMessage.Status == ProcessingStatus.Rejected)
-            {
-                return;
-            }
-
             var exceptions = new List<Exception>(3); // stores exceptions from all handlers
             var stopWatch = System.Diagnostics.Stopwatch.StartNew();
 
@@ -71,7 +59,14 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
                 // invoke method and resolve parameters if needed
                 try
                 {
-                    ExecuteHandler(handler, eventMessage.Content, eventMessage.HandlerMethods[i]);
+                    if (async)
+                    {
+                        await ExecuteHandlerAsync(handler, eventMessage.Content, eventMessage.HandlerMethods[i]);
+                    }
+                    else
+                    {
+                        ExecuteHandler(handler, eventMessage.Content, eventMessage.HandlerMethods[i]);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -97,6 +92,45 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
             }
             eventMessage.ExecutionDuration = (int)stopWatch.ElapsedMilliseconds;
             eventMessage.Status = ProcessingStatus.Completed;
+        }
+
+        /// <inheritdoc />
+        public override void Handle(IMessage message)
+        {
+            var eventMessage = message as EventMessage;
+            if (eventMessage == null)
+            {
+                throw new NotSupportedException("Message should be EventMessage type");
+            }
+
+            // rejected events are not needed to process
+            if (eventMessage.Status == ProcessingStatus.Rejected)
+            {
+                return;
+            }
+
+            // it will be sync anyway but simplified for better performance
+#pragma warning disable 4014
+            InternalHandle(eventMessage, async: false);
+#pragma warning restore 4014
+        }
+
+        /// <inheritdoc />
+        public override async Task HandleAsync(IMessage message)
+        {
+            var eventMessage = message as EventMessage;
+            if (eventMessage == null)
+            {
+                throw new NotSupportedException("Message should be EventMessage type");
+            }
+
+            // rejected events are not needed to process
+            if (eventMessage.Status == ProcessingStatus.Rejected)
+            {
+                return;
+            }
+
+            await InternalHandle(eventMessage, async: true);
         }
     }
 }

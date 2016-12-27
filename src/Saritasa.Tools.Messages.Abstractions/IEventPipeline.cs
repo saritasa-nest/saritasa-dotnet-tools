@@ -4,6 +4,7 @@
 namespace Saritasa.Tools.Messages.Abstractions
 {
     using System;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// Events specific pipeline.
@@ -15,5 +16,11 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// </summary>
         /// <param name="event">Event to raise.</param>
         void Raise(object @event);
+
+        /// <summary>
+        /// Raise event asynchronously.
+        /// </summary>
+        /// <param name="event">Event to raise.</param>
+        Task RaiseAsync(object @event);
     }
 }

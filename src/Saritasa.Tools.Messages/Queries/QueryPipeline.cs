@@ -17,10 +17,10 @@ namespace Saritasa.Tools.Messages.Queries
     /// </summary>
     public class QueryPipeline : MessagePipeline, IQueryPipeline
     {
-        static readonly byte[] AvailableMessageTypes = { Message.MessageTypeQuery };
+        static readonly byte[] availableMessageTypes = { Message.MessageTypeQuery };
 
         /// <inheritdoc />
-        public override byte[] MessageTypes => AvailableMessageTypes;
+        public override byte[] MessageTypes => availableMessageTypes;
 
         static QueryMessage CreateMessage(Delegate func, params object[] args)
         {

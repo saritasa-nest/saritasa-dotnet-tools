@@ -5,13 +5,14 @@ namespace Saritasa.Tools.Messages.Common
 {
     using System;
     using System.Reflection;
+    using System.Threading.Tasks;
     using Abstractions;
     using Internal;
 
     /// <summary>
     /// Provides common functionality for Command/Query/Event executor middlewares.
     /// </summary>
-    public abstract class BaseExecutorMiddleware : IMessagePipelineMiddleware
+    public abstract class BaseExecutorMiddleware : IMessagePipelineMiddleware, IAsyncMessagePipelineMiddleware
     {
         /// <inheritdoc />
         public string Id { get; set; } = "Executor";
@@ -47,6 +48,9 @@ namespace Saritasa.Tools.Messages.Common
         /// <inheritdoc />
         public abstract void Handle(IMessage message);
 
+        /// <inheritdoc />
+        public abstract Task HandleAsync(IMessage message);
+
         /// <summary>
         /// If UseInternalObjectResolver is turned off internal IoC container is used. Otherwise
         /// it relies on provided IoC implementation.
@@ -61,13 +65,7 @@ namespace Saritasa.Tools.Messages.Common
                 Resolver(type);
         }
 
-        /// <summary>
-        /// Execute method.
-        /// </summary>
-        /// <param name="handler">Handler.</param>
-        /// <param name="obj">The first argument.</param>
-        /// <param name="handlerMethod">Method to execute.</param>
-        protected void ExecuteHandler(object handler, object obj, MethodBase handlerMethod)
+        private object[] GetAndResolveHandlerParameters(object obj, MethodBase handlerMethod)
         {
             if (UseParametersResolve)
             {
@@ -90,20 +88,41 @@ namespace Saritasa.Tools.Messages.Common
                             paramsarr[i] = Resolver(parameters[i].ParameterType);
                         }
                     }
-                    handlerMethod.Invoke(handler, paramsarr);
+                    return paramsarr;
                 }
-                else
+                if (parameters.Length == 1)
                 {
-                    if (parameters.Length == 1)
-                    {
-                        paramsarr[0] = obj;
-                    }
-                    handlerMethod.Invoke(handler, paramsarr);
+                    paramsarr[0] = obj;
                 }
+                return paramsarr;
             }
-            else
+            return new[] { obj };
+        }
+
+        /// <summary>
+        /// Execute method.
+        /// </summary>
+        /// <param name="handler">Handler.</param>
+        /// <param name="obj">The first argument.</param>
+        /// <param name="handlerMethod">Method to execute.</param>
+        protected void ExecuteHandler(object handler, object obj, MethodBase handlerMethod)
+        {
+            handlerMethod.Invoke(handler, GetAndResolveHandlerParameters(obj, handlerMethod));
+        }
+
+        /// <summary>
+        /// Execute method in async mode. Handler should return <see cref="Task" /> otherwise
+        /// it will be executed in sync mode.
+        /// </summary>
+        /// <param name="handler">Async handler.</param>
+        /// <param name="obj">The first argument.</param>
+        /// <param name="handlerMethod">Method to execute.</param>
+        protected async Task ExecuteHandlerAsync(object handler, object obj, MethodBase handlerMethod)
+        {
+            var task = handlerMethod.Invoke(handler, GetAndResolveHandlerParameters(obj, handlerMethod)) as Task;
+            if (task != null)
             {
-                handlerMethod.Invoke(handler, new[] { obj });
+                await task;
             }
         }
     }

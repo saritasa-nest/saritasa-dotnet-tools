@@ -16,7 +16,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
     {
         #region IMessageRepository
 
-        readonly Task<bool> completedTask = Task.FromResult(true);
+        static readonly Task<bool> completedTask = Task.FromResult(true);
 
         /// <inheritdoc />
         public Task AddAsync(IMessage message)

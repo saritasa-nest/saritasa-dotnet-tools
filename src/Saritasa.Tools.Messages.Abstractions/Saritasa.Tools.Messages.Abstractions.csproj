@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="CommandHandlersAttribute.cs" />
     <Compile Include="EventHandlersAttribute.cs" />
+    <Compile Include="IAsyncMessagePipelineMiddleware.cs" />
     <Compile Include="ICommandPipeline.cs" />
     <Compile Include="IEventPipeline.cs" />
     <Compile Include="IMessage.cs" />

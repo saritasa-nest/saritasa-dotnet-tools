@@ -5,6 +5,7 @@ namespace Saritasa.Tools.Messages.Events
 {
     using System;
     using System.Reflection;
+    using System.Threading.Tasks;
     using Abstractions;
     using Common;
 
@@ -13,16 +14,26 @@ namespace Saritasa.Tools.Messages.Events
     /// </summary>
     public class EventPipeline : MessagePipeline, IEventPipeline
     {
-        static readonly byte[] AvailableMessageTypes = new byte[] { Message.MessageTypeEvent };
+        static readonly byte[] availableMessageTypes = new byte[] { Message.MessageTypeEvent };
 
         /// <inheritdoc />
-        public override byte[] MessageTypes => AvailableMessageTypes;
+        public override byte[] MessageTypes => availableMessageTypes;
+
+        #region IEventPipeline
 
         /// <inheritdoc />
         public void Raise(object @event)
         {
             ProcessMiddlewares(new EventMessage(@event));
         }
+
+        /// <inheritdoc />
+        public async Task RaiseAsync(object @event)
+        {
+            await ProcessMiddlewaresAsync(new EventMessage(@event));
+        }
+
+        #endregion
 
         /// <summary>
         /// Creates default pipeline with events executor.

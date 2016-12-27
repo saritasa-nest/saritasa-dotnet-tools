@@ -5,6 +5,7 @@ namespace Saritasa.Tools.Messages.Commands
 {
     using System;
     using System.Reflection;
+    using System.Threading.Tasks;
     using Abstractions;
     using Common;
 
@@ -18,17 +19,25 @@ namespace Saritasa.Tools.Messages.Commands
         /// <inheritdoc />
         public override byte[] MessageTypes => availableMessageTypes;
 
-        /// <summary>
-        /// Execute command.
-        /// </summary>
-        /// <param name="command">Command to execute.</param>
-        [System.Diagnostics.DebuggerHidden]
+        #region ICommandPipeline
+
+        /// <inheritdoc />
         public void Handle(object command)
         {
             var commandMessage = new CommandMessage(command);
             ProcessMiddlewares(commandMessage);
             commandMessage.ErrorDispatchInfo?.Throw();
         }
+
+        /// <inheritdoc />
+        public async Task HandleAsync(object command)
+        {
+            var commandMessage = new CommandMessage(command);
+            await ProcessMiddlewaresAsync(commandMessage);
+            commandMessage.ErrorDispatchInfo?.Throw();
+        }
+
+        #endregion
 
         /// <summary>
         /// Resolver that always returns null values.

@@ -5,6 +5,8 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
 {
     using System;
     using System.Reflection;
+    using System.Runtime.CompilerServices;
+    using System.Threading.Tasks;
     using Abstractions;
     using Common;
     using Internal;
@@ -23,19 +25,15 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             Id = "CommandExecutor";
         }
 
-        /// <inheritdoc />
-        public override void Handle(IMessage message)
+#if !NET40 && !NET35
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        private object GetHandler(CommandMessage commandMessage)
         {
-            var commandMessage = message as CommandMessage;
-            if (commandMessage == null)
-            {
-                throw new NotSupportedException("Message should be CommandMessage type");
-            }
-
             // rejected commands are not needed to process
             if (commandMessage.Status == ProcessingStatus.Rejected)
             {
-                return;
+                return null;
             }
 
             object handler = null;
@@ -55,12 +53,90 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
                 commandMessage.Status = ProcessingStatus.Rejected;
                 throw new CommandHandlerNotFoundException(commandMessage.Content.GetType().Name);
             }
+            return handler;
+        }
+
+        /// <inheritdoc />
+        public override void Handle(IMessage message)
+        {
+            var commandMessage = message as CommandMessage;
+            if (commandMessage == null)
+            {
+                throw new NotSupportedException("Message should be CommandMessage type");
+            }
+
+            var handler = GetHandler(commandMessage);
+            if (handler == null)
+            {
+                return;
+            }
 
             // invoke method and resolve parameters if needed
             var stopWatch = System.Diagnostics.Stopwatch.StartNew();
             try
             {
                 ExecuteHandler(handler, commandMessage.Content, commandMessage.HandlerMethod);
+                commandMessage.Status = ProcessingStatus.Completed;
+            }
+            catch (TargetInvocationException ex)
+            {
+                InternalLogger.Warn($"TargetInvocationException while process command \"{handler}\": {ex}", nameof(CommandExecutorMiddleware));
+                commandMessage.Status = ProcessingStatus.Failed;
+                if (ex.InnerException != null)
+                {
+                    commandMessage.Error = ex.InnerException;
+                    commandMessage.ErrorDispatchInfo = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex.InnerException);
+                }
+            }
+            catch (TargetException ex)
+            {
+                InternalLogger.Warn($"TargetException while process command \"{handler}\": {ex}", nameof(CommandExecutorMiddleware));
+                commandMessage.Status = ProcessingStatus.Failed;
+                if (ex.InnerException != null)
+                {
+                    commandMessage.Error = ex.InnerException;
+                    commandMessage.ErrorDispatchInfo = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex.InnerException);
+                }
+            }
+            catch (Exception ex)
+            {
+                InternalLogger.Warn($"Exception while process command \"{handler}\": {ex}", nameof(CommandExecutorMiddleware));
+                commandMessage.Status = ProcessingStatus.Failed;
+                commandMessage.Error = ex;
+                commandMessage.ErrorDispatchInfo = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex);
+            }
+            finally
+            {
+                stopWatch.Stop();
+                commandMessage.ExecutionDuration = (int)stopWatch.ElapsedMilliseconds;
+            }
+        }
+
+        /*
+         * There is code duplicate for HandleAsync method. We can make Handle method async instead.
+         * But I did this for sake of performance - making method async would add ~9% decrease.
+         */
+
+        /// <inheritdoc />
+        public override async Task HandleAsync(IMessage message)
+        {
+            var commandMessage = message as CommandMessage;
+            if (commandMessage == null)
+            {
+                throw new NotSupportedException("Message should be CommandMessage type");
+            }
+
+            var handler = GetHandler(commandMessage);
+            if (handler == null)
+            {
+                return;
+            }
+
+            // invoke method and resolve parameters if needed
+            var stopWatch = System.Diagnostics.Stopwatch.StartNew();
+            try
+            {
+                await ExecuteHandlerAsync(handler, commandMessage.Content, commandMessage.HandlerMethod);
                 commandMessage.Status = ProcessingStatus.Completed;
             }
             catch (TargetInvocationException ex)

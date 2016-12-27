@@ -4,6 +4,7 @@
 namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
 {
     using System;
+    using System.Threading.Tasks;
     using Abstractions;
     using Internal;
     using Common;
@@ -43,6 +44,15 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
             {
                 TypeHelpers.ResolveForParameters(queryMessage.Parameters, queryMessage.Method.GetParameters(), Resolver);
             }
+        }
+
+        static readonly Task<bool> completedTask = Task.FromResult(true);
+
+        /// <inheritdoc />
+        public override Task HandleAsync(IMessage message)
+        {
+            Handle(message);
+            return completedTask;
         }
     }
 }

@@ -4,13 +4,13 @@
 namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
 {
     using System;
-    using Common;
+    using System.Threading.Tasks;
     using Abstractions;
 
     /// <summary>
     /// Executes query delegate.
     /// </summary>
-    public class QueryExecutorMiddleware : IMessagePipelineMiddleware
+    public class QueryExecutorMiddleware : IMessagePipelineMiddleware, IAsyncMessagePipelineMiddleware
     {
         /// <inheritdoc />
         public string Id => "QueryExecutor";
@@ -29,6 +29,44 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
             try
             {
                 queryMessage.Result = queryMessage.Method.Invoke(queryMessage.QueryObject, queryMessage.Parameters);
+                queryMessage.Status = ProcessingStatus.Completed;
+            }
+            catch (Exception ex)
+            {
+                queryMessage.Status = ProcessingStatus.Failed;
+                var innerException = ex.InnerException;
+                if (innerException != null)
+                {
+                    queryMessage.Error = innerException;
+                    queryMessage.ErrorDispatchInfo = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(innerException);
+                }
+            }
+            finally
+            {
+                stopWatch.Stop();
+                queryMessage.ExecutionDuration = (int)stopWatch.ElapsedMilliseconds;
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task HandleAsync(IMessage message)
+        {
+            var queryMessage = message as QueryMessage;
+            if (queryMessage == null)
+            {
+                throw new ArgumentException("Message should be QueryMessage type");
+            }
+
+            // invoke method and resolve parameters if needed
+            var stopWatch = System.Diagnostics.Stopwatch.StartNew();
+            try
+            {
+                queryMessage.Result = queryMessage.Method.Invoke(queryMessage.QueryObject, queryMessage.Parameters);
+                var taskResult = queryMessage.Result as Task;
+                if (taskResult != null)
+                {
+                    await taskResult;
+                }
                 queryMessage.Status = ProcessingStatus.Completed;
             }
             catch (Exception ex)
