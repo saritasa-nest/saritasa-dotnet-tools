@@ -83,6 +83,12 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
                             nameof(EventExecutorMiddleware));
                     }
                 }
+                finally
+                {
+                    // Release handler.
+                    var disposable = handler as IDisposable;
+                    disposable?.Dispose();
+                }
             }
             stopWatch.Stop();
             if (exceptions.Count > 0)

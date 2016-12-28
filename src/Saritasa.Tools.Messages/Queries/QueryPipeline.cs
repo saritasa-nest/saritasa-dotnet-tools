@@ -170,6 +170,7 @@ namespace Saritasa.Tools.Messages.Queries
             var queryPipeline = new QueryPipeline();
             queryPipeline.AppendMiddlewares(new PipelineMiddlewares.QueryObjectResolverMiddleware(resolver));
             queryPipeline.AppendMiddlewares(new PipelineMiddlewares.QueryExecutorMiddleware());
+            queryPipeline.AppendMiddlewares(new PipelineMiddlewares.QueryObjectReleaseMiddleware());
             return queryPipeline;
         }
 
