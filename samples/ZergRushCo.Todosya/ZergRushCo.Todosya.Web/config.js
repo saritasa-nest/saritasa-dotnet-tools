@@ -94,8 +94,8 @@ module.exports = {
     // gulp: npm i gulp-postcss cssnano autoprefixer cssnext precss --save-dev
     useCssMin: false,
 
-    // gulp: npm i jshint gulp-jshint gulp-eslint --save-dev
-    useJsValidate: false,
+    // gulp: npm i jshint gulp-jshint gulp-eslint eslint-plugin-react babel-eslint eslint-plugin-html --save-dev
+    useJsValidate: true,
 
     // gulp: npm i gulp-csslint --save-dev
     useCssValidate: false,

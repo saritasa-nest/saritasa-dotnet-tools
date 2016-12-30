@@ -1,13 +1,13 @@
-﻿/*
+﻿'use strict';
+
+/*
  * Fake task service that needs only for development.
  */
 
-define(['jquery'], function ($) {
-    'use strict';
-
+define(['jquery'], function () {
     return {
         get: function() {
-            return new Promise(function (resolve, reject) {
+            return new Promise(function (resolve) {
                 resolve([{
                     Id: 1,
                     Text: 'Prepare presentation to frontend meeting',
@@ -24,7 +24,7 @@ define(['jquery'], function ($) {
         },
 
         getProjects: function() {
-            return new Promise(function (resolve, reject) {
+            return new Promise(function (resolve) {
                 resolve([{
                     Id: 1,
                     Name: 'Work (test)',
@@ -37,22 +37,22 @@ define(['jquery'], function ($) {
             });
         },
 
-        update: function(task) {
+        update: function() {
             return new Promise(function(resolve) {
                 resolve();
             });
         },
 
-        remove: function(task) {
+        remove: function() {
             return new Promise(function(resolve) {
                 resolve();
             });
         },
 
-        check: function(task) {
+        check: function() {
             return new Promise(function(resolve) {
                 resolve();
             });
         }
-    }
+    };
 });

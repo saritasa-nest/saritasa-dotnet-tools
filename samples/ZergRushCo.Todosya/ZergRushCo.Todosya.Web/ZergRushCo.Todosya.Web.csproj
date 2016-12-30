@@ -284,6 +284,7 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include=".eslintrc.js" />
     <Content Include="Frontend\App.js" />
     <Content Include="Frontend\config.js" />
     <Content Include="Frontend\jquery-noconflict.js" />
@@ -392,6 +393,14 @@
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\Newtonsoft.Json.dll" />
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include=".csslintrc" />
+    <Content Include=".jsbeautifyrc" />
+    <Content Include=".jscsrc" />
+    <Content Include=".jsdoc.conf.json" />
+    <Content Include=".jshintignore" />
+    <Content Include=".jshintrc" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

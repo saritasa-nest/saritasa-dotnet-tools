@@ -1,0 +1,17 @@
+{
+    // all rules 
+    // http://jscs.info/rules
+
+    "validateIndentation": 4,
+    "disallowCapitalizedComments": true,
+    "disallowEmptyBlocks": true,
+    "disallowIdentifierNames": ["temp", "foo"],
+    "disallowImplicitTypeConversion": ["numeric", "boolean", "binary", "string"],
+    "disallowKeywordsOnNewLine": ["else"],
+    "disallowMultiLineTernary": true,
+    "disallowMultipleLineBreaks": true,
+    "disallowMultipleLineStrings": true,
+    "disallowMultipleSpaces": {
+        "allowEOLComments": true
+    }
+}

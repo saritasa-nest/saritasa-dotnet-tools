@@ -1,11 +1,12 @@
-﻿/*
+﻿'use strict';
+
+/*
  * Tasks handlers.
  */
 
 define(['App', 'jquery', 'knockout'], function (App, $, ko) {
-    'use strict';
-
     return {
+
         /*
          * Returns all users tasks, returns promise.
          */
@@ -72,5 +73,5 @@ define(['App', 'jquery', 'knockout'], function (App, $, ko) {
                 contentType: App.contentTypeJson
             });
         }
-    }
+    };
 });

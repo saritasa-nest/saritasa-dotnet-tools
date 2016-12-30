@@ -29,9 +29,9 @@ if (!fs.existsSync(config.dest)) {
 gulp.task('default', function () {
     runSequence(
         config.useRequireJS ? 'bundle-app-requirejs' : 'bundle-app',
-        'bundle-bower-style',
-        'bundle-app-pages',
-        'bundle-style',
-        'custom',
-        'clean-temp');
+            'bundle-bower-style',
+            'bundle-app-pages',
+            'bundle-style',
+            'custom',
+            'clean-temp');
 });

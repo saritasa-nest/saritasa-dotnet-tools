@@ -2,6 +2,7 @@
  * Watch for .scss|.css|.js files update.
  *
  * 09/30/2016 [Ivan Kozhin] Initial version.
+ * 12/14/2016 [Ivan Kozhin] Formatting.
  */
 
 var gulp = require('gulp'),
@@ -9,8 +10,8 @@ var gulp = require('gulp'),
     config = require('../config.js');
 
 gulp.task('watch', function () {
-    gulp.watch([path.join(config.src, '**/*.js')], [
-        config.useRequireJS ? 'bundle-app-requirejs' : 'bundle-app',
-        'bundle-app-pages']);
+    gulp
+        .watch([path.join(config.src, '**/*.js')],
+            [config.useRequireJS ? 'bundle-app-requirejs' : 'bundle-app', 'bundle-app-pages']);
     gulp.watch([path.join(config.src, '**/*.scss')], ['bundle-style']);
 });

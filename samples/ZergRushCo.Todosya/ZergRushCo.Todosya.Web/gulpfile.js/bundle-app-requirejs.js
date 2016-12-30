@@ -2,6 +2,7 @@
  * Bundle all .js files using r.js . Can be used with minify and babel.
  *
  * 09/30/2016 [Ivan Kozhin] Initial version.
+ * 12/14/2016 [Ivan Kozhin] Formatting.
  */
 
 var gulp = require('gulp'),
@@ -57,7 +58,8 @@ gulp.task('bundle-app-requirejs', function () {
 
     // js
     var requirejsOptimize = require('gulp-requirejs-optimize');
-    var stream = gulp.src(config.entries.map((entry) => path.join(src, entry)))
+    var stream = gulp
+        .src(config.entries.map((entry) => path.join(src, entry)))
         .pipe(gulpif(config.useSourcemaps, sourcemaps.init()))
         .pipe(requirejsOptimize({
             mainConfigFile: requirejsConfigFile,
@@ -70,6 +72,6 @@ gulp.task('bundle-app-requirejs', function () {
             out: config.destName + '.js'
         }))
         .pipe(gulpif(config.useSourcemaps, sourcemaps.write()))
-        .pipe(gulp.dest(config.dest))
+        .pipe(gulp.dest(config.dest));
     return stream;
 });

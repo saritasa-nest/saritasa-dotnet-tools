@@ -1,4 +1,6 @@
-﻿requirejs.config({
+﻿'use strict';
+
+requirejs.config({
     urlArgs: 'bust=' + (new Date()).getTime(),
     paths: {
         'domReady': '../bower_components/domReady/domReady',

@@ -2,6 +2,7 @@
  * Remove config.temp directory.
  *
  * 09/30/2016 [Ivan Kozhin] Initial version.
+ * 12/14/2016 [Ivan Kozhin] Formatting.
  */
 
 var gulp = require('gulp'),
