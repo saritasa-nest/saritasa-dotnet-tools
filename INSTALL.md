@@ -27,13 +27,13 @@ Then you need to install our codestyle ruleset. To do that just run the followin
 
 ```
 cmd:
-@powershell -NoProfile -ExecutionPolicy Bypass -Command "iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/saritasa/SaritasaTools/develop/scripts/Saritasa.Tools/SaritasaRulesetInstall.ps1'))" && SET PATH=%PATH%;
+@powershell -NoProfile -ExecutionPolicy Bypass -Command "iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/saritasa/SaritasaTools/develop/scripts/SaritasaRulesetInstall.ps1'))" && SET PATH=%PATH%;
 
 PowerShell.exe (Ensure Get-ExecutionPolicy is at least RemoteSigned):
-iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/saritasa/SaritasaTools/develop/scripts/Saritasa.Tools/SaritasaRulesetInstall.ps1'))
+iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/saritasa/SaritasaTools/develop/scripts/SaritasaRulesetInstall.ps1'))
 
 PowerShell v3+ (Ensure Get-ExecutionPolicy is at least RemoteSigned):
-iwr https://raw.githubusercontent.com/saritasa/SaritasaTools/develop/scripts/Saritasa.Tools/SaritasaRulesetInstall.ps1 -UseBasicParsing | iex
+iwr https://raw.githubusercontent.com/saritasa/SaritasaTools/develop/scripts/SaritasaRulesetInstall.ps1 -UseBasicParsing | iex
 ```
 
 After that the "Saritasa Code Rules" will be available in "Code Analysis" tab in project properties.
