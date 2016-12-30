@@ -16,7 +16,7 @@ namespace Saritasa.Tools.Messages.Commands
         /// <summary>
         /// .ctor
         /// </summary>
-        private CommandHandlerNotFoundException() : base()
+        private CommandHandlerNotFoundException()
         {
         }
 

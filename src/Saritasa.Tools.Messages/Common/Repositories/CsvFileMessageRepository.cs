@@ -21,7 +21,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <summary>
         /// Logs path.
         /// </summary>
-        public string LogsPath { get; } = string.Empty;
+        public string LogsPath { get; }
 
         bool needWriteHeader;
 

@@ -35,7 +35,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
         MessageBinarySerializer currentBinarySerializer;
 
-        readonly string logsPath = string.Empty;
+        readonly string logsPath;
 
         readonly IObjectSerializer serializer;
 
@@ -183,7 +183,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                     System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat, System.Globalization.DateTimeStyles.None, out tmp))
                 {
                     tmp = tmp.AddDays(1);
-                    if (tmp < messageQuery.CreatedEndDate.Value)
+                    if (messageQuery.CreatedEndDate != null && tmp < messageQuery.CreatedEndDate.Value)
                     {
                         endDate = tmp;
                     }

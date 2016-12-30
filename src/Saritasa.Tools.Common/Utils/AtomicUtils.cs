@@ -28,7 +28,7 @@ namespace Saritasa.Tools.Common.Utils
             item2 = tmp;
         }
 
-        private static readonly object LockObject = new object();
+        private static readonly object lockObject = new object();
 
         /// <summary>
         /// Swaps values of two variables. Thread safe implementation.
@@ -41,7 +41,7 @@ namespace Saritasa.Tools.Common.Utils
 #endif
         public static void SafeSwap<T>(ref T item1, ref T item2)
         {
-            lock (LockObject)
+            lock (lockObject)
             {
                 T tmp = item1;
                 item1 = item2;

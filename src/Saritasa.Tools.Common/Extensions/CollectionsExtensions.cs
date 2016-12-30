@@ -129,11 +129,10 @@ namespace Saritasa.Tools.Common.Extensions
         public static IEnumerable<T> ChunkSelect<T>(this IEnumerable<T> source, int chunkSize = DefaultChunkSize)
         {
             var currentPosition = 0;
-            IEnumerable<T> subsource;
             bool hasRecords;
             do
             {
-                subsource = source.Skip(currentPosition).Take(chunkSize);
+                IEnumerable<T> subsource = source.Skip(currentPosition).Take(chunkSize);
                 hasRecords = false;
                 foreach (var item in subsource)
                 {

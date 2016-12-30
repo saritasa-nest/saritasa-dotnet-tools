@@ -169,10 +169,12 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
 
                 if (request.HttpMethod == HttpVerbPost)
                 {
-                    var message = new Message();
-                    message.Type = GetMessageTypeFromUri(request.Url);
-                    message.ContentType = GetMessageContentTypeFromUri(request.Url);
-                    message.CreatedAt = DateTime.Now;
+                    var message = new Message
+                    {
+                        Type = GetMessageTypeFromUri(request.Url),
+                        ContentType = GetMessageContentTypeFromUri(request.Url),
+                        CreatedAt = DateTime.Now
+                    };
 
                     response.ContentType = ContentTypeJson;
                     using (var streamReader = new StreamReader(request.InputStream))

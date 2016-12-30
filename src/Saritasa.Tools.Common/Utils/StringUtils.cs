@@ -139,8 +139,8 @@ namespace Saritasa.Tools.Common.Utils
             return success ? result : defaultValue;
         }
 
-        private static string[] trueValues = new[] { "yes", "y", "t", "1" };
-        private static string[] falseValues = new[] { "no", "n", "f", "0" };
+        private static readonly string[] trueValues = { "yes", "y", "t", "1" };
+        private static readonly string[] falseValues = { "no", "n", "f", "0" };
 
         /// <summary>
         /// Tries to convert target string to Boolean. If fails returns default value.

@@ -108,7 +108,7 @@ namespace Saritasa.Tools.Messages.Benchmark
         {
             var commandsPipeline = CommandPipeline.CreateDefaultPipeline(InterfacesResolver,
                 Assembly.GetAssembly(typeof(CreateUserCommand)))
-                .UseInternalResolver(true);
+                .UseInternalResolver();
             for (int i = 0; i < NumberOfInterations; i++)
             {
                 var cmd = new CreateUserCommand()

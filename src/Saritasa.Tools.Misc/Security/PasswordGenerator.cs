@@ -204,7 +204,7 @@ namespace Saritasa.Tools.Misc.Security
         /// <summary>
         /// Lock object for RandomService.
         /// </summary>
-        private static readonly object RandomServiceLock = new object();
+        private static readonly object randomServiceLock = new object();
 
         /// <summary>
         /// Characters pool that is use for password generation.
@@ -728,7 +728,7 @@ namespace Saritasa.Tools.Misc.Security
         {
 #if !PORTABLE
             var bytes = new byte[4];
-            lock (RandomServiceLock)
+            lock (randomServiceLock)
             {
                 RandomService.GetBytes(bytes);
             }

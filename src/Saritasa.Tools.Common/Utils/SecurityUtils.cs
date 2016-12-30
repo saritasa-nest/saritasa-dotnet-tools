@@ -123,7 +123,7 @@ namespace Saritasa.Tools.Common.Utils
             Sha512,
         }
 
-        private static readonly IDictionary<HashMethods, Func<string, string>> MethodsFuncMap =
+        private static readonly IDictionary<HashMethods, Func<string, string>> methodsFuncMap =
             new Dictionary<HashMethods, Func<string, string>>()
             {
                 { HashMethods.Md5, MD5 },
@@ -141,7 +141,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <returns>Hashed string.</returns>
         public static string Hash(string target, HashMethods method)
         {
-            return method.ToString().ToUpperInvariant() + "$" + MethodsFuncMap[method](target);
+            return method.ToString().ToUpperInvariant() + "$" + methodsFuncMap[method](target);
         }
 
         /// <summary>
@@ -168,7 +168,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 #endif
 
-        private static readonly uint[] Crc32Table = new uint[]
+        private static readonly uint[] crc32Table = new uint[]
         {
             0x00000000, 0x77073096, 0xEE0E612C, 0x990951BA, 0x076DC419, 0x706AF48F,
             0xE963A535, 0x9E6495A3, 0x0EDB8832, 0x79DCB8A4, 0xE0D5E91E, 0x97D2D988,
@@ -229,7 +229,7 @@ namespace Saritasa.Tools.Common.Utils
                 var len = target.Length;
                 for (var i = 0; i < len; i++)
                 {
-                    crc = (crc >> 8) ^ Crc32Table[(crc ^ (byte)target[i]) & 0xFF];
+                    crc = (crc >> 8) ^ crc32Table[(crc ^ (byte)target[i]) & 0xFF];
                 }
                 crc = (UInt32)(crc ^ (-1));
 

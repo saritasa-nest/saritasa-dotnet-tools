@@ -877,7 +877,7 @@ namespace Saritasa.Tools.Common.Utils
 
             return (key) =>
             {
-                TResult result = default(TResult);
+                TResult result;
                 bool needUpdate = false, strategiesAlreadyApplied = false;
 
                 // if result is already in cache and no need to refresh it just skip
@@ -892,7 +892,7 @@ namespace Saritasa.Tools.Common.Utils
                         bool ret = strategy(key, cache, false);
                         if (ret)
                         {
-                            needUpdate = ret;
+                            needUpdate = true;
                         }
                     }
                     if (!needUpdate)
@@ -923,7 +923,7 @@ namespace Saritasa.Tools.Common.Utils
                         bool ret = strategy(key, cache, true);
                         if (ret)
                         {
-                            needUpdate = ret;
+                            needUpdate = true;
                         }
                     }
                 }
@@ -948,9 +948,9 @@ namespace Saritasa.Tools.Common.Utils
             CacheStrategy<int, TResult> strategies = null,
             IDictionary<int, TResult> cache = null)
         {
-            var func2 = new Func<int, TResult>((arg) => func());
-            var memorized = Memoize(func2, strategies, cache);
-            return () => memorized(0);
+            var func2 = new Func<int, TResult>(arg => func());
+            var memoized = Memoize(func2, strategies, cache);
+            return () => memoized(0);
         }
 
         /// <summary>
@@ -972,7 +972,9 @@ namespace Saritasa.Tools.Common.Utils
             CacheStrategy<Tuple<T1, T2>, TResult> strategies = null,
             IDictionary<Tuple<T1, T2>, TResult> cache = null)
         {
-            return Memoize(func, strategies, cache);
+            var func2 = new Func<Tuple<T1, T2>, TResult>(arg => func(arg.Item1, arg.Item2));
+            var memoized = Memoize(func2, strategies, cache);
+            return (arg1, arg2) => memoized(new Tuple<T1, T2>(arg1, arg2));
         }
 
         /// <summary>
@@ -993,9 +995,11 @@ namespace Saritasa.Tools.Common.Utils
         public static Func<T1, T2, T3, TResult> Memoize<T1, T2, T3, TResult>(
             Func<T1, T2, T3, TResult> func,
             CacheStrategy<Tuple<T1, T2, T3>, TResult> strategies = null,
-            IDictionary<Tuple<T1, T2>, TResult> cache = null)
+            IDictionary<Tuple<T1, T2, T3>, TResult> cache = null)
         {
-            return Memoize(func, strategies, cache);
+            var func2 = new Func<Tuple<T1, T2, T3>, TResult>(arg => func(arg.Item1, arg.Item2, arg.Item3));
+            var memoized = Memoize(func2, strategies, cache);
+            return (arg1, arg2, arg3) => memoized(new Tuple<T1, T2, T3>(arg1, arg2, arg3));
         }
     }
 }

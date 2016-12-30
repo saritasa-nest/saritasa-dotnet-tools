@@ -45,7 +45,7 @@ namespace Saritasa.Tools.NLog
             }
         }
 #else
-        private static AsyncLocal<LoggerScope> localValue = new AsyncLocal<LoggerScope>();
+        private static readonly AsyncLocal<LoggerScope> localValue = new AsyncLocal<LoggerScope>();
 
         /// <summary>
         /// Logger scope related to current execution (thread) context.
@@ -72,8 +72,10 @@ namespace Saritasa.Tools.NLog
         public static IDisposable Push(object state)
         {
             var temp = Current;
-            Current = new LoggerScope(state);
-            Current.Parent = temp;
+            Current = new LoggerScope(state)
+            {
+                Parent = temp
+            };
 
             return new DisposableScope();
         }
