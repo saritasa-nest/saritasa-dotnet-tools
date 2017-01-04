@@ -16,6 +16,12 @@
     "summary": "Miscellaneous items.",
     "tags": [ "misc", "passwords" ]
   },
+  "dependencies": {
+    "StyleCop.Analyzers": {
+      "version": "1.0.0",
+      "type": "build"
+    }
+  },
   "frameworks": {
     "net452": {
     },
@@ -34,6 +40,7 @@
   },
   "buildOptions": {
     "keyFile": "../../tools/SaritasaTools.snk",
+    "additionalArguments": [ "/ruleset:../../tools/Saritasa.ruleset" ],
     "xmlDoc": true
   }
 }

@@ -56,6 +56,7 @@ namespace Saritasa.Tools.Messages.Abstractions
                 var handle = CallContext.LogicalGetData(fieldKey) as ObjectHandle;
                 return (MessageExecutionContext) handle?.Unwrap();
             }
+
             set
             {
                 CallContext.LogicalSetData(fieldKey, new ObjectHandle(value));

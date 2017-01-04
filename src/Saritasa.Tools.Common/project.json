@@ -16,6 +16,12 @@
     "summary": "Various handy extensions and utils.",
     "tags": [ "flow", "datetime", "parsing", "validation", "pagination", "memoize", "cas" ]
   },
+  "dependencies": {
+    "StyleCop.Analyzers": {
+      "version": "1.0.0",
+      "type": "build"
+    }
+  },
   "frameworks": {
     "net40": {
     },
@@ -46,6 +52,7 @@
   },
   "buildOptions": {
     "keyFile": "../../tools/SaritasaTools.snk",
+    "additionalArguments": [ "/ruleset:../../tools/Saritasa.ruleset" ],
     "xmlDoc": true
   }
 }

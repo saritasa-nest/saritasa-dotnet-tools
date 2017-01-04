@@ -39,6 +39,7 @@ namespace Saritasa.Tools.NLog
                 var handle = CallContext.LogicalGetData(FieldKey) as ObjectHandle;
                 return (LoggerScope) handle?.Unwrap();
             }
+
             set
             {
                 CallContext.LogicalSetData(FieldKey, new ObjectHandle(value));

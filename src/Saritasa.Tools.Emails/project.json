@@ -16,6 +16,12 @@
     "summary": "Emails sending using pipeline and interceptors.",
     "tags": [ "emails" ]
   },
+  "dependencies": {
+    "StyleCop.Analyzers": {
+      "version": "1.0.0",
+      "type": "build"
+    }
+  },
   "frameworks": {
     "net452": {
     },
@@ -39,6 +45,7 @@
   },
   "buildOptions": {
     "keyFile": "../../tools/SaritasaTools.snk",
+    "additionalArguments": [ "/ruleset:../../tools/Saritasa.ruleset" ],
     "xmlDoc": true
   }
 }

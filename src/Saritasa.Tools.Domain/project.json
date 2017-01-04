@@ -16,6 +16,12 @@
     "summary": "Domain abstractions.",
     "tags": [ "unit of work", "repository", "domain events" ]
   },
+  "dependencies": {
+    "StyleCop.Analyzers": {
+      "version": "1.0.0",
+      "type": "build"
+    }
+  },
   "frameworks": {
     "net452": {
       "frameworkAssemblies": {
@@ -42,6 +48,7 @@
   },
   "buildOptions": {
     "keyFile": "../../tools/SaritasaTools.snk",
+    "additionalArguments": [ "/ruleset:../../tools/Saritasa.ruleset" ],
     "xmlDoc": true
   }
 }

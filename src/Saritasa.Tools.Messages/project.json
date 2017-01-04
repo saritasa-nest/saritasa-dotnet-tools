@@ -51,10 +51,15 @@
   "dependencies": {
     "Newtonsoft.Json": "9.0.1",
     "Saritasa.Tools.Messages.Abstractions": "*",
-    "Saritasa.Tools.Domain": "*"
+    "Saritasa.Tools.Domain": "*",
+    "StyleCop.Analyzers": {
+      "version": "1.0.0",
+      "type": "build"
+    }
   },
   "buildOptions": {
     "keyFile": "../../tools/SaritasaTools.snk",
+    "additionalArguments": [ "/ruleset:../../tools/Saritasa.ruleset" ],
     "xmlDoc": true
   }
 }
