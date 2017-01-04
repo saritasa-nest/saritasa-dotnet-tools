@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Common.Utils
@@ -10,6 +10,7 @@ namespace Saritasa.Tools.Common.Utils
 #if PORTABLE || NETSTANDARD1_2 || NETSTANDARD1_6 || NETCOREAPP1_0 || NETCOREAPP1_1
     using System.Reflection;
 #endif
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Provides methods to control execution flow.
@@ -40,7 +41,10 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="retryStrategy">Retry strategy to use.</param>
         /// <param name="transientExceptions">Set of exceptions on which repeat occurs. If null retry will appear on any exception.</param>
         /// <returns>Specified user type.</returns>
-        public static T Retry<T>(Func<T> action, RetryStrategy retryStrategy, params Type[] transientExceptions)
+        public static T Retry<T>(
+            [NotNull] Func<T> action,
+            [NotNull] RetryStrategy retryStrategy,
+            params Type[] transientExceptions)
         {
             Guard.IsNotNull(action, nameof(action));
             Guard.IsNotNull(retryStrategy, nameof(retryStrategy));
@@ -86,7 +90,10 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="action">Action to execute.</param>
         /// <param name="retryStrategy">Retry strategy.</param>
         /// <param name="transientExceptions">Set of exceptions on which repeat occurs. If null retry will appear on any exception.</param>
-        public static void Retry(Action action, RetryStrategy retryStrategy, params Type[] transientExceptions)
+        public static void Retry(
+            [NotNull] Action action,
+            [NotNull] RetryStrategy retryStrategy,
+            params Type[] transientExceptions)
         {
             FlowUtils.Retry(
                 () =>
@@ -110,8 +117,8 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="transientExceptions">Transient exceptions.</param>
         /// <returns>Task that specified when action executed successfully or with error after all retries.</returns>
         public static Task<T> RetryAsync<T>(
-            Func<Task<T>> action,
-            RetryStrategy retryStrategy,
+            [NotNull] Func<Task<T>> action,
+            [NotNull] RetryStrategy retryStrategy,
             CancellationToken cancellationToken = default(CancellationToken),
             params Type[] transientExceptions)
         {
@@ -127,7 +134,7 @@ namespace Saritasa.Tools.Common.Utils
             CancellationToken cancellationToken = default(CancellationToken),
             params Type[] transientExceptions)
         {
-            // based on TPL police we should check whether action already cancelled
+            // Based on TPL police we should check whether action already cancelled.
             if (cancellationToken.IsCancellationRequested)
             {
                 var tcs1 = new TaskCompletionSource<T>();
@@ -142,7 +149,7 @@ namespace Saritasa.Tools.Common.Utils
             }
             catch (Exception executedException)
             {
-                // check sync call, if exception occurs before task creation
+                // Check sync call, if exception occurs before task creation.
                 bool isSubclass = IsSubtypeOf(executedException, transientExceptions);
                 if (isSubclass == false)
                 {
@@ -153,7 +160,7 @@ namespace Saritasa.Tools.Common.Utils
                 return tcs2.Task;
             }
 
-            // success case
+            // Success case.
             if (task.Status == TaskStatus.RanToCompletion)
             {
                 return task;
@@ -162,7 +169,7 @@ namespace Saritasa.Tools.Common.Utils
             return task.ContinueWith(
                 new Func<Task<T>, Task<T>>((Task<T> runningTask) =>
                 {
-                    // success case
+                    // Success case.
                     if (!runningTask.IsFaulted || cancellationToken.IsCancellationRequested)
                     {
                         return runningTask;
@@ -214,14 +221,15 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="transientExceptions">Transient exceptions.</param>
         /// <returns>Task that specified when action executed successfully or with error after all retries.</returns>
         public static Task RetryAsync(
-            Func<Task> action,
-            RetryStrategy retryStrategy,
+            [NotNull] Func<Task> action,
+            [NotNull] RetryStrategy retryStrategy,
             CancellationToken cancellationToken = default(CancellationToken),
             params Type[] transientExceptions)
         {
             Guard.IsNotNull(action, nameof(action));
             Guard.IsNotNull(retryStrategy, nameof(retryStrategy));
-            // try to convert generic task to non-generic
+
+            // Try to convert generic task to non-generic.
             Func<Task<int>> nonGenericAction = () =>
             {
                 var tcs = new TaskCompletionSource<int>();
@@ -257,15 +265,15 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="transientExceptions">Transient exceptions.</param>
         /// <returns>Task that specified when action executed successfully or with error after all retries.</returns>
         public static async Task<T> RetryAsync<T>(
-            Func<Task<T>> action,
-            RetryStrategy retryStrategy,
+            [NotNull] Func<Task<T>> action,
+            [NotNull] RetryStrategy retryStrategy,
             CancellationToken cancellationToken = default(CancellationToken),
             params Type[] transientExceptions)
         {
             Guard.IsNotNull(action, nameof(action));
             Guard.IsNotNull(retryStrategy, nameof(retryStrategy));
 
-            // based on TPL police we should check whether action already cancelled
+            // Based on TPL police we should check whether action already cancelled.
             if (cancellationToken.IsCancellationRequested)
             {
 #if NET46
@@ -318,8 +326,8 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="transientExceptions">Transient exceptions.</param>
         /// <returns>Task that specified when action executed successfully or with error after all retries.</returns>
         public static async Task RetryAsync(
-            Func<Task> action,
-            RetryStrategy retryStrategy,
+            [NotNull] Func<Task> action,
+            [NotNull] RetryStrategy retryStrategy,
             CancellationToken cancellationToken = default(CancellationToken),
             params Type[] transientExceptions)
         {
@@ -510,7 +518,7 @@ namespace Saritasa.Tools.Common.Utils
                 }
                 catch (Exception)
                 {
-                    // ignored
+                    // Ignored.
                 }
                 return false;
             };
@@ -862,7 +870,7 @@ namespace Saritasa.Tools.Common.Utils
         /// is not thread safe.</param>
         /// <returns>Delegate the able to cache.</returns>
         public static Func<TKey, TResult> Memoize<TKey, TResult>(
-            Func<TKey, TResult> func,
+            [NotNull] Func<TKey, TResult> func,
             CacheStrategy<TKey, TResult> strategies = null,
             IDictionary<TKey, TResult> cache = null)
         {
@@ -902,7 +910,7 @@ namespace Saritasa.Tools.Common.Utils
                     strategiesAlreadyApplied = true;
                 }
 
-                // call user func
+                // Call user func.
                 try
                 {
                     result = func(key);
@@ -914,12 +922,12 @@ namespace Saritasa.Tools.Common.Utils
                     result = exc.Result;
                 }
 
-                // if we didn't call strategies yet
+                // If we didn't call strategies yet.
                 if (!strategiesAlreadyApplied)
                 {
                     foreach (CacheStrategy<TKey, TResult> strategy in strategies.GetInvocationList())
                     {
-                        // we have to go thru whole list because some strategies may refresh cache
+                        // We have to go thru whole list because some strategies may refresh cache.
                         bool ret = strategy(key, cache, true);
                         if (ret)
                         {
@@ -944,7 +952,7 @@ namespace Saritasa.Tools.Common.Utils
         /// is not thread safe.</param>
         /// <returns>Delegate the able to cache.</returns>
         public static Func<TResult> Memoize<TResult>(
-            Func<TResult> func,
+            [NotNull] Func<TResult> func,
             CacheStrategy<int, TResult> strategies = null,
             IDictionary<int, TResult> cache = null)
         {
@@ -968,7 +976,7 @@ namespace Saritasa.Tools.Common.Utils
         /// is not thread safe.</param>
         /// <returns>Delegate the able to cache.</returns>
         public static Func<T1, T2, TResult> Memoize<T1, T2, TResult>(
-            Func<T1, T2, TResult> func,
+            [NotNull] Func<T1, T2, TResult> func,
             CacheStrategy<Tuple<T1, T2>, TResult> strategies = null,
             IDictionary<Tuple<T1, T2>, TResult> cache = null)
         {
@@ -993,7 +1001,7 @@ namespace Saritasa.Tools.Common.Utils
         /// is not thread safe.</param>
         /// <returns>Delegate the able to cache.</returns>
         public static Func<T1, T2, T3, TResult> Memoize<T1, T2, T3, TResult>(
-            Func<T1, T2, T3, TResult> func,
+            [NotNull] Func<T1, T2, T3, TResult> func,
             CacheStrategy<Tuple<T1, T2, T3>, TResult> strategies = null,
             IDictionary<Tuple<T1, T2, T3>, TResult> cache = null)
         {

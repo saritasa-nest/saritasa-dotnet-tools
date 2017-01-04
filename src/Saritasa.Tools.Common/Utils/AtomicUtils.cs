@@ -1,10 +1,12 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Common.Utils
 {
     using System;
+#if !NET40 && !NET35
     using System.Runtime.CompilerServices;
+#endif
     using System.Threading;
 
     /// <summary>

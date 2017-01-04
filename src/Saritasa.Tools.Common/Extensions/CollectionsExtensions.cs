@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Common.Extensions
@@ -6,6 +6,7 @@ namespace Saritasa.Tools.Common.Extensions
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Sort order enumeration.
@@ -40,8 +41,8 @@ namespace Saritasa.Tools.Common.Extensions
         /// <param name="sortOrder">Sort order.</param>
         /// <returns>An System.Linq.IOrderedEnumerable whose elements are sorted according to a key.</returns>
         public static IOrderedEnumerable<TSource> Order<TSource, TKey>(
-            this IEnumerable<TSource> source,
-            Func<TSource, TKey> keySelector,
+            [NotNull] this IEnumerable<TSource> source,
+            [NotNull] Func<TSource, TKey> keySelector,
             SortOrder sortOrder)
         {
             return sortOrder == SortOrder.Asc ? source.OrderBy(keySelector) : source.OrderByDescending(keySelector);
@@ -58,9 +59,9 @@ namespace Saritasa.Tools.Common.Extensions
         /// <param name="sortOrder">Sort order.</param>
         /// <returns>An System.Linq.IOrderedEnumerable whose elements are sorted according to a key.</returns>
         public static IOrderedEnumerable<TSource> Order<TSource, TKey>(
-            this IEnumerable<TSource> source,
-            Func<TSource, TKey> keySelector,
-            IComparer<TKey> comparer,
+            [NotNull] this IEnumerable<TSource> source,
+            [NotNull] Func<TSource, TKey> keySelector,
+            [NotNull] IComparer<TKey> comparer,
             SortOrder sortOrder)
         {
             return sortOrder == SortOrder.Asc ? source.OrderBy(keySelector, comparer) : source.OrderByDescending(keySelector, comparer);
@@ -75,7 +76,7 @@ namespace Saritasa.Tools.Common.Extensions
         /// <param name="pageSize">Page size.</param>
         /// <returns>Paged enumerable.</returns>
         public static PagedEnumerable<T> GetPaged<T>(
-            this IEnumerable<T> source,
+            [NotNull] this IEnumerable<T> source,
             int page = PagedEnumerable<T>.DefaultCurrentPage,
             int pageSize = PagedEnumerable<T>.DefaultPageSize)
         {
@@ -88,7 +89,9 @@ namespace Saritasa.Tools.Common.Extensions
         /// <param name="source">Source list.</param>
         /// <param name="chunkSize">Chunk size.</param>
         /// <returns>Enumeration of iterators.</returns>
-        public static IEnumerable<IEnumerable<T>> ChunkSelectRange<T>(this IEnumerable<T> source, int chunkSize = DefaultChunkSize)
+        public static IEnumerable<IEnumerable<T>> ChunkSelectRange<T>(
+            [NotNull] this IEnumerable<T> source,
+            int chunkSize = DefaultChunkSize)
         {
             var originalSource = source;
             while (originalSource.Any())
@@ -106,7 +109,9 @@ namespace Saritasa.Tools.Common.Extensions
         /// <param name="source">Source list.</param>
         /// <param name="chunkSize">Chunk size.</param>
         /// <returns>Enumeration of queryables.</returns>
-        public static IEnumerable<IQueryable<T>> ChunkSelectRange<T>(this IQueryable<T> source, int chunkSize = DefaultChunkSize)
+        public static IEnumerable<IQueryable<T>> ChunkSelectRange<T>(
+            [NotNull] this IQueryable<T> source,
+            int chunkSize = DefaultChunkSize)
         {
             long totalNumberOfElements = source.LongCount();
             int currentPosition = 0;
@@ -126,7 +131,9 @@ namespace Saritasa.Tools.Common.Extensions
         /// <param name="source">Source list.</param>
         /// <param name="chunkSize">Chunk size.</param>
         /// <returns>Items of type T.</returns>
-        public static IEnumerable<T> ChunkSelect<T>(this IEnumerable<T> source, int chunkSize = DefaultChunkSize)
+        public static IEnumerable<T> ChunkSelect<T>(
+            [NotNull] this IEnumerable<T> source,
+            int chunkSize = DefaultChunkSize)
         {
             var currentPosition = 0;
             bool hasRecords;
@@ -151,7 +158,9 @@ namespace Saritasa.Tools.Common.Extensions
         /// <param name="source">Source list.</param>
         /// <param name="chunkSize">Chunk size.</param>
         /// <returns>Items of type T.</returns>
-        public static IEnumerable<T> ChunkSelect<T>(this IQueryable<T> source, int chunkSize = DefaultChunkSize)
+        public static IEnumerable<T> ChunkSelect<T>(
+            [NotNull] this IQueryable<T> source,
+            int chunkSize = DefaultChunkSize)
         {
             int currentPosition = 0;
             bool hasRecords;
@@ -177,7 +186,9 @@ namespace Saritasa.Tools.Common.Extensions
         /// </summary>
         /// <param name="target">Target collection.</param>
         /// <param name="action">Action for execute on each item.</param>
-        public static void ForEach<T>(this IEnumerable<T> target, Action<T> action)
+        public static void ForEach<T>(
+            [NotNull] this IEnumerable<T> target,
+            [NotNull] Action<T> action)
         {
             foreach (T item in target)
             {

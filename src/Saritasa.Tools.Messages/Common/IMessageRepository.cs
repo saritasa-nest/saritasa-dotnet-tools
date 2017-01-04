@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Messages.Common
@@ -6,6 +6,7 @@ namespace Saritasa.Tools.Messages.Common
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using JetBrains.Annotations;
     using Abstractions;
 
     /// <summary>
@@ -17,14 +18,14 @@ namespace Saritasa.Tools.Messages.Common
         /// Add message.
         /// </summary>
         /// <param name="message">Message.</param>
-        Task AddAsync(IMessage message);
+        Task AddAsync([NotNull] IMessage message);
 
         /// <summary>
         /// Get messages filtered by expression.
         /// </summary>
         /// <param name="messageQuery">Query.</param>
         /// <returns>Enumerable of messages.</returns>
-        Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery);
+        Task<IEnumerable<IMessage>> GetAsync([NotNull] MessageQuery messageQuery);
 
         /// <summary>
         /// Save internal state to dict. The methpd represents the ability of message repository to
@@ -32,6 +33,6 @@ namespace Saritasa.Tools.Messages.Common
         /// method to recreate itself from dict.
         /// </summary>
         /// <param name="dict">Dictionary of properties.</param>
-        void SaveState(IDictionary<string, object> dict);
+        void SaveState([NotNull] IDictionary<string, object> dict);
     }
 }

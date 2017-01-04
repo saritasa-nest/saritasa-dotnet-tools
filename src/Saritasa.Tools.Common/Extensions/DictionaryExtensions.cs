@@ -5,6 +5,7 @@ namespace Saritasa.Tools.Common.Extensions
 {
     using System;
     using System.Collections.Generic;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Dictionary extensions.
@@ -20,7 +21,8 @@ namespace Saritasa.Tools.Common.Extensions
         /// <param name="target">Target dictionary.</param>
         /// <param name="key">Key.</param>
         /// <param name="defaultValue">Default value.</param>
-        public static TValue GetValueDefault<TKey, TValue>(this IDictionary<TKey, TValue> target, TKey key,
+        public static TValue GetValueDefault<TKey, TValue>(
+            [NotNull] this IDictionary<TKey, TValue> target, TKey key,
             TValue defaultValue = default(TValue))
         {
             TValue value;

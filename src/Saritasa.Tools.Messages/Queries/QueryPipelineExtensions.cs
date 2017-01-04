@@ -1,8 +1,9 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Messages.Queries
 {
+    using JetBrains.Annotations;
     using Common;
     using Abstractions;
 
@@ -17,7 +18,8 @@ namespace Saritasa.Tools.Messages.Queries
         /// <param name="queryPipeline">Query pipeline.</param>
         /// <param name="resolveMethodParameters">Resolve method parameters.</param>
         /// <returns>Query pipeline.</returns>
-        public static IQueryPipeline UseInternalResolver(this IQueryPipeline queryPipeline,
+        public static IQueryPipeline UseInternalResolver(
+            [NotNull] this IQueryPipeline queryPipeline,
             bool resolveMethodParameters = true)
         {
             var middleware = (PipelineMiddlewares.QueryObjectResolverMiddleware)queryPipeline.GetMiddlewareById("QueryResolver");

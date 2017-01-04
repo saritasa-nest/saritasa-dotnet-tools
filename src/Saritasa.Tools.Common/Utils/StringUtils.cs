@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Common.Utils
@@ -9,6 +9,7 @@ namespace Saritasa.Tools.Common.Utils
     using System.Globalization;
     using System.Linq;
     using System.Text.RegularExpressions;
+    using JetBrains.Annotations;
     using Extensions;
 
     /// <summary>
@@ -23,7 +24,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="maxLength">Max length.</param>
         /// <returns>Truncated string.</returns>
         [DebuggerStepThrough]
-        public static string Truncate(string target, int maxLength)
+        public static string Truncate([NotNull] string target, int maxLength)
         {
             Guard.IsNotEmpty(target, nameof(target));
             Guard.IsNotNegativeOrZero(maxLength, nameof(maxLength));
@@ -37,7 +38,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="values">The values.</param>
         /// <returns>Concatenated string.</returns>
         [DebuggerStepThrough]
-        public static string JoinIgnoreEmpty(string separator, params string[] values)
+        public static string JoinIgnoreEmpty([NotNull] string separator, params string[] values)
         {
             Guard.IsNotEmpty(separator, nameof(separator));
             Guard.IsNotNull(values, nameof(values));
@@ -51,7 +52,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="values">The values.</param>
         /// <returns>Concatenated string.</returns>
         [DebuggerStepThrough]
-        public static string JoinIgnoreEmpty(string separator, IEnumerable<string> values)
+        public static string JoinIgnoreEmpty([NotNull] string separator, [NotNull] IEnumerable<string> values)
         {
             Guard.IsNotEmpty(separator, nameof(separator));
             Guard.IsNotNull(values, nameof(values));
@@ -64,7 +65,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="pattern">The wildcards pattern.</param>
         /// <returns></returns>
         [DebuggerStepThrough]
-        public static string WildcardToRegex(string pattern)
+        public static string WildcardToRegex([NotNull] string pattern)
         {
             Guard.IsNotEmpty(pattern, nameof(pattern));
             return ("^" + Regex.Escape(pattern)).Replace("\\*", ".*").Replace("\\?", ".") + "$";
@@ -76,7 +77,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="target">Target string.</param>
         /// <returns>Reversed string.</returns>
         [DebuggerStepThrough]
-        public static string Reverse(string target)
+        public static string Reverse([NotNull] string target)
         {
             Guard.IsNotEmpty(target, nameof(target));
 
@@ -94,7 +95,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="length">The number of characters in the substring.</param>
         /// <returns>Substring.</returns>
         [DebuggerStepThrough]
-        public static string SafeSubstring(string target, int startIndex, int length = 0)
+        public static string SafeSubstring([NotNull] string target, int startIndex, int length = 0)
         {
             Guard.IsNotEmpty(target, nameof(target));
 
@@ -121,7 +122,7 @@ namespace Saritasa.Tools.Common.Utils
         /// Converts the string to snake case style (HelloWorld -> Hello_World). The string will have underscore (_) in front of
         /// each upper case letter. The function does not remove spaces and does not make string lower case.
         /// </summary>
-        public static string ConvertToSnakeCase(string target)
+        public static string ConvertToSnakeCase([NotNull] string target)
         {
             return string.Concat(target.Select((ch, index) => index > 0 && char.IsUpper(ch) ? "_" + ch.ToString() : ch.ToString()).ToArray());
         }

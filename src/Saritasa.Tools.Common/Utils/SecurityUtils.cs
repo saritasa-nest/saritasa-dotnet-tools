@@ -8,6 +8,7 @@ namespace Saritasa.Tools.Common.Utils
     using System.Diagnostics;
     using System.Globalization;
     using System.Text;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Shortcuts for hash generation to string.
@@ -21,8 +22,9 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="target">String to be hashed.</param>
         /// <returns>String's MD5 hash.</returns>
         [DebuggerStepThrough]
-        public static string MD5(string target)
+        public static string MD5([NotNull] string target)
         {
+            Guard.IsNotNull(target, nameof(target));
             byte[] bytes = Encoding.UTF8.GetBytes(target);
             using (var cryptoServiceProvider = System.Security.Cryptography.MD5.Create())
             {
@@ -41,8 +43,9 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="target">String to be hashed.</param>
         /// <returns>String's SHA1 hash.</returns>
-        public static string Sha1(string target)
+        public static string Sha1([NotNull] string target)
         {
+            Guard.IsNotNull(target, nameof(target));
             using (var hasher = System.Security.Cryptography.SHA1.Create())
             {
                 var data = hasher.ComputeHash(Encoding.UTF8.GetBytes(target));
@@ -55,8 +58,9 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="target">String to be hashed.</param>
         /// <returns>String's SHA256 hash.</returns>
-        public static string Sha256(string target)
+        public static string Sha256([NotNull] string target)
         {
+            Guard.IsNotNull(target, nameof(target));
             using (var hasher = System.Security.Cryptography.SHA256.Create())
             {
                 var data = hasher.ComputeHash(Encoding.UTF8.GetBytes(target));
@@ -69,8 +73,9 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="target">String to be hashed.</param>
         /// <returns>String's SHA384 hash.</returns>
-        public static string Sha384(string target)
+        public static string Sha384([NotNull] string target)
         {
+            Guard.IsNotNull(target, nameof(target));
             using (var hasher = System.Security.Cryptography.SHA384.Create())
             {
                 var data = hasher.ComputeHash(Encoding.UTF8.GetBytes(target));
@@ -83,8 +88,9 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="target">String to be hashed.</param>
         /// <returns>String's SHA512 hash.</returns>
-        public static string Sha512(string target)
+        public static string Sha512([NotNull] string target)
         {
+            Guard.IsNotNull(target, nameof(target));
             using (var hasher = System.Security.Cryptography.SHA512.Create())
             {
                 var data = hasher.ComputeHash(Encoding.UTF8.GetBytes(target));
@@ -139,8 +145,9 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="target">String to hash.</param>
         /// <param name="method">Method to use to hash.</param>
         /// <returns>Hashed string.</returns>
-        public static string Hash(string target, HashMethods method)
+        public static string Hash([NotNull] string target, HashMethods method)
         {
+            Guard.IsNotNull(target, nameof(target));
             return method.ToString().ToUpperInvariant() + "$" + methodsFuncMap[method](target);
         }
 
@@ -150,8 +157,9 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="target">Target non-hashed string.</param>
         /// <param name="hashedStrToCheck">Hashed string with hash method. Should be hashed with Hash() method.</param>
         /// <returns>True if string is correct.</returns>
-        public static bool CheckHash(string target, string hashedStrToCheck)
+        public static bool CheckHash([NotNull] string target, string hashedStrToCheck)
         {
+            Guard.IsNotNull(target, nameof(target));
             var separatorIndex = hashedStrToCheck.IndexOf('$');
             if (separatorIndex < 0)
             {
@@ -221,8 +229,9 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="target">String to be hashed.</param>
         /// <returns>String's CRC32 hash.</returns>
         [CLSCompliant(false)]
-        public static UInt64 Crc32(string target)
+        public static UInt64 Crc32([NotNull] string target)
         {
+            Guard.IsNotNull(target, nameof(target));
             unchecked
             {
                 var crc = (UInt32)(((UInt32)0) ^ (-1));

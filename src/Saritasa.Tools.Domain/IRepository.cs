@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Domain
@@ -6,6 +6,7 @@ namespace Saritasa.Tools.Domain
     using System;
     using System.Collections.Generic;
     using System.Linq.Expressions;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Repository abstraction.
@@ -27,7 +28,9 @@ namespace Saritasa.Tools.Domain
         /// <param name="keyValues">Entity ids.</param>
         /// <typeparam name="TProperty">Property type.</typeparam>
         /// <returns>Entity instance.</returns>
-        TEntity Get<TProperty>(IEnumerable<Expression<Func<TEntity, TProperty>>> includes, params object[] keyValues);
+        TEntity Get<TProperty>(
+            [NotNull] IEnumerable<Expression<Func<TEntity, TProperty>>> includes,
+            params object[] keyValues);
 
         /// <summary>
         /// Get all entities of specified type.
@@ -41,14 +44,15 @@ namespace Saritasa.Tools.Domain
         /// <param name="includes">Relations to include.</param>
         /// <typeparam name="TProperty">Property type.</typeparam>
         /// <returns>Enumerable of entities.</returns>
-        IEnumerable<TEntity> GetAll<TProperty>(IEnumerable<Expression<Func<TEntity, TProperty>>> includes);
+        IEnumerable<TEntity> GetAll<TProperty>(
+            [NotNull] IEnumerable<Expression<Func<TEntity, TProperty>>> includes);
 
         /// <summary>
         /// Find for range of entities based on predicate.
         /// </summary>
         /// <param name="predicate">Filter predicate.</param>
         /// <returns>Enumerable of enitites.</returns>
-        IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate);
+        IEnumerable<TEntity> Find([NotNull] Expression<Func<TEntity, bool>> predicate);
 
         /// <summary>
         /// Finds for range of entities based on predicate.
@@ -57,30 +61,32 @@ namespace Saritasa.Tools.Domain
         /// <param name="includes">Relations to include</param>
         /// <typeparam name="TProperty">Property type.</typeparam>
         /// <returns>Enumerable of enitites.</returns>
-        IEnumerable<TEntity> Find<TProperty>(Expression<Func<TEntity, bool>> predicate, IEnumerable<Expression<Func<TEntity, TProperty>>> includes);
+        IEnumerable<TEntity> Find<TProperty>(
+            [NotNull] Expression<Func<TEntity, bool>> predicate,
+            [NotNull] IEnumerable<Expression<Func<TEntity, TProperty>>> includes);
 
         /// <summary>
         /// Add entity.
         /// </summary>
         /// <param name="entity">Entity instance.</param>
-        void Add(TEntity entity);
+        void Add([NotNull] TEntity entity);
 
         /// <summary>
         /// Add range of entities.
         /// </summary>
         /// <param name="entities">Entities.</param>
-        void AddRange(IEnumerable<TEntity> entities);
+        void AddRange([NotNull] IEnumerable<TEntity> entities);
 
         /// <summary>
         /// Remove entity instance.
         /// </summary>
         /// <param name="entity">Entity instance.</param>
-        void Remove(TEntity entity);
+        void Remove([NotNull] TEntity entity);
 
         /// <summary>
         /// Remove range of entities.
         /// </summary>
         /// <param name="entities">Entities.</param>
-        void RemoveRange(IEnumerable<TEntity> entities);
+        void RemoveRange([NotNull] IEnumerable<TEntity> entities);
     }
 }

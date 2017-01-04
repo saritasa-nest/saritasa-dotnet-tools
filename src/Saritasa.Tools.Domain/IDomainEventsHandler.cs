@@ -1,8 +1,10 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Domain
 {
+    using JetBrains.Annotations;
+
     /// <summary>
     /// Interface for event handlers.
     /// </summary>
@@ -10,9 +12,9 @@ namespace Saritasa.Tools.Domain
     public interface IDomainEventHandler<in TEvent> where TEvent : class
     {
         /// <summary>
-        /// Handle (call methods) for domain event of type T.
+        /// Handle (call methods) for domain event of type TEvent.
         /// </summary>
         /// <param name="event">Domain event type.</param>
-        void Handle(TEvent @event);
+        void Handle([NotNull] TEvent @event);
     }
 }

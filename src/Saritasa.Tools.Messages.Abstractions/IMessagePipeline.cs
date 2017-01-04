@@ -1,10 +1,11 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Messages.Abstractions
 {
     using System;
     using System.Collections.Generic;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Default message pipeline.
@@ -33,7 +34,7 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// </summary>
         /// <param name="id">Middleware id.</param>
         /// <returns>Middleware or null if not found.</returns>
-        IMessagePipelineMiddleware GetMiddlewareById(string id);
+        IMessagePipelineMiddleware GetMiddlewareById([NotNull] string id);
 
         /// <summary>
         /// Insert middleware after specified one. If not specified it will be inserted as last.
@@ -41,7 +42,9 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// <param name="middleware">Middleware to insert.</param>
         /// <param name="insertAfterId">Insert after middleware with specified id. If null will be inserted
         /// as last.</param>
-        void InsertMiddlewareAfter(IMessagePipelineMiddleware middleware, string insertAfterId = null);
+        void InsertMiddlewareAfter(
+            [NotNull] IMessagePipelineMiddleware middleware,
+            string insertAfterId = null);
 
         /// <summary>
         /// Insert middleware before specified one. If not specified it will be inserted as first.
@@ -49,18 +52,20 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// <param name="middleware">Middleware to insert.</param>
         /// <param name="insertBeforeId">Insert before middleware with specified id. If null will be inserted
         /// as first.</param>
-        void InsertMiddlewareBefore(IMessagePipelineMiddleware middleware, string insertBeforeId);
+        void InsertMiddlewareBefore(
+            [NotNull] IMessagePipelineMiddleware middleware,
+            string insertBeforeId);
 
         /// <summary>
         /// Remove middleware by id.
         /// </summary>
         /// <param name="id">Middleware id.</param>
-        void RemoveMiddleware(string id);
+        void RemoveMiddleware([NotNull] string id);
 
         /// <summary>
         /// Process raw message, for example, from deserialization.
         /// </summary>
         /// <param name="message">Message.</param>
-        void ProcessRaw(IMessage message);
+        void ProcessRaw([NotNull] IMessage message);
     }
 }

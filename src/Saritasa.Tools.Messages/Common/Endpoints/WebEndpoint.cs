@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 #if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
@@ -10,6 +10,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
+    using JetBrains.Annotations;
     using Newtonsoft.Json;
     using Abstractions;
     using Internal;
@@ -53,7 +54,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
         /// <param name="address">Address to bind, loopback by default.</param>
         /// <param name="port">TCP port. By default 26025.</param>
         /// </summary>
-        public WebEndpoint(string address = DefaultAddress, int port = DefaultPort)
+        public WebEndpoint([NotNull] string address = DefaultAddress, int port = DefaultPort)
         {
             if (string.IsNullOrWhiteSpace(address))
             {

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Emails
@@ -10,6 +10,7 @@ namespace Saritasa.Tools.Emails
 #endif
     using System.Threading.Tasks;
     using System.Threading;
+    using JetBrains.Annotations;
 
     using NameValueDict = System.Collections.Generic.IDictionary<string, object>;
 
@@ -23,7 +24,7 @@ namespace Saritasa.Tools.Emails
         /// <summary>
         /// Send message.
         /// </summary>
-        protected abstract Task Process(MailMessage message, NameValueDict data);
+        protected abstract Task Process([NotNull] MailMessage message, [NotNull] NameValueDict data);
 
         /// <summary>
         /// Execution strategy. DefaultEmailExecutionStrategy used by default. Determines the way how we should proceed
@@ -37,7 +38,7 @@ namespace Saritasa.Tools.Emails
         public CancellationToken CancellationToken { get; set; } = CancellationToken.None;
 
         /// <inheritdoc />
-        public Task SendAsync(MailMessage message)
+        public Task SendAsync([NotNull] MailMessage message)
         {
             var data = new Dictionary<string, object>();
             bool cancel = false;
@@ -75,7 +76,7 @@ namespace Saritasa.Tools.Emails
         /// Add interceptor.
         /// </summary>
         /// <param name="interceptor">Interceptor.</param>
-        public EmailSender AddInterceptor(IEmailInterceptor interceptor)
+        public EmailSender AddInterceptor([NotNull] IEmailInterceptor interceptor)
         {
             if (interceptor == null)
             {

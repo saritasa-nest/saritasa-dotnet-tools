@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Messages.Abstractions
@@ -10,6 +10,7 @@ namespace Saritasa.Tools.Messages.Abstractions
 #else
     using System.Threading;
 #endif
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Message execution context represent current running message on pipeline. It stores message
@@ -32,7 +33,9 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// </summary>
         /// <param name="message">Current processing message.</param>
         /// <param name="messagePipeline">Message pipeline that processes the mesage.</param>
-        public MessageExecutionContext(IMessage message, IMessagePipeline messagePipeline)
+        public MessageExecutionContext(
+            [NotNull] IMessage message,
+            [NotNull] IMessagePipeline messagePipeline)
         {
             Message = message;
             MessagePipeline = messagePipeline;

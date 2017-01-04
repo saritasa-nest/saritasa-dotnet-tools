@@ -1,10 +1,11 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Messages.Abstractions
 {
     using System;
     using System.Threading.Tasks;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Commands specific pipeline.
@@ -15,12 +16,12 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// Execute command.
         /// </summary>
         /// <param name="command">Command to execute.</param>
-        void Handle(object command);
+        void Handle([NotNull] object command);
 
         /// <summary>
         /// Execute command asynchronously.
         /// </summary>
         /// <param name="command">Command to execute.</param>
-        Task HandleAsync(object command);
+        Task HandleAsync([NotNull] object command);
     }
 }

@@ -1,8 +1,10 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.NLog
 {
+    using JetBrains.Annotations;
+
     /// <summary>
     /// Provider logger for NLog.
     /// </summary>
@@ -13,7 +15,7 @@ namespace Saritasa.Tools.NLog
         /// </summary>
         /// <param name="name">Name of the logger to be created.</param>
         /// <returns>New logger.</returns>
-        public Microsoft.Extensions.Logging.ILogger CreateLogger(string name)
+        public Microsoft.Extensions.Logging.ILogger CreateLogger([NotNull] string name)
         {
             return new NLogLogger(global::NLog.LogManager.GetLogger(name));
         }

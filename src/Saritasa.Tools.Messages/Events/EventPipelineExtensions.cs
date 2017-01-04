@@ -1,8 +1,9 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Messages.Events
 {
+    using JetBrains.Annotations;
     using Common;
     using Abstractions;
 
@@ -17,7 +18,8 @@ namespace Saritasa.Tools.Messages.Events
         /// <param name="eventPipeline">Event pipeline.</param>
         /// <param name="resolveMethodParameters">Resolve method parameters.</param>
         /// <returns>Event pipeline.</returns>
-        public static IEventPipeline UseInternalResolver(this IEventPipeline eventPipeline,
+        public static IEventPipeline UseInternalResolver(
+            [NotNull] this IEventPipeline eventPipeline,
             bool resolveMethodParameters = true)
         {
             var middleware = (PipelineMiddlewares.EventExecutorMiddleware)eventPipeline.GetMiddlewareById("EventExecutor");
@@ -36,7 +38,8 @@ namespace Saritasa.Tools.Messages.Events
         /// <param name="eventPipeline">Event pipeline.</param>
         /// <param name="searchMethod">Handlers search method.</param>
         /// <returns>Event pipeline.</returns>
-        public static IEventPipeline UseHandlerSearchMethod(this IEventPipeline eventPipeline,
+        public static IEventPipeline UseHandlerSearchMethod(
+            [NotNull] this IEventPipeline eventPipeline,
             HandlerSearchMethod searchMethod)
         {
             var middleware = (PipelineMiddlewares.EventHandlerLocatorMiddleware)eventPipeline.GetMiddlewareById("EventLocator");

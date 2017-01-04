@@ -1,9 +1,10 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Messages.Commands
 {
     using System;
+    using JetBrains.Annotations;
     using Abstractions;
     using Common;
 
@@ -18,7 +19,8 @@ namespace Saritasa.Tools.Messages.Commands
         /// <param name="commandPipeline">Command pipeline.</param>
         /// <param name="resolveMethodParameters">Resolve method parameters.</param>
         /// <returns>Command pipeline.</returns>
-        public static ICommandPipeline UseInternalResolver(this ICommandPipeline commandPipeline,
+        public static ICommandPipeline UseInternalResolver(
+            [NotNull] this ICommandPipeline commandPipeline,
             bool resolveMethodParameters = true)
         {
             var middleware = (PipelineMiddlewares.CommandExecutorMiddleware)commandPipeline.GetMiddlewareById("CommandExecutor");
@@ -37,7 +39,8 @@ namespace Saritasa.Tools.Messages.Commands
         /// <param name="commandPipeline">Command pipeline.</param>
         /// <param name="searchMethod">Handlers search method.</param>
         /// <returns>Command pipeline.</returns>
-        public static ICommandPipeline UseHandlerSearchMethod(this ICommandPipeline commandPipeline,
+        public static ICommandPipeline UseHandlerSearchMethod(
+            [NotNull] this ICommandPipeline commandPipeline,
             HandlerSearchMethod searchMethod)
         {
             var middleware = (PipelineMiddlewares.CommandHandlerLocatorMiddleware)commandPipeline.GetMiddlewareById("CommandHandlerLocator");

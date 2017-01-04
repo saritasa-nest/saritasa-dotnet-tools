@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.NLog
@@ -6,6 +6,7 @@ namespace Saritasa.Tools.NLog
     using System;
     using System.Text;
     using Microsoft.Extensions.Logging;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Wrap NLog's Logger in a Microsoft.Extensions.Logging's interface <see cref="Microsoft.Extensions.Logging.ILogger" />.
@@ -19,20 +20,21 @@ namespace Saritasa.Tools.NLog
         /// </summary>
         public bool IncludeScopes { get; set; } = true;
 
-        public NLogLogger(global::NLog.Logger logger)
+        public NLogLogger([NotNull] global::NLog.Logger logger)
         {
             this.logger = logger;
         }
 
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+        public void Log<TState>(
+            LogLevel logLevel,
+            EventId eventId,
+            TState state,
+            [NotNull] Exception exception,
+            [NotNull] Func<TState, Exception, string> formatter)
         {
             var nLogLogLevel = ConvertLogLevel(logLevel);
             if (IsEnabled(nLogLogLevel))
             {
-                if (formatter == null)
-                {
-                    throw new ArgumentNullException(nameof(formatter));
-                }
                 var message = formatter(state, exception);
 
                 if (IncludeScopes)

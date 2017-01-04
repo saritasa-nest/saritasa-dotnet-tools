@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Misc.Security
@@ -11,6 +11,7 @@ namespace Saritasa.Tools.Misc.Security
 #if !PORTABLE
     using System.Security.Cryptography;
 #endif
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Passwords generation and strength estimation.
@@ -380,7 +381,9 @@ namespace Saritasa.Tools.Misc.Security
         /// The source code has got from http://www.passwordmeter.com .
         /// </remarks>
         /// <returns>Estimated score.</returns>
-        public static int EstimatePasswordStrength(string password, out IDictionary<Addition, int> additions)
+        public static int EstimatePasswordStrength(
+            [NotNull] string password,
+            out IDictionary<Addition, int> additions)
         {
             if (string.IsNullOrEmpty(password))
             {
@@ -648,7 +651,7 @@ namespace Saritasa.Tools.Misc.Security
         /// The source code has got from http://www.passwordmeter.com .
         /// </remarks>
         /// <returns>Estimated score.</returns>
-        public static int EstimatePasswordStrength(string password)
+        public static int EstimatePasswordStrength([NotNull] string password)
         {
             IDictionary<Addition, int> additions;
             return EstimatePasswordStrength(password, out additions);

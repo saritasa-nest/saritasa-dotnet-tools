@@ -1,10 +1,11 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Domain
 {
     using System;
     using System.Data;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// The class provides existing unit of work instead of creating new one. It may be useful for example
@@ -20,7 +21,7 @@ namespace Saritasa.Tools.Domain
         /// .ctor
         /// </summary>
         /// <param name="unitOfWork">Application unit of work.</param>
-        public InstanceUnitOfWorkFactory(TUnitOfWork unitOfWork)
+        public InstanceUnitOfWorkFactory([NotNull] TUnitOfWork unitOfWork)
         {
             if (unitOfWork == null)
             {

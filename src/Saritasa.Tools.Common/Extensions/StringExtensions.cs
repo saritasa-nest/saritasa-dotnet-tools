@@ -5,6 +5,7 @@ namespace Saritasa.Tools.Common.Extensions
 {
     using System;
     using System.Diagnostics;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// String class extensions.
@@ -18,7 +19,7 @@ namespace Saritasa.Tools.Common.Extensions
         /// <param name="arg0">Argument 1.</param>
         /// <returns>Formatted string.</returns>
         [DebuggerStepThrough]
-        public static string FormatWith(this string format, object arg0)
+        public static string FormatWith([NotNull] this string format, [NotNull] object arg0)
         {
             return string.Format(format, arg0);
         }
@@ -31,7 +32,10 @@ namespace Saritasa.Tools.Common.Extensions
         /// <param name="arg1">Argument 2.</param>
         /// <returns>Formatted string.</returns>
         [DebuggerStepThrough]
-        public static string FormatWith(this string format, object arg0, object arg1)
+        public static string FormatWith(
+            [NotNull] this string format,
+            [NotNull] object arg0,
+            [NotNull] object arg1)
         {
             return string.Format(format, arg0, arg1);
         }
@@ -45,7 +49,11 @@ namespace Saritasa.Tools.Common.Extensions
         /// <param name="arg2">Argument 3.</param>
         /// <returns>Formatted string.</returns>
         [DebuggerStepThrough]
-        public static string FormatWith(this string format, object arg0, object arg1, object arg2)
+        public static string FormatWith(
+            [NotNull] this string format,
+            [NotNull] object arg0,
+            [NotNull] object arg1,
+            [NotNull] object arg2)
         {
             return string.Format(format, arg0, arg1, arg2);
         }
@@ -57,7 +65,7 @@ namespace Saritasa.Tools.Common.Extensions
         /// <param name="args">Arguments.</param>
         /// <returns>Formatted string.</returns>
         [DebuggerStepThrough]
-        public static string FormatWith(this string format, params object[] args)
+        public static string FormatWith([NotNull] this string format, params object[] args)
         {
             return string.Format(format, args);
         }
@@ -70,7 +78,10 @@ namespace Saritasa.Tools.Common.Extensions
         /// <param name="args">Arguments.</param>
         /// <returns>Formatted string.</returns>
         [DebuggerStepThrough]
-        public static string FormatWith(this string format, IFormatProvider provider, params object[] args)
+        public static string FormatWith(
+            [NotNull] this string format,
+            [NotNull] IFormatProvider provider,
+            params object[] args)
         {
             return string.Format(provider, format, args);
         }
