@@ -55,6 +55,7 @@
     <Compile Include="Commands\PipelineMiddlewares\CommandValidationMiddleware.cs" />
     <Compile Include="Common\Endpoints\WebEndpoint.cs" />
     <Compile Include="Common\HandlerSearchMethod.cs" />
+    <Compile Include="Common\Repositories\LogglyRepository.cs" />
     <Compile Include="Common\Repositories\QueryProviders\SqlServerQueryProvider.cs" />
     <Compile Include="Common\Repositories\ElasticsearchRepository.cs" />
     <Compile Include="Events\EventMessage.cs" />

@@ -16,7 +16,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
     using Internal;
 
     /// <summary>
-    /// Use ADO.NET infrastructure to store commands.
+    /// Use ADO.NET infrastructure to store messages.
     /// </summary>
     public class AdoNetMessageRepository : IMessageRepository, IDisposable
     {

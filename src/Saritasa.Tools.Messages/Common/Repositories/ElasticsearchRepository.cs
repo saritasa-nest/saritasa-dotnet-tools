@@ -1,8 +1,6 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-using System.Net.Http.Headers;
-
 namespace Saritasa.Tools.Messages.Common.Repositories
 {
     using System;
@@ -10,6 +8,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
     using System.Linq;
     using System.Threading.Tasks;
     using System.Net.Http;
+    using System.Net.Http.Headers;
     using Abstractions;
     using ObjectSerializers;
     using Internal.Elasticsearch.Query;
@@ -57,7 +56,8 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             }
             this.uri = uri.TrimEnd('/');
             this.serializer = new JsonObjectSerializer();
-            this.client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(new ProductHeaderValue("SaritasaTools")));
+            this.client.DefaultRequestHeaders.UserAgent.Add(
+                new ProductInfoHeaderValue(new ProductHeaderValue("SaritasaTools")));
         }
 
         /// <inheritdoc />
@@ -157,6 +157,8 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             return filterQueries;
         }
 
+        #region Dispose
+
         bool disposed;
 
         /// <inheritdoc />
@@ -179,5 +181,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
+        #endregion
     }
 }
