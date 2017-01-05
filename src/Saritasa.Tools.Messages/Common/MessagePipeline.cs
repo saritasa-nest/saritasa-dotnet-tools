@@ -134,9 +134,9 @@ namespace Saritasa.Tools.Messages.Common
             MessageExecutionContext.Current = new MessageExecutionContext(message, this);
 
             // execute message thru all middlewares
-            foreach (var handler in Middlewares)
+            for (int i = 0; i < Middlewares.Count; i++)
             {
-                handler.Handle(message);
+                Middlewares[i].Handle(message);
             }
         }
 
@@ -152,16 +152,16 @@ namespace Saritasa.Tools.Messages.Common
             MessageExecutionContext.Current = new MessageExecutionContext(message, this);
 
             // execute message thru all middlewares
-            foreach (var handler in Middlewares)
+            for (int i = 0; i < Middlewares.Count; i++)
             {
-                var asyncHandler = handler as IAsyncMessagePipelineMiddleware;
+                var asyncHandler = Middlewares[i] as IAsyncMessagePipelineMiddleware;
                 if (asyncHandler != null)
                 {
                     await asyncHandler.HandleAsync(message).ConfigureAwait(false);
                 }
                 else
                 {
-                    handler.Handle(message);
+                    Middlewares[i].Handle(message);
                 }
             }
         }
