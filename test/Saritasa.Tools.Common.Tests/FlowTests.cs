@@ -23,40 +23,49 @@ namespace Saritasa.Tools.Common.Tests
         [Fact]
         public void Raise_should_call_test_handler()
         {
+            // Arrange
             int a = 10;
             EventArgs eventArgs = new EventArgs();
             EventHandler<EventArgs> testDelegate = (sender, args) =>
             {
                 a = 20;
             };
-
             EventArgsTestEvent = null;
             EventArgsTestEvent += testDelegate;
+
+            // Act
             FlowUtils.Raise(this, eventArgs, ref EventArgsTestEvent);
+
+            // Assert
             Assert.Equal(20, a);
         }
 
         [Fact]
         public void Raise_all_should_call_test_handlers()
         {
+            // Arrange
             int a = 0;
             EventArgs eventArgs = new EventArgs();
             EventHandler<EventArgs> testDelegate = (sender, args) =>
             {
                 a += 1;
             };
-
             EventArgsTestEvent = null;
             EventArgsTestEvent += testDelegate;
             EventArgsTestEvent += testDelegate;
             EventArgsTestEvent += testDelegate;
+
+            // Act
             FlowUtils.RaiseAll(this, eventArgs, ref EventArgsTestEvent);
+
+            // Assert
             Assert.Equal(3, a);
         }
 
         [Fact]
         public void Raise_all_should_return_exception_of_all_handlers()
         {
+            // Arrange
             int a = 10;
             EventArgs eventArgs = new EventArgs();
             EventHandler<EventArgs> testDelegate = (sender, args) =>
@@ -68,42 +77,52 @@ namespace Saritasa.Tools.Common.Tests
                 a = 30;
                 throw new Exception("test");
             };
-
             EventArgsTestEvent += testDelegate;
             EventArgsTestEvent += testDelegate2;
+
+            // Act
             Assert.Throws<AggregateException>(() => { FlowUtils.RaiseAll(this, eventArgs, ref EventArgsTestEvent); });
+
+            // Assert
             Assert.Equal(30, a);
         }
 
         [Fact]
         public void Raise_should_not_throw_if_event_delegate_is_null()
         {
+            // Arrange
             EventArgsTestEvent = null;
             EventArgs eventArgs = new EventArgs();
+
+            // Act
             FlowUtils.Raise(this, eventArgs, ref EventArgsTestEvent);
             FlowUtils.RaiseAll(this, eventArgs, ref EventArgsTestEvent);
+
+            // Assert
         }
 
         [Fact]
         public void Paged_enumerable_should_return_correct_enumerables_for_pages()
         {
+            // Arrange
             int capacity = 250;
             IList<int> list = new List<int>(capacity);
             for (int i = 0; i < capacity; i++)
             {
                 list.Add(i);
             }
+
+            // Act
             var pagedList = new PagedEnumerable<int>(list, 10, 10);
-            Assert.Equal(25, pagedList.TotalPages);
-
             var pagedList2 = new PagedEnumerable<int>(list, 10, 10);
-            Assert.Equal(10, pagedList2.Count());
-
             var pagedList3 = list.GetPaged(13, 25);
+            var pagedList4 = list.GetPaged(20, 13);
+
+            // Assert
+            Assert.Equal(25, pagedList.TotalPages);
+            Assert.Equal(10, pagedList2.Count());
             Assert.Equal(10, pagedList3.TotalPages);
             Assert.Equal(13, pagedList3.CurrentPage);
-
-            var pagedList4 = list.GetPaged(20, 13);
             Assert.Equal(20, pagedList4.TotalPages);
             Assert.Equal(3, pagedList4.Count());
         }
@@ -115,65 +134,80 @@ namespace Saritasa.Tools.Common.Tests
         {
         }
 
-        private void CustomMethodNoReturn()
-        {
-        }
-
-        private int CustomMethodReturn()
-        {
-            return 123;
-        }
-
-        private int CustomMethodReturnWithCustomException()
-        {
-            throw new CustomException();
-        }
-
         [Fact]
         public void Repeat_with_fixed_retry_strategy_should_work()
         {
-            // fixed retry
-            FlowUtils.Retry(CustomMethodReturn, FlowUtils.CreateFixedDelayRetryStrategy());
-            FlowUtils.Retry(CustomMethodReturn, FlowUtils.CreateFixedDelayRetryStrategy(int.MaxValue, TimeSpan.MaxValue));
+            // Arrange
+            Func<int> customMethodReturn = () => 123;
+
+            // Act & assert
+            FlowUtils.Retry(customMethodReturn, FlowUtils.CreateFixedDelayRetryStrategy());
+            FlowUtils.Retry(customMethodReturn, FlowUtils.CreateFixedDelayRetryStrategy(int.MaxValue, TimeSpan.MaxValue));
         }
 
         [Fact]
         public void Repeat_with_fixed_retry_strategy_should_throw_exceptions()
         {
-            // fixed throw exception
-            Assert.Throws<CustomException>(() => FlowUtils.Retry(CustomMethodReturnWithCustomException, FlowUtils.CreateFixedDelayRetryStrategy()));
-            Assert.Throws<CustomException>(() => FlowUtils.Retry(CustomMethodReturnWithCustomException, FlowUtils.CreateFixedDelayRetryStrategy(), typeof(InvalidOperationException)));
-            Assert.Throws<CustomException>(() => FlowUtils.Retry(CustomMethodReturnWithCustomException, FlowUtils.CreateFixedDelayRetryStrategy(), typeof(CustomException)));
+            // Arrange
+            Action customMethodReturnWithCustomException = () =>
+            {
+                throw new CustomException();
+            };
+
+            // Act & assert
+            Assert.Throws<CustomException>(
+                () => FlowUtils.Retry(customMethodReturnWithCustomException,
+                    FlowUtils.CreateFixedDelayRetryStrategy()));
+            Assert.Throws<CustomException>(
+                () => FlowUtils.Retry(customMethodReturnWithCustomException,
+                    FlowUtils.CreateFixedDelayRetryStrategy(), typeof(InvalidOperationException)));
+            Assert.Throws<CustomException>(
+                () => FlowUtils.Retry(customMethodReturnWithCustomException,
+                    FlowUtils.CreateFixedDelayRetryStrategy(), typeof(CustomException)));
         }
 
         [Fact]
         public void Repeat_with_fixed_retry_strategy_should_delay_correctly()
         {
-            // fixed delay
+            // Arrange
+            Action customMethodReturnWithCustomException = () =>
+            {
+                throw new CustomException();
+            };
             var stopwatch = new Stopwatch();
+
+            // Act
             stopwatch.Start();
             try
             {
-                FlowUtils.Retry(CustomMethodReturnWithCustomException, FlowUtils.CreateFixedDelayRetryStrategy(3, TimeSpan.FromMilliseconds(50)), typeof(CustomException));
+                FlowUtils.Retry(customMethodReturnWithCustomException, FlowUtils.CreateFixedDelayRetryStrategy(3, TimeSpan.FromMilliseconds(50)), typeof(CustomException));
             }
             catch (CustomException)
             {
                 // suppress our specific exception
             }
             stopwatch.Stop();
+
+            // Assert
             Assert.True(stopwatch.ElapsedMilliseconds >= 100);
         }
 
         [Fact]
         public void Repeat_with_fixed_retry_strategy_and_first_fast_should_work()
         {
-            // fixed delay
+            // Arrange
+            Action customMethodReturnWithCustomException = () =>
+            {
+                throw new CustomException();
+            };
             var stopwatch = new Stopwatch();
+
+            // Act
             stopwatch.Start();
             try
             {
                 FlowUtils.Retry(
-                    CustomMethodReturnWithCustomException,
+                    customMethodReturnWithCustomException,
                     FlowUtils.CreateFixedDelayRetryStrategy(4, TimeSpan.FromMilliseconds(50), true),
                     typeof(CustomException)
                 );
@@ -183,21 +217,30 @@ namespace Saritasa.Tools.Common.Tests
                 // suppress our specific exception
             }
             stopwatch.Stop();
+
+            // Assert
             Assert.True(stopwatch.ElapsedMilliseconds >= 100);
         }
 
         [Fact]
         public void Repeat_with_log_handler_should_log()
         {
+            // Arrange
+            Action customMethodReturnWithCustomException = () =>
+            {
+                throw new CustomException();
+            };
             int totalAttempts = 0;
             var callback = new FlowUtils.RetryCallback((a, e) =>
             {
                 totalAttempts = a;
             });
+
+            // Act
             try
             {
                 FlowUtils.Retry(
-                    CustomMethodReturnWithCustomException,
+                    customMethodReturnWithCustomException,
                     FlowUtils.CreateCallbackRetryStrategy(callback) + FlowUtils.CreateFixedDelayRetryStrategy(2)
                 );
             }
@@ -205,25 +248,23 @@ namespace Saritasa.Tools.Common.Tests
             {
                 // suppress our specific exception
             }
-            Assert.Equal(2, totalAttempts);
-        }
 
-        private Task<int> CustomMethodReturnWithCustomExceptionAsync()
-        {
-            return Task.Factory.StartNew<int>(() =>
-            {
-                throw new CustomException();
-            });
+            // Assert
+            Assert.Equal(2, totalAttempts);
         }
 
         [Fact]
         public void Repeat_async_with_fixed_retry_strategy_should_delay_correctly()
         {
-            // fixed async delay
+            // Arrange
+            Func<Task<int>> customMethodReturnWithCustomExceptionAsync = () =>
+                Task.Factory.StartNew<int>(() => { throw new CustomException(); });
             var stopwatch = new Stopwatch();
+
+            // Act
             stopwatch.Start();
             var task = FlowUtils.RetryAsync(
-                CustomMethodReturnWithCustomExceptionAsync,
+                customMethodReturnWithCustomExceptionAsync,
                 FlowUtils.CreateFixedDelayRetryStrategy(3, TimeSpan.FromMilliseconds(50)),
                 CancellationToken.None,
                 typeof(CustomException));
@@ -235,18 +276,25 @@ namespace Saritasa.Tools.Common.Tests
             {
             }
             stopwatch.Stop();
+
+            // Assert
             Assert.True(stopwatch.ElapsedMilliseconds >= 100);
         }
 
         [Fact]
         public void Repeat_async_with_fixed_retry_strategy_and_first_fast_should_work()
         {
+            // Arrange
+            Func<Task<int>> customMethodReturnWithCustomExceptionAsync = () =>
+                Task.Factory.StartNew<int>(() => { throw new CustomException(); });
             var stopwatch = new Stopwatch();
+
+            // Act
             stopwatch.Start();
             try
             {
                 FlowUtils.Retry(
-                    CustomMethodReturnWithCustomExceptionAsync,
+                    customMethodReturnWithCustomExceptionAsync,
                     FlowUtils.CreateFixedDelayRetryStrategy(2, TimeSpan.FromMilliseconds(50), true),
                     typeof(CustomException)).Wait();
             }
@@ -254,33 +302,45 @@ namespace Saritasa.Tools.Common.Tests
             {
             }
             stopwatch.Stop();
+
+            // Assert
             Assert.True(stopwatch.ElapsedMilliseconds <= 50);
         }
 
         [Fact]
         public void Repeat_async_with_log_handler_should_log()
         {
+            // Arrange
+            Func<Task<int>> customMethodReturnWithCustomExceptionAsync = () =>
+                Task.Factory.StartNew<int>(() => { throw new CustomException(); });
             int totalAttempts = 0;
             var callback = new FlowUtils.RetryCallback((a, e) =>
             {
                 totalAttempts = a;
             });
+
+            // Act
             try
             {
                 FlowUtils.RetryAsync(
-                    CustomMethodReturnWithCustomExceptionAsync,
+                    customMethodReturnWithCustomExceptionAsync,
                     FlowUtils.CreateCallbackRetryStrategy(callback) + FlowUtils.CreateFixedDelayRetryStrategy(2)).Wait();
             }
             catch (AggregateException)
             {
             }
+
+            // Assert
             Assert.Equal(2, totalAttempts);
         }
 
         [Fact]
         public void Repeat_async_with_first_fail_handler_should_work_fine()
         {
+            // Arrange
             int totalAttempts = 0;
+
+            // Act
             var result = FlowUtils.RetryAsync(
                 () =>
                 {
@@ -296,6 +356,8 @@ namespace Saritasa.Tools.Common.Tests
                 },
                 FlowUtils.CreateFixedDelayRetryStrategy(8)
             ).Result;
+
+            // Assert
             Assert.Equal(10, result);
             Assert.True(totalAttempts > 4);
         }
@@ -303,9 +365,11 @@ namespace Saritasa.Tools.Common.Tests
         [Fact]
         public void Memoize_with_default_dict_should_call_handler_once()
         {
+            // Arrange
             int value = 0;
             var memoized1 = FlowUtils.Memoize(() => ++value);
 
+            // Act & Assert
             Assert.Equal(1, memoized1());
             Assert.Equal(1, memoized1());
         }
@@ -313,6 +377,7 @@ namespace Saritasa.Tools.Common.Tests
         [Fact]
         public void Memoize_with_skipmemoize_exception_should_not_cache()
         {
+            // Arrange
             int value = 0;
             var memoized1 = FlowUtils.Memoize(
                 new Func<int>(() =>
@@ -321,6 +386,7 @@ namespace Saritasa.Tools.Common.Tests
                 })
             );
 
+            // Act & Assert
             Assert.Equal(1, memoized1());
             Assert.Equal(2, memoized1());
         }
@@ -328,12 +394,14 @@ namespace Saritasa.Tools.Common.Tests
         [Fact]
         public void Cache_with_max_age_should_cache_within_period()
         {
+            // Arrange
             int value = 0;
             var memoized1 = FlowUtils.Memoize(
                 () => ++value,
                 FlowUtils.CreateMaxAgeCacheStrategy<int>(TimeSpan.FromSeconds(1))
             );
 
+            // Act & assert
             Assert.Equal(1, memoized1());
             Assert.Equal(1, memoized1());
 #if PORTABLE || NETSTANDARD1_6
@@ -347,12 +415,14 @@ namespace Saritasa.Tools.Common.Tests
         [Fact]
         public void Cache_with_max_count_should_save_within_count()
         {
+            // Arrange
             int value = 0;
             var memoized1 = FlowUtils.Memoize(
                 (a) => ++value,
                 FlowUtils.CreateMaxCountCacheStrategy<int, int>(maxCount: 3, removeCount: 2)
             );
 
+            // Act & assert
             Assert.Equal(1, memoized1(1));
             Assert.Equal(2, memoized1(2));
             Assert.Equal(3, memoized1(3));
@@ -360,6 +430,32 @@ namespace Saritasa.Tools.Common.Tests
             Assert.Equal(4, memoized1(4)); // cache reset here
             Assert.Equal(5, memoized1(1)); // not cached now
             Assert.Equal(3, memoized1(3)); // but this one is cached
+        }
+
+        [Fact]
+        public void Cache_with_composite_key_should_cache()
+        {
+            // Arrange
+            int totalCalls = 0;
+            Func<int, string, int> func = (a, b) => ++totalCalls;
+            var memoizedFunc = FlowUtils.Memoize(
+                func, FlowUtils.CreateMaxCountCacheStrategy<int, string, int>(100));
+
+            // Act
+            var val1 = memoizedFunc(10, "string");
+            var val2 = memoizedFunc(10, "string");
+            var val3 = memoizedFunc(10, "string2");
+            var val4 = memoizedFunc(11, "string");
+            var val5 = memoizedFunc(10, "string");
+            var val6 = memoizedFunc(11, "string");
+
+            // Assert
+            Assert.Equal(1, val1);
+            Assert.Equal(1, val2);
+            Assert.Equal(2, val3);
+            Assert.Equal(3, val4);
+            Assert.Equal(1, val5);
+            Assert.Equal(3, val6);
         }
     }
 }

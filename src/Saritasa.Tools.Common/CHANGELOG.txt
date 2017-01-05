@@ -4,6 +4,7 @@
 [+] Add CombineDateTime, BeginOf, EndOf, IsBetween and unix time stamp functions to DateTimeUtils.
 [-] Remove BeginOfMonth and EndOfMonth functions in DateTimeUtils.
 [*] Fix Memoize for composite keys.
+[+] Add EnumExtensions.GetAttribute extension.
 
 0.1.1 [2016-12-16]
 [+] FlowUtils.RetryAsync now uses ConfigureAwait false to call action.
