@@ -4,10 +4,10 @@
  * Main application module. Loads with every page load.
  */
 
-define(function() {
+define(function () {
     var App = {};
 
-    App.sayHello = function() {
+    App.sayHello = function () {
         console.log('Hello');
     };
 

@@ -106,7 +106,7 @@ module.exports = {
         "no-loop-func": 2,
         "no-magic-numbers": [2, {
             ignoreArrayIndexes: true,
-            ignore: [-1, 0, 1, 2, 10, 200, 400, 401, 500, 1024]
+            ignore: [-1, 0, 1, 2, 10, 200, 400, 401, 404, 500, 1024]
         }],
         "no-mixed-requires": 2,
         "no-multi-spaces": 2,

@@ -34,7 +34,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>..\..\..\tools\Saritasa.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>Saritasa.ruleset</CodeAnalysisRuleSet>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -396,11 +396,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include=".csslintrc" />
-    <Content Include=".jsbeautifyrc" />
-    <Content Include=".jscsrc" />
-    <Content Include=".jsdoc.conf.json" />
-    <Content Include=".jshintignore" />
-    <Content Include=".jshintrc" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

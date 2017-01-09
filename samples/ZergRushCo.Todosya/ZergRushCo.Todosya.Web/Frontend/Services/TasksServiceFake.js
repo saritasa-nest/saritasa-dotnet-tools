@@ -6,7 +6,7 @@
 
 define(['jquery'], function () {
     return {
-        get: function() {
+        get: function () {
             return new Promise(function (resolve) {
                 resolve([{
                     Id: 1,
@@ -23,7 +23,7 @@ define(['jquery'], function () {
             });
         },
 
-        getProjects: function() {
+        getProjects: function () {
             return new Promise(function (resolve) {
                 resolve([{
                     Id: 1,
@@ -37,20 +37,20 @@ define(['jquery'], function () {
             });
         },
 
-        update: function() {
-            return new Promise(function(resolve) {
+        update: function () {
+            return new Promise(function (resolve) {
                 resolve();
             });
         },
 
-        remove: function() {
-            return new Promise(function(resolve) {
+        remove: function () {
+            return new Promise(function (resolve) {
                 resolve();
             });
         },
 
-        check: function() {
-            return new Promise(function(resolve) {
+        check: function () {
+            return new Promise(function (resolve) {
                 resolve();
             });
         }
