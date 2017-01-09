@@ -5,7 +5,7 @@
     using System.Linq;
     using System.Web.Mvc;
 
-    using Tools.Messages.Commands;
+    using Tools.Messages.Abstractions;
     using Tools.Domain.Exceptions;
 
     using Domain;
@@ -16,7 +16,6 @@
     using Models;
 
     using AuthorizeAttribute = Core.AuthorizeAttribute;
-
 
     /// <summary>
     /// Products controller
@@ -31,9 +30,13 @@
         public ProductsController(ICommandPipeline commandPipeline, ProductQueries productQueries, CompanyQueries companyQueries)
         {
             if (commandPipeline == null)
-                throw new ArgumentNullException("commandPipeline");
+            {
+                throw new ArgumentNullException(nameof(commandPipeline));
+            }
             if (productQueries == null)
-                throw new ArgumentNullException("productQueries");
+            {
+                throw new ArgumentNullException(nameof(productQueries));
+            }
 
             this.productQueries = productQueries;
             this.commandPipeline = commandPipeline;

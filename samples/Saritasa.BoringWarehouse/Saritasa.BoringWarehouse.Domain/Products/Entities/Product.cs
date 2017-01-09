@@ -38,7 +38,7 @@
 
         public User CreatedBy { get; set; }
 
-        public DateTime? UpdatedAt { get ; set; }
+        public DateTime? UpdatedAt { get; set; }
 
         /// <summary>
         /// Include Many to One and One to One relations

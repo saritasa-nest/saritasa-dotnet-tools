@@ -3,7 +3,7 @@
     using System;
     using System.Linq;
 
-    using Tools.Messages.Commands;
+    using Tools.Messages.Abstractions;
     using Tools.Domain.Exceptions;
 
     using Commands;
@@ -29,7 +29,8 @@
                 var user = new User()
                 {
                     Email = email,
-                    PasswordHashed = Candy.SecurityUtils.Hash(command.Password, Candy.SecurityUtils.HashMethods.Sha256),
+                    PasswordHashed = Tools.Common.Utils.SecurityUtils.Hash(command.Password,
+                        Tools.Common.Utils.SecurityUtils.HashMethods.Sha256),
                     FirstName = command.FirstName.Trim(),
                     LastName = command.LastName.Trim(),
                     Phone = command.Phone,
@@ -53,7 +54,8 @@
                     return;
                 }
 
-                var isPasswordCorrect = Candy.SecurityUtils.CheckHash(command.Password, user.PasswordHashed);
+                var isPasswordCorrect = Tools.Common.Utils.SecurityUtils.CheckHash(command.Password,
+                    user.PasswordHashed);
                 if (!isPasswordCorrect)
                 {
                     command.IsSuccess = false;
@@ -86,7 +88,8 @@
 
                 if (string.IsNullOrEmpty(command.Password) == false)
                 {
-                    dbUser.PasswordHashed = Candy.SecurityUtils.Hash(command.Password, Candy.SecurityUtils.HashMethods.Sha256);
+                    dbUser.PasswordHashed = Tools.Common.Utils.SecurityUtils.Hash(command.Password,
+                        Tools.Common.Utils.SecurityUtils.HashMethods.Sha256);
                 }
                 uow.SaveChanges();
             }

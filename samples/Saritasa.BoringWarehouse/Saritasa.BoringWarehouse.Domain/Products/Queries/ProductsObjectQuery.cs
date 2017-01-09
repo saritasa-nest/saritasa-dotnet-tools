@@ -3,8 +3,7 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    using Candy;
-    using static Candy.CollectionsExtensions;
+    using Tools.Common.Extensions;
 
     using Entities;
 

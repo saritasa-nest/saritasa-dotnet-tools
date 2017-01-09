@@ -5,7 +5,7 @@
 
     public class CompanyRepository : Saritasa.Tools.Ef.EfRepository<Company, AppDbContext>, ICompanyRepository
     {
-        public CompanyRepository(AppDbContext context) 
+        public CompanyRepository(AppDbContext context)
             : base(context)
         {
         }

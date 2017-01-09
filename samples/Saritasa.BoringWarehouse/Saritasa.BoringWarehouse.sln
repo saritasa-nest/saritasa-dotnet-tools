@@ -21,6 +21,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.Messages", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.Emails", "..\..\src\Saritasa.Tools.Emails\Saritasa.Tools.Emails.csproj", "{BAAF1392-6BAC-4220-8149-B207BEFE2FDD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.Messages.Abstractions", "..\..\src\Saritasa.Tools.Messages.Abstractions\Saritasa.Tools.Messages.Abstractions.csproj", "{E16B2300-A1D4-49BB-B3FC-C2891E7D1177}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.Common", "..\..\src\Saritasa.Tools.Common\Saritasa.Tools.Common.csproj", "{2900D88A-2522-4299-8D51-6AF26B74C91C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,6 +63,14 @@ Global
 		{BAAF1392-6BAC-4220-8149-B207BEFE2FDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BAAF1392-6BAC-4220-8149-B207BEFE2FDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BAAF1392-6BAC-4220-8149-B207BEFE2FDD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E16B2300-A1D4-49BB-B3FC-C2891E7D1177}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E16B2300-A1D4-49BB-B3FC-C2891E7D1177}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E16B2300-A1D4-49BB-B3FC-C2891E7D1177}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E16B2300-A1D4-49BB-B3FC-C2891E7D1177}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2900D88A-2522-4299-8D51-6AF26B74C91C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2900D88A-2522-4299-8D51-6AF26B74C91C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2900D88A-2522-4299-8D51-6AF26B74C91C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2900D88A-2522-4299-8D51-6AF26B74C91C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -69,5 +81,7 @@ Global
 		{32A3A81C-A65C-4F78-8300-17151987697C} = {C71B2713-FE29-4CAA-A464-299BBFE963A2}
 		{AEE65918-25DF-4A25-BFB8-56552FAA2A51} = {C71B2713-FE29-4CAA-A464-299BBFE963A2}
 		{BAAF1392-6BAC-4220-8149-B207BEFE2FDD} = {C71B2713-FE29-4CAA-A464-299BBFE963A2}
+		{E16B2300-A1D4-49BB-B3FC-C2891E7D1177} = {C71B2713-FE29-4CAA-A464-299BBFE963A2}
+		{2900D88A-2522-4299-8D51-6AF26B74C91C} = {C71B2713-FE29-4CAA-A464-299BBFE963A2}
 	EndGlobalSection
 EndGlobal

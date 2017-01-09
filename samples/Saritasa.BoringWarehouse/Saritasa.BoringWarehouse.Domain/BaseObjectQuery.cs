@@ -1,6 +1,6 @@
 ﻿namespace Saritasa.BoringWarehouse.Domain
 {
-    using Candy;
+    using Tools.Common.Extensions;
 
     public abstract class BaseObjectQuery
     {
@@ -18,6 +18,7 @@
         public string SortOrderName
         {
             get { return sortOrderName; }
+
             set
             {
                 sortOrderName = value;
@@ -28,6 +29,7 @@
         public SortOrder SortOrder
         {
             get { return sortOrder; }
+
             set
             {
                 sortOrder = value;

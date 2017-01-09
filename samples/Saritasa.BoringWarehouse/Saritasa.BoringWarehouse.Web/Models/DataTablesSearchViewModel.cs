@@ -1,5 +1,6 @@
 ﻿namespace Saritasa.BoringWarehouse.Web.Models
 {
+#pragma warning disable SA1300 // Element must begin with upper-case letter
     public class jDataTablesSearch
     {
         public bool regex { get; set; }
@@ -26,4 +27,5 @@
 
         public string dir { get; set; }
     }
+#pragma warning restore SA1300 // Element must begin with upper-case letter
 }

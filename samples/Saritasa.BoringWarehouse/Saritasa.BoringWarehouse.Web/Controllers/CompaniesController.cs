@@ -3,7 +3,7 @@
     using System;
     using System.Web.Mvc;
 
-    using Tools.Messages.Commands;
+    using Tools.Messages.Abstractions;
     using Tools.Domain.Exceptions;
 
     using Domain.Products.Commands;
@@ -22,11 +22,13 @@
         public CompaniesController(ICommandPipeline commandPipline, CompanyQueries companyQueries)
         {
             if (commandPipline == null)
-                throw new ArgumentNullException("commandPipline");
+            {
+                throw new ArgumentNullException(nameof(commandPipline));
+            }
             this.commandPipline = commandPipline;
             this.companyQueries = companyQueries;
         }
-        
+
         // GET: Companies/Index
         public ActionResult Index()
         {

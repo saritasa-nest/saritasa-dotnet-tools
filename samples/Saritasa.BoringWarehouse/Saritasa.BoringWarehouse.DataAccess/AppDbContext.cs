@@ -10,13 +10,13 @@
     /// </summary>
     public class AppDbContext : DbContext
     {
-        public AppDbContext() 
+        public AppDbContext()
             : base()
         {
             Database.SetInitializer(new AppDbContextInitializer());
         }
 
-        public AppDbContext(string nameOrConnectionString) 
+        public AppDbContext(string nameOrConnectionString)
             : base(nameOrConnectionString)
         {
             Database.SetInitializer(new AppDbContextInitializer());

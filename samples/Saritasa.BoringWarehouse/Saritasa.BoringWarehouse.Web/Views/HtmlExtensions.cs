@@ -16,10 +16,14 @@ public static class HtmlExtensions
         string labelText = metaData.DisplayName ?? metaData.PropertyName ?? htmlFieldName.Split('.').Last();
 
         if (metaData.IsRequired)
+        {
             labelText += "<span class=\"required\">*</span>";
+        }
 
         if (String.IsNullOrEmpty(labelText))
+        {
             return MvcHtmlString.Empty;
+        }
 
         var label = new TagBuilder("label");
         label.Attributes.Add("for", helper.ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldId(htmlFieldName));

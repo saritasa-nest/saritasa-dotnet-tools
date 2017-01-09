@@ -11,7 +11,6 @@
     {
         public AuthorizeAttribute()
         {
-
         }
 
         public AuthorizeAttribute(params UserRole[] roles)
@@ -21,7 +20,6 @@
                 Roles = string.Join(",", roles.Select(r => r.ToString()));
             }
         }
-        
 
         protected override void HandleUnauthorizedRequest(AuthorizationContext filterContext)
         {

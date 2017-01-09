@@ -7,9 +7,9 @@
 
     using Domain.Users.Entities;
 
-    using Tools.Messages.Commands;
+    using Tools.Messages.Abstractions;
     using Tools.Domain.Exceptions;
-    
+
     using Domain;
     using Domain.Users.Commands;
     using Domain.Users.Queries;

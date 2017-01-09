@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    using Tools.Messages.Commands;
+    using Tools.Messages.Abstractions;
     using Tools.Domain.Exceptions;
 
     using Commands;

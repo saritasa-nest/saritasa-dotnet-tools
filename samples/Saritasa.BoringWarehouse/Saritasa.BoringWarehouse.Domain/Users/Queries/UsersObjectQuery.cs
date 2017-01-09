@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    using static Candy.CollectionsExtensions;
+    using Tools.Common.Extensions;
 
     using Entities;
 
@@ -17,7 +17,7 @@
             if (!string.IsNullOrEmpty(SearchPattern))
             {
                 // Find by name
-                users = users.Where(u => u.FirstName.StartsWith(SearchPattern) || 
+                users = users.Where(u => u.FirstName.StartsWith(SearchPattern) ||
                                             u.LastName.StartsWith(SearchPattern) ||
                                             u.Email.StartsWith(SearchPattern) ||
                                             u.Phone.StartsWith(SearchPattern));

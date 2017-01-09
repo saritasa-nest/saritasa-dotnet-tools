@@ -5,7 +5,7 @@
     using System.Web.Mvc;
     using System.Web.Security;
 
-    using Tools.Messages.Commands;
+    using Tools.Messages.Abstractions;
     using Tools.Domain.Exceptions;
 
     using Core;
@@ -20,13 +20,13 @@
     [AllowAnonymous]
     public class UserController : Controller
     {
-        protected readonly ICommandPipeline CommandPipeline;
-        protected readonly UserQueries UserQueries;
+        readonly ICommandPipeline commandPipeline;
+        readonly UserQueries userQueries;
 
         public UserController(ICommandPipeline commandPipeline, UserQueries userQueries)
         {
-            CommandPipeline = commandPipeline;
-            UserQueries = userQueries;
+            this.commandPipeline = commandPipeline;
+            this.userQueries = userQueries;
         }
 
         public ActionResult Register()
@@ -45,7 +45,7 @@
 
             try
             {
-                CommandPipeline.Handle(command);
+                commandPipeline.Handle(command);
             }
             catch (DomainException ex)
             {
@@ -60,7 +60,7 @@
         public ActionResult UserProfile()
         {
             TicketUserData userData = TicketUserData.FromContext(HttpContext);
-            User user = UserQueries.GetById(userData.UserId);
+            User user = userQueries.GetById(userData.UserId);
             return View(new UserProfileVM(user));
         }
 
@@ -85,7 +85,7 @@
                     Phone = userProfile.Phone,
                     UserId = userData.UserId
                 };
-                CommandPipeline.Handle(command);
+                commandPipeline.Handle(command);
             }
             catch (DomainException ex)
             {
@@ -113,7 +113,7 @@
                 return View(command);
             }
 
-            CommandPipeline.Handle(command);
+            commandPipeline.Handle(command);
             if (!command.IsSuccess)
             {
                 ModelState.AddModelError(string.Empty, "Incorrect login or password");

@@ -1,7 +1,7 @@
 ﻿namespace Saritasa.BoringWarehouse.Domain.Products.Queries
 {
     using System.Collections.Generic;
-    
+
     using Entities;
 
     public class ProductQueries
@@ -25,7 +25,6 @@
 
         public PagedResult<Product> Search(ProductsObjectQuery objectQuery)
         {
-            //
             return objectQuery.Search(GetAll());
         }
     }

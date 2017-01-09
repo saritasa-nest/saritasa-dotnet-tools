@@ -3,7 +3,7 @@
     using System.Linq;
 
     using Tools.Domain.Exceptions;
-    using Tools.Messages.Commands;
+    using Tools.Messages.Abstractions;
 
     using Commands;
     using Entities;

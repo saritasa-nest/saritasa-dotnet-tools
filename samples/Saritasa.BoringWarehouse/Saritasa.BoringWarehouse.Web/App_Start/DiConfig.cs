@@ -52,7 +52,7 @@
                     )
                 )
             );
-            commandPipeline.UseInternalResolver(true);
+            commandPipeline.UseInternalResolver();
             builder = new ContainerBuilder();
             builder.RegisterInstance(commandPipeline).AsImplementedInterfaces().SingleInstance();
 

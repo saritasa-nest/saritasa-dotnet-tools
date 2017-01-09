@@ -2,6 +2,7 @@
 {
     using System.Collections;
 
+#pragma warning disable SA1300 // Element must begin with upper-case letter
     public class DataTablesSearchResultViewModel
     {
         public int draw { get; set; }
@@ -14,4 +15,5 @@
 
         public string error { get; set; }
     }
+#pragma warning restore SA1300 // Element must begin with upper-case letter
 }

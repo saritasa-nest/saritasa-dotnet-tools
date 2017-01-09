@@ -11,6 +11,7 @@
         }
 
         public ProductProperty Property { get; }
+
         public int Index { get; }
     }
 }

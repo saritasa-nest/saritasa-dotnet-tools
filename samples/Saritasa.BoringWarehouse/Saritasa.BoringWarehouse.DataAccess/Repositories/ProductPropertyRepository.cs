@@ -7,7 +7,7 @@
 
     public class ProductPropertyRepository : EfRepository<ProductProperty, AppDbContext>, IProductPropertyRepository
     {
-        public ProductPropertyRepository(AppDbContext context) 
+        public ProductPropertyRepository(AppDbContext context)
             : base(context)
         {
         }
