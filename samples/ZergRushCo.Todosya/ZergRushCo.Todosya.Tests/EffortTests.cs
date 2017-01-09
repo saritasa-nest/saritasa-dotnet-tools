@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
-using NUnit.Framework;
+using Xunit;
 using ZergRushCo.Todosya.DataAccess;
 using ZergRushCo.Todosya.Domain.UserContext.Entities;
 
@@ -13,10 +13,9 @@ namespace ZergRushCo.Todosya.Tests
     /// <summary>
     /// Effort library tests. Mainly for demonstration purposes.
     /// </summary>
-    [TestFixture]
     public class EffortTests
     {
-        [Test]
+        [Fact]
         public void Omitting_SaveChanges_should_not_add_to_context()
         {
             var connection =
@@ -41,8 +40,8 @@ namespace ZergRushCo.Todosya.Tests
             using (var dbcontext = new AppDbContext(connection))
             {
                 dbcontext.UseSqliteDatabase = false;
-                Assert.That(dbcontext.Users.Count(), Is.EqualTo(1));
-                Assert.That(dbcontext.Users.First().Id, Is.EqualTo(1));
+                Assert.Equal(1, dbcontext.Users.Count());
+                Assert.False(string.IsNullOrEmpty(dbcontext.Users.First().Id));
             }
 
             // create another user but rollback
@@ -62,11 +61,11 @@ namespace ZergRushCo.Todosya.Tests
             using (var dbcontext = new AppDbContext(connection))
             {
                 dbcontext.UseSqliteDatabase = false;
-                Assert.That(dbcontext.Users.Count(), Is.EqualTo(1));
+                Assert.Equal(1, dbcontext.Users.Count());
             }
         }
 
-        [Test]
+        [Fact]
         public void Transactions_should_be_able_to_rollback()
         {
             var connection = Effort.DbConnectionFactory.CreatePersistent("Transactions_should_be_able_to_rollback");
@@ -93,7 +92,7 @@ namespace ZergRushCo.Todosya.Tests
             using (var dbcontext = new AppDbContext(connection))
             {
                 dbcontext.UseSqliteDatabase = false;
-                Assert.That(dbcontext.Users.Count(), Is.Zero);
+                Assert.Empty(dbcontext.Users);
             }
 
             // create real user
@@ -129,8 +128,8 @@ namespace ZergRushCo.Todosya.Tests
             {
                 dbcontext.UseSqliteDatabase = false;
                 var user = dbcontext.Users.FirstOrDefault();
-                Assert.That(user.FirstName, Is.EqualTo("First"));
-                Assert.That(user.LastName, Is.EqualTo("Last"));
+                Assert.Equal("First", user.FirstName);
+                Assert.Equal("Last", user.LastName);
             }
         }
     }
