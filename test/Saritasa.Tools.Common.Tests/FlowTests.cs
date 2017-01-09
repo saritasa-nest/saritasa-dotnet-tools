@@ -11,6 +11,7 @@ namespace Saritasa.Tools.Common.Tests
     using System.Threading.Tasks;
     using Xunit;
     using Extensions;
+    using Pagination;
     using Utils;
 
     /// <summary>

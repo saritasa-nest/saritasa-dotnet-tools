@@ -68,22 +68,6 @@ namespace Saritasa.Tools.Common.Extensions
         }
 
         /// <summary>
-        /// Get paged enumerable result.
-        /// </summary>
-        /// <typeparam name="T">The type of element.</typeparam>
-        /// <param name="source">Enumerable source to be paginate.</param>
-        /// <param name="page">Page number to select from source.</param>
-        /// <param name="pageSize">Page size.</param>
-        /// <returns>Paged enumerable.</returns>
-        public static PagedEnumerable<T> GetPaged<T>(
-            [NotNull] this IEnumerable<T> source,
-            int page = PagedEnumerable<T>.DefaultCurrentPage,
-            int pageSize = PagedEnumerable<T>.DefaultPageSize)
-        {
-            return new PagedEnumerable<T>(source, page, pageSize);
-        }
-
-        /// <summary>
         /// Breaks a list of items into chunks of a specific size.
         /// </summary>
         /// <param name="source">Source list.</param>
@@ -182,7 +166,8 @@ namespace Saritasa.Tools.Common.Extensions
 #endif
 
         /// <summary>
-        /// ForEach extension for IEnumerable of T. It's equivalence to foreach loop.
+        /// ForEach extension for IEnumerable of T to execute action against
+        /// every item in it. It's equivalence to foreach loop.
         /// </summary>
         /// <param name="target">Target collection.</param>
         /// <param name="action">Action for execute on each item.</param>
@@ -194,6 +179,29 @@ namespace Saritasa.Tools.Common.Extensions
             {
                 action(item);
             }
+        }
+
+        /// <summary>
+        /// Returns item index in enumerable that matches specific condition.
+        /// </summary>
+        /// <typeparam name="T">Target enumerable type.</typeparam>
+        /// <param name="target">Target collection.</param>
+        /// <param name="condition">Condition to match.</param>
+        /// <returns>The index of first item that matches condition or -1.</returns>
+        public static int FirstIndexMatch<T>(
+            this IEnumerable<T> target,
+            Predicate<T> condition)
+        {
+            var index = 0;
+            foreach (var item in target)
+            {
+                if (condition.Invoke(item))
+                {
+                    return index;
+                }
+                index++;
+            }
+            return -1;
         }
     }
 }

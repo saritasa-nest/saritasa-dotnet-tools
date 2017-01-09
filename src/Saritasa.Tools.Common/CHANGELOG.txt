@@ -5,6 +5,8 @@
 [-] Remove BeginOfMonth and EndOfMonth functions in DateTimeUtils.
 [*] Fix Memoize for composite keys.
 [+] Add EnumExtensions.GetAttribute extension.
+[*] Pagination refactor and improvements.
+[+] Add CollectionsExtensions.FirstIndexMatch method.
 
 0.1.1 [2016-12-16]
 [+] FlowUtils.RetryAsync now uses ConfigureAwait false to call action.

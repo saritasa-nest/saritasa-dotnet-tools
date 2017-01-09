@@ -23,3 +23,11 @@ Simplify pagination.
     .. function:: PagedEnumerable<T> Create(IEnumerable<T> pagedSource, int page, int pageSize, int totalPages)
 
         Creates an instance without any queries. It only fills internal properies.
+
+    .. function:: PagedEnumerable<T> CreateAndReturnAll([NotNull] IEnumerable<T> source)
+
+        Returns paged enumerable that contains only one page with all data on it.
+
+    .. function:: PagedMetadata GetMetadata()
+
+        Returns special formatted object that contains metadata information about paged enumerable: page size, current page and total pages.

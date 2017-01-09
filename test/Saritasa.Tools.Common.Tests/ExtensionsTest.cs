@@ -133,5 +133,18 @@ namespace Saritasa.Tools.Common.Tests
             // Arrange
             Assert.Null(attr);
         }
+
+        [Fact]
+        public void Get_find_first_index_should_return_index()
+        {
+            // Arrange
+            var arr = new[] { 10, 45, 6, 34, 6 };
+
+            // Act
+            var index = arr.FirstIndexMatch(a => a == 6);
+
+            // Arrange
+            Assert.Equal(2, index);
+        }
     }
 }

@@ -26,7 +26,7 @@ CollectionsExtensions
 
         Breaks a list of items into chunks of a specific size and yeilds T items. Default ``chunkSize`` is 1000.
 
-    .. function:: void Walk<T>(IEnumerable<T> target, Action<T> action)
+    .. function:: void ForEach<T>(IEnumerable<T> target, Action<T> action)
 
         Implements foreach loop with Action. Action does something with each item of collection. Since there is a tacit agreement that linq extensions should not change collection items it is implemented as helper method. Default chunk size is 1000. For example you can use it like this:
 
@@ -38,7 +38,16 @@ CollectionsExtensions
 
                 // can be replaced
 
-                Users.Walk(u => { u.FirstName = StringExtensions.Capitalize(u.FirstName) });
+                Users.ForEach(u => { u.FirstName = StringExtensions.Capitalize(u.FirstName) });
+
+    .. function:: int FirstIndexMatch<T>(IEnumerable<T> target, Predicate<T> condition)
+
+         Returns item index in enumerable that matches specific condition. Example:
+
+            .. code-block:: c#
+
+                var arr = new[] { 10, 45, 6, 34, 6 };
+                var index = arr.FirstIndexMatch(a => a == 6); // returns 2
 
 DictionaryExtensions
 --------------------

@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.Common
+namespace Saritasa.Tools.Common.Pagination
 {
     using System;
     using System.Collections;
@@ -25,7 +25,7 @@ namespace Saritasa.Tools.Common
         /// </summary>
         public const int DefaultPageSize = 100;
 
-        IEnumerable<T> source;
+        IList<T> source;
         int totalPages;
         int pageSize;
 
@@ -43,6 +43,36 @@ namespace Saritasa.Tools.Common
         /// Page size. Max number of items on page.
         /// </summary>
         public int PageSize => pageSize;
+
+        /// <summary>
+        /// Is pagination now on first page.
+        /// </summary>
+        public bool IsFirstPage => CurrentPage == 1;
+
+        /// <summary>
+        /// Is pagination now on last page.
+        /// </summary>
+        public bool IsLastPage => CurrentPage == TotalPages;
+
+        /// <summary>
+        /// Gets the element at the specified index.
+        /// </summary>
+        /// <param name="index">The zero-based index of the element to get.</param>
+        public T this[int index] => source[index];
+
+        /// <summary>
+        /// Get paged metadata.
+        /// </summary>
+        /// <returns>Paged metadata.</returns>
+        public PagedMetadata GetMetadata()
+        {
+            return new PagedMetadata
+            {
+                TotalPages = TotalPages,
+                PageSize = PageSize,
+                CurrentPage = CurrentPage,
+            };
+        }
 
         /// <summary>
         /// Internal .ctor
@@ -68,13 +98,13 @@ namespace Saritasa.Tools.Common
             {
                 throw new ArgumentNullException(nameof(baseSource));
             }
-            if (page <= 0)
+            if (page <= 1)
             {
-                throw new ArgumentException(nameof(page));
+                throw new ArgumentOutOfRangeException(nameof(page));
             }
             if (pageSize <= 0)
             {
-                throw new ArgumentException(nameof(pageSize));
+                throw new ArgumentOutOfRangeException(nameof(pageSize));
             }
 
             this.CurrentPage = page;
@@ -84,37 +114,20 @@ namespace Saritasa.Tools.Common
         }
 
         /// <summary>
-        /// Creates the paged enumerable instance without any queries. It only fills internal properies.
+        /// Creates instance with position on first page. PageSize will be set to total
+        /// number of records in source.
         /// </summary>
         /// <param name="source">Enumerable.</param>
-        /// <param name="page">Page to select. Default is first.</param>
-        /// <param name="pageSize">Page size. Default is 100.</param>
-        /// <param name="totalPages">Total pages. If below zero it will be calculated.</param>
-        public static PagedEnumerable<T> Create(
-            [NotNull] IEnumerable<T> source,
-            int page = DefaultCurrentPage,
-            int pageSize = DefaultPageSize,
-            int totalPages = -1)
+        /// <returns>Paged enumerable.</returns>
+        public static PagedEnumerable<T> CreateAndReturnAll([NotNull] IEnumerable<T> source)
         {
-            if (source == null)
-            {
-                throw new ArgumentNullException(nameof(source));
-            }
-            if (page <= 0)
-            {
-                throw new ArgumentException(nameof(page));
-            }
-            if (pageSize <= 0)
-            {
-                throw new ArgumentException(nameof(pageSize));
-            }
-
+            var list = source.ToList();
             return new PagedEnumerable<T>()
             {
-                source = source,
-                CurrentPage = page,
-                pageSize = pageSize,
-                totalPages = totalPages,
+                source = list,
+                CurrentPage = 1,
+                pageSize = list.Count,
+                totalPages = list.Count,
             };
         }
 

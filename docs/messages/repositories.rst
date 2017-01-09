@@ -100,7 +100,7 @@ There are built in repositories.
 
             .. attribute:: bool buffer = true
 
-                Should the output stream be buffered.
+                Should the output stream be buffered. The message will be stored to buffer before writing to disk.
 
     .. class:: FileMessageRepository
 
@@ -120,7 +120,7 @@ There are built in repositories.
 
             .. attribute:: bool buffer = true
 
-                Should the output stream be buffered.
+                Should the output stream be buffered. The message will be stored to buffer before writing to disk.
 
             .. attribute:: bool compress = false
 
@@ -138,8 +138,16 @@ There are built in repositories.
 
     .. class:: ElasticsearchRepository
 
-        Store messages to Elasticsearch. Index name is ``saritasa.messages``.
+        Store messages to Elasticsearch. Default index name is ``saritasa.messages``.
 
             .. attribute:: uri
 
                 Uri to Elasticsearch instance. For example default installed instance has ``http://localhost:9200`` address.
+
+    .. class:: LogglyRepository
+
+        Uses `Loggly <http://www.loggly.com>`_ service to send messages to.
+
+            .. attribute:: token
+
+                Customer token. Should be created within Loggly admin panel.
