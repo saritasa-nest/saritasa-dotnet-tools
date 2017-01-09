@@ -73,7 +73,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
         /// <summary>
         /// Start tcp port listening.
         /// </summary>
-        public void Start()
+        public virtual void Start()
         {
             if (disposed)
             {
@@ -107,7 +107,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
         /// Stop listening. Need to wait for last executing message.
         /// <param name="wait">Wait when all handlers will be stopped.</param>
         /// </summary>
-        public void Stop(bool wait = false)
+        public virtual void Stop(bool wait = false)
         {
             if (disposed)
             {
@@ -315,7 +315,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
         }
 
         /// <inheritdoc />
-        public void RegisterPipelines(params IMessagePipeline[] pipelines)
+        public virtual void RegisterPipelines(params IMessagePipeline[] pipelines)
         {
             if (pipelines.Length == 0)
             {

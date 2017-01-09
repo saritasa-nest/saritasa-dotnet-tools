@@ -10,6 +10,9 @@ namespace Saritasa.Tools.Common.Pagination
     /// Paged data transfer object. Combines metadata and page items.
     /// </summary>
     /// <typeparam name="T">Page items type.</typeparam>
+#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_6
+    [Serializable]
+#endif
     public class PagedDto<T>
     {
         /// <summary>

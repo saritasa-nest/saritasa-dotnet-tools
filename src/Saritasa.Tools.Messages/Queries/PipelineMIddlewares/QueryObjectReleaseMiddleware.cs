@@ -15,7 +15,7 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
         public string Id { get; } = "Release";
 
         /// <inheritdoc />
-        public void Handle(IMessage message)
+        public virtual void Handle(IMessage message)
         {
             var queryMessage = message as QueryMessage;
             if (queryMessage == null)

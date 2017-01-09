@@ -86,7 +86,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public void Handle(IMessage message)
+        public virtual void Handle(IMessage message)
         {
             if (!initialized)
             {

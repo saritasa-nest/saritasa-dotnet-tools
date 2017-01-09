@@ -49,7 +49,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public void Handle(IMessage message)
+        public virtual void Handle(IMessage message)
         {
             if (filter != null && !filter.IsMatch(message))
             {
@@ -59,7 +59,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public async Task HandleAsync(IMessage message)
+        public virtual async Task HandleAsync(IMessage message)
         {
             if (filter != null && !filter.IsMatch(message))
             {

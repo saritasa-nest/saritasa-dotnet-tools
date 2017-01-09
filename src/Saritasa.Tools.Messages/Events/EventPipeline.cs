@@ -22,13 +22,13 @@ namespace Saritasa.Tools.Messages.Events
         #region IEventPipeline
 
         /// <inheritdoc />
-        public void Raise(object @event)
+        public virtual void Raise(object @event)
         {
             ProcessMiddlewares(new EventMessage(@event));
         }
 
         /// <inheritdoc />
-        public async Task RaiseAsync(object @event)
+        public virtual async Task RaiseAsync(object @event)
         {
             await ProcessMiddlewaresAsync(new EventMessage(@event));
         }

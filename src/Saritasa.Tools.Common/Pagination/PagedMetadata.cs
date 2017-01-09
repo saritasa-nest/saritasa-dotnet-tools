@@ -3,9 +3,14 @@
 
 namespace Saritasa.Tools.Common.Pagination
 {
+    using System;
+
     /// <summary>
     /// Pagination metadata class.
     /// </summary>
+#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_6
+    [Serializable]
+#endif
     public class PagedMetadata
     {
         /// <summary>

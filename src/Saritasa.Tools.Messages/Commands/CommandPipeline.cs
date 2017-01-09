@@ -22,7 +22,7 @@ namespace Saritasa.Tools.Messages.Commands
         #region ICommandPipeline
 
         /// <inheritdoc />
-        public void Handle(object command)
+        public virtual void Handle(object command)
         {
             var commandMessage = new CommandMessage(command);
             ProcessMiddlewares(commandMessage);
@@ -30,7 +30,7 @@ namespace Saritasa.Tools.Messages.Commands
         }
 
         /// <inheritdoc />
-        public async Task HandleAsync(object command)
+        public virtual async Task HandleAsync(object command)
         {
             var commandMessage = new CommandMessage(command);
             await ProcessMiddlewaresAsync(commandMessage);

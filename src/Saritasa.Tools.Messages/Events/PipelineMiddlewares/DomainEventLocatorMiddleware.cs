@@ -33,7 +33,7 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public void Handle(IMessage message)
+        public virtual void Handle(IMessage message)
         {
             var eventMessage = message as EventMessage;
             if (eventMessage == null)

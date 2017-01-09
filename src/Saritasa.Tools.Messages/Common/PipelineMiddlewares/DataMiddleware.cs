@@ -31,7 +31,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public void Handle(IMessage context)
+        public virtual void Handle(IMessage context)
         {
             action(context.Data);
         }

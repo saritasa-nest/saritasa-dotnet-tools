@@ -1,9 +1,9 @@
 {
   "title": "Saritasa Tools for NLog4",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "authors": [ "Saritasa" ],
   "description": "The package is a part of Saritasa Tools project. Saritasa.Tools.NLog4 contains implementation for Microsoft common logging infrastructure for NLog.",
-  "copyright": "Saritasa 2015-2016",
+  "copyright": "Saritasa 2015-2017",
   "packOptions": {
     "iconUrl": "https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png",
     "licenseUrl": "https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/LICENSE",

@@ -138,13 +138,13 @@ namespace Saritasa.Tools.Messages.Queries
         }
 
         /// <inheritdoc />
-        public ICaller<TQuery> Query<TQuery>() where TQuery : class
+        public virtual ICaller<TQuery> Query<TQuery>() where TQuery : class
         {
             return new Caller<TQuery>(this);
         }
 
         /// <inheritdoc />
-        public ICaller<TQuery> Query<TQuery>(TQuery obj) where TQuery : class
+        public virtual ICaller<TQuery> Query<TQuery>(TQuery obj) where TQuery : class
         {
             return new Caller<TQuery>(this, obj);
         }

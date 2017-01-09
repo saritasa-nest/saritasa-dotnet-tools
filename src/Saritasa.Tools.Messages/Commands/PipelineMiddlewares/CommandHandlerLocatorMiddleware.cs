@@ -95,7 +95,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public void Handle(IMessage message)
+        public virtual void Handle(IMessage message)
         {
             var commandMessage = message as CommandMessage;
             if (commandMessage == null)

@@ -16,7 +16,7 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
         public string Id => "QueryExecutor";
 
         /// <inheritdoc />
-        public void Handle(IMessage message)
+        public virtual void Handle(IMessage message)
         {
             var queryMessage = message as QueryMessage;
             if (queryMessage == null)
@@ -49,7 +49,7 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public async Task HandleAsync(IMessage message)
+        public virtual async Task HandleAsync(IMessage message)
         {
             var queryMessage = message as QueryMessage;
             if (queryMessage == null)
