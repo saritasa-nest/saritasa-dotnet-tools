@@ -33,6 +33,7 @@ namespace ZergRushCo.Todosya.Domain.TaskContext.Commands
         /// <summary>
         /// Task completion due date.
         /// </summary>
+        [DataType(DataType.Date)]
         public DateTime? DueDate { get; set; }
 
         /// <summary>

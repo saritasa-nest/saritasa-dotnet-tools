@@ -4,7 +4,7 @@ using Xunit;
 using ZergRushCo.Todosya.Domain.TaskContext.Commands;
 using ZergRushCo.Todosya.Domain.TaskContext.Handlers;
 
-namespace ZergRushCo.Todosya.Tests
+namespace ZergRushCo.Todosya.Domain.Tests
 {
     /// <summary>
     /// Tasks related tests.

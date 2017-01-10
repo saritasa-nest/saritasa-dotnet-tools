@@ -8,7 +8,7 @@ using Xunit;
 using ZergRushCo.Todosya.DataAccess;
 using ZergRushCo.Todosya.Domain.UserContext.Entities;
 
-namespace ZergRushCo.Todosya.Tests
+namespace ZergRushCo.Todosya.Domain.Tests
 {
     /// <summary>
     /// Effort library tests. Mainly for demonstration purposes.

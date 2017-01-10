@@ -164,7 +164,7 @@
     <Compile Include="UserContext\Commands\ResetPasswordCommand.cs" />
     <Compile Include="UserContext\Commands\UpdateUserCommand.cs" />
     <Compile Include="UserContext\Commands\RegisterUserCommand.cs" />
-    <Compile Include="UserContext\Commands\UpdateUserPassword.cs" />
+    <Compile Include="UserContext\Commands\UpdateUserPasswordCommand.cs" />
     <Compile Include="UserContext\Entities\Role.cs" />
     <Compile Include="UserContext\Entities\User.cs" />
     <Compile Include="UserContext\Entities\UserRole.cs" />

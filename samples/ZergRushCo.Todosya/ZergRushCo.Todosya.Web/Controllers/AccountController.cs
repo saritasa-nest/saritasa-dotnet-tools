@@ -144,7 +144,7 @@ namespace ZergRushCo.Todosya.Web.Controllers
                 // Don't reveal that the user does not exist
                 return RedirectToAction("ResetPasswordConfirmation", "Account");
             }
-            var result = await signInManager.UserManager.ResetPasswordAsync(user.Id, command.Code, command.Password);
+            var result = await signInManager.UserManager.ResetPasswordAsync(user.Id, command.Code, command.NewPassword);
             if (result.Succeeded)
             {
                 return RedirectToAction("ResetPasswordConfirmation", "Account");

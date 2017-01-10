@@ -108,7 +108,7 @@ namespace ZergRushCo.Todosya.Domain.UserContext.Handlers
             command.HasPassword = userManager.SupportsUserPassword;
         }
 
-        public async Task HandleUpdateUserPassword(UpdateUserPassword command)
+        public async Task HandleUpdateUserPassword(UpdateUserPasswordCommand command)
         {
             if (string.IsNullOrEmpty(command.CurrentPassword))
             {

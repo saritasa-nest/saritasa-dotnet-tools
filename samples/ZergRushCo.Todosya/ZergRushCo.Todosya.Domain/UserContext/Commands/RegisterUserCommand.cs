@@ -17,6 +17,7 @@ namespace ZergRushCo.Todosya.Domain.UserContext.Commands
         [Required]
         [EmailAddress]
         [Display(Name = "Email")]
+        [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
 
         /// <summary>
@@ -68,6 +69,7 @@ namespace ZergRushCo.Todosya.Domain.UserContext.Commands
         /// User's birthday.
         /// </summary>
         [Display(Name = "Birth Day")]
+        [DataType(DataType.Date)]
         public DateTime? BirthDay { get; set; }
 
         /// <summary>
@@ -76,6 +78,9 @@ namespace ZergRushCo.Todosya.Domain.UserContext.Commands
         [CommandOut]
         public IdentityResult Result { get; set; }
 
+        /// <summary>
+        /// Out user's instance.
+        /// </summary>
         [CommandOut]
         public User User { get; set; }
     }

@@ -8,8 +8,8 @@
     <ProjectGuid>{64615AF2-4F28-4FB4-83D7-029E7B3AB4D4}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ZergRushCo.Todosya.Tests</RootNamespace>
-    <AssemblyName>ZergRushCo.Todosya.Tests</AssemblyName>
+    <RootNamespace>ZergRushCo.Todosya.Domain.Tests</RootNamespace>
+    <AssemblyName>ZergRushCo.Todosya.Domain.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>

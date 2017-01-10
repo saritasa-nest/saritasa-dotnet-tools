@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Mail;
-using System.Text;
+﻿using System.Net.Mail;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
 using ZergRushCo.Todosya.Domain.UserContext.Events;

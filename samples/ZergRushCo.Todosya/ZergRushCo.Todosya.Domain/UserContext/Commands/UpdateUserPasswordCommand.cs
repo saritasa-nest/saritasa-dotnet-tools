@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNet.Identity;
 
 namespace ZergRushCo.Todosya.Domain.UserContext.Commands
 {
-    public class UpdateUserPassword
+    /// <summary>
+    /// Update user password.
+    /// </summary>
+    public class UpdateUserPasswordCommand
     {
         /// <summary>
         /// User id we are going update to.

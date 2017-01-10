@@ -1,15 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ZergRushCo.Todosya.Domain.UserContext.Entities
+﻿namespace ZergRushCo.Todosya.Domain.UserContext.Entities
 {
+    /// <summary>
+    /// Possible user roles.
+    /// </summary>
     public enum UserRole
     {
+        /// <summary>
+        /// Regular registered user. Has access to common site functionality.
+        /// </summary>
         Regular,
 
+        /// <summary>
+        /// Admin user. Can disable/edit other users.
+        /// </summary>
         Admin
     }
 }

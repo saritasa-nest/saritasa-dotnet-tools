@@ -18,11 +18,13 @@ namespace ZergRushCo.Todosya.Domain.TaskContext.Entities
         /// <summary>
         /// The user task belongs to.
         /// </summary>
+        [Required]
         public virtual User User { get; set; }
 
         /// <summary>
         /// The project task related to. Project must be created by the same user.
         /// </summary>
+        [Required]
         public virtual Project Project { get; set; }
 
         /// <summary>

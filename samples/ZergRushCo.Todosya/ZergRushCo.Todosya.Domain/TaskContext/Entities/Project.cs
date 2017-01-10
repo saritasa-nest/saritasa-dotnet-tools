@@ -18,6 +18,7 @@ namespace ZergRushCo.Todosya.Domain.TaskContext.Entities
         /// <summary>
         /// The user project is related to.
         /// </summary>
+        [Required]
         public virtual User User { get; set; }
 
         /// <summary>

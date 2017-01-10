@@ -98,11 +98,11 @@ namespace Saritasa.Tools.Common.Pagination
             {
                 throw new ArgumentNullException(nameof(baseSource));
             }
-            if (page <= 1)
+            if (page < 1)
             {
                 throw new ArgumentOutOfRangeException(nameof(page));
             }
-            if (pageSize <= 0)
+            if (pageSize < 1)
             {
                 throw new ArgumentOutOfRangeException(nameof(pageSize));
             }

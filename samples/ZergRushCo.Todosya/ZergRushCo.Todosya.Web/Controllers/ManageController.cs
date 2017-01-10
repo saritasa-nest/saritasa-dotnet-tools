@@ -64,7 +64,7 @@ namespace ZergRushCo.Todosya.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ChangePassword(UpdateUserPassword command)
+        public async Task<ActionResult> ChangePassword(UpdateUserPasswordCommand command)
         {
             command.UserId = User.Identity.GetUserId();
             await HandleCommandAsync(command);
@@ -78,7 +78,7 @@ namespace ZergRushCo.Todosya.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> SetPassword(UpdateUserPassword command)
+        public async Task<ActionResult> SetPassword(UpdateUserPasswordCommand command)
         {
             command.UserId = User.Identity.GetUserId();
             await HandleCommandAsync(command);

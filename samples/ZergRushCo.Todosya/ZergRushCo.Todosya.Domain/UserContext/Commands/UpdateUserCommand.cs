@@ -44,10 +44,11 @@ namespace ZergRushCo.Todosya.Domain.UserContext.Commands
         [Required]
         [EmailAddress]
         [Display(Name = "Email")]
+        [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
 
         /// <summary>
-        /// Nwe user first name.
+        /// New user first name.
         /// </summary>
         [Required]
         [MaxLength(120)]
@@ -78,6 +79,7 @@ namespace ZergRushCo.Todosya.Domain.UserContext.Commands
         /// Updated user birthday.
         /// </summary>
         [Display(Name = "Birth Day")]
+        [DataType(DataType.Date)]
         public DateTime? BirthDay { get; set; }
 
         /// <summary>

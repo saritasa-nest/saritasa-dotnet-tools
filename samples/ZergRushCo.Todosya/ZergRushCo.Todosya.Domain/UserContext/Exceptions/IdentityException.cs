@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Saritasa.Tools.Domain.Exceptions;
 
@@ -22,7 +19,7 @@ namespace ZergRushCo.Todosya.Domain.UserContext.Exceptions
         /// <summary>
         /// The list of all error messages separated by new line.
         /// </summary>
-        public override string Message => string.Join(Environment.NewLine, Result.Errors);
+        public override string Message => Result.Errors.First();
 
         /// <summary>
         /// .ctor

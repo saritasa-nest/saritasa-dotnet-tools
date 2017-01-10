@@ -4,7 +4,7 @@ using ZergRushCo.Todosya.Domain.TaskContext.Entities;
 namespace ZergRushCo.Todosya.Domain.TaskContext.Dtos
 {
     /// <summary>
-    /// Task simple DTO.
+    /// Task simple dto.
     /// </summary>
     public class TaskDto
     {

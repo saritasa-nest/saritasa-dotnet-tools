@@ -5,7 +5,7 @@ using System.IO;
 using ZergRushCo.Todosya.DataAccess;
 using ZergRushCo.Todosya.Domain;
 
-namespace ZergRushCo.Todosya.Tests
+namespace ZergRushCo.Todosya.Domain.Tests
 {
     /// <summary>
     /// Unit of work factory for testing.
