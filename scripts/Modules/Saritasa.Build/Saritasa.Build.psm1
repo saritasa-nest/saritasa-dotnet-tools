@@ -118,7 +118,7 @@ function Update-AssemblyInfoFile
                         ForEach-Object { $_ -replace $fileVersionPattern, $fileVersion }
                     } | Set-Content $filename -Encoding UTF8
                     
-                Write-Information $filename, ' -> ', $Version
+                Write-Information ($filename + ' -> ' + $Version)
             }
         }
 }

@@ -230,7 +230,7 @@ function Sync-IisApp
     Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
 
     Assert-WebDeployCredential
-    $args = @('-verb:sync', "-source:iisApp='$SiteName/FormI9Verify'",
+    $args = @('-verb:sync', "-source:iisApp='$SiteName/$Application'",
               ("-dest:auto,computerName='https://${DestinationServer}:$msdeployPort/msdeploy.axd?site=$SiteName'," + $credential))
 
     $result = Start-Process -NoNewWindow -Wait -PassThru "$msdeployPath\msdeploy.exe" $args 
@@ -256,14 +256,17 @@ function Sync-WebContent
         [Parameter(Mandatory = $true)]
         [string] $DestinationServer,
         [Parameter(Mandatory = $true)]
-        [string] $SiteName
+        [string] $SiteName,
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyString()]
+        [string] $Application
     )
 
     Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
 
     Assert-WebDeployCredential
     $args = @('-verb:sync', "-source:contentPath='$ContentPath'",
-              ("-dest:auto,computerName='https://${DestinationServer}:$msdeployPort/msdeploy.axd?site=$SiteName'," + $credential))
+              ("-dest:'$SiteName/$Application',computerName='https://${DestinationServer}:$msdeployPort/msdeploy.axd?site=$SiteName'," + $credential))
 
     $result = Start-Process -NoNewWindow -Wait -PassThru "$msdeployPath\msdeploy.exe" $args 
     if ($result.ExitCode)

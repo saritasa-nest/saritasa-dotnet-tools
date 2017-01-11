@@ -1,4 +1,4 @@
-﻿0.1.2 [TBD]
+﻿0.1.2 [2017-01-11]
 [+] EnumExtensions.GetDescription for .NET 4.0 .
 [+] Add DateTimePeriod.Week and DateTimePeriod.Year.
 [+] Add CombineDateTime, BeginOf, EndOf, IsBetween and unix time stamp functions to DateTimeUtils.

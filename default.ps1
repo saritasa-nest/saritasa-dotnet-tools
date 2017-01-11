@@ -27,6 +27,7 @@ $packages = @(
     'Saritasa.Tools.EfCore1'
     'Saritasa.Tools.Emails'
     'Saritasa.Tools.Messages'
+    'Saritasa.Tools.Messages.Abstractions'
     'Saritasa.Tools.Misc'
     'Saritasa.Tools.Mvc5'
     'Saritasa.Tools.NLog4'

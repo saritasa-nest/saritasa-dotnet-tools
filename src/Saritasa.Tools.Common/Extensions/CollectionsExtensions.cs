@@ -92,7 +92,7 @@ namespace Saritasa.Tools.Common.Extensions
         /// </summary>
         /// <param name="source">Source list.</param>
         /// <param name="chunkSize">Chunk size.</param>
-        /// <returns>Enumeration of queryables.</returns>
+        /// <returns>Enumeration of queryable collections.</returns>
         public static IEnumerable<IQueryable<T>> ChunkSelectRange<T>(
             [NotNull] this IQueryable<T> source,
             int chunkSize = DefaultChunkSize)

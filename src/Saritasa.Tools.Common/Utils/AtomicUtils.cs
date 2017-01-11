@@ -103,6 +103,7 @@ namespace Saritasa.Tools.Common.Utils
                 temp = location;
                 replace = func(temp);
             }
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
             while (Interlocked.CompareExchange(ref location, replace, temp) != temp);
         }
 
