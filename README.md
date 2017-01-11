@@ -7,7 +7,7 @@ Overview
 --------
 
 1. [Saritasa.Tools.Common](https://www.nuget.org/packages/Saritasa.Tools.Common) - _various utilities (validation, flow, security, atomic), extensions (dict, datetime, string), pagination;_
-1. [Saritasa.Tools.Domain](https://www.nuget.org/packages/Saritasa.Tools.Domain) - _general interfaces: repository, unit of work, domian events; exceptions;_
+1. [Saritasa.Tools.Domain](https://www.nuget.org/packages/Saritasa.Tools.Domain) - _general interfaces: repository, unit of work, domain events; exceptions;_
 1. [Saritasa.Tools.Emails](https://www.nuget.org/packages/Saritasa.Tools.Emails) - _intefaces for system emails;_
 1. [Saritasa.Tools.Messages](https://www.nuget.org/packages/Saritasa.Tools.Messages) - _commands, queries, events: pipeline to process and log system queries/actions;_
 1. [Saritasa.Tools.Messages.Abstractions](https://www.nuget.org/packages/Saritasa.Tools.Messages.Abstractions) - _contains interfaces and base classes for package above with minimum dependencies;_

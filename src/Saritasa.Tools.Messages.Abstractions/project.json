@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "authors": [ "Saritasa" ],
   "description": "The package is a part of Saritasa Tools project. Saritasa.Tools.Messages contains CQRS infrastructure abstractions that includes command, queryies and events.",
-  "copyright": "Saritasa 2015-2016",
+  "copyright": "Saritasa 2015-2017",
   "packOptions": {
     "iconUrl": "https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png",
     "licenseUrl": "https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/LICENSE",

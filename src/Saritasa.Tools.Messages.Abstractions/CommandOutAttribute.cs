@@ -6,11 +6,10 @@ namespace Saritasa.Tools.Messages.Abstractions
     using System;
 
     /// <summary>
-    /// The class that contains commands handers should be marked
-    /// with this attribute.
+    /// Marks property as output. Is not for processing.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public class CommandHandlersAttribute : MessageHandlersAttribute
+    [AttributeUsage(AttributeTargets.Property)]
+    public class CommandOutAttribute : Attribute
     {
     }
 }
