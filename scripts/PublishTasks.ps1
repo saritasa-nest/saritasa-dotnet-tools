@@ -30,5 +30,6 @@ Task docker-bw -depends build-bw `
     $dockerContext = "$samples\Saritasa.BoringWarehouse\Docker"
     $version = (gitversion /showvariable SemVer)
 
-    Exec { docker build -t bw/web:latest -t "bw:$version" $dockerContext }
+    Exec { docker build -t bw/web:latest -t "bw/web:$version" -f "$dockerContext\Dockerfile.web" $dockerContext }
+    Exec { docker build -t bw/db:latest -t "bw/db:$version" -f "$dockerContext\Dockerfile.db" $dockerContext }
 }

@@ -1,0 +1,24 @@
+version: '2.1'
+services:
+  db:
+    build:
+      context: ./Docker
+      dockerfile: Dockerfile.db
+    image: bw/db
+    environment:
+      sa_password: "29hHzGtB"
+      ACCEPT_EULA: "Y"
+    networks:
+      - default
+  web:
+    build:
+      context: ./Docker
+      dockerfile: Dockerfile.web
+    image: bw/web
+    depends_on:
+      - "db"
+    
+networks:
+  default:
+    external:
+      name: nat
