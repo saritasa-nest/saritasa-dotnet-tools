@@ -9,15 +9,15 @@ Task build-zerg `
     Invoke-SolutionBuild "$samples\ZergRushCo.Todosya\ZergRushCo.Todosya.sln" -Configuration $Configuration
 
     Set-Location "$samples\ZergRushCo.Todosya\ZergRushCo.Todosya.Web"
-    npm i
-    bower i
+    Exec { npm i }
+    Exec { bower i }
 
     if (!(Test-Path 'Static'))
     {
         New-Item 'Static' -ItemType Directory
     }
 
-    gulp
+    Exec { gulp }
 
     Set-Location "$samples\.."
 }

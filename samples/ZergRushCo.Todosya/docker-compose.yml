@@ -4,6 +4,7 @@ services:
     build:
       context: ./Docker
       dockerfile: Dockerfile.db
+    image: zerg/db
     environment:
       sa_password: "29hHzGtB"
       ACCEPT_EULA: "Y"
@@ -13,6 +14,7 @@ services:
     build:
       context: ./Docker
       dockerfile: Dockerfile.web
+    image: zerg/web
     depends_on:
       - "db"
     ports:
