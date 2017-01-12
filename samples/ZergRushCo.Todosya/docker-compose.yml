@@ -1,7 +1,9 @@
 version: '2.1'
 services:
   db:
-    image: microsoft/mssql-server-windows-express
+    build:
+      context: ./Docker
+      dockerfile: Dockerfile.db
     environment:
       sa_password: "29hHzGtB"
       ACCEPT_EULA: "Y"
@@ -10,7 +12,7 @@ services:
   web:
     build:
       context: ./Docker
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.web
     depends_on:
       - "db"
     ports:

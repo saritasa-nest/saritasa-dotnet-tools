@@ -56,7 +56,7 @@ namespace ZergRushCo.Todosya.Web
                     new Saritasa.Tools.Messages.Repositories.AdoNetMessageRepository(
                         System.Data.Common.DbProviderFactories.GetFactory(connectionStringConf.ProviderName),
                         connectionString,
-                        Saritasa.Tools.Messages.Repositories.AdoNetMessageRepository.Dialect.SqLite)
+                        Saritasa.Tools.Messages.Repositories.AdoNetMessageRepository.Dialect.SqlServer)
                 )
             );
             builder = new ContainerBuilder();

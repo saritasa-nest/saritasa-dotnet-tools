@@ -1,0 +1,8 @@
+FROM microsoft/mssql-server-windows-express
+
+ENV sa_password 29hHzGtB
+ENV ACCEPT_EULA Y
+
+ADD CreateDB.sql C:/Temp/CreateDB.sql
+
+RUN ["sqlcmd", "-i", "C:\\Temp\\CreateDB.sql"]
