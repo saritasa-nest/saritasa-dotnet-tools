@@ -2,6 +2,11 @@ $root = $PSScriptRoot
 $src = "$root\..\src"
 $samples = "$root\..\samples"
 
+Task download-nuget `
+{
+    Install-NugetCli $root
+}
+
 Task build-zerg `
 {
     Invoke-NugetRestore "$src\Saritasa.Tools.sln"
@@ -22,7 +27,7 @@ Task build-zerg `
     Set-Location "$samples\.."
 }
 
-Task build-bw `
+Task build-bw -depends download-nuget `
 {
     Invoke-NugetRestore "$src\Saritasa.Tools.sln"
     &"$root\nuget.exe" restore "$src\Saritasa.Tools.NLog4\packages.config" -SolutionDirectory $src

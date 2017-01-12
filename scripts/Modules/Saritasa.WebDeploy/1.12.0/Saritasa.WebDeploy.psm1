@@ -178,6 +178,7 @@ function Invoke-WebDeployment
         [Parameter(Mandatory = $true)]
         [AllowEmptyString()]
         [string] $Application,
+        [switch] $AllowUntrusted,
         [string[]] $MSDeployParams
     )
 
@@ -189,7 +190,13 @@ function Invoke-WebDeployment
     $args = @("-source:package='$PackagePath'",
               ("-dest:auto,computerName='https://${ServerHost}:$msdeployPort/msdeploy.axd?site=$SiteName',includeAcls='False'," + $credential),
               '-verb:sync', '-disableLink:AppPoolExtension', '-disableLink:ContentExtension', '-disableLink:CertificateExtension',
-              '-allowUntrusted', "-setParam:name='IIS Web Application Name',value='$SiteName/$Application'")
+              "-setParam:name='IIS Web Application Name',value='$SiteName/$Application'")
+
+    if ($AllowUntrusted)
+    {
+        $args += '-allowUntrusted'
+    }
+
     if ($MSDeployParams)
     {
         $args += $MSDeployParams
@@ -223,7 +230,7 @@ function Sync-IisApp
     Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
 
     Assert-WebDeployCredential
-    $args = @('-verb:sync', "-source:iisApp='$SiteName/FormI9Verify'",
+    $args = @('-verb:sync', "-source:iisApp='$SiteName/$Application'",
               ("-dest:auto,computerName='https://${DestinationServer}:$msdeployPort/msdeploy.axd?site=$SiteName'," + $credential))
 
     $result = Start-Process -NoNewWindow -Wait -PassThru "$msdeployPath\msdeploy.exe" $args 
@@ -249,14 +256,17 @@ function Sync-WebContent
         [Parameter(Mandatory = $true)]
         [string] $DestinationServer,
         [Parameter(Mandatory = $true)]
-        [string] $SiteName
+        [string] $SiteName,
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyString()]
+        [string] $Application
     )
 
     Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
 
     Assert-WebDeployCredential
     $args = @('-verb:sync', "-source:contentPath='$ContentPath'",
-              ("-dest:auto,computerName='https://${DestinationServer}:$msdeployPort/msdeploy.axd?site=$SiteName'," + $credential))
+              ("-dest:'$SiteName/$Application',computerName='https://${DestinationServer}:$msdeployPort/msdeploy.axd?site=$SiteName'," + $credential))
 
     $result = Start-Process -NoNewWindow -Wait -PassThru "$msdeployPath\msdeploy.exe" $args 
     if ($result.ExitCode)
@@ -285,6 +295,7 @@ function Invoke-WebSiteDeployment
         [Parameter(Mandatory = $true)]
         [AllowEmptyString()]
         [string] $Application,
+        [switch] $AllowUntrusted,
         [string[]] $MSDeployParams
     )
 
@@ -293,8 +304,14 @@ function Invoke-WebSiteDeployment
     Assert-WebDeployCredential
     Write-Information "Deploying web site from $Path to $ServerHost/$Application..."
 
-    $args = @('-verb:sync', '-allowUntrusted', "-source:iisApp='$Path'",
+    $args = @('-verb:sync', "-source:iisApp='$Path'",
               ("-dest:iisApp='$SiteName/$Application',computerName='https://${ServerHost}:$msdeployPort/msdeploy.axd?site=$SiteName'," + $credential))
+
+    if ($AllowUntrusted)
+    {
+        $args += '-allowUntrusted'
+    }
+
     if ($MSDeployParams)
     {
         $args += $MSDeployParams

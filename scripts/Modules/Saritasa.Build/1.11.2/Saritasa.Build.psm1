@@ -1,18 +1,36 @@
-﻿function Invoke-NugetRestore
+﻿function Install-NugetCli
 {
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [string] $Destination
+    )
+
+    Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
+
+    $nugetExePath = "$Destination\nuget.exe"
+    
+    if (!(Test-Path $nugetExePath))
+    {
+        Invoke-WebRequest 'https://dist.nuget.org/win-x86-commandline/latest/nuget.exe' -OutFile $nugetExePath
+    }
+}
+
+function Invoke-NugetRestore
+{
+    [CmdletBinding()]
     param
     (
         [Parameter(Mandatory = $true, HelpMessage = 'Path to solution. All NuGet packages from included projects will be restored.')]
         [string] $SolutionPath
     )
 
+    Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
+
+    Install-NugetCli -Destination $PSScriptRoot
     $nugetExePath = "$PSScriptRoot\nuget.exe"
-    
-    if (!(Test-Path $nugetExePath))
-    {
-        Invoke-WebRequest 'https://dist.nuget.org/win-x86-commandline/latest/nuget.exe' -OutFile $nugetExePath
-    }
-    
+
     &$nugetExePath 'restore' $SolutionPath
     if ($LASTEXITCODE)
     {
@@ -22,6 +40,7 @@
 
 function Invoke-SolutionBuild
 {
+    [CmdletBinding()]
     param
     (
         [Parameter(Mandatory = $true, HelpMessage = 'Path to solution.')]
@@ -30,11 +49,14 @@ function Invoke-SolutionBuild
         [string] $Configuration
     )
 
+    Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
+
     Invoke-ProjectBuild $SolutionPath $Configuration
 }
 
 function Invoke-ProjectBuild
 {
+    [CmdletBinding()]
     param
     (
         [Parameter(Mandatory = $true, HelpMessage = 'Path to project.')]
@@ -44,6 +66,8 @@ function Invoke-ProjectBuild
         [string] $Target = 'Build',
         [string[]] $BuildParams
     )
+
+    Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
 
     msbuild.exe $ProjectPath '/m' "/t:$Target" "/p:Configuration=$Configuration" '/verbosity:normal' $BuildParams
     if ($LASTEXITCODE)
@@ -70,6 +94,8 @@ function Update-AssemblyInfoFile
         [string] $Version
     )
 
+    Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
+
     $assemblyVersionPattern = 'AssemblyVersion\("[0-9]+(\.([0-9]+|\*)){1,3}"\)'
     $fileVersionPattern = 'AssemblyFileVersion\("[0-9]+(\.([0-9]+|\*)){1,3}"\)'
     $assemblyVersion = 'AssemblyVersion("' + $Version + '")';
@@ -92,18 +118,21 @@ function Update-AssemblyInfoFile
                         ForEach-Object { $_ -replace $fileVersionPattern, $fileVersion }
                     } | Set-Content $filename -Encoding UTF8
                     
-                Write-Information $filename, ' -> ', $Version
+                Write-Information ($filename + ' -> ' + $Version)
             }
         }
 }
 
 function Copy-DotnetConfig
 {
+    [CmdletBinding()]
     param
     (
         [Parameter(Mandatory = $true, HelpMessage = 'Path to App.config.template or Web.config.template file.')]
         [string] $TemplateFilename
     )
+
+    Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
 
     $configFilename = $TemplateFilename -replace '\.template', ''
     if (!(Test-Path $configFilename))
@@ -122,6 +151,7 @@ configuration file.
 #>
 function Invoke-EFMigrate
 {
+    [CmdletBinding()]
     param
     (
         [Parameter(Mandatory = $true, HelpMessage = 'Path to assembly file with migrations.')]
@@ -129,6 +159,8 @@ function Invoke-EFMigrate
         [Parameter(HelpMessage = 'Path to assembly .config file. If not specified default or parent Web.config will be used.')]
         [string] $ConfigFilename
     )
+
+    Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
 
     # Format and validate params
     if (!$ConfigFilename)
@@ -177,4 +209,34 @@ function Invoke-EFMigrate
     {
         throw "Migration failed."
     }
+}
+
+<#
+.SYNOPSIS
+Replaces placeholders $(UserName) with values from hashtable.
+.EXAMPLE
+Update-VariablesInFile -Path Config.xml @{UserName='sa'}
+#>
+function Update-VariablesInFile
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [string] $Path,
+        [Parameter(Mandatory = $true)]
+        [hashtable] $Variables
+    )
+
+    Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
+
+    $content = Get-Content $Path
+
+    foreach ($key in $Variables.Keys)
+    {
+        $escapedValue = $Variables[$key] -replace '\$', '$$$$'
+        $content = $content -ireplace"\`$\($key\)", $escapedValue
+    }
+
+    $content | Set-Content $Path
 }

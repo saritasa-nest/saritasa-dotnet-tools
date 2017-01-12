@@ -1,19 +1,18 @@
 # Requires psake to run, see README.md for more details.
 
+Framework 4.6
+$InformationPreference = 'Continue'
+$env:PSModulePath += ";$PSScriptRoot\Scripts\Modules"
+
 if ($PSVersionTable.PSVersion.Major -lt 3)
 {
     throw "PowerShell 3 is required.`nhttp://www.microsoft.com/en-us/download/details.aspx?id=40855"
 }
 
-Framework 4.6
+. .\scripts\Saritasa.PsakeTasks.ps1
 
 . .\scripts\BuildTasks.ps1
 . .\scripts\PublishTasks.ps1
-
-Import-Module .\scripts\Saritasa.Psake.psd1
-Import-Module .\scripts\Saritasa.Build.psd1
-Import-Module .\scripts\Saritasa.Test.psd1
-Register-HelpTask
 
 Properties `
 {
@@ -35,12 +34,12 @@ $packages = @(
     'Saritasa.Tools.NLog4'
 )
 
-function Get-PackageName([string]$package)
+function GetPackageName([string]$package)
 {
     If ([System.Char]::IsDigit($package[$package.Length-1])) {$package.Substring(0, $package.Length-1)} Else {$package}
 }
 
-Task pack -description 'Build the library, test it and prepare nuget packages' `
+Task pack -depends download-nuget -description 'Build the library, test it and prepare nuget packages' `
 {
     # nuget restore
     Invoke-NugetRestore './src/Saritasa.Tools.sln'
@@ -51,7 +50,9 @@ Task pack -description 'Build the library, test it and prepare nuget packages' `
     # build all versions, sign, test and prepare package directory
     foreach ($package in $packages)
     {
-        Get-PackageName($package)
+        $packageFile = GetPackageName $package
+        Write-Information $packageFile
+
         Remove-Item $libDirectory -Recurse -Force -ErrorAction SilentlyContinue
         New-Item $libDirectory -ItemType Directory
         foreach ($build in $builds)
@@ -68,7 +69,6 @@ Task pack -description 'Build the library, test it and prepare nuget packages' `
 
             # copy
             New-Item (Join-Path $libDirectory $build.Framework) -ItemType Directory
-            $packageFile = Get-PackageName $package
             Copy-Item "./src/$package/bin/Release/$packageFile.dll" (Join-Path $libDirectory $build.Framework)
             Copy-Item "./src/$package/bin/Release/$packageFile.XML" (Join-Path $libDirectory $build.Framework)
         }
@@ -76,18 +76,14 @@ Task pack -description 'Build the library, test it and prepare nuget packages' `
         # pack, we already have nuget in current folder
         $nugetExePath = "$PSScriptRoot\scripts\nuget.exe"
         $buildDirectory = (Get-Item $libDirectory).Parent.FullName
-        &"$nugetExePath" @('pack', (Join-Path $buildDirectory "$package.nuspec"), '-Version', $version, '-NonInteractive', '-Exclude', '*.snk')
-        if ($LASTEXITCODE)
-        {
-            throw 'Nuget pack failed.'
-        }
+        Exec { &$nugetExePath @('pack', (Join-Path $buildDirectory "$package.nuspec"), '-Version', $version, '-NonInteractive', '-Exclude', '*.snk') }
     }
 
     # little clean up
     Remove-Item $libDirectory -Recurse -Force -ErrorAction SilentlyContinue
 
     # build docs
-    Compile-Docs
+    CompileDocs
 }
 
 Task clean -description 'Clean solution' `
@@ -105,19 +101,15 @@ Task clean -description 'Clean solution' `
 
 Task docs -description 'Compile and open documentation' `
 {
-    Compile-Docs
+    CompileDocs
     Invoke-Item './docs/_build/html/index.html'
 }
 
-function Compile-Docs
+function CompileDocs
 {
     Set-Location '.\docs'
     Copy-Item '.\conf.py.template' '.\conf.py'
     (Get-Content '.\conf.py').replace('VX.VY', $version) | Set-Content '.\conf.py'
-    &'.\make.cmd' @('html')
-    if ($LASTEXITCODE)
-    {
-        throw 'Cannot compile documentation.'
-    }
+    Exec { &'.\make.cmd' @('html') }
     Set-Location '..'
 }

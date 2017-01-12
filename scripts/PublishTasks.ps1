@@ -2,8 +2,6 @@ $root = $PSScriptRoot
 $src = "$root\..\src"
 $samples = "$root\..\samples"
 
-Import-Module "$root\Saritasa.WebDeploy.psd1"
-
 Task package-zerg -depends build-zerg `
 {
     $packagePath = "$samples\ZergRushCo.Todosya\Docker\Zerg.zip"
