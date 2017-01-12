@@ -71,6 +71,8 @@
   </Choose>
   <ItemGroup>
     <Compile Include="CompanyTest.cs" />
+    <Compile Include="DIConfig.cs" />
+    <Compile Include="GlobalConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

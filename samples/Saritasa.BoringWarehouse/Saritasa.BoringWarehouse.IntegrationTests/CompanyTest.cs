@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 using System.Linq;
 using Autofac;
 using NUnit.Framework;
@@ -17,41 +18,8 @@ namespace Saritasa.BoringWarehouse.IntegrationTests
         [SetUp]
         public void SetUp()
         {
-            SetUpAutofac();
+            container = DIConfig.Container;
             commandPipeline = container.Resolve<ICommandPipeline>();
-        }
-
-        private void SetUpAutofac()
-        {
-            var builder = new ContainerBuilder();
-
-            // other bindings
-            builder.RegisterType<DataAccess.AppDbContext>().AsSelf();
-            builder.RegisterType<DataAccess.AppUnitOfWork>().AsImplementedInterfaces();
-            builder.RegisterType<DataAccess.AppUnitOfWorkFactory>().AsImplementedInterfaces().SingleInstance();
-            builder.RegisterType<Domain.Users.Queries.UserQueries>().AsSelf();
-            builder.RegisterType<Domain.Products.Queries.ProductQueries>().AsSelf();
-            builder.RegisterType<Domain.Products.Queries.CompanyQueries>().AsSelf();
-
-            container = builder.Build();
-
-            // command pipeline
-            var defaultPipeline = Tools.Commands.CommandPipeline.CreateDefaultPipeline(container.Resolve,
-                System.Reflection.Assembly.GetAssembly(typeof(Domain.Users.Entities.User)));
-            var connectionString = ConfigurationManager.ConnectionStrings["AppDbContext"];
-            defaultPipeline.AppendMiddlewares(
-                new Saritasa.Tools.Messages.PipelineMiddlewares.RepositoryMiddleware(
-                    new Saritasa.Tools.Messages.Repositories.AdoNetMessageRepository(
-                        System.Data.Common.DbProviderFactories.GetFactory(connectionString.ProviderName),
-                        connectionString.ConnectionString,
-                        Saritasa.Tools.Messages.Repositories.AdoNetMessageRepository.Dialect.SqlServer
-                    )
-                )
-            );
-            builder = new ContainerBuilder();
-            builder.RegisterInstance(defaultPipeline).AsImplementedInterfaces().SingleInstance();
-
-            builder.Update(container);
         }
 
         [TestCase]
@@ -63,8 +31,8 @@ namespace Saritasa.BoringWarehouse.IntegrationTests
                 var count1 = query.GetAll().Count();
 
                 var command = new CreateCompanyCommand();
-                command.CreatedByUserId = 1;
-                command.Name = "Test Company";
+                command.CreatedByUserId = GlobalConfig.AdminId;
+                command.Name = "Test Company " + DateTime.Now.Ticks;
 
                 commandPipeline.Handle(command);
 
