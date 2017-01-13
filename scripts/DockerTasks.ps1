@@ -20,7 +20,7 @@ Task docker-bw -depends package-bw `
 Task run-bw-tests `
 {
     # Recreate and containers.
-    Exec { docker-compose -f "$samples\Saritasa.BoringWarehouse\docker-compose.yml" up --force-recreate -d }
+    Exec { docker-compose -f "$samples\Saritasa.BoringWarehouse\docker-compose.yml" up --force-recreate -d db }
 
     # Get IP address of DB container.
     $ipAddress = Exec { docker inspect saritasaboringwarehouse_db_1 -f '{{ .NetworkSettings.Networks.nat.IPAddress }}' }

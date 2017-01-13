@@ -1,6 +1,6 @@
 version: '2.1'
 services:
-  bwdb:
+  db:
     build:
       context: ./Docker
       dockerfile: Dockerfile.db
@@ -8,13 +8,15 @@ services:
     environment:
       sa_password: "29hHzGtB"
       ACCEPT_EULA: "Y"
-  bwweb:
+    hostname: bwdb
+  web:
     build:
       context: ./Docker
       dockerfile: Dockerfile.web
     image: bw/web
     depends_on:
-      - "bwdb"
+      - "db"
+    hostname: bwweb
     
 networks:
   default:

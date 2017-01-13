@@ -8,8 +8,8 @@ RUN $env:chocolateyUseWindowsCompression = 'false'; \
 
 RUN choco install webdeploy -y
 
-COPY BW.zip Temp/BW.zip
 COPY Run.ps1 Temp/Run.ps1
+COPY BW.zip Temp/BW.zip
 
 RUN C:/Temp/Run.ps1
 
