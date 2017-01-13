@@ -34,8 +34,3 @@ Task build-bw -depends download-nuget `
     Invoke-NugetRestore "$samples\Saritasa.BoringWarehouse\Saritasa.BoringWarehouse.sln"
     Invoke-SolutionBuild "$samples\Saritasa.BoringWarehouse\Saritasa.BoringWarehouse.sln" -Configuration $Configuration
 }
-
-Task run-bw-tests -depends build-bw `
-{
-    Invoke-NUnit3Runner "$samples\Saritasa.BoringWarehouse\Saritasa.BoringWarehouse.IntegrationTests\bin\$Configuration\Saritasa.BoringWarehouse.IntegrationTests.dll"
-}

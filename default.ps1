@@ -12,6 +12,7 @@ if ($PSVersionTable.PSVersion.Major -lt 3)
 . .\scripts\Saritasa.PsakeTasks.ps1
 
 . .\scripts\BuildTasks.ps1
+. .\scripts\DockerTasks.ps1
 . .\scripts\PublishTasks.ps1
 
 Properties `
