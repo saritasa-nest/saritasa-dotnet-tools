@@ -1,5 +1,7 @@
 FROM microsoft/aspnet
-SHELL ["powershell"]
+SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop';"]
+
+RUN Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters' -Name ServerPriorityTimeLimit -Value 0 -Type DWord
 
 RUN $env:chocolateyUseWindowsCompression = 'false'; \
     iwr https://chocolatey.org/install.ps1 -UseBasicParsing | iex
