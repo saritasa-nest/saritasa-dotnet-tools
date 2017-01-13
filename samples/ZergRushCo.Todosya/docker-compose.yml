@@ -1,6 +1,6 @@
 version: '2.1'
 services:
-  db:
+  zergdb:
     build:
       context: ./Docker
       dockerfile: Dockerfile.db
@@ -8,17 +8,15 @@ services:
     environment:
       sa_password: "29hHzGtB"
       ACCEPT_EULA: "Y"
-    networks:
-      - default
-  web:
+  zergweb:
     build:
       context: ./Docker
       dockerfile: Dockerfile.web
     image: zerg/web
     depends_on:
-      - "db"
+      - "zergdb"
     ports:
-      - "5001:80"
+      - "8080:80"
     volumes:
       - "temp:C:/Temp2"
     
@@ -29,4 +27,3 @@ networks:
 
 volumes:
   temp:
-

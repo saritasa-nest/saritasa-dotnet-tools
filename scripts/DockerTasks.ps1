@@ -7,7 +7,7 @@ Task docker-zerg -depends package-zerg `
     Exec { docker build -t zerg/db:latest -t "zerg/db:$version" -f "$dockerContext\Dockerfile.db" $dockerContext }
 }
 
-Task docker-bw -depends build-bw `
+Task docker-bw -depends package-bw `
 {
     $dockerContext = "$samples\Saritasa.BoringWarehouse\Docker"
     $version = (gitversion /showvariable SemVer)
@@ -37,4 +37,10 @@ Task run-bw-tests `
     Write-Information "Updated $appConfigPath."
 
     Invoke-NUnit3Runner "$samples\Saritasa.BoringWarehouse\Saritasa.BoringWarehouse.IntegrationTests\bin\$Configuration\Saritasa.BoringWarehouse.IntegrationTests.dll"
+}
+
+Task docker-run-all -depends docker-bw, docker-zerg `
+{
+    Exec { docker-compose -f "$samples\Saritasa.BoringWarehouse\docker-compose.yml" up -d }
+    Exec { docker-compose -f "$samples\ZergRushCo.Todosya\docker-compose.yml" up -d }
 }

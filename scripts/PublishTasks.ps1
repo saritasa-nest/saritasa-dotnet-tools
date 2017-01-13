@@ -9,7 +9,7 @@ Task package-zerg -depends build-zerg `
         -PackagePath $packagePath -Configuration $Configuration
 }
 
-Task publish-bw -depends build-bw `
+Task package-bw -depends build-bw `
 {
     $packagePath = "$samples\Saritasa.BoringWarehouse\Docker\BW.zip"
     Invoke-PackageBuild -ProjectPath "$samples\Saritasa.BoringWarehouse\Saritasa.BoringWarehouse.Web\Saritasa.BoringWarehouse.Web.csproj" `
