@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Messages.Tests
@@ -9,6 +9,9 @@ namespace Saritasa.Tools.Messages.Tests
     using Common;
     using Queries;
 
+    /// <summary>
+    /// Message queries tests.
+    /// </summary>
     public class QueriesTests
     {
         #region Interfaces
@@ -52,7 +55,7 @@ namespace Saritasa.Tools.Messages.Tests
         {
             public IList<int> SimpleQuery(int a, int b)
             {
-                return new List<int>() { a, b };
+                return new List<int> { a, b };
             }
 
             public IList<int> SimpleQueryWithDependency(int a, int b, IInterfaceB dependencyB)
@@ -70,8 +73,13 @@ namespace Saritasa.Tools.Messages.Tests
         [Fact]
         public void Can_run_simple_query()
         {
+            // Arrange
             var qp = QueryPipeline.CreateDefaultPipeline(QueryPipeline.NullResolver).UseInternalResolver(true);
+
+            // Act
             var result = qp.Query<QueryObject>().With(q => q.SimpleQuery(10, 20));
+
+            // Assert
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
             Assert.Equal(20, result[1]);
@@ -82,8 +90,13 @@ namespace Saritasa.Tools.Messages.Tests
         [Fact]
         public void Can_run_query_with_resolving()
         {
-            var qp = QueryPipeline.CreateDefaultPipeline(QueriesTests.InterfacesResolver).UseInternalResolver(true);
+            // Arrange
+            var qp = QueryPipeline.CreateDefaultPipeline(QueriesTests.InterfacesResolver).UseInternalResolver();
+
+            // Act
             var result = qp.Query<QueryObject>().With(q => q.SimpleQueryWithDependency(10, 20, null));
+
+            // Assert
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
             Assert.Equal(20, result[1]);
@@ -92,7 +105,8 @@ namespace Saritasa.Tools.Messages.Tests
         [Fact]
         public void Can_run_query_from_raw_message()
         {
-            var qp = QueryPipeline.CreateDefaultPipeline(QueriesTests.InterfacesResolver).UseInternalResolver(true);
+            // Arrange
+            var qp = QueryPipeline.CreateDefaultPipeline(QueriesTests.InterfacesResolver).UseInternalResolver();
             var message = new Message()
             {
                 ContentType = "Saritasa.Tools.Messages.Tests.QueriesTests+QueryObject.SimpleQueryWithDependency",
@@ -104,7 +118,11 @@ namespace Saritasa.Tools.Messages.Tests
                     ["dependencyB"] = null,
                 }
             };
+
+            // Act
             qp.ProcessRaw(message);
+
+            // Assert
             Assert.IsType<List<int>>(message.Content);
         }
 
@@ -134,8 +152,13 @@ namespace Saritasa.Tools.Messages.Tests
         [Fact]
         public void Can_run_query_with_private_object_ctor()
         {
-            var qp = QueryPipeline.CreateDefaultPipeline(QueriesTests.InterfacesResolver).UseInternalResolver(true);
+            // Arrange
+            var qp = QueryPipeline.CreateDefaultPipeline(QueriesTests.InterfacesResolver).UseInternalResolver();
+
+            // Act
             var result = qp.Query<QueryObjectWithPrivateCtor>().With(q => q.Query());
+
+            // Assert
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
             Assert.Equal("A", result[0]);

@@ -36,4 +36,4 @@ PowerShell v3+ (Ensure Get-ExecutionPolicy is at least RemoteSigned):
 iwr https://raw.githubusercontent.com/saritasa/SaritasaTools/develop/scripts/SaritasaRulesetInstall.ps1 -UseBasicParsing | iex
 ```
 
-After that the "Saritasa Code Rules" will be available in "Code Analysis" tab in project properties.
+After that the "Saritasa Code Rules" will be available in "Code Analysis" tab in project properties. All Saritasa.Tools project uses relative path to ruleset within repository.

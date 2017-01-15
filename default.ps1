@@ -21,16 +21,16 @@ Import-Module Saritasa.Test
 $script:Version = '0.0.0'
 
 $packages = @(
-    'Saritasa.Tools.Common'
-    'Saritasa.Tools.Domain'
-    'Saritasa.Tools.Ef6'
-    'Saritasa.Tools.EfCore1'
-    'Saritasa.Tools.Emails'
-    'Saritasa.Tools.Messages'
-    'Saritasa.Tools.Messages.Abstractions'
-    'Saritasa.Tools.Misc'
-    'Saritasa.Tools.Mvc5'
-    'Saritasa.Tools.NLog4'
+    'Saritasa.Tools.Common' # common
+    'Saritasa.Tools.Domain' # domain
+    'Saritasa.Tools.Ef6' # ef6
+    'Saritasa.Tools.EfCore1' # efcore1
+    'Saritasa.Tools.Emails' # emails
+    'Saritasa.Tools.Messages' # messages
+    'Saritasa.Tools.Messages.Abstractions' # messages-abstractiona
+    'Saritasa.Tools.Misc' # misc
+    'Saritasa.Tools.Mvc5' # mvc5
+    'Saritasa.Tools.NLog4' # nlog4
 )
 
 $docsRoot = Resolve-Path "$PSScriptRoot\docs"

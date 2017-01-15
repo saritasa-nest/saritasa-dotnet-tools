@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Messages.Tests
@@ -11,9 +11,12 @@ namespace Saritasa.Tools.Messages.Tests
     using Events;
     using Events.PipelineMiddlewares;
 
+    /// <summary>
+    /// Message events tests.
+    /// </summary>
     public class EventsTests
     {
-        #region Interfaces
+        #region Shared interfaces
 
         public interface IInterfaceA
         {
@@ -35,6 +38,8 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         #endregion
+
+        #region Shared events and handlers
 
         class CreateUserEvent
         {
@@ -75,24 +80,26 @@ namespace Saritasa.Tools.Messages.Tests
             }
         }
 
+        #endregion
+
         [Fact]
         public void Events_should_be_fired_withing_all_classes()
         {
+            // Arrange
             var ep = EventPipeline.CreateDefaultPipeline(InterfacesResolver,
-                typeof(CommandsTests).GetTypeInfo().Assembly).UseInternalResolver(true);
+                typeof(CommandsTests).GetTypeInfo().Assembly).UseInternalResolver();
             var ev = new CreateUserEvent()
             {
                 UserId = 10,
                 FirstName = "Ivan",
                 LastName = "Ivanov",
             };
-            ep.Raise(ev);
-            Assert.Equal(3, ev.HandlersCount);
-        }
 
-        [Fact]
-        public void Events_can_be_processed_from_raw_messages()
-        {
+            // Act
+            ep.Raise(ev);
+
+            // Assert
+            Assert.Equal(3, ev.HandlersCount);
         }
 
         #region Domain_events_can_be_integrated_to_events_pipeline
@@ -113,6 +120,7 @@ namespace Saritasa.Tools.Messages.Tests
         [Fact]
         public void Domain_events_can_be_integrated_to_events_pipeline()
         {
+            // Arrange
             var eventsManager = new DomainEventsManager();
             Func<Type, object> resolver = (type) =>
             {
@@ -125,9 +133,12 @@ namespace Saritasa.Tools.Messages.Tests
             var ep = EventPipeline.CreateDefaultPipeline(resolver, typeof(CommandsTests).GetTypeInfo().Assembly);
             eventsManager.Register(new DomainTestEventHandler());
             ep.InsertMiddlewareBefore(new DomainEventLocatorMiddleware(eventsManager), "EventLocator");
-
             var ev = new DomainTestEvent();
+
+            // Act
             ep.Raise(ev);
+
+            // Assert
             Assert.Equal(42, ev.Param);
         }
 

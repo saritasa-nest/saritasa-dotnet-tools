@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Messages.Tests
@@ -10,18 +10,24 @@ namespace Saritasa.Tools.Messages.Tests
     using Common.PipelineMiddlewares;
     using Common;
 
+    /// <summary>
+    /// Message repository filter tests.
+    /// </summary>
     public class MessagesRepositoryFilterTests
     {
         [Fact]
         public void Repository_should_filter_by_status()
         {
+            // Arrange
             var filter = RepositoryMessagesFilter.Create().WithStatus(ProcessingStatus.Completed);
-            var msg1 = new Message()
+            var msg1 = new Message
             {
                 Status = ProcessingStatus.Failed,
             };
+
+            // Act & assert
             Assert.False(filter.IsMatch(msg1));
-            var msg2 = new Message()
+            var msg2 = new Message
             {
                 Status = ProcessingStatus.Completed,
             };
@@ -34,7 +40,7 @@ namespace Saritasa.Tools.Messages.Tests
         public void Repository_should_filter_by_execution_duration()
         {
             var filter = RepositoryMessagesFilter.Create().WithExecutionDurationAbove(100);
-            var msg = new Message()
+            var msg = new Message
             {
                 ExecutionDuration = 200,
             };
@@ -66,7 +72,7 @@ namespace Saritasa.Tools.Messages.Tests
         public void Repository_should_filter_by_type()
         {
             var filter = RepositoryMessagesFilter.Create().WithType(Message.MessageTypeCommand);
-            var msgquery = new Message()
+            var msgquery = new Message
             {
                 Type = Message.MessageTypeQuery,
             };
