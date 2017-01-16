@@ -1,5 +1,8 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
+
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Saritasa.Tools.Domain.Exceptions
 {
@@ -9,13 +12,33 @@ namespace Saritasa.Tools.Domain.Exceptions
 #endif
 
     /// <summary>
-    /// Validation exception.
+    /// Validation exception. Can be mapped to 400 HTTP status code.
     /// </summary>
 #if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
     [Serializable]
 #endif
     public class ValidationException : DomainException
     {
+        const string SummaryKey = "";
+
+        /// <summary>
+        /// Errors dictionary. Empty string key relates to summary error message.
+        /// </summary>
+        public IDictionary<string, string> Errors = new Dictionary<string, string>();
+
+        /// <inheritdoc />
+        public override string Message
+        {
+            get
+            {
+                if (Errors.ContainsKey(SummaryKey))
+                {
+                    return Errors[SummaryKey];
+                }
+                return base.Message;
+            }
+        }
+
         /// <summary>
         /// .ctor
         /// </summary>
@@ -29,6 +52,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         /// </summary>
         public ValidationException(string message) : base(message)
         {
+            Errors[SummaryKey] = message;
         }
 
         /// <summary>
@@ -38,6 +62,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         /// </summary>
         public ValidationException(string message, Exception innerException) : base(message, innerException)
         {
+            Errors[SummaryKey] = message;
         }
 
 #if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6

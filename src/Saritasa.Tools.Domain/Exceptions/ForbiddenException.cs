@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Domain.Exceptions
@@ -9,31 +9,31 @@ namespace Saritasa.Tools.Domain.Exceptions
 #endif
 
     /// <summary>
-    /// Domain security exception.
+    /// Domain forbidden security exception. Can be mapped to 403 HTTP status code.
     /// </summary>
 #if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
     [Serializable]
 #endif
-    public class SecurityException : DomainException
+    public class ForbiddenException : DomainException
     {
         /// <summary>
         /// .ctor
         /// </summary>
-        public SecurityException() : base("Permissions required")
+        public ForbiddenException() : base("Forbidden")
         {
         }
 
         /// <summary>
         /// .ctor
         /// </summary>
-        public SecurityException(string message) : base(message)
+        public ForbiddenException(string message) : base(message)
         {
         }
 
         /// <summary>
         /// .ctor
         /// </summary>
-        public SecurityException(string message, Exception innerException) : base(message, innerException)
+        public ForbiddenException(string message, Exception innerException) : base(message, innerException)
         {
         }
 
@@ -44,7 +44,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         /// <param name="info">Stores all the data needed to serialize or deserialize an object.</param>
         /// <param name="context">Describes the source and destination of a given serialized stream,
         /// and provides an additional caller-defined context.</param>
-        protected SecurityException(SerializationInfo info, StreamingContext context)
+        protected ForbiddenException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
         }

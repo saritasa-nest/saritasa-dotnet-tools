@@ -10,7 +10,13 @@ Exceptions
 
 ``NotFoundException`` - Inherits from ``DomainException``. Usually means that object you try to find by specified key is not in collection.
 
-``SecurityException`` - Inherits from ``DomainException``. Means that user cannot access to any resource or do any operation because he has no permissions.
+``ForbiddenException`` - Inherits from ``DomainException``. Means that user cannot access to any resource or do any operation because he has no permissions.
+
+``UnauthorizedException`` - Inherits from ``DomainException``.
+
+``ConflictException`` - Inherits from ``DomainException``. Indicates that the request could not be processed because of conflict in the request, such as an edit conflict between multiple simultaneous updates.
+
+``ValidationException`` - Inherits from ``DomainException``. Contains errors dictionary.
 
 Domain Events
 -------------

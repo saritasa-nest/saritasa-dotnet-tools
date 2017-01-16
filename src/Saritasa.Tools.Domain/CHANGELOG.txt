@@ -1,5 +1,8 @@
 ﻿0.1.1 [TBD]
 [*] Update dependencies, .NET Core 1.1 support.
+[*] Rename SecurityException to ForbiddenException.
+[+] Add ConflictException and UnauthorizedException.
+[+] Add Errors to ValidationException.
 
 0.1.0 [2016-11-14]
 [+] Initial release.

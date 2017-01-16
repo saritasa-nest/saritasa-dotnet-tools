@@ -27,5 +27,10 @@ namespace Saritasa.Tools.Common.Pagination
         /// Current page.
         /// </summary>
         public int CurrentPage { get; set; }
+
+        /// <summary>
+        /// Zero based offset of current page.
+        /// </summary>
+        public int Offset { get; set; }
     }
 }

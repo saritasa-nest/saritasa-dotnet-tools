@@ -100,14 +100,19 @@ namespace Saritasa.Tools.Messages.Common
         }
 
         /// <summary>
-        /// Execute method.
+        /// Execute method. If method is awaitable method will wait for it.
         /// </summary>
         /// <param name="handler">Handler.</param>
         /// <param name="obj">The first argument.</param>
         /// <param name="handlerMethod">Method to execute.</param>
         protected void ExecuteHandler(object handler, object obj, MethodBase handlerMethod)
         {
-            handlerMethod.Invoke(handler, GetAndResolveHandlerParameters(obj, handlerMethod));
+            var result = handlerMethod.Invoke(handler, GetAndResolveHandlerParameters(obj, handlerMethod));
+            var task = result as Task;
+            if (task != null)
+            {
+                task.ConfigureAwait(false).GetAwaiter().GetResult();
+            }
         }
 
         /// <summary>

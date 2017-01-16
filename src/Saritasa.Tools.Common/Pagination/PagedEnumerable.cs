@@ -71,6 +71,7 @@ namespace Saritasa.Tools.Common.Pagination
                 TotalPages = TotalPages,
                 PageSize = PageSize,
                 CurrentPage = CurrentPage,
+                Offset = (CurrentPage - 1) * PageSize
             };
         }
 
@@ -131,10 +132,47 @@ namespace Saritasa.Tools.Common.Pagination
             };
         }
 
+        /// <summary>
+        /// Converts current paged enumerable to another paged enumerable with another source type.
+        /// Metadata is copied. Needs if you want to convert the type of page enumerable without
+        /// metadata change.
+        /// </summary>
+        /// <typeparam name="TTarget">Target type.</typeparam>
+        /// <param name="map">Delegate to convert to target type.</param>
+        /// <returns>Paged enumerable with target type.</returns>
+        public PagedEnumerable<TTarget> Map<TTarget>(Func<T, TTarget> map)
+        {
+            return new PagedEnumerable<TTarget>
+            {
+                source = source.Select(map).ToList(),
+                CurrentPage = CurrentPage,
+                totalPages = TotalPages
+            };
+        }
+
+        /// <summary>
+        /// Converts current paged enumerable to another paged enumerable with another source type.
+        /// Metadata is copied. Needs if you want to convert the type of page enumerable without
+        /// metadata change. Uses <see cref="Enumerable.Cast{TResult}" /> method.
+        /// </summary>
+        /// <typeparam name="TTarget">Target type.</typeparam>
+        /// <returns>Paged enumerable with target type.</returns>
+        public PagedEnumerable<TTarget> Map<TTarget>()
+        {
+            return new PagedEnumerable<TTarget>
+            {
+                source = source.Cast<TTarget>().ToList(),
+                CurrentPage = CurrentPage,
+                totalPages = TotalPages
+            };
+        }
+
         static int GetTotalPages([NotNull] IEnumerable<T> source, int pageSize)
         {
             return (source.Count() + pageSize - 1) / pageSize;
         }
+
+        #region Enumerator
 
         /// <summary>
         /// Returns enumerator.
@@ -145,9 +183,12 @@ namespace Saritasa.Tools.Common.Pagination
             return source.GetEnumerator();
         }
 
+        /// <inheritdoc />
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
         }
+
+        #endregion
     }
 }

@@ -17,7 +17,7 @@ Simplify pagination.
                 // creates a paged list on page 2 where page size is 20
                 PageEnumerable<string> pagedList = new PagedEnumerable<string>(list, 2, 20);
                 // another way with extension method
-                pagedList = list.GetPaged(2, 20);
+                pagedList = list.AsPage(2, 20);
                 Grid.DataSource = pagedList;
 
     .. function:: PagedEnumerable<T> Create(IEnumerable<T> pagedSource, int page, int pageSize, int totalPages)
@@ -31,3 +31,8 @@ Simplify pagination.
     .. function:: PagedMetadata GetMetadata()
 
         Returns special formatted object that contains metadata information about paged enumerable: page size, current page and total pages.
+
+    .. function:: PagedEnumerable<TTarget> Map<TTarget>(Func<T, TTarget> map)
+                  PagedEnumerable<TTarget> Map<TTarget>()
+
+        Converts current paged enumerable to another paged enumerable with another source type. Metadata is copied. Needs if you want to convert the type of page enumerable without metadata change.
