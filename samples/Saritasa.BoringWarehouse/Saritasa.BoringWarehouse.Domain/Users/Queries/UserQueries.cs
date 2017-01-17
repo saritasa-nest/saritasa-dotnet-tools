@@ -1,13 +1,7 @@
-﻿using Saritasa.BoringWarehouse.Domain.Users.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Saritasa.BoringWarehouse.Domain.Users.Queries
+﻿namespace Saritasa.BoringWarehouse.Domain.Users.Queries
 {
+    using Entities;
+
     /// <summary>
     /// Various users queries.
     /// </summary>

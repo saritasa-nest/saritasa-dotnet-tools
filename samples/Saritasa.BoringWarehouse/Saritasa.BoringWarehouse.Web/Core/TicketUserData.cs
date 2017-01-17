@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Web;
-using System.Web.Security;
-using Saritasa.BoringWarehouse.Domain.Users.Entities;
-
-namespace Saritasa.BoringWarehouse.Web.Core
+﻿namespace Saritasa.BoringWarehouse.Web.Core
 {
+    using System;
+    using System.Globalization;
+    using System.Web;
+    using System.Web.Security;
+
+    using Domain.Users.Entities;
+
     /// <summary>
     /// User ticket.
     /// </summary>
@@ -24,7 +23,7 @@ namespace Saritasa.BoringWarehouse.Web.Core
 
         public static TicketUserData FromString(string str)
         {
-            var strarr = str.Split(';');
+            var strarr = str.Split(new char[] { ';' });
             return new TicketUserData
             {
                 UserId = Convert.ToInt32(strarr[0]),

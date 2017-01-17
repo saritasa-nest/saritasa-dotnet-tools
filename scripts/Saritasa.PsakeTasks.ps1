@@ -2,7 +2,11 @@
 
 <#PSScriptInfo
 
+<<<<<<< HEAD
 .VERSION 1.1.0
+=======
+.VERSION 1.0.2
+>>>>>>> develop
 
 .GUID 966fce03-6946-447c-8e16-29b673f2918b
 
@@ -35,10 +39,15 @@ Contains common Psake tasks.
 
 #>
 
+<<<<<<< HEAD
 Properties `
 {
     $ScriptsPath = $null
 }
+=======
+$root = $PSScriptRoot
+$modules = "$root\Modules"
+>>>>>>> develop
 
 # Tasks with description starting with * are main. They are shown on the help screen. Other tasks are auxiliary.
 Task help -description 'Display description of main tasks.' `
@@ -59,6 +68,7 @@ Task update-gallery -description '* Update all modules from Saritasa PS Gallery.
 {
     $baseUri = 'https://raw.githubusercontent.com/Saritasa/PSGallery/master'
 
+<<<<<<< HEAD
     if ($ScriptsPath)
     {
         $root = $ScriptsPath
@@ -70,6 +80,8 @@ Task update-gallery -description '* Update all modules from Saritasa PS Gallery.
     
     $modules = "$root\Modules"
 
+=======
+>>>>>>> develop
     Get-ChildItem -Path $modules -Directory | ForEach-Object `
         {
             Write-Information "Updating $($_.Name)..."

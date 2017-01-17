@@ -1,0 +1,45 @@
+﻿@model Saritasa.Tools.Common.Pagination.PagedEnumerable<ZergRushCo.Todosya.Domain.TaskContext.Dtos.ProjectDto>
+@{
+    ViewBag.Title = "Projects";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.ActiveMenu = "projects";
+}
+
+<h2>Projects</h2>
+
+@Html.ActionLink("Create", "Create")
+
+<div id="projects-table">
+    @if (Model.Any() == false)
+    {
+        <p>There are no projects created yet.</p>
+    }
+    else
+    {
+        <table class="table table-condensed">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Color</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>
+                            <i class="glyphicon glyphicon-stop" style="color: @item.Color;"></i>
+                            <span class="text-muted">@item.Color</span>
+                        </td>
+                        <td>
+                            @Html.ActionLink("Edit", "Edit", new { id = @item.Id })
+                            @Html.ActionLink("Remove", "Remove", new { id = @item.Id })
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

@@ -1,0 +1,14 @@
+﻿{
+  "frameworks": {
+    "net40": {},
+    "net452": {},
+    "net461": {}
+  },
+  "runtimes": {
+    "win": {}
+  },
+  "dependencies": {
+    "JetBrains.Annotations": "10.2.1",
+    "StyleCop.Analyzers": "1.0.0"
+  }
+}

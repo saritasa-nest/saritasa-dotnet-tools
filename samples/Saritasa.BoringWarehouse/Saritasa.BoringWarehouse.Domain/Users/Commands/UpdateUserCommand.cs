@@ -1,18 +1,13 @@
-﻿using Saritasa.BoringWarehouse.Domain.Users.Entities;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Saritasa.BoringWarehouse.Domain.Users.Commands
+﻿namespace Saritasa.BoringWarehouse.Domain.Users.Commands
 {
+    using System.ComponentModel.DataAnnotations;
+
+    using Entities;
+
     public class UpdateUserCommand
     {
         public UpdateUserCommand()
         {
-
         }
 
         public UpdateUserCommand(User user)

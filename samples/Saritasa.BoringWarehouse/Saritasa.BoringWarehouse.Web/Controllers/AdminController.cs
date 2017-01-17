@@ -3,15 +3,19 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Tools.Commands;
-    using Tools.Exceptions;
     using System.Web.Mvc;
-    using AuthorizeAttribute = Core.AuthorizeAttribute;
+
+    using Domain.Users.Entities;
+
+    using Tools.Messages.Abstractions;
+    using Tools.Domain.Exceptions;
+
     using Domain;
     using Domain.Users.Commands;
-    using Domain.Users.Entities;
     using Domain.Users.Queries;
     using Models;
+
+    using AuthorizeAttribute = Core.AuthorizeAttribute;
 
     [Authorize(UserRole.Admin)]
     public class AdminController : Controller
@@ -23,17 +27,18 @@
         {
             if (commandPipline == null)
             {
-                throw new ArgumentNullException(nameof(commandPipline));
+                throw new ArgumentNullException("commandPipline");
             }
             if (userQueries == null)
             {
-                throw new ArgumentNullException(nameof(userQueries));
+                throw new ArgumentNullException("userQueries");
             }
 
             this.commandPipeline = commandPipline;
             this.userQueries = userQueries;
         }
 
+        // GET: Admin
         public ActionResult Index()
         {
             return View();

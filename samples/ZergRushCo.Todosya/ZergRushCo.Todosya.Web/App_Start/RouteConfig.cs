@@ -3,8 +3,15 @@ using System.Web.Routing;
 
 namespace ZergRushCo.Todosya.Web
 {
+    /// <summary>
+    /// ASP.NET MVC routes config.
+    /// </summary>
     public class RouteConfig
     {
+        /// <summary>
+        /// Register ASP.NET MVC routes.
+        /// </summary>
+        /// <param name="routes">Routes collection.</param>
         public static void RegisterRoutes(RouteCollection routes)
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");

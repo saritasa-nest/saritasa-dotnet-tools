@@ -1,4 +1,13 @@
 ﻿@using Microsoft.AspNet.Identity
+@functions
+{
+    HtmlString GetActiveTabClass(string currentTab = null)
+    {
+        currentTab = currentTab ?? string.Empty;
+        var activeTab = ViewBag.ActiveMenu ?? string.Empty;
+        return currentTab == activeTab ? new HtmlString("class=\"active\"") : new HtmlString(string.Empty);
+    }
+}
 
 @if (Request.IsAuthenticated)
 {
@@ -7,7 +16,7 @@
     @Html.AntiForgeryToken()
 
     <ul class="nav navbar-nav navbar-right">
-        <li>
+        <li @GetActiveTabClass("manage")>
             @Html.ActionLink("Hello " + User.Identity.GetUserName() + "!", "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage" })
         </li>
         <li><a href="javascript:document.getElementById('logoutForm').submit()">Log off</a></li>
@@ -17,7 +26,7 @@
 else
 {
     <ul class="nav navbar-nav navbar-right">
-        <li>@Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })</li>
-        <li>@Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
+        <li @GetActiveTabClass("register")>@Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })</li>
+        <li @GetActiveTabClass("login")>@Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
     </ul>
 }

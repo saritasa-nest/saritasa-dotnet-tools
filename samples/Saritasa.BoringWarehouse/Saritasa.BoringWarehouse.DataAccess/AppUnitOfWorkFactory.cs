@@ -1,8 +1,9 @@
-﻿using System.Data;
-using Saritasa.BoringWarehouse.Domain;
-
-namespace Saritasa.BoringWarehouse.DataAccess
+﻿namespace Saritasa.BoringWarehouse.DataAccess
 {
+    using System.Data;
+
+    using Domain;
+
     /// <summary>
     /// Application unit of work factory.
     /// </summary>

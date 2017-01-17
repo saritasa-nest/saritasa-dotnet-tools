@@ -5,6 +5,9 @@ using Owin;
 
 namespace ZergRushCo.Todosya.Web
 {
+    /// <summary>
+    /// Application startup configuration.
+    /// </summary>
     public partial class Startup
     {
         public static CookieAuthenticationOptions CookieOptions { get; private set; }
@@ -20,7 +23,7 @@ namespace ZergRushCo.Todosya.Web
 
             CookieOptions = new CookieAuthenticationOptions
             {
-                AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie   
+                AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie
             };
         }
     }

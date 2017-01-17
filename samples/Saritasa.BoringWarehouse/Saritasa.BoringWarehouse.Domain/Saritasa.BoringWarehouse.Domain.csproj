@@ -20,6 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>..\..\..\tools\Saritasa.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,12 +29,9 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>..\..\..\tools\Saritasa.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Candy, Version=0.6.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Candy.0.6.1\lib\net46\Candy.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -51,6 +49,7 @@
     <Compile Include="PagedResult.cs" />
     <Compile Include="Products\Commands\CreateCompanyCommand.cs" />
     <Compile Include="Products\Commands\CreateProductCommand.cs" />
+    <Compile Include="Products\Commands\DeleteCompanyCommand.cs" />
     <Compile Include="Products\Commands\DeleteProductCommand.cs" />
     <Compile Include="Products\Commands\UpdateCompanyCommand.cs" />
     <Compile Include="Products\Commands\UpdateProductCommand.cs" />
@@ -68,7 +67,6 @@
     <Compile Include="Users\Commands\CreateUserCommand.cs" />
     <Compile Include="Users\Commands\LoginUserCommand.cs" />
     <Compile Include="Users\Commands\UpdateUserCommand.cs" />
-    <Compile Include="Users\Commands\UpdateUserProfileCommand.cs" />
     <Compile Include="Users\Entities\User.cs" />
     <Compile Include="Users\Handlers\UserHandlers.cs" />
     <Compile Include="Users\Queries\UserQueries.cs" />
@@ -84,21 +82,27 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Saritasa.Tools.NLog4\Saritasa.Tools.NLog4.csproj">
-      <Project>{83d4925b-b04f-4c9c-8bf1-9b6a6be0a87d}</Project>
-      <Name>Saritasa.Tools.NLog4</Name>
+    <ProjectReference Include="..\..\..\src\Saritasa.Tools.Common\Saritasa.Tools.Common.csproj">
+      <Project>{2900d88a-2522-4299-8d51-6af26b74c91c}</Project>
+      <Name>Saritasa.Tools.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\src\Saritasa.Tools\Saritasa.Tools.csproj">
-      <Project>{a5451164-9df3-45b9-9067-2df7e23f8806}</Project>
-      <Name>Saritasa.Tools</Name>
+    <ProjectReference Include="..\..\..\src\Saritasa.Tools.Domain\Saritasa.Tools.Domain.csproj">
+      <Project>{32A3A81C-A65C-4F78-8300-17151987697C}</Project>
+      <Name>Saritasa.Tools.Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\src\Saritasa.Tools.Messages.Abstractions\Saritasa.Tools.Messages.Abstractions.csproj">
+      <Project>{e16b2300-a1d4-49bb-b3fc-c2891e7d1177}</Project>
+      <Name>Saritasa.Tools.Messages.Abstractions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\src\Saritasa.Tools.Messages\Saritasa.Tools.Messages.csproj">
+      <Project>{AEE65918-25DF-4A25-BFB8-56552FAA2A51}</Project>
+      <Name>Saritasa.Tools.Messages</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\Newtonsoft.Json.dll" />
+    <Analyzer Include="..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
+    <Analyzer Include="..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

@@ -1,7 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Saritasa.BoringWarehouse.Domain.Products.Commands
+﻿namespace Saritasa.BoringWarehouse.Domain.Products.Commands
 {
+    using System.ComponentModel.DataAnnotations;
+
     public class CreateCompanyCommand
     {
         [Key]

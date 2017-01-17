@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
-using Autofac;
-using Autofac.Integration.Mvc;
-using Saritasa.BoringWarehouse.Web;
-
-namespace Saritasa.BoringWarehouse.Web
+﻿namespace Saritasa.BoringWarehouse.Web
 {
+    using System.Configuration;
+    using System.Web.Mvc;
+
+    using Autofac;
+    using Autofac.Integration.Mvc;
+    using Tools.Messages.Commands;
+
     /// <summary>
     /// Dependency injection configuration.
     /// </summary>
@@ -43,18 +40,19 @@ namespace Saritasa.BoringWarehouse.Web
             var container = builder.Build();
 
             // command pipeline
-            var commandPipeline = Tools.Commands.CommandPipeline.CreateDefaultPipeline(container.Resolve,
+            var commandPipeline = Tools.Messages.Commands.CommandPipeline.CreateDefaultPipeline(container.Resolve,
                 System.Reflection.Assembly.GetAssembly(typeof(Domain.Users.Entities.User)));
             var connectionString = ConfigurationManager.ConnectionStrings["AppDbContext"];
             commandPipeline.AppendMiddlewares(
-                new Saritasa.Tools.Messages.PipelineMiddlewares.RepositoryMiddleware(
-                    new Saritasa.Tools.Messages.Repositories.AdoNetMessageRepository(
+                new Tools.Messages.Common.PipelineMiddlewares.RepositoryMiddleware(
+                    new Saritasa.Tools.Messages.Common.Repositories.AdoNetMessageRepository(
                         System.Data.Common.DbProviderFactories.GetFactory(connectionString.ProviderName),
                         connectionString.ConnectionString,
-                        Saritasa.Tools.Messages.Repositories.AdoNetMessageRepository.Dialect.SqlServer
+                        Tools.Messages.Common.Repositories.AdoNetMessageRepository.Dialect.SqlServer
                     )
                 )
             );
+            commandPipeline.UseInternalResolver();
             builder = new ContainerBuilder();
             builder.RegisterInstance(commandPipeline).AsImplementedInterfaces().SingleInstance();
 

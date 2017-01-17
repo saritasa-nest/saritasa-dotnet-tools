@@ -4,15 +4,18 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Web.Mvc;
+
+    using Tools.Messages.Abstractions;
+    using Tools.Domain.Exceptions;
+
     using Domain;
     using Domain.Products.Commands;
     using Domain.Products.Entities;
     using Domain.Products.Queries;
     using Domain.Users.Entities;
     using Models;
-    using Tools.Commands;
-    using Tools.Exceptions;
-    using AuthorizeAttribute = Saritasa.BoringWarehouse.Web.Core.AuthorizeAttribute;
+
+    using AuthorizeAttribute = Core.AuthorizeAttribute;
 
     /// <summary>
     /// Products controller
@@ -89,6 +92,8 @@
         {
             if (!ModelState.IsValid)
             {
+                // Get companies list again
+                command.Companies = companyQueries.GetAll();
                 return View(command);
             }
             command.CreatedByUserId = Core.TicketUserData.FromContext(HttpContext).UserId;
@@ -117,6 +122,8 @@
         {
             if (!ModelState.IsValid)
             {
+                // Get companies list again
+                command.Companies = companyQueries.GetAll();
                 return View(command);
             }
             command.UpdatedByUserId = Core.TicketUserData.FromContext(HttpContext).UserId;

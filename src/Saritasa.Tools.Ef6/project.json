@@ -1,0 +1,43 @@
+{
+  "title": "Saritasa Tools Entity Framework 6",
+  "version": "0.1.0",
+  "authors": [ "Saritasa" ],
+  "description": "The package is a part of Saritasa Tools project. Saritasa.Tools.Ef6 contains implementations for unit of work, repository interfaces.",
+  "copyright": "Saritasa 2015-2016",
+  "packOptions": {
+    "iconUrl": "https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png",
+    "licenseUrl": "https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/LICENSE",
+    "projectUrl": "https://github.com/Saritasa/SaritasaTools",
+    "requireLicenseAcceptance": false,
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/Saritasa/SaritasaTools"
+    },
+    "summary": "Unit of work, repository implementation for Entity Framework Core.",
+    "tags": [ "unit of work", "repository", "domain events" ]
+  },
+  "dependencies": {
+    "Saritasa.Tools.Domain": "*",
+    "StyleCop.Analyzers": {
+      "version": "1.0.0",
+      "type": "build"
+    }
+  },
+  "frameworks": {
+    "net452": {
+      "dependencies": {
+        "EntityFramework": "6.1.3"
+      }
+    },
+    "net461": {
+      "dependencies": {
+        "EntityFramework": "6.1.3"
+      }
+    }
+  },
+  "buildOptions": {
+    "keyFile": "../../tools/SaritasaTools.snk",
+    "additionalArguments": [ "/ruleset:../../tools/Saritasa.ruleset" ],
+    "xmlDoc": true
+  }
+}

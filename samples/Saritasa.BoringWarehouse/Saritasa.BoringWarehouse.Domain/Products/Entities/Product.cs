@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq.Expressions;
-using Saritasa.BoringWarehouse.Domain.Users.Entities;
-
-namespace Saritasa.BoringWarehouse.Domain.Products.Entities
+﻿namespace Saritasa.BoringWarehouse.Domain.Products.Entities
 {
+    using System;
+    using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations;
+    using System.Linq.Expressions;
+
+    using Users.Entities;
+
     /// <summary>
     /// Just simple product.
     /// </summary>
@@ -37,7 +38,7 @@ namespace Saritasa.BoringWarehouse.Domain.Products.Entities
 
         public User CreatedBy { get; set; }
 
-        public DateTime? UpdatedAt { get ; set; }
+        public DateTime? UpdatedAt { get; set; }
 
         /// <summary>
         /// Include Many to One and One to One relations

@@ -1,0 +1,58 @@
+{
+  "title": "Saritasa Tools Domain",
+  "version": "0.1.1",
+  "authors": [ "Saritasa" ],
+  "description": "The package is a part of Saritasa Tools project. Saritasa.Tools.Domain contains abstractions for unit of work, repository, domain events. Also there are domain exceptions (not found, validation, security). The implementation can be found in Saritasa.Tools.EfCore1, Saritasa.Tools.Ef6 packages.",
+  "copyright": "Saritasa 2015-2017",
+  "packOptions": {
+    "iconUrl": "https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png",
+    "licenseUrl": "https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/LICENSE",
+    "projectUrl": "https://github.com/Saritasa/SaritasaTools",
+    "requireLicenseAcceptance": false,
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/Saritasa/SaritasaTools"
+    },
+    "summary": "Domain abstractions.",
+    "tags": [ "unit of work", "repository", "domain events" ]
+  },
+  "dependencies": {
+    "StyleCop.Analyzers": {
+      "version": "1.0.0",
+      "type": "build"
+    },
+    "JetBrains.Annotations": {
+      "version": "10.2.1",
+      "type": "build"
+    }
+  },
+  "frameworks": {
+    "net452": {
+      "frameworkAssemblies": {
+        "System.Data": ""
+      }
+    },
+    "net461": {
+      "frameworkAssemblies": {
+        "System.Data": ""
+      }
+    },
+    "netcoreapp1.1": {
+      "dependencies": {
+        "Microsoft.NETCore.App": "1.1.0",
+        "System.Data.Common": "4.3.0"
+      }
+    },
+    "netstandard1.6": {
+      "dependencies": {
+        "NETStandard.Library": "1.6.1",
+        "System.Data.Common": "4.3.0"
+      }
+    }
+  },
+  "buildOptions": {
+    "keyFile": "../../tools/SaritasaTools.snk",
+    "additionalArguments": [ "/ruleset:../../tools/Saritasa.ruleset" ],
+    "xmlDoc": true
+  }
+}

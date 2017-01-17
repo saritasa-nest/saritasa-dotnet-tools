@@ -2,6 +2,7 @@
  * Concatenate bower .scss|.css frontend files.
  *
  * 09/30/2016 [Ivan Kozhin] Initial version.
+ * 12/14/2016 [Ivan Kozhin] Formatting.
  */
 
 var gulp = require('gulp'),
@@ -33,7 +34,8 @@ gulp.task('bundle-bower-style', function () {
         console.log(bowerfiles);
     }
 
-    return gulp.src(bowerfiles)
+    return gulp
+        .src(bowerfiles)
         .pipe(gulpif(config.useSass, gulpif('*.scss', sass().on('error', sass.logError))))
         .pipe(gulpif(config.useSass, gulpif('*.scss', rename((dir, base, ext) => base + '.css'))))
         .pipe(gulpif(config.useCssMin, postcss(postcssOptions)))
@@ -42,7 +44,7 @@ gulp.task('bundle-bower-style', function () {
 });
 
 // empty pipeline item
-function empty () {
+function empty() {
     var through = require('through2');
     return through.obj(function (file, enc, cb) {
         cb(null, file);

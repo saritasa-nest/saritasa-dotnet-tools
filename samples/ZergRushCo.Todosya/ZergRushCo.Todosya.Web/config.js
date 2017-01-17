@@ -45,30 +45,30 @@
 module.exports = {
     // show debug information
     debug: true,
-    
+
     // frontend application main path
-    src: './App',
+    src: './Frontend',
 
     // out directory
     dest: './Static/bundles',
-    
+
     // dest base file name
     destName: 'bundle',
 
     // application frontend entry points
     entries: ['App.js'],
-    
+
     // the files will not be bundled
     pagesDir: 'Pages',
 
     // production mode: minify is enabled
     production: false,
-    
+
     bower: {
         // Bower packages path
         src: './bower_components'
     },
-    
+
     // temporary processing folder
     tempDir: './temp',
 
@@ -82,28 +82,28 @@ module.exports = {
     // use babel for js processing
     // gulp: npm i gulp-babel babel-preset-es2015 --save-dev
     useBabel: false,
-    
+
     // preprocess .scss files
     // gulp: npm i gulp-sass --save-dev
     useSass: true,
-    
+
     // minify .html files
     // gulp: npm i gulp-htmlmin --save-dev
     useHtmlMin: false,
-    
+
     // gulp: npm i gulp-postcss cssnano autoprefixer cssnext precss --save-dev
     useCssMin: false,
-    
-    // gulp: npm i jshint gulp-jshint gulp-eslint --save-dev
-    useJsValidate: false,
-    
+
+    // gulp: npm i jshint gulp-jshint gulp-eslint eslint-plugin-react babel-eslint eslint-plugin-html --save-dev
+    useJsValidate: true,
+
     // gulp: npm i gulp-csslint --save-dev
     useCssValidate: false,
-    
+
     // gulp: npm i main-bower-files --save-dev
     // grunt:
     useBowerJs: true,
-    
+
     // gulp: npm i main-bower-files --save-dev
     useBowerSassCss: true
 };

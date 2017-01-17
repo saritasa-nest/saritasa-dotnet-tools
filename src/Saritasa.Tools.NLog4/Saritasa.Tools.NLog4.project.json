@@ -1,11 +1,12 @@
 ﻿{
   "frameworks": {
+    "net452": {},
     "net461": {}
   },
-  "runtimes": {
-    "win": {}
-  },
   "dependencies": {
+    "JetBrains.Annotations": "10.2.1",
+    "Microsoft.Extensions.Logging.Abstractions": "1.1.0",
+    "NLog": "4.3.11",
     "StyleCop.Analyzers": "1.0.0"
   }
 }

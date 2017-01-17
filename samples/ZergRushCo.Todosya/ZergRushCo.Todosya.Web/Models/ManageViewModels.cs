@@ -7,7 +7,7 @@ namespace ZergRushCo.Todosya.Web.Models
     {
         public bool HasPassword { get; set; }
 
-        public Domain.Users.Commands.UpdateUserCommand User { get; set; }
+        public Domain.UserContext.Commands.UpdateUserCommand User { get; set; }
     }
 
     public class FactorViewModel

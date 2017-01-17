@@ -50,7 +50,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Saritasa.Tools'
-copyright = '2015-2016, Saritasa'
+copyright = '2015-2017, Saritasa'
 author = 'Saritasa'
 
 # The version info for the project you're documenting, acts as replacement for

@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Saritasa.BoringWarehouse.Domain
+﻿namespace Saritasa.BoringWarehouse.Domain
 {
+    using System.Collections.Generic;
+
     public class PagedResult<T>
     {
         public PagedResult(IEnumerable<T> items, int offset, int limit, long total, long filteredCount)

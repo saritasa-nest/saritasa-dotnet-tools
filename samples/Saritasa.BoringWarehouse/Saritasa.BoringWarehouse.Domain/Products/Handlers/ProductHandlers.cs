@@ -3,11 +3,13 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+
+    using Tools.Messages.Abstractions;
+    using Tools.Domain.Exceptions;
+
     using Commands;
     using Entities;
     using Users.Entities;
-    using Tools.Commands;
-    using Tools.Exceptions;
 
     /// <summary>
     /// Product handlers.
@@ -42,7 +44,7 @@
                     CreatedBy = creator
                 };
                 uow.ProductRepository.Add(product);
-                uow.Complete();
+                uow.SaveChanges();
                 command.ProductId = product.Id;
             }
         }
@@ -59,7 +61,7 @@
                 // Delete properties before
                 uow.ProductPropertyRepository.RemoveRange(product.Properties);
                 uow.ProductRepository.Remove(product);
-                uow.Complete();
+                uow.SaveChanges();
             }
         }
 
@@ -78,23 +80,20 @@
                 {
                     throw new DomainException("Can not find updater");
                 }
-
-                // delete properties
-                foreach (ProductProperty removedProperty in product.Properties.Where(oldP => command.Properties.All(newP => newP.Id != oldP.Id)).ToList())
+                // Delete properties
+                foreach (ProductProperty removedProperty in product.Properties.Where(oldP => !command.Properties.Any(newP => newP.Id == oldP.Id)).ToList())
                 {
                     product.Properties.Remove(removedProperty);
                     uow.ProductPropertyRepository.Remove(removedProperty);
                 }
-
-                // update existing properties
+                // Update existing properties
                 foreach (ProductProperty existProperty in product.Properties)
                 {
                     ProductProperty updatedProperty = command.Properties.SingleOrDefault(pp => pp.Id == existProperty.Id);
                     existProperty.Name = updatedProperty.Name;
                     existProperty.Value = updatedProperty.Value;
                 }
-
-                // add new properties
+                // Add new properties
                 foreach (ProductProperty property in command.Properties.Where(pp => pp.Id == 0))
                 {
                     product.Properties.Add(property);
@@ -106,7 +105,7 @@
                 product.Sku = command.Sku;
                 product.IsActive = command.IsActive;
                 product.UpdatedAt = DateTime.Now;
-                uow.Complete();
+                uow.SaveChanges();
             }
         }
     }

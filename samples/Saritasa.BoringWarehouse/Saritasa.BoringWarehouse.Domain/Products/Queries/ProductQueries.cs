@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Saritasa.BoringWarehouse.Domain.Products.Entities;
-
-namespace Saritasa.BoringWarehouse.Domain.Products.Queries
+﻿namespace Saritasa.BoringWarehouse.Domain.Products.Queries
 {
+    using System.Collections.Generic;
+
+    using Entities;
+
     public class ProductQueries
     {
-        readonly IAppUnitOfWork uow;
+        private readonly IAppUnitOfWork uow;
 
         public ProductQueries(IAppUnitOfWork uow)
         {
@@ -25,7 +25,6 @@ namespace Saritasa.BoringWarehouse.Domain.Products.Queries
 
         public PagedResult<Product> Search(ProductsObjectQuery objectQuery)
         {
-            //
             return objectQuery.Search(GetAll());
         }
     }

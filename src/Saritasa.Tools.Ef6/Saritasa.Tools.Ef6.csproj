@@ -22,7 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\Saritasa.Tools.Ef.XML</DocumentationFile>
-    <CodeAnalysisRuleSet>Saritasa.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>..\..\tools\Saritasa.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -32,7 +32,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\Saritasa.Tools.Ef.XML</DocumentationFile>
-    <CodeAnalysisRuleSet>Saritasa.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>..\..\tools\Saritasa.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
@@ -54,30 +54,28 @@
     <Compile Include="EfQueryableRepository.cs" />
     <Compile Include="EfRepository.cs" />
     <Compile Include="EfUnitOfWork.cs" />
+    <Compile Include="EfUnitOfWorkFactory.cs" />
     <Compile Include="QueryableExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Saritasa.Tools\Saritasa.Tools.csproj">
-      <Project>{a5451164-9df3-45b9-9067-2df7e23f8806}</Project>
-      <Name>Saritasa.Tools</Name>
-    </ProjectReference>
+    <None Include="Saritasa.Tools.Ef6.project.json" />
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\Newtonsoft.Json.dll" />
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="CHANGELOG.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Saritasa.Tools.Domain\Saritasa.Tools.Domain.csproj">
+      <Project>{32a3a81c-a65c-4f78-8300-17151987697c}</Project>
+      <Name>Saritasa.Tools.Domain</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

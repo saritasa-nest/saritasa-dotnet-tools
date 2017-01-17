@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Saritasa.BoringWarehouse.Web.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
@@ -7,7 +8,6 @@ using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using System.Web.Security;
-using Saritasa.BoringWarehouse.Web.Core;
 
 namespace Saritasa.BoringWarehouse.Web
 {
@@ -44,6 +44,7 @@ namespace Saritasa.BoringWarehouse.Web
             }
             catch
             {
+                return;
             }
         }
     }

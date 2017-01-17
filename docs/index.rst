@@ -1,18 +1,15 @@
-Saritasa.Tools
+Saritasa Tools
 ==============
 
 Development tools for company projects.
 
-Table of Contents
------------------
-
 .. toctree::
     :titlesonly:
 
-    general
-    emails
-    dataaccess
-    logging
+    common/index
+    domain/index
     messages/index
+    misc/index
+    emails
+    logging
     mvc
-    security

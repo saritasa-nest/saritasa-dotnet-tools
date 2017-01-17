@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using Saritasa.BoringWarehouse.Domain.Products.Entities;
-using Saritasa.BoringWarehouse.Domain.Products.Repositories;
-
-namespace Saritasa.BoringWarehouse.DataAccess.Repositories
+﻿namespace Saritasa.BoringWarehouse.DataAccess.Repositories
 {
-    /// <summary>
-    /// Product repository.
-    /// </summary>
+    using System;
+
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Linq.Expressions;
+
+    using Domain.Products.Entities;
+    using Domain.Products.Repositories;
+
     public class ProductRepository : Tools.Ef.EfRepository<Product, AppDbContext>, IProductRepository
     {
         public ProductRepository(AppDbContext context) : base(context)
@@ -17,9 +16,9 @@ namespace Saritasa.BoringWarehouse.DataAccess.Repositories
         }
 
         /// <inheritdoc />
-        public override Product Get(object id, IEnumerable<Expression<Func<Product, object>>> includes = null)
+        public Product Get(int id, IEnumerable<Expression<Func<Product, object>>> includes = null)
         {
-            return Find(p => p.Id == (int)id, includes).SingleOrDefault();
+            return Find(p => p.Id == id, includes).SingleOrDefault();
         }
     }
 }

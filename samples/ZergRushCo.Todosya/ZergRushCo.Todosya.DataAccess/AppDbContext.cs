@@ -1,32 +1,62 @@
-﻿using System.Data.Entity;
+﻿using System.Data.Common;
+using System.Data.Entity;
+using Microsoft.AspNet.Identity.EntityFramework;
 using SQLite.CodeFirst;
-using ZergRushCo.Todosya.Domain.Tasks.Entities;
-using ZergRushCo.Todosya.Domain.Users.Entities;
+using ZergRushCo.Todosya.Domain.TaskContext.Entities;
+using ZergRushCo.Todosya.Domain.UserContext.Entities;
 
 namespace ZergRushCo.Todosya.DataAccess
 {
     /// <summary>
     /// Application database context.
     /// </summary>
-    public class AppDbContext : DbContext
+    public class AppDbContext : IdentityDbContext<User>
     {
-        public AppDbContext()
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        public AppDbContext() : base("AppDbContext")
         {
         }
 
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        /// <param name="nameOrConnectionString">Connection string name of connection string itself.</param>
         public AppDbContext(string nameOrConnectionString) : base(nameOrConnectionString)
         {
         }
 
-        public DbSet<User> Users { get; set; }
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        /// <param name="connection">ADO.NET database connection.</param>
+        public AppDbContext(DbConnection connection) : base(connection, true)
+        {
+        }
 
+        /// <summary>
+        /// Use Sqlite database initializer. True by default. We don't need it for testing.
+        /// </summary>
+        public bool UseSqliteDatabase { get; set; } = true;
+
+        /// <summary>
+        /// Tasks database set.
+        /// </summary>
         public DbSet<Task> Tasks { get; set; }
 
+        /// <summary>
+        /// Projects database set.
+        /// </summary>
         public DbSet<Project> Projects { get; set; }
 
+        /// <summary>
+        /// Database model initializer.
+        /// </summary>
+        /// <param name="modelBuilder">Model builder.</param>
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            if (Database.Connection is System.Data.SQLite.SQLiteConnection)
+            if (UseSqliteDatabase)
             {
                 var sqliteConnectionInitializer = new SqliteCreateDatabaseIfNotExists<AppDbContext>(modelBuilder);
                 Database.SetInitializer(sqliteConnectionInitializer);
@@ -36,15 +66,13 @@ namespace ZergRushCo.Todosya.DataAccess
                 .HasRequired(c => c.User)
                 .WithMany()
                 .WillCascadeOnDelete(false);
-            modelBuilder.Entity<Task>()
-                .HasRequired(c => c.Project)
-                .WithMany()
-                .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<Project>()
                 .HasRequired(c => c.User)
                 .WithMany()
                 .WillCascadeOnDelete(false);
+
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

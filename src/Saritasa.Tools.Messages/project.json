@@ -1,0 +1,69 @@
+{
+  "title": "Saritasa Tools Messages",
+  "version": "0.1.0",
+  "authors": [ "Saritasa" ],
+  "description": "The package is a part of Saritasa Tools project. Saritasa.Tools.Messages contains CQRS infrastructure that includes command, queryies and events.",
+  "copyright": "Saritasa 2015-2016",
+  "packOptions": {
+    "iconUrl": "https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png",
+    "licenseUrl": "https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/LICENSE",
+    "projectUrl": "https://github.com/Saritasa/SaritasaTools",
+    "requireLicenseAcceptance": false,
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/Saritasa/SaritasaTools"
+    },
+    "summary": "CQRS infrastructure.",
+    "tags": [ "cqrs", "cqs", "commands", "queries", "events", "pipeline" ]
+  },
+  "frameworks": {
+    "net452": {
+      "frameworkAssemblies": {
+        "System.Xml": "",
+        "System.ComponentModel.DataAnnotations": "",
+        "System.Net.Http": "4.3.0"
+      }
+    },
+    "net461": {
+      "frameworkAssemblies": {
+        "System.Xml": "",
+        "System.ComponentModel.DataAnnotations": "",
+        "System.Net.Http": "4.3.0"
+      }
+    },
+    "netcoreapp1.1": {
+      "dependencies": {
+        "Microsoft.NETCore.App": "1.1.0",
+        "System.Data.Common": "4.3.0",
+        "System.Runtime.Loader": "4.3.0",
+        "System.Net.Http": "4.3.0"
+      }
+    },
+    "netstandard1.6": {
+      "dependencies": {
+        "NETStandard.Library": "1.6.1",
+        "System.Data.Common": "4.3.0",
+        "System.Runtime.Loader": "4.3.0",
+        "System.Net.Http": "4.3.0"
+      }
+    }
+  },
+  "dependencies": {
+    "Newtonsoft.Json": "9.0.1",
+    "Saritasa.Tools.Messages.Abstractions": "*",
+    "Saritasa.Tools.Domain": "*",
+    "StyleCop.Analyzers": {
+      "version": "1.0.0",
+      "type": "build"
+    },
+    "JetBrains.Annotations": {
+      "version": "10.2.1",
+      "type": "build"
+    }
+  },
+  "buildOptions": {
+    "keyFile": "../../tools/SaritasaTools.snk",
+    "additionalArguments": [ "/ruleset:../../tools/Saritasa.ruleset" ],
+    "xmlDoc": true
+  }
+}

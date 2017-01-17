@@ -33,30 +33,49 @@ namespace Saritasa.Tools.Ef
             Context = context;
         }
 
-        /// <inheritdoc />
-        public void Dispose()
+        private bool disposed;
+
+        /// <summary>
+        /// Dispose object.
+        /// </summary>
+        /// <param name="disposing">Dispose managed resources.</param>
+        protected virtual void Dispose(bool disposing)
         {
-            if (Context != null)
+            if (!disposed)
             {
-                Context.Dispose();
-                Context = null;
+                if (disposing)
+                {
+                    if (Context != null)
+                    {
+                        Context.Dispose();
+                        Context = null;
+                    }
+                }
+                disposed = true;
             }
         }
 
         /// <inheritdoc />
-        public int Complete()
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <inheritdoc />
+        public int SaveChanges()
         {
             return Context.SaveChanges();
         }
 
         /// <inheritdoc />
-        public Task<int> CompleteAsync()
+        public Task<int> SaveChangesAsync()
         {
             return Context.SaveChangesAsync();
         }
 
         /// <inheritdoc />
-        public Task<int> CompleteAsync(CancellationToken cancellationToken)
+        public Task<int> SaveChangesAsync(CancellationToken cancellationToken)
         {
             return Context.SaveChangesAsync(cancellationToken);
         }

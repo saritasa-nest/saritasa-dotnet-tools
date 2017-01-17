@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace Saritasa.BoringWarehouse.Web.Models
+﻿namespace Saritasa.BoringWarehouse.Web.Models
 {
+#pragma warning disable SA1300 // Element must begin with upper-case letter
     public class jDataTablesSearch
     {
         public bool regex { get; set; }
@@ -31,4 +27,5 @@ namespace Saritasa.BoringWarehouse.Web.Models
 
         public string dir { get; set; }
     }
+#pragma warning restore SA1300 // Element must begin with upper-case letter
 }

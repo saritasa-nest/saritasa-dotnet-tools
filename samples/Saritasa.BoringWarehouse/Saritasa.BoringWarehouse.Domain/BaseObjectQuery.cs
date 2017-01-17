@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Candy;
-
-namespace Saritasa.BoringWarehouse.Domain
+﻿namespace Saritasa.BoringWarehouse.Domain
 {
+    using Tools.Common.Extensions;
+
     public abstract class BaseObjectQuery
     {
         private SortOrder sortOrder;
@@ -23,6 +18,7 @@ namespace Saritasa.BoringWarehouse.Domain
         public string SortOrderName
         {
             get { return sortOrderName; }
+
             set
             {
                 sortOrderName = value;
@@ -33,13 +29,13 @@ namespace Saritasa.BoringWarehouse.Domain
         public SortOrder SortOrder
         {
             get { return sortOrder; }
+
             set
             {
                 sortOrder = value;
                 SortOrderName = value.ToString();
             }
         }
-
 
         public static SortOrder ParseSortOrder(string value)
         {

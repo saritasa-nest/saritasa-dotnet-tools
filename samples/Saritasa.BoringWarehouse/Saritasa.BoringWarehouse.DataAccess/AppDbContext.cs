@@ -1,20 +1,23 @@
-﻿using System.Data.Entity;
-using Saritasa.BoringWarehouse.Domain.Products.Entities;
-using Saritasa.BoringWarehouse.Domain.Users.Entities;
-
-namespace Saritasa.BoringWarehouse.DataAccess
+﻿namespace Saritasa.BoringWarehouse.DataAccess
 {
+    using System.Data.Entity;
+
+    using Domain.Products.Entities;
+    using Domain.Users.Entities;
+
     /// <summary>
     /// Entity framework database context.
     /// </summary>
     public class AppDbContext : DbContext
     {
         public AppDbContext()
+            : base()
         {
             Database.SetInitializer(new AppDbContextInitializer());
         }
 
-        public AppDbContext(string nameOrConnectionString) : base(nameOrConnectionString)
+        public AppDbContext(string nameOrConnectionString)
+            : base(nameOrConnectionString)
         {
             Database.SetInitializer(new AppDbContextInitializer());
         }

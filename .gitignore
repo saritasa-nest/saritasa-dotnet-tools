@@ -123,8 +123,11 @@ bower_components
 node_modules
 bundles
 *.sqlite
+
 *.zip
 *.SetParameters.xml
 *.SourceManifest.xml
 *.deploy-readme.txt
 *.deploy.cmd
+.sonar
+sonar-project.properties

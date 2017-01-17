@@ -4,9 +4,12 @@
     ViewBag.Title = "Products list";
 }
 
-<p>
-    <a class="btn btn-default" href="@Url.Action("Create")">Add product</a>
-</p>
+<div class="container">
+    <h2>Index</h2>
+    <p>
+        <a class="btn btn-default" href="@Url.Action("Create")">Add product</a>
+    </p>
+</div>
 
 <div class="container">
     <table id="productsTable" class="table table-striped table-bordered" cellspacing="0" width="100%">
@@ -94,3 +97,4 @@
         });
     </script>
 }
+    

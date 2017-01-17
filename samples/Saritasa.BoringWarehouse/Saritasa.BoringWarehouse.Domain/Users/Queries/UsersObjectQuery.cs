@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Saritasa.BoringWarehouse.Domain.Users.Entities;
-using static Candy.CollectionsExtensions;
-
-namespace Saritasa.BoringWarehouse.Domain.Users.Queries
+﻿namespace Saritasa.BoringWarehouse.Domain.Users.Queries
 {
+    using System.Collections.Generic;
+    using System.Linq;
+
+    using Tools.Common.Extensions;
+
+    using Entities;
+
     public class UsersObjectQuery : BaseObjectQuery
     {
         public PagedResult<User> Search(IEnumerable<User> users)
@@ -18,7 +17,7 @@ namespace Saritasa.BoringWarehouse.Domain.Users.Queries
             if (!string.IsNullOrEmpty(SearchPattern))
             {
                 // Find by name
-                users = users.Where(u => u.FirstName.StartsWith(SearchPattern) || 
+                users = users.Where(u => u.FirstName.StartsWith(SearchPattern) ||
                                             u.LastName.StartsWith(SearchPattern) ||
                                             u.Email.StartsWith(SearchPattern) ||
                                             u.Phone.StartsWith(SearchPattern));

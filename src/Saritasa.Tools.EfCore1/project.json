@@ -1,0 +1,67 @@
+{
+  "title": "Saritasa Tools Entity Framework Core",
+  "version": "0.1.0",
+  "authors": [ "Saritasa" ],
+  "description": "The package is a part of Saritasa Tools project. Saritasa.Tools.EfCore1 contains implementations for unit of work, repository interfaces.",
+  "copyright": "Saritasa 2015-2016",
+  "packOptions": {
+    "iconUrl": "https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png",
+    "licenseUrl": "https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/LICENSE",
+    "projectUrl": "https://github.com/Saritasa/SaritasaTools",
+    "requireLicenseAcceptance": false,
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/Saritasa/SaritasaTools"
+    },
+    "summary": "Unit of work, repository implementation for Entity Framework Core.",
+    "tags": [ "unit of work", "repository" ]
+  },
+  "dependencies": {
+    "Saritasa.Tools.Domain": "*",
+    "StyleCop.Analyzers": {
+      "version": "1.0.0",
+      "type": "build"
+    }
+  },
+  "frameworks": {
+    "net452": {
+      "frameworkAssemblies": {
+        "System.Data": ""
+      },
+      "dependencies": {
+        "Microsoft.EntityFrameworkCore": "1.1.0"
+      }
+    },
+    "net461": {
+      "frameworkAssemblies": {
+        "System.Data": ""
+      },
+      "dependencies": {
+        "Microsoft.EntityFrameworkCore": "1.1.0"
+      }
+    },
+    "netcoreapp1.0": {
+      "dependencies": {
+        "Microsoft.EntityFrameworkCore": "1.1.0",
+        "Microsoft.NETCore.App": "1.0.0"
+      },
+      "netcoreapp1.1": {
+        "dependencies": {
+          "Microsoft.EntityFrameworkCore": "1.1.0",
+          "Microsoft.NETCore.App": "1.1.0"
+        }
+      }
+    },
+    "netstandard1.6": {
+      "dependencies": {
+        "NETStandard.Library": "1.6.1",
+        "Microsoft.EntityFrameworkCore": "1.1.0"
+      }
+    }
+  },
+  "buildOptions": {
+    "keyFile": "../../tools/SaritasaTools.snk",
+    "additionalArguments": [ "/ruleset:../../tools/Saritasa.ruleset" ],
+    "xmlDoc": true
+  }
+}

@@ -49,20 +49,38 @@ namespace Saritasa.Tools.Ef
         }
 
         /// <inheritdoc />
-        public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate,
-            IEnumerable<Expression<Func<TEntity, object>>> includes = null)
+        public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate)
+        {
+            return Context.Set<TEntity>().Where(predicate);
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<TEntity> Find<TProperty>(Expression<Func<TEntity, bool>> predicate,
+            IEnumerable<Expression<Func<TEntity, TProperty>>> includes)
         {
             return Context.Set<TEntity>().Where(predicate).Include(includes);
         }
 
         /// <inheritdoc />
-        public virtual TEntity Get(object id, IEnumerable<Expression<Func<TEntity, object>>> includes = null)
+        public virtual TEntity Get(params object[] keyValues)
         {
-            return Context.Set<TEntity>().Find(id);
+            return Context.Set<TEntity>().Find(keyValues);
         }
 
         /// <inheritdoc />
-        public IEnumerable<TEntity> GetAll(IEnumerable<Expression<Func<TEntity, object>>> includes = null)
+        public virtual TEntity Get<TProperty>(IEnumerable<Expression<Func<TEntity, TProperty>>> includes, params object[] keyValues)
+        {
+            return Context.Set<TEntity>().Find(keyValues);
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<TEntity> GetAll()
+        {
+            return Context.Set<TEntity>().ToList();
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<TEntity> GetAll<TProperty>(IEnumerable<Expression<Func<TEntity, TProperty>>> includes)
         {
             return Context.Set<TEntity>().Include(includes).ToList();
         }

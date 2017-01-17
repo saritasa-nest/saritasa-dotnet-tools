@@ -3,6 +3,9 @@ using System.Web.Routing;
 
 namespace ZergRushCo.Todosya.Web
 {
+    /// <summary>
+    /// Global application object.
+    /// </summary>
     public class MvcApplication : System.Web.HttpApplication
     {
         protected void Application_Start()
@@ -11,6 +14,7 @@ namespace ZergRushCo.Todosya.Web
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             DiConfig.Register();
+            DebugEndpointConfig.Register();
         }
     }
 }

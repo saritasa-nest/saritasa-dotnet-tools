@@ -2,34 +2,34 @@
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
-using Saritasa.Tools.Queries;
-using Saritasa.Tools.Commands;
+using Microsoft.AspNet.Identity.Owin;
+using Saritasa.Tools.Messages.Abstractions;
 using ZergRushCo.Todosya.Web.Models;
-using ZergRushCo.Todosya.Domain.Users.Services;
-using ZergRushCo.Todosya.Web.Core.Identity;
+using ZergRushCo.Todosya.Domain.UserContext.Services;
+using Microsoft.Extensions.Logging;
+using ZergRushCo.Todosya.Domain.UserContext.Commands;
+using ZergRushCo.Todosya.Domain.UserContext.Entities;
 
 namespace ZergRushCo.Todosya.Web.Controllers
 {
+    /// <summary>
+    /// Manage user account controller.
+    /// </summary>
     [Authorize]
     public class ManageController : BaseController
     {
-        readonly AppSignInManager signInManager;
-        readonly AppUserManager userManager;
+        readonly SignInManager<User, string> signInManager;
 
-        readonly Domain.Users.Queries.UsersQueries userQueries;
+        readonly Domain.UserContext.Queries.UsersQueries userQueries;
 
-        public ManageController(ICommandPipeline commandPipeline, IQueryPipeline queryPipeline) :
-            base(commandPipeline, queryPipeline)
-        {
-        }
-
-        public ManageController(AppUserManager userManager,
-            AppSignInManager signInManager,
-            Domain.Users.Queries.UsersQueries userQueries,
+        public ManageController(
+            ICommandPipeline commandPipeline,
             IQueryPipeline queryPipeline,
-            ICommandPipeline commandPipeline) : base(commandPipeline, queryPipeline)
+            ILoggerFactory loggerFactory,
+            SignInManager<User, string> signInManager,
+            Domain.UserContext.Queries.UsersQueries userQueries) :
+            base(commandPipeline, queryPipeline, loggerFactory)
         {
-            this.userManager = userManager;
             this.signInManager = signInManager;
             this.userQueries = userQueries;
         }
@@ -39,20 +39,20 @@ namespace ZergRushCo.Todosya.Web.Controllers
         {
             ViewBag.StatusMessage = isUpdated ? "Profile updated" : string.Empty;
 
-            var userId = Convert.ToInt32(User.Identity.GetUserId());
-            var model = new Domain.Users.Commands.UpdateUserCommand(QueryPipeline.Execute(userQueries.GetById, userId));
+            var userId = User.Identity.GetUserId();
+            var model = new UpdateUserCommand(QueryPipeline.Query(userQueries).With(q => q.GetById(userId)));
             return View(model);
         }
 
         [HttpPost]
-        public ActionResult Index(Domain.Users.Commands.UpdateUserCommand command)
+        public ActionResult Index(UpdateUserCommand command)
         {
             if (!ModelState.IsValid)
             {
                 return View(command);
             }
 
-            command.UserId = Convert.ToInt32(User.Identity.GetUserId());
+            command.UserId = User.Identity.GetUserId();
             CommandPipeline.Handle(command);
             return View(command);
         }
@@ -64,29 +64,11 @@ namespace ZergRushCo.Todosya.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ChangePassword(ChangePasswordViewModel model)
+        public async Task<ActionResult> ChangePassword(UpdateUserPasswordCommand command)
         {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
-            var userId = Convert.ToInt32(User.Identity.GetUserId());
-            var result = await userManager.ChangePasswordAsync(userId, model.OldPassword, model.NewPassword);
-            if (result.Succeeded)
-            {
-                var user = await userManager.FindByIdAsync(userId);
-                if (user != null)
-                {
-                    await signInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
-                }
-                return RedirectToAction("Index", new { Message = "PasswordHash has been changed" });
-            }
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, error);
-            }
-            return View(model);
+            command.UserId = User.Identity.GetUserId();
+            await HandleCommandAsync(command);
+            return View(command);
         }
 
         public ActionResult SetPassword()
@@ -96,29 +78,11 @@ namespace ZergRushCo.Todosya.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> SetPassword(SetPasswordViewModel model)
+        public async Task<ActionResult> SetPassword(UpdateUserPasswordCommand command)
         {
-            if (ModelState.IsValid)
-            {
-                var userId = Convert.ToInt32(User.Identity.GetUserId());
-                var result = await userManager.AddPasswordAsync(userId, model.NewPassword);
-                if (result.Succeeded)
-                {
-                    var user = await userManager.FindByIdAsync(userId);
-                    if (user != null)
-                    {
-                        await signInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
-                    }
-                    return RedirectToAction("Index", new { Message = "PasswordHash has been successfully set" });
-                }
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error);
-                }
-            }
-
-            // if we got this far, something failed, redisplay form
-            return View(model);
+            command.UserId = User.Identity.GetUserId();
+            await HandleCommandAsync(command);
+            return View(command);
         }
     }
 }

@@ -1,15 +1,29 @@
-﻿using Autofac;
-using Autofac.Integration.Mvc;
-using System;
+﻿using System;
 using System.Configuration;
 using System.Web;
 using System.Web.Mvc;
-using Saritasa.Tools.Messages.Repositories;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Commands;
+using Saritasa.Tools.Messages.Queries;
+using Saritasa.Tools.Messages.Events;
+using Saritasa.Tools.Emails.Interceptors;
+using Autofac;
+using Autofac.Integration.Mvc;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.Extensions.Logging;
+using ZergRushCo.Todosya.DataAccess;
 
 namespace ZergRushCo.Todosya.Web
 {
+    /// <summary>
+    /// Dependency injection configuration.
+    /// </summary>
     public class DiConfig
     {
+        /// <summary>
+        /// Configures dependency injection container.
+        /// </summary>
         public static void Register()
         {
             var builder = new ContainerBuilder();
@@ -32,65 +46,67 @@ namespace ZergRushCo.Todosya.Web
                 AppDomain.CurrentDomain.BaseDirectory);
             builder.RegisterType<DataAccess.AppUnitOfWork>().AsImplementedInterfaces();
             builder.RegisterType<DataAccess.AppUnitOfWorkFactory>().AsImplementedInterfaces().SingleInstance();
-            builder.RegisterType<DataAccess.AppDbContext>().AsSelf();
-            builder.Register(c =>
-                new Domain.Users.Services.UserStoreService(
-                    c.Resolve<Domain.Users.Repositories.IUserRepository>(),
-                    c.Resolve<Saritasa.Tools.Commands.ICommandPipeline>()
-                )).AsImplementedInterfaces();
-            builder.Register(c =>
-                new Core.Identity.AppSignInManager(
-                    c.Resolve<Domain.Users.Services.AppUserManager>(),
-                    HttpContext.Current.GetOwinContext().Authentication
-                )).AsSelf();
+            builder.Register<DataAccess.AppDbContext>(c => new AppDbContext())
+                .AsSelf();
+            builder.Register<IUserStore<Domain.UserContext.Entities.User>>(
+                c => new UserStore<Domain.UserContext.Entities.User>(c.Resolve<AppDbContext>()))
+                    .AsImplementedInterfaces();
+            builder.Register(
+                c => new Domain.UserContext.Services.AppUserManager(
+                    c.Resolve<IUserStore<Domain.UserContext.Entities.User>>()))
+                        .AsImplementedInterfaces();
+            builder.Register(
+                c => new Microsoft.AspNet.Identity.Owin.SignInManager<Domain.UserContext.Entities.User, string>(
+                    c.Resolve<Domain.UserContext.Services.AppUserManager>(),
+                    HttpContext.Current.GetOwinContext().Authentication));
             builder.RegisterType<DataAccess.Repositories.UserRepository>().AsImplementedInterfaces();
-            builder.RegisterType<Domain.Users.Services.AppUserManager>().AsSelf();
+            builder.RegisterType<Domain.UserContext.Services.AppUserManager>().AsSelf();
 
             // make container
             var container = builder.Build();
 
-            // command pipeline
-            AdoNetMessageRepository.Dialect dialect = AdoNetMessageRepository.Dialect.Auto;
-
-            if (string.Compare(connectionStringConf.ProviderName, "System.Data.SQLite", true) == 0)
-            {
-                dialect = AdoNetMessageRepository.Dialect.SqLite;
-            }
-            else if (string.Compare(connectionStringConf.ProviderName, "System.Data.SqlClient", true) == 0)
-            {
-                dialect = AdoNetMessageRepository.Dialect.SqlServer;
-            }
-
-            var commandPipeline = Saritasa.Tools.Commands.CommandPipeline.CreateDefaultPipeline(container.Resolve,
-                System.Reflection.Assembly.GetAssembly(typeof(Domain.Users.Entities.User)));
-            commandPipeline.AppendMiddlewares(
-                new Saritasa.Tools.Messages.PipelineMiddlewares.RepositoryMiddleware(
-                    new Saritasa.Tools.Messages.Repositories.AdoNetMessageRepository(
-                        System.Data.Common.DbProviderFactories.GetFactory(connectionStringConf.ProviderName),
-                        connectionString,
-                        dialect)
-                )
+            var repositoryMiddleware = new Saritasa.Tools.Messages.Common.PipelineMiddlewares.RepositoryMiddleware(
+                new Saritasa.Tools.Messages.Common.Repositories.AdoNetMessageRepository(
+                    System.Data.Common.DbProviderFactories.GetFactory(connectionStringConf.ProviderName),
+                    connectionString)
             );
+
+            // command pipeline
+            var commandPipeline = CommandPipeline.CreateDefaultPipeline(container.Resolve,
+                System.Reflection.Assembly.GetAssembly(typeof(Domain.UserContext.Entities.User)));
+            commandPipeline.AppendMiddlewares(repositoryMiddleware);
+            commandPipeline.UseInternalResolver();
             builder = new ContainerBuilder();
             builder.RegisterInstance(commandPipeline).AsImplementedInterfaces().SingleInstance();
 
             // query pipeline
-            var queryPipeline = Saritasa.Tools.Queries.QueryPipeline.CreateDefaultPipeline(container.Resolve);
+            var queryPipeline = QueryPipeline.CreateDefaultPipeline(container.Resolve);
+            queryPipeline.AppendMiddlewares(repositoryMiddleware);
+            queryPipeline.UseInternalResolver();
             builder.RegisterInstance(queryPipeline).AsImplementedInterfaces().SingleInstance();
 
             // events pipeline
-            var eventsPipeline = Saritasa.Tools.Events.EventPipeline.CreateDefaultPipeline(container.Resolve,
-                System.Reflection.Assembly.GetAssembly(typeof(Domain.Users.Entities.User)));
+            var eventsPipeline = EventPipeline.CreateDefaultPipeline(container.Resolve,
+                System.Reflection.Assembly.GetAssembly(typeof(Domain.UserContext.Entities.User)));
+            eventsPipeline.UseInternalResolver();
             builder.RegisterInstance(eventsPipeline).AsImplementedInterfaces().SingleInstance();
 
             // register queries as separate objects
-            builder.RegisterType<Domain.Users.Queries.UsersQueries>().AsSelf();
-            builder.RegisterType<Domain.Tasks.Queries.TasksQueries>().AsSelf();
-            builder.RegisterType<Domain.Tasks.Queries.ProjectsQueries>().AsSelf();
+            builder.RegisterType<Domain.UserContext.Queries.UsersQueries>().AsSelf();
+            builder.RegisterType<Domain.TaskContext.Queries.TasksQueries>().AsSelf();
+            builder.RegisterType<Domain.TaskContext.Queries.ProjectsQueries>().AsSelf();
 
             // emails
-            var emailSender = new Saritasa.Tools.Emails.SystemMail.SmtpClientEmailSender();
+            var emailSender = new Saritasa.Tools.Emails.SmtpClientEmailSender();
+            emailSender.AddInterceptor(new FilterEmailInterceptor("*@saritasa.com mytest@example.com"));
+            emailSender.AddInterceptor(new CountEmailsInterceptor());
             builder.RegisterInstance(emailSender).AsImplementedInterfaces().SingleInstance();
+
+            // logger
+            var nlogProvider = new Saritasa.Tools.NLog.NLogLoggerProvider();
+            var loggerFactory = new LoggerFactory();
+            loggerFactory.AddProvider(nlogProvider);
+            builder.RegisterInstance(loggerFactory).AsImplementedInterfaces().SingleInstance();
 
             // set the dependency resolver to be Autofac
             builder.Update(container);

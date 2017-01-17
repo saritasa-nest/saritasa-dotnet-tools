@@ -1,0 +1,37 @@
+{
+  "title": "Saritasa Tools Domain, Emails Tests",
+  "dependencies": {
+    "xunit": "2.2.0-*",
+    "dotnet-test-xunit": "2.2.0-*",
+    "Saritasa.Tools.Common": "*",
+    "Saritasa.Tools.Misc": "*",
+    "Saritasa.Tools.Domain": "*",
+    "Saritasa.Tools.Emails": "*"
+  },
+  "frameworks": {
+    "netcoreapp1.0": {
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "version": "1.0.1",
+          "type": "platform"
+        },
+        "System.Data.Common": "4.3.0"
+      }
+    },
+    "net452": {
+      "frameworkAssemblies": {
+        "System.Data": "",
+        "System.Xml": "",
+        "System.ComponentModel.DataAnnotations": ""
+      }
+    },
+    "net461": {
+      "frameworkAssemblies": {
+        "System.Data": "",
+        "System.Xml": "",
+        "System.ComponentModel.DataAnnotations": ""
+      }
+    }
+  },
+  "testRunner": "xunit"
+}

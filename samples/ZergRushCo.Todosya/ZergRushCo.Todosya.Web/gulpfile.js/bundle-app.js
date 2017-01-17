@@ -2,6 +2,7 @@
  * Concatenate .js frontend files. Can be used with minify and babel.
  *
  * 09/30/2016 [Ivan Kozhin] Initial version.
+ * 12/14/2016 [Ivan Kozhin] Formatting.
  */
 
 var gulp = require('gulp'),
@@ -13,7 +14,8 @@ var gulp = require('gulp'),
 
 gulp.task('bundle-app', function () {
     var babel = config.useBabel ? require('gulp-babel') : empty;
-    return gulp.src(path.join(config.src, '**/*.js'), {
+    return gulp
+        .src(path.join(config.src, '**/*.js'), {
             ignore: './' + path.join(config.src, config.pagesDir, '**/*.js')
         })
         .pipe(gulpif(config.useSourcemaps, sourcemaps.init()))

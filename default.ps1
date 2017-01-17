@@ -10,6 +10,8 @@ if ($PSVersionTable.PSVersion.Major -lt 3)
 }
 
 . .\scripts\Saritasa.PsakeTasks.ps1
+$InformationPreference = 'Continue'
+$env:PSModulePath += ";$PSScriptRoot\scripts\Modules"
 
 . .\scripts\BuildTasks.ps1
 . .\scripts\DockerTasks.ps1
@@ -24,17 +26,28 @@ Properties `
     $Configuration = 'Release'
 }
 
-$builds = @(
-    @{Id = 'v4.5.2'; Framework = 'net452'; symbol = 'NET452'}
-    @{Id = 'v4.6.1'; Framework = 'net461'; symbol = 'NET461'}
-)
+Import-Module Saritasa.Build
+Import-Module Saritasa.Test
+
+# Global variable.
+$script:Version = '0.0.0'
+
 $packages = @(
-    'Saritasa.Tools'
-    'Saritasa.Tools.Ef6'
-    'Saritasa.Tools.Mvc5'
-    'Saritasa.Tools.NLog4'
+    'Saritasa.Tools.Common' # common
+    'Saritasa.Tools.Domain' # domain
+    'Saritasa.Tools.Ef6' # ef6
+    'Saritasa.Tools.EfCore1' # efcore1
+    'Saritasa.Tools.Emails' # emails
+    'Saritasa.Tools.Messages' # messages
+    'Saritasa.Tools.Messages.Abstractions' # messages-abstractiona
+    'Saritasa.Tools.Misc' # misc
+    'Saritasa.Tools.Mvc5' # mvc5
+    'Saritasa.Tools.NLog4' # nlog4
 )
 
+$docsRoot = Resolve-Path "$PSScriptRoot\docs"
+
+function Get-PackageName([string]$package)
 function GetPackageName([string]$package)
 {
     If ([System.Char]::IsDigit($package[$package.Length-1])) {$package.Substring(0, $package.Length-1)} Else {$package}
@@ -42,54 +55,19 @@ function GetPackageName([string]$package)
 
 Task pack -depends download-nuget -description 'Build the library, test it and prepare nuget packages' `
 {
-    # nuget restore
-    Invoke-NugetRestore './src/Saritasa.Tools.sln'
-
-    # update version
-    Update-AssemblyInfoFile $version
-
-    # build all versions, sign, test and prepare package directory
     foreach ($package in $packages)
     {
-        $packageFile = GetPackageName $package
-        Write-Information $packageFile
-
-        Remove-Item $libDirectory -Recurse -Force -ErrorAction SilentlyContinue
-        New-Item $libDirectory -ItemType Directory
-        foreach ($build in $builds)
+        &dotnet pack ".\src\$package" --configuration release --output '.'
+        if ($LASTEXITCODE)
         {
-            # build & sign
-            $id = $build.Id
-            $symbol = $build.symbol
-            $args = @("/p:TargetFrameworkVersion=$id", "/p:DefineConstants=$symbol")
-            if (Test-Path $signKey)
-            {
-                $args += "/p:AssemblyOriginatorKeyFile=$signKey" + '/p:SignAssembly=true'
-            }
-            Invoke-ProjectBuild -ProjectPath "./src/$package/$package.csproj" -Configuration 'Release' -BuildParams $args
-
-            # copy
-            New-Item (Join-Path $libDirectory $build.Framework) -ItemType Directory
-            Copy-Item "./src/$package/bin/Release/$packageFile.dll" (Join-Path $libDirectory $build.Framework)
-            Copy-Item "./src/$package/bin/Release/$packageFile.XML" (Join-Path $libDirectory $build.Framework)
+            throw 'Nuget pack failed.'
         }
-
-        # pack, we already have nuget in current folder
-        $nugetExePath = "$PSScriptRoot\scripts\nuget.exe"
-        $buildDirectory = (Get-Item $libDirectory).Parent.FullName
-        Exec { &$nugetExePath @('pack', (Join-Path $buildDirectory "$package.nuspec"), '-Version', $version, '-NonInteractive', '-Exclude', '*.snk') }
     }
-
-    # little clean up
-    Remove-Item $libDirectory -Recurse -Force -ErrorAction SilentlyContinue
-
-    # build docs
-    CompileDocs
 }
 
 Task clean -description 'Clean solution' `
 {
-    Remove-Item $libDirectory -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item $LibDirectory -Recurse -Force -ErrorAction SilentlyContinue
     Remove-Item './Saritasa.*.nupkg' -ErrorAction SilentlyContinue
     Remove-Item './src/*.suo' -Recurse -Force -ErrorAction SilentlyContinue
     Remove-Item './src/Saritasa.Tools/bin' -Recurse -Force -ErrorAction SilentlyContinue
@@ -100,7 +78,7 @@ Task clean -description 'Clean solution' `
     Remove-Item './scripts/nuget.exe' -ErrorAction SilentlyContinue
 }
 
-Task docs -description 'Compile and open documentation' `
+Task docs -depends get-version -description 'Compile and open documentation' `
 {
     CompileDocs
     Invoke-Item './docs/_build/html/index.html'
@@ -108,9 +86,12 @@ Task docs -description 'Compile and open documentation' `
 
 function CompileDocs
 {
-    Set-Location '.\docs'
-    Copy-Item '.\conf.py.template' '.\conf.py'
-    (Get-Content '.\conf.py').replace('VX.VY', $version) | Set-Content '.\conf.py'
-    Exec { &'.\make.cmd' @('html') }
-    Set-Location '..'
+    Copy-Item "$docsRoot\conf.py.template" "$docsRoot\conf.py"
+    (Get-Content "$docsRoot\conf.py").Replace('VX.VY', $Version) | Set-Content "$docsRoot\conf.py"
+    
+    python -m sphinx.__init__ -b html -d "$docsRoot\_build\doctrees" $docsRoot "$docsRoot\_build\html"
+    if ($LASTEXITCODE)
+    {
+        throw 'Cannot compile documentation.'
+    }
 }

@@ -1,22 +1,27 @@
-﻿using System;
-using System.Linq;
-using Saritasa.Tools.Ef;
-using Saritasa.BoringWarehouse.DataAccess.Repositories;
-using Saritasa.BoringWarehouse.Domain;
-using Saritasa.BoringWarehouse.Domain.Products.Entities;
-using Saritasa.BoringWarehouse.Domain.Products.Repositories;
-using Saritasa.BoringWarehouse.Domain.Users.Repositories;
-using Saritasa.BoringWarehouse.Domain.Users.Entities;
-
-namespace Saritasa.BoringWarehouse.DataAccess
+﻿namespace Saritasa.BoringWarehouse.DataAccess
 {
+    using System.Linq;
+
+    using Tools.Ef;
+
+    using Repositories;
+    using Domain;
+    using Domain.Products.Entities;
+    using Domain.Products.Repositories;
+    using Domain.Users.Repositories;
+    using Domain.Users.Entities;
+
     /// <summary>
     /// Application unit of work.
     /// </summary>
     public class AppUnitOfWork : EfUnitOfWork<AppDbContext>, IAppUnitOfWork
     {
-        public AppUnitOfWork(AppDbContext context) : base(context)
+        AppDbContext context;
+
+        public AppUnitOfWork(AppDbContext context)
+            : base(context)
         {
+            this.context = context;
         }
 
         public IUserRepository UserRepository => new UserRepository(Context);
