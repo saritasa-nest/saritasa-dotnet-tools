@@ -2,8 +2,6 @@ $root = $PSScriptRoot
 $src = "$root\..\src"
 $samples = "$root\..\samples"
 
-Import-Module Saritasa.WebDeploy
-
 Task package-zergrushco -depends build-zergrushco `
 {
     $packagePath = "$samples\ZergRushCo.Todosya\Docker\ZergRushCo.zip"

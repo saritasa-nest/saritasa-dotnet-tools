@@ -9,16 +9,16 @@ if ($PSVersionTable.PSVersion.Major -lt 3)
     throw "PowerShell 3 is required.`nhttp://www.microsoft.com/en-us/download/details.aspx?id=40855"
 }
 
+. .\scripts\Saritasa.PsakeTasks.ps1
+
 . .\scripts\BuildTasks.ps1
 . .\scripts\DockerTasks.ps1
 . .\scripts\PublishTasks.ps1
 
 Properties `
 {
-    $version = '0.1.0'
-    $signKey = './saritasa-tools.snk'
-    $nuspecFile = './build/Saritasa.Tools.nuspec'
-    $libDirectory = './build/lib'
+    $Version = '0.1.0'
+    $LibDirectory = './build/lib'
     $Configuration = 'Release'
 }
 
