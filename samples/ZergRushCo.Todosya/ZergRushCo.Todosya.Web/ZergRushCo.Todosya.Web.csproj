@@ -251,6 +251,7 @@
     <Content Include="Views\Projects\Edit.cshtml" />
     <Content Include="Views\Projects\Remove.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
+    <None Include="WebDeployParameters.xml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

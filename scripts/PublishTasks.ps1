@@ -6,7 +6,8 @@ Task package-zerg -depends build-zerg `
 {
     $packagePath = "$samples\ZergRushCo.Todosya\Docker\Zerg.zip"
     Invoke-PackageBuild -ProjectPath "$samples\ZergRushCo.Todosya\ZergRushCo.Todosya.Web\ZergRushCo.Todosya.Web.csproj" `
-        -PackagePath $packagePath -Configuration $Configuration
+        -PackagePath $packagePath -Configuration $Configuration `
+        -BuildParams @("/p:ProjectParametersXMLFile=$samples\ZergRushCo.Todosya\ZergRushCo.Todosya.Web\WebDeployParameters.xml")
 }
 
 Task package-bw -depends build-bw `

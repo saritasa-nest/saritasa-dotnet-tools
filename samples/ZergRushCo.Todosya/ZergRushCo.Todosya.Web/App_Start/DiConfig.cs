@@ -4,6 +4,7 @@ using System;
 using System.Configuration;
 using System.Web;
 using System.Web.Mvc;
+using Saritasa.Tools.Messages.Repositories;
 
 namespace ZergRushCo.Todosya.Web
 {
@@ -49,6 +50,17 @@ namespace ZergRushCo.Todosya.Web
             var container = builder.Build();
 
             // command pipeline
+            AdoNetMessageRepository.Dialect dialect = AdoNetMessageRepository.Dialect.Auto;
+
+            if (string.Compare(connectionStringConf.ProviderName, "System.Data.SQLite", true) == 0)
+            {
+                dialect = AdoNetMessageRepository.Dialect.SqLite;
+            }
+            else if (string.Compare(connectionStringConf.ProviderName, "System.Data.SqlClient", true) == 0)
+            {
+                dialect = AdoNetMessageRepository.Dialect.SqlServer;
+            }
+
             var commandPipeline = Saritasa.Tools.Commands.CommandPipeline.CreateDefaultPipeline(container.Resolve,
                 System.Reflection.Assembly.GetAssembly(typeof(Domain.Users.Entities.User)));
             commandPipeline.AppendMiddlewares(
@@ -56,7 +68,7 @@ namespace ZergRushCo.Todosya.Web
                     new Saritasa.Tools.Messages.Repositories.AdoNetMessageRepository(
                         System.Data.Common.DbProviderFactories.GetFactory(connectionStringConf.ProviderName),
                         connectionString,
-                        Saritasa.Tools.Messages.Repositories.AdoNetMessageRepository.Dialect.SqlServer)
+                        dialect)
                 )
             );
             builder = new ContainerBuilder();
