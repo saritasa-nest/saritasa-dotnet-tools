@@ -20,6 +20,8 @@ Task pre-build -depends download-nuget `
     Invoke-NugetRestore "$samples\ZergRushCo.Todosya\ZergRushCo.Todosya.sln"
     Invoke-NugetRestore "$samples\Saritasa.BoringWarehouse\Saritasa.BoringWarehouse.sln"
 
+    # Use following command to revert the files:
+    # git checkout -- **/AssemblyInfo.cs
     GitVersion.exe /updateassemblyinfo
 }
 
@@ -55,5 +57,5 @@ Task build-boringwarehouse -depends pre-build `
 
 Task build-saritasatools -depends pre-build `
 {
-    Invoke-SolutionBuild "$src\Saritasa.Tools.sln" -Configuration $Configuration
+    Invoke-SolutionBuild "$src\..\Saritasa.Tools.sln" -Configuration $Configuration
 }

@@ -7,7 +7,7 @@ Task docker-zergrushco -depends package-zergrushco `
     Exec { docker build -t zerg/db:latest -t "zerg/db:$version" -f "$dockerContext\Dockerfile.db" $dockerContext }
 }
 
-Task docker-boringwarehouse -depends package-bw `
+Task docker-boringwarehouse -depends package-boringwarehouse `
 {
     $dockerContext = "$samples\Saritasa.BoringWarehouse\Docker"
     $version = (gitversion /showvariable SemVer)
@@ -16,7 +16,7 @@ Task docker-boringwarehouse -depends package-bw `
     Exec { docker build -t bw/db:latest -t "bw/db:$version" -f "$dockerContext\Dockerfile.db" $dockerContext }
 }
 
-# Docker images should be built before run (docker-bw task).
+# Docker images should be built before run (docker-boringwarehouse task).
 Task run-boringwarehouse-tests `
 {
     # Recreate and containers.
