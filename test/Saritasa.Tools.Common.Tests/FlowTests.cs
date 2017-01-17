@@ -116,8 +116,8 @@ namespace Saritasa.Tools.Common.Tests
             // Act
             var pagedList = new PagedEnumerable<int>(list, 10, 10);
             var pagedList2 = new PagedEnumerable<int>(list, 10, 10);
-            var pagedList3 = list.GetPaged(13, 25);
-            var pagedList4 = list.GetPaged(20, 13);
+            var pagedList3 = list.AsPage(13, 25);
+            var pagedList4 = list.AsPage(20, 13);
 
             // Assert
             Assert.Equal(25, pagedList.TotalPages);

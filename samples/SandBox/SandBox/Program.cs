@@ -57,7 +57,7 @@ namespace SandBox
                 new CommandExecutorMiddleware(Resolver),
                 new RepositoryMiddleware(inMemoryMessageRepository)
             );
-            CommandPipeline.UseInternalResolver(true);
+            CommandPipeline.UseInternalResolver();
 
             // create query pipeline manually
             QueryPipeline = new QueryPipeline();
@@ -66,7 +66,7 @@ namespace SandBox
                 new QueryExecutorMiddleware(),
                 new RepositoryMiddleware(inMemoryMessageRepository)
             );
-            QueryPipeline.UseInternalResolver(true);
+            QueryPipeline.UseInternalResolver();
 
             // create event pipeline manually
             EventPipeline = new EventPipeline();
@@ -75,7 +75,7 @@ namespace SandBox
                 new EventExecutorMiddleware(Resolver),
                 new RepositoryMiddleware(inMemoryMessageRepository)
             );
-            EventPipeline.UseInternalResolver(true);
+            EventPipeline.UseInternalResolver();
         }
 
         static void Test()
