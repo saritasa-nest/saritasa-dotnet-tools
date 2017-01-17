@@ -36,11 +36,6 @@ namespace ZergRushCo.Todosya.DataAccess
         }
 
         /// <summary>
-        /// Use Sqlite database initializer. True by default. We don't need it for testing.
-        /// </summary>
-        public bool UseSqliteDatabase { get; set; } = true;
-
-        /// <summary>
         /// Tasks database set.
         /// </summary>
         public DbSet<Task> Tasks { get; set; }
@@ -56,7 +51,7 @@ namespace ZergRushCo.Todosya.DataAccess
         /// <param name="modelBuilder">Model builder.</param>
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            if (UseSqliteDatabase)
+            if (Database.Connection is System.Data.SQLite.SQLiteConnection)
             {
                 var sqliteConnectionInitializer = new SqliteCreateDatabaseIfNotExists<AppDbContext>(modelBuilder);
                 Database.SetInitializer(sqliteConnectionInitializer);
