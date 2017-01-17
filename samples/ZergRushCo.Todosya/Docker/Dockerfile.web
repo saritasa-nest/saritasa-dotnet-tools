@@ -12,7 +12,7 @@ RUN $env:chocolateyUseWindowsCompression = 'false'; \
 RUN choco install webdeploy -y
 
 COPY Run.ps1 Temp/Run.ps1
-COPY Zerg.zip Temp/Zerg.zip
+COPY ZergRushCo.zip Temp/ZergRushCo.zip
 
 RUN C:/Temp/Run.ps1
 

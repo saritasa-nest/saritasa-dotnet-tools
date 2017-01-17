@@ -1,4 +1,4 @@
-Task docker-zerg -depends package-zerg `
+Task docker-zergrushco -depends package-zergrushco `
 {
     $dockerContext = "$samples\ZergRushCo.Todosya\Docker"
     $version = (gitversion /showvariable SemVer)
@@ -7,7 +7,7 @@ Task docker-zerg -depends package-zerg `
     Exec { docker build -t zerg/db:latest -t "zerg/db:$version" -f "$dockerContext\Dockerfile.db" $dockerContext }
 }
 
-Task docker-bw -depends package-bw `
+Task docker-boringwarehouse -depends package-bw `
 {
     $dockerContext = "$samples\Saritasa.BoringWarehouse\Docker"
     $version = (gitversion /showvariable SemVer)
@@ -17,7 +17,7 @@ Task docker-bw -depends package-bw `
 }
 
 # Docker images should be built before run (docker-bw task).
-Task run-bw-tests `
+Task run-boringwarehouse-tests `
 {
     # Recreate and containers.
     Exec { docker-compose -f "$samples\Saritasa.BoringWarehouse\docker-compose.yml" up --force-recreate -d db }
@@ -39,7 +39,7 @@ Task run-bw-tests `
     Invoke-NUnit3Runner "$samples\Saritasa.BoringWarehouse\Saritasa.BoringWarehouse.IntegrationTests\bin\$Configuration\Saritasa.BoringWarehouse.IntegrationTests.dll"
 }
 
-Task docker-run-all -depends docker-bw, docker-zerg `
+Task docker-run-all -depends docker-boringwarehouse, docker-zergrushco `
 {
     Exec { docker-compose -f "$samples\Saritasa.BoringWarehouse\docker-compose.yml" up -d }
     Exec { docker-compose -f "$samples\ZergRushCo.Todosya\docker-compose.yml" up -d }

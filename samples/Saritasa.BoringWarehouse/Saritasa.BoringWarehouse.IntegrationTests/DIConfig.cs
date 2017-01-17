@@ -1,5 +1,6 @@
 ﻿using System.Configuration;
 using Autofac;
+using Saritasa.Tools.Messages.Commands;
 
 namespace Saritasa.BoringWarehouse.IntegrationTests
 {
@@ -22,20 +23,20 @@ namespace Saritasa.BoringWarehouse.IntegrationTests
             Container = builder.Build();
 
             // command pipeline
-            var defaultPipeline = Tools.Commands.CommandPipeline.CreateDefaultPipeline(Container.Resolve,
+            var commandPipeline = CommandPipeline.CreateDefaultPipeline(Container.Resolve,
                 System.Reflection.Assembly.GetAssembly(typeof(Domain.Users.Entities.User)));
             var connectionString = ConfigurationManager.ConnectionStrings["AppDbContext"];
-            defaultPipeline.AppendMiddlewares(
-                new Saritasa.Tools.Messages.PipelineMiddlewares.RepositoryMiddleware(
-                    new Saritasa.Tools.Messages.Repositories.AdoNetMessageRepository(
+            commandPipeline.AppendMiddlewares(
+                new Tools.Messages.Common.PipelineMiddlewares.RepositoryMiddleware(
+                    new Saritasa.Tools.Messages.Common.Repositories.AdoNetMessageRepository(
                         System.Data.Common.DbProviderFactories.GetFactory(connectionString.ProviderName),
                         connectionString.ConnectionString,
-                        Saritasa.Tools.Messages.Repositories.AdoNetMessageRepository.Dialect.SqlServer
+                        Tools.Messages.Common.Repositories.AdoNetMessageRepository.Dialect.SqlServer
                     )
                 )
             );
             builder = new ContainerBuilder();
-            builder.RegisterInstance(defaultPipeline).AsImplementedInterfaces().SingleInstance();
+            builder.RegisterInstance(commandPipeline).AsImplementedInterfaces().SingleInstance();
 
             builder.Update(Container);
         }

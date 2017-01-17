@@ -3,7 +3,7 @@ using NUnit.Framework;
 using Saritasa.BoringWarehouse.Domain;
 using Saritasa.BoringWarehouse.Domain.Users.Commands;
 using Saritasa.BoringWarehouse.Domain.Users.Entities;
-using Saritasa.Tools.Commands;
+using Saritasa.Tools.Messages.Abstractions;
 
 namespace Saritasa.BoringWarehouse.IntegrationTests
 {

@@ -6,7 +6,7 @@ using NUnit.Framework;
 using Saritasa.BoringWarehouse.Domain;
 using Saritasa.BoringWarehouse.Domain.Products.Commands;
 using Saritasa.BoringWarehouse.Domain.Products.Queries;
-using Saritasa.Tools.Commands;
+using Saritasa.Tools.Messages.Abstractions;
 
 namespace Saritasa.BoringWarehouse.IntegrationTests
 {
