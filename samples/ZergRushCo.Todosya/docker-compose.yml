@@ -8,7 +8,10 @@ services:
     environment:
       sa_password: "29hHzGtB"
       ACCEPT_EULA: "Y"
-    hostname: zergdb
+    networks:
+      default:
+        aliases:
+          - zergdb
   web:
     build:
       context: ./Docker
@@ -20,8 +23,11 @@ services:
       - "8080:80"
     volumes:
       - "temp:C:/Temp2"
-    hostname: zergweb
-    
+    networks:
+      default:
+        aliases:
+          - zergweb
+
 networks:
   default:
     external:

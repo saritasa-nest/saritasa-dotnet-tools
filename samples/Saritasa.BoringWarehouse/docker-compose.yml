@@ -8,7 +8,10 @@ services:
     environment:
       sa_password: "29hHzGtB"
       ACCEPT_EULA: "Y"
-    hostname: bwdb
+    networks:
+      default:
+        aliases:
+          - bwdb
   web:
     build:
       context: ./Docker
@@ -16,7 +19,10 @@ services:
     image: bw/web
     depends_on:
       - "db"
-    hostname: bwweb
+    networks:
+      default:
+        aliases:
+          - bwweb
     
 networks:
   default:
