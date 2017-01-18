@@ -1,6 +1,6 @@
 {
   "title": "Saritasa Tools Utils and Extensions",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "authors": [ "Saritasa" ],
   "description": "The package is a part of Saritasa Tools project. Saritasa.Tools.Common contains various utilities and extensions for DateTime convertion, strings manipulation, validation utils (Guard), parse with default, flow (memoize, retry), collection processing (chunk select), atomic (CAS, swap), strings hash (md5, sha1, sha2), paged enumerable.",
   "copyright": "Saritasa 2015-2017",

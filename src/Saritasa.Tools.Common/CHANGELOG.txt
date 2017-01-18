@@ -3,6 +3,7 @@
 [*] Rename PagedExtensions.GetPaged to PagedExtensions.AsPage .
 [*] Add PagedExtensions.AsOnePage method.
 [+] Add Offset to PagedMetadata.
+[+] Move DateTimePeriod out of DateTimeExtensions class.
 
 0.1.2 [2017-01-11]
 [+] EnumExtensions.GetDescription for .NET 4.0 .

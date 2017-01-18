@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\DateTimePeriod.cs" />
     <Compile Include="Pagination\PagedDto.cs" />
     <Compile Include="Pagination\PagedEnumerable.cs" />
     <Compile Include="Pagination\PagedExtensions.cs" />

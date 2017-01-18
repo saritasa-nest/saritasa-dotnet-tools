@@ -119,10 +119,6 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         static IMessageQueryProvider CreateSqlProviderByFactory(DbProviderFactory factory, IObjectSerializer serializer)
         {
             var name = factory.GetType().Name.ToLowerInvariant();
-            if (name.Contains("sqlclient"))
-            {
-                return new SqlServerQueryProvider(serializer);
-            }
             if (name.Contains("mysql"))
             {
                 return new MySqlQueryProvider(serializer);
@@ -130,6 +126,10 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             if (name.Contains("sqlite"))
             {
                 return new SqliteQueryProvider(serializer);
+            }
+            if (name.Contains("sqlclient"))
+            {
+                return new SqlServerQueryProvider(serializer);
             }
             return null;
         }
