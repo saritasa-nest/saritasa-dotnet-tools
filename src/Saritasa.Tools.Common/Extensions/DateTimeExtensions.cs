@@ -55,15 +55,29 @@ namespace Saritasa.Tools.Common.Extensions
         }
 
         /// <summary>
-        /// Is date between two startDate and endDate dates.
+        /// Is date between two startDate and endDate dates shortcut method.
         /// </summary>
-        /// <param name="date">Date to compare.</param>
+        /// <param name="target">Date to compare.</param>
         /// <param name="startDate">Start date.</param>
         /// <param name="endDate">End date.</param>
         /// <returns>True if date between startDate and endDate, False otherwise.</returns>
-        public static bool IsBetween(this DateTime date, DateTime startDate, DateTime endDate)
+        public static bool IsBetween(this DateTime target, DateTime startDate, DateTime endDate)
         {
-            return date >= startDate && date <= endDate;
+            return target >= startDate && target <= endDate;
+        }
+
+        /// <summary>
+        /// Compares the value of this instance to a specified object with truncation that contains a specified
+        /// <see cref="System.DateTime" /> value, and returns an integer that indicates whether this instance
+        /// is earlier than, the same as, or later than the specified <see cref="System.DateTime" /> value.
+        /// </summary>
+        /// <param name="target">The object to compare against.</param>
+        /// <param name="value">The object to compare to the current instance.</param>
+        /// <param name="period">Type of truncation.</param>
+        /// <returns>A signed number indicating the relative values of this instance and the value parameter.</returns>
+        public static int CompareTo(this DateTime target, DateTime value, DateTimePeriod period)
+        {
+            return target.Truncate(period).CompareTo(value.Truncate(period));
         }
     }
 }

@@ -113,9 +113,13 @@ DateTimeExtensions
 
         Trancates the date by seconds, minutes, hours, days or months.
 
-    .. function:: bool IsBetween(DateTime date, DateTime startDate, DateTime endDate)
+    .. function:: bool IsBetween(DateTime target, DateTime startDate, DateTime endDate)
 
-        Is date between two startDate and endDate dates.
+        Is target date between startDate and endDate dates.
+
+    .. function:: int CompareTo(DateTime target, DateTime value, DateTimePeriod period)
+
+        The same as DateTime.CompareTo method but with additional truncation.
 
     .. function:: IEnumerable<DateTime> Range(DateTime fromDate, DateTime toDate)
 

@@ -4,6 +4,7 @@
 [*] Add PagedExtensions.AsOnePage method.
 [+] Add Offset to PagedMetadata.
 [+] Move DateTimePeriod out of DateTimeExtensions class.
+[+] New DateTime extension method CompareTo with truncation.
 
 0.1.2 [2017-01-11]
 [+] EnumExtensions.GetDescription for .NET 4.0 .
