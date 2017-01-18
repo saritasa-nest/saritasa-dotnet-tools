@@ -1,21 +1,26 @@
 # Requires psake to run, see README.md for more details.
 
+Framework 4.6
+$InformationPreference = 'Continue'
+$env:PSModulePath += ";$PSScriptRoot\Scripts\Modules"
+
 if ($PSVersionTable.PSVersion.Major -lt 3)
 {
     throw "PowerShell 3 is required.`nhttp://www.microsoft.com/en-us/download/details.aspx?id=40855"
 }
 
-Framework 4.6
-$InformationPreference = 'Continue'
-$env:PSModulePath += ";$PSScriptRoot\scripts\Modules"
-
 . .\scripts\Saritasa.PsakeTasks.ps1
 
 . .\scripts\BuildTasks.ps1
+. .\scripts\DockerTasks.ps1
 . .\scripts\PublishTasks.ps1
 
-Import-Module Saritasa.Build
-Import-Module Saritasa.Test
+Properties `
+{
+    $Version = '0.1.0'
+    $LibDirectory = './build/lib'
+    $Configuration = 'Release'
+}
 
 # Global variable.
 $script:Version = '0.0.0'
@@ -35,12 +40,7 @@ $packages = @(
 
 $docsRoot = Resolve-Path "$PSScriptRoot\docs"
 
-function Get-PackageName([string]$package)
-{
-    If ([System.Char]::IsDigit($package[$package.Length-1])) {$package.Substring(0, $package.Length-1)} Else {$package}
-}
-
-Task pack -description 'Build the library, test it and prepare nuget packages' `
+Task pack -depends download-nuget -description 'Build the library, test it and prepare nuget packages' `
 {
     foreach ($package in $packages)
     {

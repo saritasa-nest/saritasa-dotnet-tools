@@ -24,7 +24,6 @@ namespace ZergRushCo.Todosya.Domain.Tests
             // create user1
             using (var dbcontext = new AppDbContext(connection))
             {
-                dbcontext.UseSqliteDatabase = false;
                 dbcontext.Users.Add(new User()
                 {
                     FirstName = "First",
@@ -39,7 +38,6 @@ namespace ZergRushCo.Todosya.Domain.Tests
             // check it is created
             using (var dbcontext = new AppDbContext(connection))
             {
-                dbcontext.UseSqliteDatabase = false;
                 Assert.Equal(1, dbcontext.Users.Count());
                 Assert.False(string.IsNullOrEmpty(dbcontext.Users.First().Id));
             }
@@ -47,7 +45,6 @@ namespace ZergRushCo.Todosya.Domain.Tests
             // create another user but rollback
             using (var dbcontext = new AppDbContext(connection))
             {
-                dbcontext.UseSqliteDatabase = false;
                 dbcontext.Users.Add(new User()
                 {
                     FirstName = "First2",
@@ -60,7 +57,6 @@ namespace ZergRushCo.Todosya.Domain.Tests
             // it is should not be added
             using (var dbcontext = new AppDbContext(connection))
             {
-                dbcontext.UseSqliteDatabase = false;
                 Assert.Equal(1, dbcontext.Users.Count());
             }
         }
@@ -75,7 +71,6 @@ namespace ZergRushCo.Todosya.Domain.Tests
             {
                 using (var dbcontext = new AppDbContext(connection))
                 {
-                    dbcontext.UseSqliteDatabase = false;
                     dbcontext.Users.Add(new User()
                     {
                         FirstName = "First",
@@ -91,14 +86,12 @@ namespace ZergRushCo.Todosya.Domain.Tests
             // check it is not created
             using (var dbcontext = new AppDbContext(connection))
             {
-                dbcontext.UseSqliteDatabase = false;
                 Assert.Empty(dbcontext.Users);
             }
 
             // create real user
             using (var dbcontext = new AppDbContext(connection))
             {
-                dbcontext.UseSqliteDatabase = false;
                 dbcontext.Users.Add(new User()
                 {
                     FirstName = "First",
@@ -115,7 +108,6 @@ namespace ZergRushCo.Todosya.Domain.Tests
             {
                 using (var dbcontext = new AppDbContext(connection))
                 {
-                    dbcontext.UseSqliteDatabase = false;
                     var user = dbcontext.Users.FirstOrDefault();
                     user.FirstName = "Bender";
                     user.LastName = "Rodriguez";
@@ -126,7 +118,6 @@ namespace ZergRushCo.Todosya.Domain.Tests
             // test it is not updated
             using (var dbcontext = new AppDbContext(connection))
             {
-                dbcontext.UseSqliteDatabase = false;
                 var user = dbcontext.Users.FirstOrDefault();
                 Assert.Equal("First", user.FirstName);
                 Assert.Equal("Last", user.LastName);

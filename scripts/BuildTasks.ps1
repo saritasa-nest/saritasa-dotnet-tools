@@ -15,11 +15,13 @@ Task download-nuget `
 
 Task pre-build -depends download-nuget `
 {
-    Invoke-NugetRestore "$src\Saritasa.Tools.sln"
+    Invoke-NugetRestore "$src\..\Saritasa.Tools.sln"
 
     Invoke-NugetRestore "$samples\ZergRushCo.Todosya\ZergRushCo.Todosya.sln"
     Invoke-NugetRestore "$samples\Saritasa.BoringWarehouse\Saritasa.BoringWarehouse.sln"
 
+    # Use following command to revert the files:
+    # git checkout -- **/AssemblyInfo.cs
     GitVersion.exe /updateassemblyinfo
 }
 
@@ -35,15 +37,17 @@ Task build-zergrushco -depends pre-build `
     Invoke-SolutionBuild "$samples\ZergRushCo.Todosya\ZergRushCo.Todosya.sln" -Configuration $Configuration
 
     Set-Location "$samples\ZergRushCo.Todosya\ZergRushCo.Todosya.Web"
-    npm i
-    bower i
+    Exec { npm i }
+    Exec { bower i }
 
     if (!(Test-Path 'Static'))
     {
         New-Item 'Static' -ItemType Directory
     }
 
-    gulp
+    Exec { gulp }
+
+    Set-Location "$samples\.."
 }
 
 Task build-boringwarehouse -depends pre-build `
@@ -53,5 +57,5 @@ Task build-boringwarehouse -depends pre-build `
 
 Task build-saritasatools -depends pre-build `
 {
-    Invoke-SolutionBuild "$src\Saritasa.Tools.sln" -Configuration $Configuration
+    Invoke-SolutionBuild "$src\..\Saritasa.Tools.sln" -Configuration $Configuration
 }

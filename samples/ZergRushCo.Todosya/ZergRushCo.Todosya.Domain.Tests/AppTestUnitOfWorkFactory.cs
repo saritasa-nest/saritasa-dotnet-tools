@@ -12,12 +12,12 @@ namespace ZergRushCo.Todosya.Domain.Tests
     /// </summary>
     public class AppTestUnitOfWorkFactory : IAppUnitOfWorkFactory
     {
-        DbConnection connection;
+        private DbConnection connection;
 
         /// <summary>
         /// We need to have this variable to have persistent storage within test running.
         /// </summary>
-        Guid id = Guid.NewGuid();
+        private Guid id = Guid.NewGuid();
 
         public IAppUnitOfWork Create() => new AppUnitOfWork(CreateContext());
 
@@ -38,7 +38,6 @@ namespace ZergRushCo.Todosya.Domain.Tests
         {
             var context = connection != null ? new AppDbContext(connection) :
                 new AppDbContext(Effort.DbConnectionFactory.CreatePersistent(id.ToString()));
-            context.UseSqliteDatabase = false;
             return context;
         }
     }
