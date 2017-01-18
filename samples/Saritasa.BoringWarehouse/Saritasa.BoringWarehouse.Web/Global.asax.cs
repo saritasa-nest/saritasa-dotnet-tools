@@ -19,7 +19,7 @@ namespace Saritasa.BoringWarehouse.Web
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
-            DiConfig.Register();
+            DIConfig.Register();
         }
 
         protected void Application_AuthenticateRequest(object sender, EventArgs e)

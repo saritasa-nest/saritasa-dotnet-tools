@@ -3,13 +3,25 @@ using NUnit.Framework;
 using Saritasa.BoringWarehouse.Domain;
 using Saritasa.BoringWarehouse.Domain.Users.Commands;
 using Saritasa.BoringWarehouse.Domain.Users.Entities;
+using Saritasa.BoringWarehouse.Infrastructure;
 using Saritasa.Tools.Messages.Abstractions;
 
 namespace Saritasa.BoringWarehouse.IntegrationTests
 {
+    /// <summary>
+    /// Global configuration for all tests.
+    /// </summary>
     [SetUpFixture]
     public class GlobalConfig
     {
+        /// <summary>
+        /// Autofac container.
+        /// </summary>
+        public static IContainer Container { get; private set; }
+
+        /// <summary>
+        /// User id of administrator.
+        /// </summary>
         public static int AdminId { get; private set; }
 
         private ICommandPipeline commandPipeline;
@@ -17,11 +29,11 @@ namespace Saritasa.BoringWarehouse.IntegrationTests
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            DIConfig.Initialize();
+            var builder = CommonDIConfig.CreateBuilder();
+            Container = builder.Build();
 
-            var container = DIConfig.Container;
-            commandPipeline = container.Resolve<ICommandPipeline>();
-            using (var uow = container.Resolve<IAppUnitOfWork>())
+            commandPipeline = Container.Resolve<ICommandPipeline>();
+            using (var uow = Container.Resolve<IAppUnitOfWork>())
             {
                 CreateAdmin(uow);
             }

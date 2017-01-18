@@ -135,7 +135,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
-    <Compile Include="App_Start\DiConfig.cs" />
+    <Compile Include="App_Start\DIConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\AdminController.cs" />
@@ -253,6 +253,10 @@
     <ProjectReference Include="..\Saritasa.BoringWarehouse.Domain\Saritasa.BoringWarehouse.Domain.csproj">
       <Project>{cc1ae7a8-33c6-45f0-93e2-ddf1b52bd764}</Project>
       <Name>Saritasa.BoringWarehouse.Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Saritasa.BoringWarehouse.Infrastructure\Saritasa.BoringWarehouse.Infrastructure.csproj">
+      <Project>{ccfe2072-0c6a-4fcc-99f3-4f25142cccd9}</Project>
+      <Name>Saritasa.BoringWarehouse.Infrastructure</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

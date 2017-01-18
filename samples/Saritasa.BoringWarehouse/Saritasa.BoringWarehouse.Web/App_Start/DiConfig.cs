@@ -1,20 +1,20 @@
-﻿namespace Saritasa.BoringWarehouse.Web
+﻿using Saritasa.BoringWarehouse.Infrastructure;
+
+namespace Saritasa.BoringWarehouse.Web
 {
-    using System.Configuration;
     using System.Web.Mvc;
 
     using Autofac;
     using Autofac.Integration.Mvc;
-    using Tools.Messages.Commands;
 
     /// <summary>
     /// Dependency injection configuration.
     /// </summary>
-    public class DiConfig
+    public class DIConfig
     {
         public static void Register()
         {
-            var builder = new ContainerBuilder();
+            var builder = CommonDIConfig.CreateBuilder();
 
             // register MVC controllers
             builder.RegisterControllers(typeof(MvcApplication).Assembly);
@@ -28,38 +28,8 @@
             // enable property injection into action filters
             builder.RegisterFilterProvider();
 
-            // other bindings
-            builder.RegisterType<DataAccess.AppDbContext>().AsSelf();
-            builder.RegisterType<DataAccess.AppUnitOfWork>().AsImplementedInterfaces();
-            builder.RegisterType<DataAccess.AppUnitOfWorkFactory>().AsImplementedInterfaces().SingleInstance();
-            builder.RegisterType<Domain.Users.Queries.UserQueries>().AsSelf();
-            builder.RegisterType<Domain.Products.Queries.ProductQueries>().AsSelf();
-            builder.RegisterType<Domain.Products.Queries.CompanyQueries>().AsSelf();
-
-            // make container
-            var container = builder.Build();
-
-            // command pipeline
-            var commandPipeline = Tools.Messages.Commands.CommandPipeline.CreateDefaultPipeline(container.Resolve,
-                System.Reflection.Assembly.GetAssembly(typeof(Domain.Users.Entities.User)));
-            var connectionString = ConfigurationManager.ConnectionStrings["AppDbContext"];
-            commandPipeline.AppendMiddlewares(
-                new Tools.Messages.Common.PipelineMiddlewares.RepositoryMiddleware(
-                    new Saritasa.Tools.Messages.Common.Repositories.AdoNetMessageRepository(
-                        System.Data.Common.DbProviderFactories.GetFactory(connectionString.ProviderName),
-                        connectionString.ConnectionString,
-                        Tools.Messages.Common.Repositories.AdoNetMessageRepository.Dialect.SqlServer
-                    )
-                )
-            );
-            commandPipeline.UseInternalResolver();
-            builder = new ContainerBuilder();
-            builder.RegisterInstance(commandPipeline).AsImplementedInterfaces().SingleInstance();
-
-            // query pipeline
-
             // set the dependency resolver to be Autofac
-            builder.Update(container);
+            var container = builder.Build();
             DependencyResolver.SetResolver(new AutofacDependencyResolver(container));
         }
     }

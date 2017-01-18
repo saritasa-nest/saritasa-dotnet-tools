@@ -18,7 +18,7 @@ namespace Saritasa.BoringWarehouse.IntegrationTests
         [SetUp]
         public void SetUp()
         {
-            container = DIConfig.Container;
+            container = GlobalConfig.Container;
             commandPipeline = container.Resolve<ICommandPipeline>();
         }
 
