@@ -43,7 +43,7 @@ namespace ZergRushCo.Todosya.Web
             var connectionStringConf = ConfigurationManager.ConnectionStrings["AppDbContext"];
             var connectionString = connectionStringConf.ConnectionString.Replace("{baseUrl}",
                 AppDomain.CurrentDomain.BaseDirectory);
-            builder.RegisterType<AppUnitOfWorkFactory>().AsImplementedInterfaces().SingleInstance();
+            builder.RegisterType<AppUnitOfWorkFactory>().AsSelf().AsImplementedInterfaces();
             builder.Register(c => c.Resolve<AppUnitOfWorkFactory>().Create()).AsImplementedInterfaces();
             builder.Register(c => new AppDbContext()).AsSelf();
             builder.Register<IUserStore<Domain.UserContext.Entities.User>>(
@@ -69,7 +69,8 @@ namespace ZergRushCo.Todosya.Web
             // command pipeline
             builder.Register(c =>
                 {
-                    var commandPipeline = CommandPipeline.CreateDefaultPipeline(c.Resolve,
+                    var context = c.Resolve<IComponentContext>();
+                    var commandPipeline = CommandPipeline.CreateDefaultPipeline(context.Resolve,
                         System.Reflection.Assembly.GetAssembly(typeof(Domain.UserContext.Entities.User)));
                     commandPipeline.AppendMiddlewares(repositoryMiddleware);
                     commandPipeline.UseInternalResolver();
@@ -81,7 +82,8 @@ namespace ZergRushCo.Todosya.Web
             // query pipeline
             builder.Register(c =>
                 {
-                    var queryPipeline = QueryPipeline.CreateDefaultPipeline(c.Resolve);
+                    var context = c.Resolve<IComponentContext>();
+                    var queryPipeline = QueryPipeline.CreateDefaultPipeline(context.Resolve);
                     queryPipeline.AppendMiddlewares(repositoryMiddleware);
                     queryPipeline.UseInternalResolver();
                     builder.RegisterInstance(queryPipeline).AsImplementedInterfaces().SingleInstance();
@@ -92,7 +94,8 @@ namespace ZergRushCo.Todosya.Web
             // events pipeline
             builder.Register(c =>
                 {
-                    var eventsPipeline = EventPipeline.CreateDefaultPipeline(c.Resolve,
+                    var context = c.Resolve<IComponentContext>();
+                    var eventsPipeline = EventPipeline.CreateDefaultPipeline(context.Resolve,
                         System.Reflection.Assembly.GetAssembly(typeof(Domain.UserContext.Entities.User)));
                     eventsPipeline.UseInternalResolver();
 

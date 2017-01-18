@@ -22,7 +22,7 @@
 
             // other bindings
             builder.RegisterType<DataAccess.AppDbContext>().AsSelf();
-            builder.RegisterType<DataAccess.AppUnitOfWorkFactory>().AsImplementedInterfaces().SingleInstance();
+            builder.RegisterType<DataAccess.AppUnitOfWorkFactory>().AsSelf().AsImplementedInterfaces();
             builder.Register(c => c.Resolve<DataAccess.AppUnitOfWorkFactory>().Create()).AsImplementedInterfaces();
             builder.RegisterType<Domain.Users.Queries.UserQueries>().AsSelf();
             builder.RegisterType<Domain.Products.Queries.ProductQueries>().AsSelf();
@@ -31,7 +31,8 @@
             // command pipeline
             builder.Register<ICommandPipeline>(c =>
                 {
-                    var commandPipeline = CommandPipeline.CreateDefaultPipeline(c.Resolve,
+                    var context = c.Resolve<IComponentContext>();
+                    var commandPipeline = CommandPipeline.CreateDefaultPipeline(context.Resolve,
                         System.Reflection.Assembly.GetAssembly(typeof(Domain.Users.Entities.User)));
                     var connectionString = ConfigurationManager.ConnectionStrings["AppDbContext"];
                     commandPipeline.AppendMiddlewares(
