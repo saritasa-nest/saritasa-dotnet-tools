@@ -22,8 +22,8 @@
 
             // other bindings
             builder.RegisterType<DataAccess.AppDbContext>().AsSelf();
-            builder.RegisterType<DataAccess.AppUnitOfWork>().AsImplementedInterfaces();
             builder.RegisterType<DataAccess.AppUnitOfWorkFactory>().AsImplementedInterfaces().SingleInstance();
+            builder.Register(c => c.Resolve<DataAccess.AppUnitOfWorkFactory>().Create()).AsImplementedInterfaces();
             builder.RegisterType<Domain.Users.Queries.UserQueries>().AsSelf();
             builder.RegisterType<Domain.Products.Queries.ProductQueries>().AsSelf();
             builder.RegisterType<Domain.Products.Queries.CompanyQueries>().AsSelf();

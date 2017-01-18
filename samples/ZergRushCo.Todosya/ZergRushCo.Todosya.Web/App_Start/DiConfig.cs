@@ -12,7 +12,6 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Extensions.Logging;
 using ZergRushCo.Todosya.DataAccess;
-using ZergRushCo.Todosya.Domain;
 
 namespace ZergRushCo.Todosya.Web
 {
@@ -44,10 +43,9 @@ namespace ZergRushCo.Todosya.Web
             var connectionStringConf = ConfigurationManager.ConnectionStrings["AppDbContext"];
             var connectionString = connectionStringConf.ConnectionString.Replace("{baseUrl}",
                 AppDomain.CurrentDomain.BaseDirectory);
-            builder.RegisterType<DataAccess.AppUnitOfWorkFactory>().AsImplementedInterfaces().SingleInstance();
-            builder.Register<IAppUnitOfWork>(c => c.Resolve<AppUnitOfWorkFactory>().Create());
-            builder.Register<DataAccess.AppDbContext>(c => new AppDbContext())
-                .AsSelf();
+            builder.RegisterType<AppUnitOfWorkFactory>().AsImplementedInterfaces().SingleInstance();
+            builder.Register(c => c.Resolve<AppUnitOfWorkFactory>().Create()).AsImplementedInterfaces();
+            builder.Register(c => new AppDbContext()).AsSelf();
             builder.Register<IUserStore<Domain.UserContext.Entities.User>>(
                 c => new UserStore<Domain.UserContext.Entities.User>(c.Resolve<AppDbContext>()))
                     .AsImplementedInterfaces();
