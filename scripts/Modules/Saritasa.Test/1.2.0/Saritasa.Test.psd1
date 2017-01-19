@@ -12,7 +12,7 @@
 RootModule = 'Saritasa.Test'
 
 # Version number of this module.
-ModuleVersion = '1.1.0'
+ModuleVersion = '1.2.0'
 
 # ID used to uniquely identify this module
 GUID = '97046c41-6b19-4e13-9434-ead6834a5338'
@@ -24,7 +24,7 @@ Author = 'Ivan Kozhin'
 CompanyName = 'Saritasa'
 
 # Copyright statement for this module
-Copyright = '(c) 2016 Saritasa. All rights reserved.'
+Copyright = '(c) 2016-2017 Saritasa. All rights reserved.'
 
 # Description of the functionality provided by this module
 Description = 'Contains functions to run unit tests.'
