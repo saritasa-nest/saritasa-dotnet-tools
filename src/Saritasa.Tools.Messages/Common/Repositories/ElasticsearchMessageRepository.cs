@@ -17,7 +17,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
     /// <summary>
     /// Use ElasticSearch to store messages.
     /// </summary>
-    public class ElasticsearchRepository : IMessageRepository, IDisposable
+    public class ElasticsearchMessageRepository : IMessageRepository, IDisposable
     {
         /// <summary>
         /// Elasticsearch index.
@@ -48,7 +48,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// .ctor
         /// </summary>
         /// <param name="uri">Uri to Elastictsearch service.</param>
-        public ElasticsearchRepository(string uri)
+        public ElasticsearchMessageRepository(string uri)
         {
             if (string.IsNullOrEmpty(uri))
             {
@@ -110,7 +110,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <returns>Elasticsearch repository.</returns>
         public static IMessageRepository CreateFromState(IDictionary<string, object> dict)
         {
-            return new ElasticsearchRepository(dict[nameof(uri)].ToString());
+            return new ElasticsearchMessageRepository(dict[nameof(uri)].ToString());
         }
 
         private IEnumerable<IFieldNameQuery> CreateFieldQueries(MessageQuery messageQuery)

@@ -19,7 +19,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
     /// <remarks>
     /// Information about HTTP endpoint: https://www.loggly.com/docs/http-endpoint/
     /// </remarks>
-    public class LogglyRepository : IMessageRepository, IDisposable
+    public class LogglyMessageRepository : IMessageRepository, IDisposable
     {
         const string ServerEndpoint = @"https://logs-01.loggly.com";
         const string TagsHeader = "X-LOGGLY-TAG";
@@ -37,7 +37,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// .ctor
         /// </summary>
         /// <param name="token">Customer token.</param>
-        public LogglyRepository(string token)
+        public LogglyMessageRepository(string token)
         {
             if (string.IsNullOrEmpty(token))
             {
@@ -82,7 +82,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <returns>Loggly repository.</returns>
         public static IMessageRepository CreateFromState(IDictionary<string, object> dict)
         {
-            return new LogglyRepository(dict[nameof(token)].ToString());
+            return new LogglyMessageRepository(dict[nameof(token)].ToString());
         }
 
         #region Dispose

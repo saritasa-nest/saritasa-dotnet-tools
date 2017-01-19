@@ -65,5 +65,11 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// Processing status.
         /// </summary>
         ProcessingStatus Status { get; set; }
+
+        /// <summary>
+        /// Returns cloned object with only <inheritdoc cref="IMessage" /> properties.
+        /// </summary>
+        /// <returns>Cloned object.</returns>
+        IMessage CloneToMessage();
     }
 }

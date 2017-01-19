@@ -28,7 +28,7 @@ namespace Saritasa.Tools.Messages.Internal
         {
             Type t;
 
-            // if it is a system type try to use Type.GetType first
+            // If it is a system type try to use Type.GetType first.
             if (fullName.StartsWith("System"))
             {
                 t = Type.GetType(fullName, false, true);
@@ -38,7 +38,7 @@ namespace Saritasa.Tools.Messages.Internal
                 }
             }
 
-            // then try to load from assemblies
+            // Then try to load from assemblies.
             for (int i = 0; i < assemblies.Length; i++)
             {
                 var assembly = assemblies[i];
@@ -49,7 +49,7 @@ namespace Saritasa.Tools.Messages.Internal
                 }
             }
 
-            // last chance
+            // Last chance.
             return Type.GetType(fullName, false, true);
         }
 
@@ -68,7 +68,7 @@ namespace Saritasa.Tools.Messages.Internal
                 return;
             }
 
-            // for events we don't specify actual type
+            // For events we don't specify actual type.
             if (message.Type == Message.MessageTypeQuery)
             {
                 message.Content = objectSerializer.Deserialize(bytes, typeof(IDictionary<string, object>));
@@ -120,14 +120,14 @@ namespace Saritasa.Tools.Messages.Internal
 
             var typeInfo = type.GetTypeInfo();
 
-            // try default paramless ctor
+            // Try default paramless ctor.
             var ctor = typeInfo.GetConstructor(new Type[] { });
             if (ctor != null)
             {
                 obj = ctor.Invoke(null);
             }
 
-            // try another ctor
+            // Try another ctor.
             if (obj == null)
             {
                 var ctors = typeInfo.GetConstructors(BindingFlags.Public | BindingFlags.Instance |
@@ -149,7 +149,7 @@ namespace Saritasa.Tools.Messages.Internal
                 obj = ctor.Invoke(ctorparamsValues);
             }
 
-            // prefill public dependencies
+            // Prefill public dependencies.
             if (obj != null)
             {
                 var props = obj.GetType().GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance |
@@ -248,7 +248,7 @@ namespace Saritasa.Tools.Messages.Internal
                 }
                 catch (Exception)
                 {
-                    // skip since it is possible that assembly with given name is not found
+                    // Skip since it is possible that assembly with given name is not found.
                 }
 
                 if (assembly != null)

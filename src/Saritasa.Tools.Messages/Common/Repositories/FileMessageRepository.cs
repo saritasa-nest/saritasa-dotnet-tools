@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Messages.Common.Repositories
@@ -247,15 +247,18 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// </summary>
         public void Close()
         {
-            if (currentGZipStream != null)
+            lock (objLock)
             {
-                currentGZipStream.Dispose();
-                currentGZipStream = null;
-            }
-            if (currentFileStream != null)
-            {
-                currentFileStream.Dispose();
-                currentFileStream = null;
+                if (currentGZipStream != null)
+                {
+                    currentGZipStream.Dispose();
+                    currentGZipStream = null;
+                }
+                if (currentFileStream != null)
+                {
+                    currentFileStream.Dispose();
+                    currentFileStream = null;
+                }
             }
         }
 

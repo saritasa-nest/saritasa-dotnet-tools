@@ -149,11 +149,8 @@ namespace Saritasa.Tools.Messages.Common
             return MemberwiseClone();
         }
 
-        /// <summary>
-        /// Returns cloned object with only <inheritdoc cref="Message" /> properties.
-        /// </summary>
-        /// <returns>Cloned object.</returns>
-        public Message CloneToMessage()
+        /// <inheritdoc />
+        public IMessage CloneToMessage()
         {
             var message = new Message()
             {
