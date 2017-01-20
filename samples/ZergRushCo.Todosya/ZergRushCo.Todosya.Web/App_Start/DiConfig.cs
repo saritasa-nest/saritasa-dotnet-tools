@@ -27,19 +27,19 @@ namespace ZergRushCo.Todosya.Web
         {
             var builder = new ContainerBuilder();
 
-            // register MVC controllers
+            // Register MVC controllers.
             builder.RegisterControllers(typeof(MvcApplication).Assembly);
 
-            // register web abstractions like HttpContextBase
+            // Register web abstractions like HttpContextBase.
             builder.RegisterModule<AutofacWebTypesModule>();
 
-            // enable property injection in view pages
+            // Enable property injection in view pages.
             builder.RegisterSource(new ViewRegistrationSource());
 
-            // enable property injection into action filters
+            // Enable property injection into action filters.
             builder.RegisterFilterProvider();
 
-            // other bindings
+            // Other bindings.
             var connectionStringConf = ConfigurationManager.ConnectionStrings["AppDbContext"];
             var connectionString = connectionStringConf.ConnectionString.Replace("{baseUrl}",
                 AppDomain.CurrentDomain.BaseDirectory);
@@ -66,7 +66,7 @@ namespace ZergRushCo.Todosya.Web
                     connectionString)
             );
 
-            // command pipeline
+            // Command pipeline.
             builder.Register(c =>
                 {
                     var context = c.Resolve<IComponentContext>();
@@ -79,7 +79,7 @@ namespace ZergRushCo.Todosya.Web
                     return commandPipeline;
                 }).AsImplementedInterfaces().SingleInstance();
 
-            // query pipeline
+            // Query pipeline.
             builder.Register(c =>
                 {
                     var context = c.Resolve<IComponentContext>();
@@ -91,7 +91,7 @@ namespace ZergRushCo.Todosya.Web
                     return queryPipeline;
                 }).AsImplementedInterfaces().SingleInstance();
 
-            // events pipeline
+            // Events pipeline.
             builder.Register(c =>
                 {
                     var context = c.Resolve<IComponentContext>();
@@ -102,24 +102,24 @@ namespace ZergRushCo.Todosya.Web
                     return eventsPipeline;
                 }).AsImplementedInterfaces().SingleInstance();
 
-            // register queries as separate objects
+            // Register queries as separate objects.
             builder.RegisterType<Domain.UserContext.Queries.UsersQueries>().AsSelf();
             builder.RegisterType<Domain.TaskContext.Queries.TasksQueries>().AsSelf();
             builder.RegisterType<Domain.TaskContext.Queries.ProjectsQueries>().AsSelf();
 
-            // emails
+            // Emails.
             var emailSender = new Saritasa.Tools.Emails.SmtpClientEmailSender();
             emailSender.AddInterceptor(new FilterEmailInterceptor("*@saritasa.com mytest@example.com"));
             emailSender.AddInterceptor(new CountEmailsInterceptor());
             builder.RegisterInstance(emailSender).AsImplementedInterfaces().SingleInstance();
 
-            // logger
+            // Logger.
             var nlogProvider = new Saritasa.Tools.NLog.NLogLoggerProvider();
             var loggerFactory = new LoggerFactory();
             loggerFactory.AddProvider(nlogProvider);
             builder.RegisterInstance(loggerFactory).AsImplementedInterfaces().SingleInstance();
 
-            // set the dependency resolver to be Autofac
+            // Set the dependency resolver to be Autofac.
             var container = builder.Build();
             DependencyResolver.SetResolver(new AutofacDependencyResolver(container));
         }

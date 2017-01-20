@@ -294,10 +294,10 @@ namespace Saritasa.Tools.Common.Utils
         /// Tries to convert target string to int. If fails returns default value.
         /// </summary>
         [DebuggerStepThrough]
-        public static int ParseDefault(string target, int defaultValue)
+        public static Int32 ParseDefault(string target, Int32 defaultValue)
         {
-            int result;
-            var success = int.TryParse(target, out result);
+            Int32 result;
+            var success = Int32.TryParse(target, out result);
             return success ? result : defaultValue;
         }
 

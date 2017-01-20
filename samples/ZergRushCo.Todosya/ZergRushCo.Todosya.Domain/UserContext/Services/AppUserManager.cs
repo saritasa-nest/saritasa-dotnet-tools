@@ -16,6 +16,11 @@ namespace ZergRushCo.Todosya.Domain.UserContext.Services
         public AppUserManager(IUserStore<User> store) : base(store)
         {
             this.PasswordHasher = new AppPasswordHasher();
+            // Use email as username.
+            this.UserValidator = new UserValidator<User>(this)
+            {
+                AllowOnlyAlphanumericUserNames = false
+            };
         }
     }
 }
