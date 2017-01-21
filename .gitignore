@@ -132,3 +132,4 @@ bundles
 .sonar
 sonar-project.properties
 *.targets
+*.bak

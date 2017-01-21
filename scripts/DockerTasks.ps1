@@ -26,6 +26,29 @@ Task run-boringwarehouse-tests `
     $ipAddress = Exec { docker inspect saritasaboringwarehouse_db_1 -f '{{ .NetworkSettings.Networks.nat.IPAddress }}' }
     Write-Information "DB container address: $ipAddress"
 
+    # Wait for SQL Server to start.
+    $retries = 0
+    while ($true)
+    {
+        $result = Test-NetConnection -ComputerName $ipAddress -Port 1433
+        if ($result.TcpTestSucceeded)
+        {
+            break
+        }
+        else
+        {
+            $retries++
+            if ($retries -eq 10)
+            {
+                throw 'Test database is not available.'
+            }
+            else
+            {
+                Start-Sleep $retries
+            }
+        }
+    }
+
     # Replace connection string.
     $appConfigPath = "$samples\Saritasa.BoringWarehouse\Saritasa.BoringWarehouse.IntegrationTests\bin\$Configuration\Saritasa.BoringWarehouse.IntegrationTests.dll.config"
     $lines = Get-Content $appConfigPath
