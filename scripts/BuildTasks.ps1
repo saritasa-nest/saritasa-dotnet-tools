@@ -45,7 +45,13 @@ Task build-zergrushco -depends pre-build `
         New-Item 'Static' -ItemType Directory
     }
 
-    Exec { gulp }
+    $gulpArgument = ''
+    if ($Configuration -eq 'Release')
+    {
+        $gulpArgument = '--production'
+    }
+
+    Exec { gulp $gulpArgument }
 
     Set-Location "$samples\.."
 }
