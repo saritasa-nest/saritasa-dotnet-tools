@@ -11,14 +11,18 @@ RUN `
     # Install Chocolatey.
     $env:chocolateyUseWindowsCompression = 'false'; `
     iwr https://chocolatey.org/install.ps1 -UseBasicParsing | iex; `
-    # Install WebDeploy.
-    choco install webdeploy -y
+    # Install WebDeploy, Psake.
+    choco install webdeploy psake -y
+
+COPY docs C:\Temp\docs
+COPY scripts C:\Temp\scripts
+COPY default.ps1 C:\Temp\default.ps1
 
 ENV DockerDir samples\ZergRushCo.Todosya\Docker
 
-COPY ${DockerDir}\Run.ps1 Temp\Run.ps1
 COPY ${DockerDir}\ZergRushCo.zip Temp\ZergRushCo.zip
 
-RUN C:\Temp\Run.ps1
+WORKDIR C:\Temp
+RUN psake publish-zergrushco
 
 EXPOSE 80
