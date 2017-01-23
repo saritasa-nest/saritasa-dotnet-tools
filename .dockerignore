@@ -1,0 +1,9 @@
+.git
+docs
+packages
+samples
+src
+test
+tools
+!samples/Saritasa.BoringWarehouse/Docker
+!samples/ZergRushCo.Todosya/Docker

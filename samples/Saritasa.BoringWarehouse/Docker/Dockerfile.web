@@ -11,8 +11,10 @@ RUN `
     # Install WebDeploy.
     choco install webdeploy -y
 
-COPY Run.ps1 Temp\Run.ps1
-COPY BoringWarehouse.zip C:\Temp\BoringWarehouse.zip
+ENV DockerDir samples\Saritasa.BoringWarehouse\Docker
+
+COPY ${DockerDir}\Run.ps1 Temp\Run.ps1
+COPY ${DockerDir}\BoringWarehouse.zip C:\Temp\BoringWarehouse.zip
 
 RUN C:\Temp\Run.ps1
 

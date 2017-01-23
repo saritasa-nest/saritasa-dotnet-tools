@@ -14,8 +14,8 @@ services:
           - zergdb
   web:
     build:
-      context: ./Docker
-      dockerfile: Dockerfile.web
+      context: ../..
+      dockerfile: samples/ZergRushCo.Todosya/Docker/Dockerfile.web
     image: zerg/web
     depends_on:
       - "db"
