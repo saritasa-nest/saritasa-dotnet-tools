@@ -40,7 +40,7 @@
                       "~/Static/js/bootstrap.js",
                       "~/Static/js/respond.js"));
 
-            bundles.Add(new StyleBundle("~/Static/css").Include(
+            bundles.Add(new StyleBundle("~/bundles/css").Include(
                       "~/Static/css/bootstrap.css",
                       "~/Static/css/dataTables.bootstrap.css",
                       "~/Static/css/buttons.bootstrap.css",

@@ -24,23 +24,16 @@ function Invoke-Nunit3Runner
     }
 
     # Find nunit3-console.exe
-    $packagesList = Get-ChildItem -Filter 'packages' -Recurse -Depth 3 | Where-Object { $_.PSIsContainer }
-    foreach ($pd in $packagesList)
-    {
-        $nunitDir = Get-ChildItem $pd.FullName 'NUnit.ConsoleRunner.*'
-        if ($nunitDir)
-        {
-            $packagesDirectory = $pd.FullName
-            break
-        }
-    }
+    $packagesDirectory = Get-ChildItem -Filter 'packages' -Recurse -Depth 3 |
+        Where-Object { $_.PSIsContainer -and (Get-ChildItem $_.FullName 'NUnit.ConsoleRunner.*') } |
+        Select-Object -First 1
 
     if (!$packagesDirectory)
     {
         throw 'Cannot find packages directory.'
     }
     Write-Information "Found $packagesDirectory."
-    $nunitExeDirectory = Get-ChildItem $packagesDirectory 'NUnit.ConsoleRunner.*' |
+    $nunitExeDirectory = Get-ChildItem $packagesDirectory.FullName 'NUnit.ConsoleRunner.*' |
         Sort-Object { $_.Name } | Select-Object -Last 1
     if (!$nunitExeDirectory)
     {

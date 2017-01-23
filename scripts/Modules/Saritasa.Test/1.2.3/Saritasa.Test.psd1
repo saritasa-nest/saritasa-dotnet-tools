@@ -12,7 +12,7 @@
 RootModule = 'Saritasa.Test'
 
 # Version number of this module.
-ModuleVersion = '1.2.2'
+ModuleVersion = '1.2.3'
 
 # ID used to uniquely identify this module
 GUID = '97046c41-6b19-4e13-9434-ead6834a5338'
