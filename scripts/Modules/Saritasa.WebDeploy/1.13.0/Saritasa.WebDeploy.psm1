@@ -111,11 +111,11 @@ function Start-AppPool
 
     Assert-WebDeployCredential
     Write-Information 'Starting app pool...'
-    
+
     $destArg = "-dest:recycleApp='$SiteName/$Application',recycleMode='StartAppPool'," +
         "computername=https://${ServerHost}:$msdeployPort/msdeploy.axd?site=$SiteName," + $credential
     $args = @('-verb:sync', '-source:recycleApp', $destArg)
-    
+
     $result = Start-Process -NoNewWindow -Wait -PassThru "$msdeployPath\msdeploy.exe" $args
     if ($result.ExitCode)
     {
@@ -150,11 +150,23 @@ function Stop-AppPool
     $destArg = "-dest:recycleApp='$SiteName/$Application',recycleMode='StopAppPool'," +
         "computername=https://${ServerHost}:$msdeployPort/msdeploy.axd?site=$SiteName," + $credential
     $args = @('-verb:sync', '-source:recycleApp', $destArg)
-    
+
     $result = Start-Process -NoNewWindow -Wait -PassThru "$msdeployPath\msdeploy.exe" $args
     if ($result.ExitCode)
     {
         throw 'Msdeploy failed.'
+    }
+}
+
+function GetComputerName([string] $ServerHost, [string] $SiteName)
+{
+    if (!(Test-IsLocalhost $ServerHost)) # Remote server.
+    {
+        "https://${ServerHost}:$msdeployPort/msdeploy.axd?site=$SiteName"
+    }
+    else
+    {
+        'localhost'
     }
 }
 
@@ -186,9 +198,10 @@ function Invoke-WebDeployment
 
     Assert-WebDeployCredential
     Write-Information "Deploying $PackagePath to $ServerHost/$Application..."
-    
+
+    $computerName = GetComputerName $ServerHost $SiteName
     $args = @("-source:package='$PackagePath'",
-              ("-dest:auto,computerName='https://${ServerHost}:$msdeployPort/msdeploy.axd?site=$SiteName',includeAcls='False'," + $credential),
+              ("-dest:auto,computerName='$computerName',includeAcls='False'," + $credential),
               '-verb:sync', '-disableLink:AppPoolExtension', '-disableLink:ContentExtension', '-disableLink:CertificateExtension',
               "-setParam:name='IIS Web Application Name',value='$SiteName/$Application'")
 
@@ -201,7 +214,7 @@ function Invoke-WebDeployment
     {
         $args += $MSDeployParams
     }
-    
+
     $result = Start-Process -NoNewWindow -Wait -PassThru "$msdeployPath\msdeploy.exe" $args
     if ($result.ExitCode)
     {
@@ -233,12 +246,12 @@ function Sync-IisApp
     $args = @('-verb:sync', "-source:iisApp='$SiteName/$Application'",
               ("-dest:auto,computerName='https://${DestinationServer}:$msdeployPort/msdeploy.axd?site=$SiteName'," + $credential))
 
-    $result = Start-Process -NoNewWindow -Wait -PassThru "$msdeployPath\msdeploy.exe" $args 
+    $result = Start-Process -NoNewWindow -Wait -PassThru "$msdeployPath\msdeploy.exe" $args
     if ($result.ExitCode)
     {
         throw 'Msdeploy failed.'
     }
-    
+
     Write-Information "Updated '$SiteName/$Application' app on $DestinationServer server."
 }
 
@@ -268,12 +281,12 @@ function Sync-WebContent
     $args = @('-verb:sync', "-source:contentPath='$ContentPath'",
               ("-dest:'$SiteName/$Application',computerName='https://${DestinationServer}:$msdeployPort/msdeploy.axd?site=$SiteName'," + $credential))
 
-    $result = Start-Process -NoNewWindow -Wait -PassThru "$msdeployPath\msdeploy.exe" $args 
+    $result = Start-Process -NoNewWindow -Wait -PassThru "$msdeployPath\msdeploy.exe" $args
     if ($result.ExitCode)
     {
         throw 'Msdeploy failed.'
     }
-    
+
     Write-Information "Updated '$ContentPath' directory on $DestinationServer server."
 }
 
@@ -304,8 +317,9 @@ function Invoke-WebSiteDeployment
     Assert-WebDeployCredential
     Write-Information "Deploying web site from $Path to $ServerHost/$Application..."
 
+    $computerName = GetComputerName $ServerHost $SiteName
     $args = @('-verb:sync', "-source:iisApp='$Path'",
-              ("-dest:iisApp='$SiteName/$Application',computerName='https://${ServerHost}:$msdeployPort/msdeploy.axd?site=$SiteName'," + $credential))
+              ("-dest:iisApp='$SiteName/$Application',computerName='$computerName'," + $credential))
 
     if ($AllowUntrusted)
     {
@@ -316,8 +330,8 @@ function Invoke-WebSiteDeployment
     {
         $args += $MSDeployParams
     }
-              
-    $result = Start-Process -NoNewWindow -Wait -PassThru "$msdeployPath\msdeploy.exe" $args 
+
+    $result = Start-Process -NoNewWindow -Wait -PassThru "$msdeployPath\msdeploy.exe" $args
     if ($result.ExitCode)
     {
         throw 'Msdeploy failed.'

@@ -61,7 +61,7 @@ function Get-CallerPreference
     {
         $filterHash = @{}
     }
-    
+
     process
     {
         if ($null -ne $Name)
@@ -118,7 +118,7 @@ function Get-CallerPreference
                 ($PSCmdlet.ParameterSetName -eq 'AllVariables' -or $filterHash.ContainsKey($entry.Name)))
             {
                 $variable = $Cmdlet.SessionState.PSVariable.Get($entry.Key)
-                
+
                 if ($null -ne $variable)
                 {
                     if ($SessionState -eq $ExecutionContext.SessionState)
@@ -140,7 +140,7 @@ function Get-CallerPreference
                 if (-not $vars.ContainsKey($varName))
                 {
                     $variable = $Cmdlet.SessionState.PSVariable.Get($varName)
-                
+
                     if ($null -ne $variable)
                     {
                         if ($SessionState -eq $ExecutionContext.SessionState)
@@ -159,3 +159,18 @@ function Get-CallerPreference
     } # end
 
 } # function Get-CallerPreference
+
+<#
+.SYNOPSIS
+Returns $true if hostname represents local PC.
+#>
+function Test-IsLocalhost
+{
+    [CmdletBinding()]
+    param
+    (
+        [string] $ComputerName
+    )
+
+    $ComputerName -match "^(\.|localhost|$env:COMPUTERNAME)`$"
+}

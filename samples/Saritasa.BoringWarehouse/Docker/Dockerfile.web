@@ -11,15 +11,12 @@ RUN `
     # Install WebDeploy, Psake.
     choco install webdeploy psake -y
 
-COPY docs C:\Temp\docs
 COPY scripts C:\Temp\scripts
 COPY default.ps1 C:\Temp\default.ps1
 
-ENV DockerDir samples\Saritasa.BoringWarehouse\Docker
-
-COPY ${DockerDir}\BoringWarehouse.zip C:\Temp\BoringWarehouse.zip
+COPY BoringWarehouse.zip C:\Temp\BoringWarehouse.zip
 
 WORKDIR C:\Temp
-RUN psake publish-boringwarehouse
+RUN ["psake.bat", "publish-boringwarehouse", "-properties", "@{ServerHost='localhost';SiteName='Default Web Site'}"]
 
 EXPOSE 80
