@@ -42,7 +42,7 @@ namespace Saritasa.Tools.Common.Extensions
                     return new DateTime(target.Year, target.Month, target.Day, 0, 0, 0, target.Kind)
                         .AddDays(-(int)target.DayOfWeek);
                 case DateTimePeriod.Months:
-                    return new DateTime(target.Year, 1, 1, 0, 0, 0, target.Kind);
+                    return new DateTime(target.Year, target.Month, 1, 0, 0, 0, target.Kind);
                 case DateTimePeriod.Quarters:
                     return new DateTime(target.Year, target.Month, 1, 0, 0, 0, target.Kind)
                         .AddMonths(-(target.Month - 1) % 3);
