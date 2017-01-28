@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Domain.Exceptions
@@ -20,7 +20,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         /// <summary>
         /// .ctor
         /// </summary>
-        public NotFoundException() : base("The specified item not found")
+        public NotFoundException() : base(DomainErrorDescriber.Default.NotFound())
         {
         }
 

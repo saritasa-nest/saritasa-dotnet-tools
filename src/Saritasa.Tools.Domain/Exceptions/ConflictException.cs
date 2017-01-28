@@ -21,7 +21,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         /// <summary>
         /// .ctor
         /// </summary>
-        public ConflictException() : base("Conflict occurred")
+        public ConflictException() : base(DomainErrorDescriber.Default.Conflict())
         {
         }
 

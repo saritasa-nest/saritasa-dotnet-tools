@@ -74,7 +74,7 @@ namespace Saritasa.Tools.Domain
             var entity = repository.Get(keyValues);
             if (entity == null)
             {
-                throw new NotFoundException($"Cannot find {typeof(TEntity).Name}");
+                throw new NotFoundException(DomainErrorDescriber.Default.CannotFind(typeof(TEntity).Name));
             }
             return entity;
         }
@@ -95,7 +95,7 @@ namespace Saritasa.Tools.Domain
             var entity = repository.Find(expression).Single();
             if (entity == null)
             {
-                throw new NotFoundException($"Cannot find {typeof(TEntity).Name}");
+                throw new NotFoundException(DomainErrorDescriber.Default.CannotFind(typeof(TEntity).Name));
             }
             return entity;
         }

@@ -19,7 +19,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         /// <summary>
         /// .ctor
         /// </summary>
-        public UnauthorizedException() : base("Unauthorized")
+        public UnauthorizedException() : base(DomainErrorDescriber.Default.Unauthorized())
         {
         }
 

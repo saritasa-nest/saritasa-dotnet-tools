@@ -1,9 +1,13 @@
-﻿0.1.1 [TBD]
+﻿0.1.2 [TBD]
+
+0.1.1 [2017-01-28]
 [*] Update dependencies, .NET Core 1.1 support.
 [*] Rename SecurityException to ForbiddenException.
 [+] Add ConflictException and UnauthorizedException.
 [+] Add Errors to ValidationException.
 [+] Extension methods for IRepository. GetOrAdd and GetOrThrow.
+[+] Add support .NET 4.0 .
+[+] Add localization support thru DomainErrorDescriber class.
 
 0.1.0 [2016-11-14]
 [+] Initial release.

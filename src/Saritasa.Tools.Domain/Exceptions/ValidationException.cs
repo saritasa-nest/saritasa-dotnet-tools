@@ -22,7 +22,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         /// <summary>
         /// Errors dictionary. Empty string key relates to summary error message.
         /// </summary>
-        public IDictionary<string, string> Errors = new Dictionary<string, string>();
+        public IDictionary<string, string> Errors { get; set; } = new Dictionary<string, string>();
 
         /// <inheritdoc />
         public override string Message
@@ -40,7 +40,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         /// <summary>
         /// .ctor
         /// </summary>
-        public ValidationException()
+        public ValidationException() : base(DomainErrorDescriber.Default.ValidationErrors())
         {
         }
 

@@ -29,16 +29,16 @@
     },
     "netcoreapp1.0": {
       "dependencies": {
-        "NLog": "5.0.0-beta04",
+        "NLog": "5.0.0-beta05",
         "Microsoft.NETCore.App": "1.1.0",
         "System.Threading": "4.3.0"
       }
     },
     "netstandard1.6": {
       "dependencies": {
+        "NLog": "5.0.0-beta05",
         "NETStandard.Library": "1.6.1",
-        "System.Threading": "4.3.0",
-        "NLog": "5.0.0-beta04"
+        "System.Threading": "4.3.0"
       }
     }
   },

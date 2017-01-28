@@ -19,7 +19,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         /// <summary>
         /// .ctor
         /// </summary>
-        public ForbiddenException() : base("Forbidden")
+        public ForbiddenException() : base(DomainErrorDescriber.Default.Forbidden())
         {
         }
 
