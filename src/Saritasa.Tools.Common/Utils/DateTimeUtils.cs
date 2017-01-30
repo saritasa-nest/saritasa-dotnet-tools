@@ -40,8 +40,8 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="target">Target date.</param>
         /// <param name="period">Period type.</param>
-        /// <returns>Begin of period date.</returns>
-        public static DateTime BeginOf(DateTime target, DateTimePeriod period)
+        /// <returns>Start of period date.</returns>
+        public static DateTime StartOf(DateTime target, DateTimePeriod period)
         {
             return target.Truncate(period);
         }

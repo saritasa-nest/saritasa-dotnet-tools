@@ -129,9 +129,9 @@ DateTimeExtensions
 
         Combines date part from first date and time from another.
 
-    .. function:: DateTime BeginOf(DateTime target, DateTimePeriod period)
+    .. function:: DateTime StartOf(DateTime target, DateTimePeriod period)
 
-        Begin datetime of period.
+        Start datetime of period.
 
     .. function:: DateTime EndOf(DateTime target, DateTimePeriod period)
 

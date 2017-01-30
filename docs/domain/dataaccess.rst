@@ -27,7 +27,7 @@ To achieve this there are two interfaces available: ``IUnitOfWork`` and ``IUnitO
 
 3. Make implementation of ``IAppUnitOfWork`` and ``IAppUnitOfWork`` in your data access layer:
 
-   .. code-block:: c#
+    .. code-block:: c#
 
         public class AppUnitOfWork : EfUnitOfWork<AppDbContext>, IAppUnitOfWork
         {
@@ -65,8 +65,8 @@ To achieve this there are two interfaces available: ``IUnitOfWork`` and ``IUnitO
         }
 
 5. For better usage also you can register them in you DI container. Here is an example for Autofac:
-   
-   .. code-block:: c#
+
+    .. code-block:: c#
 
         builder.RegisterType<DataAccess.AppDbContext>().AsSelf();
         builder.RegisterType<DataAccess.AppUnitOfWork>().AsImplementedInterfaces();
@@ -81,3 +81,14 @@ A Repository mediates between the domain and data mapping layers, acting like an
 - ``IQueryableRepository``. Provides the same methods as ``IRepository`` but also implements ``IQueryable`` interface. So you can query you data easily. Generally it is not recommended to return ``IQueryable`` from repository because it breaks pattern idea - the query is executed out of repository boundaries. But sometimes it may be convenient and useful.
 
 .. note:: In ``Saritasa.Tools.Ef6`` assembly you will find general implementations ``EfRepository`` and ``EfQueryableRepository``.
+
+Repository Extensions
+---------------------
+
+.. function:: TEntity GetOrAdd<TEntity>(IRepository<TEntity> repository, params object[] keyValues)
+
+    Get entity instance by id or create a new one.
+
+.. function:: TEntity GetOrThrow<TEntity>(IRepository<TEntity> repository, params object[] keyValues)
+
+    Get entity instance by id or generate ``NotFoundException`` exception.

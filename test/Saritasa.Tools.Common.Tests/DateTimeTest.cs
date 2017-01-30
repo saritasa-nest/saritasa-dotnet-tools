@@ -20,10 +20,10 @@ namespace Saritasa.Tools.Common.Tests
             var date4 = new DateTime(2017, 3, 1);
 
             // Act & Assert
-            Assert.Equal(new DateTime(2017, 2, 1), DateTimeUtils.BeginOf(date1, DateTimePeriod.Months));
-            Assert.Equal(new DateTime(2016, 6, 1), DateTimeUtils.BeginOf(date2, DateTimePeriod.Months));
-            Assert.Equal(new DateTime(2017, 9, 1), DateTimeUtils.BeginOf(date3, DateTimePeriod.Months));
-            Assert.Equal(new DateTime(2017, 3, 1), DateTimeUtils.BeginOf(date4, DateTimePeriod.Months));
+            Assert.Equal(new DateTime(2017, 2, 1), DateTimeUtils.StartOf(date1, DateTimePeriod.Months));
+            Assert.Equal(new DateTime(2016, 6, 1), DateTimeUtils.StartOf(date2, DateTimePeriod.Months));
+            Assert.Equal(new DateTime(2017, 9, 1), DateTimeUtils.StartOf(date3, DateTimePeriod.Months));
+            Assert.Equal(new DateTime(2017, 3, 1), DateTimeUtils.StartOf(date4, DateTimePeriod.Months));
         }
 
         [Fact]
@@ -52,10 +52,10 @@ namespace Saritasa.Tools.Common.Tests
             var q4 = new DateTime(2017, 11, 3);
 
             // Act & Assert
-            Assert.Equal(new DateTime(2017, 1, 1), DateTimeUtils.BeginOf(q1, DateTimePeriod.Quarters));
-            Assert.Equal(new DateTime(2017, 4, 1), DateTimeUtils.BeginOf(q2, DateTimePeriod.Quarters));
-            Assert.Equal(new DateTime(2017, 7, 1), DateTimeUtils.BeginOf(q3, DateTimePeriod.Quarters));
-            Assert.Equal(new DateTime(2017, 10, 1), DateTimeUtils.BeginOf(q4, DateTimePeriod.Quarters));
+            Assert.Equal(new DateTime(2017, 1, 1), DateTimeUtils.StartOf(q1, DateTimePeriod.Quarters));
+            Assert.Equal(new DateTime(2017, 4, 1), DateTimeUtils.StartOf(q2, DateTimePeriod.Quarters));
+            Assert.Equal(new DateTime(2017, 7, 1), DateTimeUtils.StartOf(q3, DateTimePeriod.Quarters));
+            Assert.Equal(new DateTime(2017, 10, 1), DateTimeUtils.StartOf(q4, DateTimePeriod.Quarters));
         }
     }
 }
