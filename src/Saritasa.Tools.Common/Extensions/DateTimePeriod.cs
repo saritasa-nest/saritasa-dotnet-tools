@@ -9,49 +9,49 @@ namespace Saritasa.Tools.Common.Extensions
     public enum DateTimePeriod
     {
         /// <summary>
-        /// Do not trancate.
+        /// Period not specified.
         /// </summary>
         None,
 
         /// <summary>
-        /// Trancate by seconds: 2016-03-08 07:05:23 -> 2016-01-01 07:05:00.
+        /// Second. Trancation example: 2016-03-08 07:05:23 -> 2016-01-01 07:05:00.
         /// </summary>
-        Seconds,
+        Second,
 
         /// <summary>
-        /// Trancate by minutes: 2016-03-08 07:05:23 -> 2016-01-01 07:00:00.
+        /// Minute. Trancation example: 2016-03-08 07:05:23 -> 2016-01-01 07:00:00.
         /// </summary>
-        Minutes,
+        Minute,
 
         /// <summary>
-        /// Trancate by hours: 2016-03-08 07:05:23 -> 2016-01-01 00:00:00.
+        /// Hour. Trancation example: 2016-03-08 07:05:23 -> 2016-01-01 00:00:00.
         /// </summary>
-        Hours,
+        Hour,
 
         /// <summary>
-        /// Trancate by days: 2016-03-08 07:05:23 -> 2016-03-01 00:00:00.
+        /// Day. Trancation example: 2016-03-08 07:05:23 -> 2016-03-01 00:00:00.
         /// </summary>
-        Days,
+        Day,
 
         /// <summary>
-        /// Trancate by weeks: 2016-03-08 07:05:23 -> 2016-03-06 00:00:00. First day of week
+        /// Week. Trancation example: 2016-03-08 07:05:23 -> 2016-03-06 00:00:00. First day of week
         /// depends on current thread culture.
         /// </summary>
-        Weeks,
+        Week,
 
         /// <summary>
-        /// Trancate by months: 2016-03-08 07:05:23 -> 2016-03-01 00:00:00.
+        /// Month. Trancation example: 2016-03-08 07:05:23 -> 2016-03-01 00:00:00.
         /// </summary>
-        Months,
+        Month,
 
         /// <summary>
-        /// Trancate by quarters: 2016-03-08 07:05:23 -> 2016-01-01 00:00:00.
+        /// Quarter. Trancation example: 2016-03-08 07:05:23 -> 2016-01-01 00:00:00.
         /// </summary>
-        Quarters,
+        Quarter,
 
         /// <summary>
-        /// Trancate by years: 2016-03-08 07:05:23 -> 2016-01-01 00:00:00.
+        /// Year. Trancation example: 2016-03-08 07:05:23 -> 2016-01-01 00:00:00.
         /// </summary>
-        Years,
+        Year,
     }
 }

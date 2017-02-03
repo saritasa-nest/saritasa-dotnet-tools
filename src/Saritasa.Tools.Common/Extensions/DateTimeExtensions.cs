@@ -30,23 +30,23 @@ namespace Saritasa.Tools.Common.Extensions
         {
             switch (period)
             {
-                case DateTimePeriod.Seconds:
+                case DateTimePeriod.Second:
                     return new DateTime(target.Year, target.Month, target.Day, target.Hour, target.Minute, 0, target.Kind);
-                case DateTimePeriod.Minutes:
+                case DateTimePeriod.Minute:
                     return new DateTime(target.Year, target.Month, target.Day, target.Hour, 0, 0, target.Kind);
-                case DateTimePeriod.Hours:
+                case DateTimePeriod.Hour:
                     return new DateTime(target.Year, target.Month, target.Day, 0, 0, 0, target.Kind);
-                case DateTimePeriod.Days:
+                case DateTimePeriod.Day:
                     return new DateTime(target.Year, target.Month, 1, 0, 0, 0, target.Kind);
-                case DateTimePeriod.Weeks:
+                case DateTimePeriod.Week:
                     return new DateTime(target.Year, target.Month, target.Day, 0, 0, 0, target.Kind)
                         .AddDays(-(int)target.DayOfWeek);
-                case DateTimePeriod.Months:
+                case DateTimePeriod.Month:
                     return new DateTime(target.Year, target.Month, 1, 0, 0, 0, target.Kind);
-                case DateTimePeriod.Quarters:
+                case DateTimePeriod.Quarter:
                     return new DateTime(target.Year, target.Month, 1, 0, 0, 0, target.Kind)
                         .AddMonths(-(target.Month - 1) % 3);
-                case DateTimePeriod.Years:
+                case DateTimePeriod.Year:
                     return new DateTime(target.Year, 1, 1, 0, 0, 0, target.Kind);
                 case DateTimePeriod.None:
                 default:

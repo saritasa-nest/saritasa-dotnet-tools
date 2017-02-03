@@ -57,28 +57,28 @@ namespace Saritasa.Tools.Common.Utils
             var result = target.Truncate(period);
             switch (period)
             {
-                case DateTimePeriod.Seconds:
+                case DateTimePeriod.Second:
                     result = result.AddSeconds(1);
                     break;
-                case DateTimePeriod.Minutes:
+                case DateTimePeriod.Minute:
                     result = result.AddMinutes(1);
                     break;
-                case DateTimePeriod.Hours:
+                case DateTimePeriod.Hour:
                     result = result.AddHours(1);
                     break;
-                case DateTimePeriod.Days:
+                case DateTimePeriod.Day:
                     result = result.AddDays(1);
                     break;
-                case DateTimePeriod.Weeks:
+                case DateTimePeriod.Week:
                     result = result.AddDays(7);
                     break;
-                case DateTimePeriod.Months:
+                case DateTimePeriod.Month:
                     result = result.AddMonths(1);
                     break;
-                case DateTimePeriod.Quarters:
+                case DateTimePeriod.Quarter:
                     result = result.AddMonths(4);
                     break;
-                case DateTimePeriod.Years:
+                case DateTimePeriod.Year:
                     result = result.AddYears(1);
                     break;
                 case DateTimePeriod.None:
@@ -116,5 +116,77 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         #endregion
+
+        /// <summary>
+        /// Return period difference between two dates. Negative values are converted to positive.
+        /// </summary>
+        /// <param name="target1">Date 1.</param>
+        /// <param name="target2">Date 2.</param>
+        /// <param name="period">Period type.</param>
+        /// <returns>Difference.</returns>
+        public static double Diff(DateTime target1, DateTime target2, DateTimePeriod period)
+        {
+            if (target1 > target2)
+            {
+                return Diff(target2, target1, period);
+            }
+
+            switch (period)
+            {
+                case DateTimePeriod.Second:
+                    return (target2 - target1).TotalSeconds;
+                case DateTimePeriod.Minute:
+                    return (target2 - target1).TotalMinutes;
+                case DateTimePeriod.Hour:
+                    return (target2 - target1).TotalHours;
+                case DateTimePeriod.Day:
+                    return (target2 - target1).TotalDays;
+                case DateTimePeriod.Week:
+                    return (target2 - target1).TotalDays / 7;
+                case DateTimePeriod.Month:
+                    return MonthDiff(target2, target1);
+                case DateTimePeriod.Quarter:
+                    return MonthDiff(target2, target1) / 3;
+                case DateTimePeriod.Year:
+                    return MonthDiff(target2, target1) / 12;
+            }
+
+            throw new ArgumentException(nameof(period));
+        }
+
+        /// <summary>
+        /// Calculate difference between two dates in months as float value.
+        /// </summary>
+        /// <remarks>
+        /// Original: https://github.com/moment/moment/blob/develop/src/lib/moment/diff.js .
+        /// </remarks>
+        /// <param name="target1">Date 1.</param>
+        /// <param name="target2">Date 2.</param>
+        /// <returns>Months difference.</returns>
+        private static double MonthDiff(DateTime target1, DateTime target2)
+        {
+            // Difference in months.
+            var wholeMonthDiff = (target2.Year - target1.Year) * 12 + (target2.Month - target1.Month);
+
+            // b is in (anchor - 1 month, anchor + 1 month).
+            DateTime anchor = target1.AddMonths(wholeMonthDiff);
+            DateTime anchor2;
+            double adjust;
+
+            if (target2 - anchor < TimeSpan.Zero)
+            {
+                anchor2 = target1.AddMonths(wholeMonthDiff - 1);
+                // Linear across the month.
+                adjust = (target2 - anchor).TotalMilliseconds / (anchor - anchor2).TotalMilliseconds;
+            }
+            else
+            {
+                anchor2 = target1.AddMonths(wholeMonthDiff + 1);
+                // Linear across the month.
+                adjust = (target2 - anchor).TotalMilliseconds / (anchor2 - anchor).TotalMilliseconds;
+            }
+
+            return -(wholeMonthDiff + adjust);
+        }
     }
 }
