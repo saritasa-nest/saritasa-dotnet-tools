@@ -5,8 +5,6 @@ namespace Saritasa.Tools.Common.Utils
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
     using JetBrains.Annotations;
 
     /// <summary>
@@ -165,9 +163,9 @@ namespace Saritasa.Tools.Common.Utils
         {
             if (maxCount < removeCount)
             {
-                throw new ArgumentOutOfRangeException(nameof(maxCount), "maxCount cannot be less than removeCount");
+                throw new ArgumentOutOfRangeException(nameof(maxCount), $"{nameof(maxCount)} cannot be less than removeCount");
             }
-            if (keysStorage == null && !purge)
+            if (keysStorage == null || !purge)
             {
                 keysStorage = new List<TKey>();
             }
@@ -204,6 +202,7 @@ namespace Saritasa.Tools.Common.Utils
                                 toRemove[i] = item;
                             }
                         }
+                        // ReSharper disable once ForCanBeConvertedToForeach
                         for (int i = 0; i < toRemove.Length; i++)
                         {
                             dict.Remove(toRemove[i]);
@@ -307,7 +306,7 @@ namespace Saritasa.Tools.Common.Utils
                 strategies = (key, dict, notInCache) => false;
             }
 
-            return (key) =>
+            return key =>
             {
                 TResult result;
                 bool needUpdate = false, strategiesAlreadyApplied = false;

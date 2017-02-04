@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
@@ -35,7 +35,8 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
         {
             if (SkipRows.HasValue && topIsPercent)
             {
-                throw new ArgumentException($"You mustn't set {nameof(TopIsPercent)} as true while there has been set {nameof(SkipRows)}", nameof(topIsPercent));
+                throw new ArgumentException(
+                    $"You must not set {nameof(TopIsPercent)} as true while there has been set {nameof(SkipRows)}", nameof(topIsPercent));
             }
 
             TopIsPercent = true;
@@ -47,7 +48,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
         {
             var sb = new StringBuilder("SELECT ");
 
-            // Output Distinct
+            // Output Distinct.
             if (IsDistinct)
             {
                 sb.Append("DISTINCT ");
@@ -62,16 +63,16 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
                 }
             }
 
-            // Output column names
+            // Output column names.
             sb.Append(SelectedColumns.Any() ? string.Join(", ", SelectedColumns.Select(WrapVariable)) : "*");
 
-            // Output table names
+            // Output table names.
             if (SelectedTables.Any())
             {
                 sb.Append($" FROM {string.Join(", ", SelectedTables.Select(WrapVariable))}");
             }
 
-            // Output joins
+            // Output joins.
             if (JoinStatement.Any())
             {
                 foreach (var clause in JoinStatement)
@@ -100,21 +101,21 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
                 }
             }
 
-            // Output where statement
+            // Output where statement.
             if (WhereStatement.Any())
             {
                 sb.AppendLine();
                 sb.Append($"WHERE {string.Join(" AND ", WhereStatement.Select(BuildWhereClauseString))}");
             }
 
-            // Output GroupBy statement
+            // Output GroupBy statement.
             if (GroupByColumns.Count > 0)
             {
                 sb.AppendLine();
                 sb.Append($"GROUP BY {string.Join(", ", GroupByColumns.Select(WrapVariable))}");
             }
 
-            // TODO: Output having statement
+            // TODO: Output having statement.
             /*
             if (Having.ClauseLevels > 0)
             {
@@ -134,13 +135,13 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
             }
             */
 
-            // Output OrderBy statement
+            // Output OrderBy statement.
             if (OrderByStatement.Any())
             {
                 sb.AppendLine();
                 sb.Append($"ORDER BY {string.Join(", ", OrderByStatement.Select(BuildOrderByClauseString))}");
 
-                // Works only in SQL Server 2012 and upper
+                // Works only in SQL Server 2012 and upper.
                 // TODO use BETWEEN if it require
                 if (SkipRows.HasValue)
                 {
@@ -154,7 +155,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
                 }
             }
 
-            // return the built query
+            // Return the built query.
             return sb.ToString();
         }
 
@@ -232,7 +233,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
             }
             if (someValue is DateTime)
             {
-                return $"\'{(DateTime)someValue:yyyy/MM/dd hh:mm:ss}\'";
+                return $"\'{(DateTime)someValue:yyyy-MM-dd hh:mm:ss}\'";
             }
             if (someValue is bool)
             {

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Messages.Queries
@@ -38,7 +38,7 @@ namespace Saritasa.Tools.Messages.Queries
                 Status = ProcessingStatus.Processing,
                 Parameters = args,
                 Method = method,
-                QueryObject = CreateObjectFromType(method.GetBaseDefinition().DeclaringType),
+                QueryObject = Activator.CreateInstance(method.GetBaseDefinition().DeclaringType, nonPublic: true),
                 FakeQueryObject = true,
             };
         }
@@ -89,7 +89,7 @@ namespace Saritasa.Tools.Messages.Queries
                 bool fakeQueryObject = false;
                 if (query == null)
                 {
-                    query = (TQuery)CreateObjectFromType(typeof(TQuery));
+                    query = (TQuery)Activator.CreateInstance(typeof(TQuery), nonPublic: true);
                     fakeQueryObject = true;
                 }
 
@@ -200,7 +200,7 @@ namespace Saritasa.Tools.Messages.Queries
             {
                 throw new InvalidOperationException($"Cannot load type {objectTypeName}");
             }
-            var obj = CreateObjectFromType(objectType);
+            var obj = Activator.CreateInstance(objectType, nonPublic: true);
 
             var methodName = message.ContentType.Substring(message.ContentType.LastIndexOf(".", StringComparison.Ordinal) + 1);
             var method = objectType.GetTypeInfo().GetMethod(methodName);
@@ -213,10 +213,15 @@ namespace Saritasa.Tools.Messages.Queries
             var @delegate = obj.GetType().GetTypeInfo().GetMethod(methodName).CreateDelegate(delegateType, obj);
             if (@delegate == null)
             {
-                throw new Exception("Cannot create delegate");
+                throw new InvalidOperationException("Cannot create delegate");
             }
 
-            var messageContent = ((IDictionary<string, object>)message.Content).Values;
+            var dictContent = message.Content as IDictionary<string, object>;
+            if (dictContent == null)
+            {
+                throw new ArgumentException("Content should be IDictionary<string, object> type");
+            }
+            var messageContent = dictContent.Values;
             var methodTypes = method.GetParameters().Select(p => p.ParameterType);
             var values = methodTypes.Zip(messageContent, (mt, mc) => TypeHelpers.ConvertType(mc, mt));
 
@@ -229,32 +234,6 @@ namespace Saritasa.Tools.Messages.Queries
             message.Status = queryMessage.Status;
             message.ExecutionDuration = queryMessage.ExecutionDuration;
             message.Data = queryMessage.Data;
-        }
-
-        /// <summary>
-        /// Create object from type. Type must have parameterless ctor.
-        /// </summary>
-        /// <param name="t">Type.</param>
-        /// <returns>Created object.</returns>
-        private static object CreateObjectFromType(Type t)
-        {
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
-            var ctor = t.GetTypeInfo().GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
-                null, new Type[] { }, null);
-#else
-            var ctorMember = t.GetTypeInfo().FindMembers(
-                MemberTypes.Constructor,
-                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
-                (member, filterCriteria) => true,
-                null).FirstOrDefault();
-            var ctor = ctorMember != null ? (ConstructorInfo) ctorMember : (ConstructorInfo)null;
-#endif
-            if (ctor == null)
-            {
-                throw new ArgumentException($"Type {t} must have public or private parameter-less constructor");
-            }
-
-            return ctor.Invoke(new object[] { });
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Common.Utils
@@ -130,14 +130,16 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         private static readonly IDictionary<HashMethods, Func<string, string>> methodsFuncMap =
-            new Dictionary<HashMethods, Func<string, string>>()
+            new Dictionary<HashMethods, Func<string, string>>
             {
-                { HashMethods.Md5, MD5 },
-                { HashMethods.Sha1, Sha1 },
-                { HashMethods.Sha256, Sha256 },
-                { HashMethods.Sha384, Sha384 },
-                { HashMethods.Sha512, Sha512 },
+                [HashMethods.Md5] = MD5,
+                [HashMethods.Sha1] = Sha1,
+                [HashMethods.Sha256] = Sha256,
+                [HashMethods.Sha384] = Sha384,
+                [HashMethods.Sha512] = Sha512,
             };
+
+        const char PasswordMethodHashSeparator = '$';
 
         /// <summary>
         /// Hash string with selected hash method. The string will contain method name that was used for hashing.
@@ -148,31 +150,31 @@ namespace Saritasa.Tools.Common.Utils
         public static string Hash([NotNull] string target, HashMethods method)
         {
             Guard.IsNotNull(target, nameof(target));
-            return method.ToString().ToUpperInvariant() + "$" + methodsFuncMap[method](target);
+            return method.ToString().ToUpperInvariant() + PasswordMethodHashSeparator + methodsFuncMap[method](target);
         }
 
         /// <summary>
         /// Compares target string with hashed string.
         /// </summary>
         /// <param name="target">Target non-hashed string.</param>
-        /// <param name="hashedStrToCheck">Hashed string with hash method. Should be hashed with Hash() method.</param>
-        /// <returns>True if string is correct.</returns>
-        public static bool CheckHash([NotNull] string target, string hashedStrToCheck)
+        /// <param name="hashedStringToCheck">Hashed string with hash method. Should be hashed with Hash() method.</param>
+        /// <returns>True if string is correct, false otherwise.</returns>
+        public static bool CheckHash([NotNull] string target, string hashedStringToCheck)
         {
             Guard.IsNotNull(target, nameof(target));
-            var separatorIndex = hashedStrToCheck.IndexOf('$');
+            var separatorIndex = hashedStringToCheck.IndexOf(PasswordMethodHashSeparator);
             if (separatorIndex < 0)
             {
-                throw new ArgumentException($"{nameof(hashedStrToCheck)} does not contain hash method");
+                throw new ArgumentException($"{nameof(hashedStringToCheck)} does not contain hash method");
             }
 
             HashMethods method = HashMethods.Md5;
-            if (!Enum.TryParse(hashedStrToCheck.Substring(0, separatorIndex), true, out method))
+            if (!Enum.TryParse(hashedStringToCheck.Substring(0, separatorIndex), true, out method))
             {
-                throw new ArgumentException($"{nameof(hashedStrToCheck)} contains method that is not possible to recognize");
+                throw new ArgumentException($"{nameof(hashedStringToCheck)} contains method that is not possible to recognize");
             }
 
-            return Hash(target, method) == hashedStrToCheck;
+            return Hash(target, method) == hashedStringToCheck;
         }
 #endif
 

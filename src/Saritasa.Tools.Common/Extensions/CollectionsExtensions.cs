@@ -153,7 +153,7 @@ namespace Saritasa.Tools.Common.Extensions
             {
                 originalSource = originalSource.Skip(currentPosition).Take(chunkSize);
                 hasRecords = false;
-                // actual query is here
+                // Actual query is here.
                 foreach (var item in originalSource)
                 {
                     hasRecords = true;

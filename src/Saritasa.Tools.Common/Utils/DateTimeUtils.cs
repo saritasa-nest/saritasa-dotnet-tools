@@ -126,6 +126,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <returns>Difference.</returns>
         public static double Diff(DateTime target1, DateTime target2, DateTimePeriod period)
         {
+            // Swap to get positive value.
             if (target1 > target2)
             {
                 return Diff(target2, target1, period);

@@ -174,7 +174,7 @@ namespace Saritasa.Tools.Common.Utils
                         return runningTask;
                     }
 
-                    Exception executedException = runningTask.Exception.InnerException;
+                    Exception executedException = runningTask.Exception?.InnerException;
                     TimeSpan delay;
                     bool isTransient = IsSubtypeOf(executedException, transientExceptions);
                     bool shouldStop = retryStrategy(attemptCount, executedException, out delay);
@@ -234,7 +234,7 @@ namespace Saritasa.Tools.Common.Utils
                 var tcs = new TaskCompletionSource<int>();
                 action().ContinueWith(t =>
                 {
-                    if (t.IsFaulted)
+                    if (t.IsFaulted && t.Exception != null)
                     {
                         tcs.TrySetException(t.Exception.InnerExceptions);
                     }
@@ -473,7 +473,7 @@ namespace Saritasa.Tools.Common.Utils
             Guard.IsNotNegative(deltaBackoff.Value, nameof(deltaBackoff));
             if (minBackoff > maxBackoff)
             {
-                throw new ArgumentOutOfRangeException(nameof(minBackoff), "minBackoff cannot be less than maxBackoff");
+                throw new ArgumentOutOfRangeException(nameof(minBackoff), $"{nameof(minBackoff)} cannot be less than {nameof(maxBackoff)}");
             }
 
             return (int attemptCount, Exception lastException, out TimeSpan neededDelay) =>

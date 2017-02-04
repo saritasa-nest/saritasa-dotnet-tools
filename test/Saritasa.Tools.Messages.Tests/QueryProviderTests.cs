@@ -51,7 +51,7 @@ WHERE ([ContentId] = '{guid}')";
             // Assert
             var expectedResult =
 $@"SELECT TOP 1000 * FROM [SaritasaMessages]
-WHERE ([CreatedAt] >= '{startDate:yyyy/MM/dd hh:mm:ss}') AND ([CreatedAt] <= '{endDate:yyyy/MM/dd hh:mm:ss}')";
+WHERE ([CreatedAt] >= '{startDate:yyyy-MM-dd hh:mm:ss}') AND ([CreatedAt] <= '{endDate:yyyy-MM-dd hh:mm:ss}')";
             Assert.Equal(expectedResult, result);
         }
 
@@ -113,7 +113,7 @@ LIMIT 1000";
             // Assert
             var expectedResult =
 $@"SELECT * FROM `saritasa_messages`
-WHERE (`created_at` >= '{startDate:yyyy/MM/dd hh:mm:ss}') AND (`created_at` <= '{endDate:yyyy/MM/dd hh:mm:ss}')
+WHERE (`created_at` >= '{startDate:yyyy-MM-dd hh:mm:ss}') AND (`created_at` <= '{endDate:yyyy-MM-dd hh:mm:ss}')
 LIMIT 1000";
             Assert.Equal(expectedResult, result);
         }
@@ -174,7 +174,7 @@ LIMIT 1000";
             // Assert
             var expectedResult =
 $@"SELECT * FROM saritasa_messages
-WHERE (created_at >= '{startDate:yyyy/MM/dd hh:mm:ss}') AND (created_at <= '{endDate:yyyy/MM/dd hh:mm:ss}')
+WHERE (created_at >= '{startDate:yyyy-MM-dd hh:mm:ss}') AND (created_at <= '{endDate:yyyy-MM-dd hh:mm:ss}')
 LIMIT 1000";
             Assert.Equal(expectedResult, result);
         }
