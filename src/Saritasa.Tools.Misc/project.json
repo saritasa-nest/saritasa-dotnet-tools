@@ -1,6 +1,6 @@
 {
   "title": "Saritasa Tools Misc",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "authors": [ "Saritasa" ],
   "description": "The package is a part of Saritasa Tools project. Saritasa.Tools.Misc contains miscellaneous items: passwords generation, passwords strength estimate.",
   "copyright": "Saritasa 2015-2017",
