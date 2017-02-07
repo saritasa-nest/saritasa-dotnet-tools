@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
@@ -61,7 +61,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         {
             if (assemblies == null || assemblies.Length < 1)
             {
-                throw new ArgumentException("Assemblies to search handlers were not specified");
+                throw new ArgumentException(Properties.Strings.AssembliesNotSpecified);
             }
             if (assemblies.Any(a => a == null))
             {
@@ -77,7 +77,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         /// </summary>
         private void Init()
         {
-            // precache all types with command handlers
+            // Precache all types with command handlers.
             commandHandlers = assemblies.SelectMany(a => a.GetTypes())
                 .Where(t =>
                     HandlerSearchMethod == HandlerSearchMethod.ClassAttribute ?
@@ -89,7 +89,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             if (!commandHandlers.Any())
             {
                 var assembliesStr = string.Join(",", assemblies.Select(a => a.FullName));
-                InternalLogger.Warn($"Cannot find command handlers in assemblie(-s) {assembliesStr}",
+                InternalLogger.Warn(string.Format(Properties.Strings.NoHandlersInAssembly, assembliesStr),
                     nameof(CommandHandlerLocatorMiddleware));
             }
         }
@@ -100,10 +100,11 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             var commandMessage = message as CommandMessage;
             if (commandMessage == null)
             {
-                throw new NotSupportedException("Message should be CommandMessage type");
+                throw new NotSupportedException(string.Format(Properties.Strings.MessageShouldBeType,
+                    nameof(CommandMessage)));
             }
 
-            // find handler method, first try to find cached value
+            // Find handler method, first try to find cached value.
             var cmdtype = commandMessage.Content.GetType();
             var method = cache.GetOrAdd(cmdtype, (handlerCmdType) =>
             {
@@ -113,7 +114,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
 
             if (InternalLogger.IsDebugEnabled)
             {
-                InternalLogger.Debug($"Finding command handler for type {cmdtype.Name}", nameof(CommandHandlerLocatorMiddleware));
+                InternalLogger.Debug(string.Format(Properties.Strings.SearchCommandHandler, cmdtype.Name), nameof(CommandHandlerLocatorMiddleware));
             }
             if (method == null)
             {
@@ -122,13 +123,14 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             if (method == null)
             {
                 var assembliesStr = string.Join(",", assemblies.Select(a => a.FullName));
-                InternalLogger.Warn($"Cannot find command handler for command {cmdtype.Name} in assemblies {assembliesStr}",
+                InternalLogger.Warn(string.Format(Properties.Strings.SearchCommandHandlerNotFound, cmdtype.Name, assembliesStr),
                     nameof(CommandHandlerLocatorMiddleware));
                 throw new CommandHandlerNotFoundException(cmdtype.Name);
             }
             if (InternalLogger.IsDebugEnabled)
             {
-                InternalLogger.Debug($"Found \"{method}\" for command {cmdtype}", nameof(CommandHandlerLocatorMiddleware));
+                InternalLogger.Debug(string.Format(Properties.Strings.CommandHandlerFound, method, cmdtype),
+                    nameof(CommandHandlerLocatorMiddleware));
             }
             commandMessage.HandlerMethod = method;
             commandMessage.HandlerType = method.DeclaringType;

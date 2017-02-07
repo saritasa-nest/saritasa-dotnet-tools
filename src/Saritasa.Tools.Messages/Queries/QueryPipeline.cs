@@ -96,13 +96,13 @@ namespace Saritasa.Tools.Messages.Queries
                 var mce = expression.Body as MethodCallExpression;
                 if (mce == null)
                 {
-                    throw new InvalidOperationException("Expression must have Body of type MethodCallExpression");
+                    throw new InvalidOperationException(Properties.Strings.ExpressionMethodCallExpressionBody);
                 }
                 var args = mce.Arguments.Select(PartiallyEvaluateExpression).ToArray();
                 var method = mce.Method;
                 if (method.DeclaringType == null)
                 {
-                    throw new InvalidOperationException("Method does not declare type");
+                    throw new InvalidOperationException(Properties.Strings.MethodNoTypeDeclare);
                 }
                 var message = new QueryMessage()
                 {
@@ -127,13 +127,13 @@ namespace Saritasa.Tools.Messages.Queries
                 case ExpressionType.Constant:
                     return ((ConstantExpression)expression).Value;
                 case ExpressionType.MemberAccess:
-                    // TODO: carefully check for performance
                     var objectMember = Expression.Convert(expression, typeof(object));
                     var getterLambda = Expression.Lambda<Func<object>>(objectMember);
                     var getter = getterLambda.Compile();
                     return getter();
                 default:
-                    throw new InvalidOperationException($"Cannot evaluate type {expression.NodeType}");
+                    throw new InvalidOperationException(
+                        string.Format(Properties.Strings.ExpressionCannotEvaluate, expression.NodeType));
             }
         }
 
@@ -187,7 +187,7 @@ namespace Saritasa.Tools.Messages.Queries
             }
             if (message.ContentType.IndexOf(".", StringComparison.Ordinal) < 0)
             {
-                throw new ArgumentException("Cannot specify method name and type from content type");
+                throw new ArgumentException(Properties.Strings.NoMethodNameFromContentType);
             }
 
             var objectTypeName = message.ContentType.Substring(0, message.ContentType.LastIndexOf(".", StringComparison.Ordinal));
@@ -198,7 +198,7 @@ namespace Saritasa.Tools.Messages.Queries
 #endif
             if (objectType == null)
             {
-                throw new InvalidOperationException($"Cannot load type {objectTypeName}");
+                throw new InvalidOperationException(string.Format(Properties.Strings.CannotLoadType, objectTypeName));
             }
             var obj = Activator.CreateInstance(objectType, nonPublic: true);
 
@@ -206,20 +206,21 @@ namespace Saritasa.Tools.Messages.Queries
             var method = objectType.GetTypeInfo().GetMethod(methodName);
             if (method == null)
             {
-                throw new InvalidOperationException($"Cannot find method {methodName}");
+                throw new InvalidOperationException(string.Format(Properties.Strings.CannotFindMethod, methodName));
             }
             var delegateType = Expression.GetDelegateType(
                 method.GetParameters().Select(p => p.ParameterType).Concat(new[] { method.ReturnType }).ToArray());
             var @delegate = obj.GetType().GetTypeInfo().GetMethod(methodName).CreateDelegate(delegateType, obj);
             if (@delegate == null)
             {
-                throw new InvalidOperationException("Cannot create delegate");
+                throw new InvalidOperationException(Properties.Strings.CannotCreateDelegate);
             }
 
             var dictContent = message.Content as IDictionary<string, object>;
             if (dictContent == null)
             {
-                throw new ArgumentException("Content should be IDictionary<string, object> type");
+                throw new ArgumentException(string.Format(Properties.Strings.ContentShouldBeType,
+                    nameof(IDictionary<string, object>)));
             }
             var messageContent = dictContent.Values;
             var methodTypes = method.GetParameters().Select(p => p.ParameterType);

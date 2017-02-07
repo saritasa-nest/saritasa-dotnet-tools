@@ -109,10 +109,7 @@ namespace Saritasa.Tools.Messages.Common
         {
             var result = handlerMethod.Invoke(handler, GetAndResolveHandlerParameters(obj, handlerMethod));
             var task = result as Task;
-            if (task != null)
-            {
-                task.ConfigureAwait(false).GetAwaiter().GetResult();
-            }
+            task?.ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
         /// <summary>

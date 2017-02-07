@@ -144,3 +144,7 @@ DateTimeExtensions
     .. function:: double ToUnixTimestamp(DateTime target)
 
         Converts DateTime to unix time stamp.
+
+    .. function:: double Diff(DateTime target1, DateTime target2, DateTimePeriod period)
+
+        Return period difference between two dates. Negative values are converted to positive.

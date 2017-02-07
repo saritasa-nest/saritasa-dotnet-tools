@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 #if !NETCOREAPP1_0 && !NETSTANDARD1_6
@@ -29,7 +29,8 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             var commandMessage = message as CommandMessage;
             if (commandMessage == null)
             {
-                throw new NotSupportedException("Message should be CommandMessage type");
+                throw new NotSupportedException(string.Format(Properties.Strings.MessageShouldBeType,
+                    nameof(CommandMessage)));
             }
 
             var context = new ValidationContext(commandMessage.Content);

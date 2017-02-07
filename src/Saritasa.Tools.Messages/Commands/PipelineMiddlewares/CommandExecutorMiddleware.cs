@@ -37,6 +37,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             }
 
             object handler = null;
+
             // When command class contains Handle method within.
             if (commandMessage.HandlerMethod.DeclaringType == commandMessage.Content.GetType())
             {
@@ -62,7 +63,8 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             var commandMessage = message as CommandMessage;
             if (commandMessage == null)
             {
-                throw new NotSupportedException($"Message should be {nameof(CommandMessage)} type");
+                throw new NotSupportedException(string.Format(Properties.Strings.MessageShouldBeType,
+                    nameof(CommandMessage)));
             }
 
             var handler = GetHandler(commandMessage);
@@ -80,27 +82,32 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             }
             catch (TargetInvocationException ex)
             {
-                InternalLogger.Warn($"TargetInvocationException while process command \"{handler}\": {ex}", nameof(CommandExecutorMiddleware));
+                InternalLogger.Warn(string.Format(Properties.Strings.ExceptionWhileProcess,
+                    nameof(TargetInvocationException), handler, ex), nameof(CommandExecutorMiddleware));
                 commandMessage.Status = ProcessingStatus.Failed;
                 if (ex.InnerException != null)
                 {
                     commandMessage.Error = ex.InnerException;
-                    commandMessage.ErrorDispatchInfo = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex.InnerException);
+                    commandMessage.ErrorDispatchInfo =
+                        System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex.InnerException);
                 }
             }
             catch (TargetException ex)
             {
-                InternalLogger.Warn($"TargetException while process command \"{handler}\": {ex}", nameof(CommandExecutorMiddleware));
+                InternalLogger.Warn(string.Format(Properties.Strings.ExceptionWhileProcess,
+                    nameof(TargetException), handler, ex), nameof(CommandExecutorMiddleware));
                 commandMessage.Status = ProcessingStatus.Failed;
                 if (ex.InnerException != null)
                 {
                     commandMessage.Error = ex.InnerException;
-                    commandMessage.ErrorDispatchInfo = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex.InnerException);
+                    commandMessage.ErrorDispatchInfo =
+                        System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex.InnerException);
                 }
             }
             catch (Exception ex)
             {
-                InternalLogger.Warn($"Exception while process command \"{handler}\": {ex}", nameof(CommandExecutorMiddleware));
+                InternalLogger.Warn(string.Format(Properties.Strings.ExceptionWhileProcess,
+                    nameof(Exception), handler, ex), nameof(CommandExecutorMiddleware));
                 commandMessage.Status = ProcessingStatus.Failed;
                 commandMessage.Error = ex;
                 commandMessage.ErrorDispatchInfo = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex);
@@ -127,7 +134,8 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             var commandMessage = message as CommandMessage;
             if (commandMessage == null)
             {
-                throw new NotSupportedException("Message should be CommandMessage type");
+                throw new NotSupportedException(string.Format(Properties.Strings.MessageShouldBeType,
+                    nameof(CommandMessage)));
             }
 
             var handler = GetHandler(commandMessage);
@@ -145,27 +153,32 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             }
             catch (TargetInvocationException ex)
             {
-                InternalLogger.Warn($"TargetInvocationException while process command \"{handler}\": {ex}", nameof(CommandExecutorMiddleware));
+                InternalLogger.Warn(string.Format(Properties.Strings.ExceptionWhileProcess,
+                    nameof(TargetInvocationException), handler, ex), nameof(CommandExecutorMiddleware));
                 commandMessage.Status = ProcessingStatus.Failed;
                 if (ex.InnerException != null)
                 {
                     commandMessage.Error = ex.InnerException;
-                    commandMessage.ErrorDispatchInfo = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex.InnerException);
+                    commandMessage.ErrorDispatchInfo =
+                        System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex.InnerException);
                 }
             }
             catch (TargetException ex)
             {
-                InternalLogger.Warn($"TargetException while process command \"{handler}\": {ex}", nameof(CommandExecutorMiddleware));
+                InternalLogger.Warn(string.Format(Properties.Strings.ExceptionWhileProcess,
+                    nameof(TargetException), handler, ex), nameof(CommandExecutorMiddleware));
                 commandMessage.Status = ProcessingStatus.Failed;
                 if (ex.InnerException != null)
                 {
                     commandMessage.Error = ex.InnerException;
-                    commandMessage.ErrorDispatchInfo = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex.InnerException);
+                    commandMessage.ErrorDispatchInfo =
+                        System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex.InnerException);
                 }
             }
             catch (Exception ex)
             {
-                InternalLogger.Warn($"Exception while process command \"{handler}\": {ex}", nameof(CommandExecutorMiddleware));
+                InternalLogger.Warn(string.Format(Properties.Strings.ExceptionWhileProcess,
+                    nameof(Exception), handler, ex), nameof(CommandExecutorMiddleware));
                 commandMessage.Status = ProcessingStatus.Failed;
                 commandMessage.Error = ex;
                 commandMessage.ErrorDispatchInfo = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex);

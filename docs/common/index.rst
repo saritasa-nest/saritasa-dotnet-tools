@@ -36,7 +36,7 @@ Set of functions to parse or get value or default:
 Format string:
 
     .. code-block:: c#
-    
+
         "{0} + {1} = {2}".FormatWith(2, 2, 4)  // returns "2 + 2 = 4"
 
 String handy extensions to check for empty/not empty that easier to read:

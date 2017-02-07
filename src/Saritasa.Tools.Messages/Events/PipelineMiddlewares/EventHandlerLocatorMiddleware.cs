@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
@@ -55,7 +55,7 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
         {
             if (assemblies == null || assemblies.Length < 1)
             {
-                throw new ArgumentException("Assemblies to search handlers were not specified");
+                throw new ArgumentException(Properties.Strings.AssembliesNotSpecified);
             }
             if (assemblies.Any(a => a == null))
             {
@@ -67,7 +67,7 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
 
         private void Init()
         {
-            // precache all types with event handlers
+            // Precache all types with event handlers.
             eventHandlers = assemblies.SelectMany(a => a.GetTypes())
                 .Where(t => HandlerSearchMethod == HandlerSearchMethod.ClassAttribute ?
                     t.GetTypeInfo().GetCustomAttribute<EventHandlersAttribute>() != null :
@@ -83,14 +83,16 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
             var eventMessage = message as EventMessage;
             if (eventMessage == null)
             {
-                throw new NotSupportedException("Message should be EventMessage type");
+                throw new NotSupportedException(string.Format(Properties.Strings.MessageShouldBeType,
+                    nameof(EventMessage)));
             }
 
-            // find handler methods
+            // Find handler methods.
             var eventtype = eventMessage.Content.GetType();
             if (InternalLogger.IsDebugEnabled)
             {
-                InternalLogger.Debug($"Finding command handler for type {eventtype.Name}", nameof(EventHandlerLocatorMiddleware));
+                InternalLogger.Debug(string.Format(Properties.Strings.SearchEventHandler, eventtype.Name),
+                    nameof(EventHandlerLocatorMiddleware));
             }
             var methods = eventHandlers
                 .Where(m => m.GetParameters().Any(pt => pt.ParameterType == eventtype))
@@ -106,13 +108,15 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
                 {
                     for (var i = 0; i < methods.Count; i++)
                     {
-                        InternalLogger.Debug($"Found \"{methods[i].Name}\" for event {eventtype}",
-                            nameof(EventHandlerLocatorMiddleware));
+                        InternalLogger.Debug(
+                            string.Format(Properties.Strings.EventHandlerFound, Properties.Strings.EventHandlerFound,
+                                methods[i].Name, eventtype), nameof(EventHandlerLocatorMiddleware));
                     }
                 }
                 else
                 {
-                    InternalLogger.Debug($"No handlers found for event {eventtype}");
+                    InternalLogger.Debug(string.Format(Properties.Strings.EventHandlerNotFound, eventtype),
+                        nameof(EventHandlerLocatorMiddleware));
                 }
             }
 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
@@ -27,14 +27,14 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
 
         private async Task InternalHandle(EventMessage eventMessage, bool async = false)
         {
-            var exceptions = new List<Exception>(3); // stores exceptions from all handlers
+            var exceptions = new List<Exception>(3); // Stores exceptions from all handlers.
             var stopWatch = System.Diagnostics.Stopwatch.StartNew();
 
-            // executes every handle method
+            // Executes every handle method.
             for (int i = 0; i < eventMessage.HandlerMethods.Count; i++)
             {
                 object handler = null;
-                // event already implements Handle method
+                // Event already implements Handle method.
                 if (eventMessage.HandlerMethods[i].DeclaringType == eventMessage.Content.GetType())
                 {
                     handler = eventMessage.Content;
@@ -43,20 +43,23 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
                 {
                     try
                     {
-                        handler = ResolveObject(eventMessage.HandlerMethods[i].DeclaringType, nameof(EventExecutorMiddleware));
+                        handler = ResolveObject(eventMessage.HandlerMethods[i].DeclaringType,
+                            nameof(EventExecutorMiddleware));
                     }
                     catch (Exception ex)
                     {
-                        InternalLogger.Info($"Exception while resolving {eventMessage.HandlerMethods[i].Name}: {ex}");
+                        InternalLogger.Info(string.Format(Properties.Strings.ExceptionOnResolve,
+                            eventMessage.HandlerMethods[i].Name, ex), nameof(EventExecutorMiddleware));
                     }
                 }
                 if (handler == null)
                 {
-                    InternalLogger.Warn($"Cannot resolve handler {eventMessage.HandlerMethods[i].Name}");
+                    InternalLogger.Warn(string.Format(Properties.Strings.CannotResolveHandler,
+                        eventMessage.HandlerMethods[i].Name), nameof(EventExecutorMiddleware));
                     continue;
                 }
 
-                // invoke method and resolve parameters if needed
+                // Invoke method and resolve parameters if needed.
                 try
                 {
                     if (async)
@@ -70,7 +73,7 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
                 }
                 catch (Exception ex)
                 {
-                    InternalLogger.Warn($"Exception while process \"{handler}\": {ex}",
+                    InternalLogger.Warn(string.Format(Properties.Strings.ExceptionWhileProcess, handler, ex),
                         nameof(EventExecutorMiddleware));
                     var innerException = ex.InnerException;
                     if (innerException != null)
@@ -79,7 +82,7 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
                     }
                     else
                     {
-                        InternalLogger.Warn($"For some reason InnerException is null. Type: {ex.GetType()}.",
+                        InternalLogger.Warn(string.Format(Properties.Strings.InnerExceptionIsNull, ex.GetType()),
                             nameof(EventExecutorMiddleware));
                     }
                 }
@@ -106,16 +109,17 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
             var eventMessage = message as EventMessage;
             if (eventMessage == null)
             {
-                throw new NotSupportedException("Message should be EventMessage type");
+                throw new NotSupportedException(string.Format(Properties.Strings.MessageShouldBeType,
+                    nameof(EventMessage)));
             }
 
-            // rejected events are not needed to process
+            // Rejected events are not needed to process.
             if (eventMessage.Status == ProcessingStatus.Rejected)
             {
                 return;
             }
 
-            // it will be sync anyway but simplified for better performance
+            // It will be sync anyway but simplified for better performance.
 #pragma warning disable 4014
             InternalHandle(eventMessage, async: false);
 #pragma warning restore 4014
@@ -127,10 +131,11 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
             var eventMessage = message as EventMessage;
             if (eventMessage == null)
             {
-                throw new NotSupportedException("Message should be EventMessage type");
+                throw new NotSupportedException(string.Format(Properties.Strings.MessageShouldBeType,
+                    nameof(EventMessage)));
             }
 
-            // rejected events are not needed to process
+            // Rejected events are not needed to process.
             if (eventMessage.Status == ProcessingStatus.Rejected)
             {
                 return;

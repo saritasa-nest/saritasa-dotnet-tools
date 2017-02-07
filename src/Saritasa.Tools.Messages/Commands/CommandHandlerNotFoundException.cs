@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Messages.Commands
@@ -25,9 +25,7 @@ namespace Saritasa.Tools.Messages.Commands
         /// </summary>
         /// <param name="commandName">Command name.</param>
         public CommandHandlerNotFoundException(string commandName) : base(
-            $"Cannot find command handler {commandName} or it cannot be resolved. "
-            + "Make sure it has default public parameterless "
-            + "constructor or registered with your dependency injection container.")
+            string.Format(Properties.Strings.CommandHandlerNotFound, commandName))
         {
         }
 

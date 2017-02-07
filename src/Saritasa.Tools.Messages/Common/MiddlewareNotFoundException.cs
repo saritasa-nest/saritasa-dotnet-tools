@@ -16,7 +16,7 @@ namespace Saritasa.Tools.Messages.Common
         /// <summary>
         /// .ctor
         /// </summary>
-        public MiddlewareNotFoundException() : base("Middleware not found")
+        public MiddlewareNotFoundException() : base(Properties.Strings.MiddlewareNotFound)
         {
         }
 

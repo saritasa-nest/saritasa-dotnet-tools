@@ -107,6 +107,7 @@
     <Compile Include="Common\PipelineMiddlewares\RepositoryMessagesFilter.cs" />
     <Compile Include="Common\PipelineMiddlewares\RepositoryMiddleware.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Strings.Designer.cs" />
     <Compile Include="Queries\PipelineMIddlewares\QueryExecutorMiddleware.cs" />
     <Compile Include="Queries\PipelineMIddlewares\QueryObjectReleaseMiddleware.cs" />
     <Compile Include="Queries\PipelineMIddlewares\QueryObjectResolverMiddleware.cs" />
@@ -138,6 +139,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="CHANGELOG.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Strings.resx" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

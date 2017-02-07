@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
@@ -29,16 +29,19 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
             var queryMessage = message as QueryMessage;
             if (queryMessage == null)
             {
-                throw new NotSupportedException("Message should be QueryMessage type");
+                throw new NotSupportedException(string.Format(Properties.Strings.MessageShouldBeType,
+                    nameof(QueryMessage)));
             }
 
+            var queryObjectType = queryMessage.QueryObject.GetType();
             if (queryMessage.FakeQueryObject)
             {
-                queryMessage.QueryObject = ResolveObject(queryMessage.QueryObject.GetType(), nameof(QueryObjectResolverMiddleware));
+                queryMessage.QueryObject = ResolveObject(queryObjectType, nameof(QueryObjectResolverMiddleware));
             }
             if (queryMessage.QueryObject == null)
             {
-                throw new InvalidOperationException($"Query object of type {queryMessage.QueryObject.GetType()} cannot be resolved");
+                throw new InvalidOperationException(
+                    string.Format(Properties.Strings.CannotResolveQueryObject, queryObjectType));
             }
             if (UseParametersResolve)
             {
