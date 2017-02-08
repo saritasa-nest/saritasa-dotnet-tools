@@ -163,7 +163,8 @@ namespace Saritasa.Tools.Common.Utils
         {
             if (maxCount < removeCount)
             {
-                throw new ArgumentOutOfRangeException(nameof(maxCount), $"{nameof(maxCount)} cannot be less than removeCount");
+                throw new ArgumentOutOfRangeException(nameof(maxCount),
+                    string.Format(Properties.Strings.ArgumentMustBeGreaterThan, nameof(maxCount), nameof(removeCount)));
             }
             if (keysStorage == null || !purge)
             {

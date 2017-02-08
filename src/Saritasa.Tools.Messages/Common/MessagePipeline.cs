@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Messages.Common
@@ -35,7 +35,7 @@ namespace Saritasa.Tools.Messages.Common
             if (ids.Any())
             {
                 Middlewares.Clear();
-                throw new ArgumentException($"There are middlewares with duplicated identifiers: {ids.First().Key}");
+                throw new ArgumentException(string.Format(Properties.Strings.MiddlewareDuplicate, ids.First().Key));
             }
         }
 
@@ -54,7 +54,7 @@ namespace Saritasa.Tools.Messages.Common
             }
             if (GetMiddlewareById(middleware.Id) != null)
             {
-                throw new ArgumentException($"Middleware with id {middleware.Id} already exists");
+                throw new ArgumentException(string.Format(Properties.Strings.MiddlewareExists, middleware.Id));
             }
 
             if (string.IsNullOrEmpty(insertAfterId))
@@ -81,7 +81,7 @@ namespace Saritasa.Tools.Messages.Common
             }
             if (GetMiddlewareById(middleware.Id) != null)
             {
-                throw new ArgumentException($"Middleware with id {middleware.Id} already exists");
+                throw new ArgumentException(string.Format(Properties.Strings.MiddlewareExists, middleware.Id));
             }
 
             if (string.IsNullOrEmpty(insertBeforeId))
@@ -130,10 +130,10 @@ namespace Saritasa.Tools.Messages.Common
         /// <param name="message">The message.</param>
         protected void ProcessMiddlewares(IMessage message)
         {
-            // set execution context
+            // Set execution context.
             MessageExecutionContext.Current = new MessageExecutionContext(message, this);
 
-            // execute message thru all middlewares
+            // Execute message thru all middlewares.
             for (int i = 0; i < Middlewares.Count; i++)
             {
                 Middlewares[i].Handle(message);
@@ -148,10 +148,10 @@ namespace Saritasa.Tools.Messages.Common
         /// <param name="message">The message.</param>
         protected async Task ProcessMiddlewaresAsync(IMessage message)
         {
-            // set execution context
+            // Set execution context.
             MessageExecutionContext.Current = new MessageExecutionContext(message, this);
 
-            // execute message thru all middlewares
+            // Execute message thru all middlewares.
             for (int i = 0; i < Middlewares.Count; i++)
             {
                 var asyncHandler = Middlewares[i] as IAsyncMessagePipelineMiddleware;

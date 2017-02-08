@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 #if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
@@ -44,7 +44,7 @@ namespace Saritasa.Tools.Emails.Interceptors
 
         void Save(MailMessage message)
         {
-            // sometimes we have emails sending at the same second, add postfix in that case
+            // Sometimes we have emails sending at the same second, add postfix in that case.
             lock (@lock)
             {
                 var path = Path.Combine(Directory, $"{DateTime.Now:yyyyMMdd-hhmmss}.msg");
@@ -90,7 +90,7 @@ namespace Saritasa.Tools.Emails.Interceptors
 
             using (var fileStream = new FileStream(fileName, FileMode.Create))
             {
-                // get reflection info for MailWriter contructor
+                // Get reflection info for MailWriter contructor.
                 var mailWriterContructor =
                     mailWriterType.GetConstructor(
                         BindingFlags.Instance | BindingFlags.NonPublic,
@@ -98,16 +98,16 @@ namespace Saritasa.Tools.Emails.Interceptors
                         new[] { typeof(Stream) },
                         null);
 
-                // construct MailWriter object with our FileStream
+                // Construct MailWriter object with our FileStream.
                 var mailWriter = mailWriterContructor.Invoke(new object[] { fileStream });
 
-                // get reflection info for Send() method on MailMessage
+                // Get reflection info for Send() method on MailMessage.
                 var sendMethod =
                     typeof(MailMessage).GetMethod(
                         "Send",
                         BindingFlags.Instance | BindingFlags.NonPublic);
 
-                // call method passing in MailWriter
+                // Call method passing in MailWriter.
                 if (sendMethod.GetParameters().Length == 2)
                 {
                     sendMethod.Invoke(
@@ -127,13 +127,13 @@ namespace Saritasa.Tools.Emails.Interceptors
                         null);
                 }
 
-                // finally get reflection info for Close() method on our MailWriter
+                // Finally get reflection info for Close() method on our MailWriter.
                 var closeMethod =
                     mailWriter.GetType().GetMethod(
                         "Close",
                         BindingFlags.Instance | BindingFlags.NonPublic);
 
-                // call close method
+                // Call close method.
                 closeMethod.Invoke(
                     mailWriter,
                     BindingFlags.Instance | BindingFlags.NonPublic,

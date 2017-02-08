@@ -30,7 +30,8 @@ namespace Saritasa.Tools.Emails
         {
             if (smtpClientInstancesCount <= 0)
             {
-                throw new ArgumentOutOfRangeException($"{smtpClientInstancesCount} must be greater then zero.");
+                throw new ArgumentOutOfRangeException(string.Format(Properties.Strings.ArgumentMustBeGreaterThan,
+                    smtpClientInstancesCount, "zero"));
             }
             clientInstances = new SmtpClientEmailSender[smtpClientInstancesCount];
             for (int i = 0; i < smtpClientInstancesCount; i++)

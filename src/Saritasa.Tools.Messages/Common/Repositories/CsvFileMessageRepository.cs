@@ -57,7 +57,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
             if (!this.serializer.IsText)
             {
-                throw new ArgumentException("Serializer should be text-based");
+                throw new ArgumentException(Properties.Strings.SerializerShouldBeText);
             }
         }
 

@@ -39,7 +39,7 @@ namespace Saritasa.Tools.Common.Extensions
 #if !PORTABLE && !NETSTANDARD1_2 && !NETSTANDARD1_6 && !NETCOREAPP1_0 && !NETCOREAPP1_1
             if (!target.GetType().IsEnum)
             {
-                throw new ArgumentOutOfRangeException(nameof(target), "Target is not enum");
+                throw new ArgumentOutOfRangeException(nameof(target), Properties.Strings.TargetNotEnum);
             }
 #endif
 

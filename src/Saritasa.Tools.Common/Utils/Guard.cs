@@ -36,7 +36,7 @@ namespace Saritasa.Tools.Common.Utils
         public static readonly Regex StripHtmlExpression = new Regex("<\\S[^><]*>", Options | RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.CultureInvariant);
 
         /// <summary>
-        /// Is not empty check for guid. Generates ArgumentException.
+        /// Is not empty check for guid. Generates <see cref="ArgumentException" />.
         /// </summary>
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
@@ -45,12 +45,13 @@ namespace Saritasa.Tools.Common.Utils
         {
             if (argument == Guid.Empty)
             {
-                throw new ArgumentException("\"{0}\" cannot be empty guid.".FormatWith(argumentName), argumentName);
+                throw new ArgumentException(Properties.Strings.ArgumentCannotBeEmptyGuid.FormatWith(argumentName),
+                    argumentName);
             }
         }
 
         /// <summary>
-        /// Is not empty check for string. Generates ArgumentException.
+        /// Is not empty check for string. Generates <see cref="ArgumentException" />.
         /// </summary>
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
@@ -59,12 +60,13 @@ namespace Saritasa.Tools.Common.Utils
         {
             if (string.IsNullOrWhiteSpace(argument))
             {
-                throw new ArgumentException("\"{0}\" cannot be empty string.".FormatWith(argumentName), argumentName);
+                throw new ArgumentException(Properties.Strings.ArgumentCannotBeEmptyString.FormatWith(argumentName),
+                    argumentName);
             }
         }
 
         /// <summary>
-        /// Is not out of length check. Generates ArgumentException.
+        /// Is not out of length check. Generates <see cref="ArgumentException" />.
         /// </summary>
         /// <param name="argument">Argument.</param>
         /// <param name="length">Maximum length.</param>
@@ -74,12 +76,13 @@ namespace Saritasa.Tools.Common.Utils
         {
             if (argument.Length > length)
             {
-                throw new ArgumentException("\"{0}\" cannot be more than {1} character.".FormatWith(argumentName, length), argumentName);
+                throw new ArgumentException(string.Format(
+                    Properties.Strings.ArgumentCannotBeMoreThanChars.FormatWith(argumentName, length), argumentName));
             }
         }
 
         /// <summary>
-        /// Is not null check. Generates ArgumentNullException.
+        /// Is not null check. Generates <see cref="ArgumentNullException" />.
         /// </summary>
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
@@ -93,7 +96,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Is not negative check for int. Generates ArgumentOutOfRangeException.
+        /// Is not negative check for integer. Generates <see cref="ArgumentOutOfRangeException" />.
         /// </summary>
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
@@ -107,7 +110,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Is not negative or zero check. Generates ArgumentOutOfRangeException.
+        /// Is not negative or zero check. Generates <see cref="ArgumentOutOfRangeException" />.
         /// </summary>
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
@@ -121,7 +124,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Is not negative check for Int64. Generates ArgumentOutOfRangeException.
+        /// Is not negative check for Int64. Generates <see cref="ArgumentOutOfRangeException" />.
         /// </summary>
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
@@ -135,7 +138,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Is not negative check for Int64. Generates ArgumentOutOfRangeException.
+        /// Is not negative check for Int64. Generates <see cref="ArgumentOutOfRangeException" />.
         /// </summary>
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
@@ -149,7 +152,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Is not negative check for Single. Generates ArgumentOutOfRangeException.
+        /// Is not negative check for Single. Generates <see cref="ArgumentOutOfRangeException" />.
         /// </summary>
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
@@ -163,7 +166,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Is not negative or zero check for Single. Generates ArgumentOutOfRangeException.
+        /// Is not negative or zero check for Single. Generates <see cref="ArgumentOutOfRangeException" />.
         /// </summary>
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
@@ -177,7 +180,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Is not negative check for Decimal. Generates ArgumentOutOfRangeException.
+        /// Is not negative check for Decimal. Generates <see cref="ArgumentOutOfRangeException" />.
         /// </summary>
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
@@ -191,7 +194,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Is not negative or zero check for Decimal. Generates ArgumentOutOfRangeException.
+        /// Is not negative or zero check for Decimal. Generates <see cref="ArgumentOutOfRangeException" />.
         /// </summary>
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
@@ -205,7 +208,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Is not in past check for DateTime. Generates ArgumentOutOfRangeException.
+        /// Is not in past check for DateTime. Generates <see cref="ArgumentOutOfRangeException" />.
         /// </summary>
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
@@ -219,7 +222,8 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Is not in past check for DateTime according to specific date. Generates ArgumentOutOfRangeException.
+        /// Is not in past check for DateTime according to specific date.
+        /// Generates <see cref="ArgumentOutOfRangeException" />.
         /// </summary>
         /// <param name="argument">Argument.</param>
         /// <param name="date">Date to compare.</param>
@@ -234,7 +238,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Is not in future check for DateTime. Generates ArgumentOutOfRangeException.
+        /// Is not in future check for DateTime. Generates <see cref="ArgumentOutOfRangeException" />.
         /// </summary>
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
@@ -248,7 +252,8 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Is not in future check for DateTime according to specific date. Generates ArgumentOutOfRangeException.
+        /// Is not in future check for <see cref="DateTime" /> according to specific date.
+        /// Generates <see cref="ArgumentOutOfRangeException" />.
         /// </summary>
         /// <param name="argument">Argument.</param>
         /// <param name="date">Date to compare.</param>
@@ -263,7 +268,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Is not negative check for TimeSpan. Generates ArgumentOutOfRangeException.
+        /// Is not negative check for TimeSpan. Generates <see cref="ArgumentOutOfRangeException" />.
         /// </summary>
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
@@ -277,7 +282,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Is not negative check or zero for TimeSpan. Generates ArgumentOutOfRangeException.
+        /// Is not negative check or zero for TimeSpan. Generates <see cref="ArgumentOutOfRangeException" />.
         /// </summary>
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
@@ -291,7 +296,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Is not empty check for collection of arguments. Generates ArgumentException.
+        /// Is not empty check for collection of arguments. Generates <see cref="ArgumentException" />.
         /// </summary>
         /// <param name="argument">Collection of arguments.</param>
         /// <param name="argumentName">Argument name.</param>
@@ -302,12 +307,12 @@ namespace Saritasa.Tools.Common.Utils
 
             if (argument.Count == 0)
             {
-                throw new ArgumentException("Collection cannot be empty.", argumentName);
+                throw new ArgumentException(Properties.Strings.CollectionCannotEmpty, argumentName);
             }
         }
 
         /// <summary>
-        /// Is in range check. Generates ArgumentOutOfRangeException.
+        /// Is in range check. Generates <see cref="ArgumentOutOfRangeException" />.
         /// </summary>
         /// <param name="argument">Collection of arguments.</param>
         /// <param name="min">Minimum value.</param>
@@ -318,12 +323,13 @@ namespace Saritasa.Tools.Common.Utils
         {
             if ((argument < min) || (argument > max))
             {
-                throw new ArgumentOutOfRangeException(argumentName, "{0} must be between \"{1}\"-\"{2}\".".FormatWith(argumentName, min, max));
+                throw new ArgumentOutOfRangeException(argumentName,
+                    string.Format(Properties.Strings.ArgumentMustBeBetween.FormatWith(argumentName, min, max)));
             }
         }
 
         /// <summary>
-        /// Is not invalid email check. Generates ArgumentException.
+        /// Is not invalid email check. Generates <see cref="ArgumentException" />.
         /// </summary>
         /// <param name="argument">Email argument.</param>
         /// <param name="argumentName">Argument name.</param>
@@ -334,7 +340,7 @@ namespace Saritasa.Tools.Common.Utils
 
             if (!EmailExpression.IsMatch(argument))
             {
-                throw new ArgumentException("\"{0}\" is not a valid email address.".FormatWith(argumentName), argumentName);
+                throw new ArgumentException(Properties.Strings.ArgumentNotValidEmail.FormatWith(argumentName), argumentName);
             }
         }
     }

@@ -1,6 +1,7 @@
 ﻿0.2.1 [TBD]
 [*] Rename DateTimeUtils.BeginOf to DateTimeUtils.StartOf .
 [+] Add DateTimeUtils.Diff function.
+[*] Docs update.
 
 0.1.3 [2017-01-26]
 [+] Add method PagedEnumerable.Map .

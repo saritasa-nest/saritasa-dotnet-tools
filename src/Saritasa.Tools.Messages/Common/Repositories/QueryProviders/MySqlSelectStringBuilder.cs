@@ -131,7 +131,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
                         return $"NOT {WrapVariable(columnName)} IS NULL";
                     default:
                         throw new ArgumentOutOfRangeException(nameof(comparisonOperatorOperator),
-                            $"Cannot use comparison operator {comparisonOperatorOperator} for NULL values.");
+                            string.Format(Properties.Strings.CannotUseComparisonOperatorNull, comparisonOperatorOperator));
                 }
             }
 
@@ -157,7 +157,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
                     return $"{WrapVariable(columnName)} IN ({FormatSqlValue(value)})";
                 default:
                     throw new ArgumentOutOfRangeException(nameof(comparisonOperatorOperator),
-                        $"Cannot use comparison operator {comparisonOperatorOperator}.");
+                        string.Format(Properties.Strings.CannotUseComparisonOperator, comparisonOperatorOperator));
             }
         }
 

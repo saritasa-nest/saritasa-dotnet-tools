@@ -44,7 +44,7 @@ namespace Saritasa.Tools.NLog
 
                 if (!string.IsNullOrEmpty(message))
                 {
-                    // message arguments are not needed as it is already checked that the loglevel is enabled.
+                    // Message arguments are not needed as it is already checked that the loglevel is enabled.
                     var eventInfo = global::NLog.LogEventInfo.Create(nLogLogLevel, logger.Name, message);
                     eventInfo.Exception = exception;
                     eventInfo.Properties["EventId_Id"] = eventId.Id;

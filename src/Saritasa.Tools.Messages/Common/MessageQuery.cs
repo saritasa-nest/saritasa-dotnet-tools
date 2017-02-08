@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Messages.Common
@@ -200,7 +200,8 @@ namespace Saritasa.Tools.Messages.Common
         {
             if (ExecutionDurationBelow.HasValue && ExecutionDurationBelow.Value > duration)
             {
-                throw new ArgumentOutOfRangeException($"{nameof(duration)} must be greater than ${nameof(ExecutionDurationBelow)}");
+                throw new ArgumentOutOfRangeException(nameof(duration),
+                    string.Format(Properties.Strings.ArgumentMustBeGreaterThan, nameof(duration), nameof(ExecutionDurationBelow)));
             }
             ExecutionDurationAbove = duration;
             return this;
@@ -215,7 +216,8 @@ namespace Saritasa.Tools.Messages.Common
         {
             if (ExecutionDurationAbove.HasValue && ExecutionDurationAbove.Value < duration)
             {
-                throw new ArgumentOutOfRangeException($"{nameof(duration)} must be lower than ${nameof(ExecutionDurationAbove)}");
+                throw new ArgumentOutOfRangeException(nameof(duration),
+                    string.Format(Properties.Strings.ArgumentMustBeLessThan, nameof(duration), nameof(ExecutionDurationAbove)));
             }
             ExecutionDurationBelow = duration;
             return this;

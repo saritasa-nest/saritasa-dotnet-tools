@@ -46,10 +46,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions\DateTimePeriod.cs" />
+    <Compile Include="Legacy\TypeExtensions.cs" />
+    <Compile Include="Legacy\TypeInfo.cs" />
     <Compile Include="Pagination\PagedDto.cs" />
     <Compile Include="Pagination\PagedEnumerable.cs" />
     <Compile Include="Pagination\PagedExtensions.cs" />
     <Compile Include="Pagination\PagedMetadata.cs" />
+    <Compile Include="Properties\Strings.Designer.cs" />
     <Compile Include="Utils\AtomicUtils.cs" />
     <Compile Include="Extensions\CollectionsExtensions.cs" />
     <Compile Include="Extensions\DateTimeExtensions.cs" />
@@ -68,6 +71,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="CHANGELOG.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Strings.resx" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -23,7 +23,7 @@ namespace Saritasa.Tools.NLog
         /// <inheritdoc />
         public void Dispose()
         {
-            // nothing to implement so far
+            // Nothing to implement so far.
         }
     }
 }

@@ -43,7 +43,7 @@ namespace Saritasa.Tools.Emails
             var data = new Dictionary<string, object>();
             bool cancel = false;
 
-            // run pre process interceptors
+            // Run pre process interceptors.
             foreach (var interceptor in interceptors)
             {
                 interceptor.Sending(message, data, ref cancel);
@@ -59,7 +59,7 @@ namespace Saritasa.Tools.Emails
                 }
             }
 
-            // send email and run post process interceptors
+            // Send email and run post process interceptors.
             return ExecutionStrategy.Execute(Process, message, data, CancellationToken).ContinueWith(task =>
             {
                 if (!task.IsFaulted)

@@ -473,7 +473,8 @@ namespace Saritasa.Tools.Common.Utils
             Guard.IsNotNegative(deltaBackoff.Value, nameof(deltaBackoff));
             if (minBackoff > maxBackoff)
             {
-                throw new ArgumentOutOfRangeException(nameof(minBackoff), $"{nameof(minBackoff)} cannot be less than {nameof(maxBackoff)}");
+                throw new ArgumentOutOfRangeException(nameof(minBackoff),
+                    string.Format(Properties.Strings.ArgumentMustBeGreaterThan, nameof(minBackoff), nameof(maxBackoff)));
             }
 
             return (int attemptCount, Exception lastException, out TimeSpan neededDelay) =>

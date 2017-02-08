@@ -165,13 +165,14 @@ namespace Saritasa.Tools.Common.Utils
             var separatorIndex = hashedStringToCheck.IndexOf(PasswordMethodHashSeparator);
             if (separatorIndex < 0)
             {
-                throw new ArgumentException($"{nameof(hashedStringToCheck)} does not contain hash method");
+                throw new ArgumentException(string.Format(Properties.Strings.NoHashMethod, hashedStringToCheck));
             }
 
             HashMethods method = HashMethods.Md5;
             if (!Enum.TryParse(hashedStringToCheck.Substring(0, separatorIndex), true, out method))
             {
-                throw new ArgumentException($"{nameof(hashedStringToCheck)} contains method that is not possible to recognize");
+                throw new ArgumentException(string.Format(Properties.Strings.HashMethodCannotRecognize,
+                    hashedStringToCheck));
             }
 
             return Hash(target, method) == hashedStringToCheck;

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Emails
@@ -20,7 +20,8 @@ namespace Saritasa.Tools.Emails
         /// .ctor
         /// </summary>
         /// <param name="maxSize">Max queue size that has been exceeded.</param>
-        public EmailQueueExceededException(int maxSize) : base($"Maximum email queue size {maxSize} exceeded.")
+        public EmailQueueExceededException(int maxSize) : base(
+            string.Format(Properties.Strings.EmailQueueSizeExceed, maxSize))
         {
         }
 

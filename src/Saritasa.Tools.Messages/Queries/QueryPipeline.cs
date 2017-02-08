@@ -133,7 +133,7 @@ namespace Saritasa.Tools.Messages.Queries
                     return getter();
                 default:
                     throw new InvalidOperationException(
-                        string.Format(Properties.Strings.ExpressionCannotEvaluate, expression.NodeType));
+                        string.Format(Properties.Strings.CannotEvaluateExpression, expression.NodeType));
             }
         }
 

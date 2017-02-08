@@ -60,6 +60,24 @@ namespace Saritasa.Tools.Messages.Properties {
         }
         
         /// <summary>
+        ///    Looks up a localized string similar to {0} must be greater than {1}..
+        /// </summary>
+        public static string ArgumentMustBeGreaterThan {
+            get {
+                return ResourceManager.GetString("ArgumentMustBeGreaterThan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to {0} must be less than {1}..
+        /// </summary>
+        public static string ArgumentMustBeLessThan {
+            get {
+                return ResourceManager.GetString("ArgumentMustBeLessThan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///    Looks up a localized string similar to Assemblies to search handlers were not specified..
         /// </summary>
         public static string AssembliesNotSpecified {
@@ -74,6 +92,15 @@ namespace Saritasa.Tools.Messages.Properties {
         public static string CannotCreateDelegate {
             get {
                 return ResourceManager.GetString("CannotCreateDelegate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to Cannot evaluate type {0}..
+        /// </summary>
+        public static string CannotEvaluateExpression {
+            get {
+                return ResourceManager.GetString("CannotEvaluateExpression", resourceCulture);
             }
         }
         
@@ -110,6 +137,24 @@ namespace Saritasa.Tools.Messages.Properties {
         public static string CannotResolveQueryObject {
             get {
                 return ResourceManager.GetString("CannotResolveQueryObject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to Cannot use comparison operator {0}..
+        /// </summary>
+        public static string CannotUseComparisonOperator {
+            get {
+                return ResourceManager.GetString("CannotUseComparisonOperator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to Cannot use comparison operator {0} for NULL values..
+        /// </summary>
+        public static string CannotUseComparisonOperatorNull {
+            get {
+                return ResourceManager.GetString("CannotUseComparisonOperatorNull", resourceCulture);
             }
         }
         
@@ -177,15 +222,6 @@ namespace Saritasa.Tools.Messages.Properties {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to Cannot evaluate type {0}..
-        /// </summary>
-        public static string ExpressionCannotEvaluate {
-            get {
-                return ResourceManager.GetString("ExpressionCannotEvaluate", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///    Looks up a localized string similar to Expression must have Body of type MethodCallExpression..
         /// </summary>
         public static string ExpressionMethodCallExpressionBody {
@@ -218,6 +254,24 @@ namespace Saritasa.Tools.Messages.Properties {
         public static string MethodNoTypeDeclare {
             get {
                 return ResourceManager.GetString("MethodNoTypeDeclare", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to There are middlewares with duplicated identifiers {0}..
+        /// </summary>
+        public static string MiddlewareDuplicate {
+            get {
+                return ResourceManager.GetString("MiddlewareDuplicate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to Middleware with identifier {0} already exists..
+        /// </summary>
+        public static string MiddlewareExists {
+            get {
+                return ResourceManager.GetString("MiddlewareExists", resourceCulture);
             }
         }
         
@@ -281,6 +335,15 @@ namespace Saritasa.Tools.Messages.Properties {
         public static string SearchEventHandlerNotFound {
             get {
                 return ResourceManager.GetString("SearchEventHandlerNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to Serializer should be text-based..
+        /// </summary>
+        public static string SerializerShouldBeText {
+            get {
+                return ResourceManager.GetString("SerializerShouldBeText", resourceCulture);
             }
         }
     }
