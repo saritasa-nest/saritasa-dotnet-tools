@@ -346,5 +346,95 @@ namespace Saritasa.Tools.Messages.Properties {
                 return ResourceManager.GetString("SerializerShouldBeText", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to Error while executing message: {0}..
+        /// </summary>
+        public static string WebEndpoint_ErrorExecuteMessage {
+            get {
+                return ResourceManager.GetString("WebEndpoint_ErrorExecuteMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to Incorrect request..
+        /// </summary>
+        public static string WebEndpoint_IncorrectRequest {
+            get {
+                return ResourceManager.GetString("WebEndpoint_IncorrectRequest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to Pipeline not found for message type {0}, id: {1}, content type: {2}..
+        /// </summary>
+        public static string WebEndpoint_PipelineNotFound {
+            get {
+                return ResourceManager.GetString("WebEndpoint_PipelineNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to Processing message id: {0} content type: {1}..
+        /// </summary>
+        public static string WebEndpoint_ProcessingMessage {
+            get {
+                return ResourceManager.GetString("WebEndpoint_ProcessingMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to Incoming request from {0} {1}..
+        /// </summary>
+        public static string WebEndpoint_Request {
+            get {
+                return ResourceManager.GetString("WebEndpoint_Request", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to Web endpoint started on {0}:{1}..
+        /// </summary>
+        public static string WebEndpoint_StartedOn {
+            get {
+                return ResourceManager.GetString("WebEndpoint_StartedOn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to Web endpoint starting on {0}:{1}..
+        /// </summary>
+        public static string WebEndpoint_StartingOn {
+            get {
+                return ResourceManager.GetString("WebEndpoint_StartingOn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to Web endpoint stop requested..
+        /// </summary>
+        public static string WebEndpoint_Stop {
+            get {
+                return ResourceManager.GetString("WebEndpoint_Stop", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to Web endpoint stopped..
+        /// </summary>
+        public static string WebEndpoint_Stopped {
+            get {
+                return ResourceManager.GetString("WebEndpoint_Stopped", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to Value cannot be an empty collection..
+        /// </summary>
+        public static string WebEndpoint_ValueCannotBeEmptyColleciton {
+            get {
+                return ResourceManager.GetString("WebEndpoint_ValueCannotBeEmptyColleciton", resourceCulture);
+            }
+        }
     }
 }

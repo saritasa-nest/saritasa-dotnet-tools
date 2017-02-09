@@ -213,4 +213,34 @@
   <data name="SerializerShouldBeText" xml:space="preserve">
     <value>Serializer should be text-based.</value>
   </data>
+  <data name="WebEndpoint_ErrorExecuteMessage" xml:space="preserve">
+    <value>Error while executing message: {0}.</value>
+  </data>
+  <data name="WebEndpoint_IncorrectRequest" xml:space="preserve">
+    <value>Incorrect request.</value>
+  </data>
+  <data name="WebEndpoint_PipelineNotFound" xml:space="preserve">
+    <value>Pipeline not found for message type {0}, id: {1}, content type: {2}.</value>
+  </data>
+  <data name="WebEndpoint_ProcessingMessage" xml:space="preserve">
+    <value>Processing message id: {0} content type: {1}.</value>
+  </data>
+  <data name="WebEndpoint_Request" xml:space="preserve">
+    <value>Incoming request from {0} {1}.</value>
+  </data>
+  <data name="WebEndpoint_StartedOn" xml:space="preserve">
+    <value>Web endpoint started on {0}:{1}.</value>
+  </data>
+  <data name="WebEndpoint_StartingOn" xml:space="preserve">
+    <value>Web endpoint starting on {0}:{1}.</value>
+  </data>
+  <data name="WebEndpoint_Stop" xml:space="preserve">
+    <value>Web endpoint stop requested.</value>
+  </data>
+  <data name="WebEndpoint_Stopped" xml:space="preserve">
+    <value>Web endpoint stopped.</value>
+  </data>
+  <data name="WebEndpoint_ValueCannotBeEmptyColleciton" xml:space="preserve">
+    <value>Value cannot be an empty collection.</value>
+  </data>
 </root>

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Messages.Common.Repositories
@@ -21,7 +21,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <inheritdoc />
         public Task AddAsync(IMessage message)
         {
-            // no need to implement since repository should not persist messages
+            // No need to implement since repository should not persist messages.
             return completedTask;
         }
 
@@ -34,7 +34,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <inheritdoc />
         public void SaveState(IDictionary<string, object> dict)
         {
-            // no need to implement since repository does not have state
+            // No need to implement since repository does not have state.
         }
 
         #endregion

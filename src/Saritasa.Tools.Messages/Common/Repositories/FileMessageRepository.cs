@@ -98,8 +98,8 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             {
                 name = GetFileNameByDate(date, i);
 
-                // we cannot continue zip streams, so we have to create new file
-                // every time with new stream
+                // We cannot continue zip streams, so we have to create new file
+                // every time with new stream.
                 if (!compress || !File.Exists(Path.Combine(LogsPath, name)))
                 {
                     break;
@@ -161,16 +161,16 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <inheritdoc />
         public Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery)
         {
-            // collect all files in dir
+            // Collect all files in dir.
             var allFiles =
                 Directory.GetFiles(LogsPath, GetSearchPattern()).OrderBy(f => f).Select(Path.GetFileName).ToArray();
             var allFilesHash = new HashSet<string>(allFiles);
 
-            // init first and last dates
+            // Init first and last dates.
             var startDate = messageQuery.CreatedStartDate ?? DateTime.MinValue;
             var endDate = messageQuery.CreatedEndDate ?? DateTime.MaxValue;
 
-            // correct start and end dates, so minimum date will be first file in list, and max date last file
+            // Correct start and end dates, so minimum date will be first file in list, and max date last file.
             if (allFiles.Any())
             {
                 DateTime tmp;
@@ -190,7 +190,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                 }
             }
 
-            // actual search
+            // Actual search.
             var targetList = new List<Message>(150);
             var currentDate = startDate;
             while (currentDate <= endDate)

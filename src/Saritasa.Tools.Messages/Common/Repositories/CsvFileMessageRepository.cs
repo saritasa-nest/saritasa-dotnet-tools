@@ -156,7 +156,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         {
             if (disposed)
             {
-                throw new ObjectDisposedException("The repository has been disposed.");
+                throw new ObjectDisposedException(null);
             }
 
             lock (objLock)
