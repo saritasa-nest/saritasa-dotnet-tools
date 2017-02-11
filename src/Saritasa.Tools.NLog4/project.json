@@ -19,12 +19,12 @@
   "frameworks": {
     "net452": {
       "dependencies": {
-        "NLog": "4.4.1"
+        "NLog": "4.4.2"
       }
     },
     "net461": {
       "dependencies": {
-        "NLog": "4.4.1"
+        "NLog": "4.4.2"
       }
     },
     "netcoreapp1.0": {
