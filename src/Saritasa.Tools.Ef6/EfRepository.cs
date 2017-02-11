@@ -8,6 +8,7 @@ namespace Saritasa.Tools.EF
     using System.Data.Entity;
     using System.Linq;
     using System.Linq.Expressions;
+    using JetBrains.Annotations;
     using Domain;
 
     /// <summary>
@@ -27,7 +28,7 @@ namespace Saritasa.Tools.EF
         /// .ctor
         /// </summary>
         /// <param name="context">Database context.</param>
-        public EFRepository(TContext context)
+        public EFRepository([NotNull] TContext context)
         {
             if (context == null)
             {

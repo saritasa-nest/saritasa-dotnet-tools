@@ -9,6 +9,7 @@ namespace Saritasa.Tools.EF
     using System.Data.Entity;
     using System.Linq;
     using System.Linq.Expressions;
+    using JetBrains.Annotations;
     using Domain;
 
     /// <summary>
@@ -25,7 +26,7 @@ namespace Saritasa.Tools.EF
         /// .ctor
         /// </summary>
         /// <param name="context">Database context.</param>
-        public EFQueryableRepository(TContext context) : base(context)
+        public EFQueryableRepository([NotNull] TContext context) : base(context)
         {
             set = Context.Set<TEntity>();
         }

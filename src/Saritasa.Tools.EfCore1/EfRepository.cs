@@ -8,6 +8,7 @@ namespace Saritasa.Tools.EFCore
     using System.Linq;
     using System.Linq.Expressions;
     using Microsoft.EntityFrameworkCore;
+    using JetBrains.Annotations;
     using Domain;
 
     /// <summary>
@@ -27,7 +28,7 @@ namespace Saritasa.Tools.EFCore
         /// .ctor
         /// </summary>
         /// <param name="context">Database context.</param>
-        public EFRepository(TContext context)
+        public EFRepository([NotNull] TContext context)
         {
             if (context == null)
             {
@@ -76,7 +77,8 @@ namespace Saritasa.Tools.EFCore
         }
 
         /// <inheritdoc />
-        public virtual TEntity Get<TProperty>(IEnumerable<Expression<Func<TEntity, TProperty>>> includes, params object[] keyValues)
+        public virtual TEntity Get<TProperty>(IEnumerable<Expression<Func<TEntity, TProperty>>> includes,
+            params object[] keyValues)
         {
             return Get(keyValues);
         }

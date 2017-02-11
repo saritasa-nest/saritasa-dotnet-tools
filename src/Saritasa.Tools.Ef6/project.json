@@ -21,6 +21,10 @@
     "StyleCop.Analyzers": {
       "version": "1.0.0",
       "type": "build"
+    },
+    "JetBrains.Annotations": {
+      "version": "10.2.1",
+      "type": "build"
     }
   },
   "frameworks": {

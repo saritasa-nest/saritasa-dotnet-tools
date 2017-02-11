@@ -7,6 +7,7 @@ namespace Saritasa.Tools.EFCore
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.EntityFrameworkCore;
+    using JetBrains.Annotations;
     using Domain;
 
     /// <summary>
@@ -24,7 +25,7 @@ namespace Saritasa.Tools.EFCore
         /// .ctor
         /// </summary>
         /// <param name="context">Database context.</param>
-        public EFUnitOfWork(TContext context)
+        public EFUnitOfWork([NotNull] TContext context)
         {
             if (context == null)
             {

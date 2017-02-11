@@ -19,7 +19,7 @@ namespace Saritasa.Tools.Domain
         /// </summary>
         /// <param name="keyValues">Entity ids.</param>
         /// <returns>Entity instance.</returns>
-        TEntity Get(params object[] keyValues);
+        TEntity Get([NotNull] params object[] keyValues);
 
         /// <summary>
         /// Get entity instance by id.
@@ -30,7 +30,7 @@ namespace Saritasa.Tools.Domain
         /// <returns>Entity instance.</returns>
         TEntity Get<TProperty>(
             [NotNull] IEnumerable<Expression<Func<TEntity, TProperty>>> includes,
-            params object[] keyValues);
+            [NotNull] params object[] keyValues);
 
         /// <summary>
         /// Get all entities of specified type.
