@@ -2,7 +2,7 @@
 {
     using System.Linq;
 
-    using Tools.Ef;
+    using Tools.EF;
 
     using Repositories;
     using Domain;
@@ -14,7 +14,7 @@
     /// <summary>
     /// Application unit of work.
     /// </summary>
-    public class AppUnitOfWork : EfUnitOfWork<AppDbContext>, IAppUnitOfWork
+    public class AppUnitOfWork : EFUnitOfWork<AppDbContext>, IAppUnitOfWork
     {
         AppDbContext context;
 

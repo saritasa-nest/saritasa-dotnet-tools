@@ -88,9 +88,9 @@
       <Project>{32a3a81c-a65c-4f78-8300-17151987697c}</Project>
       <Name>Saritasa.Tools.Domain</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\src\Saritasa.Tools.Ef6\Saritasa.Tools.Ef6.csproj">
+    <ProjectReference Include="..\..\..\src\Saritasa.Tools.EF6\Saritasa.Tools.EF6.csproj">
       <Project>{D1AD1713-BC18-4340-B8DB-23D86D22FB7F}</Project>
-      <Name>Saritasa.Tools.Ef6</Name>
+      <Name>Saritasa.Tools.EF6</Name>
     </ProjectReference>
     <ProjectReference Include="..\ZergRushCo.Todosya.Domain\ZergRushCo.Todosya.Domain.csproj">
       <Project>{0184ceb7-ad6d-4f0a-836a-8cc9e8153286}</Project>

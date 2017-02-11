@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.EfCore
+namespace Saritasa.Tools.EFCore
 {
     using System;
     using System.Collections.Generic;
@@ -15,7 +15,7 @@ namespace Saritasa.Tools.EfCore
     /// </summary>
     /// <typeparam name="TEntity">Entity type.</typeparam>
     /// <typeparam name="TContext">Database context type.</typeparam>
-    public class EfRepository<TEntity, TContext> : IRepository<TEntity>
+    public class EFRepository<TEntity, TContext> : IRepository<TEntity>
         where TEntity : class where TContext : DbContext
     {
         /// <summary>
@@ -27,7 +27,7 @@ namespace Saritasa.Tools.EfCore
         /// .ctor
         /// </summary>
         /// <param name="context">Database context.</param>
-        public EfRepository(TContext context)
+        public EFRepository(TContext context)
         {
             if (context == null)
             {

@@ -12,7 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Saritasa.Tools.NLog4", "src\Saritasa.Tools.NLog4\Saritasa.Tools.NLog4.xproj", "{822F4E77-E795-4102-BEE1-B72DCAC6B408}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Saritasa.Tools.EfCore1", "src\Saritasa.Tools.EfCore1\Saritasa.Tools.EfCore1.xproj", "{E667F09D-FC4E-4AA6-9FEF-F9EB607CD1BD}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Saritasa.Tools.EFCore1", "src\Saritasa.Tools.EFCore1\Saritasa.Tools.EFCore1.xproj", "{E667F09D-FC4E-4AA6-9FEF-F9EB607CD1BD}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Saritasa.Tools.Common", "src\Saritasa.Tools.Common\Saritasa.Tools.Common.xproj", "{2900D88A-2522-4299-8D51-6AF26B74C91C}"
 EndProject
@@ -24,7 +24,7 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Saritasa.Tools.Messages", "
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Saritasa.Tools.Misc", "src\Saritasa.Tools.Misc\Saritasa.Tools.Misc.xproj", "{1C26D4A0-A677-4BA5-B267-3C11BAECB233}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Saritasa.Tools.Ef6", "src\Saritasa.Tools.Ef6\Saritasa.Tools.Ef6.xproj", "{D1AD1713-BC18-4340-B8DB-23D86D22FB7F}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Saritasa.Tools.EF6", "src\Saritasa.Tools.EF6\Saritasa.Tools.EF6.xproj", "{D1AD1713-BC18-4340-B8DB-23D86D22FB7F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{635DB5B1-86B3-4F5B-97A6-04C71D672296}"
 EndProject

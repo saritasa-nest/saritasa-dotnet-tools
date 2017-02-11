@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SandBox", "SandBox\SandBox.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Saritasa.Tools", "Saritasa.Tools", "{CBCC092D-4EF0-4F85-B377-0565A819E948}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.Ef6", "..\..\src\Saritasa.Tools.Ef6\Saritasa.Tools.Ef6.csproj", "{D1AD1713-BC18-4340-B8DB-23D86D22FB7F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.EF6", "..\..\src\Saritasa.Tools.EF6\Saritasa.Tools.EF6.csproj", "{D1AD1713-BC18-4340-B8DB-23D86D22FB7F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.Messages", "..\..\src\Saritasa.Tools.Messages\Saritasa.Tools.Messages.csproj", "{AEE65918-25DF-4A25-BFB8-56552FAA2A51}"
 EndProject

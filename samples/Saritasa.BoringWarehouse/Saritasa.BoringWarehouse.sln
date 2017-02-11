@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.BoringWarehouse.Da
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Saritasa.Tools", "Saritasa.Tools", "{C71B2713-FE29-4CAA-A464-299BBFE963A2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.Ef6", "..\..\src\Saritasa.Tools.Ef6\Saritasa.Tools.Ef6.csproj", "{D1AD1713-BC18-4340-B8DB-23D86D22FB7F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.EF6", "..\..\src\Saritasa.Tools.EF6\Saritasa.Tools.EF6.csproj", "{D1AD1713-BC18-4340-B8DB-23D86D22FB7F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.NLog4", "..\..\src\Saritasa.Tools.NLog4\Saritasa.Tools.NLog4.csproj", "{83D4925B-B04F-4C9C-8BF1-9B6A6BE0A87D}"
 EndProject

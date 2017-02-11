@@ -67,9 +67,9 @@
       <Project>{32a3a81c-a65c-4f78-8300-17151987697c}</Project>
       <Name>Saritasa.Tools.Domain</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\src\Saritasa.Tools.Ef6\Saritasa.Tools.Ef6.csproj">
+    <ProjectReference Include="..\..\..\src\Saritasa.Tools.EF6\Saritasa.Tools.EF6.csproj">
       <Project>{d1ad1713-bc18-4340-b8db-23d86d22fb7f}</Project>
-      <Name>Saritasa.Tools.Ef6</Name>
+      <Name>Saritasa.Tools.EF6</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\src\Saritasa.Tools.Messages.Abstractions\Saritasa.Tools.Messages.Abstractions.csproj">
       <Project>{e16b2300-a1d4-49bb-b3fc-c2891e7d1177}</Project>
@@ -89,11 +89,4 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

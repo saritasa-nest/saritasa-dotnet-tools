@@ -1,7 +1,7 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.EfCore
+namespace Saritasa.Tools.EFCore
 {
     using System;
     using System.Data;
@@ -13,19 +13,19 @@ namespace Saritasa.Tools.EfCore
     /// to specify isolation level on creation.
     /// </summary>
     /// <typeparam name="TContext">Context type should be inherited of DbContext.</typeparam>
-    public class EfUnitOfWorkFactory<TContext> : IUnitOfWorkFactory<EfUnitOfWork<TContext>>
+    public class EFUnitOfWorkFactory<TContext> : IUnitOfWorkFactory<EFUnitOfWork<TContext>>
         where TContext : DbContext, new()
     {
         /// <inheritdoc />
-        public EfUnitOfWork<TContext> Create()
+        public EFUnitOfWork<TContext> Create()
         {
-            return new EfUnitOfWork<TContext>(new TContext());
+            return new EFUnitOfWork<TContext>(new TContext());
         }
 
         /// <inheritdoc />
-        public EfUnitOfWork<TContext> Create(IsolationLevel isolationLevel)
+        public EFUnitOfWork<TContext> Create(IsolationLevel isolationLevel)
         {
-            return new EfUnitOfWork<TContext>(new TContext());
+            return new EFUnitOfWork<TContext>(new TContext());
         }
     }
 }

@@ -9,7 +9,7 @@
     using Domain.Products.Entities;
     using Domain.Products.Repositories;
 
-    public class ProductRepository : Tools.Ef.EfRepository<Product, AppDbContext>, IProductRepository
+    public class ProductRepository : Tools.EF.EFRepository<Product, AppDbContext>, IProductRepository
     {
         public ProductRepository(AppDbContext context) : base(context)
         {

@@ -1,7 +1,7 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.Ef
+namespace Saritasa.Tools.EF
 {
     using System;
     using System.Collections;
@@ -16,7 +16,7 @@ namespace Saritasa.Tools.Ef
     /// </summary>
     /// <typeparam name="TEntity">Entity type.</typeparam>
     /// <typeparam name="TContext">Database context type.</typeparam>
-    public class EfQueryableRepository<TEntity, TContext> : EfRepository<TEntity, TContext>, IQueryableRepository<TEntity>
+    public class EFQueryableRepository<TEntity, TContext> : EFRepository<TEntity, TContext>, IQueryableRepository<TEntity>
         where TEntity : class where TContext : DbContext
     {
         readonly DbSet<TEntity> set;
@@ -25,7 +25,7 @@ namespace Saritasa.Tools.Ef
         /// .ctor
         /// </summary>
         /// <param name="context">Database context.</param>
-        public EfQueryableRepository(TContext context) : base(context)
+        public EFQueryableRepository(TContext context) : base(context)
         {
             set = Context.Set<TEntity>();
         }

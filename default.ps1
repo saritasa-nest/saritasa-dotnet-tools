@@ -28,8 +28,8 @@ $script:Version = '0.0.0'
 $packages = @(
     'Saritasa.Tools.Common' # common
     'Saritasa.Tools.Domain' # domain
-    'Saritasa.Tools.Ef6' # ef6
-    'Saritasa.Tools.EfCore1' # efcore1
+    'Saritasa.Tools.EF6' # ef6
+    'Saritasa.Tools.EFCore1' # efcore1
     'Saritasa.Tools.Emails' # emails
     'Saritasa.Tools.Messages' # messages
     'Saritasa.Tools.Messages.Abstractions' # messages-abstractiona

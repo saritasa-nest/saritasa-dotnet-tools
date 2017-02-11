@@ -29,7 +29,7 @@ To achieve this there are two interfaces available: ``IUnitOfWork`` and ``IUnitO
 
     .. code-block:: c#
 
-        public class AppUnitOfWork : EfUnitOfWork<AppDbContext>, IAppUnitOfWork
+        public class AppUnitOfWork : EFUnitOfWork<AppDbContext>, IAppUnitOfWork
         {
             public AppUnitOfWork(AppDbContext context) : base(context) { }
 
@@ -80,7 +80,7 @@ A Repository mediates between the domain and data mapping layers, acting like an
 - ``IRepository``. Contains methods to get, find, add and remove entities from in-memory collection.
 - ``IQueryableRepository``. Provides the same methods as ``IRepository`` but also implements ``IQueryable`` interface. So you can query you data easily. Generally it is not recommended to return ``IQueryable`` from repository because it breaks pattern idea - the query is executed out of repository boundaries. But sometimes it may be convenient and useful.
 
-.. note:: In ``Saritasa.Tools.Ef6`` assembly you will find general implementations ``EfRepository`` and ``EfQueryableRepository``.
+.. note:: In ``Saritasa.Tools.EF6`` assembly you will find general implementations ``EFRepository`` and ``EFQueryableRepository``.
 
 Repository Extensions
 ---------------------

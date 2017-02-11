@@ -1,7 +1,7 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.EfCore
+namespace Saritasa.Tools.EFCore
 {
     using System;
     using System.Threading;
@@ -13,7 +13,7 @@ namespace Saritasa.Tools.EfCore
     /// Entity framework base implementation of Unit of Work.
     /// </summary>
     /// <typeparam name="TContext">Context type should be inherited of DbContext.</typeparam>
-    public class EfUnitOfWork<TContext> : IUnitOfWork where TContext : DbContext
+    public class EFUnitOfWork<TContext> : IUnitOfWork where TContext : DbContext
     {
         /// <summary>
         /// Database context.
@@ -24,7 +24,7 @@ namespace Saritasa.Tools.EfCore
         /// .ctor
         /// </summary>
         /// <param name="context">Database context.</param>
-        public EfUnitOfWork(TContext context)
+        public EFUnitOfWork(TContext context)
         {
             if (context == null)
             {
