@@ -44,22 +44,18 @@
         "Microsoft.EntityFrameworkCore": "1.1.0"
       }
     },
-    "netcoreapp1.0": {
+    "netcoreapp1.1": {
       "dependencies": {
+        "Microsoft.NETCore.App": "1.1.0",
         "Microsoft.EntityFrameworkCore": "1.1.0",
-        "Microsoft.NETCore.App": "1.0.0"
-      },
-      "netcoreapp1.1": {
-        "dependencies": {
-          "Microsoft.EntityFrameworkCore": "1.1.0",
-          "Microsoft.NETCore.App": "1.1.0"
-        }
+        "System.Reflection.Emit.Lightweight": "4.3.0"
       }
     },
     "netstandard1.6": {
       "dependencies": {
         "NETStandard.Library": "1.6.1",
-        "Microsoft.EntityFrameworkCore": "1.1.0"
+        "Microsoft.EntityFrameworkCore": "1.1.0",
+        "System.Reflection.Emit.Lightweight": "4.3.0"
       }
     }
   },

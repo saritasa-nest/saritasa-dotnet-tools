@@ -51,6 +51,7 @@
     <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DynamicModuleLambdaCompiler.cs" />
     <Compile Include="EFQueryableRepository.cs" />
     <Compile Include="EFRepository.cs" />
     <Compile Include="EFUnitOfWork.cs" />

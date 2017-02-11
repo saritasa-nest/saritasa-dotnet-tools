@@ -16,16 +16,26 @@ namespace Saritasa.Tools.EF
     public class EFUnitOfWorkFactory<TContext> : IUnitOfWorkFactory<EFUnitOfWork<TContext>>
         where TContext : DbContext, new()
     {
+        private readonly Func<TContext> createContext;
+
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        public EFUnitOfWorkFactory()
+        {
+            createContext = DynamicModuleLambdaCompiler.GenerateFactory<TContext>();
+        }
+
         /// <inheritdoc />
         public EFUnitOfWork<TContext> Create()
         {
-            return new EFUnitOfWork<TContext>(new TContext());
+            return new EFUnitOfWork<TContext>(createContext());
         }
 
         /// <inheritdoc />
         public EFUnitOfWork<TContext> Create(IsolationLevel isolationLevel)
         {
-            return new EFUnitOfWork<TContext>(new TContext());
+            return new EFUnitOfWork<TContext>(createContext());
         }
     }
 }
