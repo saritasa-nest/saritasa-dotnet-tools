@@ -1,9 +1,9 @@
 {
   "title": "Saritasa Tools Entity Framework Core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "authors": [ "Saritasa" ],
   "description": "The package is a part of Saritasa Tools project. Saritasa.Tools.EfCore1 contains implementations for unit of work, repository interfaces.",
-  "copyright": "Saritasa 2015-2016",
+  "copyright": "Saritasa 2015-2017",
   "packOptions": {
     "iconUrl": "https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png",
     "licenseUrl": "https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/LICENSE",
@@ -17,7 +17,9 @@
     "tags": [ "unit of work", "repository" ]
   },
   "dependencies": {
-    "Saritasa.Tools.Domain": "*",
+    "Saritasa.Tools.Domain": {
+      "target": "project"
+    },
     "StyleCop.Analyzers": {
       "version": "1.0.0",
       "type": "build"

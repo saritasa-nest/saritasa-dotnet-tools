@@ -17,7 +17,9 @@
     "tags": [ "unit of work", "repository", "domain events" ]
   },
   "dependencies": {
-    "Saritasa.Tools.Domain": "*",
+    "Saritasa.Tools.Domain": {
+      "target": "project"
+    },
     "StyleCop.Analyzers": {
       "version": "1.0.0",
       "type": "build"

@@ -1,9 +1,9 @@
 {
   "title": "Saritasa Tools Messages",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "authors": [ "Saritasa" ],
   "description": "The package is a part of Saritasa Tools project. Saritasa.Tools.Messages contains CQRS infrastructure that includes command, queryies and events.",
-  "copyright": "Saritasa 2015-2016",
+  "copyright": "Saritasa 2015-2017",
   "packOptions": {
     "iconUrl": "https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png",
     "licenseUrl": "https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/LICENSE",
@@ -50,8 +50,12 @@
   },
   "dependencies": {
     "Newtonsoft.Json": "9.0.1",
-    "Saritasa.Tools.Messages.Abstractions": "*",
-    "Saritasa.Tools.Domain": "*",
+    "Saritasa.Tools.Messages.Abstractions": {
+      "target": "project"
+    },
+    "Saritasa.Tools.Domain": {
+      "target": "project"
+    },
     "StyleCop.Analyzers": {
       "version": "1.0.0",
       "type": "build"
