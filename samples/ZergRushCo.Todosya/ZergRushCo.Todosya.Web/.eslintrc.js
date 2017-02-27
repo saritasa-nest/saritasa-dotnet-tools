@@ -45,7 +45,7 @@ module.exports = {
         "id-blacklist": 2,
         "id-length": 0,
         "id-match": 2,
-        "indent": ["error", 4],
+        "indent": [2, 4],
         "init-declarations": 2,
         "jsx-quotes": 2,
         "key-spacing": 2,
@@ -56,7 +56,7 @@ module.exports = {
         ],
         "lines-around-comment": 2,
         "max-depth": 2,
-        "max-len": ['error', {
+        "max-len": [2, {
             code: 120,
             tabWidth: 4,
             ignoreUrls: true,
@@ -164,11 +164,11 @@ module.exports = {
         "no-with": 2,
         "object-curly-spacing": 2,
         "object-shorthand": 0,
-        "one-var": ["error", {
+        "one-var": [2, {
             uninitialized: "always",
             initialized: "always"
         }],
-        "one-var-declaration-per-line": ["error", "always"],
+        "one-var-declaration-per-line": [2, "always"],
         "operator-assignment": 2,
         "operator-linebreak": 2,
         "padded-blocks": 0,
