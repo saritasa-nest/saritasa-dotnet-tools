@@ -31,8 +31,8 @@ Contains set of methods based on standard library implementation to work with st
 
 .. function:: string Hash(string target, HashMethods method)
 
-	Hash string with selected hash method. The string will contain method name that was used for hashing. Possible methods are ``Md5``, ``Sha1``, ``Sha256``, ``Sha384``, ``Sha512``.
+    Hash string with selected hash method. The string will contain method name that was used for hashing. Possible methods are ``Md5``, ``Sha1``, ``Sha256``, ``Sha384``, ``Sha512``.
 
 .. function:: bool CheckHash(string target, string hashedStrToCheck)
 
-	Compares target string with hashed string.
+    Compares target string with hashed string.

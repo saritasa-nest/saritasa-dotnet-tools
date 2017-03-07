@@ -203,5 +203,18 @@ namespace Saritasa.Tools.Common.Extensions
             }
             return -1;
         }
+
+        /// <summary>
+        /// Returns distinct elements from a sequence by using the key selector to compare values.
+        /// </summary>
+        /// <typeparam name="TSource">The type of the elements of source.</typeparam>
+        /// <typeparam name="TKey">The type of the elements of key.</typeparam>
+        /// <param name="source">The sequence to remove duplicate elements from.</param>
+        /// <param name="keySelector">Key selector delegate.</param>
+        /// <returns>An <see cref="IEnumerable{T}" /> that contains distinct elements from the source sequence.</returns>
+        public static IEnumerable<TSource> Distinct<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
+        {
+            return source.Distinct(new DelegateEqualityComparer<TSource, TKey>(keySelector));
+        }
     }
 }

@@ -49,6 +49,10 @@ CollectionsExtensions
                 var arr = new[] { 10, 45, 6, 34, 6 };
                 var index = arr.FirstIndexMatch(a => a == 6); // returns 2
 
+    .. function:: IEnumerable<TSource> Distinct<TSource, TKey>(IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
+
+        Returns distinct elements from a sequence by using the key selector to compare values.
+
 DictionaryExtensions
 --------------------
 

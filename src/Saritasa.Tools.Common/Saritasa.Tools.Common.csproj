@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions\DateTimePeriod.cs" />
+    <Compile Include="Extensions\DelegateEqualityComparer.cs" />
     <Compile Include="Legacy\TypeExtensions.cs" />
     <Compile Include="Legacy\TypeInfo.cs" />
     <Compile Include="Pagination\PagedDto.cs" />

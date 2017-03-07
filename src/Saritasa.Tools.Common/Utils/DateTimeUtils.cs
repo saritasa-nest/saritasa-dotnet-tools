@@ -88,6 +88,45 @@ namespace Saritasa.Tools.Common.Utils
             return result.AddMilliseconds(-1);
         }
 
+        /// <summary>
+        /// Shortcut to set date part.
+        /// </summary>
+        /// <param name="target">Target date.</param>
+        /// <param name="period">Period to replace.</param>
+        /// <param name="value">Value to replace by.</param>
+        /// <returns>The date with new value.</returns>
+        public static DateTime Set(DateTime target, DateTimePeriod period, int value)
+        {
+            switch (period)
+            {
+                case DateTimePeriod.Second:
+                    return new DateTime(target.Year, target.Month, target.Day, target.Hour, target.Minute, value,
+                        target.Millisecond, target.Kind);
+                case DateTimePeriod.Minute:
+                    return new DateTime(target.Year, target.Month, target.Day, target.Hour, value, target.Second,
+                        target.Millisecond, target.Kind);
+                case DateTimePeriod.Hour:
+                    return new DateTime(target.Year, target.Month, target.Day, value, target.Minute, target.Second,
+                        target.Millisecond, target.Kind);
+                case DateTimePeriod.Day:
+                    return new DateTime(target.Year, target.Month, value, target.Hour, target.Minute, target.Second,
+                        target.Millisecond, target.Kind);
+                case DateTimePeriod.Week:
+                    throw new ArgumentException(string.Format(Properties.Strings.ArgumentCannotBeThePeriod, period), nameof(period));
+                case DateTimePeriod.Month:
+                    return new DateTime(target.Year, value, target.Day, target.Hour, target.Minute, target.Second,
+                        target.Millisecond, target.Kind);
+                case DateTimePeriod.Quarter:
+                    throw new ArgumentException(string.Format(Properties.Strings.ArgumentCannotBeThePeriod, period), nameof(period));
+                case DateTimePeriod.Year:
+                    return new DateTime(value, target.Month, target.Day, target.Hour, target.Minute, target.Second,
+                        target.Millisecond, target.Kind);
+                case DateTimePeriod.None:
+                default:
+                    return target;
+            }
+        }
+
         #region Unix
 
         /// <summary>
