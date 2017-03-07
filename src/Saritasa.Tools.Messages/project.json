@@ -33,7 +33,7 @@
     },
     "netcoreapp1.1": {
       "dependencies": {
-        "Microsoft.NETCore.App": "1.1.0",
+        "Microsoft.NETCore.App": "1.1.1",
         "System.Data.Common": "4.3.0",
         "System.Runtime.Loader": "4.3.0",
         "System.Net.Http": "4.3.0"

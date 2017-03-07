@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Common.Extensions
@@ -22,7 +22,8 @@ namespace Saritasa.Tools.Common.Extensions
         /// <param name="key">Key.</param>
         /// <param name="defaultValue">Default value.</param>
         public static TValue GetValueDefault<TKey, TValue>(
-            [NotNull] this IDictionary<TKey, TValue> target, TKey key,
+            [NotNull] this IDictionary<TKey, TValue> target,
+            TKey key,
             TValue defaultValue = default(TValue))
         {
             TValue value;

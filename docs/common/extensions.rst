@@ -148,3 +148,7 @@ DateTimeExtensions
     .. function:: double Diff(DateTime target1, DateTime target2, DateTimePeriod period)
 
         Return period difference between two dates. Negative values are converted to positive.
+
+    .. function:: DateTime Set(DateTime target, DateTimePeriod period, int value)
+
+        Shortcut to set date part.

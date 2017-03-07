@@ -118,16 +118,22 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ArgumentCannotBeEmptyGuid" xml:space="preserve">
-    <value>"{0}" cannot be empty guid.</value>
+    <value>{0} cannot be empty guid.</value>
   </data>
   <data name="ArgumentCannotBeEmptyString" xml:space="preserve">
-    <value>"{0}" cannot be empty string.</value>
+    <value>{0} cannot be empty string.</value>
   </data>
   <data name="ArgumentCannotBeMoreThanChars" xml:space="preserve">
-    <value>"{0}"cannot be more than {1} character.</value>
+    <value>{0} cannot be more than {1} character.</value>
+  </data>
+  <data name="ArgumentCannotBeThePeriod" xml:space="preserve">
+    <value>{0} period cannot be used.</value>
   </data>
   <data name="ArgumentMustBeBetween" xml:space="preserve">
-    <value>"{0}" must be between "{1}"-"{2}"</value>
+    <value>{0} must be between {1}-{2}.</value>
+  </data>
+  <data name="ArgumentMustBeEnum" xml:space="preserve">
+    <value>Argument must be enum.</value>
   </data>
   <data name="ArgumentMustBeGreaterThan" xml:space="preserve">
     <value>{0} must be greater than {1}.</value>
@@ -146,8 +152,5 @@
   </data>
   <data name="NoHashMethod" xml:space="preserve">
     <value>{0} does not contain hash method.</value>
-  </data>
-  <data name="TargetNotEnum" xml:space="preserve">
-    <value>Target is not enum.</value>
   </data>
 </root>

@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Tests
 {
     using System;
     using System.IO;
-#if !NETCOREAPP1_0 && !NETSTANDARD1_6
+#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
     using System.Runtime.Serialization.Formatters.Binary;
 #endif
     using Xunit;
@@ -16,7 +16,7 @@ namespace Saritasa.Tools.Tests
     /// </summary>
     public class DomainTests
     {
-#if !NETCOREAPP1_0 && !NETSTANDARD1_6
+#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
         [Fact]
         public void Domain_exception_should_serialize_deserialize_correctly()
         {

@@ -60,7 +60,7 @@ namespace Saritasa.Tools.Common.Properties {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to &quot;{0}&quot; cannot be empty guid..
+        ///    Looks up a localized string similar to {0} cannot be empty guid..
         /// </summary>
         public static string ArgumentCannotBeEmptyGuid {
             get {
@@ -69,7 +69,7 @@ namespace Saritasa.Tools.Common.Properties {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to &quot;{0}&quot; cannot be empty string..
+        ///    Looks up a localized string similar to {0} cannot be empty string..
         /// </summary>
         public static string ArgumentCannotBeEmptyString {
             get {
@@ -78,7 +78,7 @@ namespace Saritasa.Tools.Common.Properties {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to &quot;{0}&quot;cannot be more than {1} character..
+        ///    Looks up a localized string similar to {0} cannot be more than {1} character..
         /// </summary>
         public static string ArgumentCannotBeMoreThanChars {
             get {
@@ -87,11 +87,29 @@ namespace Saritasa.Tools.Common.Properties {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to &quot;{0}&quot; must be between &quot;{1}&quot;-&quot;{2}&quot;.
+        ///    Looks up a localized string similar to {0} period cannot be used..
+        /// </summary>
+        public static string ArgumentCannotBeThePeriod {
+            get {
+                return ResourceManager.GetString("ArgumentCannotBeThePeriod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to {0} must be between {1}-{2}..
         /// </summary>
         public static string ArgumentMustBeBetween {
             get {
                 return ResourceManager.GetString("ArgumentMustBeBetween", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to Argument must be enum..
+        /// </summary>
+        public static string ArgumentMustBeEnum {
+            get {
+                return ResourceManager.GetString("ArgumentMustBeEnum", resourceCulture);
             }
         }
         
@@ -146,15 +164,6 @@ namespace Saritasa.Tools.Common.Properties {
         public static string NoHashMethod {
             get {
                 return ResourceManager.GetString("NoHashMethod", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///    Looks up a localized string similar to Target is not enum..
-        /// </summary>
-        public static string TargetNotEnum {
-            get {
-                return ResourceManager.GetString("TargetNotEnum", resourceCulture);
             }
         }
     }
