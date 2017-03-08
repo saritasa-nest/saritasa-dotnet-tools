@@ -34,4 +34,10 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// </summary>
         Rejected,
     }
+
+    public enum Order : byte
+    {
+        Descending,
+        Ascending
+    }
 }
