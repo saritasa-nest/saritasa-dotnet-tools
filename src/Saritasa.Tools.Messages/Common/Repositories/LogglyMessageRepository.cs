@@ -41,7 +41,6 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// </summary>
         private readonly JsonObjectSerializer serializer = new JsonObjectSerializer();
 
-
         /// <summary>
         /// .ctor
         /// </summary>
@@ -91,6 +90,11 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                 throw new ObjectDisposedException(null);
             }
 
+            if (client.DefaultRequestHeaders.Authorization == null)
+            {
+                throw new ArgumentNullException(nameof(username) + nameof(password) + nameof(accountDomain));
+            }
+
             // Get search result
             var searchResponse = await client.GetAsync(string.Format(SearchEndpoint, accountDomain, searchQuery));
             if (searchResponse.IsSuccessStatusCode)
@@ -104,6 +108,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                     return (EventResponse[])serializer.Deserialize(await eventResponse.Content.ReadAsByteArrayAsync(), typeof(EventResponse[]));
                 }
             }
+
             return null;
         }
 
@@ -188,14 +193,6 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();
 
-            if (string.IsNullOrEmpty(messageQuery.ContentType))
-            {
-                dic.Add("q", "*");
-            }
-            else
-            {
-                dic.Add("q", messageQuery.ContentType);
-            }
             if (messageQuery.CreatedStartDate.HasValue)
             {
                 dic.Add("from", messageQuery.CreatedStartDate.Value.ToString("yyyy-MM-dd HH:mm:ss.SSS"));
@@ -204,6 +201,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             {
                 dic.Add("until", messageQuery.CreatedEndDate.Value.ToString("yyyy-MM-dd HH:mm:ss.SSS"));
             }
+            dic.Add("q", messageQuery.Query);
             dic.Add("order", messageQuery.Order == Order.Ascending ? "asc" : "desc");
             dic.Add("size", messageQuery.Take.ToString());
 

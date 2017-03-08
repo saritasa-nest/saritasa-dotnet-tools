@@ -95,6 +95,10 @@
     <Compile Include="Internal\Enums\SortingOperator.cs" />
     <Compile Include="Internal\InternalLogger.cs" />
     <Compile Include="Internal\ISelectStringBuilder.cs" />
+    <Compile Include="Internal\Loggly\Query\SearchQuery.cs" />
+    <Compile Include="Internal\Loggly\SearchResult\Rsid.cs" />
+    <Compile Include="Internal\Loggly\SearchResult\EventResponse.cs" />
+    <Compile Include="Internal\Loggly\SearchResult\SearchReponse.cs" />
     <Compile Include="Internal\MessageBinarySerializer.cs" />
     <Compile Include="Common\Repositories\QueryProviders\MySqlSelectStringBuilder.cs" />
     <Compile Include="Internal\SelectStringBuilder.cs" />
@@ -134,7 +138,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Saritasa.Tools.Messages.project.json" />
   </ItemGroup>
   <ItemGroup>
@@ -143,5 +149,6 @@
   <ItemGroup>
     <EmbeddedResource Include="Properties\Strings.resx" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

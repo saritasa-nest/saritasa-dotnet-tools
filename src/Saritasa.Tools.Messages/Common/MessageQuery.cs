@@ -74,6 +74,11 @@ namespace Saritasa.Tools.Messages.Common
         public Order Order { get; private set; } = Order.Descending;
 
         /// <summary>
+        /// Query string
+        /// </summary>
+        public string Query { get; private set; } = "*";
+
+        /// <summary>
         /// How many record to return. Default is 1000.
         /// </summary>
         public int Take { get; private set; } = 1000;
@@ -258,6 +263,17 @@ namespace Saritasa.Tools.Messages.Common
         public MessageQuery WithOrder(Order order)
         {
             Order = order;
+            return this;
+        }
+
+        /// <summary>
+        /// Set query
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public MessageQuery WithQuery(string query)
+        {
+            Query = query;
             return this;
         }
 

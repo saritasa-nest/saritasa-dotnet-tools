@@ -2,7 +2,6 @@
 
 namespace Saritasa.Tools.Messages.Internal.Loggly.SearchResult
 {
-
     [JsonObject]
     public class Rsid
     {
