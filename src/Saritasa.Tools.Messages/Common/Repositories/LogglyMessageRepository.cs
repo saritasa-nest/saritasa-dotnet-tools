@@ -45,6 +45,9 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// .ctor
         /// </summary>
         /// <param name="token">Customer token.</param>
+        /// <param name="username">Customer username.</param>
+        /// <param name="password">Customer password.</param>
+        /// <param name="accountDomain">Customer domain name</param>
         public LogglyMessageRepository(string token, string username = "", string password = "", string accountDomain = "")
         {
             if (string.IsNullOrEmpty(token))
