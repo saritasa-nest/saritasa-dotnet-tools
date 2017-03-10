@@ -85,36 +85,6 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                 .ConfigureAwait(false);
         }
 
-        /// <inheritdoc />
-        public async Task<IEnumerable<IMessage>> GetAsync(string searchQuery)
-        {
-            if (disposed)
-            {
-                throw new ObjectDisposedException(null);
-            }
-
-            if (client.DefaultRequestHeaders.Authorization == null)
-            {
-                throw new ArgumentNullException(nameof(username) + nameof(password) + nameof(accountDomain));
-            }
-
-            // Get search result
-            var searchResponse = await client.GetAsync(string.Format(SearchEndpoint, accountDomain, searchQuery));
-            if (searchResponse.IsSuccessStatusCode)
-            {
-                var searchResponseBody = (SearchReponse)serializer.Deserialize(await searchResponse.Content.ReadAsByteArrayAsync(), typeof(SearchReponse));
-
-                // Get event result
-                var eventResponse = await client.GetAsync(string.Format(RetrievingEventsEndpoint, accountDomain, searchResponseBody.Rsid.ToString()));
-                if (eventResponse.IsSuccessStatusCode)
-                {
-                    return (EventResponse[])serializer.Deserialize(await eventResponse.Content.ReadAsByteArrayAsync(), typeof(EventResponse[]));
-                }
-            }
-
-            return null;
-        }
-
         /// <summary>
         /// Search for events
         /// </summary>
@@ -133,7 +103,19 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                 throw new ObjectDisposedException(null);
             }
 
-            return await GetAsync(CreateQueryString(messageQuery));
+            if (client.DefaultRequestHeaders.Authorization == null)
+            {
+                throw new ArgumentNullException(nameof(username) + nameof(password) + nameof(accountDomain));
+            }
+
+            // Get rsid
+            string rsId = await CallSearchApi(CreateQueryString(messageQuery));
+
+            // Get event result. If Skip > 0, we need to start from the second page, else start from the first page
+            var eventResponse = await CallEventApi(rsId, messageQuery.Skip > 0 ? 1 : 0);
+            var response = (SearchReponse)serializer.Deserialize(await eventResponse.Content.ReadAsByteArrayAsync(), typeof(SearchReponse));
+
+            return response.Events.Select(e => e.Item.Json).ToArray();
         }
 
         /// <inheritdoc />
@@ -186,6 +168,30 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         #endregion
+
+        /// <summary>
+        /// Call event api to get event list
+        /// </summary>
+        /// <param name="rsId">Rsid</param>
+        /// <param name="page">page number</param>
+        /// <returns></returns>
+        private Task<HttpResponseMessage> CallEventApi(string rsId, int page)
+        {
+            return client.GetAsync(string.Format(RetrievingEventsEndpoint, accountDomain, $"rsid={rsId}&page={page}"));
+        }
+
+        /// <summary>
+        /// Call search api to init event api
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns>RsId</returns>
+        private async Task<string> CallSearchApi(string query)
+        {
+            var response = await client.GetAsync(string.Format(SearchEndpoint, accountDomain, query));
+            var content = (SearchReponse)serializer.Deserialize(await response.Content.ReadAsByteArrayAsync(), typeof(SearchReponse));
+
+            return content.Rsid.Id;
+        }
 
         /// <summary>
         /// Convert MessageQuery object to query string
