@@ -204,11 +204,11 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
             if (messageQuery.CreatedStartDate.HasValue)
             {
-                dic.Add("from", messageQuery.CreatedStartDate.Value.ToString("yyyy-MM-dd HH:mm:ss.SSS"));
+                dic.Add("from", messageQuery.CreatedStartDate.Value.ToString("s"));
             }
             if (messageQuery.CreatedEndDate.HasValue)
             {
-                dic.Add("until", messageQuery.CreatedEndDate.Value.ToString("yyyy-MM-dd HH:mm:ss.SSS"));
+                dic.Add("until", messageQuery.CreatedEndDate.Value.ToString("s"));
             }
             dic.Add("q", messageQuery.Query);
             dic.Add("order", messageQuery.Order == Order.Ascending ? "asc" : "desc");
