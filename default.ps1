@@ -44,7 +44,7 @@ Task pack -depends download-nuget -description 'Build the library, test it and p
 {
     foreach ($package in $packages)
     {
-        &dotnet pack ".\src\$package" --configuration release --output '.'
+        &dotnet pack ".\src\$package" --configuration release --output ..\..\
         if ($LASTEXITCODE)
         {
             throw 'Nuget pack failed.'

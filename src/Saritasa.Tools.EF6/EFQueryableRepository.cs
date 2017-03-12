@@ -13,14 +13,14 @@ namespace Saritasa.Tools.EF
     using Domain;
 
     /// <summary>
-    /// Entity Framework repository implementation that supports IQueryable.
+    /// Entity Framework repository implementation that supports <see cref="IQueryable" />.
     /// </summary>
     /// <typeparam name="TEntity">Entity type.</typeparam>
     /// <typeparam name="TContext">Database context type.</typeparam>
     public class EFQueryableRepository<TEntity, TContext> : EFRepository<TEntity, TContext>, IQueryableRepository<TEntity>
         where TEntity : class where TContext : DbContext
     {
-        readonly DbSet<TEntity> set;
+        private readonly DbSet<TEntity> set;
 
         /// <summary>
         /// .ctor

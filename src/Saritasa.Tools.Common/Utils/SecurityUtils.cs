@@ -16,6 +16,8 @@ namespace Saritasa.Tools.Common.Utils
     public static class SecurityUtils
     {
 #if !PORTABLE && !NETSTANDARD1_2
+        const char PasswordMethodHashSeparator = '$';
+
         /// <summary>
         /// Returns string's MD5 hash (PHP-compatible).
         /// </summary>
@@ -138,8 +140,6 @@ namespace Saritasa.Tools.Common.Utils
                 [HashMethods.Sha384] = Sha384,
                 [HashMethods.Sha512] = Sha512,
             };
-
-        const char PasswordMethodHashSeparator = '$';
 
         /// <summary>
         /// Hash string with selected hash method. The string will contain method name that was used for hashing.

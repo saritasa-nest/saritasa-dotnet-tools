@@ -1,19 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>The package is a part of Saritasa Tools project. Saritasa.Tools.Messages.Abstractions contains CQRS infrastructure abstractions that includes command, queryies and events.</Description>
+    <Description>The package is a part of Saritasa Tools project. Saritasa.Tools.EfCore1 contains implementations for unit of work, repository interfaces.</Description>
     <Copyright>Saritasa 2015-2017</Copyright>
-    <AssemblyTitle>Saritasa Tools Messages Abstractions</AssemblyTitle>
+    <AssemblyTitle>Saritasa Tools Entity Framework Core</AssemblyTitle>
     <VersionPrefix>0.1.1</VersionPrefix>
     <Authors>Saritasa</Authors>
     <TargetFrameworks>net452;net461;netcoreapp1.1;netstandard1.6</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyName>Saritasa.Tools.Messages.Abstractions</AssemblyName>
+    <AssemblyName>Saritasa.Tools.EFCore1</AssemblyName>
     <AssemblyOriginatorKeyFile>../../tools/SaritasaTools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <PackageId>Saritasa.Tools.Messages.Abstractions</PackageId>
-    <PackageTags>cqrs;cqs;commands;queries;events;pipeline</PackageTags>
+    <PackageId>Saritasa.Tools.EFCore1</PackageId>
+    <PackageTags>unit of work;repository</PackageTags>
     <PackageIconUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/Saritasa/SaritasaTools</PackageProjectUrl>
     <PackageLicenseUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/LICENSE</PackageLicenseUrl>
@@ -33,6 +33,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Saritasa.Tools.Domain\Saritasa.Tools.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="StyleCop.Analyzers" Version="1.0.0">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
@@ -42,13 +46,27 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="1.1.1" />
+    <Reference Include="System.Data" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="1.1.1" />
+    <Reference Include="System.Data" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="1.1.1" />
+    <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="1.1.1" />
+    <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
   </ItemGroup>
 
 </Project>

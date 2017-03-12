@@ -1,147 +1,78 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{AEE65918-25DF-4A25-BFB8-56552FAA2A51}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Saritasa.Tools.Messages</RootNamespace>
+    <Description>The package is a part of Saritasa Tools project. Saritasa.Tools.Messages contains CQRS infrastructure that includes command, queryies and events.</Description>
+    <Copyright>Saritasa 2015-2017</Copyright>
+    <AssemblyTitle>Saritasa Tools Messages</AssemblyTitle>
+    <VersionPrefix>0.1.1</VersionPrefix>
+    <Authors>Saritasa</Authors>
+    <TargetFrameworks>net452;net461;netcoreapp1.1;netstandard1.6</TargetFrameworks>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Saritasa.Tools.Messages</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <AssemblyOriginatorKeyFile>../../tools/SaritasaTools.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+    <PackageId>Saritasa.Tools.Messages</PackageId>
+    <PackageTags>cqrs;cqs;commands;queries;events;pipeline</PackageTags>
+    <PackageIconUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/Saritasa/SaritasaTools</PackageProjectUrl>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/LICENSE</PackageLicenseUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/Saritasa/SaritasaTools</RepositoryUrl>
+    <RuntimeFrameworkVersion Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">1.1.1</RuntimeFrameworkVersion>
+    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.6' ">1.6.1</NetStandardImplicitPackageVersion>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+    <CodeAnalysisRuleSet>../../tools/Saritasa.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>..\..\tools\Saritasa.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>..\..\tools\Saritasa.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>bin\Release\Saritasa.Tools.Messages.XML</DocumentationFile>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
+    <ProjectReference Include="..\Saritasa.Tools.Messages.Abstractions\Saritasa.Tools.Messages.Abstractions.csproj" />
+    <ProjectReference Include="..\Saritasa.Tools.Domain\Saritasa.Tools.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.0.0">
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="JetBrains.Annotations" Version="10.3">
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
     <Reference Include="System.Xml" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Common\BaseExecutorMiddleware.cs" />
-    <Compile Include="Commands\CommandHandlerNotFoundException.cs" />
-    <Compile Include="Commands\CommandMessage.cs" />
-    <Compile Include="Commands\CommandPipeline.cs" />
-    <Compile Include="Commands\CommandPipelineExtensions.cs" />
-    <Compile Include="Commands\CommandValidationException.cs" />
-    <Compile Include="Commands\PipelineMiddlewares\CommandExecutorMiddleware.cs" />
-    <Compile Include="Commands\PipelineMiddlewares\CommandHandlerLocatorMiddleware.cs" />
-    <Compile Include="Commands\PipelineMiddlewares\CommandValidationMiddleware.cs" />
-    <Compile Include="Common\Endpoints\WebEndpoint.cs" />
-    <Compile Include="Common\HandlerSearchMethod.cs" />
-    <Compile Include="Common\Repositories\JsonFileMessageRepository.cs" />
-    <Compile Include="Common\Repositories\LogglyMessageRepository.cs" />
-    <Compile Include="Common\Repositories\QueryProviders\SqlServerQueryProvider.cs" />
-    <Compile Include="Common\Repositories\ElasticsearchMessageRepository.cs" />
-    <Compile Include="Events\EventMessage.cs" />
-    <Compile Include="Events\EventPipeline.cs" />
-    <Compile Include="Events\EventPipelineExtensions.cs" />
-    <Compile Include="Events\PipelineMiddlewares\DomainEventLocatorMiddleware.cs" />
-    <Compile Include="Events\PipelineMiddlewares\EventExecutorMiddleware.cs" />
-    <Compile Include="Events\PipelineMiddlewares\EventHandlerLocatorMiddleware.cs" />
-    <Compile Include="Common\IMessageEndpoint.cs" />
-    <Compile Include="Common\IMessageRepository.cs" />
-    <Compile Include="Common\IObjectSerializer.cs" />
-    <Compile Include="Common\Message.cs" />
-    <Compile Include="Common\MessagePipeline.cs" />
-    <Compile Include="Common\MessageQuery.cs" />
-    <Compile Include="Common\MiddlewareNotFoundException.cs" />
-    <Compile Include="Common\ObjectSerializers\BinaryObjectSerializer.cs" />
-    <Compile Include="Common\ObjectSerializers\JsonObjectSerializer.cs" />
-    <Compile Include="Common\ObjectSerializers\XmlObjectSerializer.cs" />
-    <Compile Include="Internal\Clauses\JoinClause.cs" />
-    <Compile Include="Internal\Clauses\OrderByClause.cs" />
-    <Compile Include="Internal\Clauses\WhereClause.cs" />
-    <Compile Include="Internal\Elasticsearch\Query\IFieldNameQuery.cs" />
-    <Compile Include="Internal\Elasticsearch\Query\SearchQuerySerializer.cs" />
-    <Compile Include="Internal\Elasticsearch\Query\RangeQuerySerializer.cs" />
-    <Compile Include="Internal\Elasticsearch\Query\TermQuerySerializer.cs" />
-    <Compile Include="Internal\Elasticsearch\Query\SearchQuery.cs" />
-    <Compile Include="Internal\Elasticsearch\Query\RangeQuery.cs" />
-    <Compile Include="Internal\Elasticsearch\Query\TermQuery.cs" />
-    <Compile Include="Internal\Elasticsearch\SearchResult\Hit.cs" />
-    <Compile Include="Internal\Elasticsearch\SearchResult\Hits.cs" />
-    <Compile Include="Internal\Elasticsearch\SearchResult\Root.cs" />
-    <Compile Include="Internal\Elasticsearch\SearchResult\Shards.cs" />
-    <Compile Include="Internal\Enums\ComparisonOperator.cs" />
-    <Compile Include="Internal\Enums\JoinType.cs" />
-    <Compile Include="Internal\Enums\LogicOperator.cs" />
-    <Compile Include="Internal\Enums\SortingOperator.cs" />
-    <Compile Include="Internal\InternalLogger.cs" />
-    <Compile Include="Internal\ISelectStringBuilder.cs" />
-    <Compile Include="Internal\MessageBinarySerializer.cs" />
-    <Compile Include="Common\Repositories\QueryProviders\MySqlSelectStringBuilder.cs" />
-    <Compile Include="Internal\SelectStringBuilder.cs" />
-    <Compile Include="Common\Repositories\QueryProviders\SqLiteSelectStringBuilder.cs" />
-    <Compile Include="Internal\SqlLiteral.cs" />
-    <Compile Include="Common\Repositories\QueryProviders\SqlServerSelectStringBuilder.cs" />
-    <Compile Include="Internal\TypeHelpers.cs" />
-    <Compile Include="Common\PipelineMiddlewares\DataMiddleware.cs" />
-    <Compile Include="Common\PipelineMiddlewares\PerformanceCounterMiddleware.cs" />
-    <Compile Include="Common\PipelineMiddlewares\RepositoryMessagesFilter.cs" />
-    <Compile Include="Common\PipelineMiddlewares\RepositoryMiddleware.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\Strings.Designer.cs" />
-    <Compile Include="Queries\PipelineMIddlewares\QueryExecutorMiddleware.cs" />
-    <Compile Include="Queries\PipelineMIddlewares\QueryObjectReleaseMiddleware.cs" />
-    <Compile Include="Queries\PipelineMIddlewares\QueryObjectResolverMiddleware.cs" />
-    <Compile Include="Queries\QueryMessage.cs" />
-    <Compile Include="Queries\QueryPipeline.cs" />
-    <Compile Include="Queries\QueryPipelineExtensions.cs" />
-    <Compile Include="Common\Repositories\AdoNetMessageRepository.cs" />
-    <Compile Include="Common\Repositories\CsvFileMessageRepository.cs" />
-    <Compile Include="Common\Repositories\FileMessageRepository.cs" />
-    <Compile Include="Common\Repositories\InMemoryMessageRepository.cs" />
-    <Compile Include="Common\Repositories\NullMessageRepository.cs" />
-    <Compile Include="Common\Repositories\QueryProviders\IMessageQueryProvider.cs" />
-    <Compile Include="Common\Repositories\QueryProviders\MySqlQueryProvider.cs" />
-    <Compile Include="Common\Repositories\QueryProviders\SqLiteQueryProvider.cs" />
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
+    <Reference Include="System.Xml" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Saritasa.Tools.Domain\Saritasa.Tools.Domain.csproj">
-      <Project>{32a3a81c-a65c-4f78-8300-17151987697c}</Project>
-      <Name>Saritasa.Tools.Domain</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Saritasa.Tools.Messages.Abstractions\Saritasa.Tools.Messages.Abstractions.csproj">
-      <Project>{e16b2300-a1d4-49bb-b3fc-c2891e7d1177}</Project>
-      <Name>Saritasa.Tools.Messages.Abstractions</Name>
-    </ProjectReference>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
+    <PackageReference Include="System.Data.Common" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
+    <PackageReference Include="System.Net.Http" Version="4.3.0" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-    <None Include="Saritasa.Tools.Messages.project.json" />
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
+    <PackageReference Include="System.Data.Common" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
+    <PackageReference Include="System.Net.Http" Version="4.3.0" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="CHANGELOG.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Properties\Strings.resx" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
 </Project>
