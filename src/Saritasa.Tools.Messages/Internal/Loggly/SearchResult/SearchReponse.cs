@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Saritasa.Tools.Messages.Internal.Loggly.SearchResult
 {
-    public class SearchReponse
+    internal class SearchReponse
     {
         [JsonProperty("total_events")]
         public int Totals { get; set; }

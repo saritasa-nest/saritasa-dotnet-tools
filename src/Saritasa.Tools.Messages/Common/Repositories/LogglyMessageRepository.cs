@@ -104,7 +104,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
             if (client.DefaultRequestHeaders.Authorization == null)
             {
-                throw new ArgumentNullException(nameof(username) + nameof(password) + nameof(accountDomain));
+                throw new InvalidOperationException(nameof(username) + nameof(password) + nameof(accountDomain));
             }
 
             // Get rsid.
@@ -210,7 +210,8 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             {
                 dic.Add("until", messageQuery.CreatedEndDate.Value.ToString("s"));
             }
-            dic.Add("order", messageQuery.Order == Order.Ascending ? "asc" : "desc");
+            // Order is not implemented in other repositories. Make desc by default.
+            dic.Add("order", "desc");
             dic.Add("size", messageQuery.Take.ToString());
 
             // Build query string.

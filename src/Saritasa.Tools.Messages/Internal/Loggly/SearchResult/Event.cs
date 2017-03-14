@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Saritasa.Tools.Messages.Internal.Loggly.SearchResult
 {
-    public class EventMessage
+    internal class EventMessage
     {
         [JsonProperty("event")]
         public EventContent Item { get; set; }
@@ -19,7 +19,7 @@ namespace Saritasa.Tools.Messages.Internal.Loggly.SearchResult
         public string[] Tags { get; set; }
     }
 
-    public class EventContent
+    internal class EventContent
     {
         [JsonProperty("json")]
         public Message Json { get; set; }

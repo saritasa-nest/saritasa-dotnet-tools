@@ -3,7 +3,7 @@
 namespace Saritasa.Tools.Messages.Internal.Loggly.SearchResult
 {
     [JsonObject]
-    public class Rsid
+    internal class Rsid
     {
         [JsonProperty("status")]
         public string Status { get; set; }

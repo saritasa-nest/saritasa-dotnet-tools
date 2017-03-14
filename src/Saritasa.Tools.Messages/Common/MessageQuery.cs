@@ -69,11 +69,6 @@ namespace Saritasa.Tools.Messages.Common
         public int Skip { get; private set; }
 
         /// <summary>
-        /// Direction of results returned, either "asc" or "desc". Defaults to "desc"
-        /// </summary>
-        public Order Order { get; private set; } = Order.Descending;
-
-        /// <summary>
         /// Query string
         /// </summary>
         public string Query { get; private set; }
@@ -252,17 +247,6 @@ namespace Saritasa.Tools.Messages.Common
 
             Skip = skip;
             Take = take;
-            return this;
-        }
-
-        /// <summary>
-        /// Direction of results returned
-        /// </summary>
-        /// <param name="order">asc|desc</param>
-        /// <returns></returns>
-        public MessageQuery WithOrder(Order order)
-        {
-            Order = order;
             return this;
         }
 
