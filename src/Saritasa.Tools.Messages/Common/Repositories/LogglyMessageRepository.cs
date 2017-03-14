@@ -86,14 +86,14 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <summary>
-        /// Search for events
+        /// Search for events.
         /// </summary>
         /// <param name="messageQuery">
         /// ContentType         : query string, check out https://www.loggly.com/docs/search-query-language/
         /// CreatedStartDate    : Start time for the search.
         /// CreatedEndDate      : End time for the search.
-        /// Order               : Direction of results returned, either "asc" or "desc". Defaults to "desc"
-        /// Take                : number of rows returned by search
+        /// Order               : Direction of results returned, either "asc" or "desc". Defaults to "desc".
+        /// Take                : number of rows returned by search.
         /// </param>
         /// <returns>array of message</returns>
         public async Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery)
@@ -108,10 +108,10 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                 throw new ArgumentNullException(nameof(username) + nameof(password) + nameof(accountDomain));
             }
 
-            // Get rsid
+            // Get rsid.
             string rsId = await CallSearchApi(CreateQueryString(messageQuery));
 
-            // Get event result. If Skip > 0, we need to start from the second page, else start from the first page
+            // Get event result. If Skip > 0, we need to start from the second page, else start from the first page.
             var eventResponse = await CallEventApi(rsId, messageQuery.Skip > 0 ? 1 : 0);
             var response = (SearchReponse)serializer.Deserialize(await eventResponse.Content.ReadAsByteArrayAsync(), typeof(SearchReponse));
 
@@ -170,7 +170,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         #endregion
 
         /// <summary>
-        /// Call event api to get event list
+        /// Call event api to get event list.
         /// </summary>
         /// <param name="rsId">Rsid</param>
         /// <param name="page">page number</param>
@@ -181,10 +181,10 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <summary>
-        /// Call search api to init event api
+        /// Call search api to init event api.
         /// </summary>
         /// <param name="query"></param>
-        /// <returns>RsId</returns>
+        /// <returns>RsId.</returns>
         private async Task<string> CallSearchApi(string query)
         {
             var response = await client.GetAsync(string.Format(SearchEndpoint, accountDomain, query));
@@ -194,10 +194,10 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <summary>
-        /// Convert MessageQuery object to query string
+        /// Convert MessageQuery object to query string.
         /// </summary>
         /// <param name="messageQuery"></param>
-        /// <returns>query string</returns>
+        /// <returns>Query string.</returns>
         private string CreateQueryString(MessageQuery messageQuery)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();
