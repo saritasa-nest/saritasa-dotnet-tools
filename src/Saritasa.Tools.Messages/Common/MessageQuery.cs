@@ -76,7 +76,7 @@ namespace Saritasa.Tools.Messages.Common
         /// <summary>
         /// Query string
         /// </summary>
-        public string Query { get; private set; } = "*";
+        public string Query { get; private set; }
 
         /// <summary>
         /// How many record to return. Default is 1000.
@@ -267,7 +267,7 @@ namespace Saritasa.Tools.Messages.Common
         }
 
         /// <summary>
-        /// Set query
+        /// Set query.
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>

@@ -200,6 +200,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         private string CreateQueryString(MessageQuery messageQuery)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();
+            List<string> query = new List<string>();
 
             if (messageQuery.CreatedStartDate.HasValue)
             {
@@ -209,9 +210,31 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             {
                 dic.Add("until", messageQuery.CreatedEndDate.Value.ToString("s"));
             }
-            dic.Add("q", messageQuery.Query);
             dic.Add("order", messageQuery.Order == Order.Ascending ? "asc" : "desc");
             dic.Add("size", messageQuery.Take.ToString());
+
+            // Build query string.
+            if (messageQuery.Id != null)
+            {
+                query.Add($"json.Id:\"{messageQuery.Id.ToString()}\"");
+            }
+            if (!string.IsNullOrEmpty(messageQuery.ContentType))
+            {
+                query.Add($"json.ContentType:\"{messageQuery.ContentType}\"");
+            }
+            if (!string.IsNullOrEmpty(messageQuery.ErrorType))
+            {
+                query.Add($"json.ErrorType:\"{messageQuery.ErrorType}\"");
+            }
+            if (messageQuery.Status != null)
+            {
+                query.Add($"json.Status:\"{(int)messageQuery.Status}\"");
+            }
+            if (!string.IsNullOrEmpty(messageQuery.Query))
+            {
+                query.Add(messageQuery.Query);
+            }
+            dic.Add("q", query.Count > 0 ? string.Join(" AND ", query.ToArray()) : "*");
 
             return string.Join("&", dic.Select(x => string.Format("{0}={1}", x.Key, x.Value)));
         }
