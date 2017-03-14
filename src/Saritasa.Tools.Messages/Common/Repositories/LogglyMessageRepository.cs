@@ -11,7 +11,6 @@ namespace Saritasa.Tools.Messages.Common.Repositories
     using System.Text;
     using Abstractions;
     using ObjectSerializers;
-    using Newtonsoft.Json;
     using Internal.Loggly.SearchResult;
     using System.Linq;
 
@@ -47,7 +46,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <param name="token">Customer token.</param>
         /// <param name="username">Customer username.</param>
         /// <param name="password">Customer password.</param>
-        /// <param name="accountDomain">Customer domain name</param>
+        /// <param name="accountDomain">Customer domain name.</param>
         public LogglyMessageRepository(string token, string username = "", string password = "", string accountDomain = "")
         {
             if (string.IsNullOrEmpty(token))
@@ -89,7 +88,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// Search for events.
         /// </summary>
         /// <param name="messageQuery">
-        /// ContentType         : query string, check out https://www.loggly.com/docs/search-query-language/
+        /// Query               : query string, check out https://www.loggly.com/docs/search-query-language/.
         /// CreatedStartDate    : Start time for the search.
         /// CreatedEndDate      : End time for the search.
         /// Order               : Direction of results returned, either "asc" or "desc". Defaults to "desc".
@@ -172,8 +171,8 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <summary>
         /// Call event api to get event list.
         /// </summary>
-        /// <param name="rsId">Rsid</param>
-        /// <param name="page">page number</param>
+        /// <param name="rsId">Rsid.</param>
+        /// <param name="page">Page number.</param>
         /// <returns></returns>
         private Task<HttpResponseMessage> CallEventApi(string rsId, int page)
         {
