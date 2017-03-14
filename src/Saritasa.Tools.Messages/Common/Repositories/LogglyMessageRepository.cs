@@ -230,6 +230,10 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             {
                 query.Add($"json.Status:\"{(int)messageQuery.Status}\"");
             }
+            if (messageQuery.Type != null)
+            {
+                query.Add($"json.Type:\"{messageQuery.Type}\"");
+            }
             if (!string.IsNullOrEmpty(messageQuery.Query))
             {
                 query.Add(messageQuery.Query);
