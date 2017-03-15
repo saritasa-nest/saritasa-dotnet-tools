@@ -44,10 +44,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// .ctor
         /// </summary>
         /// <param name="token">Customer token.</param>
-        /// <param name="username">Customer username.</param>
-        /// <param name="password">Customer password.</param>
-        /// <param name="accountDomain">Customer domain name.</param>
-        public LogglyMessageRepository(string token, string username = "", string password = "", string accountDomain = "")
+        public LogglyMessageRepository(string token)
         {
             if (string.IsNullOrEmpty(token))
             {
@@ -57,7 +54,17 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             this.token = token;
             this.client.DefaultRequestHeaders.UserAgent.Add(
                 new ProductInfoHeaderValue(new ProductHeaderValue("SaritasaTools")));
+        }
 
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        /// <param name="token">Customer token.</param>
+        /// <param name="username">Customer username.</param>
+        /// <param name="password">Customer password.</param>
+        /// <param name="accountDomain">Customer domain name.</param>
+        public LogglyMessageRepository(string token, string username, string password, string accountDomain) : this(token)
+        {
             if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password) && !string.IsNullOrEmpty(accountDomain))
             {
                 this.username = username;
