@@ -69,11 +69,6 @@ namespace Saritasa.Tools.Messages.Common
         public int Skip { get; private set; }
 
         /// <summary>
-        /// Query string
-        /// </summary>
-        public string Query { get; private set; }
-
-        /// <summary>
         /// How many record to return. Default is 1000.
         /// </summary>
         public int Take { get; private set; } = 1000;
@@ -247,17 +242,6 @@ namespace Saritasa.Tools.Messages.Common
 
             Skip = skip;
             Take = take;
-            return this;
-        }
-
-        /// <summary>
-        /// Set query.
-        /// </summary>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        public MessageQuery WithQuery(string query)
-        {
-            Query = query;
             return this;
         }
 

@@ -235,10 +235,6 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             {
                 query.Add($"json.Type:\"{messageQuery.Type}\"");
             }
-            if (!string.IsNullOrEmpty(messageQuery.Query))
-            {
-                query.Add(messageQuery.Query);
-            }
             dic.Add("q", query.Count > 0 ? string.Join(" AND ", query.ToArray()) : "*");
 
             return string.Join("&", dic.Select(x => string.Format("{0}={1}", x.Key, x.Value)));
