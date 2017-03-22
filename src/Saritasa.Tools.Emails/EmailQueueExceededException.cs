@@ -21,7 +21,7 @@ namespace Saritasa.Tools.Emails
         /// </summary>
         /// <param name="maxSize">Max queue size that has been exceeded.</param>
         public EmailQueueExceededException(int maxSize) : base(
-            string.Format(Properties.Strings.EmailQueueSizeExceed, maxSize))
+            string.Format(Properties.Strings.EmailQueueSizeExceed, maxSize.ToString()))
         {
         }
 

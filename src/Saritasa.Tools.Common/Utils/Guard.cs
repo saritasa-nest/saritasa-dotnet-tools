@@ -76,8 +76,8 @@ namespace Saritasa.Tools.Common.Utils
         {
             if (argument.Length > length)
             {
-                throw new ArgumentException(string.Format(
-                    Properties.Strings.ArgumentCannotBeMoreThanChars.FormatWith(argumentName, length), argumentName));
+                throw new ArgumentException(
+                    Properties.Strings.ArgumentCannotBeMoreThanChars.FormatWith(argumentName, length.ToString()), argumentName);
             }
         }
 
@@ -324,7 +324,7 @@ namespace Saritasa.Tools.Common.Utils
             if ((argument < min) || (argument > max))
             {
                 throw new ArgumentOutOfRangeException(argumentName,
-                    string.Format(Properties.Strings.ArgumentMustBeBetween.FormatWith(argumentName, min, max)));
+                    Properties.Strings.ArgumentMustBeBetween.FormatWith(argumentName, min.ToString(), max.ToString()));
             }
         }
 

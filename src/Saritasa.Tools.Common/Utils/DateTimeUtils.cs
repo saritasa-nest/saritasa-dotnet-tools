@@ -112,12 +112,13 @@ namespace Saritasa.Tools.Common.Utils
                     return new DateTime(target.Year, target.Month, value, target.Hour, target.Minute, target.Second,
                         target.Millisecond, target.Kind);
                 case DateTimePeriod.Week:
-                    throw new ArgumentException(string.Format(Properties.Strings.ArgumentCannotBeThePeriod, period), nameof(period));
+                    throw new ArgumentException(
+                        (Properties.Strings.ArgumentCannotBeThePeriod, period), nameof(period));
                 case DateTimePeriod.Month:
                     return new DateTime(target.Year, value, target.Day, target.Hour, target.Minute, target.Second,
                         target.Millisecond, target.Kind);
                 case DateTimePeriod.Quarter:
-                    throw new ArgumentException(string.Format(Properties.Strings.ArgumentCannotBeThePeriod, period), nameof(period));
+                    throw new ArgumentException(string.Format(Properties.Strings.ArgumentCannotBeThePeriod, period.ToString()), nameof(period));
                 case DateTimePeriod.Year:
                     return new DateTime(value, target.Month, target.Day, target.Hour, target.Minute, target.Second,
                         target.Millisecond, target.Kind);
