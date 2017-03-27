@@ -100,7 +100,7 @@ namespace Saritasa.Tools.Messages.Common
         public virtual string ErrorType { get; set; }
 
         /// <inheritdoc />
-        public DateTime CreatedAt { get; set; }
+        public virtual DateTime CreatedAt { get; set; }
 
         /// <inheritdoc />
         public int ExecutionDuration { get; set; }
