@@ -75,7 +75,7 @@ function CompileDocs
 {
     Copy-Item "$docsRoot\conf.py.template" "$docsRoot\conf.py"
     (Get-Content "$docsRoot\conf.py").Replace('VX.VY', $Version) | Set-Content "$docsRoot\conf.py"
-    
+
     python -m sphinx.__init__ -b html -d "$docsRoot\_build\doctrees" $docsRoot "$docsRoot\_build\html"
     if ($LASTEXITCODE)
     {

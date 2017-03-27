@@ -1,5 +1,6 @@
 ﻿0.1.2 [TBD]
 [*] Update Microsoft.NETCore.App to 1.1.1 .
+[*] Update Newtonsoft.Json to 10.0.1 .
 
 0.1.1 [2017-02-13]
 [*] Fix reference to Saritasa.Tools.Domain .
