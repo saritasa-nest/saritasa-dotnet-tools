@@ -1,19 +1,19 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
+using System.Text;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Common.ObjectSerializers;
+using Saritasa.Tools.Messages.Internal.Loggly.SearchResult;
+using System.Linq;
+
 namespace Saritasa.Tools.Messages.Common.Repositories
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Net.Http;
-    using System.Net.Http.Headers;
-    using System.Threading.Tasks;
-    using System.Text;
-    using Abstractions;
-    using ObjectSerializers;
-    using Internal.Loggly.SearchResult;
-    using System.Linq;
-
     /// <summary>
     /// Loggly service to store messages. See more at http://www.loggly.com . You can
     /// issue API token at Source Setup -> Customer Tokens section of website.
@@ -28,12 +28,12 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         const string ServerEndpoint = @"https://logs-01.loggly.com";
         const string TagsHeader = "X-LOGGLY-TAG";
 
-        HttpClient client = new HttpClient();
+        private HttpClient client = new HttpClient();
 
-        readonly string token;
-        readonly string username = "";
-        readonly string password = "";
-        readonly string accountDomain = "";
+        private readonly string token;
+        private readonly string username;
+        private readonly string password;
+        private readonly string accountDomain;
 
         /// <summary>
         /// Json serializer.
@@ -65,15 +65,25 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <param name="accountDomain">Customer domain name.</param>
         public LogglyMessageRepository(string token, string username, string password, string accountDomain) : this(token)
         {
-            if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password) && !string.IsNullOrEmpty(accountDomain))
+            if (string.IsNullOrEmpty(username))
             {
-                this.username = username;
-                this.password = password;
-                this.accountDomain = accountDomain;
-
-                this.client.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", this.username, this.password))));
+                throw new ArgumentNullException(nameof(username));
             }
+            if (string.IsNullOrEmpty(password))
+            {
+                throw new ArgumentNullException(nameof(password));
+            }
+            if (string.IsNullOrEmpty(accountDomain))
+            {
+                throw new ArgumentNullException(nameof(accountDomain));
+            }
+
+            this.username = username;
+            this.password = password;
+            this.accountDomain = accountDomain;
+            this.client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Basic", Convert.ToBase64String(
+                    Encoding.ASCII.GetBytes(string.Format("{0}:{1}", this.username, this.password))));
         }
 
         /// <inheritdoc />
@@ -94,14 +104,11 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <summary>
         /// Search for events.
         /// </summary>
-        /// <param name="messageQuery">
-        /// Query               : query string, check out https://www.loggly.com/docs/search-query-language/.
-        /// CreatedStartDate    : Start time for the search.
-        /// CreatedEndDate      : End time for the search.
-        /// Order               : Direction of results returned, either "asc" or "desc". Defaults to "desc".
-        /// Take                : number of rows returned by search.
-        /// </param>
-        /// <returns>array of message</returns>
+        /// <param name="messageQuery">Messge query.</param>
+        /// <remarks>
+        /// Source: https://www.loggly.com/docs/search-query-language/
+        /// </remarks>
+        /// <returns>Enumerable of found messages.</returns>
         public async Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery)
         {
             if (disposed)
@@ -140,12 +147,23 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <returns>Loggly repository.</returns>
         public static IMessageRepository CreateFromState(IDictionary<string, object> dict)
         {
-            return new LogglyMessageRepository(
-                dict[nameof(token)].ToString(),
-                dict[nameof(username)].ToString(),
-                dict[nameof(password)].ToString(),
-                dict[nameof(accountDomain)].ToString()
-            );
+            var repositoryUsername = dict[nameof(username)].ToString();
+
+            if (!string.IsNullOrEmpty(repositoryUsername))
+            {
+                return new LogglyMessageRepository(
+                    dict[nameof(token)].ToString(),
+                    dict[nameof(username)].ToString(),
+                    dict[nameof(password)].ToString(),
+                    dict[nameof(accountDomain)].ToString()
+                );
+            }
+            else
+            {
+                return new LogglyMessageRepository(
+                    dict[nameof(token)].ToString()
+                );
+            }
         }
 
         #region Dispose
@@ -195,7 +213,6 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         {
             var response = await client.GetAsync(string.Format(SearchEndpoint, accountDomain, query));
             var content = (SearchReponse)serializer.Deserialize(await response.Content.ReadAsByteArrayAsync(), typeof(SearchReponse));
-
             return content.Rsid.Id;
         }
 
@@ -206,8 +223,8 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <returns>Query string.</returns>
         private string CreateQueryString(MessageQuery messageQuery)
         {
-            Dictionary<string, string> dic = new Dictionary<string, string>();
-            List<string> query = new List<string>();
+            var dic = new Dictionary<string, string>();
+            var query = new List<string>();
 
             if (messageQuery.CreatedStartDate.HasValue)
             {
@@ -224,7 +241,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             // Build query string.
             if (messageQuery.Id != null)
             {
-                query.Add($"json.Id:\"{messageQuery.Id.ToString()}\"");
+                query.Add($"json.Id:\"{messageQuery.Id}\"");
             }
             if (!string.IsNullOrEmpty(messageQuery.ContentType))
             {
