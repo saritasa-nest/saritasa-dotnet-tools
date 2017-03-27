@@ -3,7 +3,6 @@
 /*
  * Tasks handlers.
  */
-
 define(['App', 'jquery', 'knockout'], function (App, $, ko) {
     return {
 

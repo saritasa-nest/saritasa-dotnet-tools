@@ -192,7 +192,7 @@ namespace Saritasa.Tools.Messages.Internal
             }
             catch (Exception)
             {
-                // we have no place to log the message to so we ignore it
+                // We have no place to log the message to so we ignore it.
             }
         }
 

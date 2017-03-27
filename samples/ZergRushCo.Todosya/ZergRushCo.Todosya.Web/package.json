@@ -7,10 +7,10 @@
   "author": "Ivan Kozhin",
   "license": "ISC",
   "devDependencies": {
-    "babel-eslint": "^7.1.1",
+    "babel-eslint": "^7.2.1",
     "del": "^2.2.2",
-    "eslint-plugin-html": "^1.7.0",
-    "eslint-plugin-react": "^6.8.0",
+    "eslint": "^3.18.0",
+    "eslint-plugin-import": "^2.2.0",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.0",
     "gulp-eslint": "^3.0.1",
@@ -22,11 +22,10 @@
     "gulp-sass": "^2.3.2",
     "gulp-sourcemaps": "^1.6.0",
     "gulp-uglify": "^2.0.0",
-    "jshint": "^2.9.4",
     "main-bower-files": "^2.13.1",
-    "node-sass": "^3.10.0",
-    "require-dir": "^0.3.0",
-    "requirejs-config-file": "^2.0.0",
+    "node-sass": "^4.5.2",
+    "require-dir": "^0.3.1",
+    "requirejs-config-file": "^2.0.1",
     "run-sequence": "^1.2.2"
   }
 }
