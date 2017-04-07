@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.Common.Extensions
+namespace Saritasa.Tools.Common.Utils
 {
     /// <summary>
     /// Date/time period truncation types.

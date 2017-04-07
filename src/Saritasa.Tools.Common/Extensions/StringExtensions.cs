@@ -1,17 +1,19 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
+
+using System;
+using System.Diagnostics;
+using JetBrains.Annotations;
 
 namespace Saritasa.Tools.Common.Extensions
 {
-    using System;
-    using System.Diagnostics;
-    using JetBrains.Annotations;
-
     /// <summary>
     /// String class extensions.
     /// </summary>
     public static class StringExtensions
     {
+        #region FormatWith
+
         /// <summary>
         /// Formats target string with number of arguments. Equivalent of String.Format.
         /// </summary>
@@ -85,6 +87,8 @@ namespace Saritasa.Tools.Common.Extensions
         {
             return string.Format(provider, format, args);
         }
+
+        #endregion
 
         /// <summary>
         /// Checks that target string is null or empty.

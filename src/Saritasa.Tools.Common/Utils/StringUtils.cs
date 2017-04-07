@@ -1,17 +1,17 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
+using System.Linq;
+using System.Text.RegularExpressions;
+using JetBrains.Annotations;
+using Saritasa.Tools.Common.Extensions;
+
 namespace Saritasa.Tools.Common.Utils
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Globalization;
-    using System.Linq;
-    using System.Text.RegularExpressions;
-    using JetBrains.Annotations;
-    using Extensions;
-
     /// <summary>
     /// Strings utils.
     /// </summary>
@@ -125,6 +125,17 @@ namespace Saritasa.Tools.Common.Utils
         public static string ConvertToSnakeCase([NotNull] string target)
         {
             return string.Concat(target.Select((ch, index) => index > 0 && char.IsUpper(ch) ? "_" + ch.ToString() : ch.ToString()).ToArray());
+        }
+
+        /// <summary>
+        /// Returns empty string if target string is null or string itself.
+        /// </summary>
+        /// <param name="target">Target string.</param>
+        /// <returns>Empty string if null or target string.</returns>
+        [DebuggerStepThrough]
+        public static string NullSafe(string target)
+        {
+            return target ?? string.Empty;
         }
 
         #region Parse with default

@@ -104,7 +104,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <summary>
         /// Search for events.
         /// </summary>
-        /// <param name="messageQuery">Messge query.</param>
+        /// <param name="messageQuery">Message query.</param>
         /// <remarks>
         /// Source: https://www.loggly.com/docs/search-query-language/
         /// </remarks>

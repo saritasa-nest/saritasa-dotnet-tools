@@ -1,13 +1,13 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Saritasa.Tools.Common.Extensions;
+
 namespace Saritasa.Tools.Common.Utils
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using Extensions;
-
     /// <summary>
     /// Date time utils.
     /// </summary>
@@ -126,6 +126,66 @@ namespace Saritasa.Tools.Common.Utils
                 default:
                     return target;
             }
+        }
+
+        /// <summary>
+        /// Truncates date. Begin of period.
+        /// </summary>
+        /// <param name="target">Target date.</param>
+        /// <param name="period">Type of truncation.</param>
+        /// <returns>Truncated date.</returns>
+        public static DateTime Truncate(DateTime target, DateTimePeriod period)
+        {
+            switch (period)
+            {
+                case DateTimePeriod.Second:
+                    return new DateTime(target.Year, target.Month, target.Day, target.Hour, target.Minute, 0, target.Kind);
+                case DateTimePeriod.Minute:
+                    return new DateTime(target.Year, target.Month, target.Day, target.Hour, 0, 0, target.Kind);
+                case DateTimePeriod.Hour:
+                    return new DateTime(target.Year, target.Month, target.Day, 0, 0, 0, target.Kind);
+                case DateTimePeriod.Day:
+                    return new DateTime(target.Year, target.Month, 1, 0, 0, 0, target.Kind);
+                case DateTimePeriod.Week:
+                    return new DateTime(target.Year, target.Month, target.Day, 0, 0, 0, target.Kind)
+                        .AddDays(-(int)target.DayOfWeek);
+                case DateTimePeriod.Month:
+                    return new DateTime(target.Year, target.Month, 1, 0, 0, 0, target.Kind);
+                case DateTimePeriod.Quarter:
+                    return new DateTime(target.Year, target.Month, 1, 0, 0, 0, target.Kind)
+                        .AddMonths(-(target.Month - 1) % 3);
+                case DateTimePeriod.Year:
+                    return new DateTime(target.Year, 1, 1, 0, 0, 0, target.Kind);
+                case DateTimePeriod.None:
+                default:
+                    return target;
+            }
+        }
+
+        /// <summary>
+        /// Is date between two startDate and endDate dates shortcut method.
+        /// </summary>
+        /// <param name="target">Date to compare.</param>
+        /// <param name="startDate">Start date.</param>
+        /// <param name="endDate">End date.</param>
+        /// <returns>True if date between startDate and endDate, False otherwise.</returns>
+        public static bool IsBetween(DateTime target, DateTime startDate, DateTime endDate)
+        {
+            return target >= startDate && target <= endDate;
+        }
+
+        /// <summary>
+        /// Compares the value of this instance to a specified object with truncation that contains a specified
+        /// <see cref="System.DateTime" /> value, and returns an integer that indicates whether this instance
+        /// is earlier than, the same as, or later than the specified <see cref="System.DateTime" /> value.
+        /// </summary>
+        /// <param name="target">The object to compare against.</param>
+        /// <param name="value">The object to compare to the current instance.</param>
+        /// <param name="period">Type of truncation.</param>
+        /// <returns>A signed number indicating the relative values of this instance and the value parameter.</returns>
+        public static int CompareTo(DateTime target, DateTime value, DateTimePeriod period)
+        {
+            return Truncate(target, period).CompareTo(value.Truncate(period));
         }
 
         #region Unix

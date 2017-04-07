@@ -4,14 +4,13 @@
 using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
-using Saritasa.Tools.Common.Utils;
 
-namespace Saritasa.Tools.Common.Extensions
+namespace Saritasa.Tools.Common.Utils
 {
     /// <summary>
-    /// Dictionary extensions.
+    /// Dictionary utils.
     /// </summary>
-    public static class DictionaryExtensions
+    public static class DictionaryUtils
     {
         /// <summary>
         /// Tries to get the value in dictionary by key. If it does not exist it will return
@@ -23,11 +22,13 @@ namespace Saritasa.Tools.Common.Extensions
         /// <param name="key">Key.</param>
         /// <param name="defaultValue">Default value.</param>
         public static TValue GetValueDefault<TKey, TValue>(
-            [NotNull] this IDictionary<TKey, TValue> target,
+            [NotNull] IDictionary<TKey, TValue> target,
             TKey key,
             TValue defaultValue = default(TValue))
         {
-            return DictionaryUtils.GetValueDefault(target, key, defaultValue);
+            TValue value;
+            bool success = target.TryGetValue(key, out value);
+            return success ? value : defaultValue;
         }
     }
 }
