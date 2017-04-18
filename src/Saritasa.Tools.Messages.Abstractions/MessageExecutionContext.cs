@@ -4,7 +4,7 @@
 namespace Saritasa.Tools.Messages.Abstractions
 {
     using System;
-#if NET452
+#if NET452 || NET40
     using System.Runtime.Remoting;
     using System.Runtime.Remoting.Messaging;
 #else
@@ -46,7 +46,7 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// </summary>
         public static MessageExecutionContext Empty = default(MessageExecutionContext);
 
-#if NET452
+#if NET452 || NET40
         private static readonly string fieldKey = $"{typeof(MessageExecutionContext).FullName}.{AppDomain.CurrentDomain.Id}";
 
         /// <summary>

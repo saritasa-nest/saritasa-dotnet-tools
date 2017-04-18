@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+#if !NET40
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -166,7 +167,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             }
         }
 
-        #region Dispose
+#region Dispose
 
         bool disposed;
 
@@ -191,7 +192,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             GC.SuppressFinalize(this);
         }
 
-        #endregion
+#endregion
 
         /// <summary>
         /// Call event api to get event list.
@@ -265,3 +266,4 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
     }
 }
+#endif

@@ -1,16 +1,16 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Saritasa.Tools.Messages.Abstractions;
 
 namespace Saritasa.Tools.Messages.Common.Repositories
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-    using Newtonsoft.Json;
-    using Abstractions;
-
     /// <summary>
     /// Simple in memory message repository.
     /// </summary>
@@ -59,7 +59,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <inheritdoc />
         public void SaveState(IDictionary<string, object> dict)
         {
-            // no need to implement since repository does not have state
+            // No need to implement since repository does not have state.
         }
 
         /// <summary>
