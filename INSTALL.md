@@ -37,3 +37,12 @@ iwr https://raw.githubusercontent.com/saritasa/SaritasaTools/develop/scripts/Sar
 ```
 
 After that the "Saritasa Code Rules" will be available in "Code Analysis" tab in project properties. All Saritasa.Tools project uses relative path to ruleset within repository.
+
+Run Samples in Docker
+---------------------
+
+```
+PS psake docker-run-all
+```
+
+See IP addresses of running web sites in output.
