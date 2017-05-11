@@ -2,7 +2,7 @@
 
 <#PSScriptInfo
 
-.VERSION 1.1.0
+.VERSION 1.1.1
 
 .GUID 966fce03-6946-447c-8e16-29b673f2918b
 
@@ -73,6 +73,7 @@ Task update-gallery -description '* Update all modules from Saritasa PS Gallery.
     Get-ChildItem -Path $modules -Directory | ForEach-Object `
         {
             Write-Information "Updating $($_.Name)..."
+            Remove-Item  -Recurse -ErrorAction Continue $_.FullName
             Save-Module -Name $_.Name -Path $modules
             Write-Information 'OK'
         }

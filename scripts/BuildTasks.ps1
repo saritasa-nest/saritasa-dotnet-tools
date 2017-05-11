@@ -15,6 +15,8 @@ Task download-nuget `
 
 Task pre-build -depends download-nuget `
 {
+    Initialize-MSBuild
+
     Invoke-NugetRestore "$src\..\Saritasa.Tools.sln"
 
     Invoke-NugetRestore "$samples\ZergRushCo.Todosya\ZergRushCo.Todosya.sln"
@@ -22,7 +24,7 @@ Task pre-build -depends download-nuget `
 
     # Use following command to revert the files:
     # git checkout -- **/AssemblyInfo.cs
-    GitVersion.exe /updateassemblyinfo
+    Exec { GitVersion.exe /updateassemblyinfo }
 }
 
 Task get-version `

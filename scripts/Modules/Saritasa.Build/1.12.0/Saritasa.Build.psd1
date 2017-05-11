@@ -12,7 +12,7 @@
 RootModule = 'Saritasa.Build'
 
 # Version number of this module.
-ModuleVersion = '1.11.2'
+ModuleVersion = '1.12.0'
 
 # ID used to uniquely identify this module
 GUID = '5d34804a-169a-4fb1-bc0d-cc81f925f992'
@@ -24,7 +24,7 @@ Author = 'Anton Zimin'
 CompanyName = 'Saritasa'
 
 # Copyright statement for this module
-Copyright = '(c) 2015-2016 Saritasa. All rights reserved.'
+Copyright = '(c) 2015-2017 Saritasa. All rights reserved.'
 
 # Description of the functionality provided by this module
 Description = 'Contains functions to execute MSBuild targets, restore NuGet packages, run EntityFramework migrations.'
@@ -49,7 +49,8 @@ ProcessorArchitecture = 'None'
 
 # Modules that must be imported into the global environment prior to importing this module
 RequiredModules = @(
-    @{ ModuleName='Saritasa.General'; ModuleVersion='1.1.0'; GUID='7c7dc05c-033b-4838-8619-b84792571317' }
+    @{ ModuleName='Saritasa.General'; ModuleVersion='1.1.0'; GUID='7c7dc05c-033b-4838-8619-b84792571317' },
+    @{ ModuleName='VSSetup'; ModuleVersion='1.0.47'; GUID='440e8fb1-19c4-4d39-8f75-37424bc4265a' }
 )
 
 # Assemblies that must be loaded prior to importing this module
@@ -68,7 +69,7 @@ RequiredModules = @(
 # NestedModules = @()
 
 # Functions to export from this module
-FunctionsToExport = @('Copy-DotnetConfig', 'Invoke-EFMigrate',
+FunctionsToExport = @('Copy-DotnetConfig', 'Initialize-MSBuild', 'Invoke-EFMigrate',
     'Install-NugetCli', 'Invoke-NugetRestore', 'Invoke-ProjectBuild',
     'Invoke-SolutionBuild', 'Update-AssemblyInfoFile', 'Update-VariablesInFile')
 
