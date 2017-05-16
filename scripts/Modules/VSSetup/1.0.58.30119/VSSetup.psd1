@@ -6,10 +6,16 @@ Author = 'Microsoft Corporation'
 CompanyName = 'Microsoft Corporation'
 Copyright = 'Copyright (C) Microsoft Corporation. All rights reserved.'
 Description = 'Visual Studio Setup PowerShell Module'
-ModuleVersion = '1.0.47.27524'
-PowerShellVersion = '3.0'
-CLRVersion = '4.0'
-RootModule = 'Microsoft.VisualStudio.Setup.PowerShell.dll'
+ModuleVersion = '1.0.58.30119'
+PowerShellVersion = '2.0'
+CLRVersion = '2.0'
+ModuleToProcess = 'Microsoft.VisualStudio.Setup.PowerShell.dll'
 RequiredAssemblies = 'Microsoft.VisualStudio.Setup.PowerShell.dll'
 TypesToProcess = 'VSSetup.types.ps1xml'
+PrivateData = @{
+  PSData = @{
+    ProjectUri = 'https://github.com/Microsoft/vssetup.powershell'
+    LicenseUri = 'https://github.com/Microsoft/vssetup.powershell/raw/a7753a0cb8/LICENSE.txt'
+  }
+}
 }

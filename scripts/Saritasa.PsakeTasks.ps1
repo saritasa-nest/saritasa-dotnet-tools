@@ -2,7 +2,7 @@
 
 <#PSScriptInfo
 
-.VERSION 1.1.1
+.VERSION 1.2.1
 
 .GUID 966fce03-6946-447c-8e16-29b673f2918b
 
@@ -45,9 +45,9 @@ Task help -description 'Display description of main tasks.' `
 {
     Write-Host 'Main Tasks' -ForegroundColor DarkMagenta -NoNewline
     Get-PSakeScriptTasks | Where-Object { $_.Description -Like '`**' } |
-        Sort-Object -Property Name | 
+        Sort-Object -Property Name |
         Format-Table -Property Name, @{ Label = 'Description'; Expression = { $_.Description -Replace '^\* ', '' } }
-    
+
     Write-Host 'Execute ' -NoNewline -ForegroundColor DarkMagenta
     Write-Host 'psake -docs' -ForegroundColor Black -BackgroundColor DarkMagenta -NoNewline
     Write-Host ' to see all tasks.' -ForegroundColor DarkMagenta
@@ -67,13 +67,18 @@ Task update-gallery -description '* Update all modules from Saritasa PS Gallery.
     {
         $root = $PSScriptRoot
     }
-    
+
     $modules = "$root\Modules"
+
+    # Remove old modules.
+    Get-ChildItem -Path $modules -Directory | ForEach-Object `
+        {
+            Remove-Item "$($_.FullName)\*" -Recurse -ErrorAction Continue -Force
+        }
 
     Get-ChildItem -Path $modules -Directory | ForEach-Object `
         {
             Write-Information "Updating $($_.Name)..."
-            Remove-Item  -Recurse -ErrorAction Continue $_.FullName
             Save-Module -Name $_.Name -Path $modules
             Write-Information 'OK'
         }

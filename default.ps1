@@ -40,14 +40,14 @@ $packages = @(
 
 $docsRoot = "$PSScriptRoot\docs"
 
-Task pack -depends download-nuget -description 'Build the library, test it and prepare nuget packages' `
+Task pack -description 'Build the library, test it and prepare nuget packages' `
 {
     foreach ($package in $packages)
     {
         &dotnet pack ".\src\$package" --configuration release --output '.'
         if ($LASTEXITCODE)
         {
-            throw 'Nuget pack failed.'
+            throw 'Dotnet pack failed.'
         }
     }
 }
@@ -62,7 +62,6 @@ Task clean -description 'Clean solution' `
     Remove-Item './src/StyleCop.Cache' -Force -ErrorAction SilentlyContinue
     Remove-Item './docs/_build' -Recurse -Force -ErrorAction SilentlyContinue
     Remove-Item './docs/conf.py' -ErrorAction SilentlyContinue
-    Remove-Item './scripts/nuget.exe' -ErrorAction SilentlyContinue
 }
 
 Task docs -depends get-version -description 'Compile and open documentation' `

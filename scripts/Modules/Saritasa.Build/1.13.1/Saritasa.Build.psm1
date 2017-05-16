@@ -1,4 +1,8 @@
-﻿function Install-NugetCli
+﻿<#
+.SYNOPSIS
+Downloads nuget.exe to specified location.
+#>
+function Install-NugetCli
 {
     [CmdletBinding()]
     param
@@ -13,23 +17,35 @@
 
     if (!(Test-Path $nugetExePath))
     {
+        Write-Information 'Downloading nuget.exe...'
         Invoke-WebRequest 'https://dist.nuget.org/win-x86-commandline/latest/nuget.exe' -OutFile $nugetExePath
+        Write-Information 'Done.'
     }
 
     $nugetVersion = ((Get-Item $nugetExePath).VersionInfo.ProductVersion).Split('.')[0]
     if ($nugetVersion -lt 4)
     {
+        Write-Information 'Downloading nuget.exe...'
         Invoke-WebRequest 'https://dist.nuget.org/win-x86-commandline/v4.0.0/nuget.exe' -OutFile $nugetExePath
+        Write-Information 'Done.'
     }
 }
 
+<#
+.SYNOPSIS
+Restores packages for solution, project or packages.config.
+#>
 function Invoke-NugetRestore
 {
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory = $true, HelpMessage = 'Path to solution. All NuGet packages from included projects will be restored.')]
-        [string] $SolutionPath
+        [Parameter(Mandatory = $true, HelpMessage = 'Path to solution. All NuGet packages from included projects will be restored.', ParameterSetName = 'Solution')]
+        [string] $SolutionPath,
+        [Parameter(Mandatory = $true, HelpMessage = 'Path to project or packages.config.', ParameterSetName = 'Project')]
+        [string] $ProjectPath,
+        [Parameter(Mandatory = $true, HelpMessage = 'Path to the solution directory. Not valid when restoring packages for a solution.', ParameterSetName = 'Project')]
+        [string] $SolutionDirectory
     )
 
     Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
@@ -37,7 +53,17 @@ function Invoke-NugetRestore
     Install-NugetCli -Destination $PSScriptRoot
     $nugetExePath = "$PSScriptRoot\nuget.exe"
 
-    &$nugetExePath 'restore' $SolutionPath
+    $params = @('restore')
+    if ($SolutionPath)
+    {
+        $params += $SolutionPath
+    }
+    else
+    {
+        $params += @($ProjectPath, '-SolutionDirectory', $SolutionDirectory)
+    }
+
+    &$nugetExePath $params
     if ($LASTEXITCODE)
     {
         throw 'Nuget restore failed.'

@@ -3,24 +3,14 @@ $src = "$root\..\src"
 $samples = "$root\..\samples"
 $tools = "$root\..\tools"
 
-Task download-nuget `
-{
-    if (!(Test-Path $tools))
-    {
-        New-Item -ItemType Directory $tools
-    }
-
-    Install-NugetCli -Destination $tools
-}
-
-Task pre-build -depends download-nuget `
+Task pre-build `
 {
     Initialize-MSBuild
 
-    Invoke-NugetRestore "$src\..\Saritasa.Tools.sln"
+    Invoke-NugetRestore -SolutionPath "$src\..\Saritasa.Tools.sln"
 
-    Invoke-NugetRestore "$samples\ZergRushCo.Todosya\ZergRushCo.Todosya.sln"
-    Invoke-NugetRestore "$samples\Saritasa.BoringWarehouse\Saritasa.BoringWarehouse.sln"
+    Invoke-NugetRestore -SolutionPath "$samples\ZergRushCo.Todosya\ZergRushCo.Todosya.sln"
+    Invoke-NugetRestore -SolutionPath "$samples\Saritasa.BoringWarehouse\Saritasa.BoringWarehouse.sln"
 
     # Use following command to revert the files:
     # git checkout -- **/AssemblyInfo.cs
@@ -29,7 +19,7 @@ Task pre-build -depends download-nuget `
 
 Task get-version `
 {
-    $script:Version = GitVersion.exe /showvariable MajorMinorPatch
+    $script:Version = Exec { GitVersion.exe /showvariable MajorMinorPatch }
 }
 
 Task build-samples -depends build-zergrushco, build-boringwarehouse
