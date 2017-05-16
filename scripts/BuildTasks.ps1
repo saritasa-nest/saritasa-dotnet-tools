@@ -1,3 +1,8 @@
+Properties `
+{
+    $Configuration = $null
+}
+
 $root = $PSScriptRoot
 $src = "$root\..\src"
 $samples = "$root\..\samples"
@@ -17,14 +22,10 @@ Task pre-build `
     Exec { GitVersion.exe /updateassemblyinfo }
 }
 
-Task get-version `
-{
-    $script:Version = Exec { GitVersion.exe /showvariable MajorMinorPatch }
-}
-
 Task build-samples -depends build-zergrushco, build-boringwarehouse
 
 Task build-zergrushco -depends pre-build `
+    -requiredVariables @('Configuration') `
 {
     Invoke-SolutionBuild "$samples\ZergRushCo.Todosya\ZergRushCo.Todosya.sln" -Configuration $Configuration
 
@@ -49,11 +50,18 @@ Task build-zergrushco -depends pre-build `
 }
 
 Task build-boringwarehouse -depends pre-build `
+    -requiredVariables @('Configuration') `
 {
     Invoke-SolutionBuild "$samples\Saritasa.BoringWarehouse\Saritasa.BoringWarehouse.sln" -Configuration $Configuration
 }
 
 Task build-saritasatools -depends pre-build `
+    -requiredVariables @('Configuration') `
 {
     Invoke-SolutionBuild "$src\..\Saritasa.Tools.sln" -Configuration $Configuration
+}
+
+Task clean -description '* Clean repository.' `
+{
+    Exec { git clean -xdf -e packages/ -e node_modules/ -e bower_components/ -e nuget.exe }
 }
