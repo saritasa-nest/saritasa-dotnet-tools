@@ -129,6 +129,9 @@
   <data name="ArgumentCannotBeThePeriod" xml:space="preserve">
     <value>{0} period cannot be used.</value>
   </data>
+  <data name="ArgumentDateTimeKindMustBeEqual" xml:space="preserve">
+    <value>Date and time kinds must be equal.</value>
+  </data>
   <data name="ArgumentMustBeBetween" xml:space="preserve">
     <value>{0} must be between {1}-{2}.</value>
   </data>

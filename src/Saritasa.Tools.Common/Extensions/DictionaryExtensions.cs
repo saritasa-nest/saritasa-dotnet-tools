@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using Saritasa.Tools.Common.Utils;
 
 namespace Saritasa.Tools.Common.Extensions
@@ -22,12 +21,12 @@ namespace Saritasa.Tools.Common.Extensions
         /// <param name="target">Target dictionary.</param>
         /// <param name="key">Key.</param>
         /// <param name="defaultValue">Default value.</param>
-        public static TValue GetValueDefault<TKey, TValue>(
-            [NotNull] this IDictionary<TKey, TValue> target,
+        public static TValue GetValueOrDefault<TKey, TValue>(
+            this IDictionary<TKey, TValue> target,
             TKey key,
             TValue defaultValue = default(TValue))
         {
-            return DictionaryUtils.GetValueDefault(target, key, defaultValue);
+            return DictionaryUtils.GetValueOrDefault(target, key, defaultValue);
         }
     }
 }

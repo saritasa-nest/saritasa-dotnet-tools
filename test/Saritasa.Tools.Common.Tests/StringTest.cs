@@ -1,32 +1,25 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
+
+using System;
+using Xunit;
+using Saritasa.Tools.Common.Utils;
 
 namespace Saritasa.Tools.Common.Tests
 {
-    using System;
-    using Xunit;
-    using Utils;
-
     /// <summary>
     /// String utils tests.
     /// </summary>
     public class StringTest
     {
         [Theory]
-        [InlineData("My_Test_Method", "MyTestMethod")]
-        [InlineData("The_Big_Bang", "TheBigBang")]
-        public void Snake_case_should_work(string expect, string target)
-        {
-            Assert.Equal(expect, StringUtils.ConvertToSnakeCase(target));
-        }
-
-        [Theory]
         [InlineData("1234567890", 5, 5)]
         [InlineData("1234567890", 15, 10)]
+        [InlineData("", 4, 0)]
         public void Truncate_should_trim_string(string target, int truncate, int expectedLength)
         {
-            var str2 = StringUtils.Truncate(target, truncate);
-            Assert.Equal(expectedLength, str2.Length);
+            var str = StringUtils.SafeTruncate(target, truncate);
+            Assert.Equal(expectedLength, str.Length);
         }
 
         private enum TestEnum
@@ -43,19 +36,19 @@ namespace Saritasa.Tools.Common.Tests
         [InlineData("no", true, true, false)]
         public void Test_default_parse_calls_for_bools(string val, bool @default, bool extended, bool expect)
         {
-            Assert.Equal(expect, StringUtils.ParseDefault(val, @default, extended));
+            Assert.Equal(expect, StringUtils.ParseOrDefault(val, @default, extended));
         }
 
         [Fact]
         public void Test_default_parse_calls()
         {
-            Assert.Equal(1, StringUtils.ParseDefault("incorrect", 1)); // int
-            Assert.Equal('a', StringUtils.ParseDefault("incorrect", 'a')); // char
-            Assert.Equal(DateTime.MaxValue, StringUtils.ParseDefault("incorrect", DateTime.MaxValue)); // datetime
-            Assert.Equal(1.2, StringUtils.ParseDefault("incorrect", 1.2)); // double
-            Assert.Equal(TestEnum.ValueA, StringUtils.ParseDefault("incorrect", TestEnum.ValueA)); // enum
-            Assert.Equal(TestEnum.ValueC, StringUtils.ParseDefault("ValueC", TestEnum.ValueA)); // enum
-            Assert.Equal(1.2f, StringUtils.ParseDefault("incorrect", 1.2f)); // float
+            Assert.Equal(1, StringUtils.ParseOrDefault("incorrect", 1)); // int
+            Assert.Equal('a', StringUtils.ParseOrDefault("incorrect", 'a')); // char
+            Assert.Equal(DateTime.MaxValue, StringUtils.ParseOrDefault("incorrect", DateTime.MaxValue)); // datetime
+            Assert.Equal(1.2, StringUtils.ParseOrDefault("incorrect", 1.2)); // double
+            Assert.Equal(TestEnum.ValueA, StringUtils.ParseOrDefault("incorrect", TestEnum.ValueA)); // enum
+            Assert.Equal(TestEnum.ValueC, StringUtils.ParseOrDefault("ValueC", TestEnum.ValueA)); // enum
+            Assert.Equal(1.2f, StringUtils.ParseOrDefault("incorrect", 1.2f)); // float
         }
 
         [Theory]

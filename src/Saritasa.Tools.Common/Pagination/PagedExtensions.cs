@@ -1,12 +1,11 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+
 namespace Saritasa.Tools.Common.Pagination
 {
-    using System;
-    using System.Collections.Generic;
-    using JetBrains.Annotations;
-
     /// <summary>
     /// Extension methods for pagination.
     /// </summary>
@@ -21,7 +20,7 @@ namespace Saritasa.Tools.Common.Pagination
         /// <param name="pageSize">Page size.</param>
         /// <returns>Paged enumerable.</returns>
         public static PagedEnumerable<T> AsPage<T>(
-            [NotNull] this IEnumerable<T> source,
+            this IEnumerable<T> source,
             int page = PagedEnumerable<T>.DefaultCurrentPage,
             int pageSize = PagedEnumerable<T>.DefaultPageSize)
         {
@@ -35,7 +34,7 @@ namespace Saritasa.Tools.Common.Pagination
         /// <param name="source">Enumerable source to be paginate.</param>
         /// <returns>Paged enumerable with one page.</returns>
         public static PagedEnumerable<T> AsOnePage<T>(
-            [NotNull] this IEnumerable<T> source)
+            this IEnumerable<T> source)
         {
             return PagedEnumerable<T>.CreateAndReturnAll(source);
         }

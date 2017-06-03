@@ -1,13 +1,15 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Xunit;
+using Saritasa.Tools.Common.Extensions;
+using Saritasa.Tools.Common.Utils;
+
 namespace Saritasa.Tools.Common.Tests
 {
-    using System;
-    using System.Collections.Generic;
-    using Xunit;
-    using Extensions;
-
     /// <summary>
     /// All extension methods tests.
     /// </summary>
@@ -32,8 +34,8 @@ namespace Saritasa.Tools.Common.Tests
             dict.Add(2, "bca");
 
             // Act & assert
-            Assert.Equal("default", dict.GetValueDefault(5, "default"));
-            Assert.Equal("abc", dict.GetValueDefault(1, "abc"));
+            Assert.Equal("default", dict.GetValueOrDefault(5, "default"));
+            Assert.Equal("abc", dict.GetValueOrDefault(1, "abc"));
         }
 
         [Fact]
@@ -49,7 +51,7 @@ namespace Saritasa.Tools.Common.Tests
             }
 
             // Act
-            foreach (var sublist in list.ChunkSelectRange(45))
+            foreach (var sublist in list.AsQueryable().ChunkSelectRange(45))
             {
                 foreach (var item in sublist)
                 {
@@ -74,7 +76,7 @@ namespace Saritasa.Tools.Common.Tests
             }
 
             // Act
-            foreach (var item in list.ChunkSelect(45))
+            foreach (var item in list.AsQueryable().ChunkSelect(45))
             {
                 sum += item;
             }
@@ -101,7 +103,7 @@ namespace Saritasa.Tools.Common.Tests
             var val = TestEnum.A;
 
             // Act
-            var attr = val.GetAttribute<TestAttribute>();
+            var attr = EnumUtils.GetAttribute<TestAttribute>(val);
 
             // Arrange
             Assert.NotNull(attr);
@@ -115,7 +117,7 @@ namespace Saritasa.Tools.Common.Tests
             var val = TestEnum.B;
 
             // Act
-            var attr = val.GetAttribute<TestAttribute>();
+            var attr = EnumUtils.GetAttribute<TestAttribute>(val);
 
             // Arrange
             Assert.Null(attr);
@@ -128,23 +130,10 @@ namespace Saritasa.Tools.Common.Tests
             var val = TestEnum.A;
 
             // Act
-            var attr = val.GetAttribute<ObsoleteAttribute>();
+            var attr = EnumUtils.GetAttribute<ObsoleteAttribute>(val);
 
             // Arrange
             Assert.Null(attr);
-        }
-
-        [Fact]
-        public void Get_find_first_index_should_return_index()
-        {
-            // Arrange
-            var arr = new[] { 10, 45, 6, 34, 6 };
-
-            // Act
-            var index = arr.FirstIndexMatch(a => a == 6);
-
-            // Arrange
-            Assert.Equal(2, index);
         }
     }
 }

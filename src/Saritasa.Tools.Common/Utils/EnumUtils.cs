@@ -2,8 +2,12 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+#if NET35 || NET40
+    using System.Collections.Generic;
+#endif
+#if PORTABLE || !NETSTANDARD1_2 || NETSTANDARD1_6 || NETCOREAPP1_0 || NETCOREAPP1_1
+    using System.ComponentModel;
+#endif
 using System.Linq;
 using System.Reflection;
 
@@ -28,7 +32,7 @@ namespace Saritasa.Tools.Common.Utils
 #endif
 
         /// <summary>
-        /// Gets the custom attribute of enum.
+        /// Gets the custom attribute of enum value.
         /// </summary>
         /// <param name="target">Enum.</param>
         /// <typeparam name="TAttribute">Attribute type.</typeparam>

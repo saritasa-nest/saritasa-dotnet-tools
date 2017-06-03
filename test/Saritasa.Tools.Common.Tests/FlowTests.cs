@@ -22,26 +22,6 @@ namespace Saritasa.Tools.Common.Tests
         private event EventHandler<EventArgs> EventArgsTestEvent;
 
         [Fact]
-        public void Raise_should_call_test_handler()
-        {
-            // Arrange
-            int a = 10;
-            EventArgs eventArgs = new EventArgs();
-            EventHandler<EventArgs> testDelegate = (sender, args) =>
-            {
-                a = 20;
-            };
-            EventArgsTestEvent = null;
-            EventArgsTestEvent += testDelegate;
-
-            // Act
-            FlowUtils.Raise(this, eventArgs, ref EventArgsTestEvent);
-
-            // Assert
-            Assert.Equal(20, a);
-        }
-
-        [Fact]
         public void Raise_all_should_call_test_handlers()
         {
             // Arrange
@@ -96,7 +76,6 @@ namespace Saritasa.Tools.Common.Tests
             EventArgs eventArgs = new EventArgs();
 
             // Act
-            FlowUtils.Raise(this, eventArgs, ref EventArgsTestEvent);
             FlowUtils.RaiseAll(this, eventArgs, ref EventArgsTestEvent);
 
             // Assert

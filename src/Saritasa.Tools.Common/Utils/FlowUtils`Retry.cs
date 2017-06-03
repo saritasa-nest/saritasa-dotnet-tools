@@ -1,16 +1,15 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+#if PORTABLE || NETSTANDARD1_2 || NETSTANDARD1_6 || NETCOREAPP1_0 || NETCOREAPP1_1
+using System.Reflection;
+#endif
+
 namespace Saritasa.Tools.Common.Utils
 {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
-#if PORTABLE || NETSTANDARD1_2 || NETSTANDARD1_6 || NETCOREAPP1_0 || NETCOREAPP1_1
-    using System.Reflection;
-#endif
-    using JetBrains.Annotations;
-
     /// <summary>
     /// Provides methods to control execution flow.
     /// </summary>
@@ -38,11 +37,11 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="action">Action to execute.</param>
         /// <param name="retryStrategy">Retry strategy to use.</param>
-        /// <param name="transientExceptions">Set of exceptions on which repeat occurs. If null retry will appear on any exception.</param>
+        /// <param name="transientExceptions">SetPart of exceptions on which repeat occurs. If null retry will appear on any exception.</param>
         /// <returns>Specified user type.</returns>
         public static T Retry<T>(
-            [NotNull] Func<T> action,
-            [NotNull] RetryStrategy retryStrategy,
+            Func<T> action,
+            RetryStrategy retryStrategy,
             params Type[] transientExceptions)
         {
             Guard.IsNotNull(action, nameof(action));
@@ -88,10 +87,10 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="action">Action to execute.</param>
         /// <param name="retryStrategy">Retry strategy.</param>
-        /// <param name="transientExceptions">Set of exceptions on which repeat occurs. If null retry will appear on any exception.</param>
+        /// <param name="transientExceptions">SetPart of exceptions on which repeat occurs. If null retry will appear on any exception.</param>
         public static void Retry(
-            [NotNull] Action action,
-            [NotNull] RetryStrategy retryStrategy,
+            Action action,
+            RetryStrategy retryStrategy,
             params Type[] transientExceptions)
         {
             FlowUtils.Retry(
@@ -116,8 +115,8 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="transientExceptions">Transient exceptions.</param>
         /// <returns>Task that specified when action executed successfully or with error after all retries.</returns>
         public static Task<T> RetryAsync<T>(
-            [NotNull] Func<Task<T>> action,
-            [NotNull] RetryStrategy retryStrategy,
+            Func<Task<T>> action,
+            RetryStrategy retryStrategy,
             CancellationToken cancellationToken = default(CancellationToken),
             params Type[] transientExceptions)
         {
@@ -220,8 +219,8 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="transientExceptions">Transient exceptions.</param>
         /// <returns>Task that specified when action executed successfully or with error after all retries.</returns>
         public static Task RetryAsync(
-            [NotNull] Func<Task> action,
-            [NotNull] RetryStrategy retryStrategy,
+            Func<Task> action,
+            RetryStrategy retryStrategy,
             CancellationToken cancellationToken = default(CancellationToken),
             params Type[] transientExceptions)
         {
@@ -264,8 +263,8 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="transientExceptions">Transient exceptions.</param>
         /// <returns>Task that specified when action executed successfully or with error after all retries.</returns>
         public static async Task<T> RetryAsync<T>(
-            [NotNull] Func<Task<T>> action,
-            [NotNull] RetryStrategy retryStrategy,
+            Func<Task<T>> action,
+            RetryStrategy retryStrategy,
             CancellationToken cancellationToken = default(CancellationToken),
             params Type[] transientExceptions)
         {
@@ -325,8 +324,8 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="transientExceptions">Transient exceptions.</param>
         /// <returns>Task that specified when action executed successfully or with error after all retries.</returns>
         public static async Task RetryAsync(
-            [NotNull] Func<Task> action,
-            [NotNull] RetryStrategy retryStrategy,
+            Func<Task> action,
+            RetryStrategy retryStrategy,
             CancellationToken cancellationToken = default(CancellationToken),
             params Type[] transientExceptions)
         {

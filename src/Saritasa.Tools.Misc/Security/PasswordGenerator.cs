@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System.Linq;
+
 namespace Saritasa.Tools.Misc.Security
 {
     using System;
@@ -755,9 +757,7 @@ namespace Saritasa.Tools.Misc.Security
 
         static string Reverse(string target)
         {
-            var arr = target.ToCharArray();
-            Array.Reverse(arr);
-            return new string(arr);
+            return string.Join(string.Empty, target.Reverse());
         }
     }
 }

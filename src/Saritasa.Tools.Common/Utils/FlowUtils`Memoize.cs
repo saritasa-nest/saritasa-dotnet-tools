@@ -1,12 +1,14 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_6
+    using System.Runtime.Serialization;
+#endif
+
 namespace Saritasa.Tools.Common.Utils
 {
-    using System;
-    using System.Collections.Generic;
-    using JetBrains.Annotations;
-
     /// <summary>
     /// Provides methods to control execution flow.
     /// </summary>
@@ -36,6 +38,19 @@ namespace Saritasa.Tools.Common.Utils
             {
                 this.result = result;
             }
+
+#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_6
+            /// <summary>
+            /// .ctor for deserialization.
+            /// </summary>
+            /// <param name="info">Stores all the data needed to serialize or deserialize an object.</param>
+            /// <param name="context">Describes the source and destination of a given serialized stream,
+            /// and provides an additional caller-defined context.</param>
+            protected SkipMemoizeException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+            }
+#endif
         }
 
         /// <summary>
@@ -294,7 +309,7 @@ namespace Saritasa.Tools.Common.Utils
         /// is not thread safe.</param>
         /// <returns>Delegate the able to cache.</returns>
         public static Func<TKey, TResult> Memoize<TKey, TResult>(
-            [NotNull] Func<TKey, TResult> func,
+            Func<TKey, TResult> func,
             CacheStrategy<TKey, TResult> strategies = null,
             IDictionary<TKey, TResult> cache = null)
         {
@@ -376,7 +391,7 @@ namespace Saritasa.Tools.Common.Utils
         /// is not thread safe.</param>
         /// <returns>Delegate the able to cache.</returns>
         public static Func<TResult> Memoize<TResult>(
-            [NotNull] Func<TResult> func,
+            Func<TResult> func,
             CacheStrategy<int, TResult> strategies = null,
             IDictionary<int, TResult> cache = null)
         {
@@ -400,7 +415,7 @@ namespace Saritasa.Tools.Common.Utils
         /// is not thread safe.</param>
         /// <returns>Delegate the able to cache.</returns>
         public static Func<T1, T2, TResult> Memoize<T1, T2, TResult>(
-            [NotNull] Func<T1, T2, TResult> func,
+            Func<T1, T2, TResult> func,
             CacheStrategy<Tuple<T1, T2>, TResult> strategies = null,
             IDictionary<Tuple<T1, T2>, TResult> cache = null)
         {
@@ -425,7 +440,7 @@ namespace Saritasa.Tools.Common.Utils
         /// is not thread safe.</param>
         /// <returns>Delegate the able to cache.</returns>
         public static Func<T1, T2, T3, TResult> Memoize<T1, T2, T3, TResult>(
-            [NotNull] Func<T1, T2, T3, TResult> func,
+            Func<T1, T2, T3, TResult> func,
             CacheStrategy<Tuple<T1, T2, T3>, TResult> strategies = null,
             IDictionary<Tuple<T1, T2, T3>, TResult> cache = null)
         {

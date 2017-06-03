@@ -1,14 +1,13 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using Saritasa.Tools.Common.Extensions;
+
 namespace Saritasa.Tools.Common.Utils
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Text.RegularExpressions;
-    using Extensions;
-
     /// <summary>
     /// Contains various check methods. If condition is false it generates exception.
     /// </summary>
@@ -40,7 +39,6 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
-        [DebuggerStepThrough]
         public static void IsNotEmpty(Guid argument, string argumentName)
         {
             if (argument == Guid.Empty)
@@ -55,7 +53,6 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
-        [DebuggerStepThrough]
         public static void IsNotEmpty(string argument, string argumentName)
         {
             if (string.IsNullOrWhiteSpace(argument))
@@ -71,7 +68,6 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="argument">Argument.</param>
         /// <param name="length">Maximum length.</param>
         /// <param name="argumentName">Argument name.</param>
-        [DebuggerStepThrough]
         public static void IsNotOutOfLength(string argument, int length, string argumentName)
         {
             if (argument.Length > length)
@@ -86,7 +82,6 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
-        [DebuggerStepThrough]
         public static void IsNotNull(object argument, string argumentName)
         {
             if (argument == null)
@@ -100,7 +95,6 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
-        [DebuggerStepThrough]
         public static void IsNotNegative(int argument, string argumentName)
         {
             if (argument < 0)
@@ -114,7 +108,6 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
-        [DebuggerStepThrough]
         public static void IsNotNegativeOrZero(int argument, string argumentName)
         {
             if (argument <= 0)
@@ -128,7 +121,6 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
-        [DebuggerStepThrough]
         public static void IsNotNegative(Int64 argument, string argumentName)
         {
             if (argument < 0)
@@ -142,7 +134,6 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
-        [DebuggerStepThrough]
         public static void IsNotNegativeOrZero(Int64 argument, string argumentName)
         {
             if (argument <= 0)
@@ -156,7 +147,6 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
-        [DebuggerStepThrough]
         public static void IsNotNegative(Single argument, string argumentName)
         {
             if (argument < 0)
@@ -170,7 +160,6 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
-        [DebuggerStepThrough]
         public static void IsNotNegativeOrZero(Single argument, string argumentName)
         {
             if (argument <= 0)
@@ -184,7 +173,6 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
-        [DebuggerStepThrough]
         public static void IsNotNegative(Decimal argument, string argumentName)
         {
             if (argument < 0)
@@ -198,7 +186,6 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
-        [DebuggerStepThrough]
         public static void IsNotNegativeOrZero(Decimal argument, string argumentName)
         {
             if (argument <= 0)
@@ -212,7 +199,6 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
-        [DebuggerStepThrough]
         public static void IsNotInPast(DateTime argument, string argumentName)
         {
             if (argument < DateTime.Now)
@@ -228,7 +214,6 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="argument">Argument.</param>
         /// <param name="date">Date to compare.</param>
         /// <param name="argumentName">Argument name.</param>
-        [DebuggerStepThrough]
         public static void IsNotInPast(DateTime argument, DateTime date, string argumentName)
         {
             if (argument < date)
@@ -242,7 +227,6 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
-        [DebuggerStepThrough]
         public static void IsNotInFuture(DateTime argument, string argumentName)
         {
             if (argument > DateTime.Now)
@@ -258,7 +242,6 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="argument">Argument.</param>
         /// <param name="date">Date to compare.</param>
         /// <param name="argumentName">Argument name.</param>
-        [DebuggerStepThrough]
         public static void IsNotInFuture(DateTime argument, DateTime date, string argumentName)
         {
             if (argument > date)
@@ -272,7 +255,6 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
-        [DebuggerStepThrough]
         public static void IsNotNegative(TimeSpan argument, string argumentName)
         {
             if (argument < TimeSpan.Zero)
@@ -286,7 +268,6 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
-        [DebuggerStepThrough]
         public static void IsNotNegativeOrZero(TimeSpan argument, string argumentName)
         {
             if (argument <= TimeSpan.Zero)
@@ -300,7 +281,6 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="argument">Collection of arguments.</param>
         /// <param name="argumentName">Argument name.</param>
-        [DebuggerStepThrough]
         public static void IsNotEmpty<T>(ICollection<T> argument, string argumentName)
         {
             IsNotNull(argument, argumentName);
@@ -318,10 +298,9 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="min">Minimum value.</param>
         /// <param name="max">Maximum value.</param>
         /// <param name="argumentName">Argument name.</param>
-        [DebuggerStepThrough]
         public static void IsNotOutOfRange(int argument, int min, int max, string argumentName)
         {
-            if ((argument < min) || (argument > max))
+            if (argument < min || argument > max)
             {
                 throw new ArgumentOutOfRangeException(argumentName,
                     Properties.Strings.ArgumentMustBeBetween.FormatWith(argumentName, min.ToString(), max.ToString()));
@@ -333,7 +312,6 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="argument">Email argument.</param>
         /// <param name="argumentName">Argument name.</param>
-        [DebuggerStepThrough]
         public static void IsNotInvalidEmail(string argument, string argumentName)
         {
             IsNotEmpty(argument, argumentName);

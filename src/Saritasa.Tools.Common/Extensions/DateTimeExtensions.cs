@@ -2,6 +2,7 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Globalization;
 using Saritasa.Tools.Common.Utils;
 
 namespace Saritasa.Tools.Common.Extensions
@@ -16,22 +17,11 @@ namespace Saritasa.Tools.Common.Extensions
         /// </summary>
         /// <param name="target">Target date.</param>
         /// <param name="period">Type of truncation.</param>
+        /// <param name="cultureInfo">Specific culture to use. If null current culture is used.</param>
         /// <returns>Truncated date.</returns>
-        public static DateTime Truncate(this DateTime target, DateTimePeriod period)
+        public static DateTime Truncate(this DateTime target, DateTimePeriod period, CultureInfo cultureInfo = null)
         {
-            return DateTimeUtils.Truncate(target, period);
-        }
-
-        /// <summary>
-        /// Is date between two startDate and endDate dates shortcut method.
-        /// </summary>
-        /// <param name="target">Date to compare.</param>
-        /// <param name="startDate">Start date.</param>
-        /// <param name="endDate">End date.</param>
-        /// <returns>True if date between startDate and endDate, False otherwise.</returns>
-        public static bool IsBetween(this DateTime target, DateTime startDate, DateTime endDate)
-        {
-            return DateTimeUtils.IsBetween(target, startDate, endDate);
+            return DateTimeUtils.Truncate(target, period, cultureInfo);
         }
 
         /// <summary>
@@ -42,10 +32,11 @@ namespace Saritasa.Tools.Common.Extensions
         /// <param name="target">The object to compare against.</param>
         /// <param name="value">The object to compare to the current instance.</param>
         /// <param name="period">Type of truncation.</param>
+        /// <param name="cultureInfo">Specific culture to use. If null current culture is used.</param>
         /// <returns>A signed number indicating the relative values of this instance and the value parameter.</returns>
-        public static int CompareTo(this DateTime target, DateTime value, DateTimePeriod period)
+        public static int CompareWithTruncate(this DateTime target, DateTime value, DateTimePeriod period, CultureInfo cultureInfo = null)
         {
-            return DateTimeUtils.Truncate(target, period).CompareTo(value.Truncate(period));
+            return DateTimeUtils.Truncate(target, period, cultureInfo).CompareTo(value.Truncate(period, cultureInfo));
         }
     }
 }

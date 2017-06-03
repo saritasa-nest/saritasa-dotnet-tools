@@ -23,10 +23,10 @@ namespace Saritasa.Tools.Common.Tests
             var date4 = new DateTime(2017, 3, 1);
 
             // Act & Assert
-            Assert.Equal(new DateTime(2017, 2, 1), DateTimeUtils.StartOf(date1, DateTimePeriod.Month));
-            Assert.Equal(new DateTime(2016, 6, 1), DateTimeUtils.StartOf(date2, DateTimePeriod.Month));
-            Assert.Equal(new DateTime(2017, 9, 1), DateTimeUtils.StartOf(date3, DateTimePeriod.Month));
-            Assert.Equal(new DateTime(2017, 3, 1), DateTimeUtils.StartOf(date4, DateTimePeriod.Month));
+            Assert.Equal(new DateTime(2017, 2, 1), DateTimeUtils.GetStartOfPeriod(date1, DateTimePeriod.Month));
+            Assert.Equal(new DateTime(2016, 6, 1), DateTimeUtils.GetStartOfPeriod(date2, DateTimePeriod.Month));
+            Assert.Equal(new DateTime(2017, 9, 1), DateTimeUtils.GetStartOfPeriod(date3, DateTimePeriod.Month));
+            Assert.Equal(new DateTime(2017, 3, 1), DateTimeUtils.GetStartOfPeriod(date4, DateTimePeriod.Month));
         }
 
         [Fact]
@@ -39,10 +39,10 @@ namespace Saritasa.Tools.Common.Tests
             var date4 = new DateTime(2017, 3, 1);
 
             // Act & Assert
-            Assert.Equal(new DateTime(2017, 2, 28), DateTimeUtils.EndOf(date1, DateTimePeriod.Month).Date);
-            Assert.Equal(new DateTime(2016, 6, 30), DateTimeUtils.EndOf(date2, DateTimePeriod.Month).Date);
-            Assert.Equal(new DateTime(2017, 9, 30), DateTimeUtils.EndOf(date3, DateTimePeriod.Month).Date);
-            Assert.Equal(new DateTime(2017, 3, 31), DateTimeUtils.EndOf(date4, DateTimePeriod.Month).Date);
+            Assert.Equal(new DateTime(2017, 2, 28), DateTimeUtils.GetEndOfPeriod(date1, DateTimePeriod.Month).Date);
+            Assert.Equal(new DateTime(2016, 6, 30), DateTimeUtils.GetEndOfPeriod(date2, DateTimePeriod.Month).Date);
+            Assert.Equal(new DateTime(2017, 9, 30), DateTimeUtils.GetEndOfPeriod(date3, DateTimePeriod.Month).Date);
+            Assert.Equal(new DateTime(2017, 3, 31), DateTimeUtils.GetEndOfPeriod(date4, DateTimePeriod.Month).Date);
         }
 
         [Fact]
@@ -55,10 +55,10 @@ namespace Saritasa.Tools.Common.Tests
             var q4 = new DateTime(2017, 11, 3);
 
             // Act & Assert
-            Assert.Equal(new DateTime(2017, 1, 1), DateTimeUtils.StartOf(q1, DateTimePeriod.Quarter));
-            Assert.Equal(new DateTime(2017, 4, 1), DateTimeUtils.StartOf(q2, DateTimePeriod.Quarter));
-            Assert.Equal(new DateTime(2017, 7, 1), DateTimeUtils.StartOf(q3, DateTimePeriod.Quarter));
-            Assert.Equal(new DateTime(2017, 10, 1), DateTimeUtils.StartOf(q4, DateTimePeriod.Quarter));
+            Assert.Equal(new DateTime(2017, 1, 1), DateTimeUtils.GetStartOfPeriod(q1, DateTimePeriod.Quarter));
+            Assert.Equal(new DateTime(2017, 4, 1), DateTimeUtils.GetStartOfPeriod(q2, DateTimePeriod.Quarter));
+            Assert.Equal(new DateTime(2017, 7, 1), DateTimeUtils.GetStartOfPeriod(q3, DateTimePeriod.Quarter));
+            Assert.Equal(new DateTime(2017, 10, 1), DateTimeUtils.GetStartOfPeriod(q4, DateTimePeriod.Quarter));
         }
 
         [Fact]
@@ -71,10 +71,9 @@ namespace Saritasa.Tools.Common.Tests
             var diffb2 = new DateTime(2014, 8, 10);
 
             // Act & Assert
-            Assert.InRange(DateTimeUtils.Diff(diffa1, diffa2, DateTimePeriod.Month), 26.35, 26.355);
-            Assert.InRange(DateTimeUtils.Diff(diffa2, diffa1, DateTimePeriod.Month), 26.35, 26.355);
-            Assert.InRange(DateTimeUtils.Diff(diffb2, diffb1, DateTimePeriod.Month), 50.38, 50.388);
-
+            Assert.InRange(DateTimeUtils.GetDiff(diffa1, diffa2, DateTimePeriod.Month), 26.35, 26.355);
+            Assert.InRange(DateTimeUtils.GetDiff(diffa2, diffa1, DateTimePeriod.Month), 26.35, 26.355);
+            Assert.InRange(DateTimeUtils.GetDiff(diffb2, diffb1, DateTimePeriod.Month), 50.38, 50.388);
         }
     }
 }

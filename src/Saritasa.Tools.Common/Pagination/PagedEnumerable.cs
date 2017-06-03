@@ -1,14 +1,13 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace Saritasa.Tools.Common.Pagination
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Linq;
-    using JetBrains.Annotations;
-
     /// <summary>
     /// Paged enumerable. May additionaly query source to get total number of items in collection.
     /// </summary>
@@ -90,7 +89,7 @@ namespace Saritasa.Tools.Common.Pagination
         /// <param name="pageSize">Page size. Default is 100.</param>
         /// <param name="totalPages">Total pages. If below zero it will be calculated.</param>
         public PagedEnumerable(
-            [NotNull] IEnumerable<T> baseSource,
+            IEnumerable<T> baseSource,
             int page = DefaultCurrentPage,
             int pageSize = DefaultPageSize,
             int totalPages = -1)
@@ -120,7 +119,7 @@ namespace Saritasa.Tools.Common.Pagination
         /// </summary>
         /// <param name="source">Enumerable.</param>
         /// <returns>Paged enumerable.</returns>
-        public static PagedEnumerable<T> CreateAndReturnAll([NotNull] IEnumerable<T> source)
+        public static PagedEnumerable<T> CreateAndReturnAll(IEnumerable<T> source)
         {
             var list = source.ToList();
             return new PagedEnumerable<T>()
@@ -167,7 +166,7 @@ namespace Saritasa.Tools.Common.Pagination
             };
         }
 
-        static int GetTotalPages([NotNull] IEnumerable<T> source, int pageSize)
+        static int GetTotalPages(IEnumerable<T> source, int pageSize)
         {
             return (source.Count() + pageSize - 1) / pageSize;
         }

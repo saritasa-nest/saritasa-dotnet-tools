@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Saritasa.Tools.Common.Extensions;
 
@@ -19,19 +20,23 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="fromDate">From date.</param>
         /// <param name="toDate">To date.</param>
         /// <returns>Dates range.</returns>
-        public static IEnumerable<DateTime> Range(DateTime fromDate, DateTime toDate)
+        public static IEnumerable<DateTime> GetRange(DateTime fromDate, DateTime toDate)
         {
             return Enumerable.Range(0, toDate.Subtract(fromDate).Days + 1).Select(d => fromDate.AddDays(d));
         }
 
         /// <summary>
-        /// Combines date part from first date and time from another.
+        /// Combines date part from first date and time from another. Kind is taken from time part.
         /// </summary>
         /// <param name="date">Date part.</param>
         /// <param name="time">Time part.</param>
         /// <returns>Combined DateTime.</returns>
-        public static DateTime CombineDateTime(DateTime date, DateTime time)
+        public static DateTime CombineDateAndTime(DateTime date, DateTime time)
         {
+            if (date.Kind != time.Kind)
+            {
+                throw new ArgumentException(Properties.Strings.ResourceManager.GetString("ArgumentDateTimeKindMustBeEqual"));
+            }
             return new DateTime(date.Year, date.Month, date.Day, time.Hour, time.Minute, time.Second, time.Kind);
         }
 
@@ -40,19 +45,21 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="target">Target date.</param>
         /// <param name="period">Period type.</param>
+        /// <param name="cultureInfo">Specific culture to use. If null current culture is used.</param>
         /// <returns>Start of period date.</returns>
-        public static DateTime StartOf(DateTime target, DateTimePeriod period)
+        public static DateTime GetStartOfPeriod(DateTime target, DateTimePeriod period, CultureInfo cultureInfo = null)
         {
-            return target.Truncate(period);
+            return target.Truncate(period, cultureInfo);
         }
 
         /// <summary>
-        /// End datetime of period.
+        /// Get end datetime of period.
         /// </summary>
         /// <param name="target">Target date.</param>
         /// <param name="period">Period type.</param>
+        /// <param name="cultureInfo">Specific culture to use. If null current culture is used.</param>
         /// <returns>End of period date.</returns>
-        public static DateTime EndOf(DateTime target, DateTimePeriod period)
+        public static DateTime GetEndOfPeriod(DateTime target, DateTimePeriod period, CultureInfo cultureInfo = null)
         {
             var result = target.Truncate(period);
             switch (period)
@@ -89,13 +96,14 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Shortcut to set date part.
+        /// Shortcut to set date part. Method throws <see cref="ArgumentException" /> for
+        /// week and quarter periods.
         /// </summary>
         /// <param name="target">Target date.</param>
         /// <param name="period">Period to replace.</param>
         /// <param name="value">Value to replace by.</param>
         /// <returns>The date with new value.</returns>
-        public static DateTime Set(DateTime target, DateTimePeriod period, int value)
+        public static DateTime SetPart(DateTime target, DateTimePeriod period, int value)
         {
             switch (period)
             {
@@ -133,8 +141,9 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="target">Target date.</param>
         /// <param name="period">Type of truncation.</param>
+        /// <param name="cultureInfo">Specific culture to use. If null current culture is used.</param>
         /// <returns>Truncated date.</returns>
-        public static DateTime Truncate(DateTime target, DateTimePeriod period)
+        public static DateTime Truncate(DateTime target, DateTimePeriod period, CultureInfo cultureInfo = null)
         {
             switch (period)
             {
@@ -147,8 +156,9 @@ namespace Saritasa.Tools.Common.Utils
                 case DateTimePeriod.Day:
                     return new DateTime(target.Year, target.Month, 1, 0, 0, 0, target.Kind);
                 case DateTimePeriod.Week:
+                    var firstDayOfWeek = cultureInfo?.DateTimeFormat.FirstDayOfWeek ?? CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek;
                     return new DateTime(target.Year, target.Month, target.Day, 0, 0, 0, target.Kind)
-                        .AddDays(-(int)target.DayOfWeek);
+                        .AddDays(-(int)target.DayOfWeek + (int)firstDayOfWeek);
                 case DateTimePeriod.Month:
                     return new DateTime(target.Year, target.Month, 1, 0, 0, 0, target.Kind);
                 case DateTimePeriod.Quarter:
@@ -160,18 +170,6 @@ namespace Saritasa.Tools.Common.Utils
                 default:
                     return target;
             }
-        }
-
-        /// <summary>
-        /// Is date between two startDate and endDate dates shortcut method.
-        /// </summary>
-        /// <param name="target">Date to compare.</param>
-        /// <param name="startDate">Start date.</param>
-        /// <param name="endDate">End date.</param>
-        /// <returns>True if date between startDate and endDate, False otherwise.</returns>
-        public static bool IsBetween(DateTime target, DateTime startDate, DateTime endDate)
-        {
-            return target >= startDate && target <= endDate;
         }
 
         /// <summary>
@@ -208,11 +206,11 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Converts <see cref="DateTime" /> to unix time stamp.
         /// </summary>
-        /// <param name="target">Target datetime</param>
+        /// <param name="target">Target datetime.</param>
         /// <returns>Unix time stamp.</returns>
         public static double ToUnixTimestamp(DateTime target)
         {
-            return (target - UnixEpoch).TotalMilliseconds;
+            return (target - UnixEpoch).TotalSeconds;
         }
 
         #endregion
@@ -224,12 +222,12 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="target2">Date 2.</param>
         /// <param name="period">Period type.</param>
         /// <returns>Difference.</returns>
-        public static double Diff(DateTime target1, DateTime target2, DateTimePeriod period)
+        public static double GetDiff(DateTime target1, DateTime target2, DateTimePeriod period)
         {
             // Swap to get positive value.
             if (target1 > target2)
             {
-                return Diff(target2, target1, period);
+                return GetDiff(target2, target1, period);
             }
 
             switch (period)
@@ -245,18 +243,18 @@ namespace Saritasa.Tools.Common.Utils
                 case DateTimePeriod.Week:
                     return (target2 - target1).TotalDays / 7;
                 case DateTimePeriod.Month:
-                    return MonthDiff(target2, target1);
+                    return GetMonthDiff(target2, target1);
                 case DateTimePeriod.Quarter:
-                    return MonthDiff(target2, target1) / 3;
+                    return GetMonthDiff(target2, target1) / 3;
                 case DateTimePeriod.Year:
-                    return MonthDiff(target2, target1) / 12;
+                    return GetMonthDiff(target2, target1) / 12;
             }
 
             throw new ArgumentException(nameof(period));
         }
 
         /// <summary>
-        /// Calculate difference between two dates in months as float value.
+        /// Calculate difference between two dates in months as double value.
         /// </summary>
         /// <remarks>
         /// Original: https://github.com/moment/moment/blob/develop/src/lib/moment/diff.js .
@@ -264,7 +262,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="target1">Date 1.</param>
         /// <param name="target2">Date 2.</param>
         /// <returns>Months difference.</returns>
-        private static double MonthDiff(DateTime target1, DateTime target2)
+        private static double GetMonthDiff(DateTime target1, DateTime target2)
         {
             // Difference in months.
             var wholeMonthDiff = (target2.Year - target1.Year) * 12 + (target2.Month - target1.Month);
