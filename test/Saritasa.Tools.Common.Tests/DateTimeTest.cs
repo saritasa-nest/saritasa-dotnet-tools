@@ -1,13 +1,13 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Globalization;
+using Xunit;
+using Saritasa.Tools.Common.Utils;
+
 namespace Saritasa.Tools.Common.Tests
 {
-    using System;
-    using Xunit;
-    using Extensions;
-    using Utils;
-
     /// <summary>
     /// Date time tests.
     /// </summary>
@@ -16,7 +16,7 @@ namespace Saritasa.Tools.Common.Tests
         [Fact]
         public void Begin_of_month_should_truncate_date()
         {
-            // Assert
+            // Arrange
             var date1 = new DateTime(2017, 2, 3);
             var date2 = new DateTime(2016, 6, 3);
             var date3 = new DateTime(2017, 9, 30);
@@ -32,7 +32,7 @@ namespace Saritasa.Tools.Common.Tests
         [Fact]
         public void End_of_month_should_truncate_date()
         {
-            // Assert
+            // Arrange
             var date1 = new DateTime(2017, 2, 3);
             var date2 = new DateTime(2016, 6, 3);
             var date3 = new DateTime(2017, 9, 30);
@@ -48,7 +48,7 @@ namespace Saritasa.Tools.Common.Tests
         [Fact]
         public void Start_of_quarters_should_be_correct()
         {
-            // Assert
+            // Arrange
             var q1 = new DateTime(2017, 2, 3);
             var q2 = new DateTime(2017, 5, 3);
             var q3 = new DateTime(2017, 7, 5);
@@ -64,7 +64,7 @@ namespace Saritasa.Tools.Common.Tests
         [Fact]
         public void Diff_for_months_should_be_correct()
         {
-            // Assert
+            // Arrange
             var diffa1 = new DateTime(2016, 10, 12);
             var diffa2 = new DateTime(2014, 8, 1);
             var diffb1 = new DateTime(2018, 10, 22);
@@ -74,6 +74,28 @@ namespace Saritasa.Tools.Common.Tests
             Assert.InRange(DateTimeUtils.GetDiff(diffa1, diffa2, DateTimePeriod.Month), 26.35, 26.355);
             Assert.InRange(DateTimeUtils.GetDiff(diffa2, diffa1, DateTimePeriod.Month), 26.35, 26.355);
             Assert.InRange(DateTimeUtils.GetDiff(diffb2, diffb1, DateTimePeriod.Month), 50.38, 50.388);
+        }
+
+        [Fact]
+        public void Combine_date_and_time_with_different_kinds_should_generate_exception()
+        {
+            // Arrange
+            var dt1 = new DateTime(2016, 1, 1, 0, 0, 0, DateTimeKind.Local);
+            var dt2 = new DateTime(2016, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => { DateTimeUtils.CombineDateAndTime(dt1, dt2); });
+        }
+
+        [Fact]
+        public void Start_of_week_should_be_culture_correct()
+        {
+            // Arrange
+            var dt = new DateTime(2017, 6, 5);
+
+            // Act & Assert
+            Assert.Equal(DayOfWeek.Sunday, DateTimeUtils.GetStartOfPeriod(dt, DateTimePeriod.Week, CultureInfo.InvariantCulture).DayOfWeek);
+            Assert.Equal(DayOfWeek.Monday, DateTimeUtils.GetStartOfPeriod(dt, DateTimePeriod.Week, new CultureInfo("ru")).DayOfWeek);
         }
     }
 }
