@@ -9,7 +9,10 @@ We tried to collect such little things in one place to be able to use it in all 
     :maxdepth: 1
 
     atomic
-    extensions
+    collection
+    datetime
+    dictionary
+    enum
     flow
     guard
     pagination

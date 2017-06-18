@@ -24,7 +24,7 @@ namespace Saritasa.Tools.Common.Tests
         public void Creating_reference_type_delegate_should_work()
         {
             // Arrange
-            var factory = ObjectUtils.GenerateFactory<ReferenceType>();
+            var factory = ObjectUtils.CreateTypeFactory<ReferenceType>();
 
             // Act & Assert
             Assert.IsType<ReferenceType>(factory());
@@ -34,7 +34,7 @@ namespace Saritasa.Tools.Common.Tests
         public void Creating_value_type_delegate_should_work()
         {
             // Arrange
-            var factory = ObjectUtils.GenerateFactory<ValueType>();
+            var factory = ObjectUtils.CreateTypeFactory<ValueType>();
 
             // Act & Assert
             Assert.IsType<ValueType>(factory());

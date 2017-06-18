@@ -137,7 +137,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Truncates date. Begin of period.
+        /// Truncates date by specified period. Begin of period.
         /// </summary>
         /// <param name="target">Target date.</param>
         /// <param name="period">Type of truncation.</param>

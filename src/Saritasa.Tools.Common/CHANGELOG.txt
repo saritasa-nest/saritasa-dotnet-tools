@@ -3,6 +3,8 @@
 [*] Update Microsoft.NETCore.App to 1.1.1 .
 [-] Remove DateTimeExtensions.IsHoliday .
 [+] Most of extension methods now have utils equivalent. Extenstions are shortcuts for utils methods.
+[+] Add ObjectUtils.CreateTypeFactory method.
+[+] A lot of refactoring and renamings.
 
 0.2.1 [2017-02-11]
 [*] Rename DateTimeUtils.BeginOf to DateTimeUtils.StartOf .

@@ -22,7 +22,7 @@ namespace Saritasa.Tools.Common.Utils
         /// </remarks>
         /// <typeparam name="T">Type that implemented parameterless constructor.</typeparam>
         /// <returns>Factory delegate.</returns>
-        public static Func<T> GenerateFactory<T>() where T : new()
+        public static Func<T> CreateTypeFactory<T>() where T : new()
         {
 #if !PORTABLE && !NETSTANDARD1_2 && !NETSTANDARD1_6 && !NETCOREAPP1_0 && !NETCOREAPP1_1
             Expression<Func<T>> expr = () => new T();
