@@ -169,7 +169,7 @@ namespace Saritasa.Tools.Common.Utils
             Guard.IsNotNull(target, nameof(target));
             if (target.Length % 2 != 0)
             {
-                throw new ArgumentException();
+                throw new ArgumentException(Properties.Strings.TargetStringLengthIncorrect, nameof(target));
             }
             var bytes = new byte[target.Length / 2];
             for (int i = 0; i < bytes.Length; i++)

@@ -35,7 +35,7 @@ namespace Saritasa.Tools.Common.Utils
         {
             if (date.Kind != time.Kind)
             {
-                throw new ArgumentException(Properties.Strings.ResourceManager.GetString("ArgumentDateTimeKindMustBeEqual"));
+                throw new ArgumentException(Properties.Strings.ArgumentDateTimeKindMustBeEqual);
             }
             return new DateTime(date.Year, date.Month, date.Day, time.Hour, time.Minute, time.Second, time.Kind);
         }

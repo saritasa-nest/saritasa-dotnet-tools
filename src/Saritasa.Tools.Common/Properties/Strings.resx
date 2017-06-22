@@ -156,4 +156,7 @@
   <data name="NoHashMethod" xml:space="preserve">
     <value>{0} does not contain hash method.</value>
   </data>
+  <data name="TargetStringLengthIncorrect" xml:space="preserve">
+    <value>Incorrect target string length.</value>
+  </data>
 </root>

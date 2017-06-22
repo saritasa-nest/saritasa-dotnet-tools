@@ -181,6 +181,7 @@ namespace Saritasa.Tools.Common.Utils
                 throw new ArgumentOutOfRangeException(nameof(maxCount),
                     string.Format(Properties.Strings.ArgumentMustBeGreaterThan, nameof(maxCount), nameof(removeCount)));
             }
+
             if (keysStorage == null || !purge)
             {
                 keysStorage = new List<TKey>();
@@ -327,15 +328,15 @@ namespace Saritasa.Tools.Common.Utils
                 TResult result;
                 bool needUpdate = false, strategiesAlreadyApplied = false;
 
-                // if result is already in cache and no need to refresh it just skip
+                // If result is already in cache and no need to refresh it just skip.
                 bool inCache = cache.TryGetValue(key, out result);
 
                 if (inCache)
                 {
-                    // we may combine strategies
+                    // We may combine strategies.
                     foreach (CacheStrategy<TKey, TResult> strategy in strategies.GetInvocationList())
                     {
-                        // we have to go thru whole list because some strategies may refresh cache
+                        // We have to go thru whole list because some strategies may refresh cache.
                         bool ret = strategy(key, cache, false);
                         if (ret)
                         {
