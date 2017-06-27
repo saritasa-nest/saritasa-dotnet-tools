@@ -39,6 +39,22 @@ namespace Saritasa.Tools.Common.Tests
         }
 
         [Fact]
+        public void Dictionary_add_or_update_should_return_new_value()
+        {
+            // Arrange
+            Dictionary<int, int> dict = new Dictionary<int, int>();
+            dict[1] = 10;
+
+            // Act
+            dict.AddOrUpdate(0, (key, value) => ++value, 10);
+            dict.AddOrUpdate(1, (key, value) => ++value);
+
+            // Assert
+            Assert.Equal(11, dict[0]);
+            Assert.Equal(11, dict[1]);
+        }
+
+        [Fact]
         public void Chunk_select_range_should_return_subsets()
         {
             // Arrange

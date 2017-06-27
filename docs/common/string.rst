@@ -3,36 +3,25 @@ StringUtils
 
 String utils.
 
-.. function:: string ConvertToSnakeCase(string target)
-
-    Converts string to snake case string style. Example: HelloWorld -> hello_world.
-
-.. function:: bool IsEmail(string target)
-
-    Returns true if strign is email address. Uses ``CheckConstants.EmailExpression`` regexp to check.
-
-.. function:: string Truncate(string target, int maxLength)
+.. function:: string SafeTruncate(string target, int maxLength)
 
     Truncates target string to max length. Useful to do not allow string to exceed specific amount of character.
 
-.. function:: string Join(String separator, IEnumerable<String> values)
+.. function:: static string SafeSubstring(string target, int startIndex, int length)
 
-    Concatenates enumerable of strings using the specified separator.
+    Retrieves a substring from this instance. If start index had negative value it will be replaced to 0. If substring exceed length of target string the end of string will be returned.
+
+.. function:: static string NullSafe(string target)
+
+    Returns empty string if target string is null or string itself. For those who wants clean syntax:
+
+        .. code-block:: c#
+
+            var str1 = str1 ?? string.Empty;
+            var str2 = StringUtils.NullSage(str2);
 
 .. function:: string JoinIgnoreEmpty(string separator, params string[] values)
               string JoinIgnoreEmpty(string separator, IEnumerable<string> values)
-
-.. function:: string WildcardToRegex(sring pattern)
-
-    Converts wildcard characters to regexp string. For example `He*ll? -> He\*ll\?`.
-
-.. function:: T TryParseEnumDefault<T>(string target, T defaultValue)
-
-    Convert string value to enum value or return default
-
-.. function:: T TryParseEnumDefault<T>(string target, bool ignoreCase, T defaultValue)
-
-    Convert string value to enum value or return default.
 
 .. function:: ParseDefault
 
@@ -48,4 +37,4 @@ String utils.
         // with Saritasa extensions:
         int val = StringUtils.ParseDefault("1q", 1);
 
-    .. note:: There is extended behavior for boolean parse. Following values will be at ``True``: ``T``, ``t``, ``1``, ``Y``, ``y``. The values ``F``, ``f``, ``0``, ``N``, ``n`` will be parse as ``False``.
+    .. note:: There is extended behavior for boolean parse. Following values will be at ``True``: ``T``, ``t``, ``1``, ``Y``, ``y``. The values ``F``, ``f``, ``0``, ``N``, ``n`` will be parsed as ``False``.

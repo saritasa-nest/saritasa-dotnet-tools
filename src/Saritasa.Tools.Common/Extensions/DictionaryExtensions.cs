@@ -28,5 +28,27 @@ namespace Saritasa.Tools.Common.Extensions
         {
             return DictionaryUtils.GetValueOrDefault(target, key, defaultValue);
         }
+
+        /// <summary>
+        /// Adds a key/value pair to the <see cref="IDictionary{TKey,TValue}" /> if the key does not already
+        /// exist, or updates a key/value pair in the <see cref="IDictionary{TKey,TValue}" /> if the key
+        /// already exists. The default value will be used if key is missed to the <see cref="IDictionary{TKey,TValue}" />.
+        /// </summary>
+        /// <typeparam name="TKey">Key type.</typeparam>
+        /// <typeparam name="TValue">Value type.</typeparam>
+        /// <param name="target">Target dictionary.</param>
+        /// <param name="key">The key to be added or whose value should be updated.</param>
+        /// <param name="updateFunc">The function used to generate a new value for an existing key based on
+        /// the key's existing value.</param>
+        /// <param name="defaultValue">The value to be used for an absent key.</param>
+        /// <returns>The new or updated value for the key.</returns>
+        public static TValue AddOrUpdate<TKey, TValue>(
+            this IDictionary<TKey, TValue> target,
+            TKey key,
+            Func<TKey, TValue, TValue> updateFunc,
+            TValue defaultValue = default(TValue))
+        {
+            return DictionaryUtils.AddOrUpdate(target, key, updateFunc, defaultValue);
+        }
     }
 }

@@ -27,6 +27,7 @@ namespace Saritasa.Tools.Common.Utils
 
         /// <summary>
         /// Combines date part from first date and time from another. Kind is taken from time part.
+        /// Kind is getting from time part.
         /// </summary>
         /// <param name="date">Date part.</param>
         /// <param name="time">Time part.</param>
@@ -41,7 +42,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Begin datetime of period.
+        /// Returns begin <see cref="System.DateTime" /> of period.
         /// </summary>
         /// <param name="target">Target date.</param>
         /// <param name="period">Period type.</param>
@@ -53,7 +54,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Get end datetime of period.
+        /// Returns end <see cref="System.DateTime" /> of period.
         /// </summary>
         /// <param name="target">Target date.</param>
         /// <param name="period">Period type.</param>
@@ -96,7 +97,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Shortcut to set date part. Method throws <see cref="ArgumentException" /> for
+        /// Shortcut to set date part. Method throws <see cref="System.ArgumentException" /> for
         /// week and quarter periods.
         /// </summary>
         /// <param name="target">Target date.</param>
@@ -137,7 +138,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Truncates date by specified period. Begin of period.
+        /// Truncates date by specified period. Returns begin of period.
         /// </summary>
         /// <param name="target">Target date.</param>
         /// <param name="period">Type of truncation.</param>
@@ -173,12 +174,12 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Compares the value of this instance to a specified object with truncation that contains a specified
-        /// <see cref="System.DateTime" /> value, and returns an integer that indicates whether this instance
+        /// Compares the value of the instance to a specified <see cref="System.DateTime" /> object with truncation,
+        /// and returns an integer that indicates whether this instance
         /// is earlier than, the same as, or later than the specified <see cref="System.DateTime" /> value.
         /// </summary>
-        /// <param name="target">The object to compare against.</param>
-        /// <param name="value">The object to compare to the current instance.</param>
+        /// <param name="target">The date to compare against.</param>
+        /// <param name="value">The date to compare to the current instance.</param>
         /// <param name="period">Type of truncation.</param>
         /// <returns>A signed number indicating the relative values of this instance and the value parameter.</returns>
         public static int CompareTo(DateTime target, DateTime value, DateTimePeriod period)
@@ -194,7 +195,7 @@ namespace Saritasa.Tools.Common.Utils
         public static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         /// <summary>
-        /// Converts from unix time stamp to <see cref="DateTime" />.
+        /// Converts from unix time stamp to <see cref="System.DateTime" />.
         /// </summary>
         /// <param name="unixTimeStamp">Unix time stamp.</param>
         /// <returns>Datetime.</returns>
@@ -204,7 +205,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Converts <see cref="DateTime" /> to unix time stamp.
+        /// Converts <see cref="System.DateTime" /> to unix time stamp.
         /// </summary>
         /// <param name="target">Target datetime.</param>
         /// <returns>Unix time stamp.</returns>

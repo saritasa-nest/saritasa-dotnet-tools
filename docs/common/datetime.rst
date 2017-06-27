@@ -3,11 +3,11 @@ DateTime
 
 .. function:: DateTime Truncate(DateTime target, DateTimePeriod period, CultureInfo cultureInfo = null)
 
-    Truncates date by specified period. Begin of period.
+    Truncates date by specified period. Return begin of period.
 
 .. function:: int CompareTo(DateTime target, DateTime value, DateTimePeriod period)
 
-    The same as ``DateTime.CompareTo`` method but with additional truncation.
+    Compares the value of the instance to a specified ``DateTime`` object with truncation, and returns an integer that indicates whether this instance is earlier than, the same as, or later than the specified ``DateTime`` value.
 
 .. function:: IEnumerable<DateTime> GetRange(DateTime fromDate, DateTime toDate)
 
@@ -15,7 +15,7 @@ DateTime
 
 .. function:: DateTime CombineDateAndTime(DateTime date, DateTime time)
 
-    Combines date part from ``date`` and time from another.
+    Combines date part from ``date`` and time from another. Kind is getting from time part.
 
 .. function:: DateTime GetStartOfPeriod(DateTime target, DateTimePeriod period, CultureInfo cultureInfo = null)
 

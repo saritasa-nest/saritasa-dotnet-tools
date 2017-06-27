@@ -7,8 +7,8 @@ Provides common patterns to validate values. Contains set of methods to write le
 
         void CreateUser(User user, int score)
         {
-            Guard.IsNotNull(user, "user");
-            Guard.IsNotNegative(score, "score");
+            Guard.IsNotNull(user, nameof(user));
+            Guard.IsNotNegative(score, nameof(score));
         }
 
 There are methods implemented: ``IsNotEmpty``, ``IsNotOutOfLength``, ``IsNotNull``, ``IsNotNegative``, ``IsNotNegativeOrZero``, ``IsNotInPast``, ``IsNotInFuture``, ``IsNotInvalidEmail``.

@@ -9,7 +9,7 @@ Set of extensions related to collections (`IEnumerable`, `IList`, etc).
 
 .. function:: IEnumerable<IQueryable<T>> ChunkSelectRange<T>(IQueryable<T> source, int chunkSize)
 
-    Breaks a list of items into chunks of a specific size and yeilds ``T`` items. Default ``chunkSize`` is 1000.
+    Breaks a list of items into chunks of a specific size and yeilds ``T`` items. Be aware that this method generates one additional query to get total number of collection elements. Default ``chunkSize`` is 1000.
 
 .. function:: IEnumerable<T> ChunkSelect<T>(IQueryable<T> source, int chunkSize)
 

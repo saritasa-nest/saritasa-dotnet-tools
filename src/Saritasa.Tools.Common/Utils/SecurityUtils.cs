@@ -2,6 +2,7 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -273,5 +274,148 @@ namespace Saritasa.Tools.Common.Utils
             return Hash(target, method) == hashedStringToCheck;
         }
 #endif
+
+        #region CRC-32
+
+        private static readonly ConcurrentDictionary<uint, uint[]> crc32Tables =
+            new ConcurrentDictionary<uint, uint[]>();
+
+        /// <summary>
+        /// IEEE is the most common CRC-32 polynomial.
+        /// Used by ethernet (IEEE 802.3), v.42, fddi, gzip, zip, png, etc.
+        /// </summary>
+        [CLSCompliant(false)]
+        public const uint Crc32Ieee = 0xedb88320;
+
+        /// <summary>
+        /// Castagnoli's polynomial, used in iSCSI. Has better error detection characteristics than IEEE.
+        /// </summary>
+        /// <remarks>http://dx.doi.org/10.1109/26.231911</remarks>
+        [CLSCompliant(false)]
+        public const uint Crc32Castagnoli = 0x82f63b78;
+
+        /// <summary>
+        /// Koopman's polynomial. Also has better error detection characteristics than IEEE.
+        /// </summary>
+        /// <remarks>http://dx.doi.org/10.1109/DSN.2002.1028931</remarks>
+        [CLSCompliant(false)]
+        public const uint Crc32Koopman = 0xeb31d82e;
+
+        private static uint[] GenerateTableForCrc32(uint polynomial)
+        {
+            var table = new uint[256];
+            for (uint i = 0; i < 256; i++)
+            {
+                var entry = i;
+                for (var j = 0; j < 8; j++)
+                {
+                    entry = (entry & 1) == 1 ? (entry >> 1) ^ polynomial : entry >> 1;
+                }
+                table[i] = entry;
+            }
+
+            return table;
+        }
+
+        /// <summary>
+        /// Returns CRC-32 checksum. By default uses IEEE polynomial.
+        /// </summary>
+        /// <param name="target">Array of bytes to be hashed.</param>
+        /// <param name="polynomial">Polynomial.</param>
+        /// <param name="seedCrc">Initial value for crc calculation, default is 0.</param>
+        /// <returns>CRC-32 hash.</returns>
+        [CLSCompliant(false)]
+        public static uint Crc32(byte[] target, uint polynomial = Crc32Ieee, uint seedCrc = 0)
+        {
+            Guard.IsNotNull(target, nameof(target));
+
+            // Get or generate table.
+            var table = crc32Tables.GetOrAdd(polynomial, key => GenerateTableForCrc32(polynomial));
+
+            // Hash calculation.
+            unchecked
+            {
+                var crc = ~seedCrc;
+                // ReSharper disable once ForCanBeConvertedToForeach
+                for (var i = 0; i < target.Length; i++)
+                {
+                    crc = table[(byte)crc ^ target[i]] ^ (crc >> 8);
+                }
+
+                return ~crc;
+            }
+        }
+
+        #endregion
+
+        #region CRC-64
+
+        private static readonly ConcurrentDictionary<ulong, ulong[]> crc64Tables =
+            new ConcurrentDictionary<ulong, ulong[]>();
+
+        /// <summary>
+        /// The ISO polynomial, defined in ISO 3309 and used in HDLC.
+        /// </summary>
+        [CLSCompliant(false)]
+        public const ulong Crc64IsoPolynomial = 0xD800000000000000;
+
+        /// <summary>
+        /// The ECMA polynomial, defined in ECMA 182.
+        /// </summary>
+        [CLSCompliant(false)]
+        public const ulong Crc64EcmaPolynomial = 0xC96C5795D7870F42;
+
+        private static ulong[] GenerateTableForCrc64(ulong polynomial)
+        {
+            var table = new ulong[256];
+            for (uint i = 0; i < 256; i++)
+            {
+                ulong crc = i;
+                for (int j = 0; j < 8; j++)
+                {
+                    if ((crc & 1) == 1)
+                    {
+                        crc = (crc >> 1) ^ polynomial;
+                    }
+                    else
+                    {
+                        crc >>= 1;
+                    }
+                }
+
+                table[i] = crc;
+            }
+            return table;
+        }
+
+        /// <summary>
+        /// Returns the CRC-64 checksum of data using the polynomial. Default implementation uses ISO polynomial.
+        /// </summary>
+        /// <param name="target">Array of bytes to be hashed.</param>
+        /// <param name="polynomial">Polynomial.</param>
+        /// <param name="seedCrc">Initial value for crc calculation, default is 0.</param>
+        /// <returns>CRC-64 hash.</returns>
+        [CLSCompliant(false)]
+        public static ulong Crc64(byte[] target, ulong polynomial = Crc64EcmaPolynomial, ulong seedCrc = 0)
+        {
+            Guard.IsNotNull(target, nameof(target));
+
+            // Get or generate table.
+            var table = crc64Tables.GetOrAdd(polynomial, key => GenerateTableForCrc64(polynomial));
+
+            // Hash calculation.
+            unchecked
+            {
+                ulong crc = ~seedCrc;
+                // ReSharper disable once ForCanBeConvertedToForeach
+                for (var i = 0; i < target.Length; i++)
+                {
+                    crc = table[(byte)crc ^ target[i]] ^ (crc >> 8);
+                }
+                return ~crc;
+            }
+        }
+
+        #endregion
     }
 }

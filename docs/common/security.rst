@@ -25,14 +25,30 @@ Contains set of methods based on standard library implementation to work with st
 
     Produces 512-bit hash value of string. Variant of SHA-2. It provides very good security for password hashing.
 
-.. function:: UInt64 Crc32(string target)
+.. function:: byte[] Pbkdf2Sha1(string target, int numOfIterations)
+.. function:: byte[] Pbkdf2Sha1(string target, byte[] salt, int numOfIterations)
 
-    Returns CSC32 hash of string. A cyclic redundancy check (CRC) is an error-detecting code commonly used in digital networks and storage devices to detect accidental changes to raw data. Provides good hashing performance. Must not be used for sensitive data hashing (passwords, tokens, etc).
+    Returns PBKDF2 compatible hash by using a pseudo-random number generator based on HMACSHA1. Default number of iterations is 10000.
 
 .. function:: string Hash(string target, HashMethods method)
 
-    Hash string with selected hash method. The string will contain method name that was used for hashing. Possible methods are ``Md5``, ``Sha1``, ``Sha256``, ``Sha384``, ``Sha512``.
+    Hash string with selected hash method. The string will contain method name that was used for hashing. Possible methods are ``Md5``, ``Sha1``, ``Sha256``, ``Sha384``, ``Sha512``, ``Pbkdf2Sha1``.
 
-.. function:: bool CheckHash(string target, string hashedStrToCheck)
+.. function:: bool CheckHash(string target, string hashedStringToCheck)
 
     Compares target string with hashed string.
+
+.. function:: uint Crc32(byte[] target, uint polynomial, uint seedCrc)
+
+    Returns CRC-32 checksum. By default uses IEEE polynomial. Possible polynomials to use:
+
+        - ``Crc32Ieee`` *(default)*
+        - ``Crc32Castagnoli``
+        - ``Crc32Koopman``
+
+.. function:: ulong Crc64(byte[] target, ulong polynomial, ulong seedCrc)
+
+    Returns the CRC-64 checksum of data using the polynomial. Default implementation uses ISO polynomial. Possible polynomials to use:
+
+        - ``Crc64IsoPolynomial`` *(default)*
+        - ``Crc64EcmaPolynomial``

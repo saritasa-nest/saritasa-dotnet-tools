@@ -53,7 +53,7 @@ namespace Saritasa.Tools.Common.Utils
 #if !NETSTANDARD1_2 && !NETSTANDARD1_6
         /// <summary>
         /// Breaks a list of items into chunks of a specific size. Be aware that this method generates one additional
-        /// sql query to get total number of collection elements.
+        /// query to get total number of collection elements.
         /// </summary>
         /// <param name="source">Source list.</param>
         /// <param name="chunkSize">Chunk size.</param>

@@ -87,7 +87,7 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="target">Target string.</param>
         /// <returns>Empty string if null or target string.</returns>
-        public static string NullSafe(this string target)
+        public static string NullSafe(string target)
         {
             return target ?? string.Empty;
         }

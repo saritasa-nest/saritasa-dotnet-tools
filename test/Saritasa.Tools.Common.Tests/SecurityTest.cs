@@ -2,6 +2,7 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Text;
 using Xunit;
 using Saritasa.Tools.Common.Utils;
 
@@ -80,6 +81,56 @@ namespace Saritasa.Tools.Common.Tests
 
             // Assert
             Assert.Equal(bytes, bytes1);
+        }
+
+        [Fact]
+        public void Test_crc32_Ieee()
+        {
+            // Arrange & act
+            var crc = SecurityUtils.Crc32(Encoding.ASCII.GetBytes("1234567"), SecurityUtils.Crc32Ieee);
+
+            // Assert
+            Assert.Equal(0x5003699fu, crc);
+        }
+
+        [Fact]
+        public void Test_crc32_Castagnoli()
+        {
+            // Arrange & act
+            var crc = SecurityUtils.Crc32(Encoding.ASCII.GetBytes("1234567"), SecurityUtils.Crc32Castagnoli);
+
+            // Assert
+            Assert.Equal(0x124297eau, crc);
+        }
+
+        [Fact]
+        public void Test_crc32_Koopman()
+        {
+            // Arrange & act
+            var crc = SecurityUtils.Crc32(Encoding.ASCII.GetBytes("1234567"), SecurityUtils.Crc32Koopman);
+
+            // Assert
+            Assert.Equal(0xf058755u, crc);
+        }
+
+        [Fact]
+        public void Test_crc64_Iso()
+        {
+            // Arrange & act
+            var output = SecurityUtils.Crc64(Encoding.ASCII.GetBytes("1234567"), SecurityUtils.Crc64IsoPolynomial);
+
+            // Assert
+            Assert.Equal(0x46c775a41001b320u, output);
+        }
+
+        [Fact]
+        public void Test_crc64_Ecma()
+        {
+            // Arrange & act
+            var output = SecurityUtils.Crc64(Encoding.ASCII.GetBytes("1234567"), SecurityUtils.Crc64EcmaPolynomial);
+
+            // Assert
+            Assert.Equal(0x70509f3661923da0u, output);
         }
     }
 }
