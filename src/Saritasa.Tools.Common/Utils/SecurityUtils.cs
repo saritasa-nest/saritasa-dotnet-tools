@@ -341,7 +341,6 @@ namespace Saritasa.Tools.Common.Utils
                 {
                     crc = table[(byte)crc ^ target[i]] ^ (crc >> 8);
                 }
-
                 return ~crc;
             }
         }

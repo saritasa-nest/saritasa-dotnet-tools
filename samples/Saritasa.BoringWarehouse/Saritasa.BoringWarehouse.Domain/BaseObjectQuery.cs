@@ -1,7 +1,7 @@
-﻿namespace Saritasa.BoringWarehouse.Domain
-{
-    using Tools.Common.Extensions;
+﻿using Saritasa.Tools.Common.Utils;
 
+namespace Saritasa.BoringWarehouse.Domain
+{
     public abstract class BaseObjectQuery
     {
         private SortOrder sortOrder;
@@ -17,7 +17,7 @@
 
         public string SortOrderName
         {
-            get { return sortOrderName; }
+            get => sortOrderName;
 
             set
             {
@@ -28,7 +28,7 @@
 
         public SortOrder SortOrder
         {
-            get { return sortOrder; }
+            get => sortOrder;
 
             set
             {

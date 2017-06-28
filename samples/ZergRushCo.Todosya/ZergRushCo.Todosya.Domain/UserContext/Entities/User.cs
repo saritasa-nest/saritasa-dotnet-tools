@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using Saritasa.Tools.Common.Utils;
 using Saritasa.Tools.Common.Extensions;
 
 namespace ZergRushCo.Todosya.Domain.UserContext.Entities
@@ -67,10 +68,10 @@ namespace ZergRushCo.Todosya.Domain.UserContext.Entities
 
         public void Clean()
         {
-            Email = Email.NullSafe().ToLowerInvariant().Trim();
+            Email = StringUtils.NullSafe(Email).ToLowerInvariant().Trim();
             UserName = Email;
-            FirstName = FirstName.NullSafe().Trim();
-            LastName = LastName.NullSafe().Trim();
+            FirstName = StringUtils.NullSafe(FirstName).Trim();
+            LastName = StringUtils.NullSafe(LastName).Trim();
         }
     }
 }
