@@ -1,10 +1,10 @@
-﻿0.3.0 [TBD]
+﻿0.3.0 [2017-06-29]
+[+] A lot of refactoring and renamings.
 [+] Add DateTimeUtils.Set method.
 [*] Update Microsoft.NETCore.App to 1.1.1 .
-[-] Remove DateTimeExtensions.IsHoliday .
+[-] Remove DateTimeExtensions.IsHoliday and more other utils and extensions.
 [+] Most of extension methods now have utils equivalent. Extenstions are shortcuts for utils methods.
 [+] Add ObjectUtils.CreateTypeFactory method.
-[+] A lot of refactoring and renamings.
 [+] Add more CRC-32 and CRC-64 checks.
 
 0.2.1 [2017-02-11]

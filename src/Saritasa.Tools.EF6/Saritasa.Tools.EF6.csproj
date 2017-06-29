@@ -16,7 +16,7 @@
     <PackageTags>unit of work;repository;domain events</PackageTags>
     <PackageIconUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/Saritasa/SaritasaTools</PackageProjectUrl>
-    <PackageLicenseUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/LICENSE.txt</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/Saritasa/SaritasaTools</RepositoryUrl>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>

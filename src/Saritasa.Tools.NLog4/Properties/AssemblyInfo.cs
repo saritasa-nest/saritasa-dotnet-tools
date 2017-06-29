@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Saritasa.Tools.NLog")]
-[assembly: AssemblyDescription("Saritasa Tools for NLog 4")]
+[assembly: AssemblyDescription("The package is a part of Saritasa Tools project. Saritasa.Tools.NLog4 contains implementation for Microsoft common logging infrastructure for NLog.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Saritasa")]
 [assembly: AssemblyProduct("Saritasa.Tools.NLog")]
-[assembly: AssemblyCopyright("Copyright © Saritasa, 2016")]
+[assembly: AssemblyCopyright("Copyright © Saritasa, 2016-2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

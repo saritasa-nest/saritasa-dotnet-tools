@@ -16,7 +16,7 @@
     <PackageTags>flow;datetime;parsing;validation;pagination;memoize;cas</PackageTags>
     <PackageIconUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/Saritasa/SaritasaTools</PackageProjectUrl>
-    <PackageLicenseUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/LICENSE.txt</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/Saritasa/SaritasaTools</RepositoryUrl>
     <RuntimeFrameworkVersion Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">1.0.4</RuntimeFrameworkVersion>
@@ -32,6 +32,7 @@
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
     <CodeAnalysisRuleSet>../../tools/Saritasa.ruleset</CodeAnalysisRuleSet>
+    <Version>0.3.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

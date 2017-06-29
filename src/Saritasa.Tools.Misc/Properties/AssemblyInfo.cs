@@ -3,11 +3,11 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("Saritasa.Tools.Misc")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("The package is a part of Saritasa Tools project. Saritasa.Tools.Misc contains miscellaneous items: passwords generation, passwords strength estimate.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Saritasa")]
 [assembly: AssemblyProduct("Saritasa.Tools.Misc")]
-[assembly: AssemblyCopyright("Copyright © Saritasa 2016")]
+[assembly: AssemblyCopyright("Copyright © Saritasa 2016-2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
