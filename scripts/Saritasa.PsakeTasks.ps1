@@ -2,7 +2,7 @@
 
 <#PSScriptInfo
 
-.VERSION 1.1.0
+.VERSION 1.3.1
 
 .GUID 966fce03-6946-447c-8e16-29b673f2918b
 
@@ -45,9 +45,9 @@ Task help -description 'Display description of main tasks.' `
 {
     Write-Host 'Main Tasks' -ForegroundColor DarkMagenta -NoNewline
     Get-PSakeScriptTasks | Where-Object { $_.Description -Like '`**' } |
-        Sort-Object -Property Name | 
+        Sort-Object -Property Name |
         Format-Table -Property Name, @{ Label = 'Description'; Expression = { $_.Description -Replace '^\* ', '' } }
-    
+
     Write-Host 'Execute ' -NoNewline -ForegroundColor DarkMagenta
     Write-Host 'psake -docs' -ForegroundColor Black -BackgroundColor DarkMagenta -NoNewline
     Write-Host ' to see all tasks.' -ForegroundColor DarkMagenta
@@ -67,8 +67,14 @@ Task update-gallery -description '* Update all modules from Saritasa PS Gallery.
     {
         $root = $PSScriptRoot
     }
-    
+
     $modules = "$root\Modules"
+
+    # Remove old modules.
+    Get-ChildItem -Path $modules -Directory | ForEach-Object `
+        {
+            Remove-Item "$($_.FullName)\*" -Recurse -ErrorAction Continue -Force
+        }
 
     Get-ChildItem -Path $modules -Directory | ForEach-Object `
         {
@@ -82,5 +88,17 @@ Task update-gallery -description '* Update all modules from Saritasa PS Gallery.
             Write-Information "Updating $($_.Name)..."
             Invoke-WebRequest -Uri "$baseUri/scripts/Psake/$($_.Name)" -OutFile "$root\$($_.Name)"
             Write-Information 'OK'
+        }
+
+    Invoke-Task add-scripts-to-git
+}
+
+Task add-scripts-to-git -description 'Add PowerShell scripts and modules to Git.' `
+{
+    $root = $PSScriptRoot
+
+    Get-ChildItem -Path $root -File -Recurse -Exclude '*.exe' -Force | ForEach-Object `
+        {
+            Exec { git add -f $_.FullName }
         }
 }

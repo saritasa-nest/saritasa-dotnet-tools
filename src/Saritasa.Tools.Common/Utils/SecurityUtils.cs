@@ -254,7 +254,7 @@ namespace Saritasa.Tools.Common.Utils
                 throw new ArgumentException(string.Format(Properties.Strings.NoHashMethod, hashedStringToCheck));
             }
 
-            HashMethod method = HashMethod.Md5;
+            HashMethod method;
             if (!Enum.TryParse(hashedStringToCheck.Substring(0, separatorIndex), true, out method))
             {
                 throw new ArgumentException(string.Format(Properties.Strings.HashMethodCannotRecognize,

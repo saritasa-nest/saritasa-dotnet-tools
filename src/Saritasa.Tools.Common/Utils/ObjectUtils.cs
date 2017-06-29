@@ -14,7 +14,7 @@ namespace Saritasa.Tools.Common.Utils
     public static class ObjectUtils
     {
         /// <summary>
-        /// Generate factory method. For example new() generic constraint will uses <see cref="Activator" />
+        /// Generate factory method. For example new() generic constraint uses <see cref="Activator" />
         /// for creating new instances. It can be optimized by making factory delegate.
         /// </summary>
         /// <remarks>

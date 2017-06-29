@@ -1,7 +1,7 @@
 Saritasa Tools
 ==============
 
-An infrastructure components and development tools for company projects. Read the latest documentation on [Read the Docs](http://saritasa-tools.readthedocs.io/en/latest/index.html).
+Infrastructure components and development tools for company projects. Read the latest documentation on [Read the Docs](http://saritasa-tools.readthedocs.io/en/latest/index.html).
 
 Overview
 --------
@@ -54,3 +54,8 @@ Contributors
 ------------
 
 * Saritasa http://www.saritasa.com
+
+License
+-------
+
+The project is licensed under the terms of BSD license. Refer to LICENSE.txt for more information.

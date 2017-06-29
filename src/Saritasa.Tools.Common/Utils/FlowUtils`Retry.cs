@@ -354,7 +354,7 @@ namespace Saritasa.Tools.Common.Utils
             foreach (var exceptionType in exceptionsTypes)
             {
 #if PORTABLE || NETSTANDARD1_2 || NETSTANDARD1_6 || NETCOREAPP1_0 || NETCOREAPP1_1
-                if (executedExceptionType.Equals(exceptionType) || executedExceptionType.GetTypeInfo().IsSubclassOf(exceptionType))
+                if (executedExceptionType == exceptionType || executedExceptionType.GetTypeInfo().IsSubclassOf(exceptionType))
 #else
                 if (executedExceptionType == exceptionType || executedExceptionType.IsSubclassOf(exceptionType))
 #endif
