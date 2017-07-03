@@ -28,3 +28,23 @@ For example following dependines will be resolved with internal IoC:
                 command.Param = dependencyA.GetTestValue() == "A" ? 1 : 0;
             }
         }
+
+Using Popular DI containers
+---------------------------
+
+    Code below shows how to get resolver using most common dependency injection containers:
+
+    .. code-block:: c#
+
+        Func<Type, object> resolver;
+
+        // Autofac
+        var builder = new Autofac.ContainerBuilder();
+        var container = builder.Build();
+        resolver = container.Resolve;
+
+        // ASP.NET Core
+        public void ConfigureServices(IServiceCollection services)
+        {
+            resolver = services.BuildServiceProvider().GetService;
+        }

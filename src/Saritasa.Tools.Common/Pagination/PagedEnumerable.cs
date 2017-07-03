@@ -122,7 +122,7 @@ namespace Saritasa.Tools.Common.Pagination
         public static PagedEnumerable<T> CreateAndReturnAll(IEnumerable<T> source)
         {
             var list = source.ToList();
-            return new PagedEnumerable<T>()
+            return new PagedEnumerable<T>
             {
                 source = list,
                 CurrentPage = 1,

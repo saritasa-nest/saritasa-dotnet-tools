@@ -10,10 +10,12 @@ Command is something that changes the state (database insert/update/delete) of a
 
     .. code-block:: c#
 
-        var commandPipeline = Saritasa.Tools.Commands.CommandPipeline.CreateDefaultPipeline(container.Resolve,
-            System.Reflection.Assembly.GetAssembly(typeof(Domain.Users.Entities.User)));
+        var commandPipeline = Saritasa.Tools.Messages.Commands.CommandPipeline.CreateDefaultPipeline(
+            container.Resolve, // Delegate for DI.
+            System.Reflection.Assembly.GetEntryAssembly() // Assemblies that contain command handlers.
+        );
 
-    It will locate command handler and executes it. First argument is delegate to resolve dependencies. Second is set of assemblies where to locate handlers.
+    The code above setup commands pipeline. First argument is delegate to resolve dependencies. If you do not need it use ``Saritasa.Tools.Messages.Commands.CommandPipeline.NullResolver``. Most of dependency injection containers provide a method to retrieve service instance by its type. Second argument is a set of assemblies where command handlers are located.
 
 2. Create command, it should be POCO:
 

@@ -14,9 +14,9 @@ Simplify pagination.
             .. code-block:: c#
 
                 IEnumerable<string> list = ...
-                // creates a paged list on page 2 where page size is 20
+                // Сreates a paged list on page 2 where page size is 20.
                 PageEnumerable<string> pagedList = new PagedEnumerable<string>(list, 2, 20);
-                // another way with extension method
+                // Another way with extension method.
                 pagedList = list.AsPage(2, 20);
                 Grid.DataSource = pagedList;
 

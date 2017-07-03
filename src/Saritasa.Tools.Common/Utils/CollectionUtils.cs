@@ -22,7 +22,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="source">A sequence of values to order.</param>
         /// <param name="keySelector">A function to extract a key from an element.</param>
         /// <param name="sortOrder">Sort order.</param>
-        /// <returns>An System.Linq.IOrderedEnumerable whose elements are sorted according to a key.</returns>
+        /// <returns>An <see cref="System.Linq.IOrderedEnumerable{T}" /> whose elements are sorted according to a key.</returns>
         public static IOrderedEnumerable<TSource> Order<TSource, TKey>(
             IEnumerable<TSource> source,
             Func<TSource, TKey> keySelector,
@@ -40,7 +40,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="keySelector">A function to extract a key from an element.</param>
         /// <param name="comparer">An System.Collections.Generic.IComparer to compare keys.</param>
         /// <param name="sortOrder">Sort order.</param>
-        /// <returns>An System.Linq.IOrderedEnumerable whose elements are sorted according to a key.</returns>
+        /// <returns>An <see cref="System.Linq.IOrderedEnumerable{T}" /> whose elements are sorted according to a key.</returns>
         public static IOrderedEnumerable<TSource> Order<TSource, TKey>(
             IEnumerable<TSource> source,
             Func<TSource, TKey> keySelector,
@@ -100,6 +100,46 @@ namespace Saritasa.Tools.Common.Utils
                 currentPosition += chunkSize;
             }
             while (hasRecords);
+        }
+
+        /// <summary>
+        /// Returns distinct elements from a sequence by using a specified <see cref="IEqualityComparer{T}" />
+        /// to compare values and specified key selector to get distinct key. This method is implemented by
+        /// using deferred execution.
+        /// </summary>
+        /// <typeparam name="TSource">Type of the source sequence.</typeparam>
+        /// <typeparam name="TKey">Type of the projected element.</typeparam>
+        /// <param name="source">The sequence to remove duplicate elements from.</param>
+        /// <param name="keySelector">Projection for determining "distinctness".</param>
+        /// <param name="comparer">The equality comparer to compare key values. If null default comparer will be used.</param>
+        /// <returns>A collection that contains distinct elements from the source sequence.</returns>
+        public static IEnumerable<TSource> DistinctBy<TSource, TKey>(
+            this IEnumerable<TSource> source,
+            Func<TSource, TKey> keySelector,
+            IEqualityComparer<TKey> comparer = null)
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+            if (keySelector == null)
+            {
+                throw new ArgumentNullException(nameof(keySelector));
+            }
+
+            IEnumerable<TSource> DistinctByImpl()
+            {
+                var knownKeys = new HashSet<TKey>(comparer);
+                foreach (var element in source)
+                {
+                    if (knownKeys.Add(keySelector(element)))
+                    {
+                        yield return element;
+                    }
+                }
+            }
+
+            return DistinctByImpl();
         }
     }
 }

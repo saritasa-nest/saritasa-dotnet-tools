@@ -1,10 +1,10 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+
 namespace Saritasa.Tools.Common.Pagination
 {
-    using System;
-
     /// <summary>
     /// Pagination metadata class.
     /// </summary>
