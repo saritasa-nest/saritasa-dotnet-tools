@@ -53,7 +53,7 @@ namespace ZergRushCo.Todosya.Domain.TaskContext.Queries
         public PagedEnumerable<ProjectDto> GetByUser(string userId, int page, int pageSize = 10)
         {
             var query = uow.ProjectRepository.Find(p => p.User.Id == userId).Select(p => new ProjectDto(p));
-            return new PagedEnumerable<ProjectDto>(query, page, pageSize);
+            return PagedEnumerable.Create(query, page, pageSize);
         }
 
         /// <summary>

@@ -1,13 +1,13 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Data;
+using Microsoft.EntityFrameworkCore;
+using Saritasa.Tools.Domain;
+
 namespace Saritasa.Tools.EFCore
 {
-    using System;
-    using System.Data;
-    using Microsoft.EntityFrameworkCore;
-    using Domain;
-
     /// <summary>
     /// Unit of work factory implementation for Entity Framework Core. Note that it does not support
     /// to specify isolation level on creation.
@@ -27,13 +27,13 @@ namespace Saritasa.Tools.EFCore
         }
 
         /// <inheritdoc />
-        public EFUnitOfWork<TContext> Create()
+        public virtual EFUnitOfWork<TContext> Create()
         {
             return new EFUnitOfWork<TContext>(createContext());
         }
 
         /// <inheritdoc />
-        public EFUnitOfWork<TContext> Create(IsolationLevel isolationLevel)
+        public virtual EFUnitOfWork<TContext> Create(IsolationLevel isolationLevel)
         {
             return new EFUnitOfWork<TContext>(createContext());
         }

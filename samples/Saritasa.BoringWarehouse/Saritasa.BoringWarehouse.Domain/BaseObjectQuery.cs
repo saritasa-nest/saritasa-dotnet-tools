@@ -41,9 +41,9 @@ namespace Saritasa.BoringWarehouse.Domain
         {
             if (string.IsNullOrEmpty(value))
             {
-                return SortOrder.Asc;
+                return SortOrder.Ascending;
             }
-            return value.ToLower().StartsWith("asc") ? SortOrder.Asc : SortOrder.Desc;
+            return value.ToLower().StartsWith("asc") ? SortOrder.Ascending : SortOrder.Descending;
         }
     }
 }

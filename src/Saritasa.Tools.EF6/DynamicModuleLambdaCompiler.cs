@@ -1,13 +1,13 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Linq.Expressions;
+using System.Reflection.Emit;
+using System.Reflection;
+
 namespace Saritasa.Tools.EF
 {
-    using System;
-    using System.Linq.Expressions;
-    using System.Reflection.Emit;
-    using System.Reflection;
-
     /// <summary>
     /// The class contains helper method to generate lambda for creating
     /// new object.

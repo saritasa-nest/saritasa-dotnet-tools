@@ -1,17 +1,16 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
+using Saritasa.Tools.Domain;
+
 namespace Saritasa.Tools.EFCore
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using Microsoft.EntityFrameworkCore;
-    using JetBrains.Annotations;
-    using Domain;
-
     /// <summary>
     /// Entity Framework repository implementation that supports IQueryable.
     /// </summary>
@@ -26,7 +25,7 @@ namespace Saritasa.Tools.EFCore
         /// .ctor
         /// </summary>
         /// <param name="context">Database context.</param>
-        public EFQueryableRepository([NotNull]TContext context) : base(context)
+        public EFQueryableRepository(TContext context) : base(context)
         {
             set = Context.Set<TEntity>();
         }

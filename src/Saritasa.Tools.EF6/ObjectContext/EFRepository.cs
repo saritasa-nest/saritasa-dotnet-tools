@@ -3,20 +3,22 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using System.Data.Entity.Core.Objects;
 using System.Linq;
 using System.Linq.Expressions;
 using Saritasa.Tools.Domain;
+using System.Data.Entity.Core.Objects.DataClasses;
 
-namespace Saritasa.Tools.EF
+namespace Saritasa.Tools.EF.ObjectContext
 {
     /// <summary>
-    /// Entity Framework repository implementation.
+    /// Entity Framework repository implementation. Based on <see cref="System.Data.Entity.Core.Objects.ObjectContext" />.
     /// </summary>
     /// <typeparam name="TEntity">Entity type.</typeparam>
     /// <typeparam name="TContext">Database context type.</typeparam>
     public class EFRepository<TEntity, TContext> : IRepository<TEntity>
-        where TEntity : class where TContext : DbContext
+        where TEntity : EntityObject
+        where TContext : System.Data.Entity.Core.Objects.ObjectContext
     {
         /// <summary>
         /// Database context.
@@ -26,7 +28,7 @@ namespace Saritasa.Tools.EF
         /// <summary>
         /// Entity set.
         /// </summary>
-        public DbSet<TEntity> Set { get; }
+        public ObjectSet<TEntity> Set { get; }
 
         /// <summary>
         /// .ctor
@@ -39,19 +41,22 @@ namespace Saritasa.Tools.EF
                 throw new ArgumentNullException(nameof(context));
             }
             Context = context;
-            Set = Context.Set<TEntity>();
+            Set = Context.CreateObjectSet<TEntity>();
         }
 
         /// <inheritdoc />
         public virtual void Add(TEntity entity)
         {
-            Set.Add(entity);
+            Set.AddObject(entity);
         }
 
         /// <inheritdoc />
         public virtual void AddRange(IEnumerable<TEntity> entities)
         {
-            Set.AddRange(entities);
+            foreach (var entity in entities)
+            {
+                Set.AddObject(entity);
+            }
         }
 
         /// <inheritdoc />
@@ -70,13 +75,30 @@ namespace Saritasa.Tools.EF
         /// <inheritdoc />
         public virtual TEntity Get(params object[] keyValues)
         {
-            return Set.Find(keyValues);
+            switch (keyValues.Length)
+            {
+                case 1:
+                    return Set.SingleOrDefault(e => e.EntityKey.EntityKeyValues[0].Value == keyValues[0]);
+                case 2:
+                    return Set.SingleOrDefault(e => e.EntityKey.EntityKeyValues[0].Value == keyValues[0]
+                        && e.EntityKey.EntityKeyValues[1].Value == keyValues[1]);
+                case 3:
+                    return Set.SingleOrDefault(e => e.EntityKey.EntityKeyValues[0].Value == keyValues[0]
+                                                    && e.EntityKey.EntityKeyValues[1].Value == keyValues[1]
+                                                    && e.EntityKey.EntityKeyValues[2].Value == keyValues[2]);
+            }
+            throw new InvalidKeyException(Properties.Strings.InvalidKeyCount);
         }
 
         /// <inheritdoc />
         public virtual TEntity Get<TProperty>(IEnumerable<Expression<Func<TEntity, TProperty>>> includes, params object[] keyValues)
         {
-            return Set.Find(keyValues);
+            var set = (ObjectQuery<TEntity>)Set;
+            foreach (var include in includes)
+            {
+                set = set.Include(include.Name);
+            }
+            return Get(keyValues);
         }
 
         /// <inheritdoc />
@@ -94,13 +116,16 @@ namespace Saritasa.Tools.EF
         /// <inheritdoc />
         public virtual void Remove(TEntity entity)
         {
-            Set.Remove(entity);
+            Set.DeleteObject(entity);
         }
 
         /// <inheritdoc />
         public virtual void RemoveRange(IEnumerable<TEntity> entities)
         {
-            Set.RemoveRange(entities);
+            foreach (var entity in entities)
+            {
+                Set.DeleteObject(entity);
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿0.1.2 [TBD]
 [*] Update Microsoft.NETCore.App to 1.1.1 .
 [*] Update Microsoft.EntityFrameworkCore to 1.1.1 .
+[*] Make repository and uow methods virtual.
 
 0.1.1 [2017-02-13]
 [*] Fix reference to Saritasa.Tools.Domain .

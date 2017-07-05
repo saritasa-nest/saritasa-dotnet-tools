@@ -4,20 +4,22 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data.Entity;
+using System.Data.Entity.Core.Objects.DataClasses;
 using System.Linq;
 using System.Linq.Expressions;
 using Saritasa.Tools.Domain;
 
-namespace Saritasa.Tools.EF
+namespace Saritasa.Tools.EF.ObjectContext
 {
     /// <summary>
     /// Entity Framework repository implementation that supports <see cref="IQueryable" />.
+    /// Based on <see cref="System.Data.Entity.Core.Objects.ObjectContext" />.
     /// </summary>
     /// <typeparam name="TEntity">Entity type.</typeparam>
     /// <typeparam name="TContext">Database context type.</typeparam>
     public class EFQueryableRepository<TEntity, TContext> : EFRepository<TEntity, TContext>, IQueryableRepository<TEntity>
-        where TEntity : class where TContext : DbContext
+        where TEntity : EntityObject
+        where TContext : System.Data.Entity.Core.Objects.ObjectContext
     {
         /// <summary>
         /// .ctor

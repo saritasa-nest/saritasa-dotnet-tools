@@ -1,15 +1,14 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Data.Entity;
+using System.Threading;
+using System.Threading.Tasks;
+using Saritasa.Tools.Domain;
+
 namespace Saritasa.Tools.EF
 {
-    using System;
-    using System.Data.Entity;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using JetBrains.Annotations;
-    using Domain;
-
     /// <summary>
     /// Entity framework base implementation of Unit of Work.
     /// </summary>
@@ -25,7 +24,7 @@ namespace Saritasa.Tools.EF
         /// .ctor
         /// </summary>
         /// <param name="context">Database context.</param>
-        public EFUnitOfWork([NotNull] TContext context)
+        public EFUnitOfWork(TContext context)
         {
             if (context == null)
             {
@@ -64,19 +63,19 @@ namespace Saritasa.Tools.EF
         }
 
         /// <inheritdoc />
-        public int SaveChanges()
+        public virtual int SaveChanges()
         {
             return Context.SaveChanges();
         }
 
         /// <inheritdoc />
-        public Task<int> SaveChangesAsync()
+        public virtual Task<int> SaveChangesAsync()
         {
             return Context.SaveChangesAsync();
         }
 
         /// <inheritdoc />
-        public Task<int> SaveChangesAsync(CancellationToken cancellationToken)
+        public virtual Task<int> SaveChangesAsync(CancellationToken cancellationToken)
         {
             return Context.SaveChangesAsync(cancellationToken);
         }

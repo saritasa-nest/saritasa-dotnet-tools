@@ -3,18 +3,17 @@
 
 using System;
 using System.Data;
-using System.Data.Entity;
 using Saritasa.Tools.Domain;
 
-namespace Saritasa.Tools.EF
+namespace Saritasa.Tools.EF.ObjectContext
 {
     /// <summary>
     /// Unit of work factory implementation for Entity Framework 6. Note that it does not support
-    /// to specify isolation level on creation.
+    /// to specify isolation level on creation. Based on <see cref="System.Data.Entity.Core.Objects.ObjectContext" />.
     /// </summary>
     /// <typeparam name="TContext">Context type should be inherited of DbContext.</typeparam>
     public class EFUnitOfWorkFactory<TContext> : IUnitOfWorkFactory<EFUnitOfWork<TContext>>
-        where TContext : DbContext, new()
+        where TContext : System.Data.Entity.Core.Objects.ObjectContext, new()
     {
         private readonly Func<TContext> createContext;
 

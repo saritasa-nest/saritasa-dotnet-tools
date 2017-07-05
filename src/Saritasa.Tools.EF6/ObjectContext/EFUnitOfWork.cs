@@ -2,18 +2,18 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Data.Entity;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using Saritasa.Tools.Domain;
 
-namespace Saritasa.Tools.EFCore
+namespace Saritasa.Tools.EF.ObjectContext
 {
     /// <summary>
-    /// Entity framework base implementation of Unit of Work.
+    /// Entity framework base implementation of Unit of Work. Based on <see cref="System.Data.Entity.Core.Objects.ObjectContext" />.
     /// </summary>
     /// <typeparam name="TContext">Context type should be inherited of DbContext.</typeparam>
-    public class EFUnitOfWork<TContext> : IUnitOfWork where TContext : DbContext
+    public class EFUnitOfWork<TContext> : IUnitOfWork where TContext : System.Data.Entity.Core.Objects.ObjectContext
     {
         /// <summary>
         /// Database context.
