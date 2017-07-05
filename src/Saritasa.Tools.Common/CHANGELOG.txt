@@ -1,5 +1,7 @@
-﻿0.3.1 [TBD]
+﻿0.3.2 [TBD]
 [+] Add CollectionUtils.DistinctBy method.
+[+] Overall updates for Pagination namespace. Add EnumerableWithTotalCount, OffsetLimitEnumerable.
+[*] Rename SortOrder.Asc and SortOrder.Desc.
 
 0.3.0 [2017-06-29]
 [+] A lot of refactoring and renamings.

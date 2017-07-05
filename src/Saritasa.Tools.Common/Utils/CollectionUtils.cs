@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Saritasa.Tools.Common.Utils
 {
@@ -28,7 +29,7 @@ namespace Saritasa.Tools.Common.Utils
             Func<TSource, TKey> keySelector,
             SortOrder sortOrder)
         {
-            return sortOrder == SortOrder.Asc ? source.OrderBy(keySelector) : source.OrderByDescending(keySelector);
+            return sortOrder == SortOrder.Ascending ? source.OrderBy(keySelector) : source.OrderByDescending(keySelector);
         }
 
         /// <summary>
@@ -47,10 +48,27 @@ namespace Saritasa.Tools.Common.Utils
             IComparer<TKey> comparer,
             SortOrder sortOrder)
         {
-            return sortOrder == SortOrder.Asc ? source.OrderBy(keySelector, comparer) : source.OrderByDescending(keySelector, comparer);
+            return sortOrder == SortOrder.Ascending ? source.OrderBy(keySelector, comparer) : source.OrderByDescending(keySelector, comparer);
         }
 
 #if !NETSTANDARD1_2 && !NETSTANDARD1_6
+        /// <summary>
+        /// Sorts the elements of a sequence in ascending or descending order.
+        /// </summary>
+        /// <typeparam name="TSource">The type of the elements of source.</typeparam>
+        /// <typeparam name="TKey">The type of the key returned by keySelector.</typeparam>
+        /// <param name="source">A sequence of values to order.</param>
+        /// <param name="keySelector">A function to extract a key from an element.</param>
+        /// <param name="sortOrder">Sort order.</param>
+        /// <returns>An <see cref="System.Linq.IOrderedQueryable{T}" /> whose elements are sorted according to a key.</returns>
+        public static IOrderedQueryable<TSource> Order<TSource, TKey>(
+            IQueryable<TSource> source,
+            Expression<Func<TSource, TKey>> keySelector,
+            SortOrder sortOrder)
+        {
+            return sortOrder == SortOrder.Ascending ? source.OrderBy(keySelector) : source.OrderByDescending(keySelector);
+        }
+
         /// <summary>
         /// Breaks a list of items into chunks of a specific size. Be aware that this method generates one additional
         /// query to get total number of collection elements.
@@ -114,7 +132,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="comparer">The equality comparer to compare key values. If null default comparer will be used.</param>
         /// <returns>A collection that contains distinct elements from the source sequence.</returns>
         public static IEnumerable<TSource> DistinctBy<TSource, TKey>(
-            this IEnumerable<TSource> source,
+            IEnumerable<TSource> source,
             Func<TSource, TKey> keySelector,
             IEqualityComparer<TKey> comparer = null)
         {

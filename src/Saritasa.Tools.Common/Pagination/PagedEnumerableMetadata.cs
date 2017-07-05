@@ -11,8 +11,13 @@ namespace Saritasa.Tools.Common.Pagination
 #if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_6
     [Serializable]
 #endif
-    public class PagedMetadata
+    public class PagedEnumerableMetadata : OffsetLimitEnumerableMetadata
     {
+        /// <summary>
+        /// Current page.
+        /// </summary>
+        public int Page { get; set; }
+
         /// <summary>
         /// Page size. Max number of items on page.
         /// </summary>
@@ -22,15 +27,5 @@ namespace Saritasa.Tools.Common.Pagination
         /// Total pages.
         /// </summary>
         public int TotalPages { get; set; }
-
-        /// <summary>
-        /// Current page.
-        /// </summary>
-        public int CurrentPage { get; set; }
-
-        /// <summary>
-        /// Zero based offset of current page.
-        /// </summary>
-        public int Offset { get; set; }
     }
 }

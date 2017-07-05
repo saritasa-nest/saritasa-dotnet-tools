@@ -1,38 +1,40 @@
 Pagination
 ==========
 
-Simplify pagination.
+Simplifies pagination. The are several levels of pagination are supported:
 
-.. class:: PagedEnumerable
+- ``TotalCountEnumerable<T>``. Developer constructs the target source manually and should provide total count of records. If not provided it will be evaluated.
+- ``OffsetLimitEnumerable<T>``. Developer provides base source and subset source will be calculated for him based on offset and limit parameters. Total records count will be evaluated as well if not provided.
+- ``PagedEnumerable<T>``. Developer provides base source and subset source will be calculated for him based on page and page size parameters. Total records count will be evaluated as well if not provided.
 
-    The class helps to make paged enumerables. It wraps current page and page size. If not specified default page is first and default page size is 100. If ``totalPages`` parameter is below or equal zero it will be automatically populated with ``Count()`` method.
+Examples
+--------
 
-    .. function:: PagedEnumerable(IEnumerable<T> source, int page, int pageSize, int totalPages)
+Create offset limit enumerable from queryable source. In this case there will be two queries to data souce: get total items and select with limit and offset.
 
-        Creates instance of class. There are two examples of usage:
+    .. code-block:: c#
 
-            .. code-block:: c#
+        var query = Context.JiraMappings.AsQueryable();
+        int offset = 0, limit = 10;
+        OffsetLimitEnumerable<JiraMapping> querySubset = new OffsetLimitEnumerable<JiraMapping>(query, offset, limit);
 
-                IEnumerable<string> list = ...
-                // Сreates a paged list on page 2 where page size is 20.
-                PageEnumerable<string> pagedList = new PagedEnumerable<string>(list, 2, 20);
-                // Another way with extension method.
-                pagedList = list.AsPage(2, 20);
-                Grid.DataSource = pagedList;
+The same example using extension.
 
-    .. function:: PagedEnumerable<T> Create(IEnumerable<T> pagedSource, int page, int pageSize, int totalPages)
+    .. code-block:: c#
 
-        Creates an instance without any queries. It only fills internal properies.
+        var query = Context.JiraMappings.AsQueryable();
+        int offset = 0, limit = 10;
+        OffsetLimitEnumerable<JiraMapping> querySubset = query.AsOffsetLimit(offset, limit);
 
-    .. function:: PagedEnumerable<T> CreateAndReturnAll([NotNull] IEnumerable<T> source)
+Make paged enumerable and then convert result to another type.
 
-        Returns paged enumerable that contains only one page with all data on it.
+    .. code-block:: c#
 
-    .. function:: PagedMetadata GetMetadata()
+        var query = Context.User.AsQueryable();
+        PagedEnumerable<User> paged = query.AsPaged(1, 50);
+        PagedEnumerable<UserWithDepartment> paged2 = PagedEnumerable<JiraMapping>.Create(paged.Select(u => u.Id), paged);
 
-        Returns special formatted object that contains metadata information about paged enumerable: page size, current page and total pages.
+Extensions
+----------
 
-    .. function:: PagedEnumerable<TTarget> Map<TTarget>(Func<T, TTarget> map)
-                  PagedEnumerable<TTarget> Map<TTarget>()
-
-        Converts current paged enumerable to another paged enumerable with another source type. Metadata is copied. Needs if you want to convert the type of page enumerable without metadata change.
+There are also extension methods to simplify pagination enumerable creation.

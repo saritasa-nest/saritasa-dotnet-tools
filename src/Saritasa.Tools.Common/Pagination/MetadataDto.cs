@@ -1,24 +1,25 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+
 namespace Saritasa.Tools.Common.Pagination
 {
-    using System;
-    using System.Collections.Generic;
-
     /// <summary>
-    /// Paged data transfer object. Combines metadata and page items.
+    /// Metadata data transfer object. Combines metadata and enumerable items.
     /// </summary>
-    /// <typeparam name="T">Page items type.</typeparam>
+    /// <typeparam name="T">Metadata items type.</typeparam>
+    /// <typeparam name="TMetadata">Metadata type.</typeparam>
 #if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_6
     [Serializable]
 #endif
-    public class PagedDto<T>
+    public class MetadataDto<T, TMetadata>
     {
         /// <summary>
         /// .ctor
         /// </summary>
-        public PagedDto()
+        public MetadataDto()
         {
         }
 
@@ -27,30 +28,30 @@ namespace Saritasa.Tools.Common.Pagination
         /// </summary>
         /// <param name="items">Page items.</param>
         /// <param name="metadata">Page metadata.</param>
-        public PagedDto(IEnumerable<T> items, PagedMetadata metadata)
+        public MetadataDto(IEnumerable<T> items, IMetadataEnumerable<TMetadata> metadata)
         {
-            Items = items;
+            Data = items;
             Metadata = metadata;
         }
 
         /// <summary>
         /// .ctor
         /// </summary>
-        /// <param name="page">Paged enumerable.</param>
-        public PagedDto(PagedEnumerable<T> page)
+        /// <param name="page">Enumerable.</param>
+        public MetadataDto(PagedEnumerable<T> page)
         {
-            Items = page;
+            Data = page;
             Metadata = page.GetMetadata();
         }
 
         /// <summary>
-        /// Page metadata.
+        /// Metadata.
         /// </summary>
-        public PagedMetadata Metadata { get; set; }
+        public object Metadata { get; set; }
 
         /// <summary>
-        /// Page items.
+        /// Enumerable items.
         /// </summary>
-        public IEnumerable<T> Items { get; set; }
+        public IEnumerable<T> Data { get; set; }
     }
 }

@@ -9,13 +9,13 @@ namespace Saritasa.Tools.Common.Utils
     public enum SortOrder
     {
         /// <summary>
-        /// Ascending order of sort.
+        /// Ascending sort order.
         /// </summary>
-        Asc = 0,
+        Ascending = 0,
 
         /// <summary>
-        /// Descending order of sort.
+        /// Descending sort order.
         /// </summary>
-        Desc = 1,
+        Descending = 1,
     }
 }

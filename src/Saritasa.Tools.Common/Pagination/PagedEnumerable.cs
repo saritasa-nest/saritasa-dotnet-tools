@@ -2,17 +2,16 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Saritasa.Tools.Common.Pagination
 {
     /// <summary>
-    /// Paged enumerable. May additionaly query source to get total number of items in collection.
+    /// Class contains static methods for <see cref="PagedEnumerable{T}" /> and is itended to
+    /// simplify instaniation and better API.
     /// </summary>
-    /// <typeparam name="T">Source type.</typeparam>
-    public class PagedEnumerable<T> : IEnumerable<T>
+    public static class PagedEnumerable
     {
         /// <summary>
         /// The default current page.
@@ -24,79 +23,82 @@ namespace Saritasa.Tools.Common.Pagination
         /// </summary>
         public const int DefaultPageSize = 100;
 
-        IList<T> source;
-        int totalPages;
-        int pageSize;
-
         /// <summary>
-        /// Total pages.
-        /// </summary>
-        public int TotalPages => totalPages;
-
-        /// <summary>
-        /// Current page. Starts from 1.
-        /// </summary>
-        public int CurrentPage { get; set; }
-
-        /// <summary>
-        /// Page size. Max number of items on page.
-        /// </summary>
-        public int PageSize => pageSize;
-
-        /// <summary>
-        /// Is pagination now on first page.
-        /// </summary>
-        public bool IsFirstPage => CurrentPage == 1;
-
-        /// <summary>
-        /// Is pagination now on last page.
-        /// </summary>
-        public bool IsLastPage => CurrentPage == TotalPages;
-
-        /// <summary>
-        /// Gets the element at the specified index.
-        /// </summary>
-        /// <param name="index">The zero-based index of the element to get.</param>
-        public T this[int index] => source[index];
-
-        /// <summary>
-        /// Get paged metadata.
-        /// </summary>
-        /// <returns>Paged metadata.</returns>
-        public PagedMetadata GetMetadata()
-        {
-            return new PagedMetadata
-            {
-                TotalPages = TotalPages,
-                PageSize = PageSize,
-                CurrentPage = CurrentPage,
-                Offset = (CurrentPage - 1) * PageSize
-            };
-        }
-
-        /// <summary>
-        /// Internal .ctor
-        /// </summary>
-        internal PagedEnumerable()
-        {
-        }
-
-        /// <summary>
-        /// Creates paged enumerable from source and query source list by page and pageSize.
+        /// Creates paged enumerable from source and query source list by page and pageSize. The calling will
+        /// evaluate query automatically.
         /// </summary>
         /// <param name="baseSource">Enumerable.</param>
         /// <param name="page">Current page. Default is 1.</param>
         /// <param name="pageSize">Page size. Default is 100.</param>
-        /// <param name="totalPages">Total pages. If below zero it will be calculated.</param>
-        public PagedEnumerable(
+        /// <param name="totalCount">Total count of items. If below zero it will be calculated automatically.</param>
+        public static PagedEnumerable<T> Create<T>(
             IEnumerable<T> baseSource,
             int page = DefaultCurrentPage,
             int pageSize = DefaultPageSize,
-            int totalPages = -1)
+            int totalCount = -1)
         {
-            if (baseSource == null)
+            return new PagedEnumerable<T>(baseSource, page, pageSize, totalCount);
+        }
+
+        /// <summary>
+        /// Creates paged enumerable from source and query source list by page and pageSize. The calling will
+        /// evaluate query automatically.
+        /// </summary>
+        /// <param name="baseSource">Queryable enumerable.</param>
+        /// <param name="page">Current page. Default is 1.</param>
+        /// <param name="pageSize">Page size. Default is 100.</param>
+        /// <param name="totalCount">Total count of items. If below zero it will be calculated automatically.</param>
+        public static PagedEnumerable<T> Create<T>(
+            IQueryable<T> baseSource,
+            int page = DefaultCurrentPage,
+            int pageSize = DefaultPageSize,
+            int totalCount = -1)
+        {
+            return new PagedEnumerable<T>(baseSource, page, pageSize, totalCount);
+        }
+
+        /// <summary>
+        /// Creates instance with position on first page. PageSize will be set to total
+        /// number of records in source.
+        /// </summary>
+        /// <param name="source">Enumerable.</param>
+        /// <returns>Paged enumerable.</returns>
+        public static PagedEnumerable<T> CreateAndReturnAll<T>(IEnumerable<T> source)
+        {
+            if (source == null)
             {
-                throw new ArgumentNullException(nameof(baseSource));
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            var list = source.ToArray();
+            return new PagedEnumerable<T>
+            {
+                Source = list,
+                Page = 1,
+                PageSize = list.Length,
+                TotalPages = 1,
+                TotalCount = list.Length,
+            };
+        }
+
+        /// <summary>
+        /// Creates instance without any evaluation. Can be useful when source enumerable is already
+        /// transformed and need to be wrapped only.
+        /// </summary>
+        /// <param name="source">Enumerable.</param>
+        /// <param name="page">Current page.</param>
+        /// <param name="pageSize">Page size.</param>
+        /// <param name="totalCount">Total count of items that were in base source enumerable.</param>
+        /// <returns>Class instance.</returns>
+        public static PagedEnumerable<TTarget> Wrap<TTarget>(
+            IEnumerable<TTarget> source,
+            int page,
+            int pageSize,
+            int totalCount)
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
             }
             if (page < 1)
             {
@@ -106,88 +108,53 @@ namespace Saritasa.Tools.Common.Pagination
             {
                 throw new ArgumentOutOfRangeException(nameof(pageSize));
             }
+            if (totalCount < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(totalCount));
+            }
 
-            this.CurrentPage = page;
-            this.pageSize = pageSize;
-            this.totalPages = totalPages > 0 ? totalPages : GetTotalPages(baseSource, PageSize);
-            this.source = baseSource.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            return new PagedEnumerable<TTarget>
+            {
+                Page = page,
+                PageSize = pageSize,
+                Offset = GetOffset(page, pageSize),
+                Limit = pageSize,
+                Source = source,
+                TotalCount = totalCount
+            };
         }
 
         /// <summary>
-        /// Creates instance with position on first page. PageSize will be set to total
-        /// number of records in source.
+        /// Creates instance without any evaluation with new enumerable source.
+        /// Can be useful when source enumerable is already transformed and need to be wrapped only.
         /// </summary>
         /// <param name="source">Enumerable.</param>
-        /// <returns>Paged enumerable.</returns>
-        public static PagedEnumerable<T> CreateAndReturnAll(IEnumerable<T> source)
+        /// <param name="pagedEnumerable">Existing paged enumerable.</param>
+        /// <returns>Class instance.</returns>
+        public static PagedEnumerable<TTarget> Wrap<TSource, TTarget>(
+            IEnumerable<TTarget> source,
+            PagedEnumerable<TSource> pagedEnumerable)
         {
-            var list = source.ToList();
-            return new PagedEnumerable<T>
+            if (source == null)
             {
-                source = list,
-                CurrentPage = 1,
-                pageSize = list.Count,
-                totalPages = list.Count,
-            };
-        }
+                throw new ArgumentNullException(nameof(source));
+            }
+            if (pagedEnumerable == null)
+            {
+                throw new ArgumentNullException(nameof(pagedEnumerable));
+            }
 
-        /// <summary>
-        /// Converts current paged enumerable to another paged enumerable with another source type.
-        /// Metadata is copied. Needs if you want to convert the type of page enumerable without
-        /// metadata change.
-        /// </summary>
-        /// <typeparam name="TTarget">Target type.</typeparam>
-        /// <param name="map">Delegate to convert to target type.</param>
-        /// <returns>Paged enumerable with target type.</returns>
-        public PagedEnumerable<TTarget> Map<TTarget>(Func<T, TTarget> map)
-        {
             return new PagedEnumerable<TTarget>
             {
-                source = source.Select(map).ToList(),
-                CurrentPage = CurrentPage,
-                totalPages = TotalPages
+                Page = pagedEnumerable.Page,
+                PageSize = pagedEnumerable.PageSize,
+                Offset = GetOffset(pagedEnumerable.Page, pagedEnumerable.PageSize),
+                Limit = pagedEnumerable.Limit,
+                Source = source,
+                TotalCount = pagedEnumerable.TotalCount
             };
         }
 
-        /// <summary>
-        /// Converts current paged enumerable to another paged enumerable with another source type.
-        /// Metadata is copied. Needs if you want to convert the type of page enumerable without
-        /// metadata change. Uses <see cref="Enumerable.Cast{TResult}" /> method.
-        /// </summary>
-        /// <typeparam name="TTarget">Target type.</typeparam>
-        /// <returns>Paged enumerable with target type.</returns>
-        public PagedEnumerable<TTarget> Map<TTarget>()
-        {
-            return new PagedEnumerable<TTarget>
-            {
-                source = source.Cast<TTarget>().ToList(),
-                CurrentPage = CurrentPage,
-                totalPages = TotalPages
-            };
-        }
-
-        static int GetTotalPages(IEnumerable<T> source, int pageSize)
-        {
-            return (source.Count() + pageSize - 1) / pageSize;
-        }
-
-        #region Enumerator
-
-        /// <summary>
-        /// Returns enumerator.
-        /// </summary>
-        /// <returns>Enumerator.</returns>
-        public IEnumerator<T> GetEnumerator()
-        {
-            return source.GetEnumerator();
-        }
-
-        /// <inheritdoc />
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        #endregion
+        internal static int GetOffset(int page, int pageSize) => (page - 1) * pageSize;
     }
 }
