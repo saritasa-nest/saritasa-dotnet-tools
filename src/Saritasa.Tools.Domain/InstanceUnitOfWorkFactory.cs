@@ -1,12 +1,11 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Data;
+
 namespace Saritasa.Tools.Domain
 {
-    using System;
-    using System.Data;
-    using JetBrains.Annotations;
-
     /// <summary>
     /// The class provides existing unit of work instead of creating new one. It may be useful for example
     /// when you already have Unit of work instance if you want to call another method that requires IUnitOfWorkFactory interface.
@@ -21,7 +20,7 @@ namespace Saritasa.Tools.Domain
         /// .ctor
         /// </summary>
         /// <param name="unitOfWork">Application unit of work.</param>
-        public InstanceUnitOfWorkFactory([NotNull] TUnitOfWork unitOfWork)
+        public InstanceUnitOfWorkFactory(TUnitOfWork unitOfWork)
         {
             if (unitOfWork == null)
             {

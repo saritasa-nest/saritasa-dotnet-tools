@@ -139,6 +139,6 @@
     <value>Не авторизованный доступ.</value>
   </data>
   <data name="ValidationErrors" xml:space="preserve">
-    <value>Ошибки проверки.</value>
+    <value>Ошибки при проверке данных.</value>
   </data>
 </root>

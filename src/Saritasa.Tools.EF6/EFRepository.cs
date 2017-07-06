@@ -61,8 +61,8 @@ namespace Saritasa.Tools.EF
         }
 
         /// <inheritdoc />
-        public virtual IEnumerable<TEntity> Find<TProperty>(Expression<Func<TEntity, bool>> predicate,
-            IEnumerable<Expression<Func<TEntity, TProperty>>> includes)
+        public virtual IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate,
+            IEnumerable<Expression<Func<TEntity, object>>> includes)
         {
             return Set.Where(predicate).Include(includes);
         }
@@ -74,19 +74,13 @@ namespace Saritasa.Tools.EF
         }
 
         /// <inheritdoc />
-        public virtual TEntity Get<TProperty>(IEnumerable<Expression<Func<TEntity, TProperty>>> includes, params object[] keyValues)
-        {
-            return Set.Find(keyValues);
-        }
-
-        /// <inheritdoc />
         public virtual IEnumerable<TEntity> GetAll()
         {
             return Set.ToList();
         }
 
         /// <inheritdoc />
-        public virtual IEnumerable<TEntity> GetAll<TProperty>(IEnumerable<Expression<Func<TEntity, TProperty>>> includes)
+        public virtual IEnumerable<TEntity> GetAll(IEnumerable<Expression<Func<TEntity, object>>> includes)
         {
             return Set.Include(includes).ToList();
         }

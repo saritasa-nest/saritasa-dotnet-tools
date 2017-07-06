@@ -1,14 +1,13 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Linq;
+using System.Linq.Expressions;
+using Saritasa.Tools.Domain.Exceptions;
+
 namespace Saritasa.Tools.Domain
 {
-    using System;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using Exceptions;
-    using JetBrains.Annotations;
-
     /// <summary>
     /// <see cref="IRepository{TEntity}" /> extension methods.
     /// </summary>
@@ -22,9 +21,8 @@ namespace Saritasa.Tools.Domain
         /// <param name="repository">Repository.</param>
         /// <param name="keyValues">Key values to lookup by.</param>
         /// <returns>Existing entity from repository or newly created one.</returns>
-        [NotNull]
         public static TEntity GetOrAdd<TEntity>(
-            [NotNull] IRepository<TEntity> repository,
+            IRepository<TEntity> repository,
             params object[] keyValues) where TEntity : class, new()
         {
             var entity = repository.Get(keyValues);
@@ -44,9 +42,8 @@ namespace Saritasa.Tools.Domain
         /// <param name="repository">Repository.</param>
         /// <param name="expression">Expression to lookup the entity.</param>
         /// <returns>Existing entity from repository or newly created one.</returns>
-        [NotNull]
         public static TEntity GetOrAdd<TEntity>(
-            [NotNull] IRepository<TEntity> repository,
+            IRepository<TEntity> repository,
             Expression<Func<TEntity, bool>> expression) where TEntity : class, new()
         {
             var entity = repository.Find(expression).Single();
@@ -66,9 +63,8 @@ namespace Saritasa.Tools.Domain
         /// <param name="repository">Repository.</param>
         /// <param name="keyValues">Key values to lookup by.</param>
         /// <returns>Existing entity from repository.</returns>
-        [NotNull]
         public static TEntity GetOrThrow<TEntity>(
-            [NotNull] IRepository<TEntity> repository,
+            IRepository<TEntity> repository,
             params object[] keyValues) where TEntity : class
         {
             var entity = repository.Get(keyValues);
@@ -87,9 +83,8 @@ namespace Saritasa.Tools.Domain
         /// <param name="repository">Repository.</param>
         /// <param name="expression">Expression to lookup the entity.</param>
         /// <returns>Existing entity from repository.</returns>
-        [NotNull]
         public static TEntity GetOrThrow<TEntity>(
-            [NotNull] IRepository<TEntity> repository,
+            IRepository<TEntity> repository,
             Expression<Func<TEntity, bool>> expression) where TEntity : class
         {
             var entity = repository.Find(expression).Single();

@@ -1,13 +1,13 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.Domain.Exceptions
-{
-    using System;
+using System;
 #if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
-    using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 #endif
 
+namespace Saritasa.Tools.Domain.Exceptions
+{
     /// <summary>
     /// Exception occurs in domain part of application if entity is not found by key.
     /// Can be mapped to 404 HTTP status code.

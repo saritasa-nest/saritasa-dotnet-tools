@@ -61,8 +61,8 @@ namespace Saritasa.Tools.EFCore
         }
 
         /// <inheritdoc />
-        public virtual IEnumerable<TEntity> Find<TProperty>(Expression<Func<TEntity, bool>> predicate,
-            IEnumerable<Expression<Func<TEntity, TProperty>>> includes)
+        public virtual IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate,
+            IEnumerable<Expression<Func<TEntity, object>>> includes)
         {
             var query = Context.Set<TEntity>().Where(predicate);
             foreach (var include in includes)
@@ -79,27 +79,20 @@ namespace Saritasa.Tools.EFCore
         }
 
         /// <inheritdoc />
-        public virtual TEntity Get<TProperty>(IEnumerable<Expression<Func<TEntity, TProperty>>> includes,
-            params object[] keyValues)
-        {
-            return Get(keyValues);
-        }
-
-        /// <inheritdoc />
         public virtual IEnumerable<TEntity> GetAll()
         {
             return Set.AsQueryable();
         }
 
         /// <inheritdoc />
-        public virtual IEnumerable<TEntity> GetAll<TProperty>(IEnumerable<Expression<Func<TEntity, TProperty>>> includes)
+        public virtual IEnumerable<TEntity> GetAll(IEnumerable<Expression<Func<TEntity, object>>> includes)
         {
             var query = Set.AsQueryable();
             foreach (var include in includes)
             {
                 query = query.Include(include);
             }
-            return query;
+            return query.ToList();
         }
 
         /// <inheritdoc />

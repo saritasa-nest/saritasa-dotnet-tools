@@ -14,22 +14,12 @@ namespace Saritasa.Tools.Domain
     public interface IRepository<TEntity> where TEntity : class
     {
         /// <summary>
-        /// Get entity instance by id.
+        /// Get entity instance by id. In some implementations it is not the same as getting item by id
+        /// with Single or First method. It may return cached item if it already exists in identity map.
         /// </summary>
         /// <param name="keyValues">Entity ids.</param>
         /// <returns>Entity instance.</returns>
         TEntity Get(params object[] keyValues);
-
-        /// <summary>
-        /// Get entity instance by id.
-        /// </summary>
-        /// <param name="includes">Relations to include.</param>
-        /// <param name="keyValues">Entity ids.</param>
-        /// <typeparam name="TProperty">Property type.</typeparam>
-        /// <returns>Entity instance.</returns>
-        TEntity Get<TProperty>(
-            IEnumerable<Expression<Func<TEntity, TProperty>>> includes,
-            params object[] keyValues);
 
         /// <summary>
         /// Get all entities of specified type.
@@ -41,10 +31,9 @@ namespace Saritasa.Tools.Domain
         /// Get all entities of specified type.
         /// </summary>
         /// <param name="includes">Relations to include.</param>
-        /// <typeparam name="TProperty">Property type.</typeparam>
         /// <returns>Enumerable of entities.</returns>
-        IEnumerable<TEntity> GetAll<TProperty>(
-            IEnumerable<Expression<Func<TEntity, TProperty>>> includes);
+        IEnumerable<TEntity> GetAll(
+            IEnumerable<Expression<Func<TEntity, object>>> includes);
 
         /// <summary>
         /// Find for range of entities based on predicate.
@@ -58,11 +47,10 @@ namespace Saritasa.Tools.Domain
         /// </summary>
         /// <param name="predicate">Filter predicate.</param>
         /// <param name="includes">Relations to include</param>
-        /// <typeparam name="TProperty">Property type.</typeparam>
         /// <returns>Enumerable of enitites.</returns>
-        IEnumerable<TEntity> Find<TProperty>(
+        IEnumerable<TEntity> Find(
             Expression<Func<TEntity, bool>> predicate,
-            IEnumerable<Expression<Func<TEntity, TProperty>>> includes);
+            IEnumerable<Expression<Func<TEntity, object>>> includes);
 
         /// <summary>
         /// Add entity.

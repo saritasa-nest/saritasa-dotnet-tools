@@ -1,10 +1,10 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+
 namespace Saritasa.Tools.Domain
 {
-    using JetBrains.Annotations;
-
     /// <summary>
     /// The class is used to get messages to display for end user.
     /// </summary>
@@ -38,7 +38,7 @@ namespace Saritasa.Tools.Domain
         /// <summary>
         /// Get not found specified item error message.
         /// </summary>
-        public virtual string NotFoundItem([NotNull] string entityName) =>
+        public virtual string NotFoundItem(string entityName) =>
             string.Format(Resources.NotFoundEntity, entityName);
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace Saritasa.Tools.Domain
         /// Get cannot find message.
         /// </summary>
         /// <param name="entityName">Entity name.</param>
-        public virtual string CannotFind([NotNull] string entityName) =>
+        public virtual string CannotFind(string entityName) =>
             string.Format(Resources.CannotFind, entityName);
     }
 }

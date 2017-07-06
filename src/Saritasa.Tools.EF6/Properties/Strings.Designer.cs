@@ -70,7 +70,7 @@ namespace Saritasa.Tools.EF.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The specified count of entity keys is not supported..
+        ///   Looks up a localized string similar to Provided and expected keys count mismatch. Provided {0}, expected {1}..
         /// </summary>
         internal static string InvalidKeyCount {
             get {

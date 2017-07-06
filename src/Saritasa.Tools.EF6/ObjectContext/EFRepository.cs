@@ -8,6 +8,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using Saritasa.Tools.Domain;
 using System.Data.Entity.Core.Objects.DataClasses;
+using System.Data.Entity.Core;
 
 namespace Saritasa.Tools.EF.ObjectContext
 {
@@ -66,39 +67,32 @@ namespace Saritasa.Tools.EF.ObjectContext
         }
 
         /// <inheritdoc />
-        public virtual IEnumerable<TEntity> Find<TProperty>(Expression<Func<TEntity, bool>> predicate,
-            IEnumerable<Expression<Func<TEntity, TProperty>>> includes)
+        public virtual IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate,
+            IEnumerable<Expression<Func<TEntity, object>>> includes)
         {
-            return Set.Where(predicate).Include(includes);
+            return Set.Where(predicate).Include(includes).ToList();
         }
 
         /// <inheritdoc />
         public virtual TEntity Get(params object[] keyValues)
         {
-            switch (keyValues.Length)
+            // Get entity keys.
+            var keyNames = Set.EntitySet.ElementType.KeyMembers.Select(k => k.Name).ToArray();
+            if (keyNames.Length != keyValues.Length)
             {
-                case 1:
-                    return Set.SingleOrDefault(e => e.EntityKey.EntityKeyValues[0].Value == keyValues[0]);
-                case 2:
-                    return Set.SingleOrDefault(e => e.EntityKey.EntityKeyValues[0].Value == keyValues[0]
-                        && e.EntityKey.EntityKeyValues[1].Value == keyValues[1]);
-                case 3:
-                    return Set.SingleOrDefault(e => e.EntityKey.EntityKeyValues[0].Value == keyValues[0]
-                                                    && e.EntityKey.EntityKeyValues[1].Value == keyValues[1]
-                                                    && e.EntityKey.EntityKeyValues[2].Value == keyValues[2]);
+                throw new InvalidKeyException(string.Format(Properties.Strings.InvalidKeyCount, keyValues.Length, keyNames.Length));
             }
-            throw new InvalidKeyException(Properties.Strings.InvalidKeyCount);
-        }
 
-        /// <inheritdoc />
-        public virtual TEntity Get<TProperty>(IEnumerable<Expression<Func<TEntity, TProperty>>> includes, params object[] keyValues)
-        {
-            var set = (ObjectQuery<TEntity>)Set;
-            foreach (var include in includes)
+            // Format key-value pairs.
+            var keyValuePairs = new List<KeyValuePair<string, object>>(keyNames.Length);
+            for (int i = 0; i < keyValues.Length; i++)
             {
-                set = set.Include(include.Name);
+                keyValuePairs.Add(new KeyValuePair<string, object>(keyNames[i], keyValues[i]));
             }
-            return Get(keyValues);
+
+            // Select.
+            var entityKey = new EntityKey(Context.DefaultContainerName + "." + Set.EntitySet.Name, keyValuePairs);
+            return (TEntity)Context.GetObjectByKey(entityKey);
         }
 
         /// <inheritdoc />
@@ -108,7 +102,7 @@ namespace Saritasa.Tools.EF.ObjectContext
         }
 
         /// <inheritdoc />
-        public virtual IEnumerable<TEntity> GetAll<TProperty>(IEnumerable<Expression<Func<TEntity, TProperty>>> includes)
+        public virtual IEnumerable<TEntity> GetAll(IEnumerable<Expression<Func<TEntity, object>>> includes)
         {
             return Set.Include(includes).ToList();
         }
