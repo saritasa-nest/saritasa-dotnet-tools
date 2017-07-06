@@ -55,6 +55,20 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="argumentName">Argument name.</param>
         public static void IsNotEmpty(string argument, string argumentName)
         {
+            if (string.IsNullOrEmpty(argument))
+            {
+                throw new ArgumentException(Properties.Strings.ArgumentCannotBeEmptyString.FormatWith(argumentName),
+                    argumentName);
+            }
+        }
+
+        /// <summary>
+        /// Is not empty or white space check for string. Generates <see cref="ArgumentException" />.
+        /// </summary>
+        /// <param name="argument">Argument.</param>
+        /// <param name="argumentName">Argument name.</param>
+        public static void IsNotEmptyOrWhiteSpace(string argument, string argumentName)
+        {
             if (string.IsNullOrWhiteSpace(argument))
             {
                 throw new ArgumentException(Properties.Strings.ArgumentCannotBeEmptyString.FormatWith(argumentName),

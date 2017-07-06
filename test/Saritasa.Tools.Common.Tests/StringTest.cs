@@ -18,7 +18,10 @@ namespace Saritasa.Tools.Common.Tests
         [InlineData("", 4, 0)]
         public void Truncate_should_trim_string(string target, int truncate, int expectedLength)
         {
+            // Act
             var str = StringUtils.SafeTruncate(target, truncate);
+
+            // Assert
             Assert.Equal(expectedLength, str.Length);
         }
 
@@ -57,6 +60,19 @@ namespace Saritasa.Tools.Common.Tests
         public void Safe_substring_should_not_throw_exceptions(string expect, string target, int start, int count)
         {
             Assert.Equal(expect, StringUtils.SafeSubstring(target, start, count));
+        }
+
+        [Fact]
+        public void JoinIgnoreEmpty_should_allow_space_as_separator()
+        {
+            // Arrange
+            var arr = new[] { "1", "2", "", "3" };
+
+            // Act
+            var result = StringUtils.JoinIgnoreEmpty(" ", arr);
+
+            // Assert
+            Assert.Equal("1 2 3", result);
         }
     }
 }

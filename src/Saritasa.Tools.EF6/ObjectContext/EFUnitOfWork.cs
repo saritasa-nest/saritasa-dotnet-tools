@@ -18,7 +18,7 @@ namespace Saritasa.Tools.EF.ObjectContext
         /// <summary>
         /// Database context.
         /// </summary>
-        protected TContext Context { get; private set; }
+        protected virtual TContext Context { get; private set; }
 
         /// <summary>
         /// .ctor

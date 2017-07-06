@@ -1,4 +1,7 @@
-﻿0.3.2 [TBD]
+﻿0.3.3 [2017-07-06]
+[*] Guard.IsNotEmpty does not check white spaces anymore, use Guard.IsNotEmptyOrWhiteSpace .
+
+0.3.2 [2017-07-05]
 [+] Add CollectionUtils.DistinctBy method.
 [+] Overall updates for Pagination namespace. Add EnumerableWithTotalCount, OffsetLimitEnumerable.
 [*] Rename SortOrder.Asc and SortOrder.Desc.
