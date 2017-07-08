@@ -1,17 +1,17 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+#if NET452 || NET40
+using System.Runtime.Remoting;
+using System.Runtime.Remoting.Messaging;
+#else
+using System.Threading;
+#endif
+using JetBrains.Annotations;
+
 namespace Saritasa.Tools.Messages.Abstractions
 {
-    using System;
-#if NET452 || NET40
-    using System.Runtime.Remoting;
-    using System.Runtime.Remoting.Messaging;
-#else
-    using System.Threading;
-#endif
-    using JetBrains.Annotations;
-
     /// <summary>
     /// Message execution context represent current running message on pipeline. It stores message
     /// and message pipeline in "async TLS" and this info available also after message processing.

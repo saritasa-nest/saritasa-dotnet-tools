@@ -1,12 +1,12 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Linq.Expressions;
+using JetBrains.Annotations;
+
 namespace Saritasa.Tools.Messages.Abstractions
 {
-    using System;
-    using System.Linq.Expressions;
-    using JetBrains.Annotations;
-
     /// <summary>
     /// The interface should be used to make actual calls to query methods.
     /// </summary>

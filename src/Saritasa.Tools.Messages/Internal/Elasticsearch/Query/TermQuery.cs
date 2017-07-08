@@ -1,10 +1,10 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using Newtonsoft.Json;
+
 namespace Saritasa.Tools.Messages.Internal.Elasticsearch.Query
 {
-    using Newtonsoft.Json;
-
     [JsonConverter(typeof(TermQuerySerializer))]
     internal class TermQuery : IFieldNameQuery
     {

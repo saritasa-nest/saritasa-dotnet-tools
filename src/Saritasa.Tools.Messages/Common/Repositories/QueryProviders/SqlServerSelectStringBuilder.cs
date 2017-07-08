@@ -1,15 +1,15 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Linq;
+using System.Text;
+using Saritasa.Tools.Messages.Internal;
+using Saritasa.Tools.Messages.Internal.Clauses;
+using Saritasa.Tools.Messages.Internal.Enums;
+
 namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
 {
-    using System;
-    using System.Linq;
-    using System.Text;
-    using Internal;
-    using Internal.Clauses;
-    using Internal.Enums;
-
     /// <summary>
     /// The SELECT statement SQL server builder.
     /// </summary>

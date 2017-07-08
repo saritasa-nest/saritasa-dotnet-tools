@@ -1,14 +1,14 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 #if !NETCOREAPP1_1 && !NETSTANDARD1_6
+using System;
+using System.IO;
+using System.Xml;
+using System.Xml.Serialization;
+
 namespace Saritasa.Tools.Messages.Common.ObjectSerializers
 {
-    using System;
-    using System.IO;
-    using System.Xml;
-    using System.Xml.Serialization;
-
     /// <summary>
     /// Serialize object using XmlSerializer.
     /// </summary>

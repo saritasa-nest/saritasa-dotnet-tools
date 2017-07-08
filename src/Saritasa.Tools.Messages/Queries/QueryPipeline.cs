@@ -1,17 +1,17 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Linq;
+using System.Reflection;
+using Saritasa.Tools.Messages.Internal;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Common;
+
 namespace Saritasa.Tools.Messages.Queries
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq.Expressions;
-    using System.Linq;
-    using System.Reflection;
-    using Internal;
-    using Abstractions;
-    using Common;
-
     /// <summary>
     /// Query pipeline.
     /// </summary>

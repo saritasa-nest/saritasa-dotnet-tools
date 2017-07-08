@@ -1,11 +1,11 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using JetBrains.Annotations;
+
 namespace Saritasa.Tools.Messages.Common
 {
-    using System;
-    using JetBrains.Annotations;
-
     /// <summary>
     /// Simple interface to serialize/deserialize POCOs.
     /// </summary>

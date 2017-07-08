@@ -1,10 +1,10 @@
-// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
+
+using Enums;
 
 namespace Saritasa.Tools.Messages.Internal.Clauses
 {
-    using Enums;
-
     /// <summary>
     /// Represents a JOIN clause to be used with SELECT statements.
     /// </summary>

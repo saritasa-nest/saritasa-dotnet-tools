@@ -1,14 +1,14 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Reflection;
+using System.Threading.Tasks;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Common;
+
 namespace Saritasa.Tools.Messages.Events
 {
-    using System;
-    using System.Reflection;
-    using System.Threading.Tasks;
-    using Abstractions;
-    using Common;
-
     /// <summary>
     /// Events pipeline.
     /// </summary>
