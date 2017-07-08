@@ -50,5 +50,37 @@ namespace Saritasa.Tools.Domain.Exceptions
         {
         }
 #endif
+        /// <summary>
+        /// Shortcut to throw exception if certain object is null. Does not require to
+        /// write if block.
+        /// </summary>
+        /// <param name="obj">Object to check.</param>
+        /// <param name="message">Exception message.</param>
+        public static void ThrowIfNull(object obj, string message)
+        {
+            if (obj == null)
+            {
+                throw new ForbiddenException(message);
+            }
+        }
+
+        /// <summary>
+        /// Shortcut to throw exception if certain object is null. Does not require to
+        /// write if block.
+        /// </summary>
+        /// <param name="obj">Object to check.</param>
+        /// <param name="message">Exception message.</param>
+        /// <param name="innerException">Inner exception.</param>
+        public static void ThrowIfNull(object obj, string message, Exception innerException)
+        {
+            if (innerException == null)
+            {
+                throw new ArgumentNullException(nameof(innerException));
+            }
+            if (obj == null)
+            {
+                throw new ForbiddenException(message, innerException);
+            }
+        }
     }
 }

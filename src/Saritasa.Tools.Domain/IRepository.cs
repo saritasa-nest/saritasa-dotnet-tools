@@ -14,10 +14,13 @@ namespace Saritasa.Tools.Domain
     public interface IRepository<TEntity> where TEntity : class
     {
         /// <summary>
-        /// Get entity instance by id. In some implementations it is not the same as getting item by id
+        /// Returns entity instance by id. In some implementations it is not the same as getting item by id
         /// with Single or First method. It may return cached item if it already exists in identity map.
+        /// If entity is not found the <see cref="Saritasa.Tools.Domain.Exceptions.NotFoundException" /> will be
+        /// generated;
         /// </summary>
         /// <param name="keyValues">Entity ids.</param>
+        /// <exception cref="Saritasa.Tools.Domain.Exceptions.NotFoundException">Is generated when entity is not found.</exception>
         /// <returns>Entity instance.</returns>
         TEntity Get(params object[] keyValues);
 

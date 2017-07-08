@@ -7,6 +7,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using Saritasa.Tools.Domain;
+using Saritasa.Tools.Domain.Exceptions;
 
 namespace Saritasa.Tools.EF
 {
@@ -70,7 +71,12 @@ namespace Saritasa.Tools.EF
         /// <inheritdoc />
         public virtual TEntity Get(params object[] keyValues)
         {
-            return Set.Find(keyValues);
+            var entity = Set.Find(keyValues);
+            if (entity == null)
+            {
+                throw new NotFoundException(Properties.Strings.ObjectNotFound);
+            }
+            return entity;
         }
 
         /// <inheritdoc />

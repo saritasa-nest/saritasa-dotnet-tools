@@ -8,7 +8,9 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Saritasa.Tools.EF.Properties {
+using System.Reflection;
+
+namespace Saritasa.Tools.EFCore.Properties {
     using System;
     
     
@@ -39,7 +41,7 @@ namespace Saritasa.Tools.EF.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Saritasa.Tools.EF.Properties.Strings", typeof(Strings).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Saritasa.Tools.EFCore.Properties.Strings", typeof(Strings).GetTypeInfo().Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -57,24 +59,6 @@ namespace Saritasa.Tools.EF.Properties {
             }
             set {
                 resourceCulture = value;
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Invalid key..
-        /// </summary>
-        internal static string InvalidKey {
-            get {
-                return ResourceManager.GetString("InvalidKey", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Provided and expected keys count mismatch. Provided {0}, expected {1}..
-        /// </summary>
-        internal static string InvalidKeyCount {
-            get {
-                return ResourceManager.GetString("InvalidKeyCount", resourceCulture);
             }
         }
         

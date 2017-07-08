@@ -49,5 +49,71 @@ namespace Saritasa.Tools.Domain.Exceptions
         {
         }
 #endif
+
+        /// <summary>
+        /// Shortcut to throw exception if certain condition is false. Does not require to
+        /// write if block.
+        /// </summary>
+        /// <param name="condition">Condition.</param>
+        /// <param name="message">Exception message.</param>
+        public static void ThrowIfFalse(bool condition, string message)
+        {
+            if (condition == false)
+            {
+                throw new ForbiddenException(message);
+            }
+        }
+
+        /// <summary>
+        /// Shortcut to throw exception if certain condition is false. Does not require to
+        /// write if block.
+        /// </summary>
+        /// <param name="condition">Condition.</param>
+        /// <param name="message">Exception message.</param>
+        /// <param name="innerException">Inner exception.</param>
+        public static void ThrowIfFalse(bool condition, string message, Exception innerException)
+        {
+            if (innerException == null)
+            {
+                throw new ArgumentNullException(nameof(innerException));
+            }
+            if (condition == false)
+            {
+                throw new ForbiddenException(message, innerException);
+            }
+        }
+
+        /// <summary>
+        /// Shortcut to throw exception if certain condition is true. Does not require to
+        /// write if block.
+        /// </summary>
+        /// <param name="condition">Condition.</param>
+        /// <param name="message">Exception message.</param>
+        public static void ThrowIfTrue(bool condition, string message)
+        {
+            if (condition)
+            {
+                throw new ForbiddenException(message);
+            }
+        }
+
+        /// <summary>
+        /// Shortcut to throw exception if certain condition is true. Does not require to
+        /// write if block.
+        /// </summary>
+        /// <param name="condition">Condition.</param>
+        /// <param name="message">Exception message.</param>
+        /// <param name="innerException">Inner exception.</param>
+        public static void ThrowIfTrue(bool condition, string message, Exception innerException)
+        {
+            if (innerException == null)
+            {
+                throw new ArgumentNullException(nameof(innerException));
+            }
+            if (condition)
+            {
+                throw new ForbiddenException(message, innerException);
+            }
+        }
     }
 }

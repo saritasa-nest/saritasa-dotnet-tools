@@ -6,9 +6,10 @@ using System.Collections.Generic;
 using System.Data.Entity.Core.Objects;
 using System.Linq;
 using System.Linq.Expressions;
-using Saritasa.Tools.Domain;
 using System.Data.Entity.Core.Objects.DataClasses;
 using System.Data.Entity.Core;
+using Saritasa.Tools.Domain;
+using Saritasa.Tools.Domain.Exceptions;
 
 namespace Saritasa.Tools.EF.ObjectContext
 {
@@ -92,7 +93,14 @@ namespace Saritasa.Tools.EF.ObjectContext
 
             // Select.
             var entityKey = new EntityKey(Context.DefaultContainerName + "." + Set.EntitySet.Name, keyValuePairs);
-            return (TEntity)Context.GetObjectByKey(entityKey);
+            try
+            {
+                return (TEntity)Context.GetObjectByKey(entityKey);
+            }
+            catch (ObjectNotFoundException ex)
+            {
+                throw new NotFoundException(Properties.Strings.ObjectNotFound, ex);
+            }
         }
 
         /// <inheritdoc />

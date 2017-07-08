@@ -117,12 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="InvalidKey" xml:space="preserve">
-    <value>Invalid key.</value>
-  </data>
-  <data name="InvalidKeyCount" xml:space="preserve">
-    <value>Provided and expected keys count mismatch. Provided {0}, expected {1}.</value>
-  </data>
   <data name="ObjectNotFound" xml:space="preserve">
     <value>The object with specified key was not found.</value>
   </data>
