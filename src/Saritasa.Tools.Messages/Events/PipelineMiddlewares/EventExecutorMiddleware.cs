@@ -1,21 +1,29 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Common;
+using Saritasa.Tools.Messages.Internal;
+
 namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using Abstractions;
-    using Common;
-    using Internal;
-
     /// <summary>
     /// Default event executor. It does not process events with Rejected status.
     /// </summary>
     public class EventExecutorMiddleware : BaseExecutorMiddleware
     {
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        /// <param name="dict">Parameters dictionary.</param>
+        public EventExecutorMiddleware(IDictionary<string, string> dict) : base(dict)
+        {
+        }
+
         /// <summary>
         /// .ctor
         /// </summary>

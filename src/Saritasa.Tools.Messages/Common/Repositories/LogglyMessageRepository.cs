@@ -87,6 +87,37 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                     Encoding.ASCII.GetBytes(string.Format("{0}:{1}", this.username, this.password))));
         }
 
+        /// <summary>
+        /// Create repository from dictionary.
+        /// </summary>
+        /// <param name="dict">Properties.</param>
+        public LogglyMessageRepository(IDictionary<string, string> dict)
+        {
+            var repositoryUsername = dict[nameof(username)].ToString();
+
+            if (!string.IsNullOrEmpty(repositoryUsername))
+            {
+                if (!dict.ContainsKey(nameof(token)) || !dict.ContainsKey(nameof(username))
+                    || !dict.ContainsKey(nameof(password)) || !dict.ContainsKey(nameof(accountDomain)))
+                {
+                    throw new ArgumentException($"No required parameters: {nameof(token)}," +
+                                                $"{nameof(username)}, {nameof(password)}, {nameof(accountDomain)}", nameof(dict));
+                }
+                this.token = dict[nameof(token)];
+                this.username = dict[nameof(username)];
+                this.password = dict[nameof(password)];
+                this.accountDomain = dict[nameof(accountDomain)];
+            }
+            else
+            {
+                if (!dict.ContainsKey(nameof(token)))
+                {
+                    throw new ArgumentException($"No required parameter: {nameof(token)}", nameof(dict));
+                }
+                this.token = dict[nameof(token)].ToString();
+            }
+        }
+
         /// <inheritdoc />
         public async Task AddAsync(IMessage message)
         {
@@ -133,7 +164,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <inheritdoc />
-        public void SaveState(IDictionary<string, object> dict)
+        public void SaveState(IDictionary<string, string> dict)
         {
             dict[nameof(token)] = token;
             dict[nameof(username)] = username;
@@ -141,33 +172,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             dict[nameof(accountDomain)] = accountDomain;
         }
 
-        /// <summary>
-        /// Create repository from dictionary.
-        /// </summary>
-        /// <param name="dict">Properties.</param>
-        /// <returns>Loggly repository.</returns>
-        public static IMessageRepository CreateFromState(IDictionary<string, object> dict)
-        {
-            var repositoryUsername = dict[nameof(username)].ToString();
-
-            if (!string.IsNullOrEmpty(repositoryUsername))
-            {
-                return new LogglyMessageRepository(
-                    dict[nameof(token)].ToString(),
-                    dict[nameof(username)].ToString(),
-                    dict[nameof(password)].ToString(),
-                    dict[nameof(accountDomain)].ToString()
-                );
-            }
-            else
-            {
-                return new LogglyMessageRepository(
-                    dict[nameof(token)].ToString()
-                );
-            }
-        }
-
-#region Dispose
+        #region Dispose
 
         bool disposed;
 
@@ -192,7 +197,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             GC.SuppressFinalize(this);
         }
 
-#endregion
+        #endregion
 
         /// <summary>
         /// Call event api to get event list.

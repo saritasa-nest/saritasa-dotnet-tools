@@ -2,14 +2,15 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 #if !NETCOREAPP1_0 && !NETSTANDARD1_6
+
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Common;
+
 namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
 {
-    using System;
-    using System.ComponentModel.DataAnnotations;
-    using System.Collections.Generic;
-    using Abstractions;
-    using Common;
-
     /// <summary>
     /// Validates command. It uses data annotation attributes.
     /// </summary>

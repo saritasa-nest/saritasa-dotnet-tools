@@ -1,14 +1,14 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Domain;
+
 namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Reflection;
-    using Abstractions;
-    using Domain;
-
     /// <summary>
     /// Uses domain events manager to raise events.
     /// </summary>
@@ -18,6 +18,15 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
         public string Id { get; set; } = "DomainEventLocator";
 
         readonly IDomainEventsManager eventsManager;
+
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        /// <param name="dict">Parameters dictionary.</param>
+        public DomainEventLocatorMiddleware(IDictionary<string, string> dict)
+        {
+            throw new NotSupportedException("The middleware does not support instantiation from dict.");
+        }
 
         /// <summary>
         /// .ctor

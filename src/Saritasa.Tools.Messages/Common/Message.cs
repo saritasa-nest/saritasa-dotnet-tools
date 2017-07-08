@@ -1,13 +1,13 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using Newtonsoft.Json;
+using Saritasa.Tools.Messages.Abstractions;
+
 namespace Saritasa.Tools.Messages.Common
 {
-    using System;
-    using System.Collections.Generic;
-    using Newtonsoft.Json;
-    using Abstractions;
-
     /// <summary>
     /// Message execution context.
     /// </summary>
@@ -64,10 +64,7 @@ namespace Saritasa.Tools.Messages.Common
                 return id;
             }
 
-            set
-            {
-                id = value;
-            }
+            set => id = value;
         }
 
         /// <inheritdoc />
@@ -82,12 +79,9 @@ namespace Saritasa.Tools.Messages.Common
         /// <inheritdoc />
         public virtual IDictionary<string, string> Data
         {
-            get { return data ?? (data = new Dictionary<string, string>()); }
+            get => data ?? (data = new Dictionary<string, string>());
 
-            set
-            {
-                data = value;
-            }
+            set => data = value;
         }
 
         /// <inheritdoc />

@@ -1,20 +1,20 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
+
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Common;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Common.ObjectSerializers;
+using Saritasa.Tools.Messages.Common.Repositories.QueryProviders;
+using Saritasa.Tools.Messages.Internal;
 
 namespace Saritasa.Tools.Messages.Common.Repositories
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Data;
-    using System.Data.Common;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-    using Abstractions;
-    using ObjectSerializers;
-    using QueryProviders;
-    using Internal;
-
     /// <summary>
     /// Use ADO.NET infrastructure to store messages.
     /// </summary>
@@ -92,6 +92,22 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             this.factory = factory;
             this.serializer = serializer ?? new JsonObjectSerializer();
             this.queryProvider = CreateSqlProvider(this.dialect, this.factory, this.serializer);
+        }
+
+        /// <summary>
+        /// Create repository from dictionary.
+        /// </summary>
+        /// <param name="dict">Properties.</param>
+        public AdoNetMessageRepository(IDictionary<string, string> dict)
+        {
+#if NETCOREAPP1_1 || NETSTANDARD1_6
+            throw new NotSupportedException("Not sure how to handle DbProviderFactories for .NET Core.");
+#else
+            this.factory = DbProviderFactories.GetFactory(dict[nameof(factory)].ToString());
+            this.connectionString = dict[nameof(connectionString)].ToString();
+            this.dialect = (Dialect)Enum.Parse(typeof(Dialect), dict[nameof(dialect)].ToString(), true);
+            this.serializer = (IObjectSerializer)Activator.CreateInstance(Type.GetType(dict[nameof(serializer)].ToString()));
+#endif
         }
 
         static IMessageQueryProvider CreateSqlProvider(Dialect dialect, DbProviderFactory factory, IObjectSerializer serializer)
@@ -301,32 +317,13 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <inheritdoc />
-        public void SaveState(IDictionary<string, object> dict)
+        public void SaveState(IDictionary<string, string> dict)
         {
-            dict[nameof(dialect)] = dialect;
-            dict[nameof(KeepConnection)] = KeepConnection;
+            dict[nameof(dialect)] = dialect.ToString();
+            dict[nameof(KeepConnection)] = KeepConnection.ToString();
             dict[nameof(factory)] = factory.GetType().Namespace;
             dict[nameof(connectionString)] = connectionString;
             dict[nameof(serializer)] = serializer.GetType().AssemblyQualifiedName;
-        }
-
-        /// <summary>
-        /// Create repository from dictionary.
-        /// </summary>
-        /// <param name="dict">Properties.</param>
-        /// <returns>Message repository.</returns>
-        public static IMessageRepository CreateFromState(IDictionary<string, object> dict)
-        {
-#if NETCOREAPP1_1 || NETSTANDARD1_6
-            throw new NotSupportedException("Not sure how to handle DbProviderFactories for .NET Core");
-#else
-            return new AdoNetMessageRepository(
-                DbProviderFactories.GetFactory(dict[nameof(factory)].ToString()),
-                dict[nameof(connectionString)].ToString(),
-                (Dialect)Enum.Parse(typeof(Dialect), dict[nameof(dialect)].ToString(), true),
-                (IObjectSerializer)Activator.CreateInstance(Type.GetType(dict[nameof(serializer)].ToString()))
-            );
-#endif
         }
 
         private bool disposed;

@@ -1,21 +1,32 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Common;
+using Saritasa.Tools.Messages.Internal;
+
 namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
 {
-    using System;
-    using System.Reflection;
-    using System.Runtime.CompilerServices;
-    using System.Threading.Tasks;
-    using Abstractions;
-    using Common;
-    using Internal;
-
     /// <summary>
     /// Default command executor. It does not process commands with Rejected status.
     /// </summary>
     public class CommandExecutorMiddleware : BaseExecutorMiddleware
     {
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        /// <param name="dict">Input parameters as dict.</param>
+        public CommandExecutorMiddleware(IDictionary<string, string> dict) : base(dict)
+        {
+        }
+
         /// <summary>
         /// .ctor
         /// </summary>

@@ -1,27 +1,22 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Linq;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Common;
+using Saritasa.Tools.Messages.Internal;
+
 namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Reflection;
-    using System.Linq;
-    using Abstractions;
-    using Common;
-    using Internal;
-
     /// <summary>
     /// Locate command hanlder.
     /// </summary>
-    public class CommandHandlerLocatorMiddleware : IMessagePipelineMiddleware
+    public class CommandHandlerLocatorMiddleware : BaseHandlerLocatorMiddleware
     {
-        /// <inheritdoc />
-        public string Id { get; set; } = "CommandHandlerLocator";
-
         const string HandlerPrefix = "Handle";
-
-        readonly Assembly[] assemblies;
 
         /// <summary>
         /// Commands methods cache. Type is for command type, MethodInfo is for actual handler.
@@ -31,26 +26,9 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
 
         ICollection<MethodInfo> commandHandlers;
 
-        HandlerSearchMethod handlerSearchMethod = HandlerSearchMethod.ClassAttribute;
-
-        /// <summary>
-        /// What method to use to search command handler class.
-        /// </summary>
-        public HandlerSearchMethod HandlerSearchMethod
+        /// <inheritdoc />
+        public CommandHandlerLocatorMiddleware(IDictionary<string, string> dict) : base(dict)
         {
-            get
-            {
-                return handlerSearchMethod;
-            }
-
-            set
-            {
-                if (handlerSearchMethod != value)
-                {
-                    handlerSearchMethod = value;
-                    Init();
-                }
-            }
         }
 
         /// <summary>
@@ -67,18 +45,18 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             {
                 throw new ArgumentNullException(nameof(assemblies));
             }
-            this.assemblies = assemblies;
-            Init();
+            this.Assemblies = assemblies;
+            Initialize();
         }
 
         /// <summary>
         /// Prefills command handlers. We cannot do it in runtime because there can be race conditions
         /// during initialization. Much simple just do that once on application start.
         /// </summary>
-        private void Init()
+        protected override void Initialize()
         {
             // Precache all types with command handlers.
-            commandHandlers = assemblies.SelectMany(a => a.GetTypes())
+            commandHandlers = Assemblies.SelectMany(a => a.GetTypes())
                 .Where(t =>
                     HandlerSearchMethod == HandlerSearchMethod.ClassAttribute ?
                         t.GetTypeInfo().GetCustomAttribute<CommandHandlersAttribute>() != null :
@@ -88,14 +66,14 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
                 .ToArray();
             if (!commandHandlers.Any())
             {
-                var assembliesStr = string.Join(",", assemblies.Select(a => a.FullName));
+                var assembliesStr = string.Join(",", Assemblies.Select(a => a.FullName));
                 InternalLogger.Warn(string.Format(Properties.Strings.NoHandlersInAssembly, assembliesStr),
                     nameof(CommandHandlerLocatorMiddleware));
             }
         }
 
         /// <inheritdoc />
-        public virtual void Handle(IMessage message)
+        public override void Handle(IMessage message)
         {
             var commandMessage = message as CommandMessage;
             if (commandMessage == null)
@@ -122,7 +100,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             }
             if (method == null)
             {
-                var assembliesStr = string.Join(",", assemblies.Select(a => a.FullName));
+                var assembliesStr = string.Join(",", Assemblies.Select(a => a.FullName));
                 InternalLogger.Warn(string.Format(Properties.Strings.SearchCommandHandlerNotFound, cmdtype.Name, assembliesStr),
                     nameof(CommandHandlerLocatorMiddleware));
                 throw new CommandHandlerNotFoundException(cmdtype.Name);

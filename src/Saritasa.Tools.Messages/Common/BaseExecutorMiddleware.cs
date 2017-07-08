@@ -1,19 +1,24 @@
 ﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Reflection;
+using System.Threading.Tasks;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Internal;
+using System.Collections;
+using System.Collections.Generic;
+
 namespace Saritasa.Tools.Messages.Common
 {
-    using System;
-    using System.Reflection;
-    using System.Threading.Tasks;
-    using Abstractions;
-    using Internal;
-
     /// <summary>
     /// Provides common functionality for Command/Query/Event executor middlewares.
     /// </summary>
     public abstract class BaseExecutorMiddleware : IMessagePipelineMiddleware, IAsyncMessagePipelineMiddleware
     {
+        const string ParamKeyMethod = "method";
+        const string ParamKeyClass = "class";
+
         /// <inheritdoc />
         public string Id { get; set; } = "Executor";
 
@@ -31,6 +36,52 @@ namespace Saritasa.Tools.Messages.Common
         /// If true the middleware will try to resolve executing method parameters. Default is false.
         /// </summary>
         public bool UseParametersResolve { get; set; }
+
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        protected BaseExecutorMiddleware(IDictionary<string, string> dict)
+        {
+            if (dict == null)
+            {
+                throw new ArgumentNullException(nameof(dict));
+            }
+
+            if (dict.ContainsKey("id"))
+            {
+                Id = dict["id"];
+            }
+
+            if (!dict.ContainsKey(ParamKeyMethod) && !dict.ContainsKey(ParamKeyClass))
+            {
+                throw new ArgumentException($"The dict param expects to have keys {ParamKeyMethod} and {ParamKeyClass}.",
+                    nameof(dict));
+            }
+
+            string methodName = dict["method"], className = dict["class"];
+            var targetType = Type.GetType(className);
+            if (targetType == null)
+            {
+                throw new InvalidOperationException($"Cannot find type {className}");
+            }
+            var method = targetType.GetTypeInfo().GetMethod(methodName, BindingFlags.IgnoreCase | BindingFlags.Static
+                                                                        | BindingFlags.Public | BindingFlags.NonPublic);
+            if (method == null)
+            {
+                throw new InvalidOperationException($"Cannot find method {methodName}. Make sure there is a static method in class {className}");
+            }
+            if (method.GetParameters().Length != 1 || method.GetParameters()[0].ParameterType != typeof(Type)
+                || method.ReturnType != typeof(object))
+            {
+                throw new InvalidOperationException($"Method {methodName} must have one input parameter type of Type and return Object.");
+            }
+
+            // Create delegate.
+            var paramExpression = System.Linq.Expressions.Expression.Parameter(typeof(Type), "arg");
+            var call = System.Linq.Expressions.Expression.Call(method, paramExpression);
+            Func<Type, object> resolver = System.Linq.Expressions.Expression.Lambda<Func<Type, object>>(call, paramExpression).Compile();
+            this.Resolver = resolver;
+        }
 
         /// <summary>
         /// .ctor

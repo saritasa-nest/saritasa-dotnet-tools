@@ -1,22 +1,22 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+using System.Threading.Tasks;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Internal;
+using Saritasa.Tools.Messages.Common.ObjectSerializers;
+
 namespace Saritasa.Tools.Messages.Common.Repositories
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.IO.Compression;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using System.Reflection;
-    using System.Threading.Tasks;
-    using Abstractions;
-    using Internal;
-    using ObjectSerializers;
-
     /// <summary>
-    /// Stores to file message.
+    /// Store messages to files.
     /// </summary>
     public class FileMessageRepository : IMessageRepository
     {
@@ -70,6 +70,26 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             this.buffer = buffer;
             this.compress = compress;
             Directory.CreateDirectory(LogsPath);
+        }
+
+        /// <summary>
+        /// Create repository from dictionary.
+        /// </summary>
+        /// <param name="dict">Properties.</param>
+        public FileMessageRepository(IDictionary<string, string> dict)
+        {
+            this.logsPath = dict[nameof(logsPath)].ToString();
+            if (dict.ContainsKey(nameof(serializer)))
+            {
+                this.serializer = (IObjectSerializer)Activator.CreateInstance(Type.GetType(dict[nameof(serializer)]));
+            }
+            else
+            {
+                this.serializer = new JsonObjectSerializer();
+            }
+            this.prefix = dict[nameof(prefix)].ToString();
+            this.buffer = Convert.ToBoolean(dict[nameof(buffer)]);
+            this.compress = Convert.ToBoolean(dict[nameof(compress)]);
         }
 
         string GetFileNameByDate(DateTime date, int count)
@@ -231,11 +251,11 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <inheritdoc />
-        public void SaveState(IDictionary<string, object> dict)
+        public void SaveState(IDictionary<string, string> dict)
         {
             dict[nameof(logsPath)] = logsPath;
-            dict[nameof(buffer)] = buffer;
-            dict[nameof(compress)] = compress;
+            dict[nameof(buffer)] = buffer.ToString();
+            dict[nameof(compress)] = compress.ToString();
             dict[nameof(serializer)] = serializer.GetType().AssemblyQualifiedName;
             dict[nameof(prefix)] = prefix;
         }
@@ -281,22 +301,6 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         {
             Dispose(true);
             GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Create repository from dictionary.
-        /// </summary>
-        /// <param name="dict">Properties.</param>
-        /// <returns>Message repository.</returns>
-        public static IMessageRepository CreateFromState(IDictionary<string, object> dict)
-        {
-            return new FileMessageRepository(
-                dict[nameof(logsPath)].ToString(),
-                (IObjectSerializer)Activator.CreateInstance(Type.GetType(dict[nameof(serializer)].ToString())),
-                dict[nameof(prefix)].ToString(),
-                Convert.ToBoolean(dict[nameof(buffer)]),
-                Convert.ToBoolean(dict[nameof(compress)])
-            );
         }
     }
 

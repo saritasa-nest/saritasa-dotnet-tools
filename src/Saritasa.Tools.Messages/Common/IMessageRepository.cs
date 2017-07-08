@@ -1,14 +1,14 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using JetBrains.Annotations;
+using Saritasa.Tools.Messages.Abstractions;
+
 namespace Saritasa.Tools.Messages.Common
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using JetBrains.Annotations;
-    using Abstractions;
-
     /// <summary>
     /// Message repository interface.
     /// </summary>
@@ -33,6 +33,6 @@ namespace Saritasa.Tools.Messages.Common
         /// method to recreate itself from dict.
         /// </summary>
         /// <param name="dict">Dictionary of properties.</param>
-        void SaveState([NotNull] IDictionary<string, object> dict);
+        void SaveState([NotNull] IDictionary<string, string> dict);
     }
 }

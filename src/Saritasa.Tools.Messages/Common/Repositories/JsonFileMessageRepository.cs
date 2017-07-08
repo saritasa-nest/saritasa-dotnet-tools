@@ -1,16 +1,16 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using System.Threading.Tasks;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Common.ObjectSerializers;
+
 namespace Saritasa.Tools.Messages.Common.Repositories
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Text;
-    using System.Threading.Tasks;
-    using Abstractions;
-    using ObjectSerializers;
-
     /// <summary>
     /// JSON file target. Write JSON serialized messages separated by new line.
     /// </summary>
@@ -50,6 +50,19 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             this.serializer = new JsonObjectSerializer();
             this.prefix = prefix;
             this.buffer = buffer;
+            Directory.CreateDirectory(LogsPath);
+        }
+
+        /// <summary>
+        /// Create repository from dictionary.
+        /// </summary>
+        /// <param name="dict">Properties.</param>
+        public JsonFileMessageRepository(IDictionary<string, string> dict)
+        {
+            this.LogsPath = dict["logsPath"].ToString();
+            this.serializer = new JsonObjectSerializer();
+            this.prefix = dict[nameof(prefix)].ToString();
+            this.buffer = Convert.ToBoolean(dict[nameof(buffer)]);
             Directory.CreateDirectory(LogsPath);
         }
 
@@ -123,10 +136,10 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <inheritdoc />
-        public void SaveState(IDictionary<string, object> dict)
+        public void SaveState(IDictionary<string, string> dict)
         {
-            dict[nameof(LogsPath)] = LogsPath;
-            dict[nameof(buffer)] = buffer;
+            dict["logsPath"] = LogsPath;
+            dict[nameof(buffer)] = buffer.ToString();
             dict[nameof(prefix)] = prefix;
         }
 
@@ -172,20 +185,5 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         #endregion
-
-        /// <summary>
-        /// Create repository from dictionary.
-        /// </summary>
-        /// <param name="dict">Properties.</param>
-        /// <returns>Message repository.</returns>
-        public static IMessageRepository CreateFromState(IDictionary<string, object> dict)
-        {
-            return new CsvFileMessageRepository(
-                dict[nameof(LogsPath)].ToString(),
-                (IObjectSerializer)Activator.CreateInstance(Type.GetType(dict[nameof(serializer)].ToString())),
-                dict[nameof(prefix)].ToString(),
-                Convert.ToBoolean(dict[nameof(buffer)])
-            );
-        }
     }
 }

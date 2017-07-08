@@ -1,19 +1,28 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Internal;
+using Saritasa.Tools.Messages.Common;
+
 namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
 {
-    using System;
-    using System.Threading.Tasks;
-    using Abstractions;
-    using Internal;
-    using Common;
-
     /// <summary>
     /// Resolve object handler for query.
     /// </summary>
     public class QueryObjectResolverMiddleware : BaseExecutorMiddleware
     {
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        /// <param name="dict">Dictionary with parameters.</param>
+        public QueryObjectResolverMiddleware(IDictionary<string, string> dict) : base(dict)
+        {
+        }
+
         /// <summary>
         /// .ctor
         /// </summary>

@@ -35,6 +35,14 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             Messages = new List<IMessage>();
         }
 
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        /// <param name="dict">Parameters dictionary.</param>
+        public InMemoryMessageRepository(IDictionary<string, string> dict) : this()
+        {
+        }
+
         /// <inheritdoc />
         public Task AddAsync(IMessage message)
         {
@@ -57,7 +65,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         #endregion
 
         /// <inheritdoc />
-        public void SaveState(IDictionary<string, object> dict)
+        public void SaveState(IDictionary<string, string> dict)
         {
             // No need to implement since repository does not have state.
         }

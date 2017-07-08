@@ -1,50 +1,30 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Linq;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Common;
+using Saritasa.Tools.Messages.Internal;
+
 namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Reflection;
-    using System.Linq;
-    using Abstractions;
-    using Common;
-    using Internal;
-
     /// <summary>
-    /// Locates command hanlder.
+    /// Locates event handler.
     /// </summary>
-    public class EventHandlerLocatorMiddleware : IMessagePipelineMiddleware
+    public class EventHandlerLocatorMiddleware : BaseHandlerLocatorMiddleware
     {
-        /// <inheritdoc />
-        public string Id { get; set; } = "EventLocator";
-
         const string HandlerPrefix = "Handle";
 
         readonly Assembly[] assemblies;
 
         IList<MethodInfo> eventHandlers;
 
-        HandlerSearchMethod handlerSearchMethod = HandlerSearchMethod.ClassAttribute;
-
-        /// <summary>
-        /// What method to use to search command handler class.
-        /// </summary>
-        public HandlerSearchMethod HandlerSearchMethod
+        /// <inheritdoc />
+        public EventHandlerLocatorMiddleware(IDictionary<string, string> dict) : base(dict)
         {
-            get
-            {
-                return handlerSearchMethod;
-            }
-
-            set
-            {
-                if (handlerSearchMethod != value)
-                {
-                    handlerSearchMethod = value;
-                    Init();
-                }
-            }
         }
 
         /// <summary>
@@ -62,23 +42,25 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
                 throw new ArgumentNullException(nameof(assemblies));
             }
             this.assemblies = assemblies;
-            Init();
+            Initialize();
         }
 
-        private void Init()
+        /// <inheritdoc />
+        protected override void Initialize()
         {
             // Precache all types with event handlers.
             eventHandlers = assemblies.SelectMany(a => a.GetTypes())
-                .Where(t => HandlerSearchMethod == HandlerSearchMethod.ClassAttribute ?
-                    t.GetTypeInfo().GetCustomAttribute<EventHandlersAttribute>() != null :
-                    t.Name.EndsWith("Handlers"))
+                .Where(t =>
+                    HandlerSearchMethod == HandlerSearchMethod.ClassAttribute
+                        ? t.GetTypeInfo().GetCustomAttribute<EventHandlersAttribute>() != null
+                        : t.Name.EndsWith("Handlers"))
                 .SelectMany(t => t.GetTypeInfo().GetMethods())
                 .Where(m => m.Name.StartsWith(HandlerPrefix))
                 .ToArray();
         }
 
         /// <inheritdoc />
-        public virtual void Handle(IMessage message)
+        public override void Handle(IMessage message)
         {
             var eventMessage = message as EventMessage;
             if (eventMessage == null)

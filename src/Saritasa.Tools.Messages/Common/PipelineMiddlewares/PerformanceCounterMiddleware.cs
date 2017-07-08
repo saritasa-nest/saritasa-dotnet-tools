@@ -2,12 +2,13 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 #if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using Saritasa.Tools.Messages.Abstractions;
+
 namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
 {
-    using System;
-    using System.Diagnostics;
-    using Abstractions;
-
     /// <summary>
     /// Represents performance counter that count total messages passed.
     /// </summary>
@@ -44,6 +45,22 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         PerformanceCounter performanceCounterRate;
         PerformanceCounter performanceCounterAvg;
         PerformanceCounter performanceCounterAvgBase;
+
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        /// <param name="dict">Parameters.</param>
+        public PerformanceCounterMiddleware(IDictionary<string, string> dict)
+        {
+            if (dict.ContainsKey("id"))
+            {
+                Id = dict["id"];
+            }
+            if (dict.ContainsKey("category"))
+            {
+                this.category = dict["category"];
+            }
+        }
 
         /// <summary>
         /// .ctor

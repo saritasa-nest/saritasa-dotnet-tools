@@ -18,7 +18,7 @@ namespace SandBox
             ILoggerProvider loggerProvider = new NLogLoggerProvider();
             var logger = loggerProvider.CreateLogger("test");
 
-            // simple
+            // Simple.
             logger.LogTrace("trace");
             logger.LogDebug("debug");
             logger.LogInformation("info");
@@ -26,7 +26,7 @@ namespace SandBox
             logger.LogWarning("warning");
             logger.LogCritical("critical");
 
-            // scopes
+            // Scopes.
             using (logger.BeginScope("(scope 1)"))
             {
                 logger.LogInformation("test 1");

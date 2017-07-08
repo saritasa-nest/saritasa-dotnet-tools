@@ -1,20 +1,20 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 #if !NET40
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Common.ObjectSerializers;
+using Saritasa.Tools.Messages.Internal.Elasticsearch.Query;
+using Saritasa.Tools.Messages.Internal.Elasticsearch.SearchResult;
+
 namespace Saritasa.Tools.Messages.Common.Repositories
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using System.Net.Http;
-    using System.Net.Http.Headers;
-    using Abstractions;
-    using ObjectSerializers;
-    using Internal.Elasticsearch.Query;
-    using Internal.Elasticsearch.SearchResult;
-
     /// <summary>
     /// Use ElasticSearch to store messages.
     /// </summary>
@@ -61,6 +61,15 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                 new ProductInfoHeaderValue(new ProductHeaderValue("SaritasaTools")));
         }
 
+        /// <summary>
+        /// Create repository from dictionary.
+        /// </summary>
+        /// <param name="dict">Properties.</param>
+        public ElasticsearchMessageRepository(IDictionary<string, string> dict) :
+            this(dict[nameof(uri)])
+        {
+        }
+
         /// <inheritdoc />
         public async Task AddAsync(IMessage message)
         {
@@ -99,19 +108,9 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <inheritdoc />
-        public void SaveState(IDictionary<string, object> dict)
+        public void SaveState(IDictionary<string, string> dict)
         {
             dict[nameof(uri)] = uri;
-        }
-
-        /// <summary>
-        /// Create repository from dictionary.
-        /// </summary>
-        /// <param name="dict">Properties.</param>
-        /// <returns>Elasticsearch repository.</returns>
-        public static IMessageRepository CreateFromState(IDictionary<string, object> dict)
-        {
-            return new ElasticsearchMessageRepository(dict[nameof(uri)].ToString());
         }
 
         private IEnumerable<IFieldNameQuery> CreateFieldQueries(MessageQuery messageQuery)
