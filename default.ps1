@@ -22,17 +22,17 @@ Properties `
     $Configuration = 'Release'
 }
 
-# Global variable.
+# Global variables.
 $script:Version = '0.0.0'
 
 $packages = @(
-    'Saritasa.Tools.Common' # common
+    'Saritasa.Tools.Common'# common
     'Saritasa.Tools.Domain' # domain
     'Saritasa.Tools.EF6' # ef6
     'Saritasa.Tools.EFCore1' # efcore1
     'Saritasa.Tools.Emails' # emails
     'Saritasa.Tools.Messages' # messages
-    'Saritasa.Tools.Messages.Abstractions' # messages-abstractiona
+    'Saritasa.Tools.Messages.Abstractions' # messages-abstractions
     'Saritasa.Tools.Misc' # misc
     'Saritasa.Tools.Mvc5' # mvc5
     'Saritasa.Tools.NLog4' # nlog4
@@ -42,14 +42,34 @@ $docsRoot = Resolve-Path "$PSScriptRoot\docs"
 
 Task pack -depends download-nuget -description 'Build the library, test it and prepare nuget packages' `
 {
+    # Build all versions, sign, test and prepare package directory.
     foreach ($package in $packages)
     {
-        &dotnet pack ".\src\$package" --configuration release --output ..\..\
+        &dotnet build ".\src\$package" --configuration release
+
+        # Prepare library folder.
+        Remove-Item $LibDirectory -Recurse -Force -ErrorAction SilentlyContinue
+        New-Item $LibDirectory -ItemType Directory
+        foreach ($build in Get-ChildItem ".\src\$package\bin\Release" -Recurse | ?{ $_.PSIsContainer })
+        {
+            Copy-Item -Path ".\src\$package\bin\Release\$build" -Destination $LibDirectory `
+                -Exclude '*.pdb' -Recurse -Container -Force
+        }
+
+        # Pack, we already have nuget in current folder.
+        $nugetExePath = "$PSScriptRoot\tools\nuget.exe"
+        &"$nugetExePath" @('pack', ".\src\$package\$package.nuspec", `
+            '-BasePath', "$LibDirectory\..", `
+            '-NonInteractive', `
+            '-Exclude', '*.snk')
         if ($LASTEXITCODE)
         {
             throw 'Nuget pack failed.'
         }
     }
+
+    # Little clean up.
+    Remove-Item $LibDirectory -Recurse -Force -ErrorAction SilentlyContinue
 }
 
 Task clean -description 'Clean solution' `

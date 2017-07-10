@@ -1,5 +1,4 @@
 ﻿0.1.3 [TBD]
-[*] Update Microsoft.NETCore.App to 1.1.1 .
 
 0.1.2 [2017-02-11]
 [*] MultiSmtpClientEmailSender now sets ServicePoint.ConnectionLimit to make separates connections.

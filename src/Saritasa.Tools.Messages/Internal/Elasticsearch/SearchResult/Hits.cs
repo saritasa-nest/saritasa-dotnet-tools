@@ -5,7 +5,6 @@ using Newtonsoft.Json;
 
 namespace Saritasa.Tools.Messages.Internal.Elasticsearch.SearchResult
 {
-
     internal class Hits
     {
         [JsonProperty(PropertyName = "total")]

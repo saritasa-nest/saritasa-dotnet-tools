@@ -6,7 +6,6 @@ using Saritasa.Tools.Messages.Common;
 
 namespace Saritasa.Tools.Messages.Internal.Elasticsearch.SearchResult
 {
-
     internal class Hit
     {
         [JsonProperty(PropertyName = "_index")]

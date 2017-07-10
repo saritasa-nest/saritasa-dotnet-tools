@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>Saritasa.Tools.Misc</id>
+    <version>0.1.1</version>
+    <title>Saritasa Tools Misc</title>
+    <authors>Saritasa</authors>
+    <owners>Saritasa</owners>
+    <licenseUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/Saritasa/SaritasaTools</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>The package is a part of Saritasa Tools project. Saritasa.Tools.Misc contains miscellaneous items: passwords generation, passwords strength estimate.</description>
+    <summary>Miscellaneous items.</summary>
+    <copyright>Copyright (c) Saritasa, 2016-2017</copyright>
+    <tags>misc passwords</tags>
+    <dependencies>
+      <group targetFramework="netcoreapp1.0">
+        <dependency id="Microsoft.NETCore.App" version="[1.0.0, )" />
+        <dependency id="System.Data.Common" version="[4.1.0, )" />
+      </group>
+      <group targetFramework="net452" />
+      <group targetFramework="net461" />
+      <group targetFramework="netstandard1.6">
+        <dependency id="NETStandard.Library" version="[1.6.0, )" />
+        <dependency id="System.Data.Common" version="[4.1.0, )" />
+      </group>
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System.Data" targetFramework=".NETFramework4.5.2" />
+      <frameworkAssembly assemblyName="System.Xml" targetFramework=".NETFramework4.5.2" />
+      <frameworkAssembly assemblyName="System.ComponentModel.DataAnnotations" targetFramework=".NETFramework4.5.2" />
+      <frameworkAssembly assemblyName="System.Data" targetFramework=".NETFramework4.6.1" />
+      <frameworkAssembly assemblyName="System.Xml" targetFramework=".NETFramework4.6.1" />
+      <frameworkAssembly assemblyName="System.ComponentModel.DataAnnotations" targetFramework=".NETFramework4.6.1" />
+    </frameworkAssemblies>
+  </metadata>
+</package>

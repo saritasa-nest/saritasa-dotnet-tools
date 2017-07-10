@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Saritasa.Tools.Mvc5</id>
+    <title>Saritasa Tools for ASP.NET MVC5</title>
+    <version>0.1.0</version>
+    <authors>Saritasa</authors>
+    <owners>Saritasa</owners>
+    <licenseUrl>https://github.com/saritasa/saritasatools/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/saritasa/saritasatools</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/saritasa/saritasatools/master/icon.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Collection of tools for our company projects for ASP.NET MVC 5.</description>
+    <copyright>Copyright (c) Saritasa, 2016-2017</copyright>
+  </metadata>
+</package>

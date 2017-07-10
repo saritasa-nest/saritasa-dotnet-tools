@@ -4,7 +4,7 @@
     <Description>The package is a part of Saritasa Tools project. Saritasa.Tools.Common contains various utilities and extensions for DateTime convertion, strings manipulation, validation utils (Guard), parse with default, flow (memoize, retry), collection processing (chunk select), atomic (CAS, swap), strings hash (md5, sha1, sha2), paged enumerable.</Description>
     <Copyright>Saritasa 2015-2017</Copyright>
     <AssemblyTitle>Saritasa Tools Utils and Extensions</AssemblyTitle>
-    <VersionPrefix>0.2.1</VersionPrefix>
+    <VersionPrefix>0.3.3</VersionPrefix>
     <Authors>Saritasa</Authors>
     <TargetFrameworks>net40;net452;net461;netcoreapp1.0;netcoreapp1.1;netstandard1.2;netstandard1.6</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>

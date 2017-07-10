@@ -3,7 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 #if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 #endif
 
@@ -22,7 +24,13 @@ namespace Saritasa.Tools.Domain.Exceptions
         /// <summary>
         /// Errors dictionary. Empty string key relates to summary error message.
         /// </summary>
-        public IDictionary<string, string> Errors { get; set; } = new Dictionary<string, string>();
+        public IDictionary<string, IEnumerable<string>> Errors
+        {
+            get => errors;
+        }
+
+        private readonly IDictionary<string, IEnumerable<string>> errors
+            = new Dictionary<string, IEnumerable<string>>();
 
         /// <inheritdoc />
         public override string Message
@@ -31,10 +39,18 @@ namespace Saritasa.Tools.Domain.Exceptions
             {
                 if (Errors.ContainsKey(SummaryKey))
                 {
-                    return Errors[SummaryKey];
+                    return Errors[SummaryKey].First();
                 }
                 return base.Message;
             }
+        }
+
+        /// <summary>
+        /// Summary errors. Returns zero array if not defined.
+        /// </summary>
+        public IEnumerable<string> SummaryErrors
+        {
+            get => errors.ContainsKey(SummaryKey) ? errors[SummaryKey] : new string[0];
         }
 
         /// <summary>
@@ -50,7 +66,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         /// </summary>
         public ValidationException(string message) : base(message)
         {
-            Errors[SummaryKey] = message;
+            AddError(message);
         }
 
         /// <summary>
@@ -60,7 +76,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         /// </summary>
         public ValidationException(string message, Exception innerException) : base(message, innerException)
         {
-            Errors[SummaryKey] = message;
+            AddError(message);
         }
 
 #if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
@@ -73,6 +89,65 @@ namespace Saritasa.Tools.Domain.Exceptions
         protected ValidationException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
+        }
+#endif
+
+        /// <summary>
+        /// Add error to errors list for specific member.
+        /// </summary>
+        /// <param name="member">Member of field name. Can be empty.</param>
+        /// <param name="error">Error message.</param>
+        public void AddError(string member, string error)
+        {
+            if (string.IsNullOrEmpty(error))
+            {
+                throw new ArgumentException("Error cannot be empty.", nameof(error));
+            }
+
+            var list = errors.ContainsKey(member) ? (IList<string>)errors[member] : new List<string>();
+            list.Add(error);
+        }
+
+        /// <summary>
+        /// Add summar error.
+        /// </summary>
+        /// <param name="error">Error message.</param>
+        public void AddError(string error)
+        {
+            AddError(SummaryKey, error);
+        }
+
+#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
+        /// <summary>
+        /// Creates on throws instance of <see cref="ValidationException" /> based on validation results
+        /// of <see cref="IValidatableObject" /> object.
+        /// </summary>
+        /// <param name="obj">The object to validate.</param>
+        /// <param name="serviceProvider">The object that implements the <see cref="IServiceProvider" /> interface.
+        /// This parameter is optional.</param>
+        /// <param name="items">A dictionary of key/value pairs to make available to the service consumers.
+        /// This parameter is optional.</param>
+        public static void ThrowFromObjectValidation(
+            IValidatableObject obj,
+            IServiceProvider serviceProvider = null,
+            IDictionary<object, object> items = null)
+        {
+            if (obj == null)
+            {
+                throw new ArgumentNullException(nameof(obj));
+            }
+
+            var result = obj.Validate(new ValidationContext(obj, serviceProvider, items)).ToArray();
+            if (result.Any())
+            {
+                var ex = new ValidationException();
+                foreach (ValidationResult resultItem in result)
+                {
+                    var member = resultItem.MemberNames.Any() ? resultItem.MemberNames.First() : string.Empty;
+                    ex.AddError(member, resultItem.ErrorMessage);
+                }
+                throw ex;
+            }
         }
 #endif
     }

@@ -7,7 +7,6 @@ using Saritasa.Tools.Messages.Internal.Enums;
 
 namespace Saritasa.Tools.Messages.Internal
 {
-
     /// <summary>
     /// The SELECT statement builder interface.
     /// </summary>
