@@ -1,32 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>The package is a part of Saritasa Tools project. Saritasa.Tools.Ef6 contains implementations for unit of work, repository interfaces.</Description>
-    <Copyright>Saritasa 2015-2016</Copyright>
-    <AssemblyTitle>Saritasa Tools Entity Framework 6</AssemblyTitle>
-    <VersionPrefix>0.1.0</VersionPrefix>
-    <Authors>Saritasa</Authors>
     <TargetFrameworks>net452;net461</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Saritasa.Tools.EF6</AssemblyName>
     <AssemblyOriginatorKeyFile>../../tools/SaritasaTools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <PackageId>Saritasa.Tools.EF6</PackageId>
-    <PackageTags>unit of work;repository;domain events</PackageTags>
-    <PackageIconUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png</PackageIconUrl>
-    <PackageProjectUrl>https://github.com/Saritasa/SaritasaTools</PackageProjectUrl>
-    <PackageLicenseUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/LICENSE.txt</PackageLicenseUrl>
-    <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/Saritasa/SaritasaTools</RepositoryUrl>
-    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
-    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <CodeAnalysisRuleSet>../../tools/Saritasa.ruleset</CodeAnalysisRuleSet>
     <RootNamespace>Saritasa.Tools.EF</RootNamespace>
   </PropertyGroup>

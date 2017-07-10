@@ -18,7 +18,6 @@ if ($PSVersionTable.PSVersion.Major -lt 3)
 Properties `
 {
     $Version = '0.1.0'
-    $LibDirectory = './build/lib'
     $Configuration = 'Release'
 }
 
@@ -45,40 +44,54 @@ Task pack -depends download-nuget -description 'Build the library, test it and p
     # Build all versions, sign, test and prepare package directory.
     foreach ($package in $packages)
     {
+        # Format version.
+        $revcount = &'git' @('rev-list', '--all', '--count') | Out-String
+        $revcount = $revcount -replace [Environment]::NewLine, ''
+        $hash = &'git' @('log', '--pretty=format:%h', '-n', '1') | Out-String
+        $hash = $hash -replace [Environment]::NewLine, ''
+
+        $assemblyVersion = (Get-Content ".\src\$package\VERSION.txt").Trim()
+        $fileVersion = "$assemblyVersion.$revcount".Trim()
+        $productVersion = "$fileVersion-$hash"
+        Write-Information "Building $package with version $fileVersion"
+
+        # Update version for assembly.
+        ReplaceVersionInAssemblyInfo ".\src\$package\Properties\AssemblyInfo.cs" 'AssemblyVersion' $assemblyVersion
+        ReplaceVersionInAssemblyInfo ".\src\$package\Properties\AssemblyInfo.cs" 'AssemblyFileVersion' $fileVersion
+        ReplaceVersionInAssemblyInfo ".\src\$package\Properties\AssemblyInfo.cs" 'AssemblyInformationalVersion' $productVersion
+
+        # Build.
+        &dotnet restore ".\src\$package"
         &dotnet build ".\src\$package" --configuration release
 
-        # Prepare library folder.
-        Remove-Item $LibDirectory -Recurse -Force -ErrorAction SilentlyContinue
-        New-Item $LibDirectory -ItemType Directory
-        foreach ($build in Get-ChildItem ".\src\$package\bin\Release" -Recurse | ?{ $_.PSIsContainer })
-        {
-            Copy-Item -Path ".\src\$package\bin\Release\$build" -Destination $LibDirectory `
-                -Exclude '*.pdb' -Recurse -Container -Force
-        }
+        # Revert versions changes.
+        ReplaceVersionInAssemblyInfo ".\src\$package\Properties\AssemblyInfo.cs" 'AssemblyVersion' '1.0.0.0'
+        ReplaceVersionInAssemblyInfo ".\src\$package\Properties\AssemblyInfo.cs" 'AssemblyFileVersion' '1.0.0.0'
+        ReplaceVersionInAssemblyInfo ".\src\$package\Properties\AssemblyInfo.cs" 'AssemblyInformationalVersion' '1.0.0.0'
 
-        # Pack, we already have nuget in current folder.
+        # Pack.
         $nugetExePath = "$PSScriptRoot\tools\nuget.exe"
         &"$nugetExePath" @('pack', ".\src\$package\$package.nuspec", `
-            '-BasePath', "$LibDirectory\..", `
             '-NonInteractive', `
+            '-Version', $assemblyVersion,
             '-Exclude', '*.snk')
         if ($LASTEXITCODE)
         {
             throw 'Nuget pack failed.'
         }
     }
-
-    # Little clean up.
-    Remove-Item $LibDirectory -Recurse -Force -ErrorAction SilentlyContinue
 }
 
 Task clean -description 'Clean solution' `
 {
-    Remove-Item $LibDirectory -Recurse -Force -ErrorAction SilentlyContinue
     Remove-Item './Saritasa.*.nupkg' -ErrorAction SilentlyContinue
+    Remove-Item './Saritasa.*.zip' -ErrorAction SilentlyContinue
     Remove-Item './src/*.suo' -Recurse -Force -ErrorAction SilentlyContinue
-    Remove-Item './src/Saritasa.Tools/bin' -Recurse -Force -ErrorAction SilentlyContinue
-    Remove-Item './src/Saritasa.Tools/obj' -Recurse -Force -ErrorAction SilentlyContinue
+    foreach ($package in $packages)
+    {
+        Remove-Item "./src/$package/bin/*" -Recurse -Force -ErrorAction SilentlyContinue
+        Remove-Item "./src/$package/obj/*" -Recurse -Force -ErrorAction SilentlyContinue
+    }
     Remove-Item './src/StyleCop.Cache' -Force -ErrorAction SilentlyContinue
     Remove-Item './docs/_build' -Recurse -Force -ErrorAction SilentlyContinue
     Remove-Item './docs/conf.py' -ErrorAction SilentlyContinue
@@ -101,4 +114,15 @@ function CompileDocs
     {
         throw 'Cannot compile documentation.'
     }
+}
+
+function ReplaceVersionInAssemblyInfo($file, $attribute, $version)
+{
+    $pattern = "$attribute\(""[0-9]+(\.([0-9a-z\-]+|\*)){1,3}""\)"
+    $version = "$attribute(""$version"")"
+
+    (Get-Content $file) | ForEach-Object `
+        {
+            ForEach-Object { $_ -replace $pattern, $version }
+        } | Set-Content $file -Encoding UTF8
 }

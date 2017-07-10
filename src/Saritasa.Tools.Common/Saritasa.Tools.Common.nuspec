@@ -4,7 +4,7 @@
     <id>Saritasa.Tools.Common</id>
     <title>Saritasa Tools Useful Utilities and Shortcuts</title>
     <summary>Useful set of utilities that mostly used in development.</summary>
-    <version>0.3.3</version>
+    <version>0.0.0</version>
     <description>The package is a part of Saritasa Tools project. Saritasa.Tools.Common contains various utilities and extensions for DateTime convertion, strings manipulation, validation utils (Guard), parse with default, flow (memoize, retry), collection processing (chunk select), atomic (CAS, swap), strings hash (md5, sha1, sha2), paged enumerable.</description>
     <authors>Saritasa</authors>
     <owners>Saritasa</owners>
@@ -12,7 +12,7 @@
     <projectUrl>https://github.com/saritasa/saritasatools</projectUrl>
     <iconUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <copyright>Copyright (c) Saritasa, 2016-2017</copyright>
+    <copyright>(c) Saritasa, 2016-2017</copyright>
     <tags>uow repository domain ef6 objectcontext dbcontext</tags>
     <repository type="git" url="https://github.com/Saritasa/SaritasaTools" />
     <dependencies>
@@ -26,4 +26,8 @@
       </group>
     </dependencies>
   </metadata>
+  <files>
+    <file src="bin\Release\**\Saritasa.Tools.Common*.dll" target="lib" />
+    <file src="bin\Release\**\Saritasa.Tools.Common.xml" target="lib" />
+  </files>
 </package>

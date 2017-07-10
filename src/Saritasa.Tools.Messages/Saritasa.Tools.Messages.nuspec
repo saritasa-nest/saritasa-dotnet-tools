@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>Saritasa.Tools.Messages</id>
-    <version>0.1.2</version>
+    <version>0.0.0</version>
     <title>Saritasa Tools Messages</title>
     <authors>Saritasa</authors>
     <owners>Saritasa</owners>
@@ -53,4 +53,8 @@
       <frameworkAssembly assemblyName="System.Net.Http" targetFramework=".NETFramework4.6.1" />
     </frameworkAssemblies>
   </metadata>
+  <files>
+    <file src="bin\Release\**\Saritasa.Tools.Messages*.dll" target="lib" />
+    <file src="bin\Release\**\Saritasa.Tools.Messages.xml" target="lib" />
+  </files>
 </package>

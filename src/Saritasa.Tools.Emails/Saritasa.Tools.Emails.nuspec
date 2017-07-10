@@ -3,7 +3,7 @@
   <metadata>
     <id>Saritasa.Tools.Emails</id>
     <title>Saritasa Tools Emails</title>
-    <version>0.1.3</version>
+    <version>0.0.0</version>
     <description>The package is a part of Saritasa Tools project. Saritasa.Tools.Emails contains emails sending pipeline and interceptors.</description>
     <summary>Email abstractions.</summary>
     <authors>Saritasa</authors>
@@ -12,7 +12,7 @@
     <projectUrl>https://github.com/saritasa/saritasatools</projectUrl>
     <iconUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <copyright>Copyright (c) Saritasa, 2016-2017</copyright>
+    <copyright>(c) Saritasa, 2016-2017</copyright>
     <tags>email emails</tags>
     <repository type="git" url="https://github.com/Saritasa/SaritasaTools" />
     <dependencies>
@@ -29,4 +29,8 @@
       </group>
     </dependencies>
   </metadata>
+  <files>
+    <file src="bin\Release\**\Saritasa.Tools.Emails*.dll" target="lib" />
+    <file src="bin\Release\**\Saritasa.Tools.Emails.xml" target="lib" />
+  </files>
 </package>

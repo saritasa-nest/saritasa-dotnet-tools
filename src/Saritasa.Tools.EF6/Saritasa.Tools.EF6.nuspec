@@ -3,7 +3,7 @@
   <metadata>
     <id>Saritasa.Tools.EF6</id>
     <title>Saritasa Tools for Entity Framework 6</title>
-    <version>0.1.0</version>
+    <version>0.0.0</version>
     <description>The package is a part of Saritasa Tools project. Collection of tools for our company projects for Entity Framework 6.</description>
     <summary>DDD implementatons for Entity Framework 6.</summary>
     <authors>Saritasa</authors>
@@ -12,7 +12,7 @@
     <projectUrl>https://github.com/saritasa/saritasatools</projectUrl>
     <iconUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <copyright>Copyright (c) Saritasa, 2016-2017</copyright>
+    <copyright>(c) Saritasa, 2016-2017</copyright>
     <tags>uow repository domain ef6 objectcontext dbcontext</tags>
     <repository type="git" url="https://github.com/Saritasa/SaritasaTools" />
     <dependencies>
@@ -26,4 +26,8 @@
       </group>
     </dependencies>
   </metadata>
+  <files>
+    <file src="bin\Release\**\Saritasa.Tools.EF6*.dll" target="lib" />
+    <file src="bin\Release\**\Saritasa.Tools.EF6.xml" target="lib" />
+  </files>
 </package>
