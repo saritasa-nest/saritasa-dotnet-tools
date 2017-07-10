@@ -16,7 +16,7 @@
     <tags>nlog logging</tags>
     <dependencies>
       <group targetFramework="netcoreapp1.0">
-        <dependency id="NLog" version="[5.0.0-beta05, )" />
+        <dependency id="NLog" version="[5.0.0, )" />
         <dependency id="Microsoft.NETCore.App" version="[1.1.0, )" />
         <dependency id="System.Threading" version="[4.3.0, )" />
         <dependency id="Microsoft.Extensions.Logging.Abstractions" version="[1.1.0, )" />
@@ -30,7 +30,7 @@
         <dependency id="Microsoft.Extensions.Logging.Abstractions" version="[1.1.0, )" />
       </group>
       <group targetFramework="netstandard1.6">
-        <dependency id="NLog" version="[5.0.0-beta05, )" />
+        <dependency id="NLog" version="[5.0.0, )" />
         <dependency id="NETStandard.Library" version="[1.6.0, )" />
         <dependency id="System.Threading" version="[4.3.0, )" />
         <dependency id="Microsoft.Extensions.Logging.Abstractions" version="[1.1.0, )" />

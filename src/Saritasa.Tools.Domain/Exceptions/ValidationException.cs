@@ -22,7 +22,8 @@ namespace Saritasa.Tools.Domain.Exceptions
         const string SummaryKey = "";
 
         /// <summary>
-        /// Errors dictionary. Empty string key relates to summary error message.
+        /// Errors dictionary. Key is a member name, value is an enumerable of error
+        /// messages. Empty member name relates to summary error message.
         /// </summary>
         public IDictionary<string, IEnumerable<string>> Errors
         {
@@ -104,8 +105,17 @@ namespace Saritasa.Tools.Domain.Exceptions
                 throw new ArgumentException("Error cannot be empty.", nameof(error));
             }
 
-            var list = errors.ContainsKey(member) ? (IList<string>)errors[member] : new List<string>();
-            list.Add(error);
+            IEnumerable<string> list;
+            if (errors.TryGetValue(member, out list))
+            {
+                ((IList<string>)list).Add(error);
+            }
+            else
+            {
+                list = new List<string>();
+                ((IList<string>)list).Add(error);
+                errors.Add(member, list);
+            }
         }
 
         /// <summary>
@@ -117,10 +127,47 @@ namespace Saritasa.Tools.Domain.Exceptions
             AddError(SummaryKey, error);
         }
 
+        /// <summary>
+        /// Returns opposite dictionary where key is error message and value is an
+        /// enumerable with member names related to the error.
+        /// </summary>
+        /// <returns>Error members dictionary.</returns>
+        public IDictionary<string, IEnumerable<string>> GetErrorMembersDictionary()
+        {
+            var dict = new Dictionary<string, IEnumerable<string>>();
+            foreach (KeyValuePair<string, IEnumerable<string>> member in errors)
+            {
+                foreach (string error in member.Value)
+                {
+                    IEnumerable<string> list;
+                    if (dict.TryGetValue(error, out list))
+                    {
+                        ((IList<string>)list).Add(member.Key);
+                    }
+                    else
+                    {
+                        list = new List<string>();
+                        ((IList<string>)list).Add(member.Key);
+                        dict.Add(error, list);
+                    }
+                }
+            }
+            return dict;
+        }
+
+        /// <summary>
+        /// Returns dictionary that contains only one first error message per member name.
+        /// </summary>
+        /// <returns>Member error dictionary.</returns>
+        public IDictionary<string, string> GetOneErrorDictionary()
+        {
+            return errors.ToDictionary(k => k.Key, v => v.Value.FirstOrDefault() ?? string.Empty);
+        }
+
 #if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
         /// <summary>
         /// Creates on throws instance of <see cref="ValidationException" /> based on validation results
-        /// of <see cref="IValidatableObject" /> object.
+        /// of object.
         /// </summary>
         /// <param name="obj">The object to validate.</param>
         /// <param name="serviceProvider">The object that implements the <see cref="IServiceProvider" /> interface.
@@ -128,7 +175,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         /// <param name="items">A dictionary of key/value pairs to make available to the service consumers.
         /// This parameter is optional.</param>
         public static void ThrowFromObjectValidation(
-            IValidatableObject obj,
+            object obj,
             IServiceProvider serviceProvider = null,
             IDictionary<object, object> items = null)
         {
@@ -137,14 +184,18 @@ namespace Saritasa.Tools.Domain.Exceptions
                 throw new ArgumentNullException(nameof(obj));
             }
 
-            var result = obj.Validate(new ValidationContext(obj, serviceProvider, items)).ToArray();
-            if (result.Any())
+            var validationResults = new List<ValidationResult>();
+            var result = Validator.TryValidateObject(obj, new ValidationContext(obj, serviceProvider, items),
+                validationResults, true);
+            if (!result)
             {
                 var ex = new ValidationException();
-                foreach (ValidationResult resultItem in result)
+                foreach (ValidationResult validationResult in validationResults)
                 {
-                    var member = resultItem.MemberNames.Any() ? resultItem.MemberNames.First() : string.Empty;
-                    ex.AddError(member, resultItem.ErrorMessage);
+                    foreach (var memberName in validationResult.MemberNames)
+                    {
+                        ex.AddError(memberName, validationResult.ErrorMessage);
+                    }
                 }
                 throw ex;
             }

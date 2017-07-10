@@ -1,4 +1,4 @@
-﻿0.2.0 [TBD]
+﻿0.2.0 [2017-07-10]
 [+] Change ValidationException class to accept multiple errors per member, ability to create from IValidatableObject.
 
 0.1.2 [2017-06-07]
