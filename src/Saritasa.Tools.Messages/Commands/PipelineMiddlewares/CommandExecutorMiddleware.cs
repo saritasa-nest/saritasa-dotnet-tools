@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Common;
@@ -140,7 +141,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
          */
 
         /// <inheritdoc />
-        public override async Task HandleAsync(IMessage message)
+        public override async Task HandleAsync(IMessage message, CancellationToken cancellationToken)
         {
             var commandMessage = message as CommandMessage;
             if (commandMessage == null)

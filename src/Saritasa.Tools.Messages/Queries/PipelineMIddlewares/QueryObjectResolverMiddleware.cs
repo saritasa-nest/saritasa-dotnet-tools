@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Internal;
@@ -61,7 +62,7 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
         static readonly Task<bool> completedTask = Task.FromResult(true);
 
         /// <inheritdoc />
-        public override Task HandleAsync(IMessage message)
+        public override Task HandleAsync(IMessage message, CancellationToken cancellationToken)
         {
             Handle(message);
             return completedTask;

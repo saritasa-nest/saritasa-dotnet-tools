@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Common;
@@ -33,7 +34,7 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
             Id = "EventExecutor";
         }
 
-        private async Task InternalHandle(EventMessage eventMessage, bool async = false)
+        private async Task InternalHandle(EventMessage eventMessage, CancellationToken cancellationToken, bool async = false)
         {
             var exceptions = new List<Exception>(3); // Stores exceptions from all handlers.
             var stopWatch = System.Diagnostics.Stopwatch.StartNew();
@@ -100,6 +101,7 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
                     var disposable = handler as IDisposable;
                     disposable?.Dispose();
                 }
+                cancellationToken.ThrowIfCancellationRequested();
             }
             stopWatch.Stop();
             if (exceptions.Count > 0)
@@ -129,12 +131,12 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
 
             // It will be sync anyway but simplified for better performance.
 #pragma warning disable 4014
-            InternalHandle(eventMessage, async: false);
+            InternalHandle(eventMessage, CancellationToken.None, async: false);
 #pragma warning restore 4014
         }
 
         /// <inheritdoc />
-        public override async Task HandleAsync(IMessage message)
+        public override async Task HandleAsync(IMessage message, CancellationToken cancellationToken)
         {
             var eventMessage = message as EventMessage;
             if (eventMessage == null)
@@ -149,7 +151,7 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
                 return;
             }
 
-            await InternalHandle(eventMessage, async: true);
+            await InternalHandle(eventMessage, cancellationToken, async: true);
         }
     }
 }

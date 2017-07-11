@@ -2,6 +2,7 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 
@@ -22,6 +23,7 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// Raise event asynchronously.
         /// </summary>
         /// <param name="event">Event to raise.</param>
-        Task RaiseAsync([NotNull] object @event);
+        /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+        Task RaiseAsync([NotNull] object @event, CancellationToken cancellationToken);
     }
 }

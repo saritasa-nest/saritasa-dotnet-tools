@@ -3,6 +3,7 @@
 
 using System;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Common;
@@ -30,10 +31,10 @@ namespace Saritasa.Tools.Messages.Commands
         }
 
         /// <inheritdoc />
-        public virtual async Task HandleAsync(object command)
+        public virtual async Task HandleAsync(object command, CancellationToken cancellationToken)
         {
             var commandMessage = new CommandMessage(command);
-            await ProcessMiddlewaresAsync(commandMessage);
+            await ProcessMiddlewaresAsync(commandMessage, cancellationToken);
             commandMessage.ErrorDispatchInfo?.Throw();
         }
 

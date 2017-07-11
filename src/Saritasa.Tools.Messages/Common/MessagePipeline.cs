@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
 
@@ -146,7 +147,8 @@ namespace Saritasa.Tools.Messages.Common
         /// in sync mode.
         /// </summary>
         /// <param name="message">The message.</param>
-        protected async Task ProcessMiddlewaresAsync(IMessage message)
+        /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+        protected async Task ProcessMiddlewaresAsync(IMessage message, CancellationToken cancellationToken)
         {
             // Set execution context.
             MessageExecutionContext.Current = new MessageExecutionContext(message, this);
@@ -157,7 +159,7 @@ namespace Saritasa.Tools.Messages.Common
                 var asyncHandler = Middlewares[i] as IAsyncMessagePipelineMiddleware;
                 if (asyncHandler != null)
                 {
-                    await asyncHandler.HandleAsync(message).ConfigureAwait(false);
+                    await asyncHandler.HandleAsync(message, cancellationToken).ConfigureAwait(false);
                 }
                 else
                 {

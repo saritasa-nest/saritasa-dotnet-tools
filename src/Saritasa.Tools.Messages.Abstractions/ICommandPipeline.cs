@@ -4,6 +4,7 @@
 using System;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using System.Threading;
 
 namespace Saritasa.Tools.Messages.Abstractions
 {
@@ -22,6 +23,7 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// Execute command asynchronously.
         /// </summary>
         /// <param name="command">Command to execute.</param>
-        Task HandleAsync([NotNull] object command);
+        /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+        Task HandleAsync([NotNull] object command, CancellationToken cancellationToken);
     }
 }

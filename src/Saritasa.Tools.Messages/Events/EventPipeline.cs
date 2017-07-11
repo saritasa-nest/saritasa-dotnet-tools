@@ -3,6 +3,7 @@
 
 using System;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Common;
@@ -28,9 +29,9 @@ namespace Saritasa.Tools.Messages.Events
         }
 
         /// <inheritdoc />
-        public virtual async Task RaiseAsync(object @event)
+        public virtual async Task RaiseAsync(object @event, CancellationToken cancellationToken)
         {
-            await ProcessMiddlewaresAsync(new EventMessage(@event));
+            await ProcessMiddlewaresAsync(new EventMessage(@event), cancellationToken);
         }
 
         #endregion
