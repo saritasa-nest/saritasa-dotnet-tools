@@ -25,7 +25,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         /// Errors dictionary. Key is a member name, value is an enumerable of error
         /// messages. Empty member name relates to summary error message.
         /// </summary>
-        public IDictionary<string, IEnumerable<string>> Errors
+        public virtual IDictionary<string, IEnumerable<string>> Errors
         {
             get => errors;
         }
@@ -78,6 +78,39 @@ namespace Saritasa.Tools.Domain.Exceptions
         public ValidationException(string message, Exception innerException) : base(message, innerException)
         {
             AddError(message);
+        }
+
+        /// <summary>
+        /// .ctor with dictionary contain member field as key and error message as value.
+        /// </summary>
+        /// <param name="errors">Member error dictionary.</param>
+        public ValidationException(IDictionary<string, string> errors) :
+            base(DomainErrorDescriber.Default.ValidationErrors())
+        {
+            if (errors == null)
+            {
+                throw new ArgumentNullException(nameof(errors));
+            }
+
+            foreach (var error in errors)
+            {
+                this.errors[error.Key] = new string[] { error.Value };
+            }
+        }
+
+        /// <summary>
+        /// .ctor with dictionary contain member field as key and error messages as value.
+        /// </summary>
+        /// <param name="errors">Member errors dictionary.</param>
+        public ValidationException(IDictionary<string, IEnumerable<string>> errors) :
+            base(DomainErrorDescriber.Default.ValidationErrors())
+        {
+            if (errors == null)
+            {
+                throw new ArgumentNullException(nameof(errors));
+            }
+
+            this.errors = errors;
         }
 
 #if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6

@@ -41,7 +41,6 @@ $docsRoot = Resolve-Path "$PSScriptRoot\docs"
 
 Task pack -depends download-nuget -description 'Build the library, test it and prepare nuget packages' `
 {
-    # Build all versions, sign, test and prepare package directory.
     foreach ($package in $packages)
     {
         # Format version.
@@ -53,21 +52,20 @@ Task pack -depends download-nuget -description 'Build the library, test it and p
         $assemblyVersion = (Get-Content ".\src\$package\VERSION.txt").Trim()
         $fileVersion = "$assemblyVersion.$revcount".Trim()
         $productVersion = "$fileVersion-$hash"
-        Write-Information "Building $package with version $fileVersion"
+        $assemblyVersion = $assemblyVersion.Substring(0, $assemblyVersion.LastIndexOf('.')) + '.0.0'
+        Write-Information "$package has versions $assemblyVersion $fileVersion $productVersion"
 
-        # Update version for assembly.
+        # Update version for every assembly.
         ReplaceVersionInAssemblyInfo ".\src\$package\Properties\AssemblyInfo.cs" 'AssemblyVersion' $assemblyVersion
         ReplaceVersionInAssemblyInfo ".\src\$package\Properties\AssemblyInfo.cs" 'AssemblyFileVersion' $fileVersion
         ReplaceVersionInAssemblyInfo ".\src\$package\Properties\AssemblyInfo.cs" 'AssemblyInformationalVersion' $productVersion
+    }
 
+    foreach ($package in $packages)
+    {
         # Build.
         &dotnet restore ".\src\$package"
         &dotnet build ".\src\$package" --configuration release
-
-        # Revert versions changes.
-        ReplaceVersionInAssemblyInfo ".\src\$package\Properties\AssemblyInfo.cs" 'AssemblyVersion' '1.0.0.0'
-        ReplaceVersionInAssemblyInfo ".\src\$package\Properties\AssemblyInfo.cs" 'AssemblyFileVersion' '1.0.0.0'
-        ReplaceVersionInAssemblyInfo ".\src\$package\Properties\AssemblyInfo.cs" 'AssemblyInformationalVersion' '1.0.0.0'
 
         # Pack.
         $nugetExePath = "$PSScriptRoot\tools\nuget.exe"
@@ -79,6 +77,14 @@ Task pack -depends download-nuget -description 'Build the library, test it and p
         {
             throw 'Nuget pack failed.'
         }
+    }
+
+    foreach ($package in $packages)
+    {
+        # Revert versions changes.
+        ReplaceVersionInAssemblyInfo ".\src\$package\Properties\AssemblyInfo.cs" 'AssemblyVersion' '1.0.0.0'
+        ReplaceVersionInAssemblyInfo ".\src\$package\Properties\AssemblyInfo.cs" 'AssemblyFileVersion' '1.0.0.0'
+        ReplaceVersionInAssemblyInfo ".\src\$package\Properties\AssemblyInfo.cs" 'AssemblyInformationalVersion' '1.0.0.0'
     }
 }
 
