@@ -7,6 +7,7 @@ using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Common.ObjectSerializers;
@@ -153,7 +154,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <inheritdoc />
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities",
             Justification = "Parameters are used")]
-        public async Task AddAsync(IMessage result)
+        public async Task AddAsync(IMessage result, CancellationToken cancellationToken)
         {
             if (disposed)
             {
@@ -161,7 +162,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             }
             if (!isInitialized)
             {
-                Init();
+                Init(cancellationToken);
                 isInitialized = true;
             }
 
@@ -183,7 +184,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                     AddParameter(command, "@CreatedAt", result.CreatedAt);
                     AddParameter(command, "@ExecutionDuration", result.ExecutionDuration);
                     AddParameter(command, "@Status", (byte)result.Status);
-                    await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+                    await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
                 }
             }
             finally
@@ -215,19 +216,20 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities",
             Justification = "Parameters are used")]
-        void Init()
+        async void Init(CancellationToken cancellationToken)
         {
-            IDbConnection connection = null;
+            DbConnection connection = null;
             try
             {
                 connection = GetConnection();
                 using (var command = connection.CreateCommand())
                 {
                     command.CommandText = queryProvider.GetExistsTableScript();
-                    if (command.ExecuteScalar() == null)
+                    var messageTable = await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
+                    if (messageTable == null)
                     {
                         command.CommandText = queryProvider.GetCreateTableScript();
-                        command.ExecuteNonQuery();
+                        await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
                     }
                 }
             }
@@ -241,7 +243,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             }
         }
 
-        DbConnection GetConnection()
+        private DbConnection GetConnection()
         {
             lock (objLock)
             {
@@ -274,7 +276,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <inheritdoc />
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities",
             Justification = "Parameters are used")]
-        public async Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery)
+        public async Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery, CancellationToken cancellationToken)
         {
             if (disposed)
             {
@@ -287,11 +289,11 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = queryProvider.GetFilterScript(messageQuery);
-                using (var reader = await command.ExecuteReaderAsync())
+                using (var reader = await command.ExecuteReaderAsync(cancellationToken))
                 {
-                    while (await reader.ReadAsync())
+                    while (await reader.ReadAsync(cancellationToken))
                     {
-                        var message = new Message()
+                        var message = new Message
                         {
                             Type = reader.GetByte(1),
                             Id = reader.GetGuid(2),

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Common.ObjectSerializers;
@@ -88,7 +89,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
         static readonly byte[] newLine = Encoding.UTF8.GetBytes(Environment.NewLine);
 
-        void WriteToFile(IMessage message)
+        private void WriteToFile(IMessage message)
         {
             var jsonBytes = serializer.Serialize(message.CloneToMessage());
             currentFileStream.Write(jsonBytes, 0, jsonBytes.Length);
@@ -100,7 +101,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         static readonly Task<bool> completedTask = Task.FromResult(true);
 
         /// <inheritdoc />
-        public Task AddAsync(IMessage message)
+        public Task AddAsync(IMessage message, CancellationToken cancellationToken)
         {
             if (disposed)
             {
@@ -122,7 +123,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             {
                 lock (objLock)
                 {
-                    currentFileStream.FlushAsync();
+                    currentFileStream.FlushAsync(cancellationToken).ConfigureAwait(false);
                 }
             }
 
@@ -130,7 +131,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <inheritdoc />
-        public Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery)
+        public Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

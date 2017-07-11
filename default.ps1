@@ -41,18 +41,14 @@ $docsRoot = Resolve-Path "$PSScriptRoot\docs"
 
 Task pack -depends download-nuget -description 'Build the library, test it and prepare nuget packages' `
 {
+    $revcount = &'git' @('rev-list', '--all', '--count') | Out-String | ForEach-Object { $_ -replace [Environment]::NewLine, '' }
+    $hash = &'git' @('log', '--pretty=format:%h', '-n', '1') | Out-String | ForEach-Object { $_ -replace [Environment]::NewLine, '' }
     foreach ($package in $packages)
     {
-        # Format version.
-        $revcount = &'git' @('rev-list', '--all', '--count') | Out-String
-        $revcount = $revcount -replace [Environment]::NewLine, ''
-        $hash = &'git' @('log', '--pretty=format:%h', '-n', '1') | Out-String
-        $hash = $hash -replace [Environment]::NewLine, ''
-
-        $assemblyVersion = (Get-Content ".\src\$package\VERSION.txt").Trim()
-        $fileVersion = "$assemblyVersion.$revcount".Trim()
+        # Format versions.
+        $assemblyVersion = GetPackageAssemblyVersion($package)
+        $fileVersion = (Get-Content ".\src\$package\VERSION.txt").Trim() + ".$revcount"
         $productVersion = "$fileVersion-$hash"
-        $assemblyVersion = $assemblyVersion.Substring(0, $assemblyVersion.LastIndexOf('.')) + '.0.0'
         Write-Information "$package has versions $assemblyVersion $fileVersion $productVersion"
 
         # Update version for every assembly.
@@ -68,8 +64,8 @@ Task pack -depends download-nuget -description 'Build the library, test it and p
         &dotnet build ".\src\$package" --configuration release
 
         # Pack.
-        $nugetExePath = "$PSScriptRoot\tools\nuget.exe"
-        &"$nugetExePath" @('pack', ".\src\$package\$package.nuspec", `
+        $assemblyVersion = GetVersion($package)
+        &"$PSScriptRoot\tools\nuget.exe" @('pack', ".\src\$package\$package.nuspec", `
             '-NonInteractive', `
             '-Version', $assemblyVersion,
             '-Exclude', '*.snk')
@@ -108,6 +104,17 @@ Task docs -depends get-version -description 'Compile and open documentation' `
 {
     CompileDocs
     Invoke-Item './docs/_build/html/index.html'
+}
+
+function GetVersion($package)
+{
+    return (Get-Content ".\src\$package\VERSION.txt").Trim()
+}
+
+function GetPackageAssemblyVersion($package)
+{
+    $version = GetVersion($package)
+    return $version.Substring(0, $version.LastIndexOf('.')) + '.0.0'
 }
 
 function CompileDocs

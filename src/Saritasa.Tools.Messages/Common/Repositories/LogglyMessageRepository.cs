@@ -4,14 +4,15 @@
 #if !NET40
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Text;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Common.ObjectSerializers;
 using Saritasa.Tools.Messages.Internal.Loggly.SearchResult;
-using System.Linq;
 
 namespace Saritasa.Tools.Messages.Common.Repositories
 {
@@ -114,12 +115,12 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                 {
                     throw new ArgumentException($"No required parameter: {nameof(token)}", nameof(dict));
                 }
-                this.token = dict[nameof(token)].ToString();
+                this.token = dict[nameof(token)];
             }
         }
 
         /// <inheritdoc />
-        public async Task AddAsync(IMessage message)
+        public async Task AddAsync(IMessage message, CancellationToken cancellationToken)
         {
             if (disposed)
             {
@@ -128,8 +129,11 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
             var content = Encoding.UTF8.GetString(serializer.Serialize(((Message)message).CloneToMessage()));
             await client
-                .PostAsync($"{ServerEndpoint}/inputs/{token}",
-                    new StringContent(content, Encoding.UTF8, "application/json"))
+                .PostAsync(
+                    $"{ServerEndpoint}/inputs/{token}",
+                    new StringContent(content, Encoding.UTF8, "application/json"),
+                    cancellationToken
+                )
                 .ConfigureAwait(false);
         }
 
@@ -141,7 +145,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// Source: https://www.loggly.com/docs/search-query-language/
         /// </remarks>
         /// <returns>Enumerable of found messages.</returns>
-        public async Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery)
+        public async Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery, CancellationToken cancellationToken)
         {
             if (disposed)
             {
@@ -154,11 +158,12 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             }
 
             // Get rsid.
-            string rsId = await CallSearchApi(CreateQueryString(messageQuery));
+            string rsId = await CallSearchApi(CreateQueryString(messageQuery), cancellationToken);
 
             // Get event result. If Skip > 0, we need to start from the second page, else start from the first page.
             var eventResponse = await CallEventApi(rsId, messageQuery.Skip > 0 ? 1 : 0);
-            var response = (SearchReponse)serializer.Deserialize(await eventResponse.Content.ReadAsByteArrayAsync(), typeof(SearchReponse));
+            var response = (SearchReponse)serializer.Deserialize(
+                await eventResponse.Content.ReadAsByteArrayAsync(), typeof(SearchReponse));
 
             return response.Events.Select(e => e.Item.Json).ToArray();
         }
@@ -214,11 +219,13 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// Call search api to init event api.
         /// </summary>
         /// <param name="query"></param>
+        /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>RsId.</returns>
-        private async Task<string> CallSearchApi(string query)
+        private async Task<string> CallSearchApi(string query, CancellationToken cancellationToken)
         {
-            var response = await client.GetAsync(string.Format(SearchEndpoint, accountDomain, query));
-            var content = (SearchReponse)serializer.Deserialize(await response.Content.ReadAsByteArrayAsync(), typeof(SearchReponse));
+            var response = await client.GetAsync(string.Format(SearchEndpoint, accountDomain, query), cancellationToken);
+            var content = (SearchReponse)serializer.Deserialize(
+                await response.Content.ReadAsByteArrayAsync(), typeof(SearchReponse));
             return content.Rsid.Id;
         }
 
@@ -240,6 +247,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             {
                 dic.Add("until", messageQuery.CreatedEndDate.Value.ToString("s"));
             }
+
             // Order is not implemented in other repositories. Make desc by default.
             dic.Add("order", "desc");
             dic.Add("size", messageQuery.Take.ToString());

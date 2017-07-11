@@ -1,4 +1,7 @@
-﻿0.2.0 [2017-07-10]
+﻿0.2.1 [TBD]
+[*] Fix reference to Domain assembly.
+
+0.2.0 [2017-07-10]
 [*] Make repository and uow methods virtual.
 [*] Updates related to repository.
 

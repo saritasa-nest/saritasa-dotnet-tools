@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Internal;
 using Saritasa.Tools.Messages.Common.ObjectSerializers;
+using System.Threading;
 
 namespace Saritasa.Tools.Messages.Common.Repositories
 {
@@ -57,8 +58,12 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <param name="buffer">Should the output stream be buffered.</param>
         /// <param name="compress">Compress target files.</param>
         /// <param name="prefix">Files names prefix.</param>
-        public FileMessageRepository(string logsPath, IObjectSerializer serializer = null, string prefix = "",
-            bool buffer = true, bool compress = false)
+        public FileMessageRepository(
+            string logsPath,
+            IObjectSerializer serializer = null,
+            string prefix = "",
+            bool buffer = true,
+            bool compress = false)
         {
             if (string.IsNullOrEmpty(logsPath))
             {
@@ -78,7 +83,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <param name="dict">Properties.</param>
         public FileMessageRepository(IDictionary<string, string> dict)
         {
-            this.logsPath = dict[nameof(logsPath)].ToString();
+            this.logsPath = dict[nameof(logsPath)];
             if (dict.ContainsKey(nameof(serializer)))
             {
                 this.serializer = (IObjectSerializer)Activator.CreateInstance(Type.GetType(dict[nameof(serializer)]));
@@ -133,7 +138,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         static readonly Task<bool> completedTask = Task.FromResult(true);
 
         /// <inheritdoc />
-        public Task AddAsync(IMessage context)
+        public Task AddAsync(IMessage context, CancellationToken cancellationToken)
         {
             if (disposed)
             {
@@ -160,26 +165,26 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             {
                 lock (objLock)
                 {
-                    currentGZipStream?.Flush();
-                    currentFileStream.FlushAsync();
+                    currentGZipStream?.FlushAsync(cancellationToken).ConfigureAwait(false);
+                    currentFileStream.FlushAsync(cancellationToken).ConfigureAwait(false);
                 }
             }
 
             return completedTask;
         }
 
-        string GetSearchPattern()
+        private string GetSearchPattern()
         {
             return compress ? prefix + "*.bin.zip" : prefix + "*.bin";
         }
 
-        string GetFileDatePart(string fileName)
+        private string GetFileDatePart(string fileName)
         {
             return fileName.Length > 7 ? fileName.Substring(0, 8) : string.Empty;
         }
 
         /// <inheritdoc />
-        public Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery)
+        public Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery, CancellationToken cancellationToken)
         {
             // Collect all files in dir.
             var allFiles =
@@ -238,6 +243,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                             {
                                 targetList.Add(message);
                             }
+                            cancellationToken.ThrowIfCancellationRequested();
                         }
                     }
                     finally
@@ -246,6 +252,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                     }
                 }
                 currentDate = currentDate.AddDays(1);
+                cancellationToken.ThrowIfCancellationRequested();
             }
             return Task.FromResult(targetList.Cast<IMessage>());
         }

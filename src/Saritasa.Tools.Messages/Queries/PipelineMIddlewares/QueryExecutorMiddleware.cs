@@ -2,6 +2,7 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
 
@@ -50,7 +51,7 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public virtual async Task HandleAsync(IMessage message)
+        public virtual async Task HandleAsync(IMessage message, CancellationToken cancellationToken)
         {
             var queryMessage = message as QueryMessage;
             if (queryMessage == null)

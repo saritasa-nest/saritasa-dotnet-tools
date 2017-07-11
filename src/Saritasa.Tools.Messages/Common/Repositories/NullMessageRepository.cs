@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
 
@@ -34,14 +35,14 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         static readonly Task<bool> completedTask = Task.FromResult(true);
 
         /// <inheritdoc />
-        public Task AddAsync(IMessage message)
+        public Task AddAsync(IMessage message, CancellationToken cancellationToken)
         {
             // No need to implement since repository should not persist messages.
             return completedTask;
         }
 
         /// <inheritdoc />
-        public Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery)
+        public Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery, CancellationToken cancellationToken)
         {
             return Task.FromResult(new List<Message>().Cast<IMessage>());
         }

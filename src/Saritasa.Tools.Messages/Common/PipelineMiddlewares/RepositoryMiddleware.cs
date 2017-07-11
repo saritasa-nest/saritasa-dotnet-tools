@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
 
@@ -102,17 +103,17 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
             {
                 return;
             }
-            repository.AddAsync(message).ConfigureAwait(false).GetAwaiter().GetResult();
+            repository.AddAsync(message, CancellationToken.None).ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
         /// <inheritdoc />
-        public virtual async Task HandleAsync(IMessage message)
+        public virtual async Task HandleAsync(IMessage message, CancellationToken cancellationToken)
         {
             if (filter != null && !filter.IsMatch(message))
             {
                 return;
             }
-            await repository.AddAsync(message).ConfigureAwait(false);
+            await repository.AddAsync(message, cancellationToken).ConfigureAwait(false);
         }
     }
 }

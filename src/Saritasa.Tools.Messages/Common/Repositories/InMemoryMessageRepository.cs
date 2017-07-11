@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Saritasa.Tools.Messages.Abstractions;
@@ -44,7 +45,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <inheritdoc />
-        public Task AddAsync(IMessage message)
+        public Task AddAsync(IMessage message, CancellationToken cancellationToken)
         {
             lock (objLock)
             {
@@ -54,7 +55,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <inheritdoc />
-        public Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery)
+        public Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery, CancellationToken cancellationToken)
         {
             lock (objLock)
             {

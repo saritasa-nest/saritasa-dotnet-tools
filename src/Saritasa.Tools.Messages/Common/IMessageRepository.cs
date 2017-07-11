@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Saritasa.Tools.Messages.Abstractions;
@@ -18,14 +19,16 @@ namespace Saritasa.Tools.Messages.Common
         /// Add message.
         /// </summary>
         /// <param name="message">Message.</param>
-        Task AddAsync([NotNull] IMessage message);
+        /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+        Task AddAsync([NotNull] IMessage message, CancellationToken cancellationToken);
 
         /// <summary>
         /// Get messages filtered by expression.
         /// </summary>
         /// <param name="messageQuery">Query.</param>
+        /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>Enumerable of messages.</returns>
-        Task<IEnumerable<IMessage>> GetAsync([NotNull] MessageQuery messageQuery);
+        Task<IEnumerable<IMessage>> GetAsync([NotNull] MessageQuery messageQuery, CancellationToken cancellationToken);
 
         /// <summary>
         /// Save internal state to dict. The methpd represents the ability of message repository to

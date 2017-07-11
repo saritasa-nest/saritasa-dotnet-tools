@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Common.ObjectSerializers;
@@ -42,7 +43,10 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <param name="serializer">Object serializer. By default json serializer is used.</param>
         /// <param name="buffer">Should the output stream be buffered.</param>
         /// <param name="prefix">Files names prefix.</param>
-        public CsvFileMessageRepository(string logsPath, IObjectSerializer serializer = null, string prefix = "",
+        public CsvFileMessageRepository(
+            string logsPath,
+            IObjectSerializer serializer = null,
+            string prefix = "",
             bool buffer = true)
         {
             if (string.IsNullOrEmpty(logsPath))
@@ -68,7 +72,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         public CsvFileMessageRepository(IDictionary<string, string> dict)
         {
             this.LogsPath = dict[nameof(LogsPath)].ToString();
-            this.serializer = (IObjectSerializer)Activator.CreateInstance(Type.GetType(dict[nameof(serializer)].ToString()));
+            this.serializer = (IObjectSerializer)Activator.CreateInstance(Type.GetType(dict[nameof(serializer)]));
             this.prefix = dict[nameof(prefix)].ToString();
             this.buffer = Convert.ToBoolean(dict[nameof(buffer)]);
         }
@@ -132,12 +136,12 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             }
         }
 
-        static void WriteBytes(byte bt, Stream stream)
+        private static void WriteBytes(byte bt, Stream stream)
         {
             stream.WriteByte(bt);
         }
 
-        void WriteToFile(IMessage message)
+        private void WriteToFile(IMessage message, CancellationToken cancellationToken)
         {
             // Id,Type,CreatedAt,Status,ContentType,Content,Data,ErrorType,ErrorMessage,ErrorDetails,ExecutionDuration
             if (needWriteHeader)
@@ -164,7 +168,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         static readonly Task<bool> completedTask = Task.FromResult(true);
 
         /// <inheritdoc />
-        public Task AddAsync(IMessage message)
+        public Task AddAsync(IMessage message, CancellationToken cancellationToken)
         {
             if (disposed)
             {
@@ -180,14 +184,14 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                     currentFileStream = new FileStream(Path.Combine(LogsPath, name), FileMode.Append);
                     needWriteHeader = currentFileStream.Length == 0;
                 }
-                WriteToFile(message);
+                WriteToFile(message, cancellationToken);
             }
 
             if (!buffer)
             {
                 lock (objLock)
                 {
-                    currentFileStream.FlushAsync();
+                    currentFileStream.FlushAsync(cancellationToken).ConfigureAwait(false);
                 }
             }
 
@@ -195,7 +199,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <inheritdoc />
-        public Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery)
+        public Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

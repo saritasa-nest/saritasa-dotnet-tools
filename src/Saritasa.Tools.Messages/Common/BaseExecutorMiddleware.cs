@@ -8,6 +8,7 @@ using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Internal;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Saritasa.Tools.Messages.Common
 {
@@ -100,7 +101,7 @@ namespace Saritasa.Tools.Messages.Common
         public abstract void Handle(IMessage message);
 
         /// <inheritdoc />
-        public abstract Task HandleAsync(IMessage message);
+        public abstract Task HandleAsync(IMessage message, CancellationToken cancellationToken);
 
         /// <summary>
         /// If UseInternalObjectResolver is turned off internal IoC container is used. Otherwise

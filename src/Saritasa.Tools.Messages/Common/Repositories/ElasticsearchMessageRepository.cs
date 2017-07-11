@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Common.ObjectSerializers;
 using Saritasa.Tools.Messages.Internal.Elasticsearch.Query;
@@ -71,7 +72,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <inheritdoc />
-        public async Task AddAsync(IMessage message)
+        public async Task AddAsync(IMessage message, CancellationToken cancellationToken)
         {
             if (disposed)
             {
@@ -79,13 +80,16 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             }
 
             await client
-                .PutAsync($"{uri}/{IndexName}/{IndexTypeName}/{message.Id}",
-                    new ByteArrayContent(serializer.Serialize(((Message)message).CloneToMessage())))
+                .PutAsync(
+                    $"{uri}/{IndexName}/{IndexTypeName}/{message.Id}",
+                    new ByteArrayContent(serializer.Serialize(((Message)message).CloneToMessage())),
+                    cancellationToken
+                )
                 .ConfigureAwait(false);
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery)
+        public async Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery, CancellationToken cancellationToken)
         {
             if (disposed)
             {
@@ -97,12 +101,15 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                     .WithFrom(messageQuery.Skip)
                     .WithSize(messageQuery.Take);
 
-            var response = await client.PostAsync($"{uri}/{IndexName}/{IndexTypeName}/_search",
-                new ByteArrayContent(serializer.Serialize(searchQuery)));
+            var response = await client.PostAsync(
+                $"{uri}/{IndexName}/{IndexTypeName}/_search",
+                new ByteArrayContent(serializer.Serialize(searchQuery)),
+                cancellationToken
+            );
 
             var result = await response.Content.ReadAsByteArrayAsync();
             var root = (Root)serializer.Deserialize(result, typeof(Root));
-            var messages = root.Hits.Items.Select(x => x.Source).ToArray(); // message.Content deserialized as JObject
+            var messages = root.Hits.Items.Select(x => x.Source).ToArray(); // message.Content deserialized as JObject.
 
             return messages;
         }
