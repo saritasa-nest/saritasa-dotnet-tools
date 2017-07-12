@@ -35,7 +35,7 @@ namespace Saritasa.Tools.Messages.Common
         /// to save its internal state to dictionary. Also type should define static Create
         /// method to recreate itself from dict.
         /// </summary>
-        /// <param name="dict">Dictionary of properties.</param>
-        void SaveState([NotNull] IDictionary<string, string> dict);
+        /// <param name="parameters">Parameters dictionary.</param>
+        void SaveState([NotNull] IDictionary<string, string> parameters);
     }
 }

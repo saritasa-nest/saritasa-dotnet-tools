@@ -8,129 +8,71 @@ using System.IO.Compression;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Internal;
 using Saritasa.Tools.Messages.Common.ObjectSerializers;
-using System.Threading;
 
 namespace Saritasa.Tools.Messages.Common.Repositories
 {
     /// <summary>
     /// Store messages to files.
     /// </summary>
-    public class FileMessageRepository : IMessageRepository
+    public class FileMessageRepository : BaseFileRepository, IMessageRepository, IDisposable
     {
-        const string DateTimeFormat = "yyyyMMdd";
+        private const string KeyCompress = "compress";
+
+        private bool disposed;
+
+        private FileStream currentFileStream;
+
+        private GZipStream currentGZipStream;
+
+        private MessageBinarySerializer currentBinarySerializer;
+
+        private readonly bool compress;
+
+        private static readonly object objLock = new object();
+
+        private Stream CurrentStream => currentGZipStream ?? (Stream)currentFileStream;
 
         /// <summary>
-        /// Logs path.
+        /// Current file name extension.
         /// </summary>
-        public string LogsPath => logsPath;
-
-        bool disposed;
-
-        FileStream currentFileStream;
-
-        GZipStream currentGZipStream;
-
-        MessageBinarySerializer currentBinarySerializer;
-
-        readonly string logsPath;
-
-        readonly IObjectSerializer serializer;
-
-        readonly string prefix;
-
-        readonly bool buffer;
-
-        readonly bool compress;
-
-        static readonly object objLock = new object();
-
-        Stream CurrentStream => currentGZipStream ?? (Stream)currentFileStream;
+        public override string FileNameExtension => compress ? ".bin.zip" : ".bin";
 
         /// <summary>
         /// .ctor
         /// </summary>
-        /// <param name="logsPath">Logs path.</param>
+        /// <param name="path">Logs path.</param>
         /// <param name="serializer">Object serializer. By default json serializer is used.</param>
         /// <param name="buffer">Should the output stream be buffered.</param>
         /// <param name="compress">Compress target files.</param>
         /// <param name="prefix">Files names prefix.</param>
         public FileMessageRepository(
-            string logsPath,
+            string path,
             IObjectSerializer serializer = null,
             string prefix = "",
             bool buffer = true,
             bool compress = false)
         {
-            if (string.IsNullOrEmpty(logsPath))
-            {
-                throw new ArgumentException(nameof(logsPath));
-            }
-            this.logsPath = logsPath;
-            this.serializer = serializer ?? new JsonObjectSerializer();
-            this.prefix = prefix;
-            this.buffer = buffer;
+            this.Path = path;
+            this.Serializer = serializer ?? new JsonObjectSerializer();
+            this.FileNamePrefix = prefix;
+            this.BufferStream = buffer;
             this.compress = compress;
-            Directory.CreateDirectory(LogsPath);
+            ValidateAndInit();
         }
 
         /// <summary>
         /// Create repository from dictionary.
         /// </summary>
-        /// <param name="dict">Properties.</param>
-        public FileMessageRepository(IDictionary<string, string> dict)
+        /// <param name="parameters">Parameters dictionary..</param>
+        public FileMessageRepository(IDictionary<string, string> parameters) : base(parameters)
         {
-            this.logsPath = dict[nameof(logsPath)];
-            if (dict.ContainsKey(nameof(serializer)))
-            {
-                this.serializer = (IObjectSerializer)Activator.CreateInstance(Type.GetType(dict[nameof(serializer)]));
-            }
-            else
-            {
-                this.serializer = new JsonObjectSerializer();
-            }
-            this.prefix = dict[nameof(prefix)].ToString();
-            this.buffer = Convert.ToBoolean(dict[nameof(buffer)]);
-            this.compress = Convert.ToBoolean(dict[nameof(compress)]);
-        }
-
-        string GetFileNameByDate(DateTime date, int count)
-        {
-            var name = $"{date:yyyyMMdd}-{count:000}.bin";
-            if (!string.IsNullOrEmpty(prefix))
-            {
-                name = prefix + "-" + name;
-            }
-            if (compress)
-            {
-                name += ".zip";
-            }
-            return name;
-        }
-
-        string GetAvailableFileNameByDate(DateTime date)
-        {
-            if (currentFileStream != null)
-            {
-                return Path.GetFileName(currentFileStream.Name);
-            }
-
-            string name = string.Empty;
-            for (int i = 0; i < 1000; i++)
-            {
-                name = GetFileNameByDate(date, i);
-
-                // We cannot continue zip streams, so we have to create new file
-                // every time with new stream.
-                if (!compress || !File.Exists(Path.Combine(LogsPath, name)))
-                {
-                    break;
-                }
-            }
-            return name;
+            this.compress = Convert.ToBoolean(parameters.GetValueOrDefault(KeyCompress, false.ToString()));
+            ValidateAndInit();
         }
 
         #region IMessageRepository
@@ -147,26 +89,28 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
             lock (objLock)
             {
-                string name = GetAvailableFileNameByDate(DateTime.Now);
-                if (currentFileStream == null || Path.GetFileName(currentFileStream.Name) != name)
+                // We cannot continue zip streams, so we have to create new file
+                // every time with new stream.
+                string name = GetAvailableFileNameByDate(currentFileStream, DateTime.Now, compress);
+                if (currentFileStream == null || System.IO.Path.GetFileName(currentFileStream.Name) != name)
                 {
                     Close();
-                    currentFileStream = new FileStream(Path.Combine(LogsPath, name), FileMode.Append);
+                    currentFileStream = new FileStream(System.IO.Path.Combine(Path, name), FileMode.Append);
                     if (compress)
                     {
                         currentGZipStream = new GZipStream(currentFileStream, CompressionMode.Compress);
                     }
-                    currentBinarySerializer = new MessageBinarySerializer(CurrentStream, serializer, null);
+                    currentBinarySerializer = new MessageBinarySerializer(CurrentStream, Serializer, null);
                 }
                 currentBinarySerializer.Write(context);
             }
 
-            if (!buffer)
+            if (!BufferStream)
             {
                 lock (objLock)
                 {
-                    currentGZipStream?.FlushAsync(cancellationToken).ConfigureAwait(false);
-                    currentFileStream.FlushAsync(cancellationToken).ConfigureAwait(false);
+                    currentGZipStream?.Flush();
+                    currentFileStream.Flush();
                 }
             }
 
@@ -175,7 +119,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
         private string GetSearchPattern()
         {
-            return compress ? prefix + "*.bin.zip" : prefix + "*.bin";
+            return "*" + FileNameExtension;
         }
 
         private string GetFileDatePart(string fileName)
@@ -188,7 +132,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         {
             // Collect all files in dir.
             var allFiles =
-                Directory.GetFiles(LogsPath, GetSearchPattern()).OrderBy(f => f).Select(Path.GetFileName).ToArray();
+                Directory.GetFiles(Path, GetSearchPattern()).OrderBy(f => f).Select(System.IO.Path.GetFileName).ToArray();
             var allFilesHash = new HashSet<string>(allFiles);
 
             // Init first and last dates.
@@ -231,12 +175,12 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                     Stream stream = null;
                     try
                     {
-                        stream = new FileStream(Path.Combine(LogsPath, fileName), FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                        stream = new FileStream(System.IO.Path.Combine(Path, fileName), FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                         if (compress)
                         {
                             stream = new GZipStream(stream, CompressionMode.Decompress, false);
                         }
-                        var commandSerializer = new MessageBinarySerializer(stream, serializer, messageQuery.Assemblies.ToArray());
+                        var commandSerializer = new MessageBinarySerializer(stream, Serializer, messageQuery.Assemblies.ToArray());
                         for (Message message; (message = commandSerializer.Read()) != null;)
                         {
                             if (messageQuery.Match(message))
@@ -258,13 +202,10 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <inheritdoc />
-        public void SaveState(IDictionary<string, string> dict)
+        public override void SaveState(IDictionary<string, string> parameters)
         {
-            dict[nameof(logsPath)] = logsPath;
-            dict[nameof(buffer)] = buffer.ToString();
-            dict[nameof(compress)] = compress.ToString();
-            dict[nameof(serializer)] = serializer.GetType().AssemblyQualifiedName;
-            dict[nameof(prefix)] = prefix;
+            base.SaveState(parameters);
+            parameters[KeyCompress] = compress.ToString();
         }
 
         #endregion

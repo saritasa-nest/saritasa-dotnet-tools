@@ -61,6 +61,14 @@ namespace Saritasa.Tools.Messages.Configuration
             foreach (XmlNode node in nodes)
             {
                 var parameters = new Dictionary<string, string>();
+                if (node.NodeType != XmlNodeType.Element)
+                {
+                    continue;
+                }
+                if (node.Attributes == null)
+                {
+                    throw new MessagesConfigurationException("Middleware tag does not have attributes.");
+                }
                 foreach (XmlAttribute attr in node.Attributes)
                 {
                     parameters.Add(attr.Name, attr.Value);
@@ -69,7 +77,7 @@ namespace Saritasa.Tools.Messages.Configuration
                 var typeName = node.Attributes["type"].Value;
                 if (string.IsNullOrWhiteSpace(typeName))
                 {
-                    throw new MessagesConfigurationException("Middleware does not have type attribute.");
+                    throw new MessagesConfigurationException("Middleware tag does not have type attribute.");
                 }
 
                 var type = Type.GetType(typeName);

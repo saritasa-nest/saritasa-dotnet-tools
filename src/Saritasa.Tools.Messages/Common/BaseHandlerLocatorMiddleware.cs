@@ -3,9 +3,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Saritasa.Tools.Messages.Abstractions;
 using JetBrains.Annotations;
+using Saritasa.Tools.Messages.Configuration;
 
 namespace Saritasa.Tools.Messages.Common
 {
@@ -50,11 +52,18 @@ namespace Saritasa.Tools.Messages.Common
                 foreach (string assemblyFile in dict["assemblies"].Split(';'))
                 {
                     Assembly assembly;
-#if NETCOREAPP1_0 || NETCOREAPP1_1 || NETSTANDARD1_2 || NETSTANDARD1_6
-                    assembly = System.Runtime.Loader.AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyFile);
-#else
-                    assembly = Assembly.LoadFrom(assemblyFile);
-#endif
+                    try
+                    {
+                        assembly = LoadAssemblyByName(assemblyFile);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new MessagesConfigurationException($"Cannot load assembly {assemblyFile}.", ex);
+                    }
+                    if (assembly == null)
+                    {
+                        throw new MessagesConfigurationException($"Cannot load assembly {assemblyFile}.");
+                    }
                     assemblies.Add(assembly);
                 }
                 this.Assemblies = assemblies.ToArray();
@@ -63,6 +72,47 @@ namespace Saritasa.Tools.Messages.Common
         }
 
         HandlerSearchMethod handlerSearchMethod = HandlerSearchMethod.ClassAttribute;
+
+        /// <summary>
+        /// Uses various combinations to find assembly.
+        /// - Tries to load by name.
+        /// - Tries to load from currently loaded assemblies (.NET classic only).
+        /// </summary>
+        /// <param name="name">Assembly name.</param>
+        /// <returns>Assembly.</returns>
+        internal static Assembly LoadAssemblyByName(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return null;
+            }
+            if (!System.IO.Path.HasExtension(name))
+            {
+                name = System.IO.Path.ChangeExtension(name, ".dll");
+            }
+
+#if NETCOREAPP1_0 || NETCOREAPP1_1 || NETSTANDARD1_2 || NETSTANDARD1_6
+            var assembly = System.Runtime.Loader.AssemblyLoadContext.Default.LoadFromAssemblyPath(name);
+            if (assembly != null)
+            {
+                return assembly;
+            }
+#else
+            var assembly = Assembly.LoadFrom(name);
+            if (assembly != null)
+            {
+                return assembly;
+            }
+
+            var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies()
+                .ToDictionary(k => System.IO.Path.GetFileName(k.CodeBase), a => a);
+            if (loadedAssemblies.ContainsKey(name))
+            {
+                return loadedAssemblies[name];
+            }
+#endif
+            return null;
+        }
 
         /// <summary>
         /// What method to use to search command handler class.

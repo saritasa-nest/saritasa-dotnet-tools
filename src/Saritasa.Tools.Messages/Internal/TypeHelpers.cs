@@ -15,7 +15,7 @@ namespace Saritasa.Tools.Messages.Internal
     /// <summary>
     /// Load types from assemblies. Also allows to load standard .NET types.
     /// </summary>
-    public static class TypeHelpers
+    internal static class TypeHelpers
     {
         /// <summary>
         /// Load type from type full name. Searchs for assemblies.
@@ -23,7 +23,7 @@ namespace Saritasa.Tools.Messages.Internal
         /// <param name="fullName">Full type name.</param>
         /// <param name="assemblies">Assebmlies list.</param>
         /// <returns>Type. Null if type cannot be found.</returns>
-        public static Type LoadType(string fullName, Assembly[] assemblies)
+        internal static Type LoadType(string fullName, Assembly[] assemblies)
         {
             Type t;
 

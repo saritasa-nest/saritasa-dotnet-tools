@@ -21,6 +21,8 @@ namespace Saritasa.Tools.Messages.Common.Repositories
     /// </summary>
     public class ElasticsearchMessageRepository : IMessageRepository, IDisposable
     {
+        private const string KeyUrl = "uri";
+
         /// <summary>
         /// Elasticsearch index.
         /// </summary>
@@ -65,9 +67,9 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <summary>
         /// Create repository from dictionary.
         /// </summary>
-        /// <param name="dict">Properties.</param>
-        public ElasticsearchMessageRepository(IDictionary<string, string> dict) :
-            this(dict[nameof(uri)])
+        /// <param name="parameters">Parameters dictionary.</param>
+        public ElasticsearchMessageRepository(IDictionary<string, string> parameters) :
+            this(parameters[nameof(uri)])
         {
         }
 
@@ -115,9 +117,9 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <inheritdoc />
-        public void SaveState(IDictionary<string, string> dict)
+        public void SaveState(IDictionary<string, string> parameters)
         {
-            dict[nameof(uri)] = uri;
+            parameters[KeyUrl] = uri;
         }
 
         private IEnumerable<IFieldNameQuery> CreateFieldQueries(MessageQuery messageQuery)

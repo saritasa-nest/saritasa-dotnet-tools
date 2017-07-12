@@ -1,4 +1,4 @@
-﻿0.1.2 [TBD]
+﻿0.2.0 [TBD]
 
 0.1.1 [2017-02-15]
 [+] Add method CloneToMessage to IMessage interface.

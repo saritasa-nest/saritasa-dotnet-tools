@@ -141,6 +141,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// Search for events.
         /// </summary>
         /// <param name="messageQuery">Message query.</param>
+        /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <remarks>
         /// Source: https://www.loggly.com/docs/search-query-language/
         /// </remarks>

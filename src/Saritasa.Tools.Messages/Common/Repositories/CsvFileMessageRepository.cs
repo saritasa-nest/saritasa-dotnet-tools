@@ -15,86 +15,60 @@ namespace Saritasa.Tools.Messages.Common.Repositories
     /// <summary>
     /// Csv file target.
     /// </summary>
-    public class CsvFileMessageRepository : IMessageRepository, IDisposable
+    public sealed class CsvFileMessageRepository : BaseFileRepository, IMessageRepository, IDisposable
     {
-        const string CsvHeader = "Id,Type,CreatedAt,Status,ContentType,Content,Data,ErrorType,ErrorMessage,ErrorDetails,ExecutionDuration"; // 11
+        private const string KeyNeedWriteHeader = "writeheader";
 
-        /// <summary>
-        /// Logs path.
-        /// </summary>
-        public string LogsPath { get; }
+        private const string CsvHeader = "Id,Type,CreatedAt,Status,ContentType,Content,Data,ErrorType,ErrorMessage,ErrorDetails,ExecutionDuration"; // 11
 
-        bool needWriteHeader;
+        private bool needWriteHeader;
 
-        FileStream currentFileStream;
-
-        readonly IObjectSerializer serializer;
-
-        readonly string prefix;
-
-        readonly bool buffer;
+        private FileStream currentFileStream;
 
         static readonly object objLock = new object();
+
+        /// <inheritdoc />
+        public override string FileNameExtension => ".csv";
 
         /// <summary>
         /// .ctor
         /// </summary>
-        /// <param name="logsPath">Logs path.</param>
+        /// <param name="path">Logs path.</param>
         /// <param name="serializer">Object serializer. By default json serializer is used.</param>
         /// <param name="buffer">Should the output stream be buffered.</param>
         /// <param name="prefix">Files names prefix.</param>
         public CsvFileMessageRepository(
-            string logsPath,
+            string path,
             IObjectSerializer serializer = null,
             string prefix = "",
             bool buffer = true)
         {
-            if (string.IsNullOrEmpty(logsPath))
-            {
-                throw new ArgumentException(nameof(logsPath));
-            }
-            this.LogsPath = logsPath;
-            this.serializer = serializer ?? new JsonObjectSerializer();
-            this.prefix = prefix;
-            this.buffer = buffer;
-            Directory.CreateDirectory(LogsPath);
+            this.Path = path;
+            this.Serializer = serializer ?? new JsonObjectSerializer();
+            this.FileNamePrefix = prefix;
+            this.BufferStream = buffer;
 
-            if (!this.serializer.IsText)
-            {
-                throw new ArgumentException(Properties.Strings.SerializerShouldBeText);
-            }
+            ValidateAndInit();
         }
 
         /// <summary>
         /// Create repository from dictionary.
         /// </summary>
-        /// <param name="dict">Properties.</param>
-        public CsvFileMessageRepository(IDictionary<string, string> dict)
+        /// <param name="parameters">Parameters dictionary.</param>
+        public CsvFileMessageRepository(IDictionary<string, string> parameters)
+            : base(parameters)
         {
-            this.LogsPath = dict[nameof(LogsPath)].ToString();
-            this.serializer = (IObjectSerializer)Activator.CreateInstance(Type.GetType(dict[nameof(serializer)]));
-            this.prefix = dict[nameof(prefix)].ToString();
-            this.buffer = Convert.ToBoolean(dict[nameof(buffer)]);
+            ValidateAndInit();
         }
 
-        string GetFileNameByDate(DateTime date, int count)
+        /// <inheritdoc />
+        protected override void ValidateAndInit()
         {
-            var name = $"{date:yyyyMMdd}-{count:000}.csv";
-            if (!string.IsNullOrEmpty(prefix))
+            base.ValidateAndInit();
+            if (!this.Serializer.IsText)
             {
-                name = prefix + "-" + name;
+                throw new ArgumentException(Properties.Strings.SerializerShouldBeText);
             }
-            return name;
-        }
-
-        string GetAvailableFileNameByDate(DateTime date)
-        {
-            if (currentFileStream != null)
-            {
-                return Path.GetFileName(currentFileStream.Name);
-            }
-
-            return GetFileNameByDate(date, 0);
         }
 
         static readonly byte[] comma = Encoding.UTF8.GetBytes(",");
@@ -155,11 +129,11 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             WriteBytes(message.CreatedAt.ToString("yyyy-MM-ddTHH:mm:ssZ"), currentFileStream);
             WriteBytes(message.Status.ToString(), currentFileStream);
             WriteBytes(message.ContentType, currentFileStream);
-            WriteBytes(Encoding.UTF8.GetString(serializer.Serialize(message.Content)), currentFileStream);
-            WriteBytes(Encoding.UTF8.GetString(serializer.Serialize(message.Data)), currentFileStream);
+            WriteBytes(Encoding.UTF8.GetString(Serializer.Serialize(message.Content)), currentFileStream);
+            WriteBytes(Encoding.UTF8.GetString(Serializer.Serialize(message.Data)), currentFileStream);
             WriteBytes(message.ErrorType, currentFileStream);
             WriteBytes(message.ErrorMessage, currentFileStream);
-            WriteBytes(Encoding.UTF8.GetString(serializer.Serialize(message.Error)), currentFileStream);
+            WriteBytes(Encoding.UTF8.GetString(Serializer.Serialize(message.Error)), currentFileStream);
             WriteBytes(message.ExecutionDuration.ToString(), currentFileStream, last: true);
         }
 
@@ -177,21 +151,21 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
             lock (objLock)
             {
-                string name = GetAvailableFileNameByDate(DateTime.Now);
-                if (currentFileStream == null || Path.GetFileName(currentFileStream.Name) != name)
+                string name = GetAvailableFileNameByDate(currentFileStream, DateTime.Now);
+                if (currentFileStream == null || System.IO.Path.GetFileName(currentFileStream.Name) != name)
                 {
                     Close();
-                    currentFileStream = new FileStream(Path.Combine(LogsPath, name), FileMode.Append);
+                    currentFileStream = new FileStream(System.IO.Path.Combine(Path, name), FileMode.Append);
                     needWriteHeader = currentFileStream.Length == 0;
                 }
                 WriteToFile(message, cancellationToken);
             }
 
-            if (!buffer)
+            if (!BufferStream)
             {
                 lock (objLock)
                 {
-                    currentFileStream.FlushAsync(cancellationToken).ConfigureAwait(false);
+                    currentFileStream.Flush();
                 }
             }
 
@@ -202,15 +176,6 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         public Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
-        }
-
-        /// <inheritdoc />
-        public void SaveState(IDictionary<string, string> dict)
-        {
-            dict[nameof(LogsPath)] = LogsPath;
-            dict[nameof(buffer)] = buffer.ToString();
-            dict[nameof(serializer)] = serializer.GetType().AssemblyQualifiedName;
-            dict[nameof(prefix)] = prefix;
         }
 
         #endregion
@@ -235,7 +200,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         bool disposed;
 
         /// <inheritdoc />
-        protected virtual void Dispose(bool disposing)
+        protected void Dispose(bool disposing)
         {
             if (!disposed)
             {

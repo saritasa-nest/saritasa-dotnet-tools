@@ -21,8 +21,14 @@ namespace Saritasa.Tools.Messages.Common.Repositories
     /// </summary>
     public class AdoNetMessageRepository : IMessageRepository, IDisposable
     {
+        private const string KeyDialect = "dialect";
+        private const string KeyKeepConnection = "keepconnection";
+        private const string KeyFactory = "factory";
+        private const string KeyConnectionString = "connectionstring";
+        private const string KeySerializer = "serializer";
+
         /// <summary>
-        /// Possible sql dialects.
+        /// Possible SQL dialects.
         /// </summary>
         public enum Dialect
         {
@@ -57,21 +63,21 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             Oracle,
         }
 
-        readonly Dialect dialect;
+        private readonly Dialect dialect;
 
-        bool isInitialized;
+        private bool isInitialized;
 
-        DbConnection activeConnection;
+        private DbConnection activeConnection;
 
-        readonly DbProviderFactory factory;
+        private readonly DbProviderFactory factory;
 
-        readonly string connectionString;
+        private readonly string connectionString;
 
-        IObjectSerializer serializer;
+        private IObjectSerializer serializer;
 
-        readonly IMessageQueryProvider queryProvider;
+        private IMessageQueryProvider queryProvider;
 
-        readonly object objLock = new object();
+        private readonly object objLock = new object();
 
         /// <summary>
         /// Keep connection opened between queries. False by default.
@@ -88,30 +94,52 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         public AdoNetMessageRepository(DbProviderFactory factory, string connectionString, Dialect dialect = Dialect.Auto,
             IObjectSerializer serializer = null)
         {
+            if (factory == null)
+            {
+                throw new ArgumentNullException(nameof(factory));
+            }
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                throw new ArgumentNullException(nameof(connectionString));
+            }
+
             this.dialect = dialect;
             this.connectionString = connectionString;
             this.factory = factory;
-            this.serializer = serializer ?? new JsonObjectSerializer();
-            this.queryProvider = CreateSqlProvider(this.dialect, this.factory, this.serializer);
+            ValidateAndInit();
         }
 
         /// <summary>
         /// Create repository from dictionary.
         /// </summary>
-        /// <param name="dict">Properties.</param>
-        public AdoNetMessageRepository(IDictionary<string, string> dict)
+        /// <param name="parameters">Parameters dictionary.</param>
+        public AdoNetMessageRepository(IDictionary<string, string> parameters)
         {
 #if NETCOREAPP1_1 || NETSTANDARD1_6
             throw new NotSupportedException("Not sure how to handle DbProviderFactories for .NET Core.");
 #else
-            this.factory = DbProviderFactories.GetFactory(dict[nameof(factory)].ToString());
-            this.connectionString = dict[nameof(connectionString)].ToString();
-            this.dialect = (Dialect)Enum.Parse(typeof(Dialect), dict[nameof(dialect)].ToString(), true);
-            this.serializer = (IObjectSerializer)Activator.CreateInstance(Type.GetType(dict[nameof(serializer)].ToString()));
+            this.factory = DbProviderFactories.GetFactory(
+                parameters.GetValueOrInvoke(KeyFactory, RepositoryConfigurationException.ThrowParameterNotExists));
+            this.KeepConnection = Convert.ToBoolean(
+                parameters.GetValueOrDefault(KeyKeepConnection, true.ToString()));
+            this.connectionString = parameters.GetValueOrInvoke(KeyConnectionString,
+                RepositoryConfigurationException.ThrowParameterNotExists);
+            this.dialect = (Dialect)Enum.Parse(typeof(Dialect), parameters.GetValueOrDefault(KeyDialect, Dialect.Auto.ToString()));
+            if (parameters.ContainsKey(KeySerializer))
+            {
+                this.serializer = (IObjectSerializer)Activator.CreateInstance(Type.GetType(parameters[KeySerializer]));
+            }
+            ValidateAndInit();
 #endif
         }
 
-        static IMessageQueryProvider CreateSqlProvider(Dialect dialect, DbProviderFactory factory, IObjectSerializer serializer)
+        private void ValidateAndInit()
+        {
+            this.serializer = serializer ?? new JsonObjectSerializer();
+            this.queryProvider = CreateSqlProvider(this.dialect, this.factory, this.serializer);
+        }
+
+        private static IMessageQueryProvider CreateSqlProvider(Dialect dialect, DbProviderFactory factory, IObjectSerializer serializer)
         {
             switch (dialect)
             {
@@ -119,7 +147,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                     var provider = CreateSqlProviderByFactory(factory, serializer);
                     if (provider == null)
                     {
-                        throw new NotImplementedException($"The sql provider for factory {factory} is not implemented yet");
+                        throw new NotImplementedException($"The sql provider for factory {factory} is not implemented yet.");
                     }
                     return provider;
                 case Dialect.MySql:
@@ -129,7 +157,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                 case Dialect.Sqlite:
                     return new SqliteQueryProvider(serializer);
                 default:
-                    throw new NotImplementedException($"The sql provider {dialect} is not implemented yet");
+                    throw new NotImplementedException($"The sql provider {dialect} is not implemented yet.");
             }
         }
 
@@ -154,7 +182,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <inheritdoc />
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities",
             Justification = "Parameters are used")]
-        public async Task AddAsync(IMessage result, CancellationToken cancellationToken)
+        public async Task AddAsync(IMessage message, CancellationToken cancellationToken)
         {
             if (disposed)
             {
@@ -162,34 +190,36 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             }
             if (!isInitialized)
             {
-                Init(cancellationToken);
+                lock (objLock)
+                {
+                    Init(cancellationToken);
+                }
                 isInitialized = true;
             }
+
+            /*if (KeepConnection)
+            {
+                DbConnection connection = GetConnection();
+                await ExecuteAddMessageCommandAsync(connection, message, cancellationToken);
+            }
+            else
+            {
+                using (var connection = GetConnection())
+                {
+                    await ExecuteAddMessageCommandAsync(connection, message, cancellationToken);
+                    connection.Close();
+                }
+            }*/
 
             DbConnection connection = null;
             try
             {
                 connection = GetConnection();
-                using (var command = connection.CreateCommand())
-                {
-                    command.CommandText = queryProvider.GetInsertMessageScript();
-                    AddParameter(command, "@Type", result.Type);
-                    AddParameter(command, "@ContentId", result.Id.ToString());
-                    AddParameter(command, "@ContentType", result.ContentType);
-                    AddParameter(command, "@Content", serializer.Serialize(result.Content));
-                    AddParameter(command, "@Data", result.Data != null ? serializer.Serialize(result.Data) : null);
-                    AddParameter(command, "@ErrorDetails", result.Error != null ? serializer.Serialize(result.Error) : null);
-                    AddParameter(command, "@ErrorMessage", result.ErrorMessage);
-                    AddParameter(command, "@ErrorType", result.ErrorType);
-                    AddParameter(command, "@CreatedAt", result.CreatedAt);
-                    AddParameter(command, "@ExecutionDuration", result.ExecutionDuration);
-                    AddParameter(command, "@Status", (byte)result.Status);
-                    await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
-                }
+                await ExecuteAddMessageCommandAsync(connection, message, cancellationToken).ConfigureAwait(false);
             }
             finally
             {
-                if (KeepConnection && connection != null)
+                if (!KeepConnection && connection != null)
                 {
                     connection.Close();
                     connection = null;
@@ -197,7 +227,28 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             }
         }
 
-        void AddParameter(IDbCommand cmd, string name, object value)
+        private async Task ExecuteAddMessageCommandAsync(DbConnection connection, IMessage message,
+            CancellationToken cancellationToken)
+        {
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = queryProvider.GetInsertMessageScript();
+                AddParameter(command, "@Type", message.Type);
+                AddParameter(command, "@ContentId", message.Id.ToString());
+                AddParameter(command, "@ContentType", message.ContentType);
+                AddParameter(command, "@Content", serializer.Serialize(message.Content));
+                AddParameter(command, "@Data", message.Data != null ? serializer.Serialize(message.Data) : null);
+                AddParameter(command, "@ErrorDetails", message.Error != null ? serializer.Serialize(message.Error) : null);
+                AddParameter(command, "@ErrorMessage", message.ErrorMessage);
+                AddParameter(command, "@ErrorType", message.ErrorType);
+                AddParameter(command, "@CreatedAt", message.CreatedAt);
+                AddParameter(command, "@ExecutionDuration", message.ExecutionDuration);
+                AddParameter(command, "@Status", (byte)message.Status);
+                await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+            }
+        }
+
+        private void AddParameter(IDbCommand cmd, string name, object value)
         {
             var param = factory.CreateParameter();
             if (param != null)
@@ -216,7 +267,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities",
             Justification = "Parameters are used")]
-        async void Init(CancellationToken cancellationToken)
+        private void Init(CancellationToken cancellationToken)
         {
             DbConnection connection = null;
             try
@@ -225,17 +276,18 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                 using (var command = connection.CreateCommand())
                 {
                     command.CommandText = queryProvider.GetExistsTableScript();
-                    var messageTable = await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
+                    var messageTable = command.ExecuteScalar();
+                    cancellationToken.ThrowIfCancellationRequested();
                     if (messageTable == null)
                     {
                         command.CommandText = queryProvider.GetCreateTableScript();
-                        await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+                        command.ExecuteNonQuery();
                     }
                 }
             }
             finally
             {
-                if (KeepConnection && connection != null)
+                if (!KeepConnection && connection != null)
                 {
                     connection.Close();
                     connection = null;
@@ -319,13 +371,13 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <inheritdoc />
-        public void SaveState(IDictionary<string, string> dict)
+        public void SaveState(IDictionary<string, string> parameters)
         {
-            dict[nameof(dialect)] = dialect.ToString();
-            dict[nameof(KeepConnection)] = KeepConnection.ToString();
-            dict[nameof(factory)] = factory.GetType().Namespace;
-            dict[nameof(connectionString)] = connectionString;
-            dict[nameof(serializer)] = serializer.GetType().AssemblyQualifiedName;
+            parameters[KeyDialect] = dialect.ToString();
+            parameters[KeyKeepConnection] = KeepConnection.ToString();
+            parameters[KeyFactory] = factory.GetType().Namespace;
+            parameters[KeyConnectionString] = connectionString;
+            parameters[KeySerializer] = serializer.GetType().AssemblyQualifiedName;
         }
 
         private bool disposed;

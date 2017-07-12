@@ -55,21 +55,21 @@ namespace Saritasa.Tools.Messages.Common
 
             if (!dict.ContainsKey(ParamKeyMethod) && !dict.ContainsKey(ParamKeyClass))
             {
-                throw new ArgumentException($"The dict param expects to have keys {ParamKeyMethod} and {ParamKeyClass}.",
-                    nameof(dict));
+                this.Resolver = Commands.CommandPipeline.NullResolver;
+                return;
             }
 
             string methodName = dict["method"], className = dict["class"];
             var targetType = Type.GetType(className);
             if (targetType == null)
             {
-                throw new InvalidOperationException($"Cannot find type {className}");
+                throw new InvalidOperationException($"Cannot find type {className}.");
             }
             var method = targetType.GetTypeInfo().GetMethod(methodName, BindingFlags.IgnoreCase | BindingFlags.Static
                                                                         | BindingFlags.Public | BindingFlags.NonPublic);
             if (method == null)
             {
-                throw new InvalidOperationException($"Cannot find method {methodName}. Make sure there is a static method in class {className}");
+                throw new InvalidOperationException($"Cannot find method {methodName}. Make sure there is a static method in class {className}.");
             }
             if (method.GetParameters().Length != 1 || method.GetParameters()[0].ParameterType != typeof(Type)
                 || method.ReturnType != typeof(object))

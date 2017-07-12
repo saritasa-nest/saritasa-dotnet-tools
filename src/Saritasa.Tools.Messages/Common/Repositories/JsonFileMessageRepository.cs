@@ -18,80 +18,53 @@ namespace Saritasa.Tools.Messages.Common.Repositories
     /// <remarks>
     /// JSON processing utilities can be used to parse files. For example jl-sql (https://github.com/avz/jl-sql), jq.
     /// </remarks>
-    public class JsonFileMessageRepository : IMessageRepository, IDisposable
+    public class JsonFileMessageRepository : BaseFileRepository, IMessageRepository, IDisposable
     {
-        /// <summary>
-        /// Logs path.
-        /// </summary>
-        public string LogsPath { get; }
-
-        FileStream currentFileStream;
-
-        readonly IObjectSerializer serializer;
-
-        readonly string prefix;
-
-        readonly bool buffer;
+        private FileStream currentFileStream;
 
         static readonly object objLock = new object();
+
+        /// <inheritdoc />
+        public override string FileNameExtension => ".json";
 
         /// <summary>
         /// .ctor
         /// </summary>
-        /// <param name="logsPath">Logs path.</param>
+        /// <param name="path">Logs path.</param>
         /// <param name="buffer">Should the output stream be buffered.</param>
         /// <param name="prefix">Files names prefix.</param>
-        public JsonFileMessageRepository(string logsPath, string prefix = "", bool buffer = true)
+        public JsonFileMessageRepository(string path, string prefix = "", bool buffer = true)
         {
-            if (string.IsNullOrEmpty(logsPath))
-            {
-                throw new ArgumentException(nameof(logsPath));
-            }
-            this.LogsPath = logsPath;
-            this.serializer = new JsonObjectSerializer();
-            this.prefix = prefix;
-            this.buffer = buffer;
-            Directory.CreateDirectory(LogsPath);
+            this.Path = path;
+            this.FileNamePrefix = prefix;
+            this.BufferStream = buffer;
+            ValidateAndInit();
         }
 
         /// <summary>
         /// Create repository from dictionary.
         /// </summary>
-        /// <param name="dict">Properties.</param>
-        public JsonFileMessageRepository(IDictionary<string, string> dict)
+        /// <param name="parameters">Parameters dictionary.</param>
+        public JsonFileMessageRepository(IDictionary<string, string> parameters) : base(parameters)
         {
-            this.LogsPath = dict["logsPath"].ToString();
-            this.serializer = new JsonObjectSerializer();
-            this.prefix = dict[nameof(prefix)].ToString();
-            this.buffer = Convert.ToBoolean(dict[nameof(buffer)]);
-            Directory.CreateDirectory(LogsPath);
+            ValidateAndInit();
         }
 
-        string GetFileNameByDate(DateTime date, int count)
+        /// <inheritdoc />
+        protected override void ValidateAndInit()
         {
-            var name = $"{date:yyyyMMdd}-{count:000}.json";
-            if (!string.IsNullOrEmpty(prefix))
+            if (!(this.Serializer is JsonObjectSerializer))
             {
-                name = prefix + "-" + name;
+                this.Serializer = new JsonObjectSerializer();
             }
-            return name;
+            base.ValidateAndInit();
         }
 
-        string GetAvailableFileNameByDate(DateTime date)
-        {
-            if (currentFileStream != null)
-            {
-                return Path.GetFileName(currentFileStream.Name);
-            }
-
-            return GetFileNameByDate(date, 0);
-        }
-
-        static readonly byte[] newLine = Encoding.UTF8.GetBytes(Environment.NewLine);
+        private static readonly byte[] newLine = Encoding.UTF8.GetBytes(Environment.NewLine);
 
         private void WriteToFile(IMessage message)
         {
-            var jsonBytes = serializer.Serialize(message.CloneToMessage());
+            var jsonBytes = Serializer.Serialize(message.CloneToMessage());
             currentFileStream.Write(jsonBytes, 0, jsonBytes.Length);
             currentFileStream.Write(newLine, 0, newLine.Length);
         }
@@ -110,20 +83,20 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
             lock (objLock)
             {
-                string name = GetAvailableFileNameByDate(DateTime.Now);
-                if (currentFileStream == null || Path.GetFileName(currentFileStream.Name) != name)
+                string name = GetAvailableFileNameByDate(currentFileStream, DateTime.Now);
+                if (currentFileStream == null || System.IO.Path.GetFileName(currentFileStream.Name) != name)
                 {
                     Close();
-                    currentFileStream = new FileStream(Path.Combine(LogsPath, name), FileMode.Append);
+                    currentFileStream = new FileStream(System.IO.Path.Combine(Path, name), FileMode.Append);
                 }
                 WriteToFile(message);
             }
 
-            if (!buffer)
+            if (!BufferStream)
             {
                 lock (objLock)
                 {
-                    currentFileStream.FlushAsync(cancellationToken).ConfigureAwait(false);
+                    currentFileStream.Flush();
                 }
             }
 
@@ -134,14 +107,6 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         public Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
-        }
-
-        /// <inheritdoc />
-        public void SaveState(IDictionary<string, string> dict)
-        {
-            dict["logsPath"] = LogsPath;
-            dict[nameof(buffer)] = buffer.ToString();
-            dict[nameof(prefix)] = prefix;
         }
 
         #endregion

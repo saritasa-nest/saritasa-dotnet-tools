@@ -22,11 +22,11 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// </summary>
         public IList<IMessage> Messages { get; }
 
-        readonly object objLock = new object();
+        private readonly object objLock = new object();
 
         #region IMessageRepository
 
-        static readonly Task<bool> completedTask = Task.FromResult(true);
+        private static readonly Task<bool> completedTask = Task.FromResult(true);
 
         /// <summary>
         /// .ctor
@@ -39,8 +39,8 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <summary>
         /// .ctor
         /// </summary>
-        /// <param name="dict">Parameters dictionary.</param>
-        public InMemoryMessageRepository(IDictionary<string, string> dict) : this()
+        /// <param name="parameters">Parameters dictionary.</param>
+        public InMemoryMessageRepository(IDictionary<string, string> parameters) : this()
         {
         }
 
@@ -66,7 +66,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         #endregion
 
         /// <inheritdoc />
-        public void SaveState(IDictionary<string, string> dict)
+        public void SaveState(IDictionary<string, string> parameters)
         {
             // No need to implement since repository does not have state.
         }

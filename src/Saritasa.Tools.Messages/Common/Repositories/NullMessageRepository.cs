@@ -25,8 +25,8 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <summary>
         /// Create repository from dictionary.
         /// </summary>
-        /// <param name="dict">Properties.</param>
-        public NullMessageRepository(IDictionary<string, string> dict)
+        /// <param name="parameters">Properties.</param>
+        public NullMessageRepository(IDictionary<string, string> parameters)
         {
         }
 
@@ -48,7 +48,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <inheritdoc />
-        public void SaveState(IDictionary<string, string> dict)
+        public void SaveState(IDictionary<string, string> parameters)
         {
             // No need to implement since repository does not have state.
         }
