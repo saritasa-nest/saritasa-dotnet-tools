@@ -32,6 +32,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="date">Date part.</param>
         /// <param name="time">Time part.</param>
         /// <returns>Combined DateTime.</returns>
+        /// <exception cref="ArgumentException">Date and time kind format is different.</exception>
         public static DateTime CombineDateAndTime(DateTime date, DateTime time)
         {
             if (date.Kind != time.Kind)
@@ -268,7 +269,7 @@ namespace Saritasa.Tools.Common.Utils
             // Difference in months.
             var wholeMonthDiff = (target2.Year - target1.Year) * 12 + (target2.Month - target1.Month);
 
-            // b is in (anchor - 1 month, anchor + 1 month).
+            // target2 is in (anchor - 1 month, anchor + 1 month).
             DateTime anchor = target1.AddMonths(wholeMonthDiff);
             DateTime anchor2;
             double adjust;

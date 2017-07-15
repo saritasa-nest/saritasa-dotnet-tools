@@ -36,7 +36,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
             if (SkipRows.HasValue && topIsPercent)
             {
                 throw new ArgumentException(
-                    $"You must not set {nameof(TopIsPercent)} as true while there has been set {nameof(SkipRows)}", nameof(topIsPercent));
+                    $"You must not set {nameof(TopIsPercent)} as true while there has been set {nameof(SkipRows)}.", nameof(topIsPercent));
             }
 
             TopIsPercent = true;

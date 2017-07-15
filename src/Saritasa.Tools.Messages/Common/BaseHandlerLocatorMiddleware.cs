@@ -35,7 +35,7 @@ namespace Saritasa.Tools.Messages.Common
         /// .ctor
         /// </summary>
         /// <param name="dict">Input parameters as dict.</param>
-        public BaseHandlerLocatorMiddleware(IDictionary<string, string> dict)
+        protected BaseHandlerLocatorMiddleware(IDictionary<string, string> dict)
         {
             if (dict == null)
             {

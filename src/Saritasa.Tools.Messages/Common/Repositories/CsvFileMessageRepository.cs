@@ -15,7 +15,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
     /// <summary>
     /// Csv file target.
     /// </summary>
-    public sealed class CsvFileMessageRepository : BaseFileRepository, IMessageRepository, IDisposable
+    public class CsvFileMessageRepository : BaseFileRepository, IMessageRepository, IDisposable
     {
         private const string KeyNeedWriteHeader = "writeheader";
 

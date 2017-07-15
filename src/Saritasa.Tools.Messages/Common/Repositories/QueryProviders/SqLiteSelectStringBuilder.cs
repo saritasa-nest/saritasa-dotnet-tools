@@ -51,7 +51,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
                             sb.Append("LEFT OUTER JOIN ");
                             break;
                         default:
-                            throw new ArgumentOutOfRangeException(nameof(clause.JoinType), $"SqLite doesn't support {clause.JoinType} join type.");
+                            throw new ArgumentOutOfRangeException(nameof(clause.JoinType), $"SqLite does not support {clause.JoinType} join type.");
                     }
                     sb.Append($"{clause.ToTable} ON ");
                     sb.Append(CreateComparisonClause(
