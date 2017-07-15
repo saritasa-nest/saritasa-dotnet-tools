@@ -61,7 +61,7 @@ namespace Saritasa.Tools.Messages.Common
         /// <summary>
         /// Assemblies to load types.
         /// </summary>
-        public IList<Assembly> Assemblies { get; } = new List<Assembly>();
+        public IEnumerable<Assembly> Assemblies { get; private set; } = new List<Assembly>();
 
         /// <summary>
         /// How many messages to skip.
@@ -242,6 +242,21 @@ namespace Saritasa.Tools.Messages.Common
 
             Skip = skip;
             Take = take;
+            return this;
+        }
+
+        /// <summary>
+        /// Load content and error types using assemblies.
+        /// </summary>
+        /// <param name="assemblies">Assemblies to search for types.</param>
+        /// <returns>Message query.</returns>
+        public MessageQuery WithAssemblies(IEnumerable<Assembly> assemblies)
+        {
+            if (assemblies == null)
+            {
+                throw new ArgumentNullException(nameof(assemblies));
+            }
+            Assemblies = assemblies;
             return this;
         }
 

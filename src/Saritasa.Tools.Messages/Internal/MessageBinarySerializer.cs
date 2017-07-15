@@ -13,6 +13,12 @@ namespace Saritasa.Tools.Messages.Internal
 {
     internal class MessageBinarySerializer
     {
+        /*
+         * Every message in file has following structure:
+         * <chunk id> <length> <body>
+         * 1 byte, 4 bytes, vary
+         */
+
         const byte TokenBeginOfCommand = 0x10;
         const byte TokenId = 0x11;
         const byte TokenType = 0x12;
@@ -85,10 +91,13 @@ namespace Saritasa.Tools.Messages.Internal
             var length = BitConverter.ToInt32(header, 1);
             var content = new byte[length];
 
-            n = stream.Read(content, 0, content.Length);
-            if (n == 0)
+            if (length > 0)
             {
-                return nullChunk;
+                n = stream.Read(content, 0, content.Length);
+                if (n == 0)
+                {
+                    return nullChunk;
+                }
             }
             return new Tuple<byte, byte[]>(header[0], content);
         }
@@ -173,7 +182,7 @@ namespace Saritasa.Tools.Messages.Internal
             var baseMessage = message as Message;
             if (baseMessage == null)
             {
-                throw new ArgumentException($"{message} must be {nameof(Message)} type");
+                throw new ArgumentException($"{message} must be {nameof(Message)} type.");
             }
 
             var messageBytes = serializer.Serialize(baseMessage.Content);

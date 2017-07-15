@@ -103,13 +103,14 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             return completedTask;
         }
 
-        /// <inheritdoc />
-        public Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
         #endregion
+
+        /// <inheritdoc />
+        protected override IEnumerable<IMessage> ReadMessagesFromStream(Stream stream,
+            MessageQuery query)
+        {
+            return new List<Message>();
+        }
 
         /// <summary>
         /// Close all streams.

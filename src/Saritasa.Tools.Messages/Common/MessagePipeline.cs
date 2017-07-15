@@ -199,5 +199,11 @@ namespace Saritasa.Tools.Messages.Common
         }
 
         #endregion
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return GetType().Name + ": " + string.Join(" >> ", Middlewares.Select(m => m.Id));
+        }
     }
 }

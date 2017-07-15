@@ -5,6 +5,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Internal;
 using Saritasa.Tools.Messages.Common.ObjectSerializers;
 
@@ -94,6 +98,8 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             }
         }
 
+        #region IMessageRepository
+
         /// <summary>
         /// Save repository state to dictionary.
         /// </summary>
@@ -109,6 +115,92 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             parameters[KeyPrefix] = FileNamePrefix;
             parameters[KeyBuffer] = BufferStream.ToString();
             parameters[KeySerializer] = Serializer.GetType().AssemblyQualifiedName;
+        }
+
+        /// <inheritdoc />
+        public Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery, CancellationToken cancellationToken)
+        {
+            // Collect all files in dir.
+            var allFiles =
+                Directory.GetFiles(Path, GetSearchPattern()).OrderBy(f => f).Select(System.IO.Path.GetFileName).ToArray();
+            var allFilesHash = new HashSet<string>(allFiles);
+
+            // Init first and last dates.
+            var startDate = messageQuery.CreatedStartDate ?? DateTime.MinValue;
+            var endDate = messageQuery.CreatedEndDate ?? DateTime.MaxValue;
+
+            // Correct start and end dates, so minimum date will be first file in list, and max date last file.
+            if (allFiles.Any())
+            {
+                DateTime tmp;
+                if (DateTime.TryParseExact(GetFileDatePart(allFiles.First()), DateTimeFormat,
+                        System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat, System.Globalization.DateTimeStyles.None, out tmp) && tmp > startDate)
+                {
+                    startDate = tmp;
+                }
+                if (DateTime.TryParseExact(GetFileDatePart(allFiles.Last()), DateTimeFormat,
+                    System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat, System.Globalization.DateTimeStyles.None, out tmp))
+                {
+                    tmp = tmp.AddDays(1);
+                    if (messageQuery.CreatedEndDate != null && tmp < messageQuery.CreatedEndDate.Value)
+                    {
+                        endDate = tmp;
+                    }
+                }
+            }
+
+            // Actual search.
+            var targetList = new List<IMessage>(150);
+            var date = startDate;
+            while (date <= endDate)
+            {
+                for (var i = 0; i < 1000; i++)
+                {
+                    var fileName = GetFileNameByDate(date, i);
+                    if (!allFilesHash.Contains(fileName))
+                    {
+                        break;
+                    }
+
+                    Stream stream = null;
+                    try
+                    {
+                        stream = new FileStream(System.IO.Path.Combine(Path, fileName), FileMode.Open, FileAccess.Read,
+                            FileShare.ReadWrite);
+                        var messages = ReadMessagesFromStream(stream, messageQuery);
+                        targetList.AddRange(messages);
+                    }
+                    finally
+                    {
+                        stream?.Dispose();
+                    }
+                    cancellationToken.ThrowIfCancellationRequested();
+                }
+                date = date.AddDays(1);
+            }
+            return Task.FromResult(targetList.AsEnumerable());
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Read messages from stream.
+        /// </summary>
+        /// <param name="stream">Stream to read from.</param>
+        /// <param name="query">Message query.</param>
+        /// <returns>Enumerable of messages.</returns>
+        protected abstract IEnumerable<IMessage> ReadMessagesFromStream(
+            Stream stream,
+            MessageQuery query);
+
+        private string GetSearchPattern()
+        {
+            return "*" + FileNameExtension;
+        }
+
+        private string GetFileDatePart(string fileName)
+        {
+            return fileName.Length > 7 ? fileName.Substring(0, 8) : string.Empty;
         }
 
         /// <summary>

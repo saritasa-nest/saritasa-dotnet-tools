@@ -3,8 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
@@ -16,56 +14,32 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
     /// </summary>
     public class RepositoryMiddleware : IMessagePipelineMiddleware, IAsyncMessagePipelineMiddleware
     {
+        private const string KeyId = "id";
+        private const string KeyRepositoryType = "repositorytype";
+
         /// <inheritdoc />
         public string Id { get; set; }
 
-        readonly IMessageRepository repository;
+        private readonly IMessageRepository repository;
 
-        readonly RepositoryMessagesFilter filter;
+        private readonly RepositoryMessagesFilter filter;
 
         /// <summary>
         /// .ctor
         /// </summary>
-        /// <param name="dict">Parameters dictionary.</param>
-        public RepositoryMiddleware(IDictionary<string, string> dict)
+        /// <param name="parameters">Parameters dictionary.</param>
+        public RepositoryMiddleware(IDictionary<string, string> parameters)
         {
-            if (dict.ContainsKey("id"))
+            if (parameters.ContainsKey(KeyId))
             {
-                Id = dict["id"];
+                Id = parameters[KeyId];
             }
-            if (!dict.ContainsKey("repositoryType"))
+            if (!parameters.ContainsKey(KeyRepositoryType))
             {
-                throw new ArgumentException("Parameters dictionary should contain repositoryType key.");
-            }
-
-            var repositoryTypeName = dict["repositoryType"];
-            var repositoryType = Type.GetType(repositoryTypeName);
-            if (repositoryType == null)
-            {
-                throw new ArgumentException($"Cannot load repository type {repositoryTypeName}.");
+                throw new ArgumentException("Parameters dictionary should contain repositorytype key.");
             }
 
-            var ctor = repositoryType.GetTypeInfo().GetConstructors().FirstOrDefault(c => c.GetParameters().Length == 1
-                                                                  && c.GetParameters()[0].ParameterType == typeof(IDictionary<string, string>));
-            if (ctor == null)
-            {
-                ctor = repositoryType.GetTypeInfo().GetConstructors().FirstOrDefault(c => c.GetParameters().Length == 0);
-            }
-
-            if (ctor == null)
-            {
-                var msg = "Cannot find public parameterless constructor or constructor that accepts IDictionary<string, string>.";
-                throw new InvalidOperationException(msg);
-            }
-
-            var repository = ctor.GetParameters().Length == 1
-                ? ctor.Invoke(new object[] { dict }) as IMessageRepository
-                : ctor.Invoke(new object[] { }) as IMessageRepository;
-            if (repository == null)
-            {
-                throw new InvalidOperationException($"Cannot instaniate repository {repositoryType.Name}.");
-            }
-            this.repository = repository;
+            this.repository = RepositoryFactory.CreateFromTypeName(parameters[KeyRepositoryType], parameters);
         }
 
         /// <summary>

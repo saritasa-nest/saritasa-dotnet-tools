@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Microsoft.Extensions.Logging;
@@ -88,7 +89,7 @@ namespace ZergRushCo.Todosya.Web.Controllers
             var result = true;
             try
             {
-                await CommandPipeline.HandleAsync(command);
+                await CommandPipeline.HandleAsync(command, CancellationToken.None);
             }
             catch (DomainException ex)
             {

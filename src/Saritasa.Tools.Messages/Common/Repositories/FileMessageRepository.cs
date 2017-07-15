@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
@@ -117,90 +115,6 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             return completedTask;
         }
 
-        private string GetSearchPattern()
-        {
-            return "*" + FileNameExtension;
-        }
-
-        private string GetFileDatePart(string fileName)
-        {
-            return fileName.Length > 7 ? fileName.Substring(0, 8) : string.Empty;
-        }
-
-        /// <inheritdoc />
-        public Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery, CancellationToken cancellationToken)
-        {
-            // Collect all files in dir.
-            var allFiles =
-                Directory.GetFiles(Path, GetSearchPattern()).OrderBy(f => f).Select(System.IO.Path.GetFileName).ToArray();
-            var allFilesHash = new HashSet<string>(allFiles);
-
-            // Init first and last dates.
-            var startDate = messageQuery.CreatedStartDate ?? DateTime.MinValue;
-            var endDate = messageQuery.CreatedEndDate ?? DateTime.MaxValue;
-
-            // Correct start and end dates, so minimum date will be first file in list, and max date last file.
-            if (allFiles.Any())
-            {
-                DateTime tmp;
-                if (DateTime.TryParseExact(GetFileDatePart(allFiles.First()), DateTimeFormat,
-                    System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat, System.Globalization.DateTimeStyles.None, out tmp) && tmp > startDate)
-                {
-                    startDate = tmp;
-                }
-                if (DateTime.TryParseExact(GetFileDatePart(allFiles.Last()), DateTimeFormat,
-                    System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat, System.Globalization.DateTimeStyles.None, out tmp))
-                {
-                    tmp = tmp.AddDays(1);
-                    if (messageQuery.CreatedEndDate != null && tmp < messageQuery.CreatedEndDate.Value)
-                    {
-                        endDate = tmp;
-                    }
-                }
-            }
-
-            // Actual search.
-            var targetList = new List<Message>(150);
-            var currentDate = startDate;
-            while (currentDate <= endDate)
-            {
-                for (var i = 0; i < 1000; i++)
-                {
-                    var fileName = GetFileNameByDate(currentDate, i);
-                    if (!allFilesHash.Contains(fileName))
-                    {
-                        break;
-                    }
-
-                    Stream stream = null;
-                    try
-                    {
-                        stream = new FileStream(System.IO.Path.Combine(Path, fileName), FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                        if (compress)
-                        {
-                            stream = new GZipStream(stream, CompressionMode.Decompress, false);
-                        }
-                        var commandSerializer = new MessageBinarySerializer(stream, Serializer, messageQuery.Assemblies.ToArray());
-                        for (Message message; (message = commandSerializer.Read()) != null;)
-                        {
-                            if (messageQuery.Match(message))
-                            {
-                                targetList.Add(message);
-                            }
-                            cancellationToken.ThrowIfCancellationRequested();
-                        }
-                    }
-                    finally
-                    {
-                        stream?.Dispose();
-                    }
-                }
-                currentDate = currentDate.AddDays(1);
-                cancellationToken.ThrowIfCancellationRequested();
-            }
-            return Task.FromResult(targetList.Cast<IMessage>());
-        }
-
         /// <inheritdoc />
         public override void SaveState(IDictionary<string, string> parameters)
         {
@@ -209,6 +123,24 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         #endregion
+
+        /// <inheritdoc />
+        protected override IEnumerable<IMessage> ReadMessagesFromStream(Stream stream,
+            MessageQuery query)
+        {
+            if (compress)
+            {
+                stream = new GZipStream(stream, CompressionMode.Decompress, false);
+            }
+            var commandSerializer = new MessageBinarySerializer(stream, Serializer, query.Assemblies.ToArray());
+            for (Message message; (message = commandSerializer.Read()) != null;)
+            {
+                if (query.Match(message))
+                {
+                    yield return message;
+                }
+            }
+        }
 
         /// <summary>
         /// Close all streams.
@@ -249,54 +181,6 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         {
             Dispose(true);
             GC.SuppressFinalize(this);
-        }
-    }
-
-    /// <summary>
-    /// Search for CreatedAt &gt; X AND CreatedAt &lt; X.
-    /// </summary>
-    internal class CreatedDateExpressionVisitor : ExpressionVisitor
-    {
-        public DateTime StartDate { get; set; } = DateTime.MinValue;
-
-        public DateTime EndDate { get; set; } = DateTime.MaxValue;
-
-        DateTime GetDate(BinaryExpression conditionalNode)
-        {
-            if (conditionalNode.Left.NodeType == ExpressionType.MemberAccess && conditionalNode.Right.NodeType == ExpressionType.MemberAccess)
-            {
-                var leftMemberNode = (MemberExpression)conditionalNode.Left;
-                if (leftMemberNode.Member.Name != nameof(Message.CreatedAt))
-                {
-                    return DateTime.MinValue;
-                }
-                var memberNode = (MemberExpression)conditionalNode.Right;
-                var constantExpression = (ConstantExpression)memberNode.Expression;
-                return ((DateTime)((FieldInfo)memberNode.Member).GetValue(constantExpression.Value)).Date;
-            }
-            return DateTime.MinValue;
-        }
-
-        public override Expression Visit(Expression node)
-        {
-            if (node.NodeType == ExpressionType.GreaterThan || node.NodeType == ExpressionType.GreaterThanOrEqual)
-            {
-                var date = GetDate((BinaryExpression)node);
-                if (date > StartDate)
-                {
-                    StartDate = date;
-                }
-            }
-            else if (node.NodeType == ExpressionType.LessThan || node.NodeType == ExpressionType.LessThanOrEqual)
-            {
-                var date = GetDate((BinaryExpression)node);
-                if (date < EndDate)
-                {
-                    EndDate = date;
-                }
-            }
-
-            return base.Visit(node);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Saritasa.Tools.Messages.Abstractions;
@@ -68,10 +69,10 @@ namespace ZergRushCo.Todosya.Domain.UserContext.Handlers
                     throw new IdentityException(command.Result);
                 }
 
-                await eventsPipeline.RaiseAsync(new UserCreatedEvent()
+                await eventsPipeline.RaiseAsync(new UserCreatedEvent
                 {
                     User = user,
-                });
+                }, CancellationToken.None);
 
                 command.User = user;
                 logger.LogInformation($"User {user.FirstName} {user.LastName} with id {user.Id} has been registered.");
