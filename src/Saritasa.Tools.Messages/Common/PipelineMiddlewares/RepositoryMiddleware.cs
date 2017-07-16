@@ -16,9 +16,21 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
     {
         private const string KeyId = "id";
         private const string KeyRepositoryType = "repositorytype";
+        private const string KeyActive = "active";
+        private const string KeyRethrowExceptions = "rethrowexceptions";
 
         /// <inheritdoc />
         public string Id { get; set; }
+
+        /// <summary>
+        /// Is this middlware active. <c>True</c> by default.
+        /// </summary>
+        public bool Active { get; set; } = true;
+
+        /// <summary>
+        /// Rethrow exceptions from repositories. <c>True</c> by default.
+        /// </summary>
+        public bool RethrowExceptions { get; set; } = true;
 
         private readonly IMessageRepository repository;
 
@@ -36,7 +48,15 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
             }
             if (!parameters.ContainsKey(KeyRepositoryType))
             {
-                throw new ArgumentException("Parameters dictionary should contain repositorytype key.");
+                throw new ArgumentException($"Parameters dictionary should contain {KeyRepositoryType} key.");
+            }
+            if (parameters.ContainsKey(KeyActive))
+            {
+                Active = Boolean.Parse(parameters[KeyActive]);
+            }
+            if (parameters.ContainsKey(KeyRethrowExceptions))
+            {
+                RethrowExceptions = Boolean.Parse(parameters[KeyRethrowExceptions]);
             }
 
             this.repository = RepositoryFactory.CreateFromTypeName(parameters[KeyRepositoryType], parameters);
@@ -73,21 +93,49 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         /// <inheritdoc />
         public virtual void Handle(IMessage message)
         {
+            if (!Active)
+            {
+                return;
+            }
             if (filter != null && !filter.IsMatch(message))
             {
                 return;
             }
-            repository.AddAsync(message, CancellationToken.None).ConfigureAwait(false).GetAwaiter().GetResult();
+            try
+            {
+                repository.AddAsync(message, CancellationToken.None).ConfigureAwait(false).GetAwaiter().GetResult();
+            }
+            catch (Exception)
+            {
+                if (RethrowExceptions)
+                {
+                    throw;
+                }
+            }
         }
 
         /// <inheritdoc />
         public virtual async Task HandleAsync(IMessage message, CancellationToken cancellationToken)
         {
+            if (!Active)
+            {
+                return;
+            }
             if (filter != null && !filter.IsMatch(message))
             {
                 return;
             }
-            await repository.AddAsync(message, cancellationToken).ConfigureAwait(false);
+            try
+            {
+                await repository.AddAsync(message, cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception)
+            {
+                if (RethrowExceptions)
+                {
+                    throw;
+                }
+            }
         }
     }
 }
