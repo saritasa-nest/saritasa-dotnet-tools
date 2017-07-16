@@ -31,8 +31,6 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
         private readonly bool compress;
 
-        private static readonly object objLock = new object();
-
         private Stream CurrentStream => currentGZipStream ?? (Stream)currentFileStream;
 
         /// <summary>
@@ -85,7 +83,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                 throw new ObjectDisposedException(null);
             }
 
-            lock (objLock)
+            lock (SyncRoot)
             {
                 // We cannot continue zip streams, so we have to create new file
                 // every time with new stream.
@@ -105,7 +103,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
             if (!BufferStream)
             {
-                lock (objLock)
+                lock (SyncRoot)
                 {
                     currentGZipStream?.Flush();
                     currentFileStream.Flush();
@@ -147,7 +145,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// </summary>
         public void Close()
         {
-            lock (objLock)
+            lock (SyncRoot)
             {
                 if (currentGZipStream != null)
                 {

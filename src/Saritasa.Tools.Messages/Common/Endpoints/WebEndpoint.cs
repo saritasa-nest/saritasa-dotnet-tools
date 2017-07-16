@@ -2,19 +2,19 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 #if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6 && !NET40
+using System;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
+using JetBrains.Annotations;
+using Newtonsoft.Json;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Internal;
+
 namespace Saritasa.Tools.Messages.Common.Endpoints
 {
-    using System;
-    using System.IO;
-    using System.Linq;
-    using System.Net;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using JetBrains.Annotations;
-    using Newtonsoft.Json;
-    using Abstractions;
-    using Internal;
-
     /// <summary>
     /// Web endpoint. Allows to send messages directly to application. Must be POST request.
     /// Sample:
@@ -42,19 +42,19 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
         /// </summary>
         public const int DefaultPort = 26025;
 
-        IMessagePipeline[] pipelines;
+        private IMessagePipeline[] pipelines;
 
-        HttpListener listener;
+        private HttpListener listener;
 
-        readonly int port;
+        private readonly int port;
 
-        readonly string address;
+        private readonly string address;
 
-        CancellationToken cancellationToken = CancellationToken.None;
+        private CancellationToken cancellationToken = CancellationToken.None;
 
-        CancellationTokenSource cancellationTokenSource;
+        private CancellationTokenSource cancellationTokenSource;
 
-        ManualResetEventSlim threadWaitEvent = new ManualResetEventSlim();
+        private ManualResetEventSlim threadWaitEvent = new ManualResetEventSlim();
 
         /// <summary>
         /// .ctor
@@ -78,7 +78,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
         }
 
         /// <summary>
-        /// Start tcp port listening.
+        /// Start TCP port listening.
         /// </summary>
         public virtual void Start()
         {

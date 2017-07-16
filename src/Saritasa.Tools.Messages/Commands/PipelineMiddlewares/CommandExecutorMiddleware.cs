@@ -23,8 +23,8 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         /// <summary>
         /// .ctor
         /// </summary>
-        /// <param name="dict">Input parameters as dict.</param>
-        public CommandExecutorMiddleware(IDictionary<string, string> dict) : base(dict)
+        /// <param name="parameters">Input parameters as parameters.</param>
+        public CommandExecutorMiddleware(IDictionary<string, string> parameters) : base(parameters)
         {
         }
 

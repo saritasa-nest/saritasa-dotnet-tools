@@ -20,8 +20,8 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
         /// <summary>
         /// .ctor
         /// </summary>
-        /// <param name="dict">Parameters dictionary.</param>
-        public EventExecutorMiddleware(IDictionary<string, string> dict) : base(dict)
+        /// <param name="parameters">Parameters dictionary.</param>
+        public EventExecutorMiddleware(IDictionary<string, string> parameters) : base(parameters)
         {
         }
 

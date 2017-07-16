@@ -22,8 +22,6 @@ namespace Saritasa.Tools.Messages.Common.Repositories
     {
         private FileStream currentFileStream;
 
-        static readonly object objLock = new object();
-
         /// <inheritdoc />
         public override string FileNameExtension => ".json";
 
@@ -81,7 +79,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                 throw new ObjectDisposedException("The repository has been disposed.");
             }
 
-            lock (objLock)
+            lock (SyncRoot)
             {
                 string name = GetAvailableFileNameByDate(currentFileStream, DateTime.Now);
                 if (currentFileStream == null || System.IO.Path.GetFileName(currentFileStream.Name) != name)
@@ -94,7 +92,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
             if (!BufferStream)
             {
-                lock (objLock)
+                lock (SyncRoot)
                 {
                     currentFileStream.Flush();
                 }
@@ -117,7 +115,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// </summary>
         public void Close()
         {
-            lock (objLock)
+            lock (SyncRoot)
             {
                 if (currentFileStream != null)
                 {

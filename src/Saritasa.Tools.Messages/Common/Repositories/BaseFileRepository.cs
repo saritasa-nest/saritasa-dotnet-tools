@@ -54,6 +54,13 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// </summary>
         public bool BufferStream { get; protected set; }
 
+        private readonly object lockObject = new object();
+
+        /// <summary>
+        /// Gets the object which can be used to synchronize asynchronous operations that must rely on the.
+        /// </summary>
+        protected object SyncRoot => this.lockObject;
+
         /// <summary>
         /// .ctor
         /// </summary>

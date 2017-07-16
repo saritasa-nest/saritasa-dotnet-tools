@@ -19,8 +19,8 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
         /// <summary>
         /// .ctor
         /// </summary>
-        /// <param name="dict">Dictionary with parameters.</param>
-        public QueryObjectResolverMiddleware(IDictionary<string, string> dict) : base(dict)
+        /// <param name="parameters">Dictionary with parameters.</param>
+        public QueryObjectResolverMiddleware(IDictionary<string, string> parameters) : base(parameters)
         {
         }
 

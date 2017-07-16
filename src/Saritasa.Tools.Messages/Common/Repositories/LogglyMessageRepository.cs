@@ -25,10 +25,10 @@ namespace Saritasa.Tools.Messages.Common.Repositories
     /// </remarks>
     public class LogglyMessageRepository : IMessageRepository, IDisposable
     {
-        const string SearchEndpoint = "https://{0}.loggly.com/apiv2/search?{1}";
-        const string RetrievingEventsEndpoint = "https://{0}.loggly.com/apiv2/events?{1}";
-        const string ServerEndpoint = @"https://logs-01.loggly.com";
-        const string TagsHeader = "X-LOGGLY-TAG";
+        private const string SearchEndpoint = "https://{0}.loggly.com/apiv2/search?{1}";
+        private const string RetrievingEventsEndpoint = "https://{0}.loggly.com/apiv2/events?{1}";
+        private const string ServerEndpoint = @"https://logs-01.loggly.com";
+        private const string TagsHeader = "X-LOGGLY-TAG";
 
         private HttpClient client = new HttpClient();
 
@@ -170,12 +170,12 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <inheritdoc />
-        public void SaveState(IDictionary<string, string> dict)
+        public void SaveState(IDictionary<string, string> parameters)
         {
-            dict[nameof(token)] = token;
-            dict[nameof(username)] = username;
-            dict[nameof(password)] = password;
-            dict[nameof(accountDomain)] = accountDomain;
+            parameters[nameof(token)] = token;
+            parameters[nameof(username)] = username;
+            parameters[nameof(password)] = password;
+            parameters[nameof(accountDomain)] = accountDomain;
         }
 
         #region Dispose

@@ -17,8 +17,9 @@ namespace Saritasa.Tools.Messages.Common
     /// </summary>
     public abstract class BaseExecutorMiddleware : IMessagePipelineMiddleware, IAsyncMessagePipelineMiddleware
     {
-        const string ParamKeyMethod = "method";
-        const string ParamKeyClass = "class";
+        private const string KeyId = "id";
+        private const string KeyMethod = "method";
+        private const string KeyClass = "class";
 
         /// <inheritdoc />
         public string Id { get; set; } = "Executor";
@@ -41,25 +42,25 @@ namespace Saritasa.Tools.Messages.Common
         /// <summary>
         /// .ctor
         /// </summary>
-        protected BaseExecutorMiddleware(IDictionary<string, string> dict)
+        protected BaseExecutorMiddleware(IDictionary<string, string> parameters)
         {
-            if (dict == null)
+            if (parameters == null)
             {
-                throw new ArgumentNullException(nameof(dict));
+                throw new ArgumentNullException(nameof(parameters));
             }
 
-            if (dict.ContainsKey("id"))
+            if (parameters.ContainsKey(KeyId))
             {
-                Id = dict["id"];
+                Id = parameters[KeyId];
             }
 
-            if (!dict.ContainsKey(ParamKeyMethod) && !dict.ContainsKey(ParamKeyClass))
+            if (!parameters.ContainsKey(KeyMethod) && !parameters.ContainsKey(KeyClass))
             {
                 this.Resolver = Commands.CommandPipeline.NullResolver;
                 return;
             }
 
-            string methodName = dict["method"], className = dict["class"];
+            string methodName = parameters["method"], className = parameters["class"];
             var targetType = Type.GetType(className);
             if (targetType == null)
             {

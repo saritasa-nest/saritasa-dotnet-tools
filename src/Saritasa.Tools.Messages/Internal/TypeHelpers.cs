@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.ComponentModel;
+using System.Linq;
 using Saritasa.Tools.Messages.Common;
 #if NETCOREAPP1_1 || NETSTANDARD1_6
 using System.Runtime.Loader;
@@ -21,11 +22,21 @@ namespace Saritasa.Tools.Messages.Internal
         /// Load type from type full name. Searchs for assemblies.
         /// </summary>
         /// <param name="fullName">Full type name.</param>
-        /// <param name="assemblies">Assebmlies list.</param>
+        /// <param name="assemblies">Assebmlies list. If null currently loaded assemblies would try to be searched.</param>
         /// <returns>Type. Null if type cannot be found.</returns>
-        internal static Type LoadType(string fullName, Assembly[] assemblies)
+        internal static Type LoadType(string fullName, Assembly[] assemblies = null)
         {
             Type t;
+
+            if (assemblies == null)
+            {
+#if NETCOREAPP1_1 || NETSTANDARD1_6
+                assemblies = TypeHelpers.LoadAssembliesFromTypeName(fullName).ToArray();
+#else
+                assemblies = AppDomain.CurrentDomain.GetAssemblies();
+#endif
+
+            }
 
             // If it is a system type try to use Type.GetType first.
             if (fullName.StartsWith("System"))
