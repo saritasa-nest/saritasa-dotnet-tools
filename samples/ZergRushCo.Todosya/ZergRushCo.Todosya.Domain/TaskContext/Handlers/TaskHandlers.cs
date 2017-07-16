@@ -103,7 +103,7 @@ namespace ZergRushCo.Todosya.Domain.TaskContext.Handlers
                 var dbtask = uow.TaskRepository.Get(command.TaskId);
                 if (dbtask.User.Id != command.UserId)
                 {
-                    throw new DomainException("You cannot check/uncheck task for another user");
+                    throw new DomainException("You cannot check/uncheck task for another user.");
                 }
 
                 dbtask.IsDone = command.IsDone;
