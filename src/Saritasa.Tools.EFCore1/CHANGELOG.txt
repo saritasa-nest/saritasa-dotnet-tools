@@ -1,4 +1,4 @@
-﻿0.2.1 [TBD]
+﻿0.2.1 [2017-07-15]
 [*] Fix reference to Domain assembly.
 
 0.2.0 [2017-07-10]
