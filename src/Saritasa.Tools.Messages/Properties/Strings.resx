@@ -154,7 +154,7 @@
     <value>Found handler {0} for command {1}.</value>
   </data>
   <data name="CommandHandlerNotFound" xml:space="preserve">
-    <value>Cannot find command handler {0} or it cannot be resolved. Make sure it has default public parameterless constructor or registered with your dependency injection container.</value>
+    <value>Cannot find command handler for {0} or it cannot be resolved. Make sure it has default public parameterless constructor or registered with your dependency injection container.</value>
   </data>
   <data name="ContentShouldBeType" xml:space="preserve">
     <value>Content should be {0} type.</value>

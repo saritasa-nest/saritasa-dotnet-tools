@@ -138,7 +138,7 @@ namespace Saritasa.Tools.Messages.TestRuns
                 {
                     if (!string.IsNullOrEmpty(currentStepTypeName))
                     {
-                        var step = CreateTestRunStep(currentStepTypeName, sb.ToString());
+                        var step = CreateTestRunStepFromTypeName(currentStepTypeName, sb.ToString());
                         testRun.Steps.Add(step);
                         sb.Clear();
                     }
@@ -152,7 +152,7 @@ namespace Saritasa.Tools.Messages.TestRuns
 
             if (!string.IsNullOrEmpty(currentStepTypeName))
             {
-                var step = CreateTestRunStep(currentStepTypeName, sb.ToString());
+                var step = CreateTestRunStepFromTypeName(currentStepTypeName, sb.ToString());
                 testRun.Steps.Add(step);
             }
 
@@ -207,15 +207,26 @@ namespace Saritasa.Tools.Messages.TestRuns
             return string.Empty;
         }
 
-        private static ITestRunStep CreateTestRunStep(string typeName, string body)
+        /// <summary>
+        /// Create test run step from type name.
+        /// </summary>
+        /// <param name="typeName">Partial or full qualified type name.</param>
+        /// <param name="body">Initialize from text. Optional.</param>
+        /// <returns>New test run step.</returns>
+        public static ITestRunStep CreateTestRunStepFromTypeName(string typeName, string body = null)
         {
             var type = Type.GetType("Saritasa.Tools.Messages.TestRuns.Steps." + typeName);
+            if (type == null)
+            {
+                type = Type.GetType(typeName);
+            }
             if (type == null)
             {
                 throw new TestRunException($"Cannot load TestRunStep type {typeName}.");
             }
 
-            var ctor = type.GetTypeInfo().GetConstructors().FirstOrDefault(c => c.GetParameters().Length == 1
+            var ctor = type.GetTypeInfo().GetConstructors().FirstOrDefault(
+                c => c.GetParameters().Length == 1
                 && c.GetParameters().First().ParameterType == typeof(string));
             if (ctor == null)
             {

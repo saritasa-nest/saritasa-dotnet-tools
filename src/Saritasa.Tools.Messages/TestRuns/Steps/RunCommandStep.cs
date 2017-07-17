@@ -24,6 +24,8 @@ namespace Saritasa.Tools.Messages.TestRuns.Steps
 
         private readonly object command;
 
+        private readonly bool typeWasResolved;
+
         /// <summary>
         /// .ctor
         /// </summary>
@@ -67,9 +69,9 @@ namespace Saritasa.Tools.Messages.TestRuns.Steps
             this.id = Guid.Parse(j[KeyId].ToString());
             this.commandType = j[KeyType].ToString();
             var type = TypeHelpers.LoadType(this.commandType);
-            if (type == null)
+            if (type != null)
             {
-                throw new TestRunException($"Cannot load type {this.commandType} for id {this.id}.");
+                this.typeWasResolved = true;
             }
             this.command = JsonConvert.DeserializeObject(j[KeyContent].ToString(), type);
         }
@@ -77,6 +79,10 @@ namespace Saritasa.Tools.Messages.TestRuns.Steps
         /// <inheritdoc />
         public void Run(TestRunExecutionContext context)
         {
+            if (!typeWasResolved)
+            {
+                throw new TestRunException($"Cannot load type {this.commandType} for id {this.id}.");
+            }
             var commandPipeline = context.Resolver(typeof(ICommandPipeline)) as ICommandPipeline;
             if (commandPipeline == null)
             {
@@ -101,7 +107,7 @@ namespace Saritasa.Tools.Messages.TestRuns.Steps
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"{id}: {commandType}";
+            return $"{commandType} <{id}>";
         }
     }
 }

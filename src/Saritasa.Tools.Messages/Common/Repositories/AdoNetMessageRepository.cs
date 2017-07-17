@@ -335,7 +335,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                 throw new ObjectDisposedException(nameof(AdoNetMessageRepository));
             }
 
-            // execute
+            // Execute.
             IList<Message> messages = new List<Message>();
             var connection = GetConnection();
             using (var command = connection.CreateCommand())

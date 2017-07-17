@@ -197,6 +197,10 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             }
             finally
             {
+                // Release handler.
+                var disposable = handler as IDisposable;
+                disposable?.Dispose();
+
                 stopWatch.Stop();
                 commandMessage.ExecutionDuration = (int)stopWatch.ElapsedMilliseconds;
             }

@@ -84,7 +84,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
 
             // Find handler method, first try to find cached value.
             var cmdtype = commandMessage.Content.GetType();
-            var method = cache.GetOrAdd(cmdtype, (handlerCmdType) =>
+            var method = cache.GetOrAdd(cmdtype, handlerCmdType =>
             {
                 return commandHandlers
                     .FirstOrDefault(m => m.GetParameters().Any(pt => pt.ParameterType == handlerCmdType));
@@ -92,7 +92,8 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
 
             if (InternalLogger.IsDebugEnabled)
             {
-                InternalLogger.Debug(string.Format(Properties.Strings.SearchCommandHandler, cmdtype.Name), nameof(CommandHandlerLocatorMiddleware));
+                InternalLogger.Debug(string.Format(Properties.Strings.SearchCommandHandler, cmdtype.Name),
+                    nameof(CommandHandlerLocatorMiddleware));
             }
             if (method == null)
             {
