@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
@@ -8,7 +8,7 @@ using System.Security.Cryptography.X509Certificates;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Saritasa")]
 [assembly: AssemblyProduct("Saritasa.Tools.Messages")]
-[assembly: AssemblyCopyright("Copyright � Saritasa 2016-2017")]
+[assembly: AssemblyCopyright("Copyright © Saritasa 2016-2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

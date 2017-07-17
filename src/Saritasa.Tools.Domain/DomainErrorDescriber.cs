@@ -18,44 +18,50 @@ namespace Saritasa.Tools.Domain
         /// <summary>
         /// Get general error message.
         /// </summary>
-        public virtual string Error() => Resources.Error;
+        public virtual string Error() => Properties.Strings.Error;
 
         /// <summary>
         /// Get conflict error message.
         /// </summary>
-        public virtual string Conflict() => Resources.Conflict;
+        public virtual string Conflict() => Properties.Strings.Conflict;
 
         /// <summary>
         /// Get forbidden error message.
         /// </summary>
-        public virtual string Forbidden() => Resources.Forbidden;
+        public virtual string Forbidden() => Properties.Strings.Forbidden;
 
         /// <summary>
         /// Get not found error message.
         /// </summary>
-        public virtual string NotFound() => Resources.NotFound;
+        public virtual string NotFound() => Properties.Strings.NotFound;
 
         /// <summary>
         /// Get not found specified item error message.
         /// </summary>
         public virtual string NotFoundItem(string entityName) =>
-            string.Format(Resources.NotFoundEntity, entityName);
+            string.Format(Properties.Strings.NotFoundEntity, entityName);
 
         /// <summary>
         /// Get unauthorized error message.
         /// </summary>
-        public virtual string Unauthorized() => Resources.Unauthorized;
+        public virtual string Unauthorized() => Properties.Strings.Unauthorized;
 
         /// <summary>
         /// Get validation errors message.
         /// </summary>
-        public virtual string ValidationErrors() => Resources.ValidationErrors;
+        public virtual string ValidationErrors() => Properties.Strings.ValidationErrors;
+
+        /// <summary>
+        /// Get validation error is required message.
+        /// </summary>
+        /// <returns></returns>
+        public virtual string ValidationErrorIsEmpty() => Properties.Strings.ValidationErrorIsEmpty;
 
         /// <summary>
         /// Get cannot find message.
         /// </summary>
         /// <param name="entityName">Entity name.</param>
         public virtual string CannotFind(string entityName) =>
-            string.Format(Resources.CannotFind, entityName);
+            string.Format(Properties.Strings.CannotFind, entityName);
     }
 }

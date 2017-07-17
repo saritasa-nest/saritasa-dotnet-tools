@@ -118,27 +118,30 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="CannotFind" xml:space="preserve">
-    <value>{0} не найден.</value>
+    <value>Cannot find {0}.</value>
   </data>
   <data name="Conflict" xml:space="preserve">
-    <value>Произошёл конфликт.</value>
+    <value>Conflict occurred.</value>
   </data>
   <data name="Error" xml:space="preserve">
-    <value>Произошла ошибка.</value>
+    <value>An error has occurred.</value>
   </data>
   <data name="Forbidden" xml:space="preserve">
-    <value>Действие запрещено.</value>
+    <value>Action forbidden.</value>
   </data>
   <data name="NotFound" xml:space="preserve">
-    <value>Указанный элемент не найден.</value>
+    <value>The specified item not found.</value>
   </data>
   <data name="NotFoundEntity" xml:space="preserve">
-    <value>Элемент {0} не найден.</value>
+    <value>The specified {0} not found.</value>
   </data>
   <data name="Unauthorized" xml:space="preserve">
-    <value>Не авторизованный доступ.</value>
+    <value>Unauthorized access.</value>
+  </data>
+  <data name="ValidationErrorIsEmpty" xml:space="preserve">
+    <value>Please specify error message.</value>
   </data>
   <data name="ValidationErrors" xml:space="preserve">
-    <value>Ошибки при проверке данных.</value>
+    <value>Validation errors.</value>
   </data>
 </root>

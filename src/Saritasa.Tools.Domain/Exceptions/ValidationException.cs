@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
+#if NET40
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 #endif
@@ -14,7 +14,7 @@ namespace Saritasa.Tools.Domain.Exceptions
     /// <summary>
     /// Validation exception. Can be mapped to 400 HTTP status code.
     /// </summary>
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
+#if NET40
     [Serializable]
 #endif
     public class ValidationException : DomainException
@@ -113,7 +113,7 @@ namespace Saritasa.Tools.Domain.Exceptions
             this.errors = errors;
         }
 
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
+#if NET40
         /// <summary>
         /// .ctor for deserialization.
         /// </summary>
@@ -135,7 +135,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         {
             if (string.IsNullOrEmpty(error))
             {
-                throw new ArgumentException("Error cannot be empty.", nameof(error));
+                throw new ArgumentException(DomainErrorDescriber.Default.ValidationErrorIsEmpty(), nameof(error));
             }
 
             IEnumerable<string> list;
@@ -197,7 +197,7 @@ namespace Saritasa.Tools.Domain.Exceptions
             return errors.ToDictionary(k => k.Key, v => v.Value.FirstOrDefault() ?? string.Empty);
         }
 
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
+#if NET40
         /// <summary>
         /// Creates on throws instance of <see cref="ValidationException" /> based on validation results
         /// of object.
