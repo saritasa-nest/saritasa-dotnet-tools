@@ -15,42 +15,25 @@
     <copyright>Copyright (c) Saritasa, 2016-2017</copyright>
     <tags>cqrs cqs commands queries events pipeline</tags>
     <dependencies>
-      <group targetFramework="netcoreapp1.1">
-        <dependency id="Microsoft.NETCore.App" version="[1.1.0, )" />
-        <dependency id="System.Data.Common" version="[4.3.0, )" />
-        <dependency id="System.Runtime.Loader" version="[4.3.0, )" />
-        <dependency id="System.Net.Http" version="[4.3.0, )" />
-        <dependency id="Newtonsoft.Json" version="[10.0.0, )" />
-        <dependency id="Saritasa.Tools.Messages.Abstractions" version="[0.1.0, )" />
-        <dependency id="Saritasa.Tools.Domain" version="[0.1.0, )" />
-      </group>
       <group targetFramework="net452">
-        <dependency id="Newtonsoft.Json" version="[10.0.0, )" />
-        <dependency id="Saritasa.Tools.Messages.Abstractions" version="[0.1.0, )" />
-        <dependency id="Saritasa.Tools.Domain" version="[0.1.0, )" />
+        <dependency id="Newtonsoft.Json" version="[9.0.0, )" />
+        <dependency id="Saritasa.Tools.Messages.Abstractions" version="[0.2.0, )" />
+        <dependency id="Saritasa.Tools.Domain" version="[0.2.0, )" />
       </group>
-      <group targetFramework="net461">
-        <dependency id="Newtonsoft.Json" version="[10.0.0, )" />
-        <dependency id="Saritasa.Tools.Messages.Abstractions" version="[0.1.0, )" />
-        <dependency id="Saritasa.Tools.Domain" version="[0.1.0, )" />
-      </group>
-      <group targetFramework="netstandard1.6">
+      <group targetFramework="netstandard1.5">
         <dependency id="NETStandard.Library" version="[1.6.0, )" />
         <dependency id="System.Data.Common" version="[4.3.0, )" />
         <dependency id="System.Runtime.Loader" version="[4.3.0, )" />
         <dependency id="System.Net.Http" version="[4.3.0, )" />
-        <dependency id="Newtonsoft.Json" version="[10.0.0, )" />
-        <dependency id="Saritasa.Tools.Messages.Abstractions" version="[0.1.0, )" />
-        <dependency id="Saritasa.Tools.Domain" version="[0.1.0, )" />
+        <dependency id="Newtonsoft.Json" version="[9.0.0, )" />
+        <dependency id="Saritasa.Tools.Messages.Abstractions" version="[0.2.0, )" />
+        <dependency id="Saritasa.Tools.Domain" version="[0.2.0, )" />
       </group>
     </dependencies>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="System.Xml" targetFramework=".NETFramework4.5.2" />
       <frameworkAssembly assemblyName="System.ComponentModel.DataAnnotations" targetFramework=".NETFramework4.5.2" />
       <frameworkAssembly assemblyName="System.Net.Http" targetFramework=".NETFramework4.5.2" />
-      <frameworkAssembly assemblyName="System.Xml" targetFramework=".NETFramework4.6.1" />
-      <frameworkAssembly assemblyName="System.ComponentModel.DataAnnotations" targetFramework=".NETFramework4.6.1" />
-      <frameworkAssembly assemblyName="System.Net.Http" targetFramework=".NETFramework4.6.1" />
     </frameworkAssemblies>
   </metadata>
   <files>

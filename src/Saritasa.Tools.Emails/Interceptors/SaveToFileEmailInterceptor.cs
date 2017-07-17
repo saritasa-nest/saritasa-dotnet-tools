@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
+#if NET452
 namespace Saritasa.Tools.Emails.Interceptors
 {
     using System;
@@ -56,7 +56,7 @@ namespace Saritasa.Tools.Emails.Interceptors
             }
         }
 
-        #region IEmailInterceptor implementation
+#region IEmailInterceptor implementation
 
         /// <inheritdoc />
         public void Sending(MailMessage mailMessage, IDictionary<string, object> data, ref bool cancel)
@@ -76,7 +76,7 @@ namespace Saritasa.Tools.Emails.Interceptors
             }
         }
 
-        #endregion
+#endregion
 
         /// <summary>
         /// Saves the specified message to disk.

@@ -115,7 +115,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <param name="parameters">Parameters dictionary.</param>
         public AdoNetMessageRepository(IDictionary<string, string> parameters)
         {
-#if NETCOREAPP1_1 || NETSTANDARD1_6
+#if NETSTANDARD1_5
             throw new NotSupportedException("Not sure how to handle DbProviderFactories for .NET Core.");
 #else
             this.factory = DbProviderFactories.GetFactory(

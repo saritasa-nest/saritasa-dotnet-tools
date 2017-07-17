@@ -11,11 +11,11 @@ namespace Saritasa.Tools.Messages.Common
     /// <summary>
     /// Message execution context.
     /// </summary>
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
+#if NET452
     [Serializable]
 #endif
     public class Message : IMessage
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
+#if NET452
 #pragma warning disable SA1001 // Commas must be spaced correctly
         , ICloneable
 #pragma warning restore SA1001 // Commas must be spaced correctly

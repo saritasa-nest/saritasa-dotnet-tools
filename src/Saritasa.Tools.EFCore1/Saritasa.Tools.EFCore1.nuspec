@@ -16,21 +16,11 @@
     <tags>uow repository domain efcore6 dbcontext</tags>
     <repository type="git" url="https://github.com/Saritasa/SaritasaTools" />
     <dependencies>
-      <group targetFramework="netcoreapp1.1">
-        <dependency id="Microsoft.NETCore.App" version="[1.1.0, )" />
-        <dependency id="Microsoft.EntityFrameworkCore" version="[1.1.0, )" />
-        <dependency id="System.Reflection.Emit.Lightweight" version="[4.3.0, )" />
-        <dependency id="Saritasa.Tools.Domain" version="[0.2.0, )" />
-      </group>
       <group targetFramework="net452">
         <dependency id="Microsoft.EntityFrameworkCore" version="[1.1.0, )" />
         <dependency id="Saritasa.Tools.Domain" version="[0.2.0, )" />
       </group>
-      <group targetFramework="net461">
-        <dependency id="Microsoft.EntityFrameworkCore" version="[1.1.0, )" />
-        <dependency id="Saritasa.Tools.Domain" version="[0.2.0, )" />
-      </group>
-      <group targetFramework="netStandard1.6">
+      <group targetFramework="netStandard1.3">
         <dependency id="NETStandard.Library" version="[1.6.0, )" />
         <dependency id="Microsoft.EntityFrameworkCore" version="[1.1.0, )" />
         <dependency id="System.Reflection.Emit.Lightweight" version="[4.3.0, )" />
@@ -39,7 +29,6 @@
     </dependencies>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="System.Data" targetFramework=".NETFramework4.5.2" />
-      <frameworkAssembly assemblyName="System.Data" targetFramework=".NETFramework4.6.1" />
     </frameworkAssemblies>
   </metadata>
   <files>

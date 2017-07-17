@@ -91,7 +91,7 @@ namespace Saritasa.Tools.Messages.Common
                 name = System.IO.Path.ChangeExtension(name, ".dll");
             }
 
-#if NETCOREAPP1_0 || NETCOREAPP1_1 || NETSTANDARD1_2 || NETSTANDARD1_6
+#if NETSTANDARD1_5
             var assembly = System.Runtime.Loader.AssemblyLoadContext.Default.LoadFromAssemblyPath(name);
             if (assembly != null)
             {

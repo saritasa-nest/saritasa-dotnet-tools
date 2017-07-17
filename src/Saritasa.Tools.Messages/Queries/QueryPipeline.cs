@@ -24,7 +24,7 @@ namespace Saritasa.Tools.Messages.Queries
 
         static QueryMessage CreateMessage(Delegate func, params object[] args)
         {
-#if !NETCOREAPP1_1 && !NETSTANDARD1_6
+#if NET452
             var method = func.Method;
 #else
             var method = func.GetInvocationList()[0].GetMethodInfo();
@@ -191,7 +191,7 @@ namespace Saritasa.Tools.Messages.Queries
             }
 
             var objectTypeName = message.ContentType.Substring(0, message.ContentType.LastIndexOf(".", StringComparison.Ordinal));
-#if NETCOREAPP1_1 || NETSTANDARD1_6
+#if NETSTANDARD1_5
             var objectType = TypeHelpers.LoadType(objectTypeName, TypeHelpers.LoadAssembliesFromTypeName(objectTypeName).ToArray());
 #else
             var objectType = TypeHelpers.LoadType(objectTypeName, AppDomain.CurrentDomain.GetAssemblies());

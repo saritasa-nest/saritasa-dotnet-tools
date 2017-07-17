@@ -18,11 +18,7 @@
     <dependencies>
       <group targetFramework="net452">
         <dependency id="Saritasa.Tools.Domain" version="0.2.0" />
-        <dependency id="EntityFramework" version="6.1.0" />
-      </group>
-      <group targetFramework="net461">
-        <dependency id="Saritasa.Tools.Domain" version="0.2.0" />
-        <dependency id="EntityFramework" version="6.1.0" />
+        <dependency id="EntityFramework" version="[6.1.0, )" />
       </group>
     </dependencies>
   </metadata>

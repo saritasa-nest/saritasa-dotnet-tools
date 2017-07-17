@@ -7,7 +7,7 @@ using System.Reflection;
 using System.ComponentModel;
 using System.Linq;
 using Saritasa.Tools.Messages.Common;
-#if NETCOREAPP1_1 || NETSTANDARD1_6
+#if NETSTANDARD1_5
 using System.Runtime.Loader;
 #endif
 
@@ -30,7 +30,7 @@ namespace Saritasa.Tools.Messages.Internal
 
             if (assemblies == null)
             {
-#if NETCOREAPP1_1 || NETSTANDARD1_6
+#if NETSTANDARD1_5
                 assemblies = TypeHelpers.LoadAssembliesFromTypeName(fullName).ToArray();
 #else
                 assemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -250,7 +250,7 @@ namespace Saritasa.Tools.Messages.Internal
                 Assembly assembly = null;
                 try
                 {
-#if NETCOREAPP1_1 || NETSTANDARD1_6
+#if NETSTANDARD1_5
                     assembly = AssemblyLoadContext.Default.LoadFromAssemblyName(new AssemblyName(currentAssemblyName));
 #else
                     assembly = Assembly.Load(currentAssemblyName);

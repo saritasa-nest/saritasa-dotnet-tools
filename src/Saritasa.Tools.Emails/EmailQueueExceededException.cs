@@ -4,14 +4,14 @@
 namespace Saritasa.Tools.Emails
 {
     using System;
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
+#if NET452
     using System.Runtime.Serialization;
 #endif
 
     /// <summary>
     /// Exception occurs when email sending queue is overloaded.
     /// </summary>
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
+#if NET452
     [Serializable]
 #endif
     public class EmailQueueExceededException : Exception
@@ -25,7 +25,7 @@ namespace Saritasa.Tools.Emails
         {
         }
 
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
+#if NET452
         /// <summary>
         /// .ctor for deserialization.
         /// </summary>

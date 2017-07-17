@@ -10,7 +10,7 @@ namespace Saritasa.Tools.Misc.Security
     using System.Security;
     using System.Text;
     using System.Text.RegularExpressions;
-#if !PORTABLE
+#if NET452
     using System.Security.Cryptography;
 #endif
     using JetBrains.Annotations;
@@ -208,7 +208,7 @@ namespace Saritasa.Tools.Misc.Security
         /// <summary>
         /// Instance of random generation class.
         /// </summary>
-#if !PORTABLE
+#if NET452
         public static RandomNumberGenerator RandomService { get; protected set; }
 #else
         public static Random RandomService { get; protected set; }
@@ -302,7 +302,7 @@ namespace Saritasa.Tools.Misc.Security
         /// </summary>
         static PasswordGenerator()
         {
-#if !PORTABLE
+#if NET452
             RandomService = RandomNumberGenerator.Create();
 #else
             RandomService = new Random();
@@ -354,7 +354,7 @@ namespace Saritasa.Tools.Misc.Security
             return sb.ToString();
         }
 
-#if !PORTABLE && !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
+#if NET452
         /// <summary>
         /// Generates new password to SecureString.
         /// </summary>
@@ -743,7 +743,7 @@ namespace Saritasa.Tools.Misc.Security
         /// <returns>The random number between zero and maxValue.</returns>
         static int GetNextRandom(int maxValue)
         {
-#if !PORTABLE
+#if NET452
             var bytes = new byte[4];
             lock (randomServiceLock)
             {

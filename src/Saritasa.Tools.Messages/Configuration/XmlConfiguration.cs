@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6 && !NET40
+#if NET452
 using System;
 using System.Collections.Generic;
 using Saritasa.Tools.Messages.Abstractions;

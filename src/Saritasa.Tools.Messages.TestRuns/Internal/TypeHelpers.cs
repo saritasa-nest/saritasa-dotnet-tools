@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-#if NETCOREAPP1_1 || NETSTANDARD1_6
+#if NETSTANDARD1_5
 using System.Runtime.Loader;
 #endif
 
@@ -28,12 +28,11 @@ namespace Saritasa.Tools.Messages.TestRuns.Internal
 
             if (assemblies == null)
             {
-#if NETCOREAPP1_1 || NETSTANDARD1_6
+#if NETSTANDARD1_5
                 assemblies = TypeHelpers.LoadAssembliesFromTypeName(fullName).ToArray();
 #else
                 assemblies = AppDomain.CurrentDomain.GetAssemblies();
 #endif
-
             }
 
             // If it is a system type try to use Type.GetType first.
@@ -75,7 +74,7 @@ namespace Saritasa.Tools.Messages.TestRuns.Internal
                 Assembly assembly = null;
                 try
                 {
-#if NETCOREAPP1_1 || NETSTANDARD1_6
+#if NETSTANDARD1_5
                     assembly = AssemblyLoadContext.Default.LoadFromAssemblyName(new AssemblyName(currentAssemblyName));
 #else
                     assembly = Assembly.Load(currentAssemblyName);
