@@ -15,10 +15,11 @@ Task download-nuget `
 
 Task pre-build -depends download-nuget `
 {
-    Invoke-NugetRestore "$src\..\Saritasa.Tools.sln"
+    Initialize-MSBuild
+    Invoke-NugetRestore -SolutionPath "$src\..\Saritasa.Tools.sln"
 
-    Invoke-NugetRestore "$samples\ZergRushCo.Todosya\ZergRushCo.Todosya.sln"
-    Invoke-NugetRestore "$samples\Saritasa.BoringWarehouse\Saritasa.BoringWarehouse.sln"
+    Invoke-NugetRestore -SolutionPath "$samples\ZergRushCo.Todosya\ZergRushCo.Todosya.sln"
+    Invoke-NugetRestore -SolutionPath "$samples\Saritasa.BoringWarehouse\Saritasa.BoringWarehouse.sln"
 
     # Use following command to revert the files:
     # git checkout -- **/AssemblyInfo.cs
