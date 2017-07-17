@@ -52,7 +52,8 @@ namespace ZergRushCo.Todosya.Infrastructure
             builder.Register(c =>
             {
                 var context = c.Resolve<IComponentContext>();
-                var commandPipeline = CommandPipeline.CreateDefaultPipeline(context.Resolve,
+                var commandPipeline = CommandPipeline.CreateDefaultPipeline(
+                    context.Resolve,
                     System.Reflection.Assembly.GetAssembly(typeof(Domain.UserContext.Entities.User)));
                 commandPipeline.AppendMiddlewares(repositoryMiddleware);
                 commandPipeline.AppendMiddlewares(recordRepositoryMiddleware);
@@ -60,7 +61,7 @@ namespace ZergRushCo.Todosya.Infrastructure
                 builder = new ContainerBuilder();
 
                 return commandPipeline;
-            }).AsImplementedInterfaces().SingleInstance();
+            }).AsImplementedInterfaces().InstancePerRequest();
 
             // Query pipeline.
             builder.Register(c =>

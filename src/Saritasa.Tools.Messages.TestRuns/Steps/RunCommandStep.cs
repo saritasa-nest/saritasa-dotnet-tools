@@ -5,7 +5,7 @@ using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Saritasa.Tools.Messages.Abstractions;
-using Saritasa.Tools.Messages.Internal;
+using Saritasa.Tools.Messages.TestRuns.Internal;
 
 namespace Saritasa.Tools.Messages.TestRuns.Steps
 {
