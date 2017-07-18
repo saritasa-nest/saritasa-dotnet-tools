@@ -1,15 +1,15 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
+
+using System;
+using System.Collections.Generic;
+#if NET452
+using System.Net.Mail;
+#endif
+using System.Text.RegularExpressions;
 
 namespace Saritasa.Tools.Emails.Interceptors
 {
-    using System;
-    using System.Collections.Generic;
-#if NET452
-    using System.Net.Mail;
-#endif
-    using System.Text.RegularExpressions;
-
     /// <summary>
     /// Filters users to whom send an email.
     /// </summary>

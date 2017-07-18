@@ -1,13 +1,13 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.Emails
-{
-    using System;
+using System;
 #if NET452
-    using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 #endif
 
+namespace Saritasa.Tools.Emails
+{
     /// <summary>
     /// Exception occurs when email sending queue is overloaded.
     /// </summary>

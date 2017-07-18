@@ -62,7 +62,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
         private void Init()
         {
-            //client.Timeout = TimeSpan.FromSeconds(5);
+            client.Timeout = TimeSpan.FromSeconds(5);
         }
 
         #region IMessageRepository

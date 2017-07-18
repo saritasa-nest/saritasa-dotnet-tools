@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 #if NETSTANDARD1_3
+using System;
+
 namespace Saritasa.Tools.Emails
 {
-    using System;
-
     /// <summary>
     /// Very raw and basic implementation of MailMessage for frameworks that do not support MailMessage API.
     /// Itended to be replaced.

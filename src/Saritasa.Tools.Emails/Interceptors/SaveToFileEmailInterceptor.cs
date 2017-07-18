@@ -2,14 +2,14 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 #if NET452
+using System;
+using System.Collections.Generic;
+using System.Net.Mail;
+using System.IO;
+using System.Reflection;
+
 namespace Saritasa.Tools.Emails.Interceptors
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Net.Mail;
-    using System.IO;
-    using System.Reflection;
-
     /// <summary>
     /// Saves emails into specified folder in .eml format.
     /// </summary>

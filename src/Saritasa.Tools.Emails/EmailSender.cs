@@ -1,17 +1,17 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+#if NET452
+using System.Net.Mail;
+#endif
+using System.Threading.Tasks;
+using System.Threading;
+using JetBrains.Annotations;
+
 namespace Saritasa.Tools.Emails
 {
-    using System;
-    using System.Collections.Generic;
-#if NET452
-    using System.Net.Mail;
-#endif
-    using System.Threading.Tasks;
-    using System.Threading;
-    using JetBrains.Annotations;
-
     using NameValueDict = System.Collections.Generic.IDictionary<string, object>;
 
     /// <summary>
