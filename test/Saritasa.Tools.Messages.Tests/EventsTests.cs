@@ -1,16 +1,16 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Reflection;
+using Xunit;
+using Saritasa.Tools.Domain;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Events;
+using Saritasa.Tools.Messages.Events.PipelineMiddlewares;
+
 namespace Saritasa.Tools.Messages.Tests
 {
-    using System;
-    using System.Reflection;
-    using Xunit;
-    using Domain;
-    using Abstractions;
-    using Events;
-    using Events.PipelineMiddlewares;
-
     /// <summary>
     /// Message events tests.
     /// </summary>
