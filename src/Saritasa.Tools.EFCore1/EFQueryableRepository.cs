@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 using Saritasa.Tools.Domain;
 
 namespace Saritasa.Tools.EFCore
@@ -16,7 +17,8 @@ namespace Saritasa.Tools.EFCore
     /// </summary>
     /// <typeparam name="TEntity">Entity type.</typeparam>
     /// <typeparam name="TContext">Database context type.</typeparam>
-    public class EFQueryableRepository<TEntity, TContext> : EFRepository<TEntity, TContext>, IQueryableRepository<TEntity>
+    public class EFQueryableRepository<TEntity, TContext> : EFRepository<TEntity, TContext>, IQueryableRepository<TEntity>,
+        IAsyncEnumerableAccessor<TEntity>
         where TEntity : class where TContext : DbContext
     {
         readonly DbSet<TEntity> set;
@@ -44,5 +46,8 @@ namespace Saritasa.Tools.EFCore
 
         /// <inheritdoc />
         IEnumerator IEnumerable.GetEnumerator() => ((IQueryable<TEntity>)set).GetEnumerator();
+
+        /// <inheritdoc />
+        public IAsyncEnumerable<TEntity> AsyncEnumerable => ((IAsyncEnumerableAccessor<TEntity>)set).AsyncEnumerable;
     }
 }

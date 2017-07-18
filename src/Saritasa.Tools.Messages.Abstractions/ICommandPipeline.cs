@@ -24,6 +24,6 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// </summary>
         /// <param name="command">Command to execute.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
-        Task HandleAsync([NotNull] object command, CancellationToken cancellationToken);
+        Task HandleAsync([NotNull] object command, CancellationToken cancellationToken = default(CancellationToken));
     }
 }
