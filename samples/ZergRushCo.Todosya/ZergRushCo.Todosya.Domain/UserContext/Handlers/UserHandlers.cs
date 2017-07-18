@@ -49,7 +49,7 @@ namespace ZergRushCo.Todosya.Domain.UserContext.Handlers
                 var email = command.Email.ToLowerInvariant().Trim();
                 if (uow.UserRepository.Any(x => x.Email == email))
                 {
-                    throw new DomainException("The user with the same email already exists");
+                    throw new DomainException("The user with the same email already exists.");
                 }
 
                 var user = new User

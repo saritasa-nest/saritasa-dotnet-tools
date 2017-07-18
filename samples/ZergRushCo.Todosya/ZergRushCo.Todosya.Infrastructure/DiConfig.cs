@@ -17,7 +17,14 @@ namespace ZergRushCo.Todosya.Infrastructure
     /// </summary>
     public static class DiConfig
     {
-        public static void Setup(ContainerBuilder builder)
+        public static IContainer AutofacContainer { get; set; }
+
+        public static object Resolve(Type type)
+        {
+            return AutofacContainer?.Resolve(type);
+        }
+
+        public static void Setup(ContainerBuilder builder, bool testingMode = false)
         {
             // Other bindings.
             var connectionStringConf = ConfigurationManager.ConnectionStrings["AppDbContext"];
@@ -51,9 +58,8 @@ namespace ZergRushCo.Todosya.Infrastructure
             // Command pipeline.
             builder.Register(c =>
             {
-                var context = c.Resolve<IComponentContext>();
                 var commandPipeline = CommandPipeline.CreateDefaultPipeline(
-                    context.Resolve,
+                    Resolve,
                     System.Reflection.Assembly.GetAssembly(typeof(Domain.UserContext.Entities.User)));
                 commandPipeline.AppendMiddlewares(repositoryMiddleware);
                 commandPipeline.AppendMiddlewares(recordRepositoryMiddleware);
@@ -61,13 +67,12 @@ namespace ZergRushCo.Todosya.Infrastructure
                 builder = new ContainerBuilder();
 
                 return commandPipeline;
-            }).AsImplementedInterfaces().InstancePerRequest();
+            }).AsImplementedInterfaces().SingleInstance();
 
             // Query pipeline.
             builder.Register(c =>
             {
-                var context = c.Resolve<IComponentContext>();
-                var queryPipeline = QueryPipeline.CreateDefaultPipeline(context.Resolve);
+                var queryPipeline = QueryPipeline.CreateDefaultPipeline(Resolve);
                 queryPipeline.AppendMiddlewares(repositoryMiddleware);
                 queryPipeline.UseInternalResolver();
                 builder.RegisterInstance(queryPipeline).AsImplementedInterfaces().SingleInstance();
@@ -78,8 +83,7 @@ namespace ZergRushCo.Todosya.Infrastructure
             // Events pipeline.
             builder.Register(c =>
             {
-                var context = c.Resolve<IComponentContext>();
-                var eventsPipeline = EventPipeline.CreateDefaultPipeline(context.Resolve,
+                var eventsPipeline = EventPipeline.CreateDefaultPipeline(Resolve,
                     System.Reflection.Assembly.GetAssembly(typeof(Domain.UserContext.Entities.User)));
                 eventsPipeline.UseInternalResolver();
 
@@ -92,10 +96,18 @@ namespace ZergRushCo.Todosya.Infrastructure
             builder.RegisterType<Domain.TaskContext.Queries.ProjectsQueries>().AsSelf();
 
             // Emails.
-            var emailSender = new Saritasa.Tools.Emails.SmtpClientEmailSender();
-            emailSender.AddInterceptor(new FilterEmailInterceptor("*@saritasa.com mytest@example.com"));
-            emailSender.AddInterceptor(new CountEmailsInterceptor());
-            builder.RegisterInstance(emailSender).AsImplementedInterfaces().SingleInstance();
+            if (testingMode)
+            {
+                var emailSender = new Saritasa.Tools.Emails.DummyEmailSender();
+                builder.RegisterInstance(emailSender).AsImplementedInterfaces().SingleInstance();
+            }
+            else
+            {
+                var emailSender = new Saritasa.Tools.Emails.SmtpClientEmailSender();
+                emailSender.AddInterceptor(new FilterEmailInterceptor("*@saritasa.com mytest@example.com"));
+                emailSender.AddInterceptor(new CountEmailsInterceptor());
+                builder.RegisterInstance(emailSender).AsImplementedInterfaces().SingleInstance();
+            }
 
             // Logger.
             var nlogProvider = new Saritasa.Tools.NLog.NLogLoggerProvider();

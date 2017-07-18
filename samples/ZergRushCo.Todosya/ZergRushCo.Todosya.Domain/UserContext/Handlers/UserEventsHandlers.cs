@@ -20,7 +20,7 @@ namespace ZergRushCo.Todosya.Domain.UserContext.Handlers
             UserCreatedEvent userCreatedEvent,
             Saritasa.Tools.Emails.IEmailSender emailSender)
         {
-            var message = new MailMessage()
+            var message = new MailMessage
             {
                 To =
                 {

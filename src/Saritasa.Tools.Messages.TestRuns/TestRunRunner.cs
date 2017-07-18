@@ -15,21 +15,35 @@ namespace Saritasa.Tools.Messages.TestRuns
         /// Setup and initialize tests environment. Setup context resolver if needed.
         /// </summary>
         /// <param name="context">Test run execution context.</param>
-        public abstract void Setup(TestRunExecutionContext context);
+        public virtual void OnInitialize(TestRunExecutionContext context)
+        {
+        }
 
         /// <summary>
         /// The method is called before every test run. Here you can implement all
         /// preparation steps for test, for example init test data.
         /// </summary>
         /// <param name="context">Test run execution context.</param>
-        public abstract void OnBeforeTestRun(TestRunExecutionContext context);
+        public virtual void OnBeforeTestRun(TestRunExecutionContext context)
+        {
+        }
 
         /// <summary>
         /// The method is called after every test run. Here you can implement all
         /// finalization steps (connections close, rollback, etc).
         /// </summary>
         /// <param name="context">Test run execution context.</param>
-        public abstract void OnAfterTestRun(TestRunExecutionContext context);
+        public virtual void OnAfterTestRun(TestRunExecutionContext context)
+        {
+        }
+
+        /// <summary>
+        /// The method is called after all test were done.
+        /// </summary>
+        /// <param name="context">Test run execution context.</param>
+        public virtual void OnShutdown(TestRunExecutionContext context)
+        {
+        }
 
         /// <summary>
         /// Run step of test run.
@@ -51,7 +65,7 @@ namespace Saritasa.Tools.Messages.TestRuns
             context.Resolver = type => null;
             var result = new TestRunResult();
 
-            Setup(context);
+            OnInitialize(context);
 
             foreach (TestRun testRun in loader.Get())
             {
@@ -92,6 +106,9 @@ namespace Saritasa.Tools.Messages.TestRuns
                     OnAfterTestRun(context);
                 }
             }
+
+            OnShutdown(context);
+
             return result;
         }
     }
