@@ -15,7 +15,7 @@ namespace Saritasa.Tools.Common.Utils
     /// </summary>
     public static class SecurityUtils
     {
-#if !PORTABLE && !NETSTANDARD1_2
+#if NET40 || NET452 || NET46
         const char PasswordMethodHashSeparator = '$';
 
         /// <summary>
@@ -150,37 +150,6 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Convert array of bytes to string representation.
-        /// </summary>
-        /// <param name="bytes">Bytes array.</param>
-        /// <returns>Hex string.</returns>
-        internal static string ConvertBytesToString(byte[] bytes)
-        {
-            Guard.IsNotNull(bytes, nameof(bytes));
-            return BitConverter.ToString(bytes).Replace("-", string.Empty);
-        }
-
-        /// <summary>
-        /// Convert string that contains hex representation of bytes to bytes array.
-        /// </summary>
-        /// <param name="target">Hex bytes string.</param>
-        /// <returns>Bytes array.</returns>
-        internal static byte[] ConvertStringToBytes(string target)
-        {
-            Guard.IsNotNull(target, nameof(target));
-            if (target.Length % 2 != 0)
-            {
-                throw new ArgumentException(Properties.Strings.TargetStringLengthIncorrect, nameof(target));
-            }
-            var bytes = new byte[target.Length / 2];
-            for (int i = 0; i < bytes.Length; i++)
-            {
-                bytes[i] = byte.Parse(target.Substring(i * 2, 2), System.Globalization.NumberStyles.HexNumber);
-            }
-            return bytes;
-        }
-
-        /// <summary>
         /// String hash method.
         /// </summary>
         public enum HashMethod
@@ -274,6 +243,37 @@ namespace Saritasa.Tools.Common.Utils
             return Hash(target, method) == hashedStringToCheck;
         }
 #endif
+
+        /// <summary>
+        /// Convert array of bytes to string representation.
+        /// </summary>
+        /// <param name="bytes">Bytes array.</param>
+        /// <returns>Hex string.</returns>
+        internal static string ConvertBytesToString(byte[] bytes)
+        {
+            Guard.IsNotNull(bytes, nameof(bytes));
+            return BitConverter.ToString(bytes).Replace("-", string.Empty);
+        }
+
+        /// <summary>
+        /// Convert string that contains hex representation of bytes to bytes array.
+        /// </summary>
+        /// <param name="target">Hex bytes string.</param>
+        /// <returns>Bytes array.</returns>
+        internal static byte[] ConvertStringToBytes(string target)
+        {
+            Guard.IsNotNull(target, nameof(target));
+            if (target.Length % 2 != 0)
+            {
+                throw new ArgumentException(Properties.Strings.TargetStringLengthIncorrect, nameof(target));
+            }
+            var bytes = new byte[target.Length / 2];
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                bytes[i] = byte.Parse(target.Substring(i * 2, 2), System.Globalization.NumberStyles.HexNumber);
+            }
+            return bytes;
+        }
 
         #region CRC-32
 

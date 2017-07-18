@@ -3,8 +3,8 @@
 
 using System;
 using System.Collections.Generic;
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_6
-    using System.Runtime.Serialization;
+#if NET40 || NET452 || NET461
+using System.Runtime.Serialization;
 #endif
 
 namespace Saritasa.Tools.Common.Utils
@@ -17,7 +17,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Throw the exception to skip item memoization.
         /// </summary>
-#if !PORTABLE && !NETSTANDARD1_2 && !NETSTANDARD1_6 && !NETCOREAPP1_0 && !NETCOREAPP1_1
+#if NET40 || NET452 || NET461
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "GetObjectData is not needed")]
         [Serializable]
 #endif
@@ -39,7 +39,7 @@ namespace Saritasa.Tools.Common.Utils
                 this.result = result;
             }
 
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_6
+#if NET40 || NET452 || NET461
             /// <summary>
             /// .ctor for deserialization.
             /// </summary>
@@ -260,7 +260,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <typeparam name="TResult">Cache function result type.</typeparam>
         /// <param name="maxCount">Max items to cache.</param>
         /// <param name="removeCount">How many items to remove from cache, default is 1.</param>
-        /// <param name="purge">Should whole cache be cleared. If true removeCount parameter is ignored. False by default.</param>
+        /// <param name="purge">Should whole cache be cleared. If <c>true</c> removeCount parameter is ignored. <c>False</c> by default.</param>
         /// <param name="keysStorage">Storage for keys.</param>
         /// <returns>Cache strategy instance delegate.</returns>
         public static CacheStrategy<Tuple<T1, T2>, TResult> CreateMaxCountCacheStrategy<T1, T2, TResult>(

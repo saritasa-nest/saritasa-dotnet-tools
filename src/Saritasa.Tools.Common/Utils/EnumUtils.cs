@@ -2,11 +2,9 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-#if NET35 || NET40
-    using System.Collections.Generic;
-#endif
-#if PORTABLE || !NETSTANDARD1_2 || NETSTANDARD1_6 || NETCOREAPP1_0 || NETCOREAPP1_1
-    using System.ComponentModel;
+#if NET40 || NET452 || NET461
+using System.Collections.Generic;
+using System.ComponentModel;
 #endif
 using System.Linq;
 using System.Reflection;
@@ -18,7 +16,7 @@ namespace Saritasa.Tools.Common.Utils
     /// </summary>
     public static class EnumUtils
     {
-#if !PORTABLE && !NETSTANDARD1_2 && !NETSTANDARD1_6 && !NETCOREAPP1_0 && !NETCOREAPP1_1
+#if NET40 || NET452 || NET461
         /// <summary>
         /// Gets the value of Description attribute.
         /// </summary>
@@ -40,14 +38,14 @@ namespace Saritasa.Tools.Common.Utils
         public static TAttribute GetAttribute<TAttribute>(Enum target)
             where TAttribute : Attribute
         {
-#if !PORTABLE && !NETSTANDARD1_2 && !NETSTANDARD1_6 && !NETCOREAPP1_0 && !NETCOREAPP1_1
+#if NET40 || NET452 || NET461
             if (!target.GetType().IsEnum)
             {
                 throw new ArgumentOutOfRangeException(nameof(target), Properties.Strings.ArgumentMustBeEnum);
             }
 #endif
 
-#if !NETSTANDARD1_2 && !NETSTANDARD1_6
+#if NET40 || NET452 || NET461
             FieldInfo fieldInfo = target.GetType().GetField(target.ToString());
 #else
             FieldInfo fieldInfo = target.GetType().GetTypeInfo().GetDeclaredField(target.ToString());
@@ -57,7 +55,7 @@ namespace Saritasa.Tools.Common.Utils
                 return null;
             }
 
-#if !NET35 && !NET40
+#if NETSTANDARD1_2
             var attributes = fieldInfo.GetCustomAttributes<TAttribute>(false);
 #else
             var attributes =

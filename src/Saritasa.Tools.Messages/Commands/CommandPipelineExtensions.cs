@@ -43,7 +43,7 @@ namespace Saritasa.Tools.Messages.Commands
             [NotNull] this ICommandPipeline commandPipeline,
             HandlerSearchMethod searchMethod)
         {
-            var middleware = (PipelineMiddlewares.CommandHandlerLocatorMiddleware)commandPipeline.GetMiddlewareById("CommandHandlerLocator");
+            var middleware = (PipelineMiddlewares.CommandHandlerLocatorMiddleware)commandPipeline.GetMiddlewareById("Locator");
             if (middleware == null)
             {
                 throw new MiddlewareNotFoundException();

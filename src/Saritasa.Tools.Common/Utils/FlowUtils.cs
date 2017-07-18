@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-#if PORTABLE || NETSTANDARD1_2 || NETSTANDARD1_6 || NETCOREAPP1_0 || NETCOREAPP1_1
+#if NETSTANDARD1_2
 using System.Reflection;
 #endif
 
@@ -20,16 +20,16 @@ namespace Saritasa.Tools.Common.Utils
         /// If any handler throws an error the <see cref="System.AggregateException" /> will be thrown.
         /// </summary>
         public static void RaiseAll<TEventArgs>(object sender, TEventArgs e, ref EventHandler<TEventArgs> eventDelegate)
-#if NET40 || NET35
+#if NET40 || NET452 || NET461
             where TEventArgs : EventArgs
 #endif
         {
-#if !NET40 && !NET35
+#if NETSTANDARD1_2
             var temp = Volatile.Read(ref eventDelegate);
 #else
             var temp = eventDelegate;
 #endif
-#if !PORTABLE && !NETSTANDARD1_2 && !NETSTANDARD1_6 && !NETCOREAPP1_0 && !NETCOREAPP1_1
+#if NET40 || NET452 || NET461
             Thread.MemoryBarrier();
 #endif
             if (temp == null)

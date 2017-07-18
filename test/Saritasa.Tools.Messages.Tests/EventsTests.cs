@@ -132,7 +132,7 @@ namespace Saritasa.Tools.Messages.Tests
             };
             var ep = EventPipeline.CreateDefaultPipeline(resolver, typeof(CommandsTests).GetTypeInfo().Assembly);
             eventsManager.Register(new DomainTestEventHandler());
-            ep.InsertMiddlewareBefore(new DomainEventLocatorMiddleware(eventsManager), "EventLocator");
+            ep.InsertMiddlewareBefore(new DomainEventLocatorMiddleware(eventsManager), "Locator");
             var ev = new DomainTestEvent();
 
             // Act

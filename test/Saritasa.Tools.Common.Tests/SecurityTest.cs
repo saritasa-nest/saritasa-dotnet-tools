@@ -13,6 +13,8 @@ namespace Saritasa.Tools.Common.Tests
     /// </summary>
     public class SecurityTest
     {
+#if NET40 || NET452 || NET461
+
         [Fact]
         public void Validate_md5_hash()
         {
@@ -67,6 +69,8 @@ namespace Saritasa.Tools.Common.Tests
             var isCorrect = SecurityUtils.CheckHash(target, hash);
             Assert.True(isCorrect);
         }
+
+#endif
 
         [Fact]
         public void Convert_BytesToString_should_match_StringToBytes()

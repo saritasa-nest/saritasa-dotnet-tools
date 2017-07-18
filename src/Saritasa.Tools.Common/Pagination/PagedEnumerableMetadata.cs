@@ -8,7 +8,7 @@ namespace Saritasa.Tools.Common.Pagination
     /// <summary>
     /// Pagination metadata class.
     /// </summary>
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_6
+#if NET40 || NET452 || NET461
     [Serializable]
 #endif
     public class PagedEnumerableMetadata : OffsetLimitEnumerableMetadata

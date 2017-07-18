@@ -54,6 +54,7 @@ namespace Saritasa.Tools.Common.Tests
             Assert.Equal(11, dict[1]);
         }
 
+#if NET40 || NET452 || NET461
         [Fact]
         public void Chunk_select_range_should_return_subsets()
         {
@@ -78,6 +79,7 @@ namespace Saritasa.Tools.Common.Tests
             // Assert
             Assert.Equal(31125, sum);
         }
+#endif
 
         [Fact]
         public void Chunk_select_should_return_subsets()

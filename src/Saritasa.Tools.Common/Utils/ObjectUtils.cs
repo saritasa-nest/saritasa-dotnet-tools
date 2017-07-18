@@ -24,7 +24,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <returns>Factory delegate.</returns>
         public static Func<T> CreateTypeFactory<T>() where T : new()
         {
-#if !PORTABLE && !NETSTANDARD1_2 && !NETSTANDARD1_6 && !NETCOREAPP1_0 && !NETCOREAPP1_1
+#if NET40 || NET452 || NET46
             Expression<Func<T>> expr = () => new T();
             NewExpression newExpr = (NewExpression)expr.Body;
 
