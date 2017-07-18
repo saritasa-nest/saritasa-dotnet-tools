@@ -20,7 +20,7 @@
         <dependency id="Microsoft.EntityFrameworkCore" version="[1.1.0, )" />
         <dependency id="Saritasa.Tools.Domain" version="[0.2.0, )" />
       </group>
-      <group targetFramework="netStandard1.3">
+      <group targetFramework="netstandard1.3">
         <dependency id="NETStandard.Library" version="[1.6.0, )" />
         <dependency id="Microsoft.EntityFrameworkCore" version="[1.1.0, )" />
         <dependency id="System.Reflection.Emit.Lightweight" version="[4.3.0, )" />

@@ -94,6 +94,14 @@ Task clean -description 'Clean solution' `
         Remove-Item "./src/$package/bin/*" -Recurse -Force -ErrorAction SilentlyContinue
         Remove-Item "./src/$package/obj/*" -Recurse -Force -ErrorAction SilentlyContinue
     }
+    Remove-Item "./test/Saritasa.Tools.Common.Tests/bin/*" -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item "./test/Saritasa.Tools.Common.Tests/obj/*" -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item "./test/Saritasa.Tools.Messages.Benchmark/bin/*" -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item "./test/Saritasa.Tools.Messages.Benchmark/obj/*" -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item "./test/Saritasa.Tools.Messages.Tests/bin/*" -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item "./test/Saritasa.Tools.Messages.Tests/obj/*" -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item "./test/Saritasa.Tools.Tests/bin/*" -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item "./test/Saritasa.Tools.Tests/obj/*" -Recurse -Force -ErrorAction SilentlyContinue
     Remove-Item './src/StyleCop.Cache' -Force -ErrorAction SilentlyContinue
     Remove-Item './docs/_build' -Recurse -Force -ErrorAction SilentlyContinue
     Remove-Item './docs/conf.py' -ErrorAction SilentlyContinue

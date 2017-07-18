@@ -1,5 +1,5 @@
 ﻿0.2.2 [2017-07-18]
-[*] Decreased dependencies to netStandard1.3 and net452.
+[*] Decreased dependencies to netstandard1.3 and net452.
 [*] EFQueryableRepository now supports async queries.
 
 0.2.1 [2017-07-15]
