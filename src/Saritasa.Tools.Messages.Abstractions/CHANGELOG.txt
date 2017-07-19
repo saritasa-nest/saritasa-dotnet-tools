@@ -1,4 +1,6 @@
 ﻿0.2.0 [TBD]
+[*] Downgrade dependencies to netstandard1.5 and net452.
+[*] Add cancellation token to command and event pipelines.
 
 0.1.1 [2017-02-15]
 [+] Add method CloneToMessage to IMessage interface.

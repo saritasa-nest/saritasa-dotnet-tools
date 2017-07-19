@@ -1,8 +1,8 @@
 ﻿0.2.0 [TBD]
-[*] Update Newtonsoft.Json to 10.0 .
-[*] Add cancellation token to async method.
+[*] Add cancellation token to async method for pipelines and repositories.
 [*] Refactor common messages repositories, bugfix.
 [*] Add pipelines configuration loading from .config file.
+[*] Downgrade dependencies to netstandard1.5 and net452.
 
 0.1.1 [2017-02-13]
 [*] Fix reference to Saritasa.Tools.Domain .
