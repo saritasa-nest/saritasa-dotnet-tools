@@ -18,6 +18,11 @@ namespace Saritasa.Tools.Messages.Abstractions
         byte[] MessageTypes { get; }
 
         /// <summary>
+        /// Middlewares to process messages.
+        /// </summary>
+        IMessagePipelineMiddleware[] Middlewares { get; set; }
+
+        /// <summary>
         /// Add more middlewares to pipeline.
         /// </summary>
         /// <param name="middlewares">Middlewares.</param>

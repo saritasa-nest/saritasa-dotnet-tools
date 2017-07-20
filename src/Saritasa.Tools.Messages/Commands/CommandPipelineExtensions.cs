@@ -13,6 +13,34 @@ namespace Saritasa.Tools.Messages.Commands
     /// </summary>
     public static class CommandPipelineExtensions
     {
+        private const string CommandPipelineKey = ".command-pipeline";
+
+        /// <summary>
+        /// Add command pipeline feature to message context.
+        /// </summary>
+        /// <param name="messageContext">Message context to use.</param>
+        /// <param name="setupAction">Action to setup command pipeline.</param>
+        public static void AddCommandPipeline(this IMessageContext messageContext, Action<CommandPipelineOptions> setupAction)
+        {
+            if (messageContext.GlobalItems.ContainsKey(CommandPipelineKey))
+            {
+                throw new InvalidOperationException("Command pipeline already exists in global context items. " +
+                    "Use RemoveCommandPipeline method to clean up existins pipeline.");
+            }
+            messageContext.AddGlobalItemSafe(CommandPipelineKey, () =>
+            {
+                var commandPipeline = new CommandPipeline();
+                var options = new CommandPipelineOptions();
+                setupAction(options);
+                return commandPipeline;
+            });
+        }
+
+        public static void RemoveCommandPipeline(this IMessageContext messageContext)
+        {
+            // TODO:
+        }
+
         /// <summary>
         /// Use internal IoC container.
         /// </summary>
