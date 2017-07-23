@@ -2,9 +2,10 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Linq;
 using JetBrains.Annotations;
-using Saritasa.Tools.Messages.Common;
 using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Abstractions.Events;
 
 namespace Saritasa.Tools.Messages.Queries
 {
@@ -14,23 +15,37 @@ namespace Saritasa.Tools.Messages.Queries
     public static class QueryPipelineExtensions
     {
         /// <summary>
-        /// Use internal IoC container.
+        /// Add query pipeline feature to message context.
         /// </summary>
-        /// <param name="queryPipeline">Query pipeline.</param>
-        /// <param name="resolveMethodParameters">Resolve method parameters.</param>
-        /// <returns>Query pipeline.</returns>
-        public static IQueryPipeline UseInternalResolver(
-            [NotNull] this IQueryPipeline queryPipeline,
-            bool resolveMethodParameters = true)
+        /// <param name="pipelinesService">Pipelines service.</param>
+        /// <returns>Query pipeline builder.</returns>
+        public static QueryPipelineBuilder AddQueryPipeline(this IPipelinesService pipelinesService)
         {
-            var middleware = (PipelineMiddlewares.QueryObjectResolverMiddleware)queryPipeline.GetMiddlewareById("QueryResolver");
-            if (middleware == null)
+            return AddQueryPipeline(pipelinesService, options => { });
+        }
+
+        /// <summary>
+        /// Add query pipeline feature to message context.
+        /// </summary>
+        /// <param name="pipelinesService">Pipelines service.</param>
+        /// <param name="setupAction">Action to setup query pipeline.</param>
+        /// <returns>Query pipeline builder.</returns>
+        public static QueryPipelineBuilder AddQueryPipeline(this IPipelinesService pipelinesService,
+            Action<QueryPipelineOptions> setupAction)
+        {
+            if (pipelinesService.Pipelines.Any(p => p is IEventPipeline))
             {
-                throw new MiddlewareNotFoundException();
+                throw new InvalidOperationException("Queries pipeline already exists in global context items. " +
+                                                    "Use RemovePipeline method to clean up existins pipeline.");
             }
-            middleware.UseInternalObjectResolver = true;
-            middleware.UseParametersResolve = resolveMethodParameters;
-            return queryPipeline;
+
+            var queryPipeline = new QueryPipeline();
+            setupAction(queryPipeline.Options);
+            var list = pipelinesService.Pipelines.ToList();
+            list.Add(queryPipeline);
+            pipelinesService.Pipelines = list.ToArray();
+
+            return new QueryPipelineBuilder(queryPipeline);
         }
     }
 }

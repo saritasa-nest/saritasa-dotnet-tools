@@ -125,7 +125,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <inheritdoc />
-        public Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery, CancellationToken cancellationToken)
+        public Task<IEnumerable<MessageRecord>> GetAsync(MessageQuery messageQuery, CancellationToken cancellationToken)
         {
             // Collect all files in dir.
             var allFiles =
@@ -157,7 +157,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             }
 
             // Actual search.
-            var targetList = new List<IMessage>(150);
+            var targetList = new List<MessageRecord>(150);
             var date = startDate;
             while (date <= endDate)
             {
@@ -195,8 +195,8 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// </summary>
         /// <param name="stream">Stream to read from.</param>
         /// <param name="query">Message query.</param>
-        /// <returns>Enumerable of messages.</returns>
-        protected abstract IEnumerable<IMessage> ReadMessagesFromStream(
+        /// <returns>Enumerable of message records.</returns>
+        protected abstract IEnumerable<MessageRecord> ReadMessagesFromStream(
             Stream stream,
             MessageQuery query);
 

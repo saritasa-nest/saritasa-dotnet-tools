@@ -19,7 +19,7 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// <summary>
         /// Handles the message in context.
         /// </summary>
-        /// <param name="message">Message execution context.</param>
-        void Handle([NotNull] IMessage message);
+        /// <param name="messageContext">Message execution context.</param>
+        void Handle([NotNull] IMessageContext messageContext);
     }
 }

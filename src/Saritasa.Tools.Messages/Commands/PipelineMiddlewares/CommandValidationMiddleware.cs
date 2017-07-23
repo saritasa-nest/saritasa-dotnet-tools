@@ -1,12 +1,10 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-#if NET452
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
 using Saritasa.Tools.Messages.Abstractions;
-using Saritasa.Tools.Messages.Common;
 
 namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
 {
@@ -24,21 +22,14 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         public bool ThrowException { get; set; } = true;
 
         /// <inheritdoc />
-        public virtual void Handle(IMessage message)
+        public virtual void Handle(IMessageContext messageContext)
         {
-            var commandMessage = message as CommandMessage;
-            if (commandMessage == null)
-            {
-                throw new NotSupportedException(string.Format(Properties.Strings.MessageShouldBeType,
-                    nameof(CommandMessage)));
-            }
-
-            var context = new ValidationContext(commandMessage.Content);
+            var context = new ValidationContext(messageContext.Content);
             var results = new List<ValidationResult>();
-            bool isValid = Validator.TryValidateObject(commandMessage.Content, context, results);
+            bool isValid = Validator.TryValidateObject(messageContext.Content, context, results);
             if (!isValid)
             {
-                commandMessage.Status = ProcessingStatus.Rejected;
+                messageContext.Status = ProcessingStatus.Rejected;
                 if (ThrowException)
                 {
                     throw new CommandValidationException(results);
@@ -47,4 +38,3 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         }
     }
 }
-#endif

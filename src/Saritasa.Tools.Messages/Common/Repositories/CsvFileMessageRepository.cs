@@ -113,7 +113,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             stream.WriteByte(bt);
         }
 
-        private void WriteToFile(IMessage message, CancellationToken cancellationToken)
+        private void WriteToFile(MessageRecord messageRecord, CancellationToken cancellationToken)
         {
             // Id,Type,CreatedAt,Status,ContentType,Content,Data,ErrorType,ErrorMessage,ErrorDetails,ExecutionDuration
             if (needWriteHeader)
@@ -122,17 +122,17 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                 needWriteHeader = false;
             }
 
-            WriteBytes(message.Id.ToString(), currentFileStream);
-            WriteBytes(message.Type, currentFileStream);
-            WriteBytes(message.CreatedAt.ToString("yyyy-MM-ddTHH:mm:ssZ"), currentFileStream);
-            WriteBytes(message.Status.ToString(), currentFileStream);
-            WriteBytes(message.ContentType, currentFileStream);
-            WriteBytes(Encoding.UTF8.GetString(Serializer.Serialize(message.Content)), currentFileStream);
-            WriteBytes(Encoding.UTF8.GetString(Serializer.Serialize(message.Data)), currentFileStream);
-            WriteBytes(message.ErrorType, currentFileStream);
-            WriteBytes(message.ErrorMessage, currentFileStream);
-            WriteBytes(Encoding.UTF8.GetString(Serializer.Serialize(message.Error)), currentFileStream);
-            WriteBytes(message.ExecutionDuration.ToString(), currentFileStream, last: true);
+            WriteBytes(messageRecord.Id.ToString(), currentFileStream);
+            WriteBytes(messageRecord.Type, currentFileStream);
+            WriteBytes(messageRecord.CreatedAt.ToString("yyyy-MM-ddTHH:mm:ssZ"), currentFileStream);
+            WriteBytes(messageRecord.Status.ToString(), currentFileStream);
+            WriteBytes(messageRecord.ContentType, currentFileStream);
+            WriteBytes(Encoding.UTF8.GetString(Serializer.Serialize(messageRecord.Content)), currentFileStream);
+            WriteBytes(Encoding.UTF8.GetString(Serializer.Serialize(messageRecord.Data)), currentFileStream);
+            WriteBytes(messageRecord.ErrorType, currentFileStream);
+            WriteBytes(messageRecord.ErrorMessage, currentFileStream);
+            WriteBytes(Encoding.UTF8.GetString(Serializer.Serialize(messageRecord.Error)), currentFileStream);
+            WriteBytes(messageRecord.ExecutionDuration.ToString(), currentFileStream, last: true);
         }
 
         #region IMessageRepository
@@ -140,7 +140,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         static readonly Task<bool> completedTask = Task.FromResult(true);
 
         /// <inheritdoc />
-        public Task AddAsync(IMessage message, CancellationToken cancellationToken)
+        public Task AddAsync(MessageRecord message, CancellationToken cancellationToken)
         {
             if (disposed)
             {
@@ -173,10 +173,10 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         #endregion
 
         /// <inheritdoc />
-        protected override IEnumerable<IMessage> ReadMessagesFromStream(Stream stream,
+        protected override IEnumerable<MessageRecord> ReadMessagesFromStream(Stream stream,
             MessageQuery query)
         {
-            return new List<Message>();
+            return new List<MessageRecord>();
         }
 
         /// <summary>

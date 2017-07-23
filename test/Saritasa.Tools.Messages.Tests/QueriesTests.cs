@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Abstractions.Queries;
 using Xunit;
 using Saritasa.Tools.Messages.Common;
 using Saritasa.Tools.Messages.Queries;
@@ -14,6 +16,8 @@ namespace Saritasa.Tools.Messages.Tests
     /// </summary>
     public class QueriesTests
     {
+        readonly IPipelinesService pipelinesService = new DefaultPipelinesService();
+
         #region Interfaces
 
         public interface IInterfaceA
@@ -64,8 +68,20 @@ namespace Saritasa.Tools.Messages.Tests
                 {
                     return null;
                 }
-                return new List<int>() { a, b };
+                return new List<int> { a, b };
             }
+        }
+
+        public void SetupQueryPipeline(QueryPipelineBuilder builder)
+        {
+            builder
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectResolverMiddleware()
+                {
+                    UseInternalObjectResolver = true,
+                    UseParametersResolve = true,
+                })
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware())
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectReleaseMiddleware());
         }
 
         #region Can_run_simple_query
@@ -74,10 +90,10 @@ namespace Saritasa.Tools.Messages.Tests
         public void Can_run_simple_query()
         {
             // Arrange
-            var qp = QueryPipeline.CreateDefaultPipeline(QueryPipeline.NullResolver).UseInternalResolver(true);
+            SetupQueryPipeline(pipelinesService.AddQueryPipeline());
 
             // Act
-            var result = qp.Query<QueryObject>().With(q => q.SimpleQuery(10, 20));
+            var result = pipelinesService.Query<QueryObject>().With(q => q.SimpleQuery(10, 20));
 
             // Assert
             Assert.NotNull(result);
@@ -91,10 +107,11 @@ namespace Saritasa.Tools.Messages.Tests
         public void Can_run_query_with_resolving()
         {
             // Arrange
-            var qp = QueryPipeline.CreateDefaultPipeline(QueriesTests.InterfacesResolver).UseInternalResolver();
+            pipelinesService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
+            SetupQueryPipeline(pipelinesService.AddQueryPipeline());
 
             // Act
-            var result = qp.Query<QueryObject>().With(q => q.SimpleQueryWithDependency(10, 20, null));
+            var result = pipelinesService.Query<QueryObject>().With(q => q.SimpleQueryWithDependency(10, 20, null));
 
             // Assert
             Assert.NotNull(result);
@@ -106,12 +123,12 @@ namespace Saritasa.Tools.Messages.Tests
         public void Can_run_query_from_raw_message()
         {
             // Arrange
-            var qp = QueryPipeline.CreateDefaultPipeline(QueriesTests.InterfacesResolver).UseInternalResolver();
-            var message = new Message()
+            pipelinesService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
+            SetupQueryPipeline(pipelinesService.AddQueryPipeline());
+            var messageRecord = new MessageRecord
             {
                 ContentType = "Saritasa.Tools.Messages.Tests.QueriesTests+QueryObject.SimpleQueryWithDependency",
-                Type = Message.MessageTypeQuery,
-                Content = new Dictionary<string, object>()
+                Content = new Dictionary<string, object>
                 {
                     ["a"] = 10,
                     ["b"] = 20,
@@ -120,10 +137,12 @@ namespace Saritasa.Tools.Messages.Tests
             };
 
             // Act
-            qp.ProcessRaw(message);
+            var queryPipeline = pipelinesService.GetPipelineOfType<IQueryPipeline>();
+            var messageContext = queryPipeline.CreateMessageContext(pipelinesService, messageRecord);
+            queryPipeline.Invoke(messageContext);
 
             // Assert
-            Assert.IsType<List<int>>(message.Content);
+            Assert.IsType<List<int>>(messageContext.GetResult<object>());
         }
 
         #region Can_run_query_with_private_object_ctor
@@ -145,7 +164,7 @@ namespace Saritasa.Tools.Messages.Tests
 
             public IList<string> Query()
             {
-                return new List<string>() { dependencyA.GetTestValue(), dependencyB.GetTestValue() };
+                return new List<string> { dependencyA.GetTestValue(), dependencyB.GetTestValue() };
             }
         }
 
@@ -153,15 +172,39 @@ namespace Saritasa.Tools.Messages.Tests
         public void Can_run_query_with_private_object_ctor()
         {
             // Arrange
-            var qp = QueryPipeline.CreateDefaultPipeline(QueriesTests.InterfacesResolver).UseInternalResolver();
+            pipelinesService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
+            SetupQueryPipeline(pipelinesService.AddQueryPipeline());
 
             // Act
-            var result = qp.Query<QueryObjectWithPrivateCtor>().With(q => q.Query());
+            var result = pipelinesService.Query<QueryObjectWithPrivateCtor>().With(q => q.Query());
 
             // Assert
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
             Assert.Equal("A", result[0]);
+        }
+
+        #endregion
+
+        #region Can_run_query_from_raw_message_2
+
+        [Fact]
+        public void Can_run_query_from_raw_message_2()
+        {
+            // Arrange
+            pipelinesService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
+            SetupQueryPipeline(pipelinesService.AddQueryPipeline());
+            var messageContext = new MessageContext(pipelinesService);
+            var queryPipeline = pipelinesService.GetPipelineOfType<IQueryPipeline>();
+            var ret = queryPipeline.CreateMessageContext<QueryObject>(pipelinesService, messageContext)
+                .With(q => q.SimpleQuery(10, 10));
+
+            // Act
+            queryPipeline.Invoke(messageContext);
+
+            // Assert
+            var result = messageContext.GetResult<object>();
+            Assert.IsType<List<int>>(result);
         }
 
         #endregion

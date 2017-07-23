@@ -1,9 +1,10 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-using JetBrains.Annotations;
-using Saritasa.Tools.Messages.Common;
+using System;
 using Saritasa.Tools.Messages.Abstractions;
+using System.Linq;
+using Saritasa.Tools.Messages.Abstractions.Events;
 
 namespace Saritasa.Tools.Messages.Events
 {
@@ -13,42 +14,37 @@ namespace Saritasa.Tools.Messages.Events
     public static class EventPipelineExtensions
     {
         /// <summary>
-        /// Use internal IoC container.
+        /// Add events pipeline feature to message context.
         /// </summary>
-        /// <param name="eventPipeline">Event pipeline.</param>
-        /// <param name="resolveMethodParameters">Resolve method parameters.</param>
-        /// <returns>Event pipeline.</returns>
-        public static IEventPipeline UseInternalResolver(
-            [NotNull] this IEventPipeline eventPipeline,
-            bool resolveMethodParameters = true)
+        /// <param name="pipelinesService">Pipelines service.</param>
+        /// <returns>Event pipeline builder.</returns>
+        public static EventPipelineBuilder AddEventPipeline(this IPipelinesService pipelinesService)
         {
-            var middleware = (PipelineMiddlewares.EventExecutorMiddleware)eventPipeline.GetMiddlewareById("EventExecutor");
-            if (middleware == null)
-            {
-                throw new MiddlewareNotFoundException();
-            }
-            middleware.UseInternalObjectResolver = true;
-            middleware.UseParametersResolve = resolveMethodParameters;
-            return eventPipeline;
+            return AddEventPipeline(pipelinesService, options => { });
         }
 
         /// <summary>
-        /// Use another method to search handlers.
+        /// Add event pipeline feature to message context.
         /// </summary>
-        /// <param name="eventPipeline">Event pipeline.</param>
-        /// <param name="searchMethod">Handlers search method.</param>
-        /// <returns>Event pipeline.</returns>
-        public static IEventPipeline UseHandlerSearchMethod(
-            [NotNull] this IEventPipeline eventPipeline,
-            HandlerSearchMethod searchMethod)
+        /// <param name="pipelinesService">Pipelines service.</param>
+        /// <param name="setupAction">Action to setup event pipeline.</param>
+        /// <returns>Event pipeline builder.</returns>
+        public static EventPipelineBuilder AddEventPipeline(this IPipelinesService pipelinesService,
+            Action<EventPipelineOptions> setupAction)
         {
-            var middleware = (PipelineMiddlewares.EventHandlerLocatorMiddleware)eventPipeline.GetMiddlewareById("EventLocator");
-            if (middleware == null)
+            if (pipelinesService.Pipelines.Any(p => p is IEventPipeline))
             {
-                throw new MiddlewareNotFoundException();
+                throw new InvalidOperationException("Events pipeline already exists in global context items. " +
+                                                    "Use RemovePipeline method to clean up existins pipeline.");
             }
-            middleware.HandlerSearchMethod = searchMethod;
-            return eventPipeline;
+
+            var eventPipeline = new EventPipeline();
+            setupAction(eventPipeline.Options);
+            var list = pipelinesService.Pipelines.ToList();
+            list.Add(eventPipeline);
+            pipelinesService.Pipelines = list.ToArray();
+
+            return new EventPipelineBuilder(eventPipeline);
         }
     }
 }

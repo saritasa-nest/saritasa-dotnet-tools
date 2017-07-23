@@ -76,7 +76,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         static readonly Task<bool> completedTask = Task.FromResult(true);
 
         /// <inheritdoc />
-        public Task AddAsync(IMessage context, CancellationToken cancellationToken)
+        public Task AddAsync(MessageRecord messageRecord, CancellationToken cancellationToken)
         {
             if (disposed)
             {
@@ -98,7 +98,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                     }
                     currentBinarySerializer = new MessageBinarySerializer(CurrentStream, Serializer, null);
                 }
-                currentBinarySerializer.Write(context);
+                currentBinarySerializer.Write(messageRecord);
             }
 
             if (!BufferStream)
@@ -123,7 +123,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         #endregion
 
         /// <inheritdoc />
-        protected override IEnumerable<IMessage> ReadMessagesFromStream(Stream stream,
+        protected override IEnumerable<MessageRecord> ReadMessagesFromStream(Stream stream,
             MessageQuery query)
         {
             if (compress)
@@ -131,7 +131,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                 stream = new GZipStream(stream, CompressionMode.Decompress, false);
             }
             var commandSerializer = new MessageBinarySerializer(stream, Serializer, query.Assemblies.ToArray());
-            for (Message message; (message = commandSerializer.Read()) != null;)
+            for (MessageRecord message; (message = commandSerializer.Read()) != null;)
             {
                 if (query.Match(message))
                 {

@@ -15,13 +15,13 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         /// <inheritdoc />
         public string Id { get; set; } = "Data";
 
-        readonly Action<IDictionary<string, string>> action;
+        readonly Action<IDictionary<object, object>> action;
 
         /// <summary>
         /// .ctor
         /// </summary>
         /// <param name="action">The action to be executed.</param>
-        public DataMiddleware(Action<IDictionary<string, string>> action)
+        public DataMiddleware(Action<IDictionary<object, object>> action)
         {
             if (action == null)
             {
@@ -31,9 +31,9 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public virtual void Handle(IMessage context)
+        public virtual void Handle(IMessageContext messageContext)
         {
-            action(context.Data);
+            action(messageContext.Items);
         }
     }
 }

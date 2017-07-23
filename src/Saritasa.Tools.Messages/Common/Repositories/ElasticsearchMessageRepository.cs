@@ -74,7 +74,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <inheritdoc />
-        public async Task AddAsync(IMessage message, CancellationToken cancellationToken)
+        public async Task AddAsync(MessageRecord messageRecord, CancellationToken cancellationToken)
         {
             if (disposed)
             {
@@ -83,15 +83,15 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
             await client
                 .PutAsync(
-                    $"{uri}/{IndexName}/{IndexTypeName}/{message.Id}",
-                    new ByteArrayContent(serializer.Serialize(((Message)message).CloneToMessage())),
+                    $"{uri}/{IndexName}/{IndexTypeName}/{messageRecord.Id}",
+                    new ByteArrayContent(serializer.Serialize(messageRecord)),
                     cancellationToken
                 )
                 .ConfigureAwait(false);
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery, CancellationToken cancellationToken)
+        public async Task<IEnumerable<MessageRecord>> GetAsync(MessageQuery messageQuery, CancellationToken cancellationToken)
         {
             if (disposed)
             {

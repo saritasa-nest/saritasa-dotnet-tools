@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Saritasa.Tools.Messages.Abstractions
+namespace Saritasa.Tools.Messages.Abstractions.Commands
 {
     /// <summary>
     /// The class that contains commands handers should be marked

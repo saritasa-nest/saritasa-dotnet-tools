@@ -3,9 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-#if NET452
 using System.ComponentModel.DataAnnotations;
-#endif
 using Saritasa.Tools.Domain.Exceptions;
 
 namespace Saritasa.Tools.Messages.Commands
@@ -57,7 +55,6 @@ namespace Saritasa.Tools.Messages.Commands
         /// </summary>
         public bool HasErrors => brokenRules.Count > 0;
 
-#if NET452
         /// <summary>
         /// .ctor
         /// </summary>
@@ -77,7 +74,6 @@ namespace Saritasa.Tools.Messages.Commands
                 }
             }
         }
-#endif
 
         /// <summary>
         /// .ctor

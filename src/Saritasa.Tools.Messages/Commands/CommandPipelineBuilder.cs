@@ -3,6 +3,7 @@
 
 using System;
 using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Abstractions.Commands;
 using Saritasa.Tools.Messages.Common;
 
 namespace Saritasa.Tools.Messages.Commands
@@ -27,7 +28,7 @@ namespace Saritasa.Tools.Messages.Commands
         /// <returns>Command pipeline builder.</returns>
         public CommandPipelineBuilder AddMiddleware(IMessagePipelineMiddleware middleware)
         {
-            AddMiddlewareInternal(middleware);
+            Pipeline.AddMiddlewares(middleware);
             return this;
         }
     }

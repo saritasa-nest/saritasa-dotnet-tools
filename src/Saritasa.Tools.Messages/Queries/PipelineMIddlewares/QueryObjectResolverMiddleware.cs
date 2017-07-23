@@ -19,52 +19,47 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
         /// <summary>
         /// .ctor
         /// </summary>
-        /// <param name="parameters">Dictionary with parameters.</param>
-        public QueryObjectResolverMiddleware(IDictionary<string, string> parameters) : base(parameters)
+        public QueryObjectResolverMiddleware()
         {
         }
 
         /// <summary>
         /// .ctor
         /// </summary>
-        /// <param name="resolver">Resolver func.</param>
-        public QueryObjectResolverMiddleware(Func<Type, object> resolver) : base(resolver)
+        /// <param name="parameters">Dictionary with parameters.</param>
+        public QueryObjectResolverMiddleware(IDictionary<string, string> parameters) : base(parameters)
         {
-            Id = "QueryResolver";
         }
 
         /// <inheritdoc />
-        public override void Handle(IMessage message)
+        public override void Handle(IMessageContext messageContext)
         {
-            var queryMessage = message as QueryMessage;
-            if (queryMessage == null)
-            {
-                throw new NotSupportedException(string.Format(Properties.Strings.MessageShouldBeType,
-                    nameof(QueryMessage)));
-            }
+            var queryParams = (QueryParameters)messageContext.Items[QueryPipeline.QueryParametersKey];
 
-            var queryObjectType = queryMessage.QueryObject.GetType();
-            if (queryMessage.FakeQueryObject)
+            var queryObjectType = queryParams.QueryObject.GetType();
+            if (queryParams.FakeQueryObject)
             {
-                queryMessage.QueryObject = ResolveObject(queryObjectType, nameof(QueryObjectResolverMiddleware));
+                queryParams.QueryObject = ResolveObject(queryObjectType, messageContext.ServiceProvider,
+                    nameof(QueryObjectResolverMiddleware));
             }
-            if (queryMessage.QueryObject == null)
+            if (queryParams.QueryObject == null)
             {
                 throw new InvalidOperationException(
                     string.Format(Properties.Strings.CannotResolveQueryObject, queryObjectType));
             }
             if (UseParametersResolve)
             {
-                TypeHelpers.ResolveForParameters(queryMessage.Parameters, queryMessage.Method.GetParameters(), Resolver);
+                TypeHelpers.ResolveForParameters(queryParams.Parameters, queryParams.Method.GetParameters(),
+                    messageContext.ServiceProvider.GetService);
             }
         }
 
         static readonly Task<bool> completedTask = Task.FromResult(true);
 
         /// <inheritdoc />
-        public override Task HandleAsync(IMessage message, CancellationToken cancellationToken)
+        public override Task HandleAsync(IMessageContext messageContext, CancellationToken cancellationToken)
         {
-            Handle(message);
+            Handle(messageContext);
             return completedTask;
         }
     }

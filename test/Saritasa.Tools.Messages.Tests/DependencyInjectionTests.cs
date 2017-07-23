@@ -2,14 +2,13 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
+using Xunit;
 using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Abstractions.Commands;
 using Saritasa.Tools.Messages.Commands;
 using Saritasa.Tools.Messages.Common;
-using Xunit;
 
 namespace Saritasa.Tools.Messages.Tests
 {
@@ -18,6 +17,8 @@ namespace Saritasa.Tools.Messages.Tests
     /// </summary>
     public class DependencyInjectionTests
     {
+        private readonly IPipelinesService pipelinesService = new DefaultPipelinesService();
+
         public interface IInterfaceA
         {
             string GetTestValue();
@@ -72,15 +73,21 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [Fact]
-        public void Should_dispose_command_handlers_after_instaniate()
+        public void Should_dispose_command_handlers_after_instaniate_if_self_created()
         {
             // Arrange
-            var cp = CommandPipeline.CreateDefaultPipeline(CommandPipeline.NullResolver,
-                    typeof(DependencyInjectionTests).GetTypeInfo().Assembly).UseInternalResolver();
+            pipelinesService.AddCommandPipeline()
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
+                    typeof(CommandsTests).GetTypeInfo().Assembly))
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandExecutorMiddleware
+                {
+                    UseInternalObjectResolver = true,
+                    UseParametersResolve = true
+                });
             var cmd = new TestCommand();
 
             // Act
-            cp.Handle(cmd);
+            pipelinesService.HandleCommand(cmd);
 
             // Assert
             Assert.True(TestCommandHandler.IsDisposed);
@@ -90,54 +97,21 @@ namespace Saritasa.Tools.Messages.Tests
         public async Task Should_dispose_command_handlers_after_instaniate_async()
         {
             // Arrange
-            var cp = CommandPipeline.CreateDefaultPipeline(CommandPipeline.NullResolver,
-                typeof(DependencyInjectionTests).GetTypeInfo().Assembly).UseInternalResolver();
+            pipelinesService.AddCommandPipeline()
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
+                    typeof(CommandsTests).GetTypeInfo().Assembly))
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandExecutorMiddleware
+                {
+                    UseInternalObjectResolver = true,
+                    UseParametersResolve = true
+                });
             var cmd = new TestCommand();
 
             // Act
-            await cp.HandleAsync(cmd);
+            await pipelinesService.HandleCommandAsync(cmd);
 
             // Assert
             Assert.True(TestCommandHandler.IsDisposed);
-        }
-
-        #endregion
-
-        #region Should dispose resolved parameters after instaniate
-
-        public class TestCommandA
-        {
-        }
-
-        [CommandHandlers]
-        public class TestCommandAHandler : IDisposable
-        {
-            public static bool IsDisposed { get; set; }
-
-            public void HandleTestCommand(TestCommandA command, IInterfaceA a)
-            {
-                IsDisposed = false;
-            }
-
-            public void Dispose()
-            {
-                IsDisposed = true;
-            }
-        }
-
-        [Fact]
-        public void Should_dispose_resolved_parameters_after_instaniate()
-        {
-            // Arrange
-            var cp = CommandPipeline.CreateDefaultPipeline(CommandPipeline.NullResolver,
-                typeof(DependencyInjectionTests).GetTypeInfo().Assembly).UseInternalResolver();
-            var cmd = new TestCommandA();
-
-            // Act
-            cp.Handle(cmd);
-
-            // Assert
-            Assert.True(ImplementationA.IsDisposed);
         }
 
         #endregion

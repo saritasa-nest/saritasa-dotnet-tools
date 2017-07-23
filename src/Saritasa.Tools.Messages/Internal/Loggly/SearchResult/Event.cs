@@ -1,9 +1,9 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-using Newtonsoft.Json;
-using Saritasa.Tools.Messages.Common;
 using System.Collections.Generic;
+using Newtonsoft.Json;
+using Saritasa.Tools.Messages.Abstractions;
 
 namespace Saritasa.Tools.Messages.Internal.Loggly.SearchResult
 {
@@ -25,7 +25,7 @@ namespace Saritasa.Tools.Messages.Internal.Loggly.SearchResult
     internal class EventContent
     {
         [JsonProperty("json")]
-        public Message Json { get; set; }
+        public MessageRecord Json { get; set; }
 
         [JsonProperty("http")]
         public Dictionary<string, string> Http { get; set; }

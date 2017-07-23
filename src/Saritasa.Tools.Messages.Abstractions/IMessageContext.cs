@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace Saritasa.Tools.Messages.Abstractions
 {
     /// <summary>
-    /// Message context.
+    /// Message context. Contains objects to execute, metadata and current execution state.
     /// </summary>
     public interface IMessageContext
     {
@@ -15,6 +15,17 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// Unique message id.
         /// </summary>
         Guid Id { get; }
+
+        /// <summary>
+        /// Current service provider.
+        /// </summary>
+        IServiceProvider ServiceProvider { get; }
+
+        /// <summary>
+        /// Identifier for content. Can be used to determine unique
+        /// processing content type.
+        /// </summary>
+        string ContentId { get; set; }
 
         /// <summary>
         /// Current message content. May be command object or event object.
@@ -29,22 +40,12 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// <summary>
         /// Exception that describes error when status is failed.
         /// </summary>
-        Exception FailedException { get; set; }
-
-        /// <summary>
-        /// Current used service provider.
-        /// </summary>
-        IServiceProvider ServiceProvider { get; set; }
+        Exception FailException { get; set; }
 
         /// <summary>
         /// Local key/value collection of objects that are shared across current message scope.
+        /// Expect that dictionary implementation can not be thread safe.
         /// </summary>
         IDictionary<object, object> Items { get; set; }
-
-        /// <summary>
-        /// Global key/value collection of objects that are shared globally between every
-        /// message context creation.
-        /// </summary>
-        IDictionary<object, object> GlobalItems { get; set; }
     }
 }

@@ -20,7 +20,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <summary>
         /// All stored messages.
         /// </summary>
-        public IList<IMessage> Messages { get; }
+        public IList<MessageRecord> Messages { get; }
 
         private readonly object objLock = new object();
 
@@ -33,7 +33,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// </summary>
         public InMemoryMessageRepository()
         {
-            Messages = new List<IMessage>();
+            Messages = new List<MessageRecord>();
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <inheritdoc />
-        public Task AddAsync(IMessage message, CancellationToken cancellationToken)
+        public Task AddAsync(MessageRecord message, CancellationToken cancellationToken)
         {
             lock (objLock)
             {
@@ -55,7 +55,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <inheritdoc />
-        public Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery, CancellationToken cancellationToken)
+        public Task<IEnumerable<MessageRecord>> GetAsync(MessageQuery messageQuery, CancellationToken cancellationToken)
         {
             lock (objLock)
             {

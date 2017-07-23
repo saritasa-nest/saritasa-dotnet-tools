@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
 using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Abstractions.Events;
 using Saritasa.Tools.Messages.Common;
 using Saritasa.Tools.Messages.Internal;
 
@@ -16,11 +17,13 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
     /// </summary>
     public class EventHandlerLocatorMiddleware : BaseHandlerLocatorMiddleware
     {
-        const string HandlerPrefix = "Handle";
+        private const string HandlerPrefix = "Handle";
 
-        readonly Assembly[] assemblies;
+        internal const string HandlerMethodsKey = "handler-methods";
 
-        IList<MethodInfo> eventHandlers;
+        private readonly Assembly[] assemblies;
+
+        private IList<MethodInfo> eventHandlers;
 
         /// <inheritdoc />
         public EventHandlerLocatorMiddleware(IDictionary<string, string> dict) : base(dict)
@@ -60,17 +63,10 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public override void Handle(IMessage message)
+        public override void Handle(IMessageContext messageContext)
         {
-            var eventMessage = message as EventMessage;
-            if (eventMessage == null)
-            {
-                throw new NotSupportedException(string.Format(Properties.Strings.MessageShouldBeType,
-                    nameof(EventMessage)));
-            }
-
             // Find handler methods.
-            var eventtype = eventMessage.Content.GetType();
+            var eventtype = messageContext.Content.GetType();
             if (InternalLogger.IsDebugEnabled)
             {
                 InternalLogger.Debug(string.Format(Properties.Strings.SearchEventHandler, eventtype.Name),
@@ -102,13 +98,18 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
                 }
             }
 
-            if (eventMessage.HandlerMethods == null)
+            if (messageContext.Items.ContainsKey(HandlerMethodsKey))
             {
-                eventMessage.HandlerMethods = methods;
+                var list = (IList<MethodInfo>)messageContext.Items[HandlerMethodsKey];
+                for (int i = 0; i < methods.Count; i++)
+                {
+                    list.Add(methods[i]);
+                }
+                messageContext.Items[HandlerMethodsKey] = list.ToArray();
             }
             else
             {
-                eventMessage.HandlerMethods.AddRange(methods);
+                messageContext.Items[HandlerMethodsKey] = methods.ToArray();
             }
         }
     }

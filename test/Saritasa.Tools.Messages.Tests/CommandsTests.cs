@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using Xunit;
 using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Abstractions.Commands;
 using Saritasa.Tools.Messages.Common;
 using Saritasa.Tools.Messages.Commands;
 
@@ -16,6 +17,8 @@ namespace Saritasa.Tools.Messages.Tests
     /// </summary>
     public class CommandsTests
     {
+        private readonly IPipelinesService pipelinesService = new DefaultPipelinesService();
+
         #region Shared interfaces
 
         public interface IInterfaceA
@@ -71,16 +74,27 @@ namespace Saritasa.Tools.Messages.Tests
             }
         }
 
+        private void SetupCommandPipeline(CommandPipelineBuilder builder)
+        {
+            builder.AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
+                typeof(CommandsTests).GetTypeInfo().Assembly))
+            .AddMiddleware(new Commands.PipelineMiddlewares.CommandExecutorMiddleware
+            {
+                UseInternalObjectResolver = true,
+                UseParametersResolve = true
+            });
+        }
+
         [Fact]
         public void Can_run_default_simple_pipeline()
         {
             // Arrange
-            var cp = CommandPipeline.CreateDefaultPipeline(CommandPipeline.NullResolver,
-                typeof(CommandsTests).GetTypeInfo().Assembly).UseInternalResolver();
+            var builder = pipelinesService.AddCommandPipeline();
+            SetupCommandPipeline(builder);
             var cmd = new SimpleTestCommand { Id = 5 };
 
             // Act
-            cp.Handle(cmd);
+            pipelinesService.HandleCommand(cmd);
 
             // Assert
             Assert.Equal("result", cmd.Out);
@@ -104,12 +118,12 @@ namespace Saritasa.Tools.Messages.Tests
         public void Command_with_handle_in_it_should_run()
         {
             // Arrange
-            var cp = CommandPipeline.CreateDefaultPipeline(CommandPipeline.NullResolver,
-                typeof(CommandsTests).GetTypeInfo().Assembly).UseInternalResolver();
+            var builder = pipelinesService.AddCommandPipeline();
+            SetupCommandPipeline(builder);
             var cmd = new SimpleTestCommandWithHandler();
 
             // Act
-            cp.Handle(cmd);
+            pipelinesService.HandleCommand(cmd);
 
             // Assert
             Assert.Equal("result", cmd.Param);
@@ -133,12 +147,13 @@ namespace Saritasa.Tools.Messages.Tests
         public void Command_with_handle_in_it_and_deps_should_run()
         {
             // Arrange
-            var cp = CommandPipeline.CreateDefaultPipeline(InterfacesResolver,
-                typeof(CommandsTests).GetTypeInfo().Assembly).UseInternalResolver();
+            pipelinesService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
+            var builder = pipelinesService.AddCommandPipeline();
+            SetupCommandPipeline(builder);
             var cmd = new TestCommandWithHandlerAndDeps();
 
             // Act
-            cp.Handle(cmd);
+            pipelinesService.HandleCommand(cmd);
 
             // Assert
             Assert.Equal("AB", cmd.Param);
@@ -168,12 +183,13 @@ namespace Saritasa.Tools.Messages.Tests
         public void Can_run_command_handler_with_public_properties_resolve()
         {
             // Arrange
-            var cp = CommandPipeline.CreateDefaultPipeline(InterfacesResolver,
-                typeof(CommandsTests).GetTypeInfo().Assembly).UseInternalResolver();
+            pipelinesService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
+            var builder = pipelinesService.AddCommandPipeline();
+            SetupCommandPipeline(builder);
             var cmd = new TestCommand2();
 
             // Act
-            cp.Handle(cmd);
+            pipelinesService.HandleCommand(cmd);
 
             // Assert
             Assert.Equal(1, cmd.Param);
@@ -208,12 +224,13 @@ namespace Saritasa.Tools.Messages.Tests
         public void Can_run_command_handler_with_ctor_properties_resolve()
         {
             // Arrange
-            var cp = CommandPipeline.CreateDefaultPipeline(InterfacesResolver,
-                typeof(CommandsTests).GetTypeInfo().Assembly).UseInternalResolver(true);
+            pipelinesService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
+            var builder = pipelinesService.AddCommandPipeline();
+            SetupCommandPipeline(builder);
             var cmd = new TestCommand3();
 
             // Act
-            cp.Handle(cmd);
+            pipelinesService.HandleCommand(cmd);
 
             // Assert
             Assert.Equal(1, cmd.Param);
@@ -242,23 +259,29 @@ namespace Saritasa.Tools.Messages.Tests
         public void Validation_command_attributes_should_generate_exception_for_bad_command()
         {
             // Arrange
-            var cp = CommandPipeline.CreateDefaultPipeline(CommandPipeline.NullResolver,
-                Assembly.GetAssembly(typeof(CommandsTests))).UseInternalResolver();
-            cp.InsertMiddlewareAfter(
-                new Commands.PipelineMiddlewares.CommandValidationMiddleware(), "CommandHandlerLocator");
-            var cmd = new CommandWithValidation()
+            pipelinesService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
+            pipelinesService.AddCommandPipeline()
+            .AddMiddleware(new Commands.PipelineMiddlewares.CommandValidationMiddleware())
+            .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
+                typeof(CommandsTests).GetTypeInfo().Assembly))
+            .AddMiddleware(new Commands.PipelineMiddlewares.CommandExecutorMiddleware()
+            {
+                UseInternalObjectResolver = true,
+                UseParametersResolve = true
+            });
+            var cmd = new CommandWithValidation
             {
                 PercentInt = -10,
                 Name = string.Empty,
             };
 
             // Act & assert
-            Assert.Throws<CommandValidationException>(() => { cp.Handle(cmd); });
+            Assert.Throws<CommandValidationException>(() => { pipelinesService.HandleCommand(cmd); });
             Assert.NotEqual(10, cmd.PercentInt);
 
             cmd.PercentInt = 20;
             cmd.Name = "Mr Robot";
-            cp.Handle(cmd);
+            pipelinesService.HandleCommand(cmd);
             Assert.Equal(10, cmd.PercentInt);
         }
 
@@ -266,10 +289,15 @@ namespace Saritasa.Tools.Messages.Tests
         public void Validation_command_attributes_should_not_generate_exception_for_good_command()
         {
             // Arrange
-            var cp = CommandPipeline.CreateDefaultPipeline(CommandPipeline.NullResolver,
-                Assembly.GetAssembly(typeof(CommandsTests))).UseInternalResolver();
-            cp.InsertMiddlewareAfter(
-                new Commands.PipelineMiddlewares.CommandValidationMiddleware(), "CommandHandlerLocator");
+            pipelinesService.AddCommandPipeline()
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandValidationMiddleware())
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
+                    typeof(CommandsTests).GetTypeInfo().Assembly))
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandExecutorMiddleware
+                {
+                    UseInternalObjectResolver = true,
+                    UseParametersResolve = true
+                });
             var cmd = new CommandWithValidation()
             {
                 PercentInt = 20,
@@ -277,7 +305,7 @@ namespace Saritasa.Tools.Messages.Tests
             };
 
             // Act
-            cp.Handle(cmd);
+            pipelinesService.HandleCommand(cmd);
 
             // Assert
             Assert.Equal(10, cmd.PercentInt);
@@ -296,11 +324,14 @@ namespace Saritasa.Tools.Messages.Tests
         public void If_command_handler_not_found_generate_exception()
         {
             // Arrange
-            var cp = CommandPipeline.CreateDefaultPipeline(CommandPipeline.NullResolver,
-                typeof(CommandsTests).GetTypeInfo().Assembly);
+            var builder = pipelinesService.AddCommandPipeline();
+            SetupCommandPipeline(builder);
 
             // Act & assert
-            Assert.Throws<CommandHandlerNotFoundException>(() => { cp.Handle(new CommandWithNoHandler()); });
+            Assert.Throws<CommandHandlerNotFoundException>(() =>
+            {
+                pipelinesService.HandleCommand(new CommandWithNoHandler());
+            });
         }
 
         #endregion
@@ -326,13 +357,21 @@ namespace Saritasa.Tools.Messages.Tests
         public void Can_find_handler_with_ClassSuffix_search_method()
         {
             // Arrange
-            var cp = CommandPipeline.CreateDefaultPipeline(CommandPipeline.NullResolver,
-                typeof(CommandsTests).GetTypeInfo().Assembly).UseInternalResolver()
-                    .UseHandlerSearchMethod(HandlerSearchMethod.ClassSuffix);
+            pipelinesService.AddCommandPipeline()
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
+                    typeof(CommandsTests).GetTypeInfo().Assembly)
+                {
+                    HandlerSearchMethod = HandlerSearchMethod.ClassSuffix
+                })
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandExecutorMiddleware
+                {
+                    UseInternalObjectResolver = true,
+                    UseParametersResolve = true
+                });
             var cmd = new SimpleTestCommand2 { Id = 6 };
 
             // Act
-            cp.Handle(cmd);
+            pipelinesService.HandleCommand(cmd);
 
             // Assert
             Assert.Equal("out", cmd.Out);

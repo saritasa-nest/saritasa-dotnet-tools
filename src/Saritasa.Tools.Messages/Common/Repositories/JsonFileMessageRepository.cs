@@ -60,9 +60,9 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
         private static readonly byte[] newLine = Encoding.UTF8.GetBytes(Environment.NewLine);
 
-        private void WriteToFile(IMessage message)
+        private void WriteToFile(MessageRecord message)
         {
-            var jsonBytes = Serializer.Serialize(message.CloneToMessage());
+            var jsonBytes = Serializer.Serialize(message);
             currentFileStream.Write(jsonBytes, 0, jsonBytes.Length);
             currentFileStream.Write(newLine, 0, newLine.Length);
         }
@@ -72,7 +72,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         static readonly Task<bool> completedTask = Task.FromResult(true);
 
         /// <inheritdoc />
-        public Task AddAsync(IMessage message, CancellationToken cancellationToken)
+        public Task AddAsync(MessageRecord messageRecord, CancellationToken cancellationToken)
         {
             if (disposed)
             {
@@ -87,7 +87,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                     Close();
                     currentFileStream = new FileStream(System.IO.Path.Combine(Path, name), FileMode.Append);
                 }
-                WriteToFile(message);
+                WriteToFile(messageRecord);
             }
 
             if (!BufferStream)
@@ -104,10 +104,10 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         #endregion
 
         /// <inheritdoc />
-        protected override IEnumerable<IMessage> ReadMessagesFromStream(Stream stream,
+        protected override IEnumerable<MessageRecord> ReadMessagesFromStream(Stream stream,
             MessageQuery query)
         {
-            return new List<Message>();
+            return new List<MessageRecord>();
         }
 
         /// <summary>

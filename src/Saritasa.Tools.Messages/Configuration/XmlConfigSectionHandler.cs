@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System.Xml;
 using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Common;
 
 namespace Saritasa.Tools.Messages.Configuration
 {
@@ -106,7 +107,7 @@ namespace Saritasa.Tools.Messages.Configuration
                 {
                     throw new MessagesConfigurationException($"Cannot instaniate pipeline middleware {type.Name}.");
                 }
-                pipeline.AppendMiddlewares(middleware);
+                pipeline.AddMiddlewares(middleware);
             }
         }
     }

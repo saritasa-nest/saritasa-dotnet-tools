@@ -5,13 +5,13 @@ using System;
 using System.Linq.Expressions;
 using JetBrains.Annotations;
 
-namespace Saritasa.Tools.Messages.Abstractions
+namespace Saritasa.Tools.Messages.Abstractions.Queries
 {
     /// <summary>
     /// The interface should be used to make actual calls to query methods.
     /// </summary>
     /// <typeparam name="TQuery">Query object type.</typeparam>
-    public interface ICaller<TQuery> where TQuery : class
+    public interface IQueryCaller<TQuery> where TQuery : class
     {
         /// <summary>
         /// Calls delegate from expression.

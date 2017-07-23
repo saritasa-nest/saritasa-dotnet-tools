@@ -12,22 +12,25 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
     public class QueryObjectReleaseMiddleware : IMessagePipelineMiddleware
     {
         /// <inheritdoc />
-        public string Id { get; } = "Release";
+        public string Id { get; set; }
+
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        public QueryObjectReleaseMiddleware()
+        {
+            Id = this.GetType().Name;
+        }
 
         /// <inheritdoc />
-        public virtual void Handle(IMessage message)
+        public virtual void Handle(IMessageContext messageContext)
         {
-            var queryMessage = message as QueryMessage;
-            if (queryMessage == null)
-            {
-                throw new NotSupportedException(string.Format(Properties.Strings.MessageShouldBeType,
-                    nameof(QueryMessage)));
-            }
+            var queryParams = (QueryParameters)messageContext.Items[QueryPipeline.QueryParametersKey];
 
             // Release handler.
-            var disposable = queryMessage.QueryObject as IDisposable;
+            var disposable = queryParams.QueryObject as IDisposable;
             disposable?.Dispose();
-            queryMessage.QueryObject = null;
+            queryParams.QueryObject = null;
         }
     }
 }

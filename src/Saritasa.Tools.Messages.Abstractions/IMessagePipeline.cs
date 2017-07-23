@@ -2,7 +2,8 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 
 namespace Saritasa.Tools.Messages.Abstractions
@@ -13,7 +14,7 @@ namespace Saritasa.Tools.Messages.Abstractions
     public interface IMessagePipeline
     {
         /// <summary>
-        /// Available message types to process.
+        /// Available message types the pipeline as able to process.
         /// </summary>
         byte[] MessageTypes { get; }
 
@@ -23,54 +24,19 @@ namespace Saritasa.Tools.Messages.Abstractions
         IMessagePipelineMiddleware[] Middlewares { get; set; }
 
         /// <summary>
-        /// Add more middlewares to pipeline.
+        /// Process prepared message context thru all middlewares.
         /// </summary>
-        /// <param name="middlewares">Middlewares.</param>
-        void AppendMiddlewares(params IMessagePipelineMiddleware[] middlewares);
+        /// <param name="messageContext">Message context.</param>
+        void Invoke([NotNull] IMessageContext messageContext);
 
         /// <summary>
-        /// Gets all middlewares.
+        /// Process prepared message context thru all middlewares. Middlewares should support
+        /// <see cref="IAsyncMessagePipelineMiddleware" /> interface. Otherwise they will be called
+        /// in sync mode.
         /// </summary>
-        /// <returns>Middlewares.</returns>
-        IEnumerable<IMessagePipelineMiddleware> GetMiddlewares();
-
-        /// <summary>
-        /// Get middle by its id. If not found null will be returned.
-        /// </summary>
-        /// <param name="id">Middleware id.</param>
-        /// <returns>Middleware or null if not found.</returns>
-        IMessagePipelineMiddleware GetMiddlewareById([NotNull] string id);
-
-        /// <summary>
-        /// Insert middleware after specified one. If not specified it will be inserted as last.
-        /// </summary>
-        /// <param name="middleware">Middleware to insert.</param>
-        /// <param name="insertAfterId">Insert after middleware with specified id. If null will be inserted
-        /// as last.</param>
-        void InsertMiddlewareAfter(
-            [NotNull] IMessagePipelineMiddleware middleware,
-            string insertAfterId = null);
-
-        /// <summary>
-        /// Insert middleware before specified one. If not specified it will be inserted as first.
-        /// </summary>
-        /// <param name="middleware">Middleware to insert.</param>
-        /// <param name="insertBeforeId">Insert before middleware with specified id. If null will be inserted
-        /// as first.</param>
-        void InsertMiddlewareBefore(
-            [NotNull] IMessagePipelineMiddleware middleware,
-            string insertBeforeId);
-
-        /// <summary>
-        /// Remove middleware by id.
-        /// </summary>
-        /// <param name="id">Middleware id.</param>
-        void RemoveMiddleware([NotNull] string id);
-
-        /// <summary>
-        /// Process raw message, for example, from deserialization.
-        /// </summary>
-        /// <param name="message">Message.</param>
-        void ProcessRaw([NotNull] IMessage message);
+        /// <param name="messageContext">Message context.</param>
+        /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+        Task InvokeAsync([NotNull] IMessageContext messageContext,
+            CancellationToken cancellationToken = default(CancellationToken));
     }
 }

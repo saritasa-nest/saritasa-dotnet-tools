@@ -182,7 +182,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <inheritdoc />
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities",
             Justification = "Parameters are used")]
-        public async Task AddAsync(IMessage message, CancellationToken cancellationToken)
+        public async Task AddAsync(MessageRecord messageRecord, CancellationToken cancellationToken)
         {
             if (disposed)
             {
@@ -215,7 +215,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             try
             {
                 connection = GetConnection();
-                await ExecuteAddMessageCommandAsync(connection, message, cancellationToken).ConfigureAwait(false);
+                await ExecuteAddMessageCommandAsync(connection, messageRecord, cancellationToken).ConfigureAwait(false);
             }
             finally
             {
@@ -227,23 +227,23 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             }
         }
 
-        private async Task ExecuteAddMessageCommandAsync(DbConnection connection, IMessage message,
+        private async Task ExecuteAddMessageCommandAsync(DbConnection connection, MessageRecord messageRecord,
             CancellationToken cancellationToken)
         {
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = queryProvider.GetInsertMessageScript();
-                AddParameter(command, "@Type", message.Type);
-                AddParameter(command, "@ContentId", message.Id.ToString());
-                AddParameter(command, "@ContentType", message.ContentType);
-                AddParameter(command, "@Content", serializer.Serialize(message.Content));
-                AddParameter(command, "@Data", message.Data != null ? serializer.Serialize(message.Data) : null);
-                AddParameter(command, "@ErrorDetails", message.Error != null ? serializer.Serialize(message.Error) : null);
-                AddParameter(command, "@ErrorMessage", message.ErrorMessage);
-                AddParameter(command, "@ErrorType", message.ErrorType);
-                AddParameter(command, "@CreatedAt", message.CreatedAt);
-                AddParameter(command, "@ExecutionDuration", message.ExecutionDuration);
-                AddParameter(command, "@Status", (byte)message.Status);
+                AddParameter(command, "@Type", messageRecord.Type);
+                AddParameter(command, "@ContentId", messageRecord.Id.ToString());
+                AddParameter(command, "@ContentType", messageRecord.ContentType);
+                AddParameter(command, "@Content", serializer.Serialize(messageRecord.Content));
+                AddParameter(command, "@Data", messageRecord.Data != null ? serializer.Serialize(messageRecord.Data) : null);
+                AddParameter(command, "@ErrorDetails", messageRecord.Error != null ? serializer.Serialize(messageRecord.Error) : null);
+                AddParameter(command, "@ErrorMessage", messageRecord.ErrorMessage);
+                AddParameter(command, "@ErrorType", messageRecord.ErrorType);
+                AddParameter(command, "@CreatedAt", messageRecord.CreatedAt);
+                AddParameter(command, "@ExecutionDuration", messageRecord.ExecutionDuration);
+                AddParameter(command, "@Status", (byte)messageRecord.Status);
                 await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
             }
         }
@@ -328,7 +328,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <inheritdoc />
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities",
             Justification = "Parameters are used")]
-        public async Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery, CancellationToken cancellationToken)
+        public async Task<IEnumerable<MessageRecord>> GetAsync(MessageQuery messageQuery, CancellationToken cancellationToken)
         {
             if (disposed)
             {
@@ -336,7 +336,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             }
 
             // Execute.
-            IList<Message> messages = new List<Message>();
+            var messages = new List<MessageRecord>();
             var connection = GetConnection();
             using (var command = connection.CreateCommand())
             {
@@ -345,24 +345,25 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                 {
                     while (await reader.ReadAsync(cancellationToken))
                     {
-                        var message = new Message
+                        var messageRecord = new MessageRecord
                         {
                             Type = reader.GetByte(1),
                             Id = reader.GetGuid(2),
                             ContentType = reader.GetString(3)
                         };
                         var content = serializer.IsText ? Encoding.UTF8.GetBytes(reader.GetString(4)) : (byte[])reader[4];
-                        TypeHelpers.ResolveTypeForContent(message, content, serializer, messageQuery.Assemblies.ToArray());
-                        message.Data = (IDictionary<string, string>)serializer.Deserialize(Encoding.UTF8.GetBytes(reader.GetString(5)), typeof(IDictionary<string, string>));
+                        TypeHelpers.ResolveTypeForContent(messageRecord, content, serializer, messageQuery.Assemblies.ToArray());
+                        messageRecord.Data = (IDictionary<string, string>)serializer.Deserialize(
+                            Encoding.UTF8.GetBytes(reader.GetString(5)), typeof(IDictionary<string, string>));
                         var error = serializer.IsText ? Encoding.UTF8.GetBytes(reader.GetString(7)) : (byte[])reader[7];
-                        TypeHelpers.ResolveTypeForError(message, error, serializer, messageQuery.Assemblies.ToArray());
-                        message.ErrorMessage = reader.GetString(7);
-                        message.ErrorType = reader.GetString(8);
-                        message.CreatedAt = reader.GetDateTime(9);
-                        message.ExecutionDuration = reader.GetInt32(10);
-                        message.Status = (ProcessingStatus)reader.GetByte(11);
+                        TypeHelpers.ResolveTypeForError(messageRecord, error, serializer, messageQuery.Assemblies.ToArray());
+                        messageRecord.ErrorMessage = reader.GetString(7);
+                        messageRecord.ErrorType = reader.GetString(8);
+                        messageRecord.CreatedAt = reader.GetDateTime(9);
+                        messageRecord.ExecutionDuration = reader.GetInt32(10);
+                        messageRecord.Status = (ProcessingStatus)reader.GetByte(11);
 
-                        messages.Add(message);
+                        messages.Add(messageRecord);
                     }
                 }
             }

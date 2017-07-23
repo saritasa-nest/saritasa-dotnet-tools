@@ -11,20 +11,28 @@ namespace Saritasa.Tools.Messages.Common
     /// </summary>
     public static class MessageContextExtensions
     {
-        private static readonly object lockObj = new object();
-
         /// <summary>
-        /// Add item to global items collections in thread safe mode.
+        /// Get typed object from message context items. Throws exception if not exists.
         /// </summary>
-        /// <param name="messageContext">Message context to use.</param>
-        /// <param name="key">Key.</param>
-        /// <param name="valueFunc">Value factory.</param>
-        public static void AddGlobalItemSafe(this IMessageContext messageContext, object key, Func<object> valueFunc)
+        /// <typeparam name="T">Object type.</typeparam>
+        /// <param name="messageContext">Message context.</param>
+        /// <param name="key">Object key.</param>
+        /// <exception cref="InvalidOperationException">Item with specified key not exists or has incorrect type.</exception>
+        /// <returns>Item.</returns>
+        public static T GetItemByKey<T>(this IMessageContext messageContext, string key)
+            where T : class
         {
-            lock (lockObj)
+            object obj;
+            if (messageContext.Items.TryGetValue(key, out obj))
             {
-                messageContext.GlobalItems[key] = valueFunc();
+                var typedObj = obj as T;
+                if (typedObj != null)
+                {
+                    return typedObj;
+                }
             }
+            throw new InvalidOperationException($"The message context items dictionary expects to have item with \"{key}\" " +
+                $"and type {typeof(T).Name}");
         }
     }
 }

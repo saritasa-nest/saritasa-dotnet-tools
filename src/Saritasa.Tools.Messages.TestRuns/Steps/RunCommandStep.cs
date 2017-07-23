@@ -5,6 +5,7 @@ using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Abstractions.Commands;
 using Saritasa.Tools.Messages.TestRuns.Internal;
 
 namespace Saritasa.Tools.Messages.TestRuns.Steps
@@ -39,10 +40,10 @@ namespace Saritasa.Tools.Messages.TestRuns.Steps
         }
 
         /// <summary>
-        /// .ctor to create from <see cref="IMessage" />.
+        /// .ctor to create from <see cref="IMessageContext" />.
         /// </summary>
         /// <param name="message">Message.</param>
-        public RunCommandStep(IMessage message)
+        public RunCommandStep(IMessageContext message)
         {
             if (message == null)
             {
@@ -50,7 +51,7 @@ namespace Saritasa.Tools.Messages.TestRuns.Steps
             }
 
             this.id = message.Id;
-            this.commandType = message.ContentType;
+            this.commandType = message.ContentId;
             this.command = message.Content;
         }
 
@@ -79,7 +80,7 @@ namespace Saritasa.Tools.Messages.TestRuns.Steps
         /// <inheritdoc />
         public void Run(TestRunExecutionContext context)
         {
-            if (!typeWasResolved)
+            /*if (!typeWasResolved)
             {
                 throw new TestRunException($"Cannot load type {this.commandType} for id {this.id}.");
             }
@@ -89,7 +90,7 @@ namespace Saritasa.Tools.Messages.TestRuns.Steps
                 throw new TestRunException($"Cannot resolve {nameof(ICommandPipeline)}.");
             }
             commandPipeline.Handle(command);
-            context.LastResult = command;
+            context.LastResult = command;*/
         }
 
         /// <inheritdoc />

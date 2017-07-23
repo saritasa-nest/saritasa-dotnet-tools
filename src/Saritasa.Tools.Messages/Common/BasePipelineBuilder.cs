@@ -26,21 +26,5 @@ namespace Saritasa.Tools.Messages.Common
         {
             this.Pipeline = pipeline;
         }
-
-        internal void AddMiddlewareInternal(IMessagePipelineMiddleware middleware)
-        {
-            if (middleware == null)
-            {
-                throw new ArgumentNullException(nameof(middleware));
-            }
-            if (Pipeline.Middlewares == null)
-            {
-                Pipeline.Middlewares = new IMessagePipelineMiddleware[1];
-                return;
-            }
-            var list = Pipeline.Middlewares.ToList();
-            list.Add(middleware);
-            Pipeline.Middlewares = list.ToArray();
-        }
     }
 }

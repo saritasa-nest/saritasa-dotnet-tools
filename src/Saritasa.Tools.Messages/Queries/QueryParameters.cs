@@ -3,14 +3,13 @@
 
 using System;
 using System.Reflection;
-using Saritasa.Tools.Messages.Common;
 
 namespace Saritasa.Tools.Messages.Queries
 {
     /// <summary>
     /// Query execution context.
     /// </summary>
-    public class QueryMessage : Message
+    public class QueryParameters
     {
         /// <summary>
         /// Query handler.
@@ -21,20 +20,6 @@ namespace Saritasa.Tools.Messages.Queries
         /// Query handler method to execute.
         /// </summary>
         protected internal MethodInfo HandlerMethod { get; set; }
-
-        /// <inheritdoc />
-        public override string ErrorMessage => Error?.Message ?? string.Empty;
-
-        /// <inheritdoc />
-        public override string ErrorType => Error != null ? Error.GetType().FullName : string.Empty;
-
-        /// <summary>
-        /// Information about the exception source.
-        /// </summary>
-        public System.Runtime.ExceptionServices.ExceptionDispatchInfo ErrorDispatchInfo { get; set; }
-
-        /// <inheritdoc />
-        public override string ContentType { get; set; }
 
         /// <summary>
         /// Execution result.
@@ -52,7 +37,7 @@ namespace Saritasa.Tools.Messages.Queries
         protected internal object QueryObject { get; set; }
 
         /// <summary>
-        /// If true QueryObject has been created by Caller.
+        /// If true QueryObject has been created by QueryCaller.
         /// </summary>
         protected internal bool FakeQueryObject { get; set; }
 
@@ -60,13 +45,5 @@ namespace Saritasa.Tools.Messages.Queries
         /// Function input parameters.
         /// </summary>
         protected internal object[] Parameters { get; set; }
-
-        /// <summary>
-        /// .ctor
-        /// </summary>
-        public QueryMessage()
-        {
-            Type = Message.MessageTypeQuery;
-        }
     }
 }

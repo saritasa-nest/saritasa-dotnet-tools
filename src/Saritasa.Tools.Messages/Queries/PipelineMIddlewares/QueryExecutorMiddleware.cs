@@ -5,6 +5,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Common;
 
 namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
 {
@@ -14,78 +15,63 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
     public class QueryExecutorMiddleware : IMessagePipelineMiddleware, IAsyncMessagePipelineMiddleware
     {
         /// <inheritdoc />
-        public string Id => "QueryExecutor";
+        public string Id { get; set; }
+
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        public QueryExecutorMiddleware()
+        {
+            Id = this.GetType().Name;
+        }
 
         /// <inheritdoc />
-        public virtual void Handle(IMessage message)
+        public virtual void Handle(IMessageContext messageContext)
         {
-            var queryMessage = message as QueryMessage;
-            if (queryMessage == null)
-            {
-                throw new NotSupportedException(string.Format(Properties.Strings.MessageShouldBeType,
-                    nameof(QueryMessage)));
-            }
+            var queryParams = messageContext.GetItemByKey<QueryParameters>(QueryPipeline.QueryParametersKey);
 
             // Invoke method and resolve parameters if needed.
-            var stopWatch = System.Diagnostics.Stopwatch.StartNew();
             try
             {
-                queryMessage.Result = queryMessage.Method.Invoke(queryMessage.QueryObject, queryMessage.Parameters);
-                queryMessage.Status = ProcessingStatus.Completed;
+                queryParams.Result = queryParams.Method.Invoke(queryParams.QueryObject, queryParams.Parameters);
+                messageContext.Items[MessageContextConstants.ResultKey] = queryParams.Result;
+                messageContext.Status = ProcessingStatus.Completed;
             }
             catch (Exception ex)
             {
-                queryMessage.Status = ProcessingStatus.Failed;
+                messageContext.Status = ProcessingStatus.Failed;
                 var innerException = ex.InnerException;
                 if (innerException != null)
                 {
-                    queryMessage.Error = innerException;
-                    queryMessage.ErrorDispatchInfo = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(innerException);
+                    messageContext.FailException = innerException;
                 }
-            }
-            finally
-            {
-                stopWatch.Stop();
-                queryMessage.ExecutionDuration = (int)stopWatch.ElapsedMilliseconds;
             }
         }
 
         /// <inheritdoc />
-        public virtual async Task HandleAsync(IMessage message, CancellationToken cancellationToken)
+        public virtual async Task HandleAsync(IMessageContext messageContext, CancellationToken cancellationToken)
         {
-            var queryMessage = message as QueryMessage;
-            if (queryMessage == null)
-            {
-                throw new NotSupportedException(string.Format(Properties.Strings.MessageShouldBeType,
-                    nameof(QueryMessage)));
-            }
+            var queryParams = (QueryParameters)messageContext.Items[QueryPipeline.QueryParametersKey];
 
             // Invoke method and resolve parameters if needed.
-            var stopWatch = System.Diagnostics.Stopwatch.StartNew();
             try
             {
-                queryMessage.Result = queryMessage.Method.Invoke(queryMessage.QueryObject, queryMessage.Parameters);
-                var taskResult = queryMessage.Result as Task;
+                queryParams.Result = queryParams.Method.Invoke(queryParams.QueryObject, queryParams.Parameters);
+                var taskResult = queryParams.Result as Task;
                 if (taskResult != null)
                 {
                     await taskResult;
                 }
-                queryMessage.Status = ProcessingStatus.Completed;
+                messageContext.Status = ProcessingStatus.Completed;
             }
             catch (Exception ex)
             {
-                queryMessage.Status = ProcessingStatus.Failed;
+                messageContext.Status = ProcessingStatus.Failed;
                 var innerException = ex.InnerException;
                 if (innerException != null)
                 {
-                    queryMessage.Error = innerException;
-                    queryMessage.ErrorDispatchInfo = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(innerException);
+                    messageContext.FailException = innerException;
                 }
-            }
-            finally
-            {
-                stopWatch.Stop();
-                queryMessage.ExecutionDuration = (int)stopWatch.ElapsedMilliseconds;
             }
         }
     }

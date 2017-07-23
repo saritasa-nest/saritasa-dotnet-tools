@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
@@ -18,7 +19,12 @@ namespace Saritasa.Tools.Messages.Common
         /// <summary>
         /// Middlewares list.
         /// </summary>
-        protected IList<IMessagePipelineMiddleware> Middlewares { get; set; } = new List<IMessagePipelineMiddleware>();
+        public IMessagePipelineMiddleware[] Middlewares { get; set; }
+
+        /// <summary>
+        /// Options.
+        /// </summary>
+        public MessagePipelineOptions Options { get; set; } = new MessagePipelineOptions();
 
         #region IMessagePipeline
 
@@ -26,118 +32,28 @@ namespace Saritasa.Tools.Messages.Common
         public virtual byte[] MessageTypes => new byte[] { };
 
         /// <inheritdoc />
-        public void AppendMiddlewares(params IMessagePipelineMiddleware[] middlewares)
+        public virtual void Invoke(IMessageContext messageContext)
         {
-            foreach (var middleware in middlewares)
+            Stopwatch stopwatch = null;
+            if (Options.IncludeExecutionDuration)
             {
-                Middlewares.Add(middleware);
-            }
-            var ids = Middlewares.GroupBy(m => m.Id).Where(m => m.Count() > 1).ToArray();
-            if (ids.Any())
-            {
-                Middlewares.Clear();
-                throw new ArgumentException(string.Format(Properties.Strings.MiddlewareDuplicate, ids.First().Key));
-            }
-        }
-
-        /// <inheritdoc />
-        public IMessagePipelineMiddleware GetMiddlewareById(string id)
-        {
-            return Middlewares.FirstOrDefault(m => m.Id == id);
-        }
-
-        /// <inheritdoc />
-        public void InsertMiddlewareAfter(IMessagePipelineMiddleware middleware, string insertAfterId = null)
-        {
-            if (middleware == null)
-            {
-                throw new ArgumentNullException(nameof(middleware));
-            }
-            if (GetMiddlewareById(middleware.Id) != null)
-            {
-                throw new ArgumentException(string.Format(Properties.Strings.MiddlewareExists, middleware.Id));
+                stopwatch = new Stopwatch();
+                stopwatch.Start();
             }
 
-            if (string.IsNullOrEmpty(insertAfterId))
+            for (int i = 0; i < Middlewares.Length; i++)
             {
-                Middlewares.Add(middleware);
-            }
-            else
-            {
-                var insertAfterMiddleware = GetMiddlewareById(insertAfterId);
-                if (insertAfterMiddleware == null)
-                {
-                    throw new MiddlewareNotFoundException();
-                }
-                Middlewares.Insert(Middlewares.IndexOf(insertAfterMiddleware) + 1, middleware);
-            }
-        }
-
-        /// <inheritdoc />
-        public void InsertMiddlewareBefore(IMessagePipelineMiddleware middleware, string insertBeforeId = null)
-        {
-            if (middleware == null)
-            {
-                throw new ArgumentNullException(nameof(middleware));
-            }
-            if (GetMiddlewareById(middleware.Id) != null)
-            {
-                throw new ArgumentException(string.Format(Properties.Strings.MiddlewareExists, middleware.Id));
+                Middlewares[i].Handle(messageContext);
             }
 
-            if (string.IsNullOrEmpty(insertBeforeId))
+            if (stopwatch != null)
             {
-                Middlewares.Insert(0, middleware);
+                stopwatch.Stop();
+                messageContext.Items[MessageContextConstants.ExecutionDurationKey] = (int)stopwatch.ElapsedMilliseconds;
             }
-            else
+            if (Options.ThrowExceptionOnFail && messageContext.FailException != null)
             {
-                var insertBeforeMiddleware = GetMiddlewareById(insertBeforeId);
-                if (insertBeforeMiddleware == null)
-                {
-                    throw new MiddlewareNotFoundException();
-                }
-                Middlewares.Insert(Middlewares.IndexOf(insertBeforeMiddleware), middleware);
-            }
-        }
-
-        /// <inheritdoc />
-        public void RemoveMiddleware(string id)
-        {
-            var middleware = GetMiddlewareById(id);
-            if (middleware == null)
-            {
-                throw new MiddlewareNotFoundException();
-            }
-            Middlewares.Remove(middleware);
-        }
-
-        /// <inheritdoc />
-        public IEnumerable<IMessagePipelineMiddleware> GetMiddlewares()
-        {
-            return Middlewares;
-        }
-
-        /// <inheritdoc />
-        public virtual void ProcessRaw(IMessage message)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
-
-        /// <summary>
-        /// Processes the message thru all middlewares.
-        /// </summary>
-        /// <param name="message">The message.</param>
-        protected void ProcessMiddlewares(IMessage message)
-        {
-            // Set execution context.
-            MessageExecutionContext.Current = new MessageExecutionContext(message, this);
-
-            // Execute message thru all middlewares.
-            for (int i = 0; i < Middlewares.Count; i++)
-            {
-                Middlewares[i].Handle(message);
+                throw new MessageProcessingException("Processing exception.", messageContext.FailException);
             }
         }
 
@@ -146,27 +62,43 @@ namespace Saritasa.Tools.Messages.Common
         /// <see cref="IAsyncMessagePipelineMiddleware" /> interface. Otherwise it will be called
         /// in sync mode.
         /// </summary>
-        /// <param name="message">The message.</param>
+        /// <param name="messageContext">The message context.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
-        protected async Task ProcessMiddlewaresAsync(IMessage message, CancellationToken cancellationToken)
+        public async Task InvokeAsync(IMessageContext messageContext, CancellationToken cancellationToken)
         {
-            // Set execution context.
-            MessageExecutionContext.Current = new MessageExecutionContext(message, this);
+            Stopwatch stopwatch = null;
+            if (Options.IncludeExecutionDuration)
+            {
+                stopwatch = new Stopwatch();
+                stopwatch.Start();
+            }
 
             // Execute message thru all middlewares.
-            for (int i = 0; i < Middlewares.Count; i++)
+            for (int i = 0; i < Middlewares.Length; i++)
             {
                 var asyncHandler = Middlewares[i] as IAsyncMessagePipelineMiddleware;
                 if (asyncHandler != null)
                 {
-                    await asyncHandler.HandleAsync(message, cancellationToken).ConfigureAwait(false);
+                    await asyncHandler.HandleAsync(messageContext, cancellationToken).ConfigureAwait(false);
                 }
                 else
                 {
-                    Middlewares[i].Handle(message);
+                    Middlewares[i].Handle(messageContext);
                 }
             }
+
+            if (stopwatch != null)
+            {
+                stopwatch.Stop();
+                messageContext.Items[MessageContextConstants.ExecutionDurationKey] = (int)stopwatch.ElapsedMilliseconds;
+            }
+            if (Options.ThrowExceptionOnFail && messageContext.FailException != null)
+            {
+                throw new MessageProcessingException("Processing exception.", messageContext.FailException);
+            }
         }
+
+        #endregion
 
         #region Dispose
 
@@ -184,7 +116,6 @@ namespace Saritasa.Tools.Messages.Common
                         var disposableMiddleware = middleware as IDisposable;
                         disposableMiddleware?.Dispose();
                     }
-                    Middlewares.Clear();
                     Middlewares = null;
                 }
                 disposed = true;

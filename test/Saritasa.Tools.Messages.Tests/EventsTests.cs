@@ -6,8 +6,9 @@ using System.Reflection;
 using Xunit;
 using Saritasa.Tools.Domain;
 using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Abstractions.Events;
+using Saritasa.Tools.Messages.Common;
 using Saritasa.Tools.Messages.Events;
-using Saritasa.Tools.Messages.Events.PipelineMiddlewares;
 
 namespace Saritasa.Tools.Messages.Tests
 {
@@ -16,6 +17,8 @@ namespace Saritasa.Tools.Messages.Tests
     /// </summary>
     public class EventsTests
     {
+        private readonly IPipelinesService pipelinesService = new DefaultPipelinesService();
+
         #region Shared interfaces
 
         public interface IInterfaceA
@@ -82,13 +85,25 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
+        private void SetupEventPipeline(EventPipelineBuilder builder)
+        {
+            builder
+            .AddMiddleware(new Events.PipelineMiddlewares.EventHandlerLocatorMiddleware(
+                typeof(EventsTests).GetTypeInfo().Assembly))
+            .AddMiddleware(new Events.PipelineMiddlewares.EventExecutorMiddleware
+            {
+                UseInternalObjectResolver = true,
+                UseParametersResolve = true
+            });
+        }
+
         [Fact]
         public void Events_should_be_fired_withing_all_classes()
         {
             // Arrange
-            var ep = EventPipeline.CreateDefaultPipeline(InterfacesResolver,
-                typeof(CommandsTests).GetTypeInfo().Assembly).UseInternalResolver();
-            var ev = new CreateUserEvent()
+            pipelinesService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
+            SetupEventPipeline(pipelinesService.AddEventPipeline());
+            var ev = new CreateUserEvent
             {
                 UserId = 10,
                 FirstName = "Ivan",
@@ -96,7 +111,7 @@ namespace Saritasa.Tools.Messages.Tests
             };
 
             // Act
-            ep.Raise(ev);
+            pipelinesService.RaiseEvent(ev);
 
             // Assert
             Assert.Equal(3, ev.HandlersCount);
@@ -104,12 +119,12 @@ namespace Saritasa.Tools.Messages.Tests
 
         #region Domain_events_can_be_integrated_to_events_pipeline
 
-        class DomainTestEvent
+        private class DomainTestEvent
         {
             public int Param { get; set; }
         }
 
-        class DomainTestEventHandler : IDomainEventHandler<DomainTestEvent>
+        private class DomainTestEventHandler : IDomainEventHandler<DomainTestEvent>
         {
             public void Handle(DomainTestEvent @event)
             {
@@ -122,21 +137,28 @@ namespace Saritasa.Tools.Messages.Tests
         {
             // Arrange
             var eventsManager = new DomainEventsManager();
-            Func<Type, object> resolver = (type) =>
+            eventsManager.Register(new DomainTestEventHandler());
+            object Resolver(Type type)
             {
                 if (type == typeof(IDomainEventsManager))
                 {
                     return eventsManager;
                 }
                 return null;
-            };
-            var ep = EventPipeline.CreateDefaultPipeline(resolver, typeof(CommandsTests).GetTypeInfo().Assembly);
-            eventsManager.Register(new DomainTestEventHandler());
-            ep.InsertMiddlewareBefore(new DomainEventLocatorMiddleware(eventsManager), "Locator");
+            }
+
+            pipelinesService.ServiceProvider = new FuncServiceProvider(Resolver);
+            pipelinesService.AddEventPipeline()
+                .AddMiddleware(new Events.PipelineMiddlewares.DomainEventLocatorMiddleware(eventsManager))
+                .AddMiddleware(new Events.PipelineMiddlewares.EventExecutorMiddleware
+                {
+                    UseInternalObjectResolver = true,
+                    UseParametersResolve = true
+                });
             var ev = new DomainTestEvent();
 
             // Act
-            ep.Raise(ev);
+            pipelinesService.RaiseEvent(ev);
 
             // Assert
             Assert.Equal(42, ev.Param);

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using Saritasa.Tools.Messages.Internal;
 using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Abstractions.Queries;
 using Saritasa.Tools.Messages.Common;
 
 namespace Saritasa.Tools.Messages.Queries
@@ -17,12 +18,19 @@ namespace Saritasa.Tools.Messages.Queries
     /// </summary>
     public class QueryPipeline : MessagePipeline, IQueryPipeline
     {
-        static readonly byte[] availableMessageTypes = { Message.MessageTypeQuery };
+        internal const string QueryParametersKey = ".query-parameters";
+
+        private static readonly byte[] availableMessageTypes = { MessageContextConstants.MessageTypeQuery };
 
         /// <inheritdoc />
         public override byte[] MessageTypes => availableMessageTypes;
 
-        static QueryMessage CreateMessage(Delegate func, params object[] args)
+        /// <summary>
+        /// Options.
+        /// </summary>
+        public new QueryPipelineOptions Options { get; set; } = new QueryPipelineOptions();
+
+        private static QueryParameters CreateMessage(Delegate func, params object[] args)
         {
 #if NET452
             var method = func.Method;
@@ -30,167 +38,49 @@ namespace Saritasa.Tools.Messages.Queries
             var method = func.GetInvocationList()[0].GetMethodInfo();
 #endif
 
-            return new QueryMessage()
+            return new QueryParameters
             {
-                ContentType = method.DeclaringType.FullName + "." + method.Name,
-                Content = method.GetParameters().ToDictionary(p => p.Name, v => args[v.Position]),
-                CreatedAt = DateTime.Now,
-                Status = ProcessingStatus.Processing,
                 Parameters = args,
                 Method = method,
                 QueryObject = Activator.CreateInstance(method.GetBaseDefinition().DeclaringType, nonPublic: true),
-                FakeQueryObject = true,
+                FakeQueryObject = true
             };
         }
 
-        void ProcessPipeline(QueryMessage message)
+        /// <inheritdoc />
+        public virtual IQueryCaller<TQuery> Query<TQuery>(IPipelinesService pipelinesService) where TQuery : class
         {
-            ProcessMiddlewares(message);
-            message.ErrorDispatchInfo?.Throw();
-        }
-
-        /// <summary>
-        /// The class wraps query object and makes actual call to query pipeline.
-        /// </summary>
-        /// <typeparam name="TQuery">Query type.</typeparam>
-        public struct Caller<TQuery> : ICaller<TQuery> where TQuery : class
-        {
-            TQuery query;
-
-            readonly QueryPipeline queryPipeline;
-
-            /// <summary>
-            /// .ctor
-            /// </summary>
-            /// <param name="queryPipeline">Query pipeline.</param>
-            public Caller(QueryPipeline queryPipeline)
-            {
-                this.query = null;
-                this.queryPipeline = queryPipeline;
-            }
-
-            /// <summary>
-            /// .ctor
-            /// </summary>
-            /// <param name="queryPipeline">Query pipeline.</param>
-            /// <param name="query">Query object.</param>
-            public Caller(QueryPipeline queryPipeline, TQuery query) : this(queryPipeline)
-            {
-                if (query == null)
-                {
-                    throw new ArgumentNullException(nameof(query));
-                }
-                this.query = query;
-            }
-
-            /// <inheritdoc />
-            public TResult With<TResult>(Expression<Func<TQuery, TResult>> expression)
-            {
-                bool fakeQueryObject = false;
-                if (query == null)
-                {
-                    query = (TQuery)Activator.CreateInstance(typeof(TQuery), nonPublic: true);
-                    fakeQueryObject = true;
-                }
-
-                var mce = expression.Body as MethodCallExpression;
-                if (mce == null)
-                {
-                    throw new InvalidOperationException(Properties.Strings.ExpressionMethodCallExpressionBody);
-                }
-                var args = mce.Arguments.Select(PartiallyEvaluateExpression).ToArray();
-                var method = mce.Method;
-                if (method.DeclaringType == null)
-                {
-                    throw new InvalidOperationException(Properties.Strings.MethodNoTypeDeclare);
-                }
-                var message = new QueryMessage()
-                {
-                    ContentType = method.DeclaringType.FullName + "." + method.Name,
-                    Content = method.GetParameters().ToDictionary(p => p.Name, v => args[v.Position]),
-                    CreatedAt = DateTime.Now,
-                    Status = ProcessingStatus.Processing,
-                    Parameters = args,
-                    QueryObject = query,
-                    FakeQueryObject = fakeQueryObject,
-                    Method = method,
-                };
-                queryPipeline.ProcessPipeline(message);
-                return (TResult)message.Result;
-            }
-        }
-
-        private static object PartiallyEvaluateExpression(Expression expression)
-        {
-            switch (expression.NodeType)
-            {
-                case ExpressionType.Constant:
-                    return ((ConstantExpression)expression).Value;
-                case ExpressionType.MemberAccess:
-                    var objectMember = Expression.Convert(expression, typeof(object));
-                    var getterLambda = Expression.Lambda<Func<object>>(objectMember);
-                    var getter = getterLambda.Compile();
-                    return getter();
-                default:
-                    throw new InvalidOperationException(
-                        string.Format(Properties.Strings.CannotEvaluateExpression, expression.NodeType));
-            }
+            var messageContext = new MessageContext(pipelinesService);
+            return new QueryCaller<TQuery>(this, messageContext);
         }
 
         /// <inheritdoc />
-        public virtual ICaller<TQuery> Query<TQuery>() where TQuery : class
+        public virtual IQueryCaller<TQuery> Query<TQuery>(IPipelinesService pipelinesService, TQuery obj) where TQuery : class
         {
-            return new Caller<TQuery>(this);
+            var messageContext = new MessageContext(pipelinesService, obj);
+            return new QueryCaller<TQuery>(this, messageContext, obj);
         }
 
         /// <inheritdoc />
-        public virtual ICaller<TQuery> Query<TQuery>(TQuery obj) where TQuery : class
+        public IQueryCaller<TQuery> CreateMessageContext<TQuery>(IPipelinesService pipelinesService,
+            IMessageContext messageContext) where TQuery : class
         {
-            return new Caller<TQuery>(this, obj);
+            return new QueryCaller<TQuery>(this, messageContext).NoExecution();
         }
 
-        /// <summary>
-        /// Resolver that always returns null values.
-        /// </summary>
-        /// <param name="type">Type to resolve.</param>
-        /// <returns>Null.</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "type",
-            Justification = "Mock method")]
-        public static object NullResolver(Type type)
+        /// <inheritdoc />
+        public IMessageContext CreateMessageContext(IPipelinesService pipelinesService, MessageRecord record)
         {
-            return null;
-        }
-
-        /// <summary>
-        /// Creates default pipeline with query executor.
-        /// </summary>
-        /// <returns>Query pipeline.</returns>
-        public static QueryPipeline CreateDefaultPipeline(Func<Type, object> resolver)
-        {
-            var queryPipeline = new QueryPipeline();
-            queryPipeline.AppendMiddlewares(new PipelineMiddlewares.QueryObjectResolverMiddleware(resolver));
-            queryPipeline.AppendMiddlewares(new PipelineMiddlewares.QueryExecutorMiddleware());
-            queryPipeline.AppendMiddlewares(new PipelineMiddlewares.QueryObjectReleaseMiddleware());
-            return queryPipeline;
-        }
-
-        /// <inheritdoc cref="IMessagePipeline.ProcessRaw" />
-        public override void ProcessRaw(IMessage message)
-        {
-            if (message == null)
+            if (record == null)
             {
-                throw new ArgumentNullException(nameof(message));
+                throw new ArgumentNullException(nameof(record));
             }
-            if (string.IsNullOrEmpty(message.ContentType))
-            {
-                throw new ArgumentException(nameof(message.ContentType));
-            }
-            if (message.ContentType.IndexOf(".", StringComparison.Ordinal) < 0)
+            if (record.ContentType.IndexOf(".", StringComparison.Ordinal) < 0)
             {
                 throw new ArgumentException(Properties.Strings.NoMethodNameFromContentType);
             }
 
-            var objectTypeName = message.ContentType.Substring(0, message.ContentType.LastIndexOf(".", StringComparison.Ordinal));
+            var objectTypeName = record.ContentType.Substring(0, record.ContentType.LastIndexOf(".", StringComparison.Ordinal));
 #if NETSTANDARD1_5
             var objectType = TypeHelpers.LoadType(objectTypeName, TypeHelpers.LoadAssembliesFromTypeName(objectTypeName).ToArray());
 #else
@@ -202,7 +92,7 @@ namespace Saritasa.Tools.Messages.Queries
             }
             var obj = Activator.CreateInstance(objectType, nonPublic: true);
 
-            var methodName = message.ContentType.Substring(message.ContentType.LastIndexOf(".", StringComparison.Ordinal) + 1);
+            var methodName = record.ContentType.Substring(record.ContentType.LastIndexOf(".", StringComparison.Ordinal) + 1);
             var method = objectType.GetTypeInfo().GetMethod(methodName);
             if (method == null)
             {
@@ -216,7 +106,8 @@ namespace Saritasa.Tools.Messages.Queries
                 throw new InvalidOperationException(Properties.Strings.CannotCreateDelegate);
             }
 
-            var dictContent = message.Content as IDictionary<string, object>;
+            var messageContext = new MessageContext(pipelinesService);
+            var dictContent = record.Content as IDictionary<string, object>;
             if (dictContent == null)
             {
                 throw new ArgumentException(string.Format(Properties.Strings.ContentShouldBeType,
@@ -226,15 +117,10 @@ namespace Saritasa.Tools.Messages.Queries
             var methodTypes = method.GetParameters().Select(p => p.ParameterType);
             var values = methodTypes.Zip(messageContent, (mt, mc) => TypeHelpers.ConvertType(mc, mt));
 
-            var queryMessage = CreateMessage(@delegate, values.ToArray());
-            ProcessPipeline(queryMessage);
-            message.Content = queryMessage.Result;
-            message.Error = queryMessage.Error;
-            message.ErrorMessage = queryMessage.ErrorMessage;
-            message.ErrorType = queryMessage.ErrorType;
-            message.Status = queryMessage.Status;
-            message.ExecutionDuration = queryMessage.ExecutionDuration;
-            message.Data = queryMessage.Data;
+            var queryParameters = CreateMessage(@delegate, values.ToArray());
+            messageContext.Items[QueryParametersKey] = queryParameters;
+            messageContext.Content = dictContent;
+            return messageContext;
         }
     }
 }

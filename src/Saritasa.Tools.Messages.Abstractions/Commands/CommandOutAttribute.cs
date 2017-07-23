@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Saritasa.Tools.Messages.Abstractions
+namespace Saritasa.Tools.Messages.Abstractions.Commands
 {
     /// <summary>
     /// Marks property as output. Is not for processing.

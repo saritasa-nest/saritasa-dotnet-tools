@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-#if NET452
+#if NET452 && TODO
 using System;
 using System.IO;
 using System.Linq;
@@ -196,12 +196,12 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
                         {
                             var body = streamReader.ReadToEnd();
                             message.Content = JsonConvert.DeserializeObject(body);
-                            TypeHelpers.ResolveTypeForContent(
+                            /*TypeHelpers.ResolveTypeForContent(
                                 message,
                                 System.Text.Encoding.UTF8.GetBytes(message.Content.ToString()),
                                 new ObjectSerializers.JsonObjectSerializer(), // Only json is supported.
                                 AppDomain.CurrentDomain.GetAssemblies() // Pretend that all types are loaded into current domain.
-                            );
+                            );*/
                         }
                         catch (Exception ex)
                         {
@@ -314,7 +314,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
             {
                 if (pipeline.MessageTypes.Contains(message.Type))
                 {
-                    pipeline.ProcessRaw(message);
+                    //pipeline.Invoke(message);
                     isPipelineFound = true;
                 }
             }

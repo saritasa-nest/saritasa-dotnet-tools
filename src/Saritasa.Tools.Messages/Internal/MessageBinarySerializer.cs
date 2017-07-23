@@ -103,12 +103,12 @@ namespace Saritasa.Tools.Messages.Internal
         }
 
         /// <summary>
-        /// Reads the next command from stream.
+        /// Reads the next message from stream.
         /// </summary>
-        /// <returns>Command execution result.</returns>
-        public Message Read()
+        /// <returns>Message record.</returns>
+        public MessageRecord Read()
         {
-            var result = new Message();
+            var result = new MessageRecord();
             Type errorType = null;
             bool messageStarted = false;
             byte[] content = null;
@@ -176,36 +176,30 @@ namespace Saritasa.Tools.Messages.Internal
         /// <summary>
         /// Writes the message to stream.
         /// </summary>
-        /// <param name="message">Message.</param>
-        public void Write(IMessage message)
+        /// <param name="messageRecord">Message record.</param>
+        public void Write(MessageRecord messageRecord)
         {
-            var baseMessage = message as Message;
-            if (baseMessage == null)
-            {
-                throw new ArgumentException($"{message} must be {nameof(Message)} type.");
-            }
-
-            var messageBytes = serializer.Serialize(baseMessage.Content);
-            var errorBytes = baseMessage.Error != null ? serializer.Serialize(baseMessage.Error) : emptyBytes;
-            var dataBytes = baseMessage.Data != null ? serializer.Serialize(baseMessage.Data) : emptyBytes;
+            var messageBytes = serializer.Serialize(messageRecord.Content);
+            var errorBytes = messageRecord.Error != null ? serializer.Serialize(messageRecord.Error) : emptyBytes;
+            var dataBytes = messageRecord.Data != null ? serializer.Serialize(messageRecord.Data) : emptyBytes;
 
             lock (objLock)
             {
                 WriteChunk(TokenBeginOfCommand);
-                WriteChunk(TokenId, baseMessage.Id.ToByteArray()); // id
-                WriteChunk(TokenType, BitConverter.GetBytes(baseMessage.Type)); // type
-                WriteChunk(TokenContentType, Encoding.UTF8.GetBytes(baseMessage.ContentType)); // message type
-                WriteChunk(TokenCreated, BitConverter.GetBytes(baseMessage.CreatedAt.ToBinary())); // created
-                WriteChunk(TokenExecutionDuration, BitConverter.GetBytes(baseMessage.ExecutionDuration)); // completed
-                WriteChunk(TokenStatus, BitConverter.GetBytes((byte)baseMessage.Status)); // status
-                if (baseMessage.Error != null)
+                WriteChunk(TokenId, messageRecord.Id.ToByteArray()); // id
+                WriteChunk(TokenType, BitConverter.GetBytes(messageRecord.Type)); // type
+                WriteChunk(TokenContentType, Encoding.UTF8.GetBytes(messageRecord.ContentType)); // message type
+                WriteChunk(TokenCreated, BitConverter.GetBytes(messageRecord.CreatedAt.ToBinary())); // created
+                WriteChunk(TokenExecutionDuration, BitConverter.GetBytes(messageRecord.ExecutionDuration)); // completed
+                WriteChunk(TokenStatus, BitConverter.GetBytes((byte)messageRecord.Status)); // status
+                if (messageRecord.Error != null)
                 {
                     WriteChunk(TokenErrorDetails, errorBytes); // error
                 }
-                WriteChunk(TokenErrorMessage, Encoding.UTF8.GetBytes(baseMessage.ErrorMessage)); // error message
-                WriteChunk(TokenErrorType, Encoding.UTF8.GetBytes(baseMessage.ErrorType)); // error type
+                WriteChunk(TokenErrorMessage, Encoding.UTF8.GetBytes(messageRecord.ErrorMessage)); // error message
+                WriteChunk(TokenErrorType, Encoding.UTF8.GetBytes(messageRecord.ErrorType)); // error type
                 WriteChunk(TokenContent, messageBytes); // message object
-                if (baseMessage.HasData)
+                if (messageRecord.Data != null)
                 {
                     WriteChunk(TokenData, dataBytes);
                 }

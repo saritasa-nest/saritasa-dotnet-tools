@@ -91,19 +91,20 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public virtual void Handle(IMessage message)
+        public virtual void Handle(IMessageContext messageContext)
         {
             if (!Active)
             {
                 return;
             }
-            if (filter != null && !filter.IsMatch(message))
+            var messageRecord = new MessageRecord(messageContext);
+            if (filter != null && !filter.IsMatch(messageRecord))
             {
                 return;
             }
             try
             {
-                repository.AddAsync(message, CancellationToken.None).ConfigureAwait(false).GetAwaiter().GetResult();
+                repository.AddAsync(messageRecord, CancellationToken.None).ConfigureAwait(false).GetAwaiter().GetResult();
             }
             catch (Exception)
             {
@@ -115,19 +116,20 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public virtual async Task HandleAsync(IMessage message, CancellationToken cancellationToken)
+        public virtual async Task HandleAsync(IMessageContext messageContext, CancellationToken cancellationToken)
         {
             if (!Active)
             {
                 return;
             }
-            if (filter != null && !filter.IsMatch(message))
+            var messageRecord = new MessageRecord(messageContext);
+            if (filter != null && !filter.IsMatch(messageRecord))
             {
                 return;
             }
             try
             {
-                await repository.AddAsync(message, cancellationToken).ConfigureAwait(false);
+                await repository.AddAsync(messageRecord, cancellationToken).ConfigureAwait(false);
             }
             catch (Exception)
             {

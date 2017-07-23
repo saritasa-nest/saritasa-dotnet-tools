@@ -113,21 +113,21 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             {
                 if (!dict.ContainsKey(nameof(token)))
                 {
-                    throw new ArgumentException($"No required parameter: {nameof(token)}", nameof(dict));
+                    throw new ArgumentException($"No required parameter: {nameof(token)}.", nameof(dict));
                 }
                 this.token = dict[nameof(token)];
             }
         }
 
         /// <inheritdoc />
-        public async Task AddAsync(IMessage message, CancellationToken cancellationToken)
+        public async Task AddAsync(MessageRecord messageRecord, CancellationToken cancellationToken)
         {
             if (disposed)
             {
                 throw new ObjectDisposedException(null);
             }
 
-            var content = Encoding.UTF8.GetString(serializer.Serialize(((Message)message).CloneToMessage()));
+            var content = Encoding.UTF8.GetString(serializer.Serialize(messageRecord));
             await client
                 .PostAsync(
                     $"{ServerEndpoint}/inputs/{token}",
@@ -146,7 +146,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// Source: https://www.loggly.com/docs/search-query-language/
         /// </remarks>
         /// <returns>Enumerable of found messages.</returns>
-        public async Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery, CancellationToken cancellationToken)
+        public async Task<IEnumerable<MessageRecord>> GetAsync(MessageQuery messageQuery, CancellationToken cancellationToken)
         {
             if (disposed)
             {

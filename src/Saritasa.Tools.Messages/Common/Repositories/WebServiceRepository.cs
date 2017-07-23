@@ -68,14 +68,14 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         #region IMessageRepository
 
         /// <inheritdoc />
-        public async Task AddAsync([NotNull] IMessage message, CancellationToken cancellationToken)
+        public async Task AddAsync([NotNull] MessageRecord messageRecord, CancellationToken cancellationToken)
         {
             if (disposed)
             {
                 throw new ObjectDisposedException(null);
             }
 
-            var content = Encoding.UTF8.GetString(serializer.Serialize(((Message)message).CloneToMessage()));
+            var content = Encoding.UTF8.GetString(serializer.Serialize(messageRecord));
             await client.PostAsync(
                 uri,
                 new StringContent(content, Encoding.UTF8, "application/json"),
@@ -83,7 +83,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<IMessage>> GetAsync([NotNull] MessageQuery messageQuery, CancellationToken cancellationToken)
+        public async Task<IEnumerable<MessageRecord>> GetAsync([NotNull] MessageQuery messageQuery, CancellationToken cancellationToken)
         {
             if (disposed)
             {

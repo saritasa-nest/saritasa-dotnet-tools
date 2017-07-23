@@ -43,8 +43,6 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
 
         PerformanceCounter performanceCounterTotal;
         PerformanceCounter performanceCounterRate;
-        PerformanceCounter performanceCounterAvg;
-        PerformanceCounter performanceCounterAvgBase;
 
         /// <summary>
         /// .ctor
@@ -97,13 +95,11 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
 
             performanceCounterTotal = new PerformanceCounter(category, TotalMessagesProcessed, false);
             performanceCounterRate = new PerformanceCounter(category, RateMessagesProcessed, false);
-            performanceCounterAvg = new PerformanceCounter(category, AverageMessagesDuration, false);
-            performanceCounterAvgBase = new PerformanceCounter(category, AverageMessagesDurationBase, false);
             initialized = true;
         }
 
         /// <inheritdoc />
-        public virtual void Handle(IMessage message)
+        public virtual void Handle(IMessageContext messageContext)
         {
             if (!initialized)
             {
@@ -112,8 +108,6 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
 
             performanceCounterTotal.Increment();
             performanceCounterRate.Increment();
-            performanceCounterAvg.IncrementBy(message.ExecutionDuration);
-            performanceCounterAvgBase.Increment();
         }
 
         private bool disposed;
@@ -144,16 +138,6 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
                     {
                         performanceCounterRate.Dispose();
                         performanceCounterRate = null;
-                    }
-                    if (performanceCounterAvg != null)
-                    {
-                        performanceCounterAvg.Dispose();
-                        performanceCounterAvg = null;
-                    }
-                    if (performanceCounterAvgBase != null)
-                    {
-                        performanceCounterAvgBase.Dispose();
-                        performanceCounterAvgBase = null;
                     }
                 }
                 disposed = true;

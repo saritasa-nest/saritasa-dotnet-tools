@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Domain;
@@ -15,7 +16,7 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
     public class DomainEventLocatorMiddleware : IMessagePipelineMiddleware
     {
         /// <inheritdoc />
-        public string Id { get; set; } = "DomainEventLocator";
+        public string Id { get; set; }
 
         readonly IDomainEventsManager eventsManager;
 
@@ -38,30 +39,30 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
             {
                 throw new ArgumentNullException(nameof(eventsManager));
             }
+            this.Id = GetType().Name;
             this.eventsManager = eventsManager;
         }
 
         /// <inheritdoc />
-        public virtual void Handle(IMessage message)
+        public virtual void Handle(IMessageContext messageContext)
         {
-            var eventMessage = message as EventMessage;
-            if (eventMessage == null)
-            {
-                throw new NotSupportedException(string.Format(Properties.Strings.MessageShouldBeType,
-                    nameof(EventMessage)));
-            }
-
-            var hasHandlersGenericMethod = typeof(IDomainEventsManager).GetTypeInfo().GetMethod("HasHandlers").MakeGenericMethod(message.Content.GetType());
+            var hasHandlersGenericMethod = typeof(IDomainEventsManager).GetTypeInfo().GetMethod("HasHandlers")
+                .MakeGenericMethod(messageContext.Content.GetType());
             if ((bool)hasHandlersGenericMethod.Invoke(eventsManager, new object[] { }))
             {
-                var raiseGenericMethod = typeof(IDomainEventsManager).GetTypeInfo().GetMethod("Raise").MakeGenericMethod(message.Content.GetType());
-                if (eventMessage.HandlerMethods == null)
+                var raiseGenericMethod = typeof(IDomainEventsManager).GetTypeInfo().GetMethod("Raise")
+                    .MakeGenericMethod(messageContext.Content.GetType());
+
+                if (messageContext.Items.ContainsKey(EventHandlerLocatorMiddleware.HandlerMethodsKey))
                 {
-                    eventMessage.HandlerMethods = new List<MethodInfo>() { raiseGenericMethod };
+                    var list = (IList<MethodInfo>)messageContext.Items[EventHandlerLocatorMiddleware.HandlerMethodsKey];
+                    list.Add(raiseGenericMethod);
+                    messageContext.Items[EventHandlerLocatorMiddleware.HandlerMethodsKey] = list.ToArray();
                 }
                 else
                 {
-                    eventMessage.HandlerMethods.Add(raiseGenericMethod);
+                    messageContext.Items[EventHandlerLocatorMiddleware.HandlerMethodsKey] =
+                        new[] { raiseGenericMethod };
                 }
             }
         }

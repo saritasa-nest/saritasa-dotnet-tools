@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
 using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Abstractions.Commands;
 using Saritasa.Tools.Messages.Common;
 using Saritasa.Tools.Messages.Internal;
 
@@ -16,7 +17,9 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
     /// </summary>
     public class CommandHandlerLocatorMiddleware : BaseHandlerLocatorMiddleware
     {
-        const string HandlerPrefix = "Handle";
+        private const string HandlerPrefix = "Handle";
+
+        internal const string HandlerMethodKey = "handler-method";
 
         /// <summary>
         /// Commands methods cache. Type is for command type, MethodInfo is for actual handler.
@@ -24,11 +27,20 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         readonly System.Collections.Concurrent.ConcurrentDictionary<Type, MethodInfo> cache =
             new System.Collections.Concurrent.ConcurrentDictionary<Type, MethodInfo>();
 
-        ICollection<MethodInfo> commandHandlers;
+        MethodInfo[] commandHandlers;
 
         /// <inheritdoc />
         public CommandHandlerLocatorMiddleware(IDictionary<string, string> dict) : base(dict)
         {
+        }
+
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        public CommandHandlerLocatorMiddleware()
+        {
+            this.Assemblies = new[] { Assembly.GetEntryAssembly() };
+            Initialize();
         }
 
         /// <summary>
@@ -40,10 +52,6 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             if (assemblies == null || assemblies.Length < 1)
             {
                 throw new ArgumentException(Properties.Strings.AssembliesNotSpecified);
-            }
-            if (assemblies.Any(a => a == null))
-            {
-                throw new ArgumentNullException(nameof(assemblies));
             }
             this.Assemblies = assemblies;
             Initialize();
@@ -73,17 +81,10 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public override void Handle(IMessage message)
+        public override void Handle(IMessageContext messageContext)
         {
-            var commandMessage = message as CommandMessage;
-            if (commandMessage == null)
-            {
-                throw new NotSupportedException(string.Format(Properties.Strings.MessageShouldBeType,
-                    nameof(CommandMessage)));
-            }
-
             // Find handler method, first try to find cached value.
-            var cmdtype = commandMessage.Content.GetType();
+            var cmdtype = messageContext.Content.GetType();
             var method = cache.GetOrAdd(cmdtype, handlerCmdType =>
             {
                 return commandHandlers
@@ -111,8 +112,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
                 InternalLogger.Debug(string.Format(Properties.Strings.CommandHandlerFound, method, cmdtype),
                     nameof(CommandHandlerLocatorMiddleware));
             }
-            commandMessage.HandlerMethod = method;
-            commandMessage.HandlerType = method.DeclaringType;
+            messageContext.Items[HandlerMethodKey] = method;
         }
     }
 }

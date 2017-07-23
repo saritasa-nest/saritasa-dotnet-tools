@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Internal;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -22,12 +21,7 @@ namespace Saritasa.Tools.Messages.Common
         private const string KeyClass = "class";
 
         /// <inheritdoc />
-        public string Id { get; set; } = "Executor";
-
-        /// <summary>
-        /// Types resolver.
-        /// </summary>
-        protected Func<Type, object> Resolver { get; set; }
+        public string Id { get; set; }
 
         /// <summary>
         /// If true the middleware will resolve project using internal resolver.
@@ -42,7 +36,7 @@ namespace Saritasa.Tools.Messages.Common
         /// <summary>
         /// .ctor
         /// </summary>
-        protected BaseExecutorMiddleware(IDictionary<string, string> parameters)
+        protected BaseExecutorMiddleware(IDictionary<string, string> parameters) : this()
         {
             if (parameters == null)
             {
@@ -53,72 +47,39 @@ namespace Saritasa.Tools.Messages.Common
             {
                 Id = parameters[KeyId];
             }
-
-            if (!parameters.ContainsKey(KeyMethod) && !parameters.ContainsKey(KeyClass))
-            {
-                this.Resolver = Commands.CommandPipeline.NullResolver;
-                return;
-            }
-
-            string methodName = parameters["method"], className = parameters["class"];
-            var targetType = Type.GetType(className);
-            if (targetType == null)
-            {
-                throw new InvalidOperationException($"Cannot find type {className}.");
-            }
-            var method = targetType.GetTypeInfo().GetMethod(methodName, BindingFlags.IgnoreCase | BindingFlags.Static
-                                                                        | BindingFlags.Public | BindingFlags.NonPublic);
-            if (method == null)
-            {
-                throw new InvalidOperationException($"Cannot find method {methodName}. Make sure there is a static method in class {className}.");
-            }
-            if (method.GetParameters().Length != 1 || method.GetParameters()[0].ParameterType != typeof(Type)
-                || method.ReturnType != typeof(object))
-            {
-                throw new InvalidOperationException($"Method {methodName} must have one input parameter type of Type and return Object.");
-            }
-
-            // Create delegate.
-            var paramExpression = System.Linq.Expressions.Expression.Parameter(typeof(Type), "arg");
-            var call = System.Linq.Expressions.Expression.Call(method, paramExpression);
-            Func<Type, object> resolver = System.Linq.Expressions.Expression.Lambda<Func<Type, object>>(call, paramExpression).Compile();
-            this.Resolver = resolver;
         }
 
         /// <summary>
         /// .ctor
         /// </summary>
-        /// <param name="resolver">Types resolver.</param>
-        protected BaseExecutorMiddleware(Func<Type, object> resolver)
+        protected BaseExecutorMiddleware()
         {
-            if (resolver == null)
-            {
-                throw new ArgumentNullException(nameof(resolver));
-            }
-            Resolver = resolver;
+            Id = this.GetType().Name;
         }
 
         /// <inheritdoc />
-        public abstract void Handle(IMessage message);
+        public abstract void Handle(IMessageContext messageContext);
 
         /// <inheritdoc />
-        public abstract Task HandleAsync(IMessage message, CancellationToken cancellationToken);
+        public abstract Task HandleAsync(IMessageContext messageContext, CancellationToken cancellationToken);
 
         /// <summary>
         /// If UseInternalObjectResolver is turned off internal IoC container is used. Otherwise
         /// it relies on provided IoC implementation.
         /// </summary>
         /// <param name="type">Type to resolve.</param>
+        /// <param name="serviceProvider">Service provider.</param>
         /// <param name="loggingSource">Logging source. Optional.</param>
         /// <returns>Object or null if cannot be resolved.</returns>
-        protected object ResolveObject(Type type, string loggingSource = "")
+        protected object ResolveObject(Type type, IServiceProvider serviceProvider, string loggingSource = "")
         {
             return UseInternalObjectResolver ?
-                TypeHelpers.ResolveObjectForType(type, Resolver, loggingSource) :
-                Resolver(type);
+                TypeHelpers.ResolveObjectForType(type, serviceProvider.GetService, loggingSource) :
+                serviceProvider.GetService(type);
         }
 
-        private object[] GetAndResolveHandlerParameters(object obj, MethodBase handlerMethod)
+        private object[] GetAndResolveHandlerParameters(object obj, IServiceProvider serviceProvider,
+            MethodBase handlerMethod)
         {
             if (UseParametersResolve)
             {
@@ -131,14 +92,14 @@ namespace Saritasa.Tools.Messages.Common
                         paramsarr[0] = obj;
                         for (int i = 1; i < parameters.Length; i++)
                         {
-                            paramsarr[i] = Resolver(parameters[i].ParameterType);
+                            paramsarr[i] = serviceProvider.GetService(parameters[i].ParameterType);
                         }
                     }
                     else
                     {
                         for (int i = 0; i < parameters.Length; i++)
                         {
-                            paramsarr[i] = Resolver(parameters[i].ParameterType);
+                            paramsarr[i] = serviceProvider.GetService(parameters[i].ParameterType);
                         }
                     }
                     return paramsarr;
@@ -149,7 +110,7 @@ namespace Saritasa.Tools.Messages.Common
                 }
                 return paramsarr;
             }
-            return new[] { obj };
+            return handlerMethod.GetParameters().Length > 0 ? new[] { obj } : new object[] { };
         }
 
         /// <summary>
@@ -157,10 +118,11 @@ namespace Saritasa.Tools.Messages.Common
         /// </summary>
         /// <param name="handler">Handler.</param>
         /// <param name="obj">The first argument.</param>
+        /// <param name="serviceProvider">Service provider.</param>
         /// <param name="handlerMethod">Method to execute.</param>
-        protected void ExecuteHandler(object handler, object obj, MethodBase handlerMethod)
+        protected void ExecuteHandler(object handler, object obj, IServiceProvider serviceProvider, MethodBase handlerMethod)
         {
-            var result = handlerMethod.Invoke(handler, GetAndResolveHandlerParameters(obj, handlerMethod));
+            var result = handlerMethod.Invoke(handler, GetAndResolveHandlerParameters(obj, serviceProvider, handlerMethod));
             var task = result as Task;
             task?.ConfigureAwait(false).GetAwaiter().GetResult();
         }
@@ -171,10 +133,12 @@ namespace Saritasa.Tools.Messages.Common
         /// </summary>
         /// <param name="handler">Async handler.</param>
         /// <param name="obj">The first argument.</param>
+        /// <param name="serviceProvider">Service provider.</param>
         /// <param name="handlerMethod">Method to execute.</param>
-        protected async Task ExecuteHandlerAsync(object handler, object obj, MethodBase handlerMethod)
+        protected async Task ExecuteHandlerAsync(object handler, object obj, IServiceProvider serviceProvider,
+            MethodBase handlerMethod)
         {
-            var task = handlerMethod.Invoke(handler, GetAndResolveHandlerParameters(obj, handlerMethod)) as Task;
+            var task = handlerMethod.Invoke(handler, GetAndResolveHandlerParameters(obj, serviceProvider, handlerMethod)) as Task;
             if (task != null)
             {
                 await task;

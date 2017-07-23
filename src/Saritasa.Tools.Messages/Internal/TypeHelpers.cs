@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.ComponentModel;
 using System.Linq;
+using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Common;
 #if NETSTANDARD1_5
 using System.Runtime.Loader;
@@ -66,11 +67,11 @@ namespace Saritasa.Tools.Messages.Internal
         /// <summary>
         /// Resolve type for content type.
         /// </summary>
-        /// <param name="message">Message.</param>
+        /// <param name="messageRecord">Message record.</param>
         /// <param name="bytes">Message body (content).</param>
         /// <param name="objectSerializer">Serializer to be used.</param>
         /// <param name="assemblies">Assemblies that will be additionaly used for resolving.</param>
-        internal static void ResolveTypeForContent(Message message, byte[] bytes, IObjectSerializer objectSerializer,
+        internal static void ResolveTypeForContent(MessageRecord messageRecord, byte[] bytes, IObjectSerializer objectSerializer,
             Assembly[] assemblies)
         {
             if (bytes == null || bytes.Length < 1)
@@ -79,16 +80,16 @@ namespace Saritasa.Tools.Messages.Internal
             }
 
             // For events we don't specify actual type.
-            if (message.Type == Message.MessageTypeQuery)
+            if (messageRecord.Type == MessageContextConstants.MessageTypeQuery)
             {
-                message.Content = objectSerializer.Deserialize(bytes, typeof(IDictionary<string, object>));
+                messageRecord.Content = objectSerializer.Deserialize(bytes, typeof(IDictionary<string, object>));
             }
             else
             {
-                var t = LoadType(message.ContentType, assemblies);
+                var t = LoadType(messageRecord.ContentType, assemblies);
                 if (t != null)
                 {
-                    message.Content = objectSerializer.Deserialize(bytes, t);
+                    messageRecord.Content = objectSerializer.Deserialize(bytes, t);
                 }
             }
         }
@@ -96,11 +97,11 @@ namespace Saritasa.Tools.Messages.Internal
         /// <summary>
         /// The method fills message.Error property based on type message.ErrorType .
         /// </summary>
-        /// <param name="message">The message.</param>
+        /// <param name="messageRecord">The message record.</param>
         /// <param name="bytes">Error body.</param>
         /// <param name="objectSerializer">Serializer to use.</param>
         /// <param name="assemblies">Assemblies to search type.</param>
-        internal static void ResolveTypeForError(Message message, byte[] bytes, IObjectSerializer objectSerializer,
+        internal static void ResolveTypeForError(MessageRecord messageRecord, byte[] bytes, IObjectSerializer objectSerializer,
             Assembly[] assemblies)
         {
             if (bytes == null || bytes.Length < 1)
@@ -108,8 +109,8 @@ namespace Saritasa.Tools.Messages.Internal
                 return;
             }
 
-            var t = LoadType(message.ErrorType, assemblies) ?? typeof(Exception);
-            message.Error = (Exception)objectSerializer.Deserialize(bytes, t);
+            var t = LoadType(messageRecord.ErrorType, assemblies) ?? typeof(Exception);
+            messageRecord.Error = (Exception)objectSerializer.Deserialize(bytes, t);
         }
 
         internal static object ResolveObjectForType(Type type, Func<Type, object> resolver, string loggingSource = "")

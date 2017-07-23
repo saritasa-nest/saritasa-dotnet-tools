@@ -2,9 +2,7 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -23,27 +21,27 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         /// <summary>
         /// .ctor
         /// </summary>
-        /// <param name="parameters">Input parameters as parameters.</param>
-        public CommandExecutorMiddleware(IDictionary<string, string> parameters) : base(parameters)
+        public CommandExecutorMiddleware()
         {
+            Id = this.GetType().Name;
         }
 
         /// <summary>
         /// .ctor
         /// </summary>
-        /// <param name="resolver">Dependency injection resolver.</param>
-        public CommandExecutorMiddleware(Func<Type, object> resolver) : base(resolver)
+        /// <param name="parameters">Input parameters as parameters.</param>
+        public CommandExecutorMiddleware(IDictionary<string, string> parameters) : base(parameters)
         {
-            Id = "CommandExecutor";
+            Id = this.GetType().Name;
         }
 
 #if !NET40 && !NET35
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-        private object GetHandler(CommandMessage commandMessage)
+        private object GetHandler(IMessageContext messageContext, MethodInfo handlerMethod)
         {
             // Rejected commands are not needed to process.
-            if (commandMessage.Status == ProcessingStatus.Rejected)
+            if (messageContext.Status == ProcessingStatus.Rejected)
             {
                 return null;
             }
@@ -51,87 +49,72 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             object handler = null;
 
             // When command class contains Handle method within.
-            if (commandMessage.HandlerMethod.DeclaringType == commandMessage.Content.GetType())
+            if (handlerMethod.DeclaringType == messageContext.Content.GetType())
             {
-                handler = commandMessage.Content;
+                handler = messageContext.Content;
             }
             else
             {
-                handler = ResolveObject(commandMessage.HandlerType, nameof(CommandExecutorMiddleware));
+                handler = ResolveObject(handlerMethod.DeclaringType, messageContext.ServiceProvider, nameof(CommandExecutorMiddleware));
             }
 
             // If we don't have handler - throw exception.
             if (handler == null)
             {
-                commandMessage.Status = ProcessingStatus.Rejected;
-                throw new CommandHandlerNotFoundException(commandMessage.Content.GetType().Name);
+                messageContext.Status = ProcessingStatus.Rejected;
+                throw new CommandHandlerNotFoundException(messageContext.Content.GetType().Name);
             }
             return handler;
         }
 
         /// <inheritdoc />
-        public override void Handle(IMessage message)
+        public override void Handle(IMessageContext messageContext)
         {
-            var commandMessage = message as CommandMessage;
-            if (commandMessage == null)
-            {
-                throw new NotSupportedException(string.Format(Properties.Strings.MessageShouldBeType,
-                    nameof(CommandMessage)));
-            }
-
-            var handler = GetHandler(commandMessage);
+            var handlerMethod = messageContext.GetItemByKey<MethodInfo>(CommandHandlerLocatorMiddleware.HandlerMethodKey);
+            var handler = GetHandler(messageContext, handlerMethod);
             if (handler == null)
             {
                 return;
             }
 
             // Invoke method and resolve parameters if needed.
-            var stopWatch = System.Diagnostics.Stopwatch.StartNew();
             try
             {
-                ExecuteHandler(handler, commandMessage.Content, commandMessage.HandlerMethod);
-                commandMessage.Status = ProcessingStatus.Completed;
+                ExecuteHandler(handler, messageContext.Content, messageContext.ServiceProvider, handlerMethod);
+                messageContext.Status = ProcessingStatus.Completed;
             }
             catch (TargetInvocationException ex)
             {
                 InternalLogger.Warn(string.Format(Properties.Strings.ExceptionWhileProcess,
                     nameof(TargetInvocationException), handler, ex), nameof(CommandExecutorMiddleware));
-                commandMessage.Status = ProcessingStatus.Failed;
+                messageContext.Status = ProcessingStatus.Failed;
                 if (ex.InnerException != null)
                 {
-                    commandMessage.Error = ex.InnerException;
-                    commandMessage.ErrorDispatchInfo =
-                        System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex.InnerException);
+                    messageContext.FailException = ex.InnerException;
                 }
             }
             catch (TargetException ex)
             {
                 InternalLogger.Warn(string.Format(Properties.Strings.ExceptionWhileProcess,
                     nameof(TargetException), handler, ex), nameof(CommandExecutorMiddleware));
-                commandMessage.Status = ProcessingStatus.Failed;
+                messageContext.Status = ProcessingStatus.Failed;
                 if (ex.InnerException != null)
                 {
-                    commandMessage.Error = ex.InnerException;
-                    commandMessage.ErrorDispatchInfo =
-                        System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex.InnerException);
+                    messageContext.FailException = ex.InnerException;
                 }
             }
             catch (Exception ex)
             {
                 InternalLogger.Warn(string.Format(Properties.Strings.ExceptionWhileProcess,
                     nameof(Exception), handler, ex), nameof(CommandExecutorMiddleware));
-                commandMessage.Status = ProcessingStatus.Failed;
-                commandMessage.Error = ex;
-                commandMessage.ErrorDispatchInfo = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex);
+                messageContext.Status = ProcessingStatus.Failed;
+                messageContext.FailException = ex;
             }
             finally
             {
                 // Release handler.
                 var disposable = handler as IDisposable;
                 disposable?.Dispose();
-
-                stopWatch.Stop();
-                commandMessage.ExecutionDuration = (int)stopWatch.ElapsedMilliseconds;
             }
         }
 
@@ -141,68 +124,53 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
          */
 
         /// <inheritdoc />
-        public override async Task HandleAsync(IMessage message, CancellationToken cancellationToken)
+        public override async Task HandleAsync(IMessageContext messageContext, CancellationToken cancellationToken)
         {
-            var commandMessage = message as CommandMessage;
-            if (commandMessage == null)
-            {
-                throw new NotSupportedException(string.Format(Properties.Strings.MessageShouldBeType,
-                    nameof(CommandMessage)));
-            }
-
-            var handler = GetHandler(commandMessage);
+            var handlerMethod = messageContext.GetItemByKey<MethodInfo>(CommandHandlerLocatorMiddleware.HandlerMethodKey);
+            var handler = GetHandler(messageContext, handlerMethod);
             if (handler == null)
             {
                 return;
             }
 
             // Invoke method and resolve parameters if needed.
-            var stopWatch = System.Diagnostics.Stopwatch.StartNew();
             try
             {
-                await ExecuteHandlerAsync(handler, commandMessage.Content, commandMessage.HandlerMethod);
-                commandMessage.Status = ProcessingStatus.Completed;
+                await ExecuteHandlerAsync(handler, messageContext.Content, messageContext.ServiceProvider, handlerMethod);
+                messageContext.Status = ProcessingStatus.Completed;
             }
             catch (TargetInvocationException ex)
             {
                 InternalLogger.Warn(string.Format(Properties.Strings.ExceptionWhileProcess,
                     nameof(TargetInvocationException), handler, ex), nameof(CommandExecutorMiddleware));
-                commandMessage.Status = ProcessingStatus.Failed;
+                messageContext.Status = ProcessingStatus.Failed;
                 if (ex.InnerException != null)
                 {
-                    commandMessage.Error = ex.InnerException;
-                    commandMessage.ErrorDispatchInfo =
-                        System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex.InnerException);
+                    messageContext.FailException = ex.InnerException;
                 }
             }
             catch (TargetException ex)
             {
                 InternalLogger.Warn(string.Format(Properties.Strings.ExceptionWhileProcess,
                     nameof(TargetException), handler, ex), nameof(CommandExecutorMiddleware));
-                commandMessage.Status = ProcessingStatus.Failed;
+                messageContext.Status = ProcessingStatus.Failed;
                 if (ex.InnerException != null)
                 {
-                    commandMessage.Error = ex.InnerException;
-                    commandMessage.ErrorDispatchInfo =
-                        System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex.InnerException);
+                    messageContext.FailException = ex.InnerException;
                 }
             }
             catch (Exception ex)
             {
                 InternalLogger.Warn(string.Format(Properties.Strings.ExceptionWhileProcess,
                     nameof(Exception), handler, ex), nameof(CommandExecutorMiddleware));
-                commandMessage.Status = ProcessingStatus.Failed;
-                commandMessage.Error = ex;
-                commandMessage.ErrorDispatchInfo = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex);
+                messageContext.Status = ProcessingStatus.Failed;
+                messageContext.FailException = ex;
             }
             finally
             {
                 // Release handler.
                 var disposable = handler as IDisposable;
                 disposable?.Dispose();
-
-                stopWatch.Stop();
-                commandMessage.ExecutionDuration = (int)stopWatch.ElapsedMilliseconds;
             }
         }
     }

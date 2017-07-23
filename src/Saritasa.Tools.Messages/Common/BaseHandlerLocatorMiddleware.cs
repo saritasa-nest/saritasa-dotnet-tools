@@ -119,10 +119,7 @@ namespace Saritasa.Tools.Messages.Common
         /// </summary>
         public HandlerSearchMethod HandlerSearchMethod
         {
-            get
-            {
-                return handlerSearchMethod;
-            }
+            get => handlerSearchMethod;
 
             set
             {
@@ -135,7 +132,7 @@ namespace Saritasa.Tools.Messages.Common
         }
 
         /// <inheritdoc />
-        public abstract void Handle([NotNull] IMessage message);
+        public abstract void Handle([NotNull] IMessageContext message);
 
         /// <summary>
         /// Initialize middleware.

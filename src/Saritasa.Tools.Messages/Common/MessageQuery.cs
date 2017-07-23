@@ -263,43 +263,43 @@ namespace Saritasa.Tools.Messages.Common
         /// <summary>
         /// Does the message match criterias of query.
         /// </summary>
-        /// <param name="message">Message.</param>
+        /// <param name="messageRecord">Message record.</param>
         /// <returns>True if message matches criteries.</returns>
-        public bool Match(IMessage message)
+        public bool Match(MessageRecord messageRecord)
         {
-            if (Id.HasValue && message.Id != Id.Value)
+            if (Id.HasValue && messageRecord.Id != Id.Value)
             {
                 return false;
             }
-            if (CreatedStartDate.HasValue && message.CreatedAt < CreatedStartDate.Value)
+            if (CreatedStartDate.HasValue && messageRecord.CreatedAt < CreatedStartDate.Value)
             {
                 return false;
             }
-            if (CreatedEndDate.HasValue && message.CreatedAt > CreatedEndDate.Value)
+            if (CreatedEndDate.HasValue && messageRecord.CreatedAt > CreatedEndDate.Value)
             {
                 return false;
             }
-            if (!string.IsNullOrEmpty(ContentType) && message.ContentType != ContentType)
+            if (!string.IsNullOrEmpty(ContentType) && messageRecord.ContentType != ContentType)
             {
                 return false;
             }
-            if (!string.IsNullOrEmpty(ErrorType) && message.ErrorType != ErrorType)
+            if (!string.IsNullOrEmpty(ErrorType) && messageRecord.ErrorType != ErrorType)
             {
                 return false;
             }
-            if (Status.HasValue && message.Status != Status.Value)
+            if (Status.HasValue && messageRecord.Status != Status.Value)
             {
                 return false;
             }
-            if (Type.HasValue && message.Type != Type.Value)
+            if (Type.HasValue && messageRecord.Type != Type.Value)
             {
                 return false;
             }
-            if (ExecutionDurationAbove.HasValue && message.ExecutionDuration < ExecutionDurationAbove.Value)
+            if (ExecutionDurationAbove.HasValue && messageRecord.ExecutionDuration < ExecutionDurationAbove.Value)
             {
                 return false;
             }
-            if (ExecutionDurationBelow.HasValue && message.ExecutionDuration > ExecutionDurationBelow.Value)
+            if (ExecutionDurationBelow.HasValue && messageRecord.ExecutionDuration > ExecutionDurationBelow.Value)
             {
                 return false;
             }

@@ -2,7 +2,7 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using Newtonsoft.Json;
-using Saritasa.Tools.Messages.Common;
+using Saritasa.Tools.Messages.Abstractions;
 
 namespace Saritasa.Tools.Messages.Internal.Elasticsearch.SearchResult
 {
@@ -21,6 +21,6 @@ namespace Saritasa.Tools.Messages.Internal.Elasticsearch.SearchResult
         public string Score { get; set; }
 
         [JsonProperty(PropertyName = "_source")]
-        public Message Source { get; set; }
+        public MessageRecord Source { get; set; }
     }
 }
