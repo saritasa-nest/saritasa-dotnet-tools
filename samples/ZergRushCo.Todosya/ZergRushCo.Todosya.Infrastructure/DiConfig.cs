@@ -8,6 +8,7 @@ using Saritasa.Tools.Emails.Interceptors;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Commands;
 using Saritasa.Tools.Messages.Common;
+using Saritasa.Tools.Messages.Common.Repositories;
 using Saritasa.Tools.Messages.Events;
 using Saritasa.Tools.Messages.Queries;
 using ZergRushCo.Todosya.DataAccess;
@@ -19,19 +20,9 @@ namespace ZergRushCo.Todosya.Infrastructure
     /// </summary>
     public static class DiConfig
     {
-        public static IContainer AutofacContainer { get; set; }
-
-        public static object Resolve(Type type)
-        {
-            return AutofacContainer?.Resolve(type);
-        }
-
         public static void Setup(ContainerBuilder builder, bool testingMode = false)
         {
             // Other bindings.
-            var connectionStringConf = ConfigurationManager.ConnectionStrings["AppDbContext"];
-            var connectionString = connectionStringConf.ConnectionString.Replace("{baseUrl}",
-                AppDomain.CurrentDomain.BaseDirectory);
             builder.RegisterType<AppUnitOfWorkFactory>().AsSelf().AsImplementedInterfaces();
             builder.Register(c => c.Resolve<AppUnitOfWorkFactory>().Create()).AsImplementedInterfaces();
             builder.Register(c => new AppDbContext()).AsSelf();
@@ -44,18 +35,6 @@ namespace ZergRushCo.Todosya.Infrastructure
                 .AsImplementedInterfaces();
             builder.RegisterType<DataAccess.Repositories.UserRepository>().AsImplementedInterfaces();
             builder.RegisterType<Domain.UserContext.Services.AppUserManager>().AsSelf();
-
-            var repositoryMiddleware = new Saritasa.Tools.Messages.Common.PipelineMiddlewares.RepositoryMiddleware(
-                new Saritasa.Tools.Messages.Common.Repositories.AdoNetMessageRepository(
-                    System.Data.Common.DbProviderFactories.GetFactory(connectionStringConf.ProviderName),
-                    connectionString)
-            );
-            var recordRepositoryMiddleware = new Saritasa.Tools.Messages.Common.PipelineMiddlewares.RepositoryMiddleware(
-                new Saritasa.Tools.Messages.Common.Repositories.WebServiceRepository()
-            )
-            {
-                RethrowExceptions = false,
-            };
 
             var pipelinesContainer = RegisterPipelines();
             builder.RegisterInstance(pipelinesContainer).As<IMessagePipelineContainer>().SingleInstance();
@@ -88,9 +67,25 @@ namespace ZergRushCo.Todosya.Infrastructure
             builder.RegisterInstance(loggerFactory).AsImplementedInterfaces().SingleInstance();
         }
 
-        public static IMessagePipelineContainer RegisterPipelines()
+        public static IMessagePipelineContainer RegisterPipelines(params IMessagePipelineMiddleware[] middlewares)
         {
             var pipelinesContainer = new SimpleMessagePipelineContainer();
+
+            // Repositories.
+            var connectionStringConf = ConfigurationManager.ConnectionStrings["AppDbContext"];
+            var connectionString = connectionStringConf.ConnectionString.Replace("{baseUrl}",
+                AppDomain.CurrentDomain.BaseDirectory);
+            var repositoryMiddleware = new Saritasa.Tools.Messages.Common.PipelineMiddlewares.RepositoryMiddleware(
+                new Saritasa.Tools.Messages.Common.Repositories.AdoNetMessageRepository(
+                    System.Data.Common.DbProviderFactories.GetFactory(connectionStringConf.ProviderName),
+                    connectionString)
+            );
+            var recordRepositoryMiddleware = new Saritasa.Tools.Messages.Common.PipelineMiddlewares.RepositoryMiddleware(
+                new Saritasa.Tools.Messages.Common.Repositories.WebServiceRepository()
+            )
+            {
+                RethrowExceptions = false,
+            };
 
             // Command.
             pipelinesContainer.AddCommandPipeline()
@@ -101,7 +96,9 @@ namespace ZergRushCo.Todosya.Infrastructure
                 {
                     UseInternalObjectResolver = true,
                     UseParametersResolve = true
-                });
+                })
+                .AddMiddleware(repositoryMiddleware)
+                .AddMiddleware(recordRepositoryMiddleware);
 
             // Query.
             pipelinesContainer.AddQueryPipeline()
@@ -111,13 +108,18 @@ namespace ZergRushCo.Todosya.Infrastructure
                     UseParametersResolve = true,
                 })
                 .AddMiddleware(new Saritasa.Tools.Messages.Queries.PipelineMiddlewares.QueryExecutorMiddleware())
-                .AddMiddleware(new Saritasa.Tools.Messages.Queries.PipelineMiddlewares.QueryObjectReleaseMiddleware());
+                .AddMiddleware(new Saritasa.Tools.Messages.Queries.PipelineMiddlewares.QueryObjectReleaseMiddleware())
+                .AddMiddleware(repositoryMiddleware)
+                .AddMiddleware(recordRepositoryMiddleware);
 
             // Event.
             pipelinesContainer.AddEventPipeline()
                 .AddMiddleware(new Saritasa.Tools.Messages.Events.PipelineMiddlewares.EventHandlerLocatorMiddleware(
                     System.Reflection.Assembly.GetAssembly(typeof(Domain.UserContext.Entities.User))))
-                .AddMiddleware(new Saritasa.Tools.Messages.Events.PipelineMiddlewares.EventExecutorMiddleware());
+                .AddMiddleware(new Saritasa.Tools.Messages.Events.PipelineMiddlewares.EventExecutorMiddleware())
+                .AddMiddleware(repositoryMiddleware)
+                .AddMiddleware(recordRepositoryMiddleware);
+
             return pipelinesContainer;
         }
     }

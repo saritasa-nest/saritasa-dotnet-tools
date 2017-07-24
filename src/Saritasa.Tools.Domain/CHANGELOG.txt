@@ -1,4 +1,7 @@
-﻿0.2.2 [2017-07-17]
+﻿0.2.3 [TBD]
+[+] ValidationException.ThrowFromObjectValidation support for NET Standard.
+
+0.2.2 [2017-07-17]
 [*] Set dependencies only to .NET 4.0 and NET Standard 1.2 .
 
 0.2.0 [2017-07-10]

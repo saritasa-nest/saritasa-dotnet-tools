@@ -16,7 +16,7 @@ namespace Saritasa.Tools.Messages.Queries
     /// <summary>
     /// Query pipeline.
     /// </summary>
-    public class QueryPipeline : MessagePipeline, IQueryPipeline
+    public class QueryPipeline : MessagePipeline, IQueryPipeline, IMessageRecordConverter
     {
         internal const string QueryParametersKey = ".query-parameters";
 
@@ -47,10 +47,14 @@ namespace Saritasa.Tools.Messages.Queries
             };
         }
 
+        #region IQueryPipeline
+
         /// <inheritdoc />
         public virtual IQueryCaller<TQuery> Query<TQuery>(IPipelineService pipelineService) where TQuery : class
         {
             var messageContext = new MessageContext(pipelineService);
+            messageContext.ContentId = TypeHelpers.GetPartiallyAssemblyQualifiedName(typeof(TQuery));
+            messageContext.Pipeline = this;
             return new QueryCaller<TQuery>(this, messageContext);
         }
 
@@ -58,6 +62,8 @@ namespace Saritasa.Tools.Messages.Queries
         public virtual IQueryCaller<TQuery> Query<TQuery>(IPipelineService pipelineService, TQuery obj) where TQuery : class
         {
             var messageContext = new MessageContext(pipelineService, obj);
+            messageContext.ContentId = TypeHelpers.GetPartiallyAssemblyQualifiedName(typeof(TQuery));
+            messageContext.Pipeline = this;
             return new QueryCaller<TQuery>(this, messageContext, obj);
         }
 
@@ -67,6 +73,10 @@ namespace Saritasa.Tools.Messages.Queries
         {
             return new QueryCaller<TQuery>(this, messageContext).NoExecution();
         }
+
+        #endregion
+
+        #region IMessageRecordConverter
 
         /// <inheritdoc />
         public IMessageContext CreateMessageContext(IPipelineService pipelineService, MessageRecord record)
@@ -80,19 +90,19 @@ namespace Saritasa.Tools.Messages.Queries
                 throw new ArgumentException(Properties.Strings.NoMethodNameFromContentType);
             }
 
-            var objectTypeName = record.ContentType.Substring(0, record.ContentType.LastIndexOf(".", StringComparison.Ordinal));
-#if NETSTANDARD1_5
-            var objectType = TypeHelpers.LoadType(objectTypeName, TypeHelpers.LoadAssembliesFromTypeName(objectTypeName).ToArray());
-#else
-            var objectType = TypeHelpers.LoadType(objectTypeName, AppDomain.CurrentDomain.GetAssemblies());
-#endif
+            // Format object type name.
+            var typesplit = record.ContentType.Split(','); // type.method, assembly
+            var objectTypeName = typesplit[0].Substring(0, typesplit[0].LastIndexOf(".", StringComparison.Ordinal))
+                + "," + typesplit[1];
+            var objectType = Type.GetType(objectTypeName);
+
             if (objectType == null)
             {
                 throw new InvalidOperationException(string.Format(Properties.Strings.CannotLoadType, objectTypeName));
             }
             var obj = Activator.CreateInstance(objectType, nonPublic: true);
 
-            var methodName = record.ContentType.Substring(record.ContentType.LastIndexOf(".", StringComparison.Ordinal) + 1);
+            var methodName = typesplit[0].Substring(typesplit[0].LastIndexOf(".", StringComparison.Ordinal) + 1);
             var method = objectType.GetTypeInfo().GetMethod(methodName);
             if (method == null)
             {
@@ -107,6 +117,7 @@ namespace Saritasa.Tools.Messages.Queries
             }
 
             var messageContext = new MessageContext(pipelineService);
+            messageContext.Pipeline = this;
             var dictContent = record.Content as IDictionary<string, object>;
             if (dictContent == null)
             {
@@ -122,5 +133,15 @@ namespace Saritasa.Tools.Messages.Queries
             messageContext.Content = dictContent;
             return messageContext;
         }
+
+        /// <inheritdoc />
+        public MessageRecord CreateMessageRecord(IMessageContext context)
+        {
+            var record = new MessageRecord(context);
+            record.Type = MessageContextConstants.MessageTypeQuery;
+            return record;
+        }
+
+        #endregion
     }
 }

@@ -1,11 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+// Licensed under the BSD license. See LICENSE file in the project root for full license information.
+
+using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Abstractions.Queries;
+using Saritasa.Tools.Messages.Internal;
 
 namespace Saritasa.Tools.Messages.Queries
 {
@@ -100,6 +102,14 @@ namespace Saritasa.Tools.Messages.Queries
             {
                 throw new InvalidOperationException(Properties.Strings.MethodNoTypeDeclare);
             }
+
+            Stopwatch stopwatch = null;
+            if (queryPipeline.Options.IncludeExecutionDuration)
+            {
+                stopwatch = new Stopwatch();
+                stopwatch.Start();
+            }
+
             var queryParameters = new QueryParameters
             {
                 Parameters = args,
@@ -108,14 +118,27 @@ namespace Saritasa.Tools.Messages.Queries
                 Method = method
             };
             messageContext.Content = method.GetParameters().ToDictionary(p => p.Name, v => args[v.Position]);
-            messageContext.ContentId = method.DeclaringType.FullName + "." + method.Name;
+            messageContext.ContentId = TypeHelpers.GetPartiallyAssemblyQualifiedName(method.DeclaringType);
+            var indexOfComma = messageContext.ContentId.IndexOf(',');
+            if (indexOfComma > -1)
+            {
+                messageContext.ContentId = messageContext.ContentId.Insert(indexOfComma, "." + method.Name);
+            }
             messageContext.Items[QueryPipeline.QueryParametersKey] = queryParameters;
             if (invokeQuery)
             {
                 queryPipeline.Invoke(messageContext);
-                return (TResult)queryParameters.Result;
             }
-            return default(TResult);
+            if (stopwatch != null)
+            {
+                stopwatch.Stop();
+                messageContext.Items[MessageContextConstants.ExecutionDurationKey] = (int)stopwatch.ElapsedMilliseconds;
+            }
+            if (queryPipeline.Options.ThrowExceptionOnFail && messageContext.FailException != null)
+            {
+                throw new MessageProcessingException("Query processing error.", messageContext.FailException);
+            }
+            return (TResult)queryParameters.Result;
         }
     }
 }

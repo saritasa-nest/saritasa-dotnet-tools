@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 namespace Saritasa.Tools.Messages.Common.ObjectSerializers
 {
     /// <summary>
-    /// Json object serializer based on NewtonJson lib.
+    /// Json object serializer based on NewtonJson library.
     /// </summary>
     public class JsonObjectSerializer : IObjectSerializer
     {

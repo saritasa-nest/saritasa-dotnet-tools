@@ -70,28 +70,31 @@ namespace Saritasa.Tools.Messages.Internal
         /// <param name="messageRecord">Message record.</param>
         /// <param name="bytes">Message body (content).</param>
         /// <param name="objectSerializer">Serializer to be used.</param>
-        /// <param name="assemblies">Assemblies that will be additionaly used for resolving.</param>
-        internal static void ResolveTypeForContent(MessageRecord messageRecord, byte[] bytes,
-            IObjectSerializer objectSerializer, Assembly[] assemblies)
+        /// <param name="assemblies">Assemblies that will be additionaly used for resolving. If null all
+        /// loaded assemblies will be taken.</param>
+        /// <returns>Deserialized object or null.</returns>
+        internal static object ResolveTypeForContent(MessageRecord messageRecord, byte[] bytes,
+            IObjectSerializer objectSerializer, Assembly[] assemblies = null)
         {
             if (bytes == null || bytes.Length < 1)
             {
-                return;
+                return null;
             }
 
             // For events we don't specify actual type.
             if (messageRecord.Type == MessageContextConstants.MessageTypeQuery)
             {
-                messageRecord.Content = objectSerializer.Deserialize(bytes, typeof(IDictionary<string, object>));
+                return objectSerializer.Deserialize(bytes, typeof(IDictionary<string, object>));
             }
             else
             {
                 var t = LoadType(messageRecord.ContentType, assemblies);
                 if (t != null)
                 {
-                    messageRecord.Content = objectSerializer.Deserialize(bytes, t);
+                    return objectSerializer.Deserialize(bytes, t);
                 }
             }
+            return null;
         }
 
         /// <summary>
@@ -269,6 +272,25 @@ namespace Saritasa.Tools.Messages.Internal
                 currentAssemblyName += "." + nsitems[i];
             }
             return assemblies;
+        }
+
+        /// <summary>
+        /// Get partially type assembly qualified name. For example
+        /// System.Globalization.NumberFormatInfo, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089 to
+        /// System.Globalization.NumberFormatInfo, mscorlib .
+        /// </summary>
+        /// <param name="t">Type.</param>
+        /// <returns>Partial assembly qualified name.</returns>
+        internal static string GetPartiallyAssemblyQualifiedName(Type t)
+        {
+            if (t == null)
+            {
+                return String.Empty;
+            }
+            var aqn = t.AssemblyQualifiedName;
+            var firstCommaIndex = aqn.IndexOf(',');
+            var secondCommaIndex = aqn.IndexOf(',', firstCommaIndex + 1);
+            return aqn.Substring(0, secondCommaIndex);
         }
     }
 }

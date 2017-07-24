@@ -24,8 +24,6 @@ namespace ZergRushCo.Todosya.Domain.IntegrationTests
         {
             var builder = new ContainerBuilder();
             ZergRushCo.Todosya.Infrastructure.DiConfig.Setup(builder, testingMode: true);
-            Infrastructure.DiConfig.AutofacContainer = builder.Build();
-            context.SetResolver(Infrastructure.DiConfig.Resolve);
 
             using (var sqlConnection = new SqlConnection(ConfigurationManager.ConnectionStrings["AppDbContext"].ConnectionString))
             {

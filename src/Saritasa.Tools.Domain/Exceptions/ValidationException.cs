@@ -4,8 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-#if NET40
 using System.ComponentModel.DataAnnotations;
+#if NET40
 using System.Runtime.Serialization;
 #endif
 
@@ -219,6 +219,39 @@ namespace Saritasa.Tools.Domain.Exceptions
 
             var validationResults = new List<ValidationResult>();
             var result = Validator.TryValidateObject(obj, new ValidationContext(obj, serviceProvider, items),
+                validationResults, true);
+            if (!result)
+            {
+                var ex = new ValidationException();
+                foreach (ValidationResult validationResult in validationResults)
+                {
+                    foreach (var memberName in validationResult.MemberNames)
+                    {
+                        ex.AddError(memberName, validationResult.ErrorMessage);
+                    }
+                }
+                throw ex;
+            }
+        }
+#else
+        /// <summary>
+        /// Creates on throws instance of <see cref="ValidationException" /> based on validation results
+        /// of object.
+        /// </summary>
+        /// <param name="obj">The object to validate.</param>
+        /// <param name="items">A dictionary of key/value pairs to make available to the service consumers.
+        /// This parameter is optional.</param>
+        public static void ThrowFromObjectValidation(
+            object obj,
+            IDictionary<object, object> items = null)
+        {
+            if (obj == null)
+            {
+                throw new ArgumentNullException(nameof(obj));
+            }
+
+            var validationResults = new List<ValidationResult>();
+            var result = Validator.TryValidateObject(obj, new ValidationContext(obj, items),
                 validationResults, true);
             if (!result)
             {

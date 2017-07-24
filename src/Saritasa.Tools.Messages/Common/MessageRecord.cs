@@ -3,8 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Internal;
 
-namespace Saritasa.Tools.Messages.Abstractions
+namespace Saritasa.Tools.Messages.Common
 {
     /// <summary>
     /// Message data transfer object used by repositories to save.
@@ -22,17 +24,18 @@ namespace Saritasa.Tools.Messages.Abstractions
         public byte Type { get; set; }
 
         /// <summary>
-        /// Message name.
+        /// Message type name.
         /// </summary>
         public string ContentType { get; set; }
 
         /// <summary>
-        /// Message content. May be command object, or event object.
+        /// Message serialized content. May be command object, or event object.
         /// </summary>
         public object Content { get; set; }
 
         /// <summary>
-        /// Custom data.
+        /// Custom data. Should be <see cref="IDictionary{TKey,TValue}"/> where
+        /// TKey and TValue are a <see cref="string" /> type.
         /// </summary>
         public IDictionary<string, string> Data { get; set; }
 
@@ -74,7 +77,7 @@ namespace Saritasa.Tools.Messages.Abstractions
         }
 
         /// <summary>
-        /// .ctor to create from message context.
+        /// .ctor to create from message context. It allows partially prepare record object.
         /// </summary>
         /// <param name="messageContext">Message context.</param>
         public MessageRecord(IMessageContext messageContext)
@@ -82,19 +85,20 @@ namespace Saritasa.Tools.Messages.Abstractions
             object val;
 
             Id = messageContext.Id;
-            if (messageContext.Items.TryGetValue(MessageContext.TypeKey, out object type))
+            if (messageContext.Items.TryGetValue(MessageContextConstants.TypeKey, out object type))
             {
                 Type = (byte)type;
             }
+            Content = messageContext.Content;
             ContentType = messageContext.ContentId;
-            if (messageContext.Items.TryGetValue(MessageContext.DataKey, out val))
+            if (messageContext.Items.TryGetValue(MessageContextConstants.DataKey, out val))
             {
                 Data = (IDictionary<string, string>)val;
             }
             Error = messageContext.FailException;
-            ErrorType = messageContext.FailException?.GetType().Name;
-            ErrorMessage = messageContext.FailException?.Message;
-            if (messageContext.Items.TryGetValue(MessageContext.ExecutionDurationKey, out val))
+            ErrorType = TypeHelpers.GetPartiallyAssemblyQualifiedName(messageContext.FailException?.GetType());
+            ErrorMessage = messageContext.FailException?.Message ?? string.Empty;
+            if (messageContext.Items.TryGetValue(MessageContextConstants.ExecutionDurationKey, out val))
             {
                 ExecutionDuration = (int)val;
             }

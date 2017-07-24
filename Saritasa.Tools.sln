@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.15
+VisualStudioVersion = 15.0.26430.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{45D13EC5-88F3-403A-8148-0812C2796062}"
 EndProject
@@ -35,7 +35,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saritasa.Tools.Messages.Abs
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.Messages.Benchmark", "test\Saritasa.Tools.Messages.Benchmark\Saritasa.Tools.Messages.Benchmark.csproj", "{6A11CB78-CB88-448A-86F3-C4AFEFEB413A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.Messages.TestRuns", "src\Saritasa.Tools.Messages.TestRuns\Saritasa.Tools.Messages.TestRuns.csproj", "{8B67CEBE-634D-4A99-9A77-A98146C52E13}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saritasa.Tools.Messages.TestRuns", "src\Saritasa.Tools.Messages.TestRuns\Saritasa.Tools.Messages.TestRuns.csproj", "{8B67CEBE-634D-4A99-9A77-A98146C52E13}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -93,8 +93,8 @@ Global
 		{6C773C8F-226C-454E-8656-3A6B9BF38476}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E16B2300-A1D4-49BB-B3FC-C2891E7D1177}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E16B2300-A1D4-49BB-B3FC-C2891E7D1177}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E16B2300-A1D4-49BB-B3FC-C2891E7D1177}.Release|Any CPU.ActiveCfg = Debug|Any CPU
-		{E16B2300-A1D4-49BB-B3FC-C2891E7D1177}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{E16B2300-A1D4-49BB-B3FC-C2891E7D1177}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E16B2300-A1D4-49BB-B3FC-C2891E7D1177}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6A11CB78-CB88-448A-86F3-C4AFEFEB413A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6A11CB78-CB88-448A-86F3-C4AFEFEB413A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6A11CB78-CB88-448A-86F3-C4AFEFEB413A}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -5,13 +5,14 @@ using System;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Abstractions.Commands;
 using Saritasa.Tools.Messages.Common;
+using Saritasa.Tools.Messages.Internal;
 
 namespace Saritasa.Tools.Messages.Commands
 {
     /// <summary>
     /// Commands specific pipeline.
     /// </summary>
-    public class CommandPipeline : MessagePipeline, ICommandPipeline
+    public class CommandPipeline : MessagePipeline, ICommandPipeline, IMessageRecordConverter
     {
         /// <inheritdoc />
         public override byte[] MessageTypes { get; } = { MessageContextConstants.MessageTypeCommand };
@@ -20,6 +21,8 @@ namespace Saritasa.Tools.Messages.Commands
         /// Options.
         /// </summary>
         public new CommandPipelineOptions Options { get; } = new CommandPipelineOptions();
+
+        #region ICommandPipeline
 
         /// <inheritdoc />
         public IMessageContext CreateMessageContext(IPipelineService pipelineService, object command)
@@ -32,9 +35,36 @@ namespace Saritasa.Tools.Messages.Commands
             var mc = new MessageContext(pipelineService)
             {
                 Content = command,
-                ContentId = command.GetType().FullName
+                ContentId = TypeHelpers.GetPartiallyAssemblyQualifiedName(command.GetType()),
+                Pipeline = this
             };
             return mc;
         }
+
+        #endregion
+
+        #region IMessageRecordConverter
+
+        /// <inheritdoc />
+        public IMessageContext CreateMessageContext(IPipelineService pipelineService, MessageRecord record)
+        {
+            var context = new MessageContext(pipelineService)
+            {
+                ContentId = record.ContentType,
+                Content = record.Content,
+                Pipeline = this
+            };
+            return context;
+        }
+
+        /// <inheritdoc />
+        public MessageRecord CreateMessageRecord(IMessageContext context)
+        {
+            var record = new MessageRecord(context);
+            record.Type = MessageContextConstants.MessageTypeCommand;
+            return record;
+        }
+
+        #endregion
     }
 }

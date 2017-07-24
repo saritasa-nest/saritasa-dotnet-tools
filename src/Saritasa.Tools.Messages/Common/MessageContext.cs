@@ -3,31 +3,16 @@
 
 using System;
 using System.Collections.Generic;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Internal;
 
-namespace Saritasa.Tools.Messages.Abstractions
+namespace Saritasa.Tools.Messages.Common
 {
     /// <summary>
     /// Base message context.
     /// </summary>
     public class MessageContext : IMessageContext
     {
-        /// <summary>
-        /// Specifies key to be used in items to determine what pipeline
-        /// should be used to process message.
-        /// </summary>
-        public const string TypeKey = ".type";
-
-        /// <summary>
-        /// Specifies key to be sued in items to get user key/value
-        /// dictionary with additional processing data. For key/value use <see cref="string" /> type.
-        /// </summary>
-        public const string DataKey = ".data";
-
-        /// <summary>
-        /// Processing execution duration in milliseconds.
-        /// </summary>
-        public const string ExecutionDurationKey = ".execution-duration";
-
         private Guid id = Guid.Empty;
 
         /// <inheritdoc />
@@ -59,6 +44,9 @@ namespace Saritasa.Tools.Messages.Abstractions
 
         /// <inheritdoc />
         public IServiceProvider ServiceProvider { get; set; } = NullServiceProvider.Default;
+
+        /// <inheritdoc />
+        public IMessagePipeline Pipeline { get; set; }
 
         /// <inheritdoc />
         public IDictionary<object, object> Items { get; set; } = new Dictionary<object, object>();
@@ -94,7 +82,7 @@ namespace Saritasa.Tools.Messages.Abstractions
             {
                 throw new ArgumentNullException(nameof(content));
             }
-            ContentId = content.GetType().FullName;
+            ContentId = TypeHelpers.GetPartiallyAssemblyQualifiedName(content.GetType());
             Content = content;
         }
 

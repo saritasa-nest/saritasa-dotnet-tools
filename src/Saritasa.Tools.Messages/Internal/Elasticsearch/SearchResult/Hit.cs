@@ -2,7 +2,7 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using Newtonsoft.Json;
-using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Common;
 
 namespace Saritasa.Tools.Messages.Internal.Elasticsearch.SearchResult
 {

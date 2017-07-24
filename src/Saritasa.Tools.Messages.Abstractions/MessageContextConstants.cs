@@ -11,6 +11,18 @@ namespace Saritasa.Tools.Messages.Abstractions
     public static class MessageContextConstants
     {
         /// <summary>
+        /// Specifies key to be used in items to determine what pipeline
+        /// should be used to process message.
+        /// </summary>
+        public const string TypeKey = ".type";
+
+        /// <summary>
+        /// Specifies key to be used in items to get user key/value
+        /// dictionary with additional processing data. For key/value use <see cref="string" /> type.
+        /// </summary>
+        public const string DataKey = ".data";
+
+        /// <summary>
         /// Execution processing duration key.
         /// </summary>
         public const string ExecutionDurationKey = ".execution-duration";

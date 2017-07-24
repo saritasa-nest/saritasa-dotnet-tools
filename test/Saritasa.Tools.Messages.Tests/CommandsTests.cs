@@ -240,7 +240,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #region Validation_command_attributes_should_generate_exception
 
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
+#if NET452
         class CommandWithValidation
         {
             [Range(0, 100)]
@@ -276,7 +276,7 @@ namespace Saritasa.Tools.Messages.Tests
             };
 
             // Act & assert
-            Assert.Throws<CommandValidationException>(() => { pipelineService.HandleCommand(cmd); });
+            Assert.Throws<Domain.Exceptions.ValidationException>(() => { pipelineService.HandleCommand(cmd); });
             Assert.NotEqual(10, cmd.PercentInt);
 
             cmd.PercentInt = 20;

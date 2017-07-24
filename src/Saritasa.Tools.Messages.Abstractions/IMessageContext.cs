@@ -43,6 +43,11 @@ namespace Saritasa.Tools.Messages.Abstractions
         Exception FailException { get; set; }
 
         /// <summary>
+        /// Current processing pipeline or null.
+        /// </summary>
+        IMessagePipeline Pipeline { get; set; }
+
+        /// <summary>
         /// Local key/value collection of objects that are shared across current message scope.
         /// Expect that dictionary implementation can not be thread safe.
         /// </summary>

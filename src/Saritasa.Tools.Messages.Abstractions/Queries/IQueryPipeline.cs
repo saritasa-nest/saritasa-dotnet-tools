@@ -38,13 +38,5 @@ namespace Saritasa.Tools.Messages.Abstractions.Queries
         /// <returns>Default value for TQuery.</returns>
         IQueryCaller<TQuery> CreateMessageContext<TQuery>([NotNull] IPipelineService pipelineService,
             IMessageContext messageContext) where TQuery : class;
-
-        /// <summary>
-        /// Create message query from <see cref="MessageRecord" />.
-        /// </summary>
-        /// <param name="pipelineService">Pipeline service.</param>
-        /// <param name="messageRecord">Message record.</param>
-        /// <returns>Message context.</returns>
-        IMessageContext CreateMessageContext([NotNull] IPipelineService pipelineService, [NotNull] MessageRecord messageRecord);
     }
 }

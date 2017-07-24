@@ -7,6 +7,7 @@ using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Abstractions.Queries;
 using Xunit;
 using Saritasa.Tools.Messages.Common;
+using Saritasa.Tools.Messages.Common.ObjectSerializers;
 using Saritasa.Tools.Messages.Queries;
 
 namespace Saritasa.Tools.Messages.Tests
@@ -125,9 +126,11 @@ namespace Saritasa.Tools.Messages.Tests
             // Arrange
             pipelineService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
             SetupQueryPipeline(pipelineService.PipelineContainer.AddQueryPipeline());
+            var serializer = new JsonObjectSerializer();
             var messageRecord = new MessageRecord
             {
-                ContentType = "Saritasa.Tools.Messages.Tests.QueriesTests+QueryObject.SimpleQueryWithDependency",
+                ContentType = "Saritasa.Tools.Messages.Tests.QueriesTests+QueryObject.SimpleQueryWithDependency," +
+                    "Saritasa.Tools.Messages.Tests",
                 Content = new Dictionary<string, object>
                 {
                     ["a"] = 10,
@@ -138,7 +141,8 @@ namespace Saritasa.Tools.Messages.Tests
 
             // Act
             var queryPipeline = pipelineService.GetPipelineOfType<IQueryPipeline>();
-            var messageContext = queryPipeline.CreateMessageContext(pipelineService, messageRecord);
+            var queryConverter = pipelineService.GetPipelineOfType<IQueryPipeline>() as IMessageRecordConverter;
+            var messageContext = queryConverter.CreateMessageContext(pipelineService, messageRecord);
             queryPipeline.Invoke(messageContext);
 
             // Assert

@@ -25,6 +25,7 @@
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.2' ">
     <PackageReference Include="System.Data.Common" Version="4.3.0" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>

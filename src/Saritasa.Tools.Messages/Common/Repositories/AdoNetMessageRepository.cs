@@ -106,6 +106,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             this.dialect = dialect;
             this.connectionString = connectionString;
             this.factory = factory;
+            this.serializer = serializer;
             ValidateAndInit();
         }
 
@@ -328,7 +329,8 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <inheritdoc />
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities",
             Justification = "Parameters are used")]
-        public async Task<IEnumerable<MessageRecord>> GetAsync(MessageQuery messageQuery, CancellationToken cancellationToken)
+        public async Task<IEnumerable<MessageRecord>> GetAsync(MessageQuery messageQuery,
+            CancellationToken cancellationToken)
         {
             if (disposed)
             {

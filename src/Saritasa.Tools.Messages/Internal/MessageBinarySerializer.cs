@@ -165,7 +165,7 @@ namespace Saritasa.Tools.Messages.Internal
                             break;
                         case TokenEndOfCommand:
                             var t = TypeHelpers.LoadType(result.ContentType, assemblies);
-                            result.Content = serializer.Deserialize(content, t);
+                            result.Content = content;
                             return result;
                     }
                 }

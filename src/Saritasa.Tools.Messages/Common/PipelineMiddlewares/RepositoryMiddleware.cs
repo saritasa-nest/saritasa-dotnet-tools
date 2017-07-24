@@ -97,11 +97,23 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
             {
                 return;
             }
-            var messageRecord = new MessageRecord(messageContext);
+
+            MessageRecord messageRecord = null;
+            var convertPipeline = messageContext.Pipeline as IMessageRecordConverter;
+            if (convertPipeline != null)
+            {
+                messageRecord = convertPipeline.CreateMessageRecord(messageContext);
+            }
+            else
+            {
+                messageRecord = new MessageRecord(messageContext);
+            }
+
             if (filter != null && !filter.IsMatch(messageRecord))
             {
                 return;
             }
+
             try
             {
                 repository.AddAsync(messageRecord, CancellationToken.None).ConfigureAwait(false).GetAwaiter().GetResult();

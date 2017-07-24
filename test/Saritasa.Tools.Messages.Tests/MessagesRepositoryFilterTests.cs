@@ -5,6 +5,7 @@ using System;
 using System.Text.RegularExpressions;
 using Xunit;
 using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Common;
 using Saritasa.Tools.Messages.Common.PipelineMiddlewares;
 
 namespace Saritasa.Tools.Messages.Tests

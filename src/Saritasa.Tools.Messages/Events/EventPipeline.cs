@@ -2,8 +2,6 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Abstractions.Events;
 using Saritasa.Tools.Messages.Common;
@@ -13,7 +11,7 @@ namespace Saritasa.Tools.Messages.Events
     /// <summary>
     /// Events pipeline.
     /// </summary>
-    public class EventPipeline : MessagePipeline, IEventPipeline
+    public class EventPipeline : MessagePipeline, IEventPipeline, IMessageRecordConverter
     {
         /// <inheritdoc />
         public override byte[] MessageTypes { get; } = { MessageContextConstants.MessageTypeEvent };
@@ -23,10 +21,40 @@ namespace Saritasa.Tools.Messages.Events
         /// </summary>
         public new EventPipelineOptions Options { get; } = new EventPipelineOptions();
 
+        #region IEventPipeline
+
         /// <inheritdoc />
         public IMessageContext CreateMessageContext(IPipelineService pipelineService, object @event)
         {
-            return new MessageContext(pipelineService, @event);
+            var messageContext = new MessageContext(pipelineService, @event);
+            messageContext.Pipeline = this;
+            return messageContext;
         }
+
+        #endregion
+
+        #region IMessageRecordConverter
+
+        /// <inheritdoc />
+        public IMessageContext CreateMessageContext(IPipelineService pipelineService, MessageRecord record)
+        {
+            var context = new MessageContext(pipelineService)
+            {
+                ContentId = record.ContentType,
+                Content = record.Content,
+                Pipeline = this
+            };
+            return context;
+        }
+
+        /// <inheritdoc />
+        public MessageRecord CreateMessageRecord(IMessageContext context)
+        {
+            var record = new MessageRecord(context);
+            record.Type = MessageContextConstants.MessageTypeEvent;
+            return record;
+        }
+
+        #endregion
     }
 }
