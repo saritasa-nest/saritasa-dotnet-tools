@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using Saritasa.Tools.Messages.Abstractions;
@@ -89,7 +88,7 @@ namespace Saritasa.Tools.Messages.Benchmark
             }
         }
 
-        //[Benchmark(Baseline = true)]
+        [Benchmark(Baseline = true)]
         public void RunCommandDirect()
         {
             var usersCommand = new UsersCommandHandlers((IUsersService)InterfacesResolver(typeof(IUsersService)));
@@ -109,9 +108,9 @@ namespace Saritasa.Tools.Messages.Benchmark
         [Benchmark]
         public void RunCommandWithPipeline()
         {
-            var piplinesService = new DefaultPipelinesService();
+            var piplinesService = new DefaultPipelineService();
             piplinesService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
-            piplinesService.AddCommandPipeline()
+            piplinesService.PipelineContainer.AddCommandPipeline()
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
                     typeof(CreateUserCommand).GetTypeInfo().Assembly))
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandExecutorMiddleware

@@ -13,13 +13,13 @@ namespace Saritasa.BoringWarehouse.IntegrationTests
     public class CompanyTest
     {
         private IContainer container;
-        private ICommandPipeline commandPipeline;
+        private IPipelineService pipelineService;
 
         [SetUp]
         public void SetUp()
         {
             container = GlobalConfig.Container;
-            commandPipeline = container.Resolve<ICommandPipeline>();
+            pipelineService = container.Resolve<IPipelineService>();
         }
 
         [TestCase]
@@ -34,7 +34,7 @@ namespace Saritasa.BoringWarehouse.IntegrationTests
                 command.CreatedByUserId = GlobalConfig.AdminId;
                 command.Name = "Test Company " + DateTime.Now.Ticks;
 
-                commandPipeline.Handle(command);
+                pipelineService.HandleCommand(command);
 
                 var count2 = query.GetAll().Count();
                 Assert.AreEqual(count1 + 1, count2, "number of companies");

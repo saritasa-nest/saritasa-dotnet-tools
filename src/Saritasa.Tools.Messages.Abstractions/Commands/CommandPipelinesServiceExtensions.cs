@@ -4,41 +4,43 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Saritasa.Tools.Messages.Abstractions.Commands;
 
-namespace Saritasa.Tools.Messages.Abstractions.Commands
+// ReSharper disable once CheckNamespace
+namespace Saritasa.Tools.Messages.Abstractions
 {
     /// <summary>
     /// Command pipeline extensions.
     /// </summary>
-    public static class PipelinesServiceExtensions
+    public static class CommandPipelinesServiceExtensions
     {
         /// <summary>
         /// Handle command within message context.
         /// </summary>
-        /// <param name="pipelinesService">Pipelines service.</param>
+        /// <param name="pipelineService">Pipelines service.</param>
         /// <param name="command">Command to execute.</param>
         /// <returns>Message context used in execution.</returns>
-        public static IMessageContext HandleCommand(this IPipelinesService pipelinesService, object command)
+        public static IMessageContext HandleCommand(this IPipelineService pipelineService, object command)
         {
-            var commandPipeline = pipelinesService.GetPipelineOfType<ICommandPipeline>();
-            var messageContext = commandPipeline.CreateMessageContext(pipelinesService, command);
-            commandPipeline.Invoke(messageContext);
+            var pipeline = pipelineService.GetPipelineOfType<ICommandPipeline>();
+            var messageContext = pipeline.CreateMessageContext(pipelineService, command);
+            pipeline.Invoke(messageContext);
             return messageContext;
         }
 
         /// <summary>
         /// Handle command within message context.
         /// </summary>
-        /// <param name="pipelinesService">Pipelines service.</param>
+        /// <param name="pipelineService">Pipelines service.</param>
         /// <param name="command">Command to execute.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>Message context used in execution.</returns>
-        public static async Task<IMessageContext> HandleCommandAsync(this IPipelinesService pipelinesService,
+        public static async Task<IMessageContext> HandleCommandAsync(this IPipelineService pipelineService,
             object command,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            var commandPipeline = pipelinesService.GetPipelineOfType<ICommandPipeline>();
-            var messageContext = commandPipeline.CreateMessageContext(pipelinesService, command);
+            var commandPipeline = pipelineService.GetPipelineOfType<ICommandPipeline>();
+            var messageContext = commandPipeline.CreateMessageContext(pipelineService, command);
             await commandPipeline.InvokeAsync(messageContext, cancellationToken);
             return messageContext;
         }

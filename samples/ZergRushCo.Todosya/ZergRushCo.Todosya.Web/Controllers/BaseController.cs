@@ -5,6 +5,7 @@ using System.Web.Mvc;
 using Microsoft.Extensions.Logging;
 using Saritasa.Tools.Domain.Exceptions;
 using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Abstractions.Commands;
 
 namespace ZergRushCo.Todosya.Web.Controllers
 {
@@ -13,25 +14,20 @@ namespace ZergRushCo.Todosya.Web.Controllers
     /// </summary>
     public class BaseController : Controller
     {
-        protected ICommandPipeline CommandPipeline { get; }
-
-        protected IQueryPipeline QueryPipeline { get; }
-
         readonly ILogger logger;
+
+        protected IPipelineService PipelineService { get; }
 
         /// <summary>
         /// .ctor
         /// </summary>
-        /// <param name="commandPipeline">Command pipeline.</param>
-        /// <param name="queryPipeline">Query pipeline.</param>
+        /// <param name="pipelineService">Pipeline service.</param>
         /// <param name="loggerFactory">Logger factory.</param>
         public BaseController(
-            ICommandPipeline commandPipeline,
-            IQueryPipeline queryPipeline,
+            IPipelineService pipelineService,
             ILoggerFactory loggerFactory)
         {
-            CommandPipeline = commandPipeline;
-            QueryPipeline = queryPipeline;
+            PipelineService = pipelineService;
             logger = loggerFactory.CreateLogger<BaseController>();
         }
 
@@ -52,7 +48,7 @@ namespace ZergRushCo.Todosya.Web.Controllers
             var result = true;
             try
             {
-                CommandPipeline.Handle(command);
+                PipelineService.HandleCommand(command);
             }
             catch (DomainException ex)
             {
@@ -89,7 +85,7 @@ namespace ZergRushCo.Todosya.Web.Controllers
             var result = true;
             try
             {
-                await CommandPipeline.HandleAsync(command, CancellationToken.None);
+                await PipelineService.HandleCommandAsync(command, CancellationToken.None);
             }
             catch (DomainException ex)
             {

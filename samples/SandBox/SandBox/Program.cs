@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Commands;
@@ -12,6 +13,10 @@ using Saritasa.Tools.Messages.Queries.PipelineMiddlewares;
 using SandBox.Commands;
 using SandBox.Events;
 using SandBox.Queries;
+using Saritasa.Tools.Messages.Abstractions.Commands;
+using Saritasa.Tools.Messages.Abstractions.Events;
+using Saritasa.Tools.Messages.Abstractions.Queries;
+using Saritasa.Tools.Messages.Common;
 
 namespace SandBox
 {
@@ -32,7 +37,7 @@ namespace SandBox
         /// </summary>
         /// <param name="type">Type to find object.</param>
         /// <returns>Instaniated object.</returns>
-        static object Resolver(Type type)
+        public static object Resolver(Type type)
         {
             if (type == typeof(IProductsRepository))
             {
@@ -46,42 +51,55 @@ namespace SandBox
         /// </summary>
         static void Init()
         {
-            // we will use in memory repository
+            /*
+            var config = Saritasa.Tools.Messages.Configuration.XmlConfiguration.AppConfig;
+            CommandPipeline = (ICommandPipeline)config.First();
+            */
+
+            // We will use in memory repository.
             inMemoryMessageRepository = new InMemoryMessageRepository();
 
-            // create command pipeline manually
+            // Create command pipeline manually.
             CommandPipeline = new CommandPipeline();
-            CommandPipeline.AppendMiddlewares(
+            CommandPipeline.AddMiddlewares(
                 new CommandValidationMiddleware(),
                 new CommandHandlerLocatorMiddleware(Assembly.GetEntryAssembly()),
-                new CommandExecutorMiddleware(Resolver),
+                new CommandExecutorMiddleware(),
                 new RepositoryMiddleware(inMemoryMessageRepository)
             );
-            CommandPipeline.UseInternalResolver();
 
-            // create query pipeline manually
+            // Create query pipeline manually.
             QueryPipeline = new QueryPipeline();
-            QueryPipeline.AppendMiddlewares(
-                new QueryObjectResolverMiddleware(Resolver),
+            QueryPipeline.AddMiddlewares(
+                new QueryObjectResolverMiddleware(),
                 new QueryExecutorMiddleware(),
                 new RepositoryMiddleware(inMemoryMessageRepository)
             );
-            QueryPipeline.UseInternalResolver();
 
-            // create event pipeline manually
+            // Create event pipeline manually.
             EventPipeline = new EventPipeline();
-            EventPipeline.AppendMiddlewares(
+            EventPipeline.AddMiddlewares(
                 new EventHandlerLocatorMiddleware(Assembly.GetEntryAssembly()),
-                new EventExecutorMiddleware(Resolver),
+                new EventExecutorMiddleware(),
                 new RepositoryMiddleware(inMemoryMessageRepository)
             );
-            EventPipeline.UseInternalResolver();
         }
 
         static void Test()
         {
-            // command
-            CommandPipeline.Handle(new UpdateProductCommand()
+            var pipelineService = new DefaultPipelineService();
+            pipelineService.PipelineContainer = new SimpleMessagePipelineContainer
+            {
+                Pipelines = new IMessagePipeline[]
+                {
+                    CommandPipeline,
+                    QueryPipeline,
+                    EventPipeline
+                }
+            };
+
+            // Command.
+            pipelineService.HandleCommand(new UpdateProductCommand
             {
                 ProductId = 10,
                 Name = "Test",
@@ -89,13 +107,13 @@ namespace SandBox
             Console.WriteLine(inMemoryMessageRepository.Dump());
             inMemoryMessageRepository.Messages.Clear();
 
-            // query
-            var list = ((QueryPipeline)QueryPipeline).Query<ProductsQueries>().With(q => q.Get(0, 10));
+            // Query.
+            var list = pipelineService.Query<ProductsQueries>().With(q => q.Get(0, 10));
             Console.WriteLine(inMemoryMessageRepository.Dump());
             inMemoryMessageRepository.Messages.Clear();
 
-            // event
-            EventPipeline.Raise(new UpdateProductEvent() { Id = 1 });
+            // Event.
+            pipelineService.RaiseEvent(new UpdateProductEvent { Id = 1 });
             Console.WriteLine(inMemoryMessageRepository.Dump());
             inMemoryMessageRepository.Messages.Clear();
         }

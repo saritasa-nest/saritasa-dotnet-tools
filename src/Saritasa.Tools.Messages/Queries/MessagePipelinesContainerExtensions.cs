@@ -12,28 +12,28 @@ namespace Saritasa.Tools.Messages.Queries
     /// <summary>
     /// Query pipeline extensions.
     /// </summary>
-    public static class QueryPipelineExtensions
+    public static class MessagePipelinesContainerExtensions
     {
         /// <summary>
         /// Add query pipeline feature to message context.
         /// </summary>
-        /// <param name="pipelinesService">Pipelines service.</param>
+        /// <param name="messagePipelineContainer">Pipeline container.</param>
         /// <returns>Query pipeline builder.</returns>
-        public static QueryPipelineBuilder AddQueryPipeline(this IPipelinesService pipelinesService)
+        public static QueryPipelineBuilder AddQueryPipeline(this IMessagePipelineContainer messagePipelineContainer)
         {
-            return AddQueryPipeline(pipelinesService, options => { });
+            return AddQueryPipeline(messagePipelineContainer, options => { });
         }
 
         /// <summary>
         /// Add query pipeline feature to message context.
         /// </summary>
-        /// <param name="pipelinesService">Pipelines service.</param>
+        /// <param name="messagePipelineContainer">Pipeline container.</param>
         /// <param name="setupAction">Action to setup query pipeline.</param>
         /// <returns>Query pipeline builder.</returns>
-        public static QueryPipelineBuilder AddQueryPipeline(this IPipelinesService pipelinesService,
+        public static QueryPipelineBuilder AddQueryPipeline(this IMessagePipelineContainer messagePipelineContainer,
             Action<QueryPipelineOptions> setupAction)
         {
-            if (pipelinesService.Pipelines.Any(p => p is IEventPipeline))
+            if (messagePipelineContainer.Pipelines.Any(p => p is IEventPipeline))
             {
                 throw new InvalidOperationException("Queries pipeline already exists in global context items. " +
                                                     "Use RemovePipeline method to clean up existins pipeline.");
@@ -41,9 +41,9 @@ namespace Saritasa.Tools.Messages.Queries
 
             var queryPipeline = new QueryPipeline();
             setupAction(queryPipeline.Options);
-            var list = pipelinesService.Pipelines.ToList();
+            var list = messagePipelineContainer.Pipelines.ToList();
             list.Add(queryPipeline);
-            pipelinesService.Pipelines = list.ToArray();
+            messagePipelineContainer.Pipelines = list.ToArray();
 
             return new QueryPipelineBuilder(queryPipeline);
         }

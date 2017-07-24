@@ -9,20 +9,20 @@ namespace Saritasa.Tools.Messages.Abstractions
     /// <summary>
     /// Pipelines service extension methods.
     /// </summary>
-    public static class PipelinesServiceExtensions
+    public static class PipelineServiceExtensions
     {
         /// <summary>
         /// Get pipeline of specified type or throw exception.s
         /// </summary>
         /// <typeparam name="T">Type of pipeline.</typeparam>
-        /// <param name="pipelinesService">Pipelines service.</param>
+        /// <param name="pipelineService">Pipelines service.</param>
         /// <returns>Pipeline.</returns>
-        public static T GetPipelineOfType<T>(this IPipelinesService pipelinesService)
+        public static T GetPipelineOfType<T>(this IPipelineService pipelineService)
             where T : class, IMessagePipeline
         {
-            for (int i = 0; i < pipelinesService.Pipelines.Length; i++)
+            for (int i = 0; i < pipelineService.PipelineContainer.Pipelines.Length; i++)
             {
-                var pipeline = pipelinesService.Pipelines[i] as T;
+                var pipeline = pipelineService.PipelineContainer.Pipelines[i] as T;
                 if (pipeline != null)
                 {
                     return pipeline;
@@ -37,13 +37,13 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// </summary>
         /// <typeparam name="T">Pipeline type.</typeparam>
         /// <param name="pipelinesService">Pipelines service.</param>
-        public static void RemovePipelineOfType<T>(this IPipelinesService pipelinesService)
+        public static void RemovePipelineOfType<T>(this IPipelineService pipelinesService)
             where T : class, IMessagePipeline
         {
             var pipeline = GetPipelineOfType<T>(pipelinesService);
-            var list = pipelinesService.Pipelines.ToList();
+            var list = pipelinesService.PipelineContainer.Pipelines.ToList();
             list.Remove(pipeline);
-            pipelinesService.Pipelines = list.ToArray();
+            pipelinesService.PipelineContainer.Pipelines = list.ToArray();
         }
     }
 }

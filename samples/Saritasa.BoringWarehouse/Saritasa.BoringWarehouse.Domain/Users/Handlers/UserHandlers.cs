@@ -1,4 +1,6 @@
-﻿namespace Saritasa.BoringWarehouse.Domain.Users.Handlers
+﻿using Saritasa.Tools.Messages.Abstractions.Commands;
+
+namespace Saritasa.BoringWarehouse.Domain.Users.Handlers
 {
     using System;
     using System.Linq;

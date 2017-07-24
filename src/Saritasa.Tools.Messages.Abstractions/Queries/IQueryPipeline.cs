@@ -15,36 +15,36 @@ namespace Saritasa.Tools.Messages.Abstractions.Queries
         /// Creates caller wrapper.
         /// </summary>
         /// <typeparam name="TQuery">Query type.</typeparam>
-        /// <param name="pipelinesService">Pipelines service.</param>
+        /// <param name="pipelineService">Pipeline service.</param>
         /// <returns>Query wrapper.</returns>
-        IQueryCaller<TQuery> Query<TQuery>([NotNull] IPipelinesService pipelinesService) where TQuery : class;
+        IQueryCaller<TQuery> Query<TQuery>([NotNull] IPipelineService pipelineService) where TQuery : class;
 
         /// <summary>
         /// Creates caller wrapper.
         /// </summary>
         /// <typeparam name="TQuery">Query type.</typeparam>
-        /// <param name="pipelinesService">Pipelines service.</param>
+        /// <param name="pipelineService">Pipeline service.</param>
         /// <param name="obj">Query object to execute by.</param>
         /// <returns>Query wrapper.</returns>
-        IQueryCaller<TQuery> Query<TQuery>([NotNull] IPipelinesService pipelinesService,
+        IQueryCaller<TQuery> Query<TQuery>([NotNull] IPipelineService pipelineService,
             [NotNull] TQuery obj) where TQuery : class;
 
         /// <summary>
         /// Create message context from query call. Does not run query.
         /// </summary>
         /// <typeparam name="TQuery">Query object type.</typeparam>
-        /// <param name="pipelinesService">Pipelines service.</param>
+        /// <param name="pipelineService">Pipeline service.</param>
         /// <param name="messageContext">Message context.</param>
         /// <returns>Default value for TQuery.</returns>
-        IQueryCaller<TQuery> CreateMessageContext<TQuery>([NotNull] IPipelinesService pipelinesService,
+        IQueryCaller<TQuery> CreateMessageContext<TQuery>([NotNull] IPipelineService pipelineService,
             IMessageContext messageContext) where TQuery : class;
 
         /// <summary>
         /// Create message query from <see cref="MessageRecord" />.
         /// </summary>
-        /// <param name="pipelinesService">Pipelines service.</param>
+        /// <param name="pipelineService">Pipeline service.</param>
         /// <param name="messageRecord">Message record.</param>
         /// <returns>Message context.</returns>
-        IMessageContext CreateMessageContext([NotNull] IPipelinesService pipelinesService, [NotNull] MessageRecord messageRecord);
+        IMessageContext CreateMessageContext([NotNull] IPipelineService pipelineService, [NotNull] MessageRecord messageRecord);
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Saritasa.BoringWarehouse.Domain.Users.Commands
+﻿using Saritasa.Tools.Messages.Abstractions.Commands;
+
+namespace Saritasa.BoringWarehouse.Domain.Users.Commands
 {
     using System.ComponentModel.DataAnnotations;
 

@@ -73,22 +73,22 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// <summary>
         /// .ctor
         /// </summary>
-        /// <param name="pipelinesService">Pipeline service the context will be related to.</param>
-        public MessageContext(IPipelinesService pipelinesService)
+        /// <param name="pipelineService">Pipeline service the context will be related to.</param>
+        public MessageContext(IPipelineService pipelineService)
         {
-            if (pipelinesService == null)
+            if (pipelineService == null)
             {
-                throw new ArgumentNullException(nameof(pipelinesService));
+                throw new ArgumentNullException(nameof(pipelineService));
             }
-            ServiceProvider = pipelinesService.ServiceProvider;
+            ServiceProvider = pipelineService.ServiceProvider;
         }
 
         /// <summary>
         /// .ctor
         /// </summary>
-        /// <param name="pipelinesService">Pipeline service the context will be related to.</param>
+        /// <param name="pipelineService">Pipeline service the context will be related to.</param>
         /// <param name="content">Content to process.</param>
-        public MessageContext(IPipelinesService pipelinesService, object content) : this(pipelinesService)
+        public MessageContext(IPipelineService pipelineService, object content) : this(pipelineService)
         {
             if (content == null)
             {

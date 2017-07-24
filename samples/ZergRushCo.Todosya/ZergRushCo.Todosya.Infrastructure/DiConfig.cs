@@ -5,7 +5,9 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Extensions.Logging;
 using Saritasa.Tools.Emails.Interceptors;
+using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Commands;
+using Saritasa.Tools.Messages.Common;
 using Saritasa.Tools.Messages.Events;
 using Saritasa.Tools.Messages.Queries;
 using ZergRushCo.Todosya.DataAccess;
@@ -55,40 +57,10 @@ namespace ZergRushCo.Todosya.Infrastructure
                 RethrowExceptions = false,
             };
 
-            // Command pipeline.
-            builder.Register(c =>
-            {
-                var commandPipeline = CommandPipeline.CreateDefaultPipeline(
-                    Resolve,
-                    System.Reflection.Assembly.GetAssembly(typeof(Domain.UserContext.Entities.User)));
-                commandPipeline.AppendMiddlewares(repositoryMiddleware);
-                commandPipeline.AppendMiddlewares(recordRepositoryMiddleware);
-                commandPipeline.UseInternalResolver();
-                builder = new ContainerBuilder();
-
-                return commandPipeline;
-            }).AsImplementedInterfaces().SingleInstance();
-
-            // Query pipeline.
-            builder.Register(c =>
-            {
-                var queryPipeline = QueryPipeline.CreateDefaultPipeline(Resolve);
-                queryPipeline.AppendMiddlewares(repositoryMiddleware);
-                queryPipeline.UseInternalResolver();
-                builder.RegisterInstance(queryPipeline).AsImplementedInterfaces().SingleInstance();
-
-                return queryPipeline;
-            }).AsImplementedInterfaces().SingleInstance();
-
-            // Events pipeline.
-            builder.Register(c =>
-            {
-                var eventsPipeline = EventPipeline.CreateDefaultPipeline(Resolve,
-                    System.Reflection.Assembly.GetAssembly(typeof(Domain.UserContext.Entities.User)));
-                eventsPipeline.UseInternalResolver();
-
-                return eventsPipeline;
-            }).AsImplementedInterfaces().SingleInstance();
+            var pipelinesContainer = RegisterPipelines();
+            builder.RegisterInstance(pipelinesContainer).As<IMessagePipelineContainer>().SingleInstance();
+            builder.RegisterType<DefaultPipelineService>().As<IPipelineService>().InstancePerRequest();
+            builder.RegisterType<AutofacServiceProvider>().As<IServiceProvider>().InstancePerRequest();
 
             // Register queries as separate objects.
             builder.RegisterType<Domain.UserContext.Queries.UsersQueries>().AsSelf();
@@ -114,6 +86,39 @@ namespace ZergRushCo.Todosya.Infrastructure
             var loggerFactory = new LoggerFactory();
             loggerFactory.AddProvider(nlogProvider);
             builder.RegisterInstance(loggerFactory).AsImplementedInterfaces().SingleInstance();
+        }
+
+        public static IMessagePipelineContainer RegisterPipelines()
+        {
+            var pipelinesContainer = new SimpleMessagePipelineContainer();
+
+            // Command.
+            pipelinesContainer.AddCommandPipeline()
+                .AddMiddleware(
+                    new Saritasa.Tools.Messages.Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
+                        System.Reflection.Assembly.GetAssembly(typeof(Domain.UserContext.Entities.User))))
+                .AddMiddleware(new Saritasa.Tools.Messages.Commands.PipelineMiddlewares.CommandExecutorMiddleware
+                {
+                    UseInternalObjectResolver = true,
+                    UseParametersResolve = true
+                });
+
+            // Query.
+            pipelinesContainer.AddQueryPipeline()
+                .AddMiddleware(new Saritasa.Tools.Messages.Queries.PipelineMiddlewares.QueryObjectResolverMiddleware
+                {
+                    UseInternalObjectResolver = true,
+                    UseParametersResolve = true,
+                })
+                .AddMiddleware(new Saritasa.Tools.Messages.Queries.PipelineMiddlewares.QueryExecutorMiddleware())
+                .AddMiddleware(new Saritasa.Tools.Messages.Queries.PipelineMiddlewares.QueryObjectReleaseMiddleware());
+
+            // Event.
+            pipelinesContainer.AddEventPipeline()
+                .AddMiddleware(new Saritasa.Tools.Messages.Events.PipelineMiddlewares.EventHandlerLocatorMiddleware(
+                    System.Reflection.Assembly.GetAssembly(typeof(Domain.UserContext.Entities.User))))
+                .AddMiddleware(new Saritasa.Tools.Messages.Events.PipelineMiddlewares.EventExecutorMiddleware());
+            return pipelinesContainer;
         }
     }
 }

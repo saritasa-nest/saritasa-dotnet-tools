@@ -1,6 +1,7 @@
 ﻿using System.Net.Mail;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Abstractions.Events;
 using ZergRushCo.Todosya.Domain.UserContext.Events;
 
 namespace ZergRushCo.Todosya.Domain.UserContext.Handlers

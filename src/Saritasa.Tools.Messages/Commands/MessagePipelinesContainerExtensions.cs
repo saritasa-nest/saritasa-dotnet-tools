@@ -9,30 +9,30 @@ using Saritasa.Tools.Messages.Abstractions.Commands;
 namespace Saritasa.Tools.Messages.Commands
 {
     /// <summary>
-    /// Command pipeline extensions.
+    /// Message pipeline container pipeline extensions.
     /// </summary>
-    public static class PipelinesServiceExtensions
+    public static class MessagePipelinesContainerExtensions
     {
         /// <summary>
         /// Add command pipeline feature to message context.
         /// </summary>
-        /// <param name="pipelinesService">Pipelines service.</param>
+        /// <param name="messagePipelineContainer">Message pipelines container.</param>
         /// <returns>Command pipeline builder.</returns>
-        public static CommandPipelineBuilder AddCommandPipeline(this IPipelinesService pipelinesService)
+        public static CommandPipelineBuilder AddCommandPipeline(this IMessagePipelineContainer messagePipelineContainer)
         {
-            return AddCommandPipeline(pipelinesService, options => { });
+            return AddCommandPipeline(messagePipelineContainer, options => { });
         }
 
         /// <summary>
         /// Add command pipeline feature to message context.
         /// </summary>
-        /// <param name="pipelinesService">Pipelines service.</param>
+        /// <param name="messagePipelineContainer">Message pipelines container.</param>
         /// <param name="setupAction">Action to setup command pipeline.</param>
         /// <returns>Command pipeline builder.</returns>
-        public static CommandPipelineBuilder AddCommandPipeline(this IPipelinesService pipelinesService,
+        public static CommandPipelineBuilder AddCommandPipeline(this IMessagePipelineContainer messagePipelineContainer,
             Action<CommandPipelineOptions> setupAction)
         {
-            if (pipelinesService.Pipelines.Any(p => p is ICommandPipeline))
+            if (messagePipelineContainer.Pipelines.Any(p => p is ICommandPipeline))
             {
                 throw new InvalidOperationException("Command pipeline already exists in global context items. " +
                     "Use RemovePipeline method to clean up existins pipeline.");
@@ -40,9 +40,9 @@ namespace Saritasa.Tools.Messages.Commands
 
             var commandPipeline = new CommandPipeline();
             setupAction(commandPipeline.Options);
-            var list = pipelinesService.Pipelines.ToList();
+            var list = messagePipelineContainer.Pipelines.ToList();
             list.Add(commandPipeline);
-            pipelinesService.Pipelines = list.ToArray();
+            messagePipelineContainer.Pipelines = list.ToArray();
 
             return new CommandPipelineBuilder(commandPipeline);
         }

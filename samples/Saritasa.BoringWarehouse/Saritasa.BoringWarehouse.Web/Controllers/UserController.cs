@@ -20,12 +20,12 @@
     [AllowAnonymous]
     public class UserController : Controller
     {
-        readonly ICommandPipeline commandPipeline;
+        readonly IPipelineService pipelineService;
         readonly UserQueries userQueries;
 
-        public UserController(ICommandPipeline commandPipeline, UserQueries userQueries)
+        public UserController(IPipelineService pipelineService, UserQueries userQueries)
         {
-            this.commandPipeline = commandPipeline;
+            this.pipelineService = pipelineService;
             this.userQueries = userQueries;
         }
 
@@ -45,7 +45,7 @@
 
             try
             {
-                commandPipeline.Handle(command);
+                pipelineService.HandleCommand(command);
             }
             catch (DomainException ex)
             {
@@ -85,7 +85,7 @@
                     Phone = userProfile.Phone,
                     UserId = userData.UserId
                 };
-                commandPipeline.Handle(command);
+                pipelineService.HandleCommand(command);
             }
             catch (DomainException ex)
             {
@@ -113,7 +113,7 @@
                 return View(command);
             }
 
-            commandPipeline.Handle(command);
+            pipelineService.HandleCommand(command);
             if (!command.IsSuccess)
             {
                 ModelState.AddModelError(string.Empty, "Incorrect login or password");

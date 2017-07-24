@@ -48,28 +48,28 @@ namespace Saritasa.Tools.Messages.Queries
         }
 
         /// <inheritdoc />
-        public virtual IQueryCaller<TQuery> Query<TQuery>(IPipelinesService pipelinesService) where TQuery : class
+        public virtual IQueryCaller<TQuery> Query<TQuery>(IPipelineService pipelineService) where TQuery : class
         {
-            var messageContext = new MessageContext(pipelinesService);
+            var messageContext = new MessageContext(pipelineService);
             return new QueryCaller<TQuery>(this, messageContext);
         }
 
         /// <inheritdoc />
-        public virtual IQueryCaller<TQuery> Query<TQuery>(IPipelinesService pipelinesService, TQuery obj) where TQuery : class
+        public virtual IQueryCaller<TQuery> Query<TQuery>(IPipelineService pipelineService, TQuery obj) where TQuery : class
         {
-            var messageContext = new MessageContext(pipelinesService, obj);
+            var messageContext = new MessageContext(pipelineService, obj);
             return new QueryCaller<TQuery>(this, messageContext, obj);
         }
 
         /// <inheritdoc />
-        public IQueryCaller<TQuery> CreateMessageContext<TQuery>(IPipelinesService pipelinesService,
+        public IQueryCaller<TQuery> CreateMessageContext<TQuery>(IPipelineService pipelineService,
             IMessageContext messageContext) where TQuery : class
         {
             return new QueryCaller<TQuery>(this, messageContext).NoExecution();
         }
 
         /// <inheritdoc />
-        public IMessageContext CreateMessageContext(IPipelinesService pipelinesService, MessageRecord record)
+        public IMessageContext CreateMessageContext(IPipelineService pipelineService, MessageRecord record)
         {
             if (record == null)
             {
@@ -106,7 +106,7 @@ namespace Saritasa.Tools.Messages.Queries
                 throw new InvalidOperationException(Properties.Strings.CannotCreateDelegate);
             }
 
-            var messageContext = new MessageContext(pipelinesService);
+            var messageContext = new MessageContext(pipelineService);
             var dictContent = record.Content as IDictionary<string, object>;
             if (dictContent == null)
             {

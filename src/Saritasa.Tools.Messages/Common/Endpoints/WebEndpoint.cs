@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-#if NET452 && TODO
+#if NET452 && DEMO
 using System;
 using System.IO;
 using System.Linq;
@@ -182,7 +182,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
 
                 if (request.HttpMethod == HttpVerbPost)
                 {
-                    var message = new Message
+                    var message = new MessageRecord
                     {
                         Type = GetMessageTypeFromUri(request.Url),
                         ContentType = GetMessageContentTypeFromUri(request.Url),
@@ -196,12 +196,12 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
                         {
                             var body = streamReader.ReadToEnd();
                             message.Content = JsonConvert.DeserializeObject(body);
-                            /*TypeHelpers.ResolveTypeForContent(
+                            TypeHelpers.ResolveTypeForContent(
                                 message,
                                 System.Text.Encoding.UTF8.GetBytes(message.Content.ToString()),
                                 new ObjectSerializers.JsonObjectSerializer(), // Only json is supported.
                                 AppDomain.CurrentDomain.GetAssemblies() // Pretend that all types are loaded into current domain.
-                            );*/
+                            );
                         }
                         catch (Exception ex)
                         {
@@ -260,9 +260,9 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
 
             switch (cmd)
             {
-                case "command": return Message.MessageTypeCommand;
-                case "query": return Message.MessageTypeQuery;
-                case "event": return Message.MessageTypeEvent;
+                case "command": return MessageContextConstants.MessageTypeCommand;
+                case "query": return MessageContextConstants.MessageTypeQuery;
+                case "event": return MessageContextConstants.MessageTypeEvent;
             }
 
             throw new ArgumentException(Properties.Strings.WebEndpoint_IncorrectRequest, nameof(uri));
@@ -305,14 +305,14 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
             output.Flush();
         }
 
-        private void ProcessMessage(Message message)
+        private void ProcessMessage(MessageRecord messageRecord)
         {
-            InternalLogger.Trace(string.Format(Properties.Strings.WebEndpoint_ProcessingMessage, message.Id,
-                message.ContentType), nameof(WebEndpoint));
+            InternalLogger.Trace(string.Format(Properties.Strings.WebEndpoint_ProcessingMessage, messageRecord.Id,
+                messageRecord.ContentType), nameof(WebEndpoint));
             var isPipelineFound = false;
             foreach (IMessagePipeline pipeline in pipelines)
             {
-                if (pipeline.MessageTypes.Contains(message.Type))
+                if (pipeline.MessageTypes.Contains(messageRecord.Type))
                 {
                     //pipeline.Invoke(message);
                     isPipelineFound = true;
@@ -322,7 +322,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
             if (!isPipelineFound)
             {
                 InternalLogger.Warn(string.Format(Properties.Strings.WebEndpoint_PipelineNotFound,
-                    message.Type, message.Id, message.ContentType), nameof(WebEndpoint));
+                    messageRecord.Type, messageRecord.Id, messageRecord.ContentType), nameof(WebEndpoint));
             }
         }
 

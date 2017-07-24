@@ -24,14 +24,14 @@
     public class ProductsController : Controller
     {
         private readonly ProductQueries productQueries;
-        private readonly ICommandPipeline commandPipeline;
+        private readonly IPipelineService pipelineService;
         private readonly CompanyQueries companyQueries;
 
-        public ProductsController(ICommandPipeline commandPipeline, ProductQueries productQueries, CompanyQueries companyQueries)
+        public ProductsController(IPipelineService pipelineService, ProductQueries productQueries, CompanyQueries companyQueries)
         {
-            if (commandPipeline == null)
+            if (pipelineService == null)
             {
-                throw new ArgumentNullException(nameof(commandPipeline));
+                throw new ArgumentNullException(nameof(pipelineService));
             }
             if (productQueries == null)
             {
@@ -39,7 +39,7 @@
             }
 
             this.productQueries = productQueries;
-            this.commandPipeline = commandPipeline;
+            this.pipelineService = pipelineService;
             this.companyQueries = companyQueries;
         }
 
@@ -97,7 +97,7 @@
                 return View(command);
             }
             command.CreatedByUserId = Core.TicketUserData.FromContext(HttpContext).UserId;
-            commandPipeline.Handle(command);
+            pipelineService.HandleCommand(command);
             return RedirectToAction("Index");
         }
 
@@ -127,7 +127,7 @@
                 return View(command);
             }
             command.UpdatedByUserId = Core.TicketUserData.FromContext(HttpContext).UserId;
-            commandPipeline.Handle(command);
+            pipelineService.HandleCommand(command);
             return RedirectToAction("Index");
         }
 
@@ -151,7 +151,7 @@
         {
             try
             {
-                commandPipeline.Handle(new DeleteProductCommand(id));
+                pipelineService.HandleCommand(new DeleteProductCommand(id));
             }
             catch (DomainException ex)
             {
@@ -167,7 +167,7 @@
         {
             try
             {
-                commandPipeline.Handle(new DeleteProductCommand(id));
+                pipelineService.HandleCommand(new DeleteProductCommand(id));
                 return Json(new { }, JsonRequestBehavior.AllowGet);
             }
             catch (DomainException ex)

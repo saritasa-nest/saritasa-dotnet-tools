@@ -17,7 +17,7 @@ namespace Saritasa.Tools.Messages.Tests
     /// </summary>
     public class CommandsTests
     {
-        private readonly IPipelinesService pipelinesService = new DefaultPipelinesService();
+        private readonly IPipelineService pipelineService = new DefaultPipelineService();
 
         #region Shared interfaces
 
@@ -89,12 +89,12 @@ namespace Saritasa.Tools.Messages.Tests
         public void Can_run_default_simple_pipeline()
         {
             // Arrange
-            var builder = pipelinesService.AddCommandPipeline();
+            var builder = pipelineService.PipelineContainer.AddCommandPipeline();
             SetupCommandPipeline(builder);
             var cmd = new SimpleTestCommand { Id = 5 };
 
             // Act
-            pipelinesService.HandleCommand(cmd);
+            pipelineService.HandleCommand(cmd);
 
             // Assert
             Assert.Equal("result", cmd.Out);
@@ -118,12 +118,12 @@ namespace Saritasa.Tools.Messages.Tests
         public void Command_with_handle_in_it_should_run()
         {
             // Arrange
-            var builder = pipelinesService.AddCommandPipeline();
+            var builder = pipelineService.PipelineContainer.AddCommandPipeline();
             SetupCommandPipeline(builder);
             var cmd = new SimpleTestCommandWithHandler();
 
             // Act
-            pipelinesService.HandleCommand(cmd);
+            pipelineService.HandleCommand(cmd);
 
             // Assert
             Assert.Equal("result", cmd.Param);
@@ -147,13 +147,13 @@ namespace Saritasa.Tools.Messages.Tests
         public void Command_with_handle_in_it_and_deps_should_run()
         {
             // Arrange
-            pipelinesService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
-            var builder = pipelinesService.AddCommandPipeline();
+            pipelineService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
+            var builder = pipelineService.PipelineContainer.AddCommandPipeline();
             SetupCommandPipeline(builder);
             var cmd = new TestCommandWithHandlerAndDeps();
 
             // Act
-            pipelinesService.HandleCommand(cmd);
+            pipelineService.HandleCommand(cmd);
 
             // Assert
             Assert.Equal("AB", cmd.Param);
@@ -183,13 +183,13 @@ namespace Saritasa.Tools.Messages.Tests
         public void Can_run_command_handler_with_public_properties_resolve()
         {
             // Arrange
-            pipelinesService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
-            var builder = pipelinesService.AddCommandPipeline();
+            pipelineService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
+            var builder = pipelineService.PipelineContainer.AddCommandPipeline();
             SetupCommandPipeline(builder);
             var cmd = new TestCommand2();
 
             // Act
-            pipelinesService.HandleCommand(cmd);
+            pipelineService.HandleCommand(cmd);
 
             // Assert
             Assert.Equal(1, cmd.Param);
@@ -224,13 +224,13 @@ namespace Saritasa.Tools.Messages.Tests
         public void Can_run_command_handler_with_ctor_properties_resolve()
         {
             // Arrange
-            pipelinesService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
-            var builder = pipelinesService.AddCommandPipeline();
+            pipelineService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
+            var builder = pipelineService.PipelineContainer.AddCommandPipeline();
             SetupCommandPipeline(builder);
             var cmd = new TestCommand3();
 
             // Act
-            pipelinesService.HandleCommand(cmd);
+            pipelineService.HandleCommand(cmd);
 
             // Assert
             Assert.Equal(1, cmd.Param);
@@ -259,8 +259,8 @@ namespace Saritasa.Tools.Messages.Tests
         public void Validation_command_attributes_should_generate_exception_for_bad_command()
         {
             // Arrange
-            pipelinesService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
-            pipelinesService.AddCommandPipeline()
+            pipelineService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
+            pipelineService.PipelineContainer.AddCommandPipeline()
             .AddMiddleware(new Commands.PipelineMiddlewares.CommandValidationMiddleware())
             .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
                 typeof(CommandsTests).GetTypeInfo().Assembly))
@@ -276,12 +276,12 @@ namespace Saritasa.Tools.Messages.Tests
             };
 
             // Act & assert
-            Assert.Throws<CommandValidationException>(() => { pipelinesService.HandleCommand(cmd); });
+            Assert.Throws<CommandValidationException>(() => { pipelineService.HandleCommand(cmd); });
             Assert.NotEqual(10, cmd.PercentInt);
 
             cmd.PercentInt = 20;
             cmd.Name = "Mr Robot";
-            pipelinesService.HandleCommand(cmd);
+            pipelineService.HandleCommand(cmd);
             Assert.Equal(10, cmd.PercentInt);
         }
 
@@ -289,7 +289,7 @@ namespace Saritasa.Tools.Messages.Tests
         public void Validation_command_attributes_should_not_generate_exception_for_good_command()
         {
             // Arrange
-            pipelinesService.AddCommandPipeline()
+            pipelineService.PipelineContainer.AddCommandPipeline()
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandValidationMiddleware())
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
                     typeof(CommandsTests).GetTypeInfo().Assembly))
@@ -305,7 +305,7 @@ namespace Saritasa.Tools.Messages.Tests
             };
 
             // Act
-            pipelinesService.HandleCommand(cmd);
+            pipelineService.HandleCommand(cmd);
 
             // Assert
             Assert.Equal(10, cmd.PercentInt);
@@ -324,13 +324,13 @@ namespace Saritasa.Tools.Messages.Tests
         public void If_command_handler_not_found_generate_exception()
         {
             // Arrange
-            var builder = pipelinesService.AddCommandPipeline();
+            var builder = pipelineService.PipelineContainer.AddCommandPipeline();
             SetupCommandPipeline(builder);
 
             // Act & assert
             Assert.Throws<CommandHandlerNotFoundException>(() =>
             {
-                pipelinesService.HandleCommand(new CommandWithNoHandler());
+                pipelineService.HandleCommand(new CommandWithNoHandler());
             });
         }
 
@@ -357,7 +357,7 @@ namespace Saritasa.Tools.Messages.Tests
         public void Can_find_handler_with_ClassSuffix_search_method()
         {
             // Arrange
-            pipelinesService.AddCommandPipeline()
+            pipelineService.PipelineContainer.AddCommandPipeline()
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
                     typeof(CommandsTests).GetTypeInfo().Assembly)
                 {
@@ -371,7 +371,7 @@ namespace Saritasa.Tools.Messages.Tests
             var cmd = new SimpleTestCommand2 { Id = 6 };
 
             // Act
-            pipelinesService.HandleCommand(cmd);
+            pipelineService.HandleCommand(cmd);
 
             // Assert
             Assert.Equal("out", cmd.Out);

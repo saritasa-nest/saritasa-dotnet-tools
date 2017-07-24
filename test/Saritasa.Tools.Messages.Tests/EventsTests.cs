@@ -17,7 +17,7 @@ namespace Saritasa.Tools.Messages.Tests
     /// </summary>
     public class EventsTests
     {
-        private readonly IPipelinesService pipelinesService = new DefaultPipelinesService();
+        private readonly IPipelineService pipelinesService = new DefaultPipelineService();
 
         #region Shared interfaces
 
@@ -102,7 +102,7 @@ namespace Saritasa.Tools.Messages.Tests
         {
             // Arrange
             pipelinesService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
-            SetupEventPipeline(pipelinesService.AddEventPipeline());
+            SetupEventPipeline(pipelinesService.PipelineContainer.AddEventPipeline());
             var ev = new CreateUserEvent
             {
                 UserId = 10,
@@ -148,7 +148,7 @@ namespace Saritasa.Tools.Messages.Tests
             }
 
             pipelinesService.ServiceProvider = new FuncServiceProvider(Resolver);
-            pipelinesService.AddEventPipeline()
+            pipelinesService.PipelineContainer.AddEventPipeline()
                 .AddMiddleware(new Events.PipelineMiddlewares.DomainEventLocatorMiddleware(eventsManager))
                 .AddMiddleware(new Events.PipelineMiddlewares.EventExecutorMiddleware
                 {

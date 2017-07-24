@@ -2,8 +2,6 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Abstractions.Commands;
 using Saritasa.Tools.Messages.Common;
@@ -24,14 +22,14 @@ namespace Saritasa.Tools.Messages.Commands
         public new CommandPipelineOptions Options { get; } = new CommandPipelineOptions();
 
         /// <inheritdoc />
-        public IMessageContext CreateMessageContext(IPipelinesService pipelinesService, object command)
+        public IMessageContext CreateMessageContext(IPipelineService pipelineService, object command)
         {
             if (command == null)
             {
                 throw new ArgumentNullException(nameof(command));
             }
 
-            var mc = new MessageContext(pipelinesService)
+            var mc = new MessageContext(pipelineService)
             {
                 Content = command,
                 ContentId = command.GetType().FullName

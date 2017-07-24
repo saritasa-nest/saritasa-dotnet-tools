@@ -16,7 +16,7 @@ namespace Saritasa.Tools.Messages.Tests
     /// </summary>
     public class QueriesTests
     {
-        readonly IPipelinesService pipelinesService = new DefaultPipelinesService();
+        readonly IPipelineService pipelineService = new DefaultPipelineService();
 
         #region Interfaces
 
@@ -90,10 +90,10 @@ namespace Saritasa.Tools.Messages.Tests
         public void Can_run_simple_query()
         {
             // Arrange
-            SetupQueryPipeline(pipelinesService.AddQueryPipeline());
+            SetupQueryPipeline(pipelineService.PipelineContainer.AddQueryPipeline());
 
             // Act
-            var result = pipelinesService.Query<QueryObject>().With(q => q.SimpleQuery(10, 20));
+            var result = pipelineService.Query<QueryObject>().With(q => q.SimpleQuery(10, 20));
 
             // Assert
             Assert.NotNull(result);
@@ -107,11 +107,11 @@ namespace Saritasa.Tools.Messages.Tests
         public void Can_run_query_with_resolving()
         {
             // Arrange
-            pipelinesService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
-            SetupQueryPipeline(pipelinesService.AddQueryPipeline());
+            pipelineService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
+            SetupQueryPipeline(pipelineService.PipelineContainer.AddQueryPipeline());
 
             // Act
-            var result = pipelinesService.Query<QueryObject>().With(q => q.SimpleQueryWithDependency(10, 20, null));
+            var result = pipelineService.Query<QueryObject>().With(q => q.SimpleQueryWithDependency(10, 20, null));
 
             // Assert
             Assert.NotNull(result);
@@ -123,8 +123,8 @@ namespace Saritasa.Tools.Messages.Tests
         public void Can_run_query_from_raw_message()
         {
             // Arrange
-            pipelinesService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
-            SetupQueryPipeline(pipelinesService.AddQueryPipeline());
+            pipelineService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
+            SetupQueryPipeline(pipelineService.PipelineContainer.AddQueryPipeline());
             var messageRecord = new MessageRecord
             {
                 ContentType = "Saritasa.Tools.Messages.Tests.QueriesTests+QueryObject.SimpleQueryWithDependency",
@@ -137,8 +137,8 @@ namespace Saritasa.Tools.Messages.Tests
             };
 
             // Act
-            var queryPipeline = pipelinesService.GetPipelineOfType<IQueryPipeline>();
-            var messageContext = queryPipeline.CreateMessageContext(pipelinesService, messageRecord);
+            var queryPipeline = pipelineService.GetPipelineOfType<IQueryPipeline>();
+            var messageContext = queryPipeline.CreateMessageContext(pipelineService, messageRecord);
             queryPipeline.Invoke(messageContext);
 
             // Assert
@@ -172,11 +172,11 @@ namespace Saritasa.Tools.Messages.Tests
         public void Can_run_query_with_private_object_ctor()
         {
             // Arrange
-            pipelinesService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
-            SetupQueryPipeline(pipelinesService.AddQueryPipeline());
+            pipelineService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
+            SetupQueryPipeline(pipelineService.PipelineContainer.AddQueryPipeline());
 
             // Act
-            var result = pipelinesService.Query<QueryObjectWithPrivateCtor>().With(q => q.Query());
+            var result = pipelineService.Query<QueryObjectWithPrivateCtor>().With(q => q.Query());
 
             // Assert
             Assert.NotNull(result);
@@ -192,11 +192,11 @@ namespace Saritasa.Tools.Messages.Tests
         public void Can_run_query_from_raw_message_2()
         {
             // Arrange
-            pipelinesService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
-            SetupQueryPipeline(pipelinesService.AddQueryPipeline());
-            var messageContext = new MessageContext(pipelinesService);
-            var queryPipeline = pipelinesService.GetPipelineOfType<IQueryPipeline>();
-            var ret = queryPipeline.CreateMessageContext<QueryObject>(pipelinesService, messageContext)
+            pipelineService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
+            SetupQueryPipeline(pipelineService.PipelineContainer.AddQueryPipeline());
+            var messageContext = new MessageContext(pipelineService);
+            var queryPipeline = pipelineService.GetPipelineOfType<IQueryPipeline>();
+            var ret = queryPipeline.CreateMessageContext<QueryObject>(pipelineService, messageContext)
                 .With(q => q.SimpleQuery(10, 10));
 
             // Act

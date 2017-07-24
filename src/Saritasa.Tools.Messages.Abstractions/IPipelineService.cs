@@ -1,20 +1,20 @@
-﻿using System;
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+// Licensed under the BSD license. See LICENSE file in the project root for full license information.
+
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Saritasa.Tools.Messages.Abstractions
 {
     /// <summary>
     /// Pipelines service.
     /// </summary>
-    public interface IPipelinesService
+    public interface IPipelineService
     {
         /// <summary>
-        /// Collection of pipelines.
+        /// Pipelines related to service.
         /// </summary>
-        IMessagePipeline[] Pipelines { get; set; }
+        IMessagePipelineContainer PipelineContainer { get; set; }
 
         /// <summary>
         /// Current used service provider.

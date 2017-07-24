@@ -2,6 +2,7 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Reflection;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Abstractions.Commands;
 using Saritasa.Tools.Messages.Common;
@@ -29,6 +30,18 @@ namespace Saritasa.Tools.Messages.Commands
         public CommandPipelineBuilder AddMiddleware(IMessagePipelineMiddleware middleware)
         {
             Pipeline.AddMiddlewares(middleware);
+            return this;
+        }
+
+        /// <summary>
+        /// Use default middlewares configuration. Includes command handler locator and executor.
+        /// </summary>
+        /// <param name="assemblies">Assemblies to search command handlers.</param>
+        /// <returns>Command pipeline builder.</returns>
+        public CommandPipelineBuilder UseDefaultMiddlewares(params Assembly[] assemblies)
+        {
+            Pipeline.AddMiddlewares(new PipelineMiddlewares.CommandHandlerLocatorMiddleware(assemblies));
+            Pipeline.AddMiddlewares(new PipelineMiddlewares.CommandExecutorMiddleware());
             return this;
         }
     }

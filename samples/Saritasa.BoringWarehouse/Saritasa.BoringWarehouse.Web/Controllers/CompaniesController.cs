@@ -16,16 +16,16 @@
     [Authorize]
     public class CompaniesController : Controller
     {
-        private readonly ICommandPipeline commandPipline;
+        private readonly IPipelineService pipelineService;
         private readonly CompanyQueries companyQueries;
 
-        public CompaniesController(ICommandPipeline commandPipline, CompanyQueries companyQueries)
+        public CompaniesController(IPipelineService pipelineService, CompanyQueries companyQueries)
         {
-            if (commandPipline == null)
+            if (pipelineService == null)
             {
-                throw new ArgumentNullException(nameof(commandPipline));
+                throw new ArgumentNullException(nameof(pipelineService));
             }
-            this.commandPipline = commandPipline;
+            this.pipelineService = pipelineService;
             this.companyQueries = companyQueries;
         }
 
@@ -63,7 +63,7 @@
             try
             {
                 command.CreatedByUserId = Core.TicketUserData.FromContext(HttpContext).UserId;
-                commandPipline.Handle(command);
+                pipelineService.HandleCommand(command);
             }
             catch (DomainException ex)
             {
@@ -87,7 +87,7 @@
         {
             try
             {
-                commandPipline.Handle(command);
+                pipelineService.HandleCommand(command);
             }
             catch (DomainException ex)
             {
@@ -121,7 +121,7 @@
 
             try
             {
-                commandPipline.Handle(new DeleteCompanyCommand(company));
+                pipelineService.HandleCommand(new DeleteCompanyCommand(company));
             }
             catch (DomainException ex)
             {

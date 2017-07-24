@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Domain.Exceptions;
+using Saritasa.Tools.Messages.Abstractions.Commands;
+using Saritasa.Tools.Messages.Abstractions.Events;
 using ZergRushCo.Todosya.Domain.UserContext.Commands;
 using ZergRushCo.Todosya.Domain.UserContext.Entities;
 using ZergRushCo.Todosya.Domain.UserContext.Events;
@@ -39,10 +41,10 @@ namespace ZergRushCo.Todosya.Domain.UserContext.Handlers
         /// Handle user registration.
         /// </summary>
         /// <param name="command">Command.</param>
-        /// <param name="eventsPipeline">Events pipeline.</param>
+        /// <param name="pipelineService">Pipeline service.</param>
         public async Task HandleRegisterUser(
             RegisterUserCommand command,
-            IEventPipeline eventsPipeline)
+            IPipelineService pipelineService)
         {
             using (var uow = uowFactory.Create())
             {
@@ -69,10 +71,10 @@ namespace ZergRushCo.Todosya.Domain.UserContext.Handlers
                     throw new IdentityException(command.Result);
                 }
 
-                await eventsPipeline.RaiseAsync(new UserCreatedEvent
+                await pipelineService.RaiseEventAsync(new UserCreatedEvent
                 {
                     User = user,
-                }, CancellationToken.None);
+                });
 
                 command.User = user;
                 logger.LogInformation($"User {user.FirstName} {user.LastName} with id {user.Id} has been registered.");

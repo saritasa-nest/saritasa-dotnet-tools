@@ -17,21 +17,19 @@ namespace Saritasa.Tools.Messages.Common
     public abstract class BaseExecutorMiddleware : IMessagePipelineMiddleware, IAsyncMessagePipelineMiddleware
     {
         private const string KeyId = "id";
-        private const string KeyMethod = "method";
-        private const string KeyClass = "class";
 
         /// <inheritdoc />
         public string Id { get; set; }
 
         /// <summary>
-        /// If true the middleware will resolve project using internal resolver.
+        /// If true the middleware will resolve project using internal resolver. Default is <c>true</c>.
         /// </summary>
-        public bool UseInternalObjectResolver { get; set; }
+        public bool UseInternalObjectResolver { get; set; } = true;
 
         /// <summary>
-        /// If true the middleware will try to resolve executing method parameters. Default is false.
+        /// If true the middleware will try to resolve executing method parameters. Default is <c>true</c>.
         /// </summary>
-        public bool UseParametersResolve { get; set; }
+        public bool UseParametersResolve { get; set; } = true;
 
         /// <summary>
         /// .ctor

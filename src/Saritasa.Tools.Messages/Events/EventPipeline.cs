@@ -24,9 +24,9 @@ namespace Saritasa.Tools.Messages.Events
         public new EventPipelineOptions Options { get; } = new EventPipelineOptions();
 
         /// <inheritdoc />
-        public IMessageContext CreateMessageContext(IPipelinesService pipelinesService, object @event)
+        public IMessageContext CreateMessageContext(IPipelineService pipelineService, object @event)
         {
-            return new MessageContext(pipelinesService, @event);
+            return new MessageContext(pipelineService, @event);
         }
     }
 }

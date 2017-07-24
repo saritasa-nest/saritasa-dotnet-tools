@@ -14,9 +14,9 @@ namespace Saritasa.Tools.Messages.Abstractions.Events
         /// <summary>
         /// Create message context from pipelines service and event object.
         /// </summary>
-        /// <param name="pipelinesService">Pipelines service.</param>
+        /// <param name="pipelineService">Pipeline service.</param>
         /// <param name="event">Event object.</param>
         /// <returns>Message context.</returns>
-        IMessageContext CreateMessageContext([NotNull] IPipelinesService pipelinesService, [NotNull] object @event);
+        IMessageContext CreateMessageContext([NotNull] IPipelineService pipelineService, [NotNull] object @event);
     }
 }

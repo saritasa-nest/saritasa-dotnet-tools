@@ -71,8 +71,8 @@ namespace Saritasa.Tools.Messages.Internal
         /// <param name="bytes">Message body (content).</param>
         /// <param name="objectSerializer">Serializer to be used.</param>
         /// <param name="assemblies">Assemblies that will be additionaly used for resolving.</param>
-        internal static void ResolveTypeForContent(MessageRecord messageRecord, byte[] bytes, IObjectSerializer objectSerializer,
-            Assembly[] assemblies)
+        internal static void ResolveTypeForContent(MessageRecord messageRecord, byte[] bytes,
+            IObjectSerializer objectSerializer, Assembly[] assemblies)
         {
             if (bytes == null || bytes.Length < 1)
             {

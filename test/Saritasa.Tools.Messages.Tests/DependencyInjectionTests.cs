@@ -17,7 +17,7 @@ namespace Saritasa.Tools.Messages.Tests
     /// </summary>
     public class DependencyInjectionTests
     {
-        private readonly IPipelinesService pipelinesService = new DefaultPipelinesService();
+        private readonly IPipelineService pipelineService = new DefaultPipelineService();
 
         public interface IInterfaceA
         {
@@ -76,7 +76,7 @@ namespace Saritasa.Tools.Messages.Tests
         public void Should_dispose_command_handlers_after_instaniate_if_self_created()
         {
             // Arrange
-            pipelinesService.AddCommandPipeline()
+            pipelineService.PipelineContainer.AddCommandPipeline()
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
                     typeof(CommandsTests).GetTypeInfo().Assembly))
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandExecutorMiddleware
@@ -87,7 +87,7 @@ namespace Saritasa.Tools.Messages.Tests
             var cmd = new TestCommand();
 
             // Act
-            pipelinesService.HandleCommand(cmd);
+            pipelineService.HandleCommand(cmd);
 
             // Assert
             Assert.True(TestCommandHandler.IsDisposed);
@@ -97,7 +97,7 @@ namespace Saritasa.Tools.Messages.Tests
         public async Task Should_dispose_command_handlers_after_instaniate_async()
         {
             // Arrange
-            pipelinesService.AddCommandPipeline()
+            pipelineService.PipelineContainer.AddCommandPipeline()
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
                     typeof(CommandsTests).GetTypeInfo().Assembly))
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandExecutorMiddleware
@@ -108,7 +108,7 @@ namespace Saritasa.Tools.Messages.Tests
             var cmd = new TestCommand();
 
             // Act
-            await pipelinesService.HandleCommandAsync(cmd);
+            await pipelineService.HandleCommandAsync(cmd);
 
             // Assert
             Assert.True(TestCommandHandler.IsDisposed);
