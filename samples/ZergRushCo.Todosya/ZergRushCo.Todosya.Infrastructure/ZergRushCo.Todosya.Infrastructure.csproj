@@ -79,6 +79,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutofacServiceProvider.cs" />
+    <Compile Include="AutofacServiceProviderFactory.cs" />
     <Compile Include="DiConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -18,9 +18,6 @@ namespace Saritasa.Tools.Messages.Common
         /// <inheritdoc />
         public IServiceProvider ServiceProvider { get; set; }
 
-        /// <inheritdoc />
-        public IDictionary<object, object> Items { get; set; } = new Dictionary<object, object>();
-
         /// <summary>
         /// .ctor
         /// </summary>

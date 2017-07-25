@@ -2,6 +2,7 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
+using Newtonsoft.Json.Linq;
 
 namespace Saritasa.Tools.Messages.TestRuns.Steps
 {
@@ -20,9 +21,9 @@ namespace Saritasa.Tools.Messages.TestRuns.Steps
         }
 
         /// <inheritdoc />
-        public string Save()
+        public JObject Save()
         {
-            return string.Empty;
+            return new JObject();
         }
     }
 }

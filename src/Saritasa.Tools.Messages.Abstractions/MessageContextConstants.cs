@@ -2,6 +2,8 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace Saritasa.Tools.Messages.Abstractions
 {
@@ -33,6 +35,11 @@ namespace Saritasa.Tools.Messages.Abstractions
         public const string ResultKey = "result";
 
         /// <summary>
+        /// Unknown type.
+        /// </summary>
+        public const byte MessageTypeUnknown = 0;
+
+        /// <summary>
         /// Command type.
         /// </summary>
         public const byte MessageTypeCommand = 1;
@@ -46,5 +53,16 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// Event type.
         /// </summary>
         public const byte MessageTypeEvent = 3;
+
+        /// <summary>
+        /// Dictionary that maps message type to string code.
+        /// </summary>
+        public static readonly IDictionary<byte, string> MessageTypeCodes = new ConcurrentDictionary<byte, string>()
+        {
+            [MessageTypeUnknown] = "unknown",
+            [MessageTypeCommand] = "command",
+            [MessageTypeQuery] = "query",
+            [MessageTypeEvent] = "event"
+        };
     }
 }

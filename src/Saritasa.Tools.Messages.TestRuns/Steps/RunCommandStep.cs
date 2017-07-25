@@ -2,6 +2,7 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Saritasa.Tools.Messages.Abstractions;
@@ -58,15 +59,15 @@ namespace Saritasa.Tools.Messages.TestRuns.Steps
         /// <summary>
         /// .ctor to create from string line.
         /// </summary>
-        /// <param name="body">String.</param>
-        public RunCommandStep(string body)
+        /// <param name="body">JSON.</param>
+        public RunCommandStep(JObject body)
         {
-            if (string.IsNullOrEmpty(body))
+            if (body == null)
             {
                 throw new ArgumentNullException(nameof(body));
             }
 
-            var j = JObject.Parse(body);
+            var j = body;
             this.id = Guid.Parse(j[KeyId].ToString());
             this.commandType = j[KeyType].ToString();
             var type = TypeHelpers.LoadType(this.commandType);
@@ -74,27 +75,37 @@ namespace Saritasa.Tools.Messages.TestRuns.Steps
             {
                 this.typeWasResolved = true;
             }
-            this.command = JsonConvert.DeserializeObject(j[KeyContent].ToString(), type);
+            this.command = JsonConvert.DeserializeObject(j[KeyContent].ToString(), type, new JsonSerializerSettings
+            {
+                Error = (sender, args) => { args.ErrorContext.Handled = true; }
+            });
         }
 
         /// <inheritdoc />
         public void Run(TestRunExecutionContext context)
         {
-            /*if (!typeWasResolved)
+            if (!typeWasResolved)
             {
                 throw new TestRunException($"Cannot load type {this.commandType} for id {this.id}.");
             }
-            var commandPipeline = context.Resolver(typeof(ICommandPipeline)) as ICommandPipeline;
-            if (commandPipeline == null)
+            var pipelines = context.ServiceProvider.GetService(typeof(IMessagePipelineContainer))
+                as IMessagePipelineContainer;
+            if (pipelines == null)
+            {
+                throw new TestRunException($"Cannot resolve {nameof(IMessagePipelineContainer)}.");
+            }
+            var commandPipeline = pipelines.Pipelines.FirstOrDefault(p => p is ICommandPipeline);
+            if (pipelines == null)
             {
                 throw new TestRunException($"Cannot resolve {nameof(ICommandPipeline)}.");
             }
-            commandPipeline.Handle(command);
-            context.LastResult = command;*/
+            var pipelineService = new TestRunPipelineService(context.ServiceProvider, commandPipeline);
+            pipelineService.HandleCommand(command);
+            context.LastResult = command;
         }
 
         /// <inheritdoc />
-        public string Save()
+        public JObject Save()
         {
             var j = new JObject
             {
@@ -102,7 +113,7 @@ namespace Saritasa.Tools.Messages.TestRuns.Steps
                 [KeyType] = commandType,
                 [KeyContent] = JObject.FromObject(command)
             };
-            return JsonConvert.SerializeObject(j, Formatting.Indented);
+            return j;
         }
 
         /// <inheritdoc />

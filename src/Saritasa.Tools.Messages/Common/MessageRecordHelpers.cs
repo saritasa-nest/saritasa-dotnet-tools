@@ -29,6 +29,7 @@ namespace Saritasa.Tools.Messages.Common
             }
             messageRecord.Content = messageContext.Content;
             messageRecord.ContentType = messageContext.ContentId;
+            messageRecord.Status = messageContext.Status;
             if (messageContext.Items.TryGetValue(MessageContextConstants.DataKey, out val))
             {
                 messageRecord.Data = (IDictionary<string, string>)val;

@@ -10,5 +10,14 @@ namespace Saritasa.Tools.Messages.TestRuns
     /// </summary>
     public class TestRunResult
     {
+        /// <summary>
+        /// Was test run succeed.
+        /// </summary>
+        public bool IsSuccess { get; set; } = true;
+
+        /// <summary>
+        /// Exception if any occured.
+        /// </summary>
+        public Exception FailException { get; set; }
     }
 }

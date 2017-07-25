@@ -12,6 +12,11 @@ namespace ZergRushCo.Todosya.Domain.UserContext.Commands
     public class RegisterUserCommand
     {
         /// <summary>
+        /// Optional user id. Should be set manually for testing.
+        /// </summary>
+        public Guid UserId { get; set; } = Guid.Empty;
+
+        /// <summary>
         /// User's email.
         /// </summary>
         [Required]

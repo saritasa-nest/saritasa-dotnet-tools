@@ -1,6 +1,9 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using Newtonsoft.Json.Linq;
+
 namespace Saritasa.Tools.Messages.TestRuns
 {
     /// <summary>
@@ -19,6 +22,6 @@ namespace Saritasa.Tools.Messages.TestRuns
         /// Save test run step as string.
         /// </summary>
         /// <returns>Serialized presentation of step state.</returns>
-        string Save();
+        JObject Save();
     }
 }

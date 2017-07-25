@@ -8,7 +8,6 @@ using Saritasa.Tools.Emails.Interceptors;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Commands;
 using Saritasa.Tools.Messages.Common;
-using Saritasa.Tools.Messages.Common.Repositories;
 using Saritasa.Tools.Messages.Events;
 using Saritasa.Tools.Messages.Queries;
 using ZergRushCo.Todosya.DataAccess;
@@ -36,10 +35,13 @@ namespace ZergRushCo.Todosya.Infrastructure
             builder.RegisterType<DataAccess.Repositories.UserRepository>().AsImplementedInterfaces();
             builder.RegisterType<Domain.UserContext.Services.AppUserManager>().AsSelf();
 
+            // Pipelines container.
             var pipelinesContainer = RegisterPipelines();
             builder.RegisterInstance(pipelinesContainer).As<IMessagePipelineContainer>().SingleInstance();
-            builder.RegisterType<DefaultPipelineService>().As<IPipelineService>().InstancePerRequest();
-            builder.RegisterType<AutofacServiceProvider>().As<IServiceProvider>().InstancePerRequest();
+            builder.RegisterType<DefaultPipelineService>().As<IPipelineService>().InstancePerRequest()
+                .InstancePerLifetimeScope();
+            builder.RegisterType<AutofacServiceProvider>().As<IServiceProvider>().InstancePerRequest()
+                .InstancePerLifetimeScope();
 
             // Register queries as separate objects.
             builder.RegisterType<Domain.UserContext.Queries.UsersQueries>().AsSelf();

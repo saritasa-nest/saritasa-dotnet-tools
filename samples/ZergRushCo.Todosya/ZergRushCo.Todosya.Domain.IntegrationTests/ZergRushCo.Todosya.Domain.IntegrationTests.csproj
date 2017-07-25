@@ -66,8 +66,18 @@
   <ItemGroup>
     <Compile Include="AppTestRunRunner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestHelpers.cs" />
+    <Compile Include="UserTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Saritasa.Tools.Domain\Saritasa.Tools.Domain.csproj">
+      <Project>{32a3a81c-a65c-4f78-8300-17151987697c}</Project>
+      <Name>Saritasa.Tools.Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\src\Saritasa.Tools.Messages.Abstractions\Saritasa.Tools.Messages.Abstractions.csproj">
+      <Project>{e16b2300-a1d4-49bb-b3fc-c2891e7d1177}</Project>
+      <Name>Saritasa.Tools.Messages.Abstractions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\src\Saritasa.Tools.Messages.TestRuns\Saritasa.Tools.Messages.TestRuns.csproj">
       <Project>{dcd61699-bd99-4691-82cc-bd7d887c64f8}</Project>
       <Name>Saritasa.Tools.Messages.TestRuns</Name>
@@ -84,6 +94,9 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+    <EmbeddedResource Include="Users\Cannot_create_user_with_equal_email.json" />
+    <EmbeddedResource Include="Users\Cannot_edit_project_for_another_user.json" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

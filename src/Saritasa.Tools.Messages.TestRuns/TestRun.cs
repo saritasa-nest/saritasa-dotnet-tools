@@ -7,6 +7,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Saritasa.Tools.Messages.TestRuns.Steps;
 
 namespace Saritasa.Tools.Messages.TestRuns
@@ -16,11 +18,20 @@ namespace Saritasa.Tools.Messages.TestRuns
     /// </summary>
     public class TestRun
     {
-        private const int Version = 1;
+        /// <summary>
+        /// Json field name for step number.
+        /// </summary>
+        public const string NumberKey = "number";
 
-        private string FormatDelimiterLine(int stepNumber, string target) => $"/*>! #{stepNumber} {target} */";
+        /// <summary>
+        /// Json field name for type.
+        /// </summary>
+        public const string TypeKey = "type";
 
-        private string FormatHeaderLine(int version) => $"/*>! V{version} Saritasa Tools Messages TestRun file. */";
+        /// <summary>
+        /// Json field name for content.
+        /// </summary>
+        public const string ContentKey = "content";
 
         /// <summary>
         /// Test run steps.
@@ -97,15 +108,19 @@ namespace Saritasa.Tools.Messages.TestRuns
         /// <param name="streamWriter">Stream writer.</param>
         public void Save(StreamWriter streamWriter)
         {
-            streamWriter.WriteLine(FormatHeaderLine(Version));
+            var jarr = new JArray();
             for (int i = 0; i < Steps.Count; i++)
             {
                 var step = Steps[i];
-                var stepTypeName = step.GetType().Name;
-                streamWriter.WriteLine(FormatDelimiterLine(i + 1, stepTypeName));
-                streamWriter.WriteLine(step.Save());
-                streamWriter.WriteLine();
+                var jstep = new JObject
+                {
+                    [NumberKey] = "#" + i,
+                    [TypeKey] = step.GetType().Name,
+                    [ContentKey] = step.Save()
+                };
+                jarr.Add(jstep);
             }
+            streamWriter.WriteLine(jarr.ToString(Formatting.Indented));
         }
 
         /// <summary>
@@ -115,48 +130,25 @@ namespace Saritasa.Tools.Messages.TestRuns
         /// <returns>Test run.</returns>
         public static TestRun Load(StreamReader reader)
         {
-            var sb = new StringBuilder();
             var testRun = new TestRun();
-            string currentStepTypeName = string.Empty;
 
-            var versionLine = GetTypeNameFromDelimeterLine(reader.ReadLine());
-            var version = GetVersionFromName(versionLine);
-            if (version != Version)
+            using (var jsonReader = new JsonTextReader(reader))
             {
-                throw new TestRunException("Incorrect version file format.");
-            }
-
-            while (!reader.EndOfStream)
-            {
-                var line = (reader.ReadLine() ?? string.Empty).Trim();
-                if (line.StartsWith("//"))
+                var jarr = JToken.ReadFrom(jsonReader);
+                foreach (JToken jToken in jarr)
                 {
-                    continue;
-                }
-
-                if (IsDelimeterLine(line))
-                {
-                    if (!string.IsNullOrEmpty(currentStepTypeName))
+                    var type = jToken[TypeKey].ToString();
+                    var content = jToken[ContentKey] as JObject;
+                    if (string.IsNullOrEmpty(type) || content == null)
                     {
-                        var step = CreateTestRunStepFromTypeName(currentStepTypeName, sb.ToString());
-                        testRun.Steps.Add(step);
-                        sb.Clear();
+                        throw new InvalidOperationException($"{TypeKey} or {ContentKey} are not specified.");
                     }
-                    currentStepTypeName = GetTypeNameFromDelimeterLine(line);
-                }
-                else
-                {
-                    sb.AppendLine(line);
+                    var step = CreateTestRunStepFromTypeName(type, content);
+                    testRun.Steps.Add(step);
                 }
             }
 
-            if (!string.IsNullOrEmpty(currentStepTypeName))
-            {
-                var step = CreateTestRunStepFromTypeName(currentStepTypeName, sb.ToString());
-                testRun.Steps.Add(step);
-            }
-
-            if (!testRun.Steps.Any() && string.IsNullOrEmpty(currentStepTypeName))
+            if (!testRun.Steps.Any())
             {
                 throw new TestRunException("Invalid stream format.");
             }
@@ -166,19 +158,6 @@ namespace Saritasa.Tools.Messages.TestRuns
             }
 
             return testRun;
-        }
-
-        private static int GetVersionFromName(string line)
-        {
-            if (line.StartsWith("V") && line.Length > 1)
-            {
-                var v = line.Substring(1);
-                if (int.TryParse(v, out int versionInt))
-                {
-                    return versionInt;
-                }
-            }
-            throw new TestRunException("Incorrect file header.");
         }
 
         private static bool IsDelimeterLine(string line) => line.StartsWith("/*>!") && line.EndsWith("*/");
@@ -211,9 +190,9 @@ namespace Saritasa.Tools.Messages.TestRuns
         /// Create test run step from type name.
         /// </summary>
         /// <param name="typeName">Partial or full qualified type name.</param>
-        /// <param name="body">Initialize from text. Optional.</param>
+        /// <param name="body">Initialize from json. Optional.</param>
         /// <returns>New test run step.</returns>
-        public static ITestRunStep CreateTestRunStepFromTypeName(string typeName, string body = null)
+        public static ITestRunStep CreateTestRunStepFromTypeName(string typeName, JObject body = null)
         {
             var type = Type.GetType("Saritasa.Tools.Messages.TestRuns.Steps." + typeName);
             if (type == null)
@@ -227,7 +206,7 @@ namespace Saritasa.Tools.Messages.TestRuns
 
             var ctor = type.GetTypeInfo().GetConstructors().FirstOrDefault(
                 c => c.GetParameters().Length == 1
-                && c.GetParameters().First().ParameterType == typeof(string));
+                && c.GetParameters().First().ParameterType == typeof(JObject));
             if (ctor == null)
             {
                 ctor = type.GetTypeInfo().GetConstructors().FirstOrDefault(c => c.GetParameters().Length == 0);
@@ -235,7 +214,7 @@ namespace Saritasa.Tools.Messages.TestRuns
 
             if (ctor == null)
             {
-                throw new TestRunException($"Type {typeName} does not have ctor with string parameter or parameterless ctor.");
+                throw new TestRunException($"Type {typeName} does not have ctor with JObject parameter or parameterless ctor.");
             }
             return ctor.GetParameters().Length > 0
                 ? (ITestRunStep)ctor.Invoke(new object[] { body })

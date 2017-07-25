@@ -62,15 +62,15 @@ namespace Saritasa.Tools.Messages.TestRuns.Steps
         /// <summary>
         /// .ctor
         /// </summary>
-        /// <param name="body">Deserialize from lines.</param>
-        public BasicInformationStep(string body)
+        /// <param name="body">Deserialize from json.</param>
+        public BasicInformationStep(JObject body)
         {
-            if (string.IsNullOrEmpty(body))
+            if (body == null)
             {
                 throw new ArgumentNullException(nameof(body));
             }
 
-            var j = JObject.Parse(body);
+            var j = body;
             if (j[KeyName] != null && j[KeyName].HasValues)
             {
                 Name = j[KeyName].ToString();
@@ -94,7 +94,7 @@ namespace Saritasa.Tools.Messages.TestRuns.Steps
         }
 
         /// <inheritdoc />
-        public string Save()
+        public JObject Save()
         {
             var j = new JObject
             {
@@ -104,7 +104,7 @@ namespace Saritasa.Tools.Messages.TestRuns.Steps
                 [KeyDescription] = Description,
                 [KeyTags] = new JArray(Tags)
             };
-            return JsonConvert.SerializeObject(j, Formatting.Indented);
+            return j;
         }
 
         /// <inheritdoc />

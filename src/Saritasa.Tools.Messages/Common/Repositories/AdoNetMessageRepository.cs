@@ -5,14 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Internal;
 using Saritasa.Tools.Messages.Common.ObjectSerializers;
 using Saritasa.Tools.Messages.Common.Repositories.QueryProviders;
-using Saritasa.Tools.Messages.Internal;
 
 namespace Saritasa.Tools.Messages.Common.Repositories
 {
@@ -198,20 +197,6 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                 isInitialized = true;
             }
 
-            /*if (KeepConnection)
-            {
-                DbConnection connection = GetConnection();
-                await ExecuteAddMessageCommandAsync(connection, message, cancellationToken);
-            }
-            else
-            {
-                using (var connection = GetConnection())
-                {
-                    await ExecuteAddMessageCommandAsync(connection, message, cancellationToken);
-                    connection.Close();
-                }
-            }*/
-
             DbConnection connection = null;
             try
             {
@@ -385,6 +370,8 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             parameters[KeySerializer] = serializer.GetType().AssemblyQualifiedName;
         }
 
+        #region Dispose
+
         private bool disposed;
 
         /// <inheritdoc />
@@ -423,5 +410,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                 disposed = true;
             }
         }
+
+        #endregion
     }
 }

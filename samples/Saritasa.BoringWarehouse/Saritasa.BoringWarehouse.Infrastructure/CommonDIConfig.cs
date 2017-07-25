@@ -1,12 +1,12 @@
-﻿using Saritasa.Tools.Messages.Common;
+﻿using System;
+using System.Configuration;
+using Saritasa.Tools.Messages.Common;
+using Autofac;
 
 namespace Saritasa.BoringWarehouse.Infrastructure
 {
-    using System.Configuration;
-
     using Tools.Messages.Abstractions;
 
-    using Autofac;
     using Tools.Messages.Commands;
 
     /// <summary>
@@ -23,6 +23,8 @@ namespace Saritasa.BoringWarehouse.Infrastructure
             var builder = new ContainerBuilder();
 
             // Bindings.
+            builder.RegisterType<AutofacServiceProvider>().As<IServiceProvider>().InstancePerRequest()
+                .InstancePerLifetimeScope();
             builder.RegisterType<DataAccess.AppDbContext>().AsSelf();
             builder.RegisterType<DataAccess.AppUnitOfWorkFactory>().AsSelf().AsImplementedInterfaces();
             builder.Register(c => c.Resolve<DataAccess.AppUnitOfWorkFactory>().Create()).AsImplementedInterfaces();

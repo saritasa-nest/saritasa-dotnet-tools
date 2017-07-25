@@ -3,6 +3,7 @@
 
 #if NET452
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -67,7 +68,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
         /// <param name="address">Address to bind, loopback by default.</param>
         /// <param name="port">TCP port. By default 26025.</param>
         /// </summary>
-        public WebEndpoint(IServiceProviderFactory serviceProviderFactory,
+        public WebEndpoint([NotNull] IServiceProviderFactory serviceProviderFactory,
             [NotNull] string address = DefaultAddress, int port = DefaultPort)
         {
             if (serviceProviderFactory == null)
@@ -204,10 +205,13 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
                     response.ContentType = ContentTypeJson;
                     using (var streamReader = new StreamReader(request.InputStream))
                     {
+                        byte[] bytes = null;
                         try
                         {
                             var body = streamReader.ReadToEnd();
-                            message.Content = Encoding.Default.GetBytes(body);
+                            bytes = Encoding.Default.GetBytes(body);
+                            var t = Type.GetType(message.ContentType);
+                            message.Content = serializer.Deserialize(bytes, t);
                         }
                         catch (Exception ex)
                         {
@@ -264,19 +268,18 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
                 return cmdnum;
             }
 
-            switch (cmd)
+            var code = MessageContextConstants.MessageTypeCodes.FirstOrDefault(c => c.Value == cmd).Key;
+            if (code > 0)
             {
-                case "command": return MessageContextConstants.MessageTypeCommand;
-                case "query": return MessageContextConstants.MessageTypeQuery;
-                case "event": return MessageContextConstants.MessageTypeEvent;
+                return code;
             }
 
             throw new ArgumentException(Properties.Strings.WebEndpoint_IncorrectRequest, nameof(uri));
         }
 
-        static string GetMessageContentTypeFromUri(Uri uri)
+        private static string GetMessageContentTypeFromUri(Uri uri)
         {
-            var str = uri.PathAndQuery.Trim();
+            var str = Uri.UnescapeDataString(uri.PathAndQuery.Trim());
             if (string.IsNullOrEmpty(str))
             {
                 throw new ArgumentException(Properties.Strings.WebEndpoint_IncorrectRequest, nameof(uri));
@@ -293,7 +296,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
                 throw new ArgumentException(Properties.Strings.WebEndpoint_IncorrectRequest, nameof(uri));
             }
 
-            var contentType = str.Substring(ind + 1, uri.PathAndQuery.Length - ind - 2);
+            var contentType = str.Substring(ind + 1, str.Length - ind - 1);
             if (string.IsNullOrEmpty(contentType))
             {
                 throw new ArgumentNullException(nameof(uri));
@@ -348,13 +351,13 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
         }
 
         /// <inheritdoc />
-        public virtual void RegisterPipelines(params IMessagePipeline[] messagePipelines)
+        public virtual void RegisterPipelines(IMessagePipelineContainer container)
         {
-            if (messagePipelines.Length == 0)
+            if (container.Pipelines.Length == 0)
             {
-                throw new ArgumentException(Properties.Strings.WebEndpoint_ValueCannotBeEmptyColleciton, nameof(messagePipelines));
+                throw new ArgumentException(Properties.Strings.WebEndpoint_ValueCannotBeEmptyColleciton, nameof(container.Pipelines));
             }
-            this.pipelines = messagePipelines;
+            this.pipelines = container.Pipelines;
         }
 
         #region Dispose

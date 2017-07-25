@@ -134,11 +134,23 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
             {
                 return;
             }
-            var messageRecord = MessageRecordHelpers.Create(messageContext);
+
+            MessageRecord messageRecord = null;
+            var convertPipeline = messageContext.Pipeline as IMessageRecordConverter;
+            if (convertPipeline != null)
+            {
+                messageRecord = convertPipeline.CreateMessageRecord(messageContext);
+            }
+            else
+            {
+                messageRecord = MessageRecordHelpers.Create(messageContext);
+            }
+
             if (filter != null && !filter.IsMatch(messageRecord))
             {
                 return;
             }
+
             try
             {
                 await repository.AddAsync(messageRecord, cancellationToken).ConfigureAwait(false);

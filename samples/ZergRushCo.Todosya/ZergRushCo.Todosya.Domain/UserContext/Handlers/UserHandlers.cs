@@ -64,6 +64,10 @@ namespace ZergRushCo.Todosya.Domain.UserContext.Handlers
                     Email = command.Email,
                     UserName = email,
                 };
+                if (command.UserId != Guid.Empty)
+                {
+                    user.Id = command.UserId.ToString();
+                }
                 user.Clean();
                 command.Result = await userManager.CreateAsync(user, command.Password);
                 if (!command.Result.Succeeded)

@@ -1,7 +1,7 @@
 ﻿using System;
 using Autofac;
 
-namespace ZergRushCo.Todosya.Infrastructure
+namespace Saritasa.BoringWarehouse.Infrastructure
 {
     /// <summary>
     /// Autofac wrapper for <see cref="IServiceProvider" />.

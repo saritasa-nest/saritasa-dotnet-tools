@@ -13,7 +13,7 @@ namespace ZergRushCo.Todosya.Web
         /// <summary>
         /// Configures dependency injection container.
         /// </summary>
-        public static void Register()
+        public static IContainer Register()
         {
             var builder = new ContainerBuilder();
 
@@ -38,6 +38,7 @@ namespace ZergRushCo.Todosya.Web
             // Set the dependency resolver to be Autofac.
             var container = builder.Build();
             DependencyResolver.SetResolver(new AutofacDependencyResolver(container));
+            return container;
         }
     }
 }

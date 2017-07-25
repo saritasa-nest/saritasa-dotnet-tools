@@ -39,7 +39,7 @@ namespace Saritasa.Tools.Messages.TestRuns
         /// <summary>
         /// Resolver.
         /// </summary>
-        public Func<Type, object> Resolver { get; internal set; }
+        public IServiceProvider ServiceProvider { get; internal set; }
 
         /// <summary>
         /// First exception occurred during <see cref="TestRun" /> execution.
@@ -60,10 +60,15 @@ namespace Saritasa.Tools.Messages.TestRuns
         /// <summary>
         /// Initialize dependency injection resolver.
         /// </summary>
-        /// <param name="resolver">DI resolver.</param>
-        public void SetResolver(Func<Type, object> resolver)
+        /// <param name="serviceProvider">DI resolver.</param>
+        public void SetResolver(IServiceProvider serviceProvider)
         {
-            this.Resolver = resolver;
+            this.ServiceProvider = serviceProvider;
         }
+
+        /// <summary>
+        /// Empty execution context.
+        /// </summary>
+        public static readonly TestRunExecutionContext Empty = new TestRunExecutionContext();
     }
 }
