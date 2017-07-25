@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -18,6 +19,11 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
     /// </summary>
     public class CommandExecutorMiddleware : BaseExecutorMiddleware
     {
+        /// <summary>
+        /// Include execution duration.
+        /// </summary>
+        public bool IncludeExecutionDuration { get; set; } = true;
+
         /// <summary>
         /// .ctor
         /// </summary>
@@ -78,6 +84,13 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             }
 
             // Invoke method and resolve parameters if needed.
+            Stopwatch stopwatch = null;
+            if (IncludeExecutionDuration)
+            {
+                stopwatch = new Stopwatch();
+                stopwatch.Start();
+            }
+
             try
             {
                 ExecuteHandler(handler, messageContext.Content, messageContext.ServiceProvider, handlerMethod);
@@ -115,6 +128,12 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
                 // Release handler.
                 var disposable = handler as IDisposable;
                 disposable?.Dispose();
+
+                if (stopwatch != null)
+                {
+                    stopwatch.Stop();
+                    messageContext.Items[MessageContextConstants.ExecutionDurationKey] = (int)stopwatch.ElapsedMilliseconds;
+                }
             }
         }
 
@@ -134,6 +153,13 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             }
 
             // Invoke method and resolve parameters if needed.
+            Stopwatch stopwatch = null;
+            if (IncludeExecutionDuration)
+            {
+                stopwatch = new Stopwatch();
+                stopwatch.Start();
+            }
+
             try
             {
                 await ExecuteHandlerAsync(handler, messageContext.Content, messageContext.ServiceProvider, handlerMethod);
@@ -171,6 +197,12 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
                 // Release handler.
                 var disposable = handler as IDisposable;
                 disposable?.Dispose();
+
+                if (stopwatch != null)
+                {
+                    stopwatch.Stop();
+                    messageContext.Items[MessageContextConstants.ExecutionDurationKey] = (int)stopwatch.ElapsedMilliseconds;
+                }
             }
         }
     }

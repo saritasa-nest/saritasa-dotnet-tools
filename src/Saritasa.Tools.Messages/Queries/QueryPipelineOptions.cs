@@ -11,5 +11,9 @@ namespace Saritasa.Tools.Messages.Queries
     /// </summary>
     public class QueryPipelineOptions : MessagePipelineOptions
     {
+        /// <summary>
+        /// Include execution duration.
+        /// </summary>
+        public bool IncludeExecutionDuration { get; set; } = true;
     }
 }

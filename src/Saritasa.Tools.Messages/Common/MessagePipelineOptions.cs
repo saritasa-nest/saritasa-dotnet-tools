@@ -14,10 +14,5 @@ namespace Saritasa.Tools.Messages.Common
         /// Throw exception if execution were failes.
         /// </summary>
         public bool ThrowExceptionOnFail { get; set; } = true;
-
-        /// <summary>
-        /// Include execution duration to message context items.
-        /// </summary>
-        public bool IncludeExecutionDuration { get; set; } = true;
     }
 }

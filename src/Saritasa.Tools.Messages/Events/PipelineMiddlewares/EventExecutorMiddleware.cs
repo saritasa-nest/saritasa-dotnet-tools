@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,6 +18,11 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
     /// </summary>
     public class EventExecutorMiddleware : BaseExecutorMiddleware
     {
+        /// <summary>
+        /// Include execution duration.
+        /// </summary>
+        public bool IncludeExecutionDuration { get; set; } = true;
+
         /// <summary>
         /// .ctor
         /// </summary>
@@ -69,6 +75,13 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
                 }
 
                 // Invoke method and resolve parameters if needed.
+                Stopwatch stopwatch = null;
+                if (IncludeExecutionDuration)
+                {
+                    stopwatch = new Stopwatch();
+                    stopwatch.Start();
+                }
+
                 try
                 {
                     if (async)
@@ -101,6 +114,12 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
                     // Release handler.
                     var disposable = handler as IDisposable;
                     disposable?.Dispose();
+
+                    if (stopwatch != null)
+                    {
+                        stopwatch.Stop();
+                        messageContext.Items[MessageContextConstants.ExecutionDurationKey] = (int)stopwatch.ElapsedMilliseconds;
+                    }
                 }
                 cancellationToken.ThrowIfCancellationRequested();
             }

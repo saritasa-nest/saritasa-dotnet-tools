@@ -2,6 +2,7 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
@@ -31,6 +32,14 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
             var queryParams = messageContext.GetItemByKey<QueryParameters>(QueryPipeline.QueryParametersKey);
 
             // Invoke method and resolve parameters if needed.
+            Stopwatch stopwatch = null;
+            var queryPipeline = (QueryPipeline)messageContext.Pipeline;
+            if (queryPipeline != null && queryPipeline.Options.IncludeExecutionDuration)
+            {
+                stopwatch = new Stopwatch();
+                stopwatch.Start();
+            }
+
             try
             {
                 queryParams.Result = queryParams.Method.Invoke(queryParams.QueryObject, queryParams.Parameters);
@@ -46,6 +55,14 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
                     messageContext.FailException = innerException;
                 }
             }
+            finally
+            {
+                if (stopwatch != null)
+                {
+                    stopwatch.Stop();
+                    messageContext.Items[MessageContextConstants.ExecutionDurationKey] = (int)stopwatch.ElapsedMilliseconds;
+                }
+            }
         }
 
         /// <inheritdoc />
@@ -54,6 +71,14 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
             var queryParams = (QueryParameters)messageContext.Items[QueryPipeline.QueryParametersKey];
 
             // Invoke method and resolve parameters if needed.
+            Stopwatch stopwatch = null;
+            var queryPipeline = (QueryPipeline)messageContext.Pipeline;
+            if (queryPipeline != null && queryPipeline.Options.IncludeExecutionDuration)
+            {
+                stopwatch = new Stopwatch();
+                stopwatch.Start();
+            }
+
             try
             {
                 queryParams.Result = queryParams.Method.Invoke(queryParams.QueryObject, queryParams.Parameters);
@@ -71,6 +96,14 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
                 if (innerException != null)
                 {
                     messageContext.FailException = innerException;
+                }
+            }
+            finally
+            {
+                if (stopwatch != null)
+                {
+                    stopwatch.Stop();
+                    messageContext.Items[MessageContextConstants.ExecutionDurationKey] = (int)stopwatch.ElapsedMilliseconds;
                 }
             }
         }

@@ -33,22 +33,9 @@ namespace Saritasa.Tools.Messages.Common
         /// <inheritdoc />
         public virtual void Invoke(IMessageContext messageContext)
         {
-            Stopwatch stopwatch = null;
-            if (Options.IncludeExecutionDuration)
-            {
-                stopwatch = new Stopwatch();
-                stopwatch.Start();
-            }
-
             for (int i = 0; i < Middlewares.Length; i++)
             {
                 Middlewares[i].Handle(messageContext);
-            }
-
-            if (stopwatch != null)
-            {
-                stopwatch.Stop();
-                messageContext.Items[MessageContextConstants.ExecutionDurationKey] = (int)stopwatch.ElapsedMilliseconds;
             }
             if (Options.ThrowExceptionOnFail && messageContext.FailException != null)
             {
@@ -65,13 +52,6 @@ namespace Saritasa.Tools.Messages.Common
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         public async Task InvokeAsync(IMessageContext messageContext, CancellationToken cancellationToken)
         {
-            Stopwatch stopwatch = null;
-            if (Options.IncludeExecutionDuration)
-            {
-                stopwatch = new Stopwatch();
-                stopwatch.Start();
-            }
-
             // Execute message thru all middlewares.
             for (int i = 0; i < Middlewares.Length; i++)
             {
@@ -84,12 +64,6 @@ namespace Saritasa.Tools.Messages.Common
                 {
                     Middlewares[i].Handle(messageContext);
                 }
-            }
-
-            if (stopwatch != null)
-            {
-                stopwatch.Stop();
-                messageContext.Items[MessageContextConstants.ExecutionDurationKey] = (int)stopwatch.ElapsedMilliseconds;
             }
             if (Options.ThrowExceptionOnFail && messageContext.FailException != null)
             {
