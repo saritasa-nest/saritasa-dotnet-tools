@@ -20,9 +20,10 @@ namespace Saritasa.Tools.Messages.Abstractions
         public static T GetPipelineOfType<T>(this IPipelineService pipelineService)
             where T : class, IMessagePipeline
         {
-            for (int i = 0; i < pipelineService.PipelineContainer.Pipelines.Length; i++)
+            var container = pipelineService.PipelineContainer;
+            for (int i = 0; i < container.Pipelines.Length; i++)
             {
-                var pipeline = pipelineService.PipelineContainer.Pipelines[i] as T;
+                var pipeline = container.Pipelines[i] as T;
                 if (pipeline != null)
                 {
                     return pipeline;

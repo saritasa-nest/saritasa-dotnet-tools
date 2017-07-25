@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using Saritasa.Tools.Messages.Common;
+using Saritasa.Tools.Messages.Abstractions;
 
 namespace Saritasa.Tools.Messages.Internal.Loggly.SearchResult
 {

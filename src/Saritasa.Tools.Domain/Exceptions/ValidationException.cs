@@ -94,7 +94,7 @@ namespace Saritasa.Tools.Domain.Exceptions
 
             foreach (var error in errors)
             {
-                this.errors[error.Key] = new string[] { error.Value };
+                this.errors[error.Key] = new[] { error.Value };
             }
         }
 

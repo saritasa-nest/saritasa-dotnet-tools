@@ -23,10 +23,10 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
         /// <summary>
         /// .ctor
         /// </summary>
-        /// <param name="dict">Parameters dictionary.</param>
-        public DomainEventLocatorMiddleware(IDictionary<string, string> dict)
+        /// <param name="parameters">Parameters dictionary.</param>
+        public DomainEventLocatorMiddleware(IDictionary<string, string> parameters)
         {
-            throw new NotSupportedException("The middleware does not support instantiation from dict.");
+            throw new NotSupportedException("The middleware does not support instantiation from parameters dictionary.");
         }
 
         /// <summary>

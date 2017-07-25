@@ -60,7 +60,7 @@ namespace Saritasa.Tools.Messages.Commands
         /// <inheritdoc />
         public MessageRecord CreateMessageRecord(IMessageContext context)
         {
-            var record = new MessageRecord(context);
+            var record = MessageRecordHelpers.Create(context);
             record.Type = MessageContextConstants.MessageTypeCommand;
             return record;
         }

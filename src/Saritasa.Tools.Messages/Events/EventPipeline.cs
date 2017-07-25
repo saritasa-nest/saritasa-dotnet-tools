@@ -50,7 +50,7 @@ namespace Saritasa.Tools.Messages.Events
         /// <inheritdoc />
         public MessageRecord CreateMessageRecord(IMessageContext context)
         {
-            var record = new MessageRecord(context);
+            var record = MessageRecordHelpers.Create(context);
             record.Type = MessageContextConstants.MessageTypeEvent;
             return record;
         }

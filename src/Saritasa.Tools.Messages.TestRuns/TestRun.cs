@@ -195,7 +195,7 @@ namespace Saritasa.Tools.Messages.TestRuns
                 return string.Empty;
             }
             line = line.Replace("/*>!", string.Empty).Replace("*/", string.Empty).Trim();
-            var arr = line.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            var arr = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             if (arr.Length > 1 && arr[0].Length > 0 && arr[0][0] == '#')
             {
                 return arr[1];

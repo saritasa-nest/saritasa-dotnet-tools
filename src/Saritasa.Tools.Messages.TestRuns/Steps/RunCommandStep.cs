@@ -42,17 +42,17 @@ namespace Saritasa.Tools.Messages.TestRuns.Steps
         /// <summary>
         /// .ctor to create from <see cref="IMessageContext" />.
         /// </summary>
-        /// <param name="message">Message.</param>
-        public RunCommandStep(IMessageContext message)
+        /// <param name="messageRecord">Message record.</param>
+        public RunCommandStep(MessageRecord messageRecord)
         {
-            if (message == null)
+            if (messageRecord == null)
             {
-                throw new ArgumentNullException(nameof(message));
+                throw new ArgumentNullException(nameof(messageRecord));
             }
 
-            this.id = message.Id;
-            this.commandType = message.ContentId;
-            this.command = message.Content;
+            this.id = messageRecord.Id;
+            this.commandType = messageRecord.ContentType;
+            this.command = messageRecord.Content;
         }
 
         /// <summary>

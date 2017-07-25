@@ -3,7 +3,6 @@
 
 #if NET452
 using System;
-using System.Collections.Generic;
 using Saritasa.Tools.Messages.Abstractions;
 
 namespace Saritasa.Tools.Messages.Configuration
@@ -14,15 +13,15 @@ namespace Saritasa.Tools.Messages.Configuration
     public class XmlConfiguration
     {
         /// <summary>
-        /// Gets the default list of <see cref="IMessagePipeline" /> objects by parsing
+        /// Gets the <see cref="IMessagePipelineContainer" /> object by parsing
         /// the application configuration file (<c>app.exe.config</c>).
         /// </summary>
-        public static IEnumerable<IMessagePipeline> AppConfig
+        public static IMessagePipelineContainer AppConfig
         {
             get
             {
                 object o = System.Configuration.ConfigurationManager.GetSection("pipelines");
-                return o as IEnumerable<IMessagePipeline>;
+                return o as IMessagePipelineContainer;
             }
         }
     }

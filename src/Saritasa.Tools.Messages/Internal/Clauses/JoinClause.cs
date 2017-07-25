@@ -105,7 +105,7 @@ namespace Saritasa.Tools.Messages.Internal.Clauses
         }
 
         /// <summary>
-        /// Finishes the clause initialization with <see cref="ComparisonOperator.Equals" /> comparison operator.
+        /// Finishes the clause initialization with <see cref="ComparisonOperator" /> comparison operator.
         /// </summary>
         /// <param name="fromTableName">Name of from table.</param>
         /// <param name="fromColumnName">Name of from column.</param>

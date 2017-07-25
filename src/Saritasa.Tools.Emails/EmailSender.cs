@@ -38,7 +38,7 @@ namespace Saritasa.Tools.Emails
         public CancellationToken CancellationToken { get; set; } = CancellationToken.None;
 
         /// <inheritdoc />
-        public Task SendAsync([NotNull] MailMessage message)
+        public Task SendAsync(MailMessage message)
         {
             var data = new Dictionary<string, object>();
             bool cancel = false;

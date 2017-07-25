@@ -137,7 +137,7 @@ namespace Saritasa.Tools.Messages.Queries
         /// <inheritdoc />
         public MessageRecord CreateMessageRecord(IMessageContext context)
         {
-            var record = new MessageRecord(context);
+            var record = MessageRecordHelpers.Create(context);
             record.Type = MessageContextConstants.MessageTypeQuery;
             return record;
         }

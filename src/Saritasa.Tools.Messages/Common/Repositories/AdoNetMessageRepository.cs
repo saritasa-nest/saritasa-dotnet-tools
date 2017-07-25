@@ -354,11 +354,13 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                             ContentType = reader.GetString(3)
                         };
                         var content = serializer.IsText ? Encoding.UTF8.GetBytes(reader.GetString(4)) : (byte[])reader[4];
-                        TypeHelpers.ResolveTypeForContent(messageRecord, content, serializer, messageQuery.Assemblies.ToArray());
+                        var contentType = Type.GetType(messageRecord.ContentType);
+                        messageRecord.Content = serializer.Deserialize(content, contentType);
                         messageRecord.Data = (IDictionary<string, string>)serializer.Deserialize(
                             Encoding.UTF8.GetBytes(reader.GetString(5)), typeof(IDictionary<string, string>));
                         var error = serializer.IsText ? Encoding.UTF8.GetBytes(reader.GetString(7)) : (byte[])reader[7];
-                        TypeHelpers.ResolveTypeForError(messageRecord, error, serializer, messageQuery.Assemblies.ToArray());
+                        var errorType = Type.GetType(messageRecord.ErrorType);
+                        messageRecord.Error = (Exception)serializer.Deserialize(error, errorType);
                         messageRecord.ErrorMessage = reader.GetString(7);
                         messageRecord.ErrorType = reader.GetString(8);
                         messageRecord.CreatedAt = reader.GetDateTime(9);
@@ -402,11 +404,14 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             {
                 if (disposing)
                 {
-                    if (activeConnection != null && activeConnection.State == ConnectionState.Open)
+                    lock (objLock)
                     {
-                        activeConnection.Close();
-                        activeConnection.Dispose();
-                        activeConnection = null;
+                        if (activeConnection != null && activeConnection.State == ConnectionState.Open)
+                        {
+                            activeConnection.Close();
+                            activeConnection.Dispose();
+                            activeConnection = null;
+                        }
                     }
                     if (serializer != null)
                     {

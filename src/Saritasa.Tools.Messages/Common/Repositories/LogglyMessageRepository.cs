@@ -94,7 +94,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <param name="dict">Properties.</param>
         public LogglyMessageRepository(IDictionary<string, string> dict)
         {
-            var repositoryUsername = dict[nameof(username)].ToString();
+            var repositoryUsername = dict[nameof(username)];
 
             if (!string.IsNullOrEmpty(repositoryUsername))
             {

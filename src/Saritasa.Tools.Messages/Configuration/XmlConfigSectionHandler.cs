@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
-using System.Reflection;
 using System.Xml;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Common;
@@ -30,11 +29,15 @@ namespace Saritasa.Tools.Messages.Configuration
             return ParsePipeline(section);
         }
 
-        private IEnumerable<IMessagePipeline> ParsePipeline(XmlNode node)
+        private IMessagePipelineContainer ParsePipeline(XmlNode node)
         {
             var pipelines = new List<IMessagePipeline>();
             foreach (XmlNode childNode in node)
             {
+                if (childNode.Attributes == null)
+                {
+                    continue;
+                }
                 var typeAttr = childNode.Attributes["type"];
                 if (typeAttr == null)
                 {
@@ -54,7 +57,7 @@ namespace Saritasa.Tools.Messages.Configuration
                 ParseMiddlewares(pipeline, childNode.ChildNodes);
                 pipelines.Add(pipeline);
             }
-            return pipelines;
+            return new SimpleMessagePipelineContainer(pipelines);
         }
 
         private void ParseMiddlewares(IMessagePipeline pipeline, XmlNodeList nodes)
@@ -78,13 +81,13 @@ namespace Saritasa.Tools.Messages.Configuration
                 var typeName = node.Attributes["type"].Value;
                 if (string.IsNullOrWhiteSpace(typeName))
                 {
-                    throw new MessagesConfigurationException("Middleware tag does not have type attribute.");
+                    throw new MessagesConfigurationException("Middleware tag does not have \"type\" attribute.");
                 }
 
                 var type = Type.GetType(typeName);
                 if (type == null)
                 {
-                    throw new MessagesConfigurationException($"Cannot load type {type}.");
+                    throw new MessagesConfigurationException($"Cannot load type {typeName}.");
                 }
 
                 var ctor = type.GetConstructors().FirstOrDefault(c => c.GetParameters().Length == 1

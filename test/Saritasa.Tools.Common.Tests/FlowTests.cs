@@ -128,10 +128,7 @@ namespace Saritasa.Tools.Common.Tests
         public void Repeat_with_fixed_retry_strategy_should_throw_exceptions()
         {
             // Arrange
-            Action customMethodReturnWithCustomException = () =>
-            {
-                throw new CustomException();
-            };
+            Action customMethodReturnWithCustomException = () => throw new CustomException();
 
             // Act & assert
             Assert.Throws<CustomException>(
@@ -149,10 +146,7 @@ namespace Saritasa.Tools.Common.Tests
         public void Repeat_with_fixed_retry_strategy_should_delay_correctly()
         {
             // Arrange
-            Action customMethodReturnWithCustomException = () =>
-            {
-                throw new CustomException();
-            };
+            Action customMethodReturnWithCustomException = () => throw new CustomException();
             var stopwatch = new Stopwatch();
 
             // Act
@@ -175,10 +169,7 @@ namespace Saritasa.Tools.Common.Tests
         public void Repeat_with_fixed_retry_strategy_and_first_fast_should_work()
         {
             // Arrange
-            Action customMethodReturnWithCustomException = () =>
-            {
-                throw new CustomException();
-            };
+            Action customMethodReturnWithCustomException = () => throw new CustomException();
             var stopwatch = new Stopwatch();
 
             // Act
@@ -205,10 +196,7 @@ namespace Saritasa.Tools.Common.Tests
         public void Repeat_with_log_handler_should_log()
         {
             // Arrange
-            Action customMethodReturnWithCustomException = () =>
-            {
-                throw new CustomException();
-            };
+            Action customMethodReturnWithCustomException = () => throw new CustomException();
             int totalAttempts = 0;
             var callback = new FlowUtils.RetryCallback((a, e) =>
             {
@@ -265,7 +253,7 @@ namespace Saritasa.Tools.Common.Tests
         {
             // Arrange
             Func<Task<int>> customMethodReturnWithCustomExceptionAsync = () =>
-                Task.Factory.StartNew<int>(() => { throw new CustomException(); });
+                Task.Factory.StartNew<int>(() => throw new CustomException());
             var stopwatch = new Stopwatch();
 
             // Act
@@ -291,7 +279,7 @@ namespace Saritasa.Tools.Common.Tests
         {
             // Arrange
             Func<Task<int>> customMethodReturnWithCustomExceptionAsync = () =>
-                Task.Factory.StartNew<int>(() => { throw new CustomException(); });
+                Task.Factory.StartNew<int>(() => throw new CustomException());
             int totalAttempts = 0;
             var callback = new FlowUtils.RetryCallback((a, e) =>
             {
@@ -359,10 +347,7 @@ namespace Saritasa.Tools.Common.Tests
             // Arrange
             int value = 0;
             var memoized1 = FlowUtils.Memoize(
-                new Func<int>(() =>
-                {
-                    throw new FlowUtils.SkipMemoizeException<int>(++value);
-                })
+                new Func<int>(() => throw new FlowUtils.SkipMemoizeException<int>(++value))
             );
 
             // Act & Assert

@@ -164,8 +164,8 @@ namespace Saritasa.Tools.Messages.Internal
                             result.Status = (ProcessingStatus)chunk.Item2[0];
                             break;
                         case TokenEndOfCommand:
-                            var t = TypeHelpers.LoadType(result.ContentType, assemblies);
-                            result.Content = content;
+                            var t = Type.GetType(result.ContentType);
+                            result.Content = serializer.Deserialize(content, t);
                             return result;
                     }
                 }

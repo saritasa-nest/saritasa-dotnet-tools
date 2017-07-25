@@ -15,9 +15,6 @@ namespace Saritasa.Tools.Messages.Benchmark
         /// <param name="args">Command line arguments.</param>
         static void Main(string[] args)
         {
-            new CommandsBenchmarks().RunCommandWithPipeline();
-            return;
-
             if (args.Length < 1)
             {
                 Console.WriteLine("Usage: Saritasa.Tools.Messages.Benchmark.exe [TypeName].");

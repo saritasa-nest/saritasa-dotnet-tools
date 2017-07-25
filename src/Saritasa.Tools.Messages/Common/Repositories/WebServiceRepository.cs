@@ -68,7 +68,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         #region IMessageRepository
 
         /// <inheritdoc />
-        public async Task AddAsync([NotNull] MessageRecord messageRecord, CancellationToken cancellationToken)
+        public async Task AddAsync(MessageRecord messageRecord, CancellationToken cancellationToken)
         {
             if (disposed)
             {
@@ -83,7 +83,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<MessageRecord>> GetAsync([NotNull] MessageQuery messageQuery, CancellationToken cancellationToken)
+        public async Task<IEnumerable<MessageRecord>> GetAsync(MessageQuery messageQuery, CancellationToken cancellationToken)
         {
             if (disposed)
             {
@@ -93,7 +93,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <inheritdoc />
-        public void SaveState([NotNull] IDictionary<string, string> parameters)
+        public void SaveState(IDictionary<string, string> parameters)
         {
             parameters[KeyUri] = uri;
         }

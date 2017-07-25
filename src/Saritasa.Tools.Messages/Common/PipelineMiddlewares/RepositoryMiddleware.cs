@@ -106,7 +106,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
             }
             else
             {
-                messageRecord = new MessageRecord(messageContext);
+                messageRecord = MessageRecordHelpers.Create(messageContext);
             }
 
             if (filter != null && !filter.IsMatch(messageRecord))
@@ -134,7 +134,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
             {
                 return;
             }
-            var messageRecord = new MessageRecord(messageContext);
+            var messageRecord = MessageRecordHelpers.Create(messageContext);
             if (filter != null && !filter.IsMatch(messageRecord))
             {
                 return;

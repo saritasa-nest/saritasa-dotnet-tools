@@ -132,7 +132,7 @@ namespace Saritasa.Tools.Messages.Common
         }
 
         /// <inheritdoc />
-        public abstract void Handle([NotNull] IMessageContext message);
+        public abstract void Handle(IMessageContext message);
 
         /// <summary>
         /// Initialize middleware.

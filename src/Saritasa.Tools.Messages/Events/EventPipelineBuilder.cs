@@ -2,6 +2,7 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Reflection;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Abstractions.Events;
 using Saritasa.Tools.Messages.Common;
@@ -29,6 +30,18 @@ namespace Saritasa.Tools.Messages.Events
         public EventPipelineBuilder AddMiddleware(IMessagePipelineMiddleware middleware)
         {
             Pipeline.AddMiddlewares(middleware);
+            return this;
+        }
+
+        /// <summary>
+        /// Use default middlewares configuration. Includes event handler locator and executor.
+        /// </summary>
+        /// <param name="assemblies">Assemblies to search event handlers.</param>
+        /// <returns>Event pipeline builder.</returns>
+        public EventPipelineBuilder UseDefaultMiddlewares(params Assembly[] assemblies)
+        {
+            Pipeline.AddMiddlewares(new PipelineMiddlewares.EventHandlerLocatorMiddleware(assemblies));
+            Pipeline.AddMiddlewares(new PipelineMiddlewares.EventExecutorMiddleware());
             return this;
         }
     }
