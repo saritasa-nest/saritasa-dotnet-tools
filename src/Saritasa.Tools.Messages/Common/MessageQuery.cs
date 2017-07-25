@@ -2,8 +2,6 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
-using System.Reflection;
 using Saritasa.Tools.Messages.Abstractions;
 
 namespace Saritasa.Tools.Messages.Common
@@ -59,11 +57,6 @@ namespace Saritasa.Tools.Messages.Common
         public int? ExecutionDurationBelow { get; private set; }
 
         /// <summary>
-        /// Assemblies to load types.
-        /// </summary>
-        public IEnumerable<Assembly> Assemblies { get; private set; } = new List<Assembly>();
-
-        /// <summary>
         /// How many messages to skip.
         /// </summary>
         public int Skip { get; private set; }
@@ -73,7 +66,7 @@ namespace Saritasa.Tools.Messages.Common
         /// </summary>
         public int Take { get; private set; } = 1000;
 
-        MessageQuery()
+        private MessageQuery()
         {
         }
 
@@ -242,21 +235,6 @@ namespace Saritasa.Tools.Messages.Common
 
             Skip = skip;
             Take = take;
-            return this;
-        }
-
-        /// <summary>
-        /// Load content and error types using assemblies.
-        /// </summary>
-        /// <param name="assemblies">Assemblies to search for types.</param>
-        /// <returns>Message query.</returns>
-        public MessageQuery WithAssemblies(IEnumerable<Assembly> assemblies)
-        {
-            if (assemblies == null)
-            {
-                throw new ArgumentNullException(nameof(assemblies));
-            }
-            Assemblies = assemblies;
             return this;
         }
 

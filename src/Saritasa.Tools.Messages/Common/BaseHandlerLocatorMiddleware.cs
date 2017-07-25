@@ -17,7 +17,7 @@ namespace Saritasa.Tools.Messages.Common
     public abstract class BaseHandlerLocatorMiddleware : IMessagePipelineMiddleware
     {
         /// <inheritdoc />
-        public string Id { get; set; } = "Locator";
+        public string Id { get; set; }
 
         /// <summary>
         /// Assemblies to search in.
@@ -29,6 +29,7 @@ namespace Saritasa.Tools.Messages.Common
         /// </summary>
         protected BaseHandlerLocatorMiddleware()
         {
+            Id = this.GetType().Name;
         }
 
         /// <summary>
@@ -45,6 +46,10 @@ namespace Saritasa.Tools.Messages.Common
             if (dict.ContainsKey("id"))
             {
                 Id = dict["id"];
+            }
+            else
+            {
+                Id = this.GetType().Name;
             }
             if (dict.ContainsKey("assemblies"))
             {

@@ -32,7 +32,7 @@ namespace Saritasa.Tools.Messages.Common
                 }
             }
             throw new InvalidOperationException($"The message context items dictionary expects to have item with \"{key}\" " +
-                $"and type {typeof(T).Name}");
+                $"and type {typeof(T).Name}.");
         }
     }
 }

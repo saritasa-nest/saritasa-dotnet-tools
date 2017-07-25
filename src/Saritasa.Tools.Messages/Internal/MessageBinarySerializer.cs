@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -19,33 +19,31 @@ namespace Saritasa.Tools.Messages.Internal
          * 1 byte, 4 bytes, vary
          */
 
-        const byte TokenBeginOfCommand = 0x10;
-        const byte TokenId = 0x11;
-        const byte TokenType = 0x12;
-        const byte TokenContentType = 0x13;
-        const byte TokenContent = 0x15;
-        const byte TokenData = 0x16;
-        const byte TokenCreated = 0x17;
-        const byte TokenExecutionDuration = 0x18;
-        const byte TokenStatus = 0x19;
-        const byte TokenErrorDetails = 0x21;
-        const byte TokenErrorMessage = 0x22;
-        const byte TokenErrorType = 0x23;
-        const byte TokenEndOfCommand = 0x50;
+        private const byte TokenBeginOfCommand = 0x10;
+        private const byte TokenId = 0x11;
+        private const byte TokenType = 0x12;
+        private const byte TokenContentType = 0x13;
+        private const byte TokenContent = 0x15;
+        private const byte TokenData = 0x16;
+        private const byte TokenCreated = 0x17;
+        private const byte TokenExecutionDuration = 0x18;
+        private const byte TokenStatus = 0x19;
+        private const byte TokenErrorDetails = 0x21;
+        private const byte TokenErrorMessage = 0x22;
+        private const byte TokenErrorType = 0x23;
+        private const byte TokenEndOfCommand = 0x50;
 
-        static readonly Tuple<byte, byte[]> nullChunk = new Tuple<byte, byte[]>(0, null);
+        private static readonly Tuple<byte, byte[]> nullChunk = new Tuple<byte, byte[]>(0, null);
 
-        static readonly byte[] emptyBytes = new byte[] { };
+        private static readonly byte[] emptyBytes = new byte[] { };
 
-        readonly IObjectSerializer serializer;
+        private readonly IObjectSerializer serializer;
 
-        readonly Stream stream;
+        private readonly Stream stream;
 
-        readonly object objLock = new object();
+        private readonly object objLock = new object();
 
-        readonly Assembly[] assemblies;
-
-        public MessageBinarySerializer(Stream stream, IObjectSerializer serializer, Assembly[] assemblies)
+        public MessageBinarySerializer(Stream stream, IObjectSerializer serializer)
         {
             if (stream == null)
             {
@@ -57,7 +55,6 @@ namespace Saritasa.Tools.Messages.Internal
             }
             this.serializer = serializer;
             this.stream = stream;
-            this.assemblies = assemblies;
         }
 
         private void WriteChunk(byte chunk, byte[] bytes = null)

@@ -11,9 +11,9 @@ namespace Saritasa.Tools.Messages.Abstractions
     public interface IServiceProviderFactory
     {
         /// <summary>
-        /// Creates service provider factory.
+        /// Creates service provider.
         /// </summary>
-        /// <returns>Service provider factory.</returns>
+        /// <returns>Service provider.</returns>
         IServiceProvider Create();
     }
 }

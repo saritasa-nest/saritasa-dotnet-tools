@@ -10,7 +10,7 @@ namespace Saritasa.Tools.Messages.Abstractions.Queries
     /// with this attribute.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public class QueryHandlersAttribute : MessageHandlersAttribute
+    public class QueryHandlersAttribute : Attribute
     {
     }
 }

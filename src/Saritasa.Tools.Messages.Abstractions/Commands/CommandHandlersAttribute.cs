@@ -10,7 +10,7 @@ namespace Saritasa.Tools.Messages.Abstractions.Commands
     /// with this attribute.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public class CommandHandlersAttribute : MessageHandlersAttribute
+    public class CommandHandlersAttribute : Attribute
     {
     }
 }

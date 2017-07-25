@@ -57,7 +57,7 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// <summary>
         /// Dictionary that maps message type to string code.
         /// </summary>
-        public static readonly IDictionary<byte, string> MessageTypeCodes = new ConcurrentDictionary<byte, string>()
+        public static readonly IDictionary<byte, string> MessageTypeCodes = new Dictionary<byte, string>()
         {
             [MessageTypeUnknown] = "unknown",
             [MessageTypeCommand] = "command",

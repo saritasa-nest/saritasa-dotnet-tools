@@ -10,7 +10,7 @@ namespace Saritasa.Tools.Messages.Abstractions.Events
     /// with this attribute.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public class EventHandlersAttribute : MessageHandlersAttribute
+    public class EventHandlersAttribute : Attribute
     {
     }
 }

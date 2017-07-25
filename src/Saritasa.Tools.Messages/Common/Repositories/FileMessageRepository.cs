@@ -96,7 +96,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                     {
                         currentGZipStream = new GZipStream(currentFileStream, CompressionMode.Compress);
                     }
-                    currentBinarySerializer = new MessageBinarySerializer(CurrentStream, Serializer, null);
+                    currentBinarySerializer = new MessageBinarySerializer(CurrentStream, Serializer);
                 }
                 currentBinarySerializer.Write(messageRecord);
             }
@@ -130,7 +130,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             {
                 stream = new GZipStream(stream, CompressionMode.Decompress, false);
             }
-            var commandSerializer = new MessageBinarySerializer(stream, Serializer, query.Assemblies.ToArray());
+            var commandSerializer = new MessageBinarySerializer(stream, Serializer);
             for (MessageRecord message; (message = commandSerializer.Read()) != null;)
             {
                 if (query.Match(message))

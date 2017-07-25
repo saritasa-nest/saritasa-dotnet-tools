@@ -50,7 +50,7 @@ namespace Saritasa.Tools.Messages.Common
         /// </summary>
         /// <param name="messageContext">The message context.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
-        public async Task InvokeAsync(IMessageContext messageContext, CancellationToken cancellationToken)
+        public virtual async Task InvokeAsync(IMessageContext messageContext, CancellationToken cancellationToken)
         {
             // Execute message thru all middlewares.
             for (int i = 0; i < Middlewares.Length; i++)

@@ -31,5 +31,18 @@ namespace Saritasa.Tools.Messages.Queries
             Pipeline.AddMiddlewares(middleware);
             return this;
         }
+
+        /// <summary>
+        /// Use default middlewares configuration. Includes command handler resolver, executor and
+        /// releaser.
+        /// </summary>
+        /// <returns>Query pipeline builder.</returns>
+        public QueryPipelineBuilder UseDefaultMiddlewares()
+        {
+            Pipeline.AddMiddlewares(new PipelineMiddlewares.QueryObjectResolverMiddleware());
+            Pipeline.AddMiddlewares(new PipelineMiddlewares.QueryExecutorMiddleware());
+            Pipeline.AddMiddlewares(new PipelineMiddlewares.QueryObjectReleaseMiddleware());
+            return this;
+        }
     }
 }
