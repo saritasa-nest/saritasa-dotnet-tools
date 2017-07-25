@@ -28,6 +28,11 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         public bool Active { get; set; } = true;
 
         /// <summary>
+        /// Message repository.
+        /// </summary>
+        public IMessageRepository Repository => repository;
+
+        /// <summary>
         /// Rethrow exceptions from repositories. <c>True</c> by default.
         /// </summary>
         public bool RethrowExceptions { get; set; } = true;
@@ -45,6 +50,10 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
             if (parameters.ContainsKey(KeyId))
             {
                 Id = parameters[KeyId];
+            }
+            else
+            {
+                Id = repository.GetType().Name;
             }
             if (!parameters.ContainsKey(KeyRepositoryType))
             {

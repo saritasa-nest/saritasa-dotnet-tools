@@ -107,7 +107,25 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         protected override IEnumerable<MessageRecord> ReadMessagesFromStream(Stream stream,
             MessageQuery query)
         {
-            return new List<MessageRecord>();
+            using (var streamReader = new StreamReader(stream))
+            {
+                var line = streamReader.ReadLine();
+                var messageRecord = (MessageRecord)Serializer.Deserialize(Encoding.UTF8.GetBytes(line),
+                    typeof(MessageRecord));
+
+                var contentType = Type.GetType(messageRecord.ContentType);
+                var contentBytes = Encoding.UTF8.GetBytes(messageRecord.Content.ToString());
+                messageRecord.Content = Serializer.Deserialize(contentBytes, contentType);
+
+                if (messageRecord.Error != null)
+                {
+                    var errorType = Type.GetType(messageRecord.ErrorType);
+                    var errorBytes = Encoding.UTF8.GetBytes(messageRecord.Error.ToString());
+                    messageRecord.Error = (Exception)Serializer.Deserialize(errorBytes, errorType);
+                }
+
+                yield return messageRecord;
+            }
         }
 
         /// <summary>

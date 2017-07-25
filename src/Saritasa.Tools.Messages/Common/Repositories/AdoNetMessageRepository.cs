@@ -9,9 +9,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
-using Saritasa.Tools.Messages.Internal;
 using Saritasa.Tools.Messages.Common.ObjectSerializers;
 using Saritasa.Tools.Messages.Common.Repositories.QueryProviders;
+using Saritasa.Tools.Messages.Internal;
 
 namespace Saritasa.Tools.Messages.Common.Repositories
 {

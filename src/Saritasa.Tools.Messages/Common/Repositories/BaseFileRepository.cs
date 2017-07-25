@@ -153,6 +153,10 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                     {
                         endDate = tmp;
                     }
+                    if (!messageQuery.CreatedEndDate.HasValue)
+                    {
+                        endDate = tmp;
+                    }
                 }
             }
 
@@ -207,7 +211,15 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
         private string GetFileDatePart(string fileName)
         {
-            return fileName.Length > 7 ? fileName.Substring(0, 8) : string.Empty;
+            if (string.IsNullOrEmpty(FileNamePrefix))
+            {
+                return fileName.Length > 7 ? fileName.Substring(0, 8) : string.Empty;
+            }
+            else
+            {
+                var ind = fileName.IndexOf('-');
+                return fileName.Substring(ind + 1, 8);
+            }
         }
 
         /// <summary>
