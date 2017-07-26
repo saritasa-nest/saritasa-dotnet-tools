@@ -341,13 +341,20 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                         var content = serializer.IsText ? Encoding.UTF8.GetBytes(reader.GetString(4)) : (byte[])reader[4];
                         var contentType = Type.GetType(messageRecord.ContentType);
                         messageRecord.Content = serializer.Deserialize(content, contentType);
-                        messageRecord.Data = (IDictionary<string, string>)serializer.Deserialize(
-                            Encoding.UTF8.GetBytes(reader.GetString(5)), typeof(IDictionary<string, string>));
-                        var error = serializer.IsText ? Encoding.UTF8.GetBytes(reader.GetString(7)) : (byte[])reader[7];
-                        var errorType = Type.GetType(messageRecord.ErrorType);
-                        messageRecord.Error = (Exception)serializer.Deserialize(error, errorType);
-                        messageRecord.ErrorMessage = reader.GetString(7);
-                        messageRecord.ErrorType = reader.GetString(8);
+                        if (!reader.IsDBNull(5))
+                        {
+                            messageRecord.Data = serializer.Deserialize(
+                            Encoding.UTF8.GetBytes(reader.GetString(5)), typeof(IDictionary<string, string>))
+                            as IDictionary<string, string>;
+                        }
+                        if (!reader.IsDBNull(7) && !reader.IsDBNull(8))
+                        {
+                            messageRecord.ErrorMessage = reader.GetString(7);
+                            messageRecord.ErrorType = reader.GetString(8);
+                            var error = serializer.IsText ? Encoding.UTF8.GetBytes(reader.GetString(7)) : (byte[])reader[7];
+                            var errorType = Type.GetType(messageRecord.ErrorType);
+                            messageRecord.Error = serializer.Deserialize(error, errorType) as Exception;
+                        }
                         messageRecord.CreatedAt = reader.GetDateTime(9);
                         messageRecord.ExecutionDuration = reader.GetInt32(10);
                         messageRecord.Status = (ProcessingStatus)reader.GetByte(11);
