@@ -24,7 +24,7 @@ namespace Saritasa.BoringWarehouse.IntegrationTests
         /// </summary>
         public static int AdminId { get; private set; }
 
-        private IPipelineService pipelineService;
+        private IMessagePipelineService pipelineService;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
@@ -32,7 +32,7 @@ namespace Saritasa.BoringWarehouse.IntegrationTests
             var builder = CommonDIConfig.CreateBuilder();
             Container = builder.Build();
 
-            pipelineService = Container.Resolve<IPipelineService>();
+            pipelineService = Container.Resolve<IMessagePipelineService>();
             using (var uow = Container.Resolve<IAppUnitOfWork>())
             {
                 CreateAdmin(uow);

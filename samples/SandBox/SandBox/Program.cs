@@ -87,8 +87,8 @@ namespace SandBox
 
         static void Test()
         {
-            var pipelineService = new DefaultPipelineService();
-            pipelineService.PipelineContainer = new SimpleMessagePipelineContainer
+            var pipelineService = new DefaultMessagePipelineService();
+            pipelineService.PipelineContainer = new DefaultMessagePipelineContainer
             {
                 Pipelines = new IMessagePipeline[]
                 {

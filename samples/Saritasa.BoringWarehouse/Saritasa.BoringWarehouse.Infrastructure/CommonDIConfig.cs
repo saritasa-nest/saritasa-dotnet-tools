@@ -43,12 +43,12 @@ namespace Saritasa.BoringWarehouse.Infrastructure
             );
 
             // Command pipeline.
-            var messagePipelineContainer = new SimpleMessagePipelineContainer();
+            var messagePipelineContainer = new DefaultMessagePipelineContainer();
             messagePipelineContainer.AddCommandPipeline()
                 .UseDefaultMiddlewares(System.Reflection.Assembly.GetAssembly(typeof(Domain.Users.Entities.User)))
                 .AddMiddleware(adoNetRepositoryMiddleware);
             builder.RegisterInstance(messagePipelineContainer).As<IMessagePipelineContainer>().SingleInstance();
-            builder.RegisterType<DefaultPipelineService>().As<IPipelineService>();
+            builder.RegisterType<DefaultMessagePipelineService>().As<IMessagePipelineService>();
 
             return builder;
         }

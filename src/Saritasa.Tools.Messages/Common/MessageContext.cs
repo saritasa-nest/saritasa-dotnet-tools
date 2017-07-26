@@ -62,7 +62,7 @@ namespace Saritasa.Tools.Messages.Common
         /// .ctor
         /// </summary>
         /// <param name="pipelineService">Pipeline service the context will be related to.</param>
-        public MessageContext(IPipelineService pipelineService)
+        public MessageContext(IMessagePipelineService pipelineService)
         {
             if (pipelineService == null)
             {
@@ -76,7 +76,7 @@ namespace Saritasa.Tools.Messages.Common
         /// </summary>
         /// <param name="pipelineService">Pipeline service the context will be related to.</param>
         /// <param name="content">Content to process.</param>
-        public MessageContext(IPipelineService pipelineService, object content) : this(pipelineService)
+        public MessageContext(IMessagePipelineService pipelineService, object content) : this(pipelineService)
         {
             if (content == null)
             {

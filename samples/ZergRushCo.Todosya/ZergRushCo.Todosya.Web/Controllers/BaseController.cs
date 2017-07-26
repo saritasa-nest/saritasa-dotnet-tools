@@ -16,7 +16,7 @@ namespace ZergRushCo.Todosya.Web.Controllers
     {
         readonly ILogger logger;
 
-        protected IPipelineService PipelineService { get; }
+        protected IMessagePipelineService PipelineService { get; }
 
         /// <summary>
         /// .ctor
@@ -24,7 +24,7 @@ namespace ZergRushCo.Todosya.Web.Controllers
         /// <param name="pipelineService">Pipeline service.</param>
         /// <param name="loggerFactory">Logger factory.</param>
         public BaseController(
-            IPipelineService pipelineService,
+            IMessagePipelineService pipelineService,
             ILoggerFactory loggerFactory)
         {
             PipelineService = pipelineService;

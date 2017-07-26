@@ -20,7 +20,7 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// <param name="pipelineService">Pipelines service.</param>
         /// <param name="command">Command to execute.</param>
         /// <returns>Message context used in execution.</returns>
-        public static IMessageContext HandleCommand(this IPipelineService pipelineService, object command)
+        public static IMessageContext HandleCommand(this IMessagePipelineService pipelineService, object command)
         {
             var pipeline = pipelineService.GetPipelineOfType<ICommandPipeline>();
             var messageContext = pipeline.CreateMessageContext(pipelineService, command);
@@ -35,7 +35,7 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// <param name="command">Command to execute.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>Message context used in execution.</returns>
-        public static async Task<IMessageContext> HandleCommandAsync(this IPipelineService pipelineService,
+        public static async Task<IMessageContext> HandleCommandAsync(this IMessagePipelineService pipelineService,
             object command,
             CancellationToken cancellationToken = default(CancellationToken))
         {

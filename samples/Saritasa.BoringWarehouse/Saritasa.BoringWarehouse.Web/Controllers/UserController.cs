@@ -20,10 +20,10 @@
     [AllowAnonymous]
     public class UserController : Controller
     {
-        readonly IPipelineService pipelineService;
+        readonly IMessagePipelineService pipelineService;
         readonly UserQueries userQueries;
 
-        public UserController(IPipelineService pipelineService, UserQueries userQueries)
+        public UserController(IMessagePipelineService pipelineService, UserQueries userQueries)
         {
             this.pipelineService = pipelineService;
             this.userQueries = userQueries;

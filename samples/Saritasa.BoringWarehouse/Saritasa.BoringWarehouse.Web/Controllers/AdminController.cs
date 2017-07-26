@@ -20,10 +20,10 @@
     [Authorize(UserRole.Admin)]
     public class AdminController : Controller
     {
-        private readonly IPipelineService commandPipeline;
+        private readonly IMessagePipelineService commandPipeline;
         private readonly UserQueries userQueries;
 
-        public AdminController(IPipelineService pipelineService, UserQueries userQueries)
+        public AdminController(IMessagePipelineService pipelineService, UserQueries userQueries)
         {
             if (pipelineService == null)
             {

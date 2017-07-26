@@ -27,8 +27,7 @@ namespace Saritasa.Tools.Messages.Common
         object Deserialize([NotNull] byte[] bytes, Type type);
 
         /// <summary>
-        /// Is current serializer represents text string.
-        /// If not binary is meant by default.
+        /// Does serializer represent text string. Binary by default.
         /// </summary>
         bool IsText { get; }
     }

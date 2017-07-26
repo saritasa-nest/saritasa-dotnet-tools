@@ -344,8 +344,8 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                         if (!reader.IsDBNull(5))
                         {
                             messageRecord.Data = serializer.Deserialize(
-                            Encoding.UTF8.GetBytes(reader.GetString(5)), typeof(IDictionary<string, string>))
-                            as IDictionary<string, string>;
+                                Encoding.UTF8.GetBytes(reader.GetString(5)), typeof(IDictionary<string, string>))
+                                as IDictionary<string, string>;
                         }
                         if (!reader.IsDBNull(7) && !reader.IsDBNull(8))
                         {

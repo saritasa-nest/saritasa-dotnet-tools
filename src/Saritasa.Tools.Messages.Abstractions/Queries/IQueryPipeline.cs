@@ -17,7 +17,7 @@ namespace Saritasa.Tools.Messages.Abstractions.Queries
         /// <typeparam name="TQuery">Query type.</typeparam>
         /// <param name="pipelineService">Pipeline service.</param>
         /// <returns>Query wrapper.</returns>
-        IQueryCaller<TQuery> Query<TQuery>([NotNull] IPipelineService pipelineService) where TQuery : class;
+        IQueryCaller<TQuery> Query<TQuery>([NotNull] IMessagePipelineService pipelineService) where TQuery : class;
 
         /// <summary>
         /// Creates caller wrapper.
@@ -26,7 +26,7 @@ namespace Saritasa.Tools.Messages.Abstractions.Queries
         /// <param name="pipelineService">Pipeline service.</param>
         /// <param name="obj">Query object to execute by.</param>
         /// <returns>Query wrapper.</returns>
-        IQueryCaller<TQuery> Query<TQuery>([NotNull] IPipelineService pipelineService,
+        IQueryCaller<TQuery> Query<TQuery>([NotNull] IMessagePipelineService pipelineService,
             [NotNull] TQuery obj) where TQuery : class;
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace Saritasa.Tools.Messages.Abstractions.Queries
         /// <param name="pipelineService">Pipeline service.</param>
         /// <param name="messageContext">Message context.</param>
         /// <returns>Default value for TQuery.</returns>
-        IQueryCaller<TQuery> CreateMessageContext<TQuery>([NotNull] IPipelineService pipelineService,
+        IQueryCaller<TQuery> CreateMessageContext<TQuery>([NotNull] IMessagePipelineService pipelineService,
             IMessageContext messageContext) where TQuery : class;
     }
 }

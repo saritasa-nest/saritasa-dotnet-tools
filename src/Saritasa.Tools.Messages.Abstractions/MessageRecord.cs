@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace Saritasa.Tools.Messages.Abstractions
 {
     /// <summary>
-    /// Message data transfer object used by repositories to save.
+    /// Message data transfer object used by repositories to save/load.
     /// </summary>
     public class MessageRecord
     {

@@ -238,7 +238,8 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                     messageRecord.Content = Deserialize(fields[5], Type.GetType(messageRecord.ContentType));
                     if (!string.IsNullOrEmpty(messageRecord.ErrorType))
                     {
-                        messageRecord.Error = (Exception)Deserialize(fields[9], Type.GetType(messageRecord.ErrorType));
+                        messageRecord.Error = Deserialize(fields[9], Type.GetType(messageRecord.ErrorType))
+                            as Exception;
                     }
                     yield return messageRecord;
                 }

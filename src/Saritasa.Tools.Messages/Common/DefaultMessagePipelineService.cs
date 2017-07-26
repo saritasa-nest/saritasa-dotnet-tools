@@ -9,7 +9,7 @@ namespace Saritasa.Tools.Messages.Common
     /// <summary>
     /// Default pipeline service.
     /// </summary>
-    public class DefaultPipelineService : IPipelineService
+    public class DefaultMessagePipelineService : IMessagePipelineService
     {
         /// <inheritdoc />
         public IMessagePipelineContainer PipelineContainer { get; set; }
@@ -20,10 +20,10 @@ namespace Saritasa.Tools.Messages.Common
         /// <summary>
         /// .ctor
         /// </summary>
-        public DefaultPipelineService()
+        public DefaultMessagePipelineService()
         {
             this.ServiceProvider = NullServiceProvider.Default;
-            this.PipelineContainer = new SimpleMessagePipelineContainer();
+            this.PipelineContainer = new DefaultMessagePipelineContainer();
         }
 
         /// <summary>
@@ -31,7 +31,8 @@ namespace Saritasa.Tools.Messages.Common
         /// </summary>
         /// <param name="serviceProvider">Service provider.</param>
         /// <param name="messagePipelineContainer">Pipelines container.</param>
-        public DefaultPipelineService(IServiceProvider serviceProvider, IMessagePipelineContainer messagePipelineContainer)
+        public DefaultMessagePipelineService(IServiceProvider serviceProvider,
+            IMessagePipelineContainer messagePipelineContainer)
         {
             this.ServiceProvider = serviceProvider;
             this.PipelineContainer = messagePipelineContainer;

@@ -57,7 +57,7 @@ namespace Saritasa.Tools.Messages.Configuration
                 ParseMiddlewares(pipeline, childNode.ChildNodes);
                 pipelines.Add(pipeline);
             }
-            return new SimpleMessagePipelineContainer(pipelines);
+            return new DefaultMessagePipelineContainer(pipelines);
         }
 
         private void ParseMiddlewares(IMessagePipeline pipeline, XmlNodeList nodes)

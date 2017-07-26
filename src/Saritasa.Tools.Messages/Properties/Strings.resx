@@ -177,20 +177,8 @@
   <data name="InnerExceptionIsNull" xml:space="preserve">
     <value>For some reason InnerException is null. Type {0}.</value>
   </data>
-  <data name="MessageShouldBeType" xml:space="preserve">
-    <value>Message should be {0} type.</value>
-  </data>
   <data name="MethodNoTypeDeclare" xml:space="preserve">
     <value>Method does not declare type.</value>
-  </data>
-  <data name="MiddlewareDuplicate" xml:space="preserve">
-    <value>There are middlewares with duplicated identifiers {0}.</value>
-  </data>
-  <data name="MiddlewareExists" xml:space="preserve">
-    <value>Middleware with identifier {0} already exists.</value>
-  </data>
-  <data name="MiddlewareNotFound" xml:space="preserve">
-    <value>Middleware not found.</value>
   </data>
   <data name="NoHandlersInAssembly" xml:space="preserve">
     <value>Cannot find command handlers in assemblie(-s) {0}.</value>

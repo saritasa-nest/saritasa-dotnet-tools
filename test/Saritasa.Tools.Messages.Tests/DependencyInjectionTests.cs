@@ -17,7 +17,7 @@ namespace Saritasa.Tools.Messages.Tests
     /// </summary>
     public class DependencyInjectionTests
     {
-        private readonly IPipelineService pipelineService = new DefaultPipelineService();
+        private readonly IMessagePipelineService pipelineService = new DefaultMessagePipelineService();
 
         public interface IInterfaceA
         {

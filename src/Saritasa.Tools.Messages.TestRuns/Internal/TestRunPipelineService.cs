@@ -13,7 +13,7 @@ namespace Saritasa.Tools.Messages.TestRuns.Internal
     /// <summary>
     /// Simple implementation of pipeline service for test run.
     /// </summary>
-    public class TestRunPipelineService : IPipelineService
+    public class TestRunPipelineService : IMessagePipelineService
     {
         /// <summary>
         /// .ctor

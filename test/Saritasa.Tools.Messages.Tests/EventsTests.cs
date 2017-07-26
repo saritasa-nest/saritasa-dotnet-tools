@@ -17,7 +17,7 @@ namespace Saritasa.Tools.Messages.Tests
     /// </summary>
     public class EventsTests
     {
-        private readonly IPipelineService pipelinesService = new DefaultPipelineService();
+        private readonly IMessagePipelineService pipelinesService = new DefaultMessagePipelineService();
 
         #region Shared interfaces
 

@@ -9,15 +9,15 @@ namespace Saritasa.Tools.Messages.Abstractions
     /// <summary>
     /// Pipelines service extension methods.
     /// </summary>
-    public static class PipelineServiceExtensions
+    public static class MessagePipelineServiceExtensions
     {
         /// <summary>
-        /// Get pipeline of specified type or throw exception.s
+        /// Get pipeline of specified type or throw exception.
         /// </summary>
         /// <typeparam name="T">Type of pipeline.</typeparam>
         /// <param name="pipelineService">Pipelines service.</param>
         /// <returns>Pipeline.</returns>
-        public static T GetPipelineOfType<T>(this IPipelineService pipelineService)
+        public static T GetPipelineOfType<T>(this IMessagePipelineService pipelineService)
             where T : class, IMessagePipeline
         {
             var container = pipelineService.PipelineContainer;
@@ -38,7 +38,7 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// </summary>
         /// <typeparam name="T">Pipeline type.</typeparam>
         /// <param name="pipelinesService">Pipelines service.</param>
-        public static void RemovePipelineOfType<T>(this IPipelineService pipelinesService)
+        public static void RemovePipelineOfType<T>(this IMessagePipelineService pipelinesService)
             where T : class, IMessagePipeline
         {
             var pipeline = GetPipelineOfType<T>(pipelinesService);

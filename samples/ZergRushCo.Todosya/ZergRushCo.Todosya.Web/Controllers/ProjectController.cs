@@ -1,11 +1,7 @@
-﻿using System;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using Microsoft.Extensions.Logging;
-using Saritasa.Tools.Common;
 using Saritasa.Tools.Messages.Abstractions;
-using Saritasa.Tools.Messages.Abstractions.Commands;
-using Saritasa.Tools.Messages.Abstractions.Queries;
 using ZergRushCo.Todosya.Domain.TaskContext.Queries;
 using ZergRushCo.Todosya.Domain.TaskContext.Commands;
 
@@ -17,7 +13,7 @@ namespace ZergRushCo.Todosya.Web.Controllers
     public class ProjectController : BaseController
     {
         public ProjectController(
-            IPipelineService pipelinesService,
+            IMessagePipelineService pipelinesService,
             ILoggerFactory loggerFactory) :
             base(pipelinesService, loggerFactory)
         {

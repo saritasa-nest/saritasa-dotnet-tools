@@ -18,7 +18,7 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// <typeparam name="TQuery">Query type.</typeparam>
         /// <param name="pipelineService">Pipelines service.</param>
         /// <returns>Query caller.</returns>
-        public static IQueryCaller<TQuery> Query<TQuery>(this IPipelineService pipelineService) where TQuery : class
+        public static IQueryCaller<TQuery> Query<TQuery>(this IMessagePipelineService pipelineService) where TQuery : class
         {
             var pipeline = pipelineService.GetPipelineOfType<IQueryPipeline>();
             return pipeline.Query<TQuery>(pipelineService);
@@ -31,7 +31,7 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// <param name="pipelineService">Pipelines service.</param>
         /// <param name="obj">Query object to execute by.</param>
         /// <returns>Query caller.</returns>
-        public static IQueryCaller<TQuery> Query<TQuery>(this IPipelineService pipelineService,
+        public static IQueryCaller<TQuery> Query<TQuery>(this IMessagePipelineService pipelineService,
             TQuery obj) where TQuery : class
         {
             var pipeline = pipelineService.GetPipelineOfType<IQueryPipeline>();

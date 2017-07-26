@@ -25,7 +25,7 @@ namespace Saritasa.Tools.Messages.Commands
         #region ICommandPipeline
 
         /// <inheritdoc />
-        public IMessageContext CreateMessageContext(IPipelineService pipelineService, object command)
+        public IMessageContext CreateMessageContext(IMessagePipelineService pipelineService, object command)
         {
             if (command == null)
             {
@@ -46,7 +46,7 @@ namespace Saritasa.Tools.Messages.Commands
         #region IMessageRecordConverter
 
         /// <inheritdoc />
-        public IMessageContext CreateMessageContext(IPipelineService pipelineService, MessageRecord record)
+        public IMessageContext CreateMessageContext(IMessagePipelineService pipelineService, MessageRecord record)
         {
             var context = new MessageContext(pipelineService)
             {

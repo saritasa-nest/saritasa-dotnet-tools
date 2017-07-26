@@ -17,6 +17,6 @@ namespace Saritasa.Tools.Messages.Abstractions.Commands
         /// <param name="pipelineService">Pipelines service.</param>
         /// <param name="command">Command object.</param>
         /// <returns>Message context.</returns>
-        IMessageContext CreateMessageContext([NotNull] IPipelineService pipelineService, [NotNull] object command);
+        IMessageContext CreateMessageContext([NotNull] IMessagePipelineService pipelineService, [NotNull] object command);
     }
 }

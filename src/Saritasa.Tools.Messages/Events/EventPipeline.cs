@@ -24,7 +24,7 @@ namespace Saritasa.Tools.Messages.Events
         #region IEventPipeline
 
         /// <inheritdoc />
-        public IMessageContext CreateMessageContext(IPipelineService pipelineService, object @event)
+        public IMessageContext CreateMessageContext(IMessagePipelineService pipelineService, object @event)
         {
             var messageContext = new MessageContext(pipelineService, @event);
             messageContext.Pipeline = this;
@@ -36,7 +36,7 @@ namespace Saritasa.Tools.Messages.Events
         #region IMessageRecordConverter
 
         /// <inheritdoc />
-        public IMessageContext CreateMessageContext(IPipelineService pipelineService, MessageRecord record)
+        public IMessageContext CreateMessageContext(IMessagePipelineService pipelineService, MessageRecord record)
         {
             var context = new MessageContext(pipelineService)
             {

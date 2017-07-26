@@ -44,7 +44,7 @@ namespace ZergRushCo.Todosya.Domain.UserContext.Handlers
         /// <param name="pipelineService">Pipeline service.</param>
         public async Task HandleRegisterUser(
             RegisterUserCommand command,
-            IPipelineService pipelineService)
+            IMessagePipelineService pipelineService)
         {
             using (var uow = uowFactory.Create())
             {

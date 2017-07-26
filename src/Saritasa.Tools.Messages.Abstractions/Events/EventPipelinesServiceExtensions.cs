@@ -19,7 +19,7 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// </summary>
         /// <param name="pipelineService">Pipeline service.</param>
         /// <param name="event">Event to process.</param>
-        public static void RaiseEvent(this IPipelineService pipelineService, object @event)
+        public static void RaiseEvent(this IMessagePipelineService pipelineService, object @event)
         {
             var eventPipeline = pipelineService.GetPipelineOfType<IEventPipeline>();
             var messageContext = eventPipeline.CreateMessageContext(pipelineService, @event);
@@ -32,7 +32,7 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// <param name="pipelineService">Pipeline service.</param>
         /// <param name="event">Event to process.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
-        public static async Task RaiseEventAsync(this IPipelineService pipelineService, object @event,
+        public static async Task RaiseEventAsync(this IMessagePipelineService pipelineService, object @event,
             CancellationToken cancellationToken = default(CancellationToken))
         {
             var eventPipeline = pipelineService.GetPipelineOfType<IEventPipeline>();

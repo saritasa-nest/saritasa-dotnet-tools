@@ -22,7 +22,7 @@ namespace ZergRushCo.Todosya.Web.Controllers
         readonly Domain.UserContext.Queries.UsersQueries userQueries;
 
         public ManageController(
-            IPipelineService pipelineService,
+            IMessagePipelineService pipelineService,
             ILoggerFactory loggerFactory,
             SignInManager<User, string> signInManager,
             Domain.UserContext.Queries.UsersQueries userQueries) :

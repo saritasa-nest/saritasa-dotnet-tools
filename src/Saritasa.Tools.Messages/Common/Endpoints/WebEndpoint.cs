@@ -326,7 +326,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
                     var converter = pipeline as IMessageRecordConverter;
                     if (converter != null)
                     {
-                        var pipelineService = new DefaultPipelineService();
+                        var pipelineService = new DefaultMessagePipelineService();
                         pipelineService.ServiceProvider = serviceProviderFactory.Create();
                         var message = converter.CreateMessageContext(pipelineService, messageRecord);
                         try
@@ -360,7 +360,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
             this.pipelines = container.Pipelines;
         }
 
-        #region Dispose
+#region Dispose
 
         bool disposed;
 
@@ -403,7 +403,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
             GC.SuppressFinalize(this);
         }
 
-        #endregion
+#endregion
     }
 }
 #endif

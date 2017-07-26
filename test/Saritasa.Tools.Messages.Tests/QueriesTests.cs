@@ -17,7 +17,7 @@ namespace Saritasa.Tools.Messages.Tests
     /// </summary>
     public class QueriesTests
     {
-        readonly IPipelineService pipelineService = new DefaultPipelineService();
+        readonly IMessagePipelineService pipelineService = new DefaultMessagePipelineService();
 
         #region Interfaces
 

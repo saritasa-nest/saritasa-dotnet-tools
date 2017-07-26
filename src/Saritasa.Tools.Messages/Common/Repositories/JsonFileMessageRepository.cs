@@ -121,7 +121,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                 {
                     var errorType = Type.GetType(messageRecord.ErrorType);
                     var errorBytes = Encoding.UTF8.GetBytes(messageRecord.Error.ToString());
-                    messageRecord.Error = (Exception)Serializer.Deserialize(errorBytes, errorType);
+                    messageRecord.Error = Serializer.Deserialize(errorBytes, errorType) as Exception;
                 }
 
                 yield return messageRecord;

@@ -24,10 +24,10 @@
     public class ProductsController : Controller
     {
         private readonly ProductQueries productQueries;
-        private readonly IPipelineService pipelineService;
+        private readonly IMessagePipelineService pipelineService;
         private readonly CompanyQueries companyQueries;
 
-        public ProductsController(IPipelineService pipelineService, ProductQueries productQueries, CompanyQueries companyQueries)
+        public ProductsController(IMessagePipelineService pipelineService, ProductQueries productQueries, CompanyQueries companyQueries)
         {
             if (pipelineService == null)
             {

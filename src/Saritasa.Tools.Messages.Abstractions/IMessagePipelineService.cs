@@ -8,7 +8,7 @@ namespace Saritasa.Tools.Messages.Abstractions
     /// <summary>
     /// Pipelines service.
     /// </summary>
-    public interface IPipelineService
+    public interface IMessagePipelineService
     {
         /// <summary>
         /// Pipelines related to service.

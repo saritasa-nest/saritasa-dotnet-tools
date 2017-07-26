@@ -13,13 +13,13 @@ namespace Saritasa.BoringWarehouse.IntegrationTests
     public class CompanyTest
     {
         private IContainer container;
-        private IPipelineService pipelineService;
+        private IMessagePipelineService pipelineService;
 
         [SetUp]
         public void SetUp()
         {
             container = GlobalConfig.Container;
-            pipelineService = container.Resolve<IPipelineService>();
+            pipelineService = container.Resolve<IMessagePipelineService>();
         }
 
         [TestCase]

@@ -16,10 +16,10 @@
     [Authorize]
     public class CompaniesController : Controller
     {
-        private readonly IPipelineService pipelineService;
+        private readonly IMessagePipelineService pipelineService;
         private readonly CompanyQueries companyQueries;
 
-        public CompaniesController(IPipelineService pipelineService, CompanyQueries companyQueries)
+        public CompaniesController(IMessagePipelineService pipelineService, CompanyQueries companyQueries)
         {
             if (pipelineService == null)
             {

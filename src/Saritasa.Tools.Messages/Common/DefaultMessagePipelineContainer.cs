@@ -11,12 +11,12 @@ namespace Saritasa.Tools.Messages.Common
     /// <summary>
     /// Simple message pipeline container with default arrays implementation.
     /// </summary>
-    public class SimpleMessagePipelineContainer : IMessagePipelineContainer
+    public class DefaultMessagePipelineContainer : IMessagePipelineContainer
     {
         /// <summary>
         /// Default static instance.
         /// </summary>
-        public static readonly IMessagePipelineContainer Default = new SimpleMessagePipelineContainer();
+        public static readonly IMessagePipelineContainer Default = new DefaultMessagePipelineContainer();
 
         /// <inheritdoc />
         public IMessagePipeline[] Pipelines { get; set; } = new IMessagePipeline[0];
@@ -24,7 +24,7 @@ namespace Saritasa.Tools.Messages.Common
         /// <summary>
         /// .ctor
         /// </summary>
-        public SimpleMessagePipelineContainer()
+        public DefaultMessagePipelineContainer()
         {
         }
 
@@ -32,7 +32,7 @@ namespace Saritasa.Tools.Messages.Common
         /// .ctor
         /// </summary>
         /// <param name="pipelines">Pipelines enumerable.</param>
-        public SimpleMessagePipelineContainer(IEnumerable<IMessagePipeline> pipelines)
+        public DefaultMessagePipelineContainer(IEnumerable<IMessagePipeline> pipelines)
         {
             if (pipelines == null)
             {

@@ -50,7 +50,7 @@ namespace Saritasa.Tools.Messages.Queries
         #region IQueryPipeline
 
         /// <inheritdoc />
-        public virtual IQueryCaller<TQuery> Query<TQuery>(IPipelineService pipelineService) where TQuery : class
+        public virtual IQueryCaller<TQuery> Query<TQuery>(IMessagePipelineService pipelineService) where TQuery : class
         {
             var messageContext = new MessageContext(pipelineService);
             messageContext.ContentId = TypeHelpers.GetPartiallyAssemblyQualifiedName(typeof(TQuery));
@@ -59,7 +59,7 @@ namespace Saritasa.Tools.Messages.Queries
         }
 
         /// <inheritdoc />
-        public virtual IQueryCaller<TQuery> Query<TQuery>(IPipelineService pipelineService, TQuery obj) where TQuery : class
+        public virtual IQueryCaller<TQuery> Query<TQuery>(IMessagePipelineService pipelineService, TQuery obj) where TQuery : class
         {
             var messageContext = new MessageContext(pipelineService, obj);
             messageContext.ContentId = TypeHelpers.GetPartiallyAssemblyQualifiedName(typeof(TQuery));
@@ -68,7 +68,7 @@ namespace Saritasa.Tools.Messages.Queries
         }
 
         /// <inheritdoc />
-        public IQueryCaller<TQuery> CreateMessageContext<TQuery>(IPipelineService pipelineService,
+        public IQueryCaller<TQuery> CreateMessageContext<TQuery>(IMessagePipelineService pipelineService,
             IMessageContext messageContext) where TQuery : class
         {
             return new QueryCaller<TQuery>(this, messageContext).NoExecution();
@@ -79,7 +79,7 @@ namespace Saritasa.Tools.Messages.Queries
         #region IMessageRecordConverter
 
         /// <inheritdoc />
-        public IMessageContext CreateMessageContext(IPipelineService pipelineService, MessageRecord record)
+        public IMessageContext CreateMessageContext(IMessagePipelineService pipelineService, MessageRecord record)
         {
             if (record == null)
             {

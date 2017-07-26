@@ -16,7 +16,7 @@ namespace ZergRushCo.Todosya.Web.Controllers
     public class ApiProjectController : BaseController
     {
         public ApiProjectController(
-            IPipelineService pipelinesService,
+            IMessagePipelineService pipelinesService,
             ILoggerFactory loggerFactory) :
             base(pipelinesService, loggerFactory)
         {

@@ -18,7 +18,7 @@ namespace Saritasa.Tools.Messages.Common
         /// <param name="pipelineService">Pipeline service to be used to create message context.</param>
         /// <param name="record">Message record to covert from.</param>
         /// <returns>Message context to convert to.</returns>
-        IMessageContext CreateMessageContext(IPipelineService pipelineService, MessageRecord record);
+        IMessageContext CreateMessageContext(IMessagePipelineService pipelineService, MessageRecord record);
 
         /// <summary>
         /// Create message record from <see cref="IMessageContext" />.

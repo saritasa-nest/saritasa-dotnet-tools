@@ -38,7 +38,7 @@ namespace ZergRushCo.Todosya.Infrastructure
             // Pipelines container.
             var pipelinesContainer = RegisterPipelines();
             builder.RegisterInstance(pipelinesContainer).As<IMessagePipelineContainer>().SingleInstance();
-            builder.RegisterType<DefaultPipelineService>().As<IPipelineService>().InstancePerRequest()
+            builder.RegisterType<DefaultMessagePipelineService>().As<IMessagePipelineService>().InstancePerRequest()
                 .InstancePerLifetimeScope();
             builder.RegisterType<AutofacServiceProvider>().As<IServiceProvider>().InstancePerRequest()
                 .InstancePerLifetimeScope();
@@ -71,7 +71,7 @@ namespace ZergRushCo.Todosya.Infrastructure
 
         public static IMessagePipelineContainer RegisterPipelines(params IMessagePipelineMiddleware[] middlewares)
         {
-            var pipelinesContainer = new SimpleMessagePipelineContainer();
+            var pipelinesContainer = new DefaultMessagePipelineContainer();
 
             // Repositories.
             var connectionStringConf = ConfigurationManager.ConnectionStrings["AppDbContext"];
