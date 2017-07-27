@@ -4,7 +4,7 @@
 using System;
 using System.Linq;
 using Saritasa.Tools.Messages.Abstractions;
-using Saritasa.Tools.Messages.Abstractions.Events;
+using Saritasa.Tools.Messages.Abstractions.Queries;
 
 namespace Saritasa.Tools.Messages.Queries
 {
@@ -32,7 +32,7 @@ namespace Saritasa.Tools.Messages.Queries
         public static QueryPipelineBuilder AddQueryPipeline(this IMessagePipelineContainer messagePipelineContainer,
             Action<QueryPipelineOptions> setupAction)
         {
-            if (messagePipelineContainer.Pipelines.Any(p => p is IEventPipeline))
+            if (messagePipelineContainer.Pipelines.Any(p => p is IQueryPipeline))
             {
                 throw new InvalidOperationException("Queries pipeline already exists in global context items. " +
                                                     "Use RemovePipeline method to clean up existins pipeline.");

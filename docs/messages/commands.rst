@@ -6,16 +6,7 @@ Overview
 
 Command is something that changes the state (database insert/update/delete) of application. It utilizes Command behavioral design pattern: you should separate data for command and its handler. Here is a general usage:
 
-1. Setup command pipeline, you can start with general one:
-
-    .. code-block:: c#
-
-        var commandPipeline = Saritasa.Tools.Messages.Commands.CommandPipeline.CreateDefaultPipeline(
-            container.Resolve, // Delegate for DI.
-            System.Reflection.Assembly.GetEntryAssembly() // Assemblies that contain command handlers.
-        );
-
-    The code above setup commands pipeline. First argument is delegate to resolve dependencies. If you do not need it use ``Saritasa.Tools.Messages.Commands.CommandPipeline.NullResolver``. Most of dependency injection containers provide a method to retrieve service instance by its type. Second argument is a set of assemblies where command handlers are located.
+1. Setup pipeline service.
 
 2. Create command, it should be POCO:
 
@@ -38,16 +29,16 @@ Command is something that changes the state (database insert/update/delete) of a
         {
             public void HandleCreateProject(CreateProjectCommand command, IAppUnitOfWorkFactory uowFactory)
             {
-                // processing...
+                // Processing...
             }
         }
 
-4. Execute command using command pipeline:
+4. Execute command using pipeline service:
    
     .. code-block:: c#
 
         CreateProjectCommand command = new CreateProjectCommand() { Name = "Test", CreatedByUserId = CurrentUser.Id };
-        CommandPipeline.Handle(command);
+        ServicePipeline.HandleCommand(command);
 
 That's it!
 
@@ -66,19 +57,19 @@ Middlewares
 
     .. class:: CommandHandlerLocatorMiddleware
 
-        Included to default pipeline. Locates for command handler class. Default id is ``CommandHandlerLocator``.
+        Included to default pipeline. Locates for command handler class using provided assemblies. Handler class must have ``CommandHandlers`` attribute, method should begin with ``Handle`` work and first argument must be command type.
 
     .. class:: CommandExecutorMiddleware
 
-        Included to default pipeline. Executes command against found command handler. Default id is ``CommandExecutor``.
+        Included to default pipeline. Executes command against found command handler.
 
     .. class:: CommandValidationMiddleware
 
-        Validates command against data annotation attributes. Generates ``CommandValidationException``. Id is ``CommandValidation``.
+        Validates command against data annotation attributes. Generates ``ValidationException``.
 
 Default Pipeline
 ----------------
 
     ::
 
-        CommandHandlerLocatorMiddleware [CommandHandlerLocator] ---> CommandExecutorMiddleware [CommandExecutor]
+        CommandHandlerLocatorMiddleware ---> CommandExecutorMiddleware

@@ -13,7 +13,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
     public class DataMiddleware : IMessagePipelineMiddleware
     {
         /// <inheritdoc />
-        public string Id { get; set; } = "Data";
+        public string Id { get; set; };
 
         readonly Action<IDictionary<object, object>> action;
 
@@ -28,6 +28,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
                 throw new ArgumentNullException(nameof(action));
             }
             this.action = action;
+            this.Id = this.GetType().Name;
         }
 
         /// <inheritdoc />

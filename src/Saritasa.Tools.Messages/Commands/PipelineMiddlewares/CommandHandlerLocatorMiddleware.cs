@@ -27,7 +27,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         readonly System.Collections.Concurrent.ConcurrentDictionary<Type, MethodInfo> cache =
             new System.Collections.Concurrent.ConcurrentDictionary<Type, MethodInfo>();
 
-        MethodInfo[] commandHandlers;
+        private MethodInfo[] commandHandlers;
 
         /// <inheritdoc />
         public CommandHandlerLocatorMiddleware(IDictionary<string, string> dict) : base(dict)

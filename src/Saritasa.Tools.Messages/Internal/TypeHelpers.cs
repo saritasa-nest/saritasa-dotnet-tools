@@ -33,7 +33,7 @@ namespace Saritasa.Tools.Messages.Internal
 
             var typeInfo = type.GetTypeInfo();
 
-            // Try default paramless ctor.
+            // Try default parameterless ctor.
             var ctor = typeInfo.GetConstructor(new Type[] { });
             if (ctor != null)
             {

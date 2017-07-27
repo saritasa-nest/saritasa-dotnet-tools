@@ -12,13 +12,7 @@ Things happen. Not all of them are interesting, some may be worth recording but 
 
 Here is how it can be used:
 
-1. Setup event pipeline. Also you need to register it with your DI container since it can be injected to command hanlders.
-
-    .. code-block:: c#
-
-        var eventsPipeline = Saritasa.Tools.Events.EventPipeline.CreateDefaultPipeline(container.Resolve,
-            System.Reflection.Assembly.GetAssembly(typeof(Domain.Users.Entities.User)));
-        builder.RegisterInstance(eventsPipeline).AsImplementedInterfaces().SingleInstance();
+1. Setup pipeline service. Also you need to register it with your DI container since it can be injected to command hanlders.
 
 2. Create event class:
    
@@ -39,10 +33,10 @@ Here is how it can be used:
             public void HandleSendEmailOnUserCreate(UserCreatedEvent userCreatedEvent,
                 Saritasa.Tools.Emails.IEmailSender<MailMessage> emailSender)
             {
-                var message = new MailMessage()
+                var message = new MailMessage
                 {
                     To = { new MailAddress(userCreatedEvent.User.Email) },
-                    Body = $"Thanks for registering to our site!",
+                    Body = $"Thanks for registering to our site!"
                 };
                 emailSender.SendAsync(message);
             }
@@ -53,19 +47,19 @@ Middlewares
 
     .. class:: DomainEventLocatorMiddleware
 
-        Uses domain events manager to raise events. Id is ``DomainEventLocator``.
+        Uses domain events manager to raise events.
 
     .. class:: EventExecutorMiddleware
 
-        Included to default pipeline. Default event executor. It does not process events with Rejected status. Id is ``EventExecutor``.
+        Included to default pipeline. Default event executor. It does not process events with Rejected status.
 
     .. class:: EventHandlerLocatorMiddleware
 
-        Included to default pipeline. Locates command hanlder. Id is ``EventLocator``.
+        Included to default pipeline. Locates command hanlder. See requirements above.
 
 Default Pipeline
 ----------------
 
     ::
 
-        EventHandlerLocatorMiddleware [EventLocator] ---> EventExecutorMiddleware [EventExecutor]
+        EventHandlerLocatorMiddleware ---> EventExecutorMiddleware
