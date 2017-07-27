@@ -3,6 +3,7 @@
 
 using System;
 using System.Reflection;
+using Saritasa.Tools.Messages.Abstractions.Queries;
 
 namespace Saritasa.Tools.Messages.Queries
 {
@@ -37,7 +38,7 @@ namespace Saritasa.Tools.Messages.Queries
         protected internal object QueryObject { get; set; }
 
         /// <summary>
-        /// If true QueryObject has been created by QueryCaller.
+        /// If <c>true</c> <see cref="QueryParameters" /> has been created by <see cref="IQueryCaller" />.
         /// </summary>
         protected internal bool FakeQueryObject { get; set; }
 

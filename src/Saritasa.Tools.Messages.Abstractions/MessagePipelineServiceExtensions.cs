@@ -9,7 +9,7 @@ namespace Saritasa.Tools.Messages.Abstractions
     /// <summary>
     /// Pipelines service extension methods.
     /// </summary>
-    public static class MessagePipelineServiceExtensions
+    public static partial class MessagePipelineServiceExtensions
     {
         /// <summary>
         /// Get pipeline of specified type or throw exception.

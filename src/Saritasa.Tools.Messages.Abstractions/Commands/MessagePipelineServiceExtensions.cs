@@ -12,7 +12,7 @@ namespace Saritasa.Tools.Messages.Abstractions
     /// <summary>
     /// Command pipeline extensions.
     /// </summary>
-    public static class CommandPipelinesServiceExtensions
+    public static partial class MessagePipelineServiceExtensions
     {
         /// <summary>
         /// Handle command within message context.

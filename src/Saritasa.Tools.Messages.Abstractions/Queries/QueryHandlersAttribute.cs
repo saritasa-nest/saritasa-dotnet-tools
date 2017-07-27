@@ -6,7 +6,7 @@ using System;
 namespace Saritasa.Tools.Messages.Abstractions.Queries
 {
     /// <summary>
-    /// The class that contains queries handers should be marked
+    /// The class that contains queries handlers should be marked
     /// with this attribute.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]

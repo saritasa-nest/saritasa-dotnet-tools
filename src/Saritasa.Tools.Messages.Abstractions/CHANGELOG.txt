@@ -1,4 +1,5 @@
-﻿0.2.0 [TBD]
+﻿0.2.0 [2017-07-27]
+[+] Global pipelines refactoring. Instead of register and using every pipeline separately use IMessagePipelineService.
 [*] Downgrade dependencies to netstandard1.5 and net452.
 [*] Add cancellation token to command and event pipelines.
 

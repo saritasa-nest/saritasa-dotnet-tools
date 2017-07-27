@@ -1,4 +1,4 @@
-﻿0.2.3 [TBD]
+﻿0.2.3 [2017-07-27]
 [+] ValidationException.ThrowFromObjectValidation support for NET Standard.
 
 0.2.2 [2017-07-17]

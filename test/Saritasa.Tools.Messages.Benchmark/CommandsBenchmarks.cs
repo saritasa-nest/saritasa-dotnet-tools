@@ -108,7 +108,7 @@ namespace Saritasa.Tools.Messages.Benchmark
         [Benchmark]
         public void RunCommandWithPipeline()
         {
-            var piplinesService = new DefaultPipelineService();
+            var piplinesService = new DefaultMessagePipelineService();
             piplinesService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
             piplinesService.PipelineContainer.AddCommandPipeline()
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(

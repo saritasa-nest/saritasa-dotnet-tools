@@ -12,7 +12,7 @@ namespace Saritasa.Tools.Messages.Abstractions
     /// <summary>
     /// Events pipeline extensions.
     /// </summary>
-    public static class EventPipelinesServiceExtensions
+    public static partial class MessagePipelineServiceExtensions
     {
         /// <summary>
         /// Raise event.

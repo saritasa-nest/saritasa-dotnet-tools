@@ -81,7 +81,7 @@ namespace Saritasa.Tools.Messages.Internal
                     }
                     catch (Exception ex)
                     {
-                        InternalLogger.Error($"Cannot set value for handler {obj} of type {type}. {ex}",
+                        InternalLogger.Error($"Cannot set value for handler {obj} of type {type}. {ex}.",
                             loggingSource);
                     }
                 }
@@ -95,7 +95,7 @@ namespace Saritasa.Tools.Messages.Internal
         {
             if (parameterValues.Length != parameters.Length)
             {
-                InternalLogger.Warn("Provided parameters count does not match method parameters count", loggingSource);
+                InternalLogger.Warn("Provided parameters count does not match method parameters count.", loggingSource);
                 return;
             }
 
@@ -113,7 +113,7 @@ namespace Saritasa.Tools.Messages.Internal
                 }
                 catch (Exception ex)
                 {
-                    InternalLogger.Warn($"Cannot resolve parameter of type {type}: {ex}", loggingSource);
+                    InternalLogger.Warn($"Cannot resolve parameter of type {type}: {ex}.", loggingSource);
                 }
             }
         }

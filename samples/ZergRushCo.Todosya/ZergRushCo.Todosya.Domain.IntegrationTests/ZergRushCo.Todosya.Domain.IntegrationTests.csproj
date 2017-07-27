@@ -97,6 +97,8 @@
     <EmbeddedResource Include="Users\Cannot_create_user_with_equal_email.json" />
     <EmbeddedResource Include="Users\Cannot_edit_project_for_another_user.json" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

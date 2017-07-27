@@ -1,4 +1,6 @@
-﻿0.2.0 [TBD]
+﻿0.2.0 [2017-07-27]
+[+] Global pipelines refactoring. Instead of register and using every pipeline separately use IMessagePipelineService.
+[*] Refactor and improve work for files and ADO.NET repositories.
 [*] Add cancellation token to async method for pipelines and repositories.
 [*] Refactor common messages repositories, bugfix.
 [*] Add pipelines configuration loading from .config file.

@@ -10,7 +10,7 @@ namespace Saritasa.Tools.Messages.Abstractions
     /// <summary>
     /// Query pipelines extensions.
     /// </summary>
-    public static class QueryPipelinesServiceExtensions
+    public static partial class MessagePipelineServiceExtensions
     {
         /// <summary>
         /// Query.

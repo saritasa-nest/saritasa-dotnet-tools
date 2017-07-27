@@ -6,7 +6,7 @@ using System;
 namespace Saritasa.Tools.Messages.Abstractions.Commands
 {
     /// <summary>
-    /// The class that contains commands handers should be marked
+    /// The class that contains commands handlers should be marked
     /// with this attribute.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]

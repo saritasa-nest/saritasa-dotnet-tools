@@ -33,7 +33,7 @@ namespace Saritasa.Tools.Messages.Abstractions
 
         /// <summary>
         /// Custom data. Should be <see cref="IDictionary{TKey,TValue}"/> where
-        /// TKey and TValue are a <see cref="string" /> type.
+        /// TKey and TValue are <see cref="string" /> type.
         /// </summary>
         public IDictionary<string, string> Data { get; set; }
 
