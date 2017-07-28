@@ -15,7 +15,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
     public class PerformanceCounterMiddleware : IMessagePipelineMiddleware, IDisposable
     {
         /// <inheritdoc />
-        public string Id { get; set; };
+        public string Id { get; set; }
 
         /// <summary>
         /// Total processed messages counter.

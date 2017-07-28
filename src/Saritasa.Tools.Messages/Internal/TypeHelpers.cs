@@ -18,18 +18,6 @@ namespace Saritasa.Tools.Messages.Internal
         internal static object ResolveObjectForType(Type type, Func<Type, object> resolver, string loggingSource = "")
         {
             object obj = null;
-            try
-            {
-                obj = resolver(type);
-            }
-            catch (Exception ex)
-            {
-                InternalLogger.Info($"Error while resolving type {type}: {ex}. Continue with fallback method.", loggingSource);
-            }
-            if (obj != null)
-            {
-                return obj;
-            }
 
             var typeInfo = type.GetTypeInfo();
 

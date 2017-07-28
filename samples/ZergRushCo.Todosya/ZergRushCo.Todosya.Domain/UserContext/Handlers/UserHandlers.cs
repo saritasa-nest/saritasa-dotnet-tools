@@ -94,7 +94,7 @@ namespace ZergRushCo.Todosya.Domain.UserContext.Handlers
             var user = await userManager.FindByIdAsync(command.UserId);
             if (user == null)
             {
-                throw new NotFoundException("User not found");
+                throw new NotFoundException("User not found.");
             }
 
             user.Email = command.Email;

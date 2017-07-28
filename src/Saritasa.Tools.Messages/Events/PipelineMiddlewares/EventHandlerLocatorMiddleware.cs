@@ -98,19 +98,11 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
                 }
             }
 
-            if (messageContext.Items.ContainsKey(HandlerMethodsKey))
-            {
-                var list = (IList<MethodInfo>)messageContext.Items[HandlerMethodsKey];
-                for (int i = 0; i < methods.Count; i++)
-                {
-                    list.Add(methods[i]);
-                }
-                messageContext.Items[HandlerMethodsKey] = list.ToArray();
-            }
-            else
-            {
-                messageContext.Items[HandlerMethodsKey] = methods.ToArray();
-            }
+            messageContext.Items.TryGetValue(HandlerMethodsKey, out object handlersObj);
+            var methodsWrap = methods.Select(m => new EventHandlerMethodWithObject(m)).ToArray();
+            var handlers = handlersObj as EventHandlerMethodWithObject[];
+            messageContext.Items[HandlerMethodsKey] =
+                ArrayHelpers.AddItems(handlers, methodsWrap);
         }
     }
 }

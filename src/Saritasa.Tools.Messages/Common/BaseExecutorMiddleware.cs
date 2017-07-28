@@ -118,9 +118,11 @@ namespace Saritasa.Tools.Messages.Common
         /// <param name="obj">The first argument.</param>
         /// <param name="serviceProvider">Service provider.</param>
         /// <param name="handlerMethod">Method to execute.</param>
-        protected void ExecuteHandler(object handler, object obj, IServiceProvider serviceProvider, MethodBase handlerMethod)
+        protected void ExecuteHandler(object handler, object obj, IServiceProvider serviceProvider,
+            MethodBase handlerMethod)
         {
-            var result = handlerMethod.Invoke(handler, GetAndResolveHandlerParameters(obj, serviceProvider, handlerMethod));
+            var parameters = GetAndResolveHandlerParameters(obj, serviceProvider, handlerMethod);
+            var result = handlerMethod.Invoke(handler, parameters);
             var task = result as Task;
             task?.ConfigureAwait(false).GetAwaiter().GetResult();
         }

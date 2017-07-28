@@ -41,6 +41,10 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
             {
                 queryParams.QueryObject = ResolveObject(queryObjectType, messageContext.ServiceProvider,
                     nameof(QueryObjectResolverMiddleware));
+                if (UseInternalObjectResolver)
+                {
+                    messageContext.Items[QueryObjectReleaseMiddleware.IsInternalResolverUsedKey] = true;
+                }
             }
             if (queryParams.QueryObject == null)
             {

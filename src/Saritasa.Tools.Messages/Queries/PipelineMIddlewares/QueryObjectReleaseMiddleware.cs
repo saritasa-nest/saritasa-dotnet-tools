@@ -11,6 +11,8 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
     /// </summary>
     public class QueryObjectReleaseMiddleware : IMessagePipelineMiddleware
     {
+        internal const string IsInternalResolverUsedKey = "internal-resolver-used";
+
         /// <inheritdoc />
         public string Id { get; set; }
 
@@ -28,8 +30,11 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
             var queryParams = (QueryParameters)messageContext.Items[QueryPipeline.QueryParametersKey];
 
             // Release handler.
-            var disposable = queryParams.QueryObject as IDisposable;
-            disposable?.Dispose();
+            if (messageContext.Items.ContainsKey(IsInternalResolverUsedKey))
+            {
+                var disposable = queryParams.QueryObject as IDisposable;
+                disposable?.Dispose();
+            }
             queryParams.QueryObject = null;
         }
     }

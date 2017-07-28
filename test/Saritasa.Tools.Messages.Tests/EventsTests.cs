@@ -3,6 +3,7 @@
 
 using System;
 using System.Reflection;
+using System.Threading.Tasks;
 using Xunit;
 using Saritasa.Tools.Domain;
 using Saritasa.Tools.Messages.Abstractions;
@@ -88,13 +89,13 @@ namespace Saritasa.Tools.Messages.Tests
         private void SetupEventPipeline(EventPipelineBuilder builder)
         {
             builder
-            .AddMiddleware(new Events.PipelineMiddlewares.EventHandlerLocatorMiddleware(
-                typeof(EventsTests).GetTypeInfo().Assembly))
-            .AddMiddleware(new Events.PipelineMiddlewares.EventExecutorMiddleware
-            {
-                UseInternalObjectResolver = true,
-                UseParametersResolve = true
-            });
+                .AddMiddleware(new Events.PipelineMiddlewares.EventHandlerLocatorMiddleware(
+                    typeof(EventsTests).GetTypeInfo().Assembly))
+                .AddMiddleware(new Events.PipelineMiddlewares.EventExecutorMiddleware
+                {
+                    UseInternalObjectResolver = true,
+                    UseParametersResolve = true
+                });
         }
 
         [Fact]
@@ -162,6 +163,80 @@ namespace Saritasa.Tools.Messages.Tests
 
             // Assert
             Assert.Equal(42, ev.Param);
+        }
+
+        #endregion
+
+        #region Can combine domain event with class events
+
+        private class DomainTestEvent2
+        {
+        }
+
+        private class DomainTestEventHandler2 : IDomainEventHandler<DomainTestEvent>
+        {
+            public void Handle(DomainTestEvent @event)
+            {
+                EventHandler1.CallCount++;
+            }
+        }
+
+        public class Event1 { }
+
+        public class Event2 { }
+
+        public class Event3 { }
+
+        [EventHandlers]
+        public class EventHandler1
+        {
+            public static int CallCount = 0;
+
+            public void Handle(Event1 ev)
+            {
+                CallCount++;
+            }
+
+            public void Handle(Event2 ev)
+            {
+                CallCount++;
+            }
+        }
+
+        [EventHandlers]
+        public class EventHandler2
+        {
+            public void Handle(Event3 ev)
+            {
+                EventHandler1.CallCount++;
+            }
+        }
+
+        [Fact]
+        public async Task Can_combine_domain_event_with_class_events()
+        {
+            // Arrange
+            var eventsManager = new DomainEventsManager();
+            eventsManager.Register(new DomainTestEventHandler2());
+
+            pipelinesService.PipelineContainer.AddEventPipeline()
+                .AddMiddleware(new Events.PipelineMiddlewares.DomainEventLocatorMiddleware(eventsManager))
+                .AddMiddleware(new Events.PipelineMiddlewares.EventHandlerLocatorMiddleware(
+                    typeof(EventsTests).GetTypeInfo().Assembly))
+                .AddMiddleware(new Events.PipelineMiddlewares.EventExecutorMiddleware
+                {
+                    UseInternalObjectResolver = true,
+                    UseParametersResolve = true
+                });
+
+            // Act
+            await pipelinesService.RaiseEventAsync(new DomainTestEvent());
+            await pipelinesService.RaiseEventAsync(new Event1());
+            await pipelinesService.RaiseEventAsync(new Event2());
+            await pipelinesService.RaiseEventAsync(new Event3());
+
+            // Assert
+            Assert.Equal(4, EventHandler1.CallCount);
         }
 
         #endregion

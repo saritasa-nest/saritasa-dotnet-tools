@@ -126,8 +126,11 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             finally
             {
                 // Release handler.
-                var disposable = handler as IDisposable;
-                disposable?.Dispose();
+                if (UseInternalObjectResolver)
+                {
+                    var disposable = handler as IDisposable;
+                    disposable?.Dispose();
+                }
 
                 if (stopwatch != null)
                 {
@@ -195,8 +198,11 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             finally
             {
                 // Release handler.
-                var disposable = handler as IDisposable;
-                disposable?.Dispose();
+                if (UseInternalObjectResolver)
+                {
+                    var disposable = handler as IDisposable;
+                    disposable?.Dispose();
+                }
 
                 if (stopwatch != null)
                 {

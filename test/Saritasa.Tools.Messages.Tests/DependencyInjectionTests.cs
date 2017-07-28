@@ -7,8 +7,10 @@ using System.Threading.Tasks;
 using Xunit;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Abstractions.Commands;
+using Saritasa.Tools.Messages.Abstractions.Queries;
 using Saritasa.Tools.Messages.Commands;
 using Saritasa.Tools.Messages.Common;
+using Saritasa.Tools.Messages.Queries;
 
 namespace Saritasa.Tools.Messages.Tests
 {
@@ -18,39 +20,6 @@ namespace Saritasa.Tools.Messages.Tests
     public class DependencyInjectionTests
     {
         private readonly IMessagePipelineService pipelineService = new DefaultMessagePipelineService();
-
-        public interface IInterfaceA
-        {
-            string GetTestValue();
-        }
-
-        public class ImplementationA : IInterfaceA, IDisposable
-        {
-            public string GetTestValue() => "A";
-
-            public static bool IsDisposed { get; set; }
-
-            public ImplementationA()
-            {
-                IsDisposed = false;
-            }
-
-            public void Dispose()
-            {
-                IsDisposed = true;
-            }
-        }
-
-        public static object InterfacesResolver(Type t)
-        {
-            if (t == typeof(IInterfaceA))
-            {
-                return new ImplementationA();
-            }
-            return null;
-        }
-
-        #region Should dispose command handlers after instaniate
 
         public class TestCommand
         {
@@ -72,8 +41,15 @@ namespace Saritasa.Tools.Messages.Tests
             }
         }
 
+        public static object CustomObjectsResolver(Type t)
+        {
+            return Activator.CreateInstance(t);
+        }
+
+        #region Should dispose command handlers after instaniate if use internal object resolver
+
         [Fact]
-        public void Should_dispose_command_handlers_after_instaniate_if_self_created()
+        public void Should_dispose_command_handlers_after_instaniate_if_use_internal_object_resolver()
         {
             // Arrange
             pipelineService.PipelineContainer.AddCommandPipeline()
@@ -94,7 +70,7 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [Fact]
-        public async Task Should_dispose_command_handlers_after_instaniate_async()
+        public async Task Should_dispose_command_handlers_after_instaniate_if_use_internal_object_resolver_async()
         {
             // Arrange
             pipelineService.PipelineContainer.AddCommandPipeline()
@@ -112,6 +88,108 @@ namespace Saritasa.Tools.Messages.Tests
 
             // Assert
             Assert.True(TestCommandHandler.IsDisposed);
+        }
+
+        #endregion
+
+        #region Should dispose query handlers after instaniate if use internal object resolver
+
+        [QueryHandlers]
+        public class QueryClass : IDisposable
+        {
+            public static bool IsDisposed { get; set; }
+
+            public int Query() => 42;
+
+            public void Dispose()
+            {
+                IsDisposed = true;
+            }
+        }
+
+        [Fact]
+        public void Should_dispose_query_handlers_after_instaniate_if_use_internal_object_resolver()
+        {
+            // Arrange
+            pipelineService.PipelineContainer.AddQueryPipeline()
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectResolverMiddleware
+                {
+                    UseInternalObjectResolver = true,
+                    UseParametersResolve = true
+                })
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware())
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectReleaseMiddleware());
+
+            // Act
+            pipelineService.Query<QueryClass>().With(q => q.Query());
+
+            // Assert
+            Assert.True(QueryClass.IsDisposed);
+        }
+
+        #endregion
+
+        #region Should not dispose query handlers after instaniate if not use internal object resolver
+
+        [QueryHandlers]
+        public class QueryClass2 : IDisposable
+        {
+            public static bool IsDisposed { get; set; }
+
+            public int Query() => 42;
+
+            public void Dispose()
+            {
+                IsDisposed = true;
+            }
+        }
+
+        [Fact]
+        public void Should_not_dispose_query_handlers_after_instaniate_if_not_use_internal_object_resolver()
+        {
+            // Arrange
+            pipelineService.PipelineContainer.AddQueryPipeline()
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectResolverMiddleware
+                {
+                    UseInternalObjectResolver = false,
+                    UseParametersResolve = true
+                })
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware())
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectReleaseMiddleware());
+
+            // Act
+            pipelineService.ServiceProvider = new FuncServiceProvider(CustomObjectsResolver);
+            pipelineService.Query<QueryClass>().With(q => q.Query());
+
+            // Assert
+            Assert.False(QueryClass.IsDisposed);
+        }
+
+        #endregion
+
+        #region Should not dispose command handlers after instaniate if not use internal object resolver
+
+        [Fact]
+        public void Should_not_dispose_command_handlers_after_instaniate_if_not_use_internal_object_resolver()
+        {
+            // Arrange
+            pipelineService.PipelineContainer.AddCommandPipeline()
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
+                    typeof(CommandsTests).GetTypeInfo().Assembly))
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandExecutorMiddleware
+                {
+                    UseInternalObjectResolver = false,
+                    UseParametersResolve = true
+                });
+            var cmd = new TestCommand();
+
+            // Act
+            pipelineService.ServiceProvider = new FuncServiceProvider(CustomObjectsResolver);
+            pipelineService.HandleCommand(cmd);
+
+            // Assert
+            // Since handler object is controlled by external resolver we should not dispose it ourself.
+            Assert.False(TestCommandHandler.IsDisposed);
         }
 
         #endregion

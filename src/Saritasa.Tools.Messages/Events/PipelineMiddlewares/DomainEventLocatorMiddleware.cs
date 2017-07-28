@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Domain;
+using Saritasa.Tools.Messages.Internal;
 
 namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
 {
@@ -18,7 +19,7 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
         /// <inheritdoc />
         public string Id { get; set; }
 
-        readonly IDomainEventsManager eventsManager;
+        private readonly IDomainEventsManager eventsManager;
 
         /// <summary>
         /// .ctor
@@ -50,20 +51,13 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
                 .MakeGenericMethod(messageContext.Content.GetType());
             if ((bool)hasHandlersGenericMethod.Invoke(eventsManager, new object[] { }))
             {
-                var raiseGenericMethod = typeof(IDomainEventsManager).GetTypeInfo().GetMethod("Raise")
+                var raiseGenericMethod = eventsManager.GetType().GetTypeInfo().GetMethod("Raise")
                     .MakeGenericMethod(messageContext.Content.GetType());
 
-                if (messageContext.Items.ContainsKey(EventHandlerLocatorMiddleware.HandlerMethodsKey))
-                {
-                    var list = (IList<MethodInfo>)messageContext.Items[EventHandlerLocatorMiddleware.HandlerMethodsKey];
-                    list.Add(raiseGenericMethod);
-                    messageContext.Items[EventHandlerLocatorMiddleware.HandlerMethodsKey] = list.ToArray();
-                }
-                else
-                {
-                    messageContext.Items[EventHandlerLocatorMiddleware.HandlerMethodsKey] =
-                        new[] { raiseGenericMethod };
-                }
+                messageContext.Items.TryGetValue(EventHandlerLocatorMiddleware.HandlerMethodsKey, out object handlersObj);
+                var handlers = handlersObj as EventHandlerMethodWithObject[];
+                messageContext.Items[EventHandlerLocatorMiddleware.HandlerMethodsKey] =
+                    ArrayHelpers.AddItem(handlers, new EventHandlerMethodWithObject(raiseGenericMethod, eventsManager));
             }
         }
     }

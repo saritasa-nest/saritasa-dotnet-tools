@@ -24,7 +24,7 @@ namespace ZergRushCo.Todosya.Domain.TaskContext.Handlers
                 var project = uow.ProjectRepository.Get(command.ProjectId);
                 if (project != null && project.User.Id != command.UserId)
                 {
-                    throw new DomainException("User does not own the project");
+                    throw new DomainException("User does not own the project.");
                 }
 
                 var user = uow.UserRepository.Get(command.UserId);
@@ -55,13 +55,13 @@ namespace ZergRushCo.Todosya.Domain.TaskContext.Handlers
                 var project = uow.ProjectRepository.Get(command.ProjectId);
                 if (project != null && project.User.Id != command.UserId)
                 {
-                    throw new DomainException("User does not own the project");
+                    throw new DomainException("User does not own the project.");
                 }
 
                 var dbtask = uow.TaskRepository.Get(command.Id);
                 if (dbtask.User.Id != command.UserId)
                 {
-                    throw new DomainException("You cannot update task for another user");
+                    throw new DomainException("You cannot update task for another user.");
                 }
 
                 dbtask.DueDate = DateTime.MaxValue;
@@ -84,7 +84,7 @@ namespace ZergRushCo.Todosya.Domain.TaskContext.Handlers
                 var dbtask = uow.TaskRepository.Get(command.TaskId);
                 if (dbtask.User.Id != command.UserId)
                 {
-                    throw new DomainException("You cannot remove task for another user");
+                    throw new DomainException("You cannot remove task for another user.");
                 }
 
                 uow.TaskRepository.Remove(dbtask);
