@@ -225,9 +225,16 @@ namespace Saritasa.Tools.Domain.Exceptions
                 var ex = new ValidationException();
                 foreach (ValidationResult validationResult in validationResults)
                 {
-                    foreach (var memberName in validationResult.MemberNames)
+                    if (validationResult.MemberNames != null && validationResult.MemberNames.Any())
                     {
-                        ex.AddError(memberName, validationResult.ErrorMessage);
+                        foreach (var memberName in validationResult.MemberNames)
+                        {
+                            ex.AddError(memberName, validationResult.ErrorMessage);
+                        }
+                    }
+                    else
+                    {
+                        ex.AddError(validationResult.ErrorMessage);
                     }
                 }
                 throw ex;
@@ -258,9 +265,16 @@ namespace Saritasa.Tools.Domain.Exceptions
                 var ex = new ValidationException();
                 foreach (ValidationResult validationResult in validationResults)
                 {
-                    foreach (var memberName in validationResult.MemberNames)
+                    if (validationResult.MemberNames != null && validationResult.MemberNames.Any())
                     {
-                        ex.AddError(memberName, validationResult.ErrorMessage);
+                        foreach (var memberName in validationResult.MemberNames)
+                        {
+                            ex.AddError(memberName, validationResult.ErrorMessage);
+                        }
+                    }
+                    else
+                    {
+                        ex.AddError(validationResult.ErrorMessage);
                     }
                 }
                 throw ex;
