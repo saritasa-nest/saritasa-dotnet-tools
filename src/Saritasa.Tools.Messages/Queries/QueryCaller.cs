@@ -84,13 +84,6 @@ namespace Saritasa.Tools.Messages.Queries
         /// <inheritdoc />
         public TResult With<TResult>(Expression<Func<TQuery, TResult>> expression)
         {
-            bool fakeQueryObject = false;
-            if (query == null)
-            {
-                query = (TQuery)Activator.CreateInstance(typeof(TQuery), nonPublic: true);
-                fakeQueryObject = true;
-            }
-
             var mce = expression.Body as MethodCallExpression;
             if (mce == null)
             {
@@ -103,18 +96,10 @@ namespace Saritasa.Tools.Messages.Queries
                 throw new InvalidOperationException(Properties.Strings.MethodNoTypeDeclare);
             }
 
-            Stopwatch stopwatch = null;
-            if (queryPipeline.Options.IncludeExecutionDuration)
-            {
-                stopwatch = new Stopwatch();
-                stopwatch.Start();
-            }
-
             var queryParameters = new QueryParameters
             {
                 Parameters = args,
                 QueryObject = query,
-                FakeQueryObject = fakeQueryObject,
                 Method = method
             };
             messageContext.Content = method.GetParameters().ToDictionary(p => p.Name, v => args[v.Position]);
@@ -128,11 +113,6 @@ namespace Saritasa.Tools.Messages.Queries
             if (invokeQuery)
             {
                 queryPipeline.Invoke(messageContext);
-            }
-            if (stopwatch != null)
-            {
-                stopwatch.Stop();
-                messageContext.Items[MessageContextConstants.ExecutionDurationKey] = (int)stopwatch.ElapsedMilliseconds;
             }
             if (queryPipeline.Options.ThrowExceptionOnFail && messageContext.FailException != null)
             {

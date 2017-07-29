@@ -24,7 +24,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         /// <summary>
         /// Commands methods cache. Type is for command type, MethodInfo is for actual handler.
         /// </summary>
-        readonly System.Collections.Concurrent.ConcurrentDictionary<Type, MethodInfo> cache =
+        private readonly System.Collections.Concurrent.ConcurrentDictionary<Type, MethodInfo> cache =
             new System.Collections.Concurrent.ConcurrentDictionary<Type, MethodInfo>();
 
         private MethodInfo[] commandHandlers;

@@ -41,9 +41,7 @@ namespace Saritasa.Tools.Messages.Queries
             return new QueryParameters
             {
                 Parameters = args,
-                Method = method,
-                QueryObject = Activator.CreateInstance(method.GetBaseDefinition().DeclaringType, nonPublic: true),
-                FakeQueryObject = true
+                Method = method
             };
         }
 

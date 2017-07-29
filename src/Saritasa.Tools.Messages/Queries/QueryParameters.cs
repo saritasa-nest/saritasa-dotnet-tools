@@ -3,7 +3,6 @@
 
 using System;
 using System.Reflection;
-using Saritasa.Tools.Messages.Abstractions.Queries;
 
 namespace Saritasa.Tools.Messages.Queries
 {
@@ -12,16 +11,6 @@ namespace Saritasa.Tools.Messages.Queries
     /// </summary>
     public class QueryParameters
     {
-        /// <summary>
-        /// Query handler.
-        /// </summary>
-        protected internal Type HandlerType { get; set; }
-
-        /// <summary>
-        /// Query handler method to execute.
-        /// </summary>
-        protected internal MethodInfo HandlerMethod { get; set; }
-
         /// <summary>
         /// Execution result.
         /// </summary>
@@ -36,11 +25,6 @@ namespace Saritasa.Tools.Messages.Queries
         /// Query object the delegate will be executed against.
         /// </summary>
         protected internal object QueryObject { get; set; }
-
-        /// <summary>
-        /// If <c>true</c> <see cref="QueryParameters" /> has been created by <see cref="IQueryCaller" />.
-        /// </summary>
-        protected internal bool FakeQueryObject { get; set; }
 
         /// <summary>
         /// Function input parameters.

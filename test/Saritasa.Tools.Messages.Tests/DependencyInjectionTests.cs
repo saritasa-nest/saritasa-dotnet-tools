@@ -41,11 +41,6 @@ namespace Saritasa.Tools.Messages.Tests
             }
         }
 
-        public static object CustomObjectsResolver(Type t)
-        {
-            return Activator.CreateInstance(t);
-        }
-
         #region Should dispose command handlers after instaniate if use internal object resolver
 
         [Fact]
@@ -158,7 +153,7 @@ namespace Saritasa.Tools.Messages.Tests
                 .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectReleaseMiddleware());
 
             // Act
-            pipelineService.ServiceProvider = new FuncServiceProvider(CustomObjectsResolver);
+            pipelineService.ServiceProvider = new FuncServiceProvider(Activator.CreateInstance);
             pipelineService.Query<QueryClass>().With(q => q.Query());
 
             // Assert
@@ -184,7 +179,7 @@ namespace Saritasa.Tools.Messages.Tests
             var cmd = new TestCommand();
 
             // Act
-            pipelineService.ServiceProvider = new FuncServiceProvider(CustomObjectsResolver);
+            pipelineService.ServiceProvider = new FuncServiceProvider(Activator.CreateInstance);
             pipelineService.HandleCommand(cmd);
 
             // Assert

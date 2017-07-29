@@ -3,11 +3,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Abstractions.Queries;
 using Xunit;
 using Saritasa.Tools.Messages.Common;
-using Saritasa.Tools.Messages.Common.ObjectSerializers;
 using Saritasa.Tools.Messages.Queries;
 
 namespace Saritasa.Tools.Messages.Tests
@@ -126,7 +126,6 @@ namespace Saritasa.Tools.Messages.Tests
             // Arrange
             pipelineService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
             SetupQueryPipeline(pipelineService.PipelineContainer.AddQueryPipeline());
-            var serializer = new JsonObjectSerializer();
             var messageRecord = new MessageRecord
             {
                 ContentType = "Saritasa.Tools.Messages.Tests.QueriesTests+QueryObject.SimpleQueryWithDependency," +
@@ -209,6 +208,78 @@ namespace Saritasa.Tools.Messages.Tests
             // Assert
             var result = messageContext.GetResult<object>();
             Assert.IsType<List<int>>(result);
+        }
+
+        #endregion
+
+        #region Can_use_interfaces_to_run_query
+
+        public interface IUserQueries
+        {
+            int GetByNameCount(string name);
+        }
+
+        [QueryHandlers]
+        public class UserQueries : IUserQueries
+        {
+            public int GetByNameCount(string name) => 34;
+        }
+
+        [Fact]
+        public void Can_use_interfaces_to_run_query()
+        {
+            // Arrange
+            pipelineService.PipelineContainer.AddQueryPipeline()
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectResolverMiddleware(
+                    typeof(UserQueries).GetTypeInfo().Assembly)
+                {
+                    UseInternalObjectResolver = true,
+                    UseParametersResolve = true,
+                })
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware())
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectReleaseMiddleware());
+
+            // Act
+            var result = pipelineService.Query<IUserQueries>().With(q => q.GetByNameCount("Test"));
+
+            // Assert
+            Assert.Equal(34, result);
+        }
+
+        #endregion
+
+        #region Query object should not require parameterless ctor
+
+        public class UserQueries2Dep
+        {
+            public string Name { get; } = "Quake Champions";
+        }
+
+        [QueryHandlers]
+        public class UserQueries2
+        {
+            private readonly UserQueries2Dep dep;
+
+            public UserQueries2(UserQueries2Dep dep)
+            {
+                this.dep = dep;
+            }
+
+            public string GetString() => dep.Name;
+        }
+
+        [Fact]
+        public void Query_object_should_not_require_parameterles_ctor()
+        {
+            // Arrange
+            SetupQueryPipeline(pipelineService.PipelineContainer.AddQueryPipeline());
+            pipelineService.ServiceProvider = new FuncServiceProvider(Activator.CreateInstance);
+
+            // Act
+            var result = pipelineService.Query<UserQueries2>().With(q => q.GetString());
+
+            // Assert
+            Assert.Equal("Quake Champions", result);
         }
 
         #endregion
