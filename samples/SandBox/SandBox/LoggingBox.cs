@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Saritasa.Tools.NLog;
+using NLog.Extensions.Logging;
 
 namespace SandBox
 {

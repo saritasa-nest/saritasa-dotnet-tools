@@ -14,8 +14,6 @@ Overview
 1. [Saritasa.Tools.Misc](https://www.nuget.org/packages/Saritasa.Tools.Misc) - _miscellaneous: password generation;_
 1. [Saritasa.Tools.EF6](https://www.nuget.org/packages/Saritasa.Tools.EF6) - _unit of work and repository implementation for Entity Framework 6;_
 1. [Saritasa.Tools.EFCore1](https://www.nuget.org/packages/Saritasa.Tools.EFCore1) - _unit of work and repository implementation for Entity Framework Core;_
-1. [Saritasa.Tools.Mvc5](https://www.nuget.org/packages/Saritasa.Tools.Mvc5) - _utilities for ASP.NET MVC 5;_
-1. [Saritasa.Tools.NLog4](https://www.nuget.org/packages/Saritasa.Tools.NLog4) - _Microsoft common logger abstractions implementation for NLog 4;_
 
 Goals
 -----

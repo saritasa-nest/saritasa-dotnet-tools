@@ -28,7 +28,7 @@ namespace ZergRushCo.Todosya.Domain.Tests
             }
 
             // remove project
-            new ProjectHandlers().HandleRemoveProject(new RemoveProjectCommand()
+            new ProjectHandlers().HandleRemoveProject(new RemoveProjectCommand
             {
                 ProjectId = 1,
                 UpdatedByUserId = "1"

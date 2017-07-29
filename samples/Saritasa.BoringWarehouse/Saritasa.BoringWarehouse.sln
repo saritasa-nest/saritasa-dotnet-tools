@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.BoringWarehouse.Web", "Saritasa.BoringWarehouse.Web\Saritasa.BoringWarehouse.Web.csproj", "{B8D48FD2-B20B-40A9-8870-9B964117DEFA}"
 EndProject
@@ -11,19 +11,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.BoringWarehouse.Da
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Saritasa.Tools", "Saritasa.Tools", "{C71B2713-FE29-4CAA-A464-299BBFE963A2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.EF6", "..\..\src\Saritasa.Tools.EF6\Saritasa.Tools.EF6.csproj", "{D1AD1713-BC18-4340-B8DB-23D86D22FB7F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saritasa.Tools.EF6", "..\..\src\Saritasa.Tools.EF6\Saritasa.Tools.EF6.csproj", "{D1AD1713-BC18-4340-B8DB-23D86D22FB7F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.NLog4", "..\..\src\Saritasa.Tools.NLog4\Saritasa.Tools.NLog4.csproj", "{83D4925B-B04F-4C9C-8BF1-9B6A6BE0A87D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saritasa.Tools.Domain", "..\..\src\Saritasa.Tools.Domain\Saritasa.Tools.Domain.csproj", "{32A3A81C-A65C-4F78-8300-17151987697C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.Domain", "..\..\src\Saritasa.Tools.Domain\Saritasa.Tools.Domain.csproj", "{32A3A81C-A65C-4F78-8300-17151987697C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saritasa.Tools.Messages", "..\..\src\Saritasa.Tools.Messages\Saritasa.Tools.Messages.csproj", "{AEE65918-25DF-4A25-BFB8-56552FAA2A51}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.Messages", "..\..\src\Saritasa.Tools.Messages\Saritasa.Tools.Messages.csproj", "{AEE65918-25DF-4A25-BFB8-56552FAA2A51}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saritasa.Tools.Emails", "..\..\src\Saritasa.Tools.Emails\Saritasa.Tools.Emails.csproj", "{BAAF1392-6BAC-4220-8149-B207BEFE2FDD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.Emails", "..\..\src\Saritasa.Tools.Emails\Saritasa.Tools.Emails.csproj", "{BAAF1392-6BAC-4220-8149-B207BEFE2FDD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saritasa.Tools.Messages.Abstractions", "..\..\src\Saritasa.Tools.Messages.Abstractions\Saritasa.Tools.Messages.Abstractions.csproj", "{E16B2300-A1D4-49BB-B3FC-C2891E7D1177}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.Messages.Abstractions", "..\..\src\Saritasa.Tools.Messages.Abstractions\Saritasa.Tools.Messages.Abstractions.csproj", "{E16B2300-A1D4-49BB-B3FC-C2891E7D1177}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.Common", "..\..\src\Saritasa.Tools.Common\Saritasa.Tools.Common.csproj", "{2900D88A-2522-4299-8D51-6AF26B74C91C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saritasa.Tools.Common", "..\..\src\Saritasa.Tools.Common\Saritasa.Tools.Common.csproj", "{2900D88A-2522-4299-8D51-6AF26B74C91C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.BoringWarehouse.IntegrationTests", "Saritasa.BoringWarehouse.IntegrationTests\Saritasa.BoringWarehouse.IntegrationTests.csproj", "{35F75451-BCE1-4FC0-9847-35FDF745C968}"
 EndProject
@@ -51,10 +49,6 @@ Global
 		{D1AD1713-BC18-4340-B8DB-23D86D22FB7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D1AD1713-BC18-4340-B8DB-23D86D22FB7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D1AD1713-BC18-4340-B8DB-23D86D22FB7F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{83D4925B-B04F-4C9C-8BF1-9B6A6BE0A87D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{83D4925B-B04F-4C9C-8BF1-9B6A6BE0A87D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{83D4925B-B04F-4C9C-8BF1-9B6A6BE0A87D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{83D4925B-B04F-4C9C-8BF1-9B6A6BE0A87D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{32A3A81C-A65C-4F78-8300-17151987697C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{32A3A81C-A65C-4F78-8300-17151987697C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{32A3A81C-A65C-4F78-8300-17151987697C}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -89,7 +83,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{D1AD1713-BC18-4340-B8DB-23D86D22FB7F} = {C71B2713-FE29-4CAA-A464-299BBFE963A2}
-		{83D4925B-B04F-4C9C-8BF1-9B6A6BE0A87D} = {C71B2713-FE29-4CAA-A464-299BBFE963A2}
 		{32A3A81C-A65C-4F78-8300-17151987697C} = {C71B2713-FE29-4CAA-A464-299BBFE963A2}
 		{AEE65918-25DF-4A25-BFB8-56552FAA2A51} = {C71B2713-FE29-4CAA-A464-299BBFE963A2}
 		{BAAF1392-6BAC-4220-8149-B207BEFE2FDD} = {C71B2713-FE29-4CAA-A464-299BBFE963A2}

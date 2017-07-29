@@ -12,4 +12,3 @@ Development tools for company projects.
     misc/index
     emails
     logging
-    mvc

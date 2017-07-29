@@ -33,8 +33,6 @@ $packages = @(
     'Saritasa.Tools.Messages' # messages
     'Saritasa.Tools.Messages.Abstractions' # messages-abstractions
     'Saritasa.Tools.Misc' # misc
-    'Saritasa.Tools.Mvc5' # mvc5
-    'Saritasa.Tools.NLog4' # nlog4
 )
 
 $docsRoot = Resolve-Path "$PSScriptRoot\docs"

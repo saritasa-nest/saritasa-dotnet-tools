@@ -63,7 +63,7 @@ namespace ZergRushCo.Todosya.Infrastructure
             }
 
             // Logger.
-            var nlogProvider = new Saritasa.Tools.NLog.NLogLoggerProvider();
+            var nlogProvider = new NLog.Extensions.Logging.NLogLoggerProvider();
             var loggerFactory = new LoggerFactory();
             loggerFactory.AddProvider(nlogProvider);
             builder.RegisterInstance(loggerFactory).AsImplementedInterfaces().SingleInstance();

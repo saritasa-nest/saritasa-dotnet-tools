@@ -238,10 +238,6 @@
       <Project>{aee65918-25df-4a25-bfb8-56552faa2a51}</Project>
       <Name>Saritasa.Tools.Messages</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\src\Saritasa.Tools.NLog4\Saritasa.Tools.NLog4.csproj">
-      <Project>{83d4925b-b04f-4c9c-8bf1-9b6a6be0a87d}</Project>
-      <Name>Saritasa.Tools.NLog4</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Saritasa.BoringWarehouse.DataAccess\Saritasa.BoringWarehouse.DataAccess.csproj">
       <Project>{ca154950-2e0a-4568-9390-e196f0bc420e}</Project>
       <Name>Saritasa.BoringWarehouse.DataAccess</Name>

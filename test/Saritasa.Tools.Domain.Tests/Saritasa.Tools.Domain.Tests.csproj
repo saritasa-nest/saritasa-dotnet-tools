@@ -24,7 +24,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Saritasa.Tools.Domain\Saritasa.Tools.Domain.csproj" />
-    <ProjectReference Include="..\src\Saritasa.Tools.Domain\Saritasa.Tools.Domain.csproj" />
   </ItemGroup>
 
 </Project>
