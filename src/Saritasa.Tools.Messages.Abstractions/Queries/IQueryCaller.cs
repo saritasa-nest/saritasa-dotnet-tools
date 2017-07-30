@@ -3,6 +3,8 @@
 
 using System;
 using System.Linq.Expressions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Saritasa.Tools.Messages.Abstractions.Queries
 {
@@ -13,11 +15,22 @@ namespace Saritasa.Tools.Messages.Abstractions.Queries
     public interface IQueryCaller<TQuery> where TQuery : class
     {
         /// <summary>
-        /// Calls delegate from expression.
+        /// Call delegate from expression.
         /// </summary>
         /// <typeparam name="TResult">Query result.</typeparam>
         /// <param name="expression">Query method call expression.</param>
         /// <returns>Query result.</returns>
         TResult With<TResult>(Expression<Func<TQuery, TResult>> expression);
+
+        /// <summary>
+        /// Call delegate from expression. The delegate should return <see cref="Task{T}" />
+        /// object.
+        /// </summary>
+        /// <typeparam name="TResult">Query result.</typeparam>
+        /// <param name="expression">Query method call expression.</param>
+        /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+        /// <returns>Query result.</returns>
+        Task<TResult> WithAsync<TResult>(Expression<Func<TQuery, Task<TResult>>> expression,
+            CancellationToken cancellationToken = default(CancellationToken));
     }
 }

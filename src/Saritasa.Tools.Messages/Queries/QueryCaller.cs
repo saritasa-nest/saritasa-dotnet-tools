@@ -2,9 +2,10 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
+using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Abstractions.Queries;
 using Saritasa.Tools.Messages.Internal;
@@ -17,7 +18,7 @@ namespace Saritasa.Tools.Messages.Queries
     /// <typeparam name="TQuery">Query type.</typeparam>
     public struct QueryCaller<TQuery> : IQueryCaller<TQuery> where TQuery : class
     {
-        private TQuery query;
+        private readonly TQuery query;
 
         private bool invokeQuery;
 
@@ -81,14 +82,8 @@ namespace Saritasa.Tools.Messages.Queries
             }
         }
 
-        /// <inheritdoc />
-        public TResult With<TResult>(Expression<Func<TQuery, TResult>> expression)
+        private QueryParameters PrepareQueryParametersAndMessageContext(MethodCallExpression mce)
         {
-            var mce = expression.Body as MethodCallExpression;
-            if (mce == null)
-            {
-                throw new InvalidOperationException(Properties.Strings.ExpressionMethodCallExpressionBody);
-            }
             var args = mce.Arguments.Select(PartiallyEvaluateExpression).ToArray();
             var method = mce.Method;
             if (method.DeclaringType == null)
@@ -110,6 +105,19 @@ namespace Saritasa.Tools.Messages.Queries
                 messageContext.ContentId = messageContext.ContentId.Insert(indexOfComma, "." + method.Name);
             }
             messageContext.Items[QueryPipeline.QueryParametersKey] = queryParameters;
+            return queryParameters;
+        }
+
+        /// <inheritdoc />
+        public TResult With<TResult>(Expression<Func<TQuery, TResult>> expression)
+        {
+            var mce = expression.Body as MethodCallExpression;
+            if (mce == null)
+            {
+                throw new InvalidOperationException(Properties.Strings.ExpressionMethodCallExpressionBody);
+            }
+            var queryParameters = PrepareQueryParametersAndMessageContext(mce);
+
             if (invokeQuery)
             {
                 queryPipeline.Invoke(messageContext);
@@ -119,6 +127,28 @@ namespace Saritasa.Tools.Messages.Queries
                 throw new MessageProcessingException("Query processing error.", messageContext.FailException);
             }
             return (TResult)queryParameters.Result;
+        }
+
+        /// <inheritdoc />
+        public async Task<TResult> WithAsync<TResult>(Expression<Func<TQuery, Task<TResult>>> expression,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var mce = expression.Body as MethodCallExpression;
+            if (mce == null)
+            {
+                throw new InvalidOperationException(Properties.Strings.ExpressionMethodCallExpressionBody);
+            }
+            var queryParameters = PrepareQueryParametersAndMessageContext(mce);
+
+            if (invokeQuery)
+            {
+                await queryPipeline.InvokeAsync(messageContext, cancellationToken);
+            }
+            if (queryPipeline.Options.ThrowExceptionOnFail && messageContext.FailException != null)
+            {
+                throw new MessageProcessingException("Query processing error.", messageContext.FailException);
+            }
+            return ((Task<TResult>)queryParameters.Result).Result;
         }
     }
 }

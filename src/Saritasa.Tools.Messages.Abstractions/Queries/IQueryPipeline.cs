@@ -2,6 +2,7 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Threading;
 
 namespace Saritasa.Tools.Messages.Abstractions.Queries
 {

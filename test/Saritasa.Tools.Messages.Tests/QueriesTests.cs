@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Abstractions.Queries;
 using Xunit;
@@ -85,8 +86,6 @@ namespace Saritasa.Tools.Messages.Tests
                 .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectReleaseMiddleware());
         }
 
-        #region Can_run_simple_query
-
         [Fact]
         public void Can_run_simple_query()
         {
@@ -100,6 +99,31 @@ namespace Saritasa.Tools.Messages.Tests
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
             Assert.Equal(20, result[1]);
+        }
+
+        #region Can_run_simple_async_query
+
+        [QueryHandlers]
+        public class AsyncQueryObject
+        {
+            public async Task<string> GetString()
+            {
+                await Task.Delay(100);
+                return await Task.FromResult("LP");
+            }
+        }
+
+        [Fact]
+        public async Task Can_run_simple_async_query()
+        {
+            // Arrange
+            SetupQueryPipeline(pipelineService.PipelineContainer.AddQueryPipeline());
+
+            // Act
+            var result = await pipelineService.Query<AsyncQueryObject>().WithAsync(q => q.GetString());
+
+            // Assert
+            Assert.Equal("LP", result);
         }
 
         #endregion
@@ -199,7 +223,7 @@ namespace Saritasa.Tools.Messages.Tests
             SetupQueryPipeline(pipelineService.PipelineContainer.AddQueryPipeline());
             var messageContext = new MessageContext(pipelineService);
             var queryPipeline = pipelineService.GetPipelineOfType<IQueryPipeline>();
-            var ret = queryPipeline.CreateMessageContext<QueryObject>(pipelineService, messageContext)
+            var ret = queryPipeline.CreateMessageContext<QueriesTests.QueryObject>(pipelineService, messageContext)
                 .With(q => q.SimpleQuery(10, 10));
 
             // Act
