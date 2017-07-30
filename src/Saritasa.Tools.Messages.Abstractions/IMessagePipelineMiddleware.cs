@@ -2,7 +2,6 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-using JetBrains.Annotations;
 
 namespace Saritasa.Tools.Messages.Abstractions
 {
@@ -20,6 +19,6 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// Handles the message in context.
         /// </summary>
         /// <param name="messageContext">Message execution context.</param>
-        void Handle([NotNull] IMessageContext messageContext);
+        void Handle(IMessageContext messageContext);
     }
 }

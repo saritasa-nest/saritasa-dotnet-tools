@@ -4,7 +4,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 
 namespace Saritasa.Tools.Messages.Abstractions
 {
@@ -27,7 +26,7 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// Process prepared message context thru all middlewares.
         /// </summary>
         /// <param name="messageContext">Message context.</param>
-        void Invoke([NotNull] IMessageContext messageContext);
+        void Invoke(IMessageContext messageContext);
 
         /// <summary>
         /// Process prepared message context thru all middlewares. Middlewares should support
@@ -36,7 +35,7 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// </summary>
         /// <param name="messageContext">Message context.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
-        Task InvokeAsync([NotNull] IMessageContext messageContext,
+        Task InvokeAsync(IMessageContext messageContext,
             CancellationToken cancellationToken = default(CancellationToken));
     }
 }

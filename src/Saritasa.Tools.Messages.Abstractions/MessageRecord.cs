@@ -3,12 +3,18 @@
 
 using System;
 using System.Collections.Generic;
+#if NET452
+using System.Runtime.Serialization;
+#endif
 
 namespace Saritasa.Tools.Messages.Abstractions
 {
     /// <summary>
     /// Message data transfer object used by repositories to save/load.
     /// </summary>
+#if NET452
+    [Serializable]
+#endif
     public class MessageRecord
     {
         /// <summary>

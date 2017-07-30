@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Saritasa.Tools.Messages.Abstractions
+namespace Saritasa.Tools.Messages.Common
 {
     /// <summary>
     /// Service provider that always resolves to null.

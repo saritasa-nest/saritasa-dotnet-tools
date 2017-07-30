@@ -2,7 +2,6 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-using JetBrains.Annotations;
 
 namespace Saritasa.Tools.Messages.Abstractions.Events
 {
@@ -17,6 +16,6 @@ namespace Saritasa.Tools.Messages.Abstractions.Events
         /// <param name="pipelineService">Pipeline service.</param>
         /// <param name="event">Event object.</param>
         /// <returns>Message context.</returns>
-        IMessageContext CreateMessageContext([NotNull] IMessagePipelineService pipelineService, [NotNull] object @event);
+        IMessageContext CreateMessageContext(IMessagePipelineService pipelineService, object @event);
     }
 }

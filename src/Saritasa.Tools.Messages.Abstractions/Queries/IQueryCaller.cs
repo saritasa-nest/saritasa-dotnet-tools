@@ -3,7 +3,6 @@
 
 using System;
 using System.Linq.Expressions;
-using JetBrains.Annotations;
 
 namespace Saritasa.Tools.Messages.Abstractions.Queries
 {
@@ -19,6 +18,6 @@ namespace Saritasa.Tools.Messages.Abstractions.Queries
         /// <typeparam name="TResult">Query result.</typeparam>
         /// <param name="expression">Query method call expression.</param>
         /// <returns>Query result.</returns>
-        TResult With<TResult>([NotNull] Expression<Func<TQuery, TResult>> expression);
+        TResult With<TResult>(Expression<Func<TQuery, TResult>> expression);
     }
 }

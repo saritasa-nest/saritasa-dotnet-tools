@@ -4,7 +4,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 
 namespace Saritasa.Tools.Messages.Abstractions
 {
@@ -23,7 +22,7 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// </summary>
         /// <param name="messageContext">Message execution context.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
-        Task HandleAsync([NotNull] IMessageContext messageContext, CancellationToken cancellationToken =
+        Task HandleAsync(IMessageContext messageContext, CancellationToken cancellationToken =
             default(CancellationToken));
     }
 }

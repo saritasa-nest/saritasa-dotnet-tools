@@ -2,7 +2,6 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-using JetBrains.Annotations;
 
 namespace Saritasa.Tools.Messages.Abstractions.Commands
 {
@@ -17,6 +16,6 @@ namespace Saritasa.Tools.Messages.Abstractions.Commands
         /// <param name="pipelineService">Pipelines service.</param>
         /// <param name="command">Command object.</param>
         /// <returns>Message context.</returns>
-        IMessageContext CreateMessageContext([NotNull] IMessagePipelineService pipelineService, [NotNull] object command);
+        IMessageContext CreateMessageContext(IMessagePipelineService pipelineService, object command);
     }
 }
