@@ -2,6 +2,7 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Concurrent;
 using System.Reflection;
 using System.ComponentModel;
 #if NETSTANDARD1_5
@@ -127,6 +128,9 @@ namespace Saritasa.Tools.Messages.Internal
 #endif
         }
 
+        private static readonly ConcurrentDictionary<Type, string> typeNamesDictionaryCache =
+            new ConcurrentDictionary<Type, string>();
+
         /// <summary>
         /// Get partially type assembly qualified name. For example
         /// System.Globalization.NumberFormatInfo, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089 to
@@ -140,10 +144,13 @@ namespace Saritasa.Tools.Messages.Internal
             {
                 return String.Empty;
             }
-            var aqn = t.AssemblyQualifiedName;
-            var firstCommaIndex = aqn.IndexOf(',');
-            var secondCommaIndex = aqn.IndexOf(',', firstCommaIndex + 1);
-            return aqn.Substring(0, secondCommaIndex);
+            return typeNamesDictionaryCache.GetOrAdd(t, type =>
+            {
+                var aqn = type.AssemblyQualifiedName;
+                var firstCommaIndex = aqn.IndexOf(',');
+                var secondCommaIndex = aqn.IndexOf(',', firstCommaIndex + 1);
+                return aqn.Substring(0, secondCommaIndex);
+            });
         }
     }
 }
