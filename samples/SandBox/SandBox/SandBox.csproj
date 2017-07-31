@@ -131,12 +131,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnotherProductsRepository.cs" />
     <Compile Include="CommandsHandlers.cs" />
     <Compile Include="Commands\UpdateProductCommand.cs" />
     <Compile Include="EventsHandlers.cs" />
     <Compile Include="Events\UpdateProductEvent.cs" />
     <Compile Include="IProductsRepository.cs" />
     <Compile Include="LoggingBox.cs" />
+    <Compile Include="Paging.cs" />
     <Compile Include="Product.cs" />
     <Compile Include="ProductsRepository.cs" />
     <Compile Include="Program.cs" />

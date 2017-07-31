@@ -1,4 +1,8 @@
-﻿0.3.3 [2017-07-06]
+﻿0.4.0 [TBD]
+[*] Improve pagination API. Instead of Wrap methods introduce ToMetadataObject and CastMetadataEnumerable.
+[*] XML documentation fixes.
+
+0.3.3 [2017-07-06]
 [*] Guard.IsNotEmpty does not check white spaces anymore, use Guard.IsNotEmptyOrWhiteSpace .
 
 0.3.2 [2017-07-05]

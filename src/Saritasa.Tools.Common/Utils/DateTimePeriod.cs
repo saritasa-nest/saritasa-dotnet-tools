@@ -4,7 +4,7 @@
 namespace Saritasa.Tools.Common.Utils
 {
     /// <summary>
-    /// Date/time period truncation types.
+    /// Date/time period types.
     /// </summary>
     public enum DateTimePeriod
     {
@@ -14,44 +14,44 @@ namespace Saritasa.Tools.Common.Utils
         None,
 
         /// <summary>
-        /// Second. Trancation example: 2016-03-08 07:05:23 -> 2016-01-01 07:05:00.
+        /// Second. Truncation example: 2016-03-08 07:05:23 -> 2016-03-08 07:05:00.
         /// </summary>
         Second,
 
         /// <summary>
-        /// Minute. Trancation example: 2016-03-08 07:05:23 -> 2016-01-01 07:00:00.
+        /// Minute. Truncation example: 2016-03-08 07:05:23 -> 2016-03-08 07:00:00.
         /// </summary>
         Minute,
 
         /// <summary>
-        /// Hour. Trancation example: 2016-03-08 07:05:23 -> 2016-01-01 00:00:00.
+        /// Hour. Truncation example: 2016-03-08 07:05:23 -> 2016-03-08 00:00:00.
         /// </summary>
         Hour,
 
         /// <summary>
-        /// Day. Trancation example: 2016-03-08 07:05:23 -> 2016-03-01 00:00:00.
+        /// Day. Truncation example: 2016-03-08 07:05:23 -> 2016-03-01 00:00:00.
         /// </summary>
         Day,
 
         /// <summary>
-        /// Week. Trancation example: 2016-03-08 07:05:23 -> 2016-03-06 00:00:00. First day of week
+        /// Week. Truncation example: 2016-03-08 07:05:23 -> 2016-03-06 00:00:00. First day of week
         /// depends on current thread culture.
         /// </summary>
         Week,
 
         /// <summary>
-        /// Month. Trancation example: 2016-03-08 07:05:23 -> 2016-03-01 00:00:00.
+        /// Month. Truncation example: 2016-03-08 07:05:23 -> 2016-03-01 00:00:00.
         /// </summary>
         Month,
 
         /// <summary>
-        /// Quarter. Trancation example: 2016-03-08 07:05:23 -> 2016-01-01 00:00:00.
+        /// Quarter. Truncation example: 2016-03-08 07:05:23 -> 2016-01-01 00:00:00.
         /// </summary>
         Quarter,
 
         /// <summary>
-        /// Year. Trancation example: 2016-03-08 07:05:23 -> 2016-01-01 00:00:00.
+        /// Year. Truncation example: 2016-03-08 07:05:23 -> 2016-01-01 00:00:00.
         /// </summary>
-        Year,
+        Year
     }
 }

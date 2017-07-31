@@ -10,7 +10,8 @@ namespace Saritasa.Tools.Common.Pagination
     /// <summary>
     /// Enumerable with limit and offset feature. Additionaly forces evaluation with Take and Skip methods.
     /// </summary>
-    public class OffsetLimitEnumerable<T> : TotalCountEnumerable<T>, IMetadataEnumerable<OffsetLimitEnumerableMetadata>
+    public class OffsetLimitEnumerable<T> : TotalCountEnumerable<T>,
+        IMetadataEnumerable<OffsetLimitEnumerableMetadata, T>
     {
         /// <summary>
         /// The zero based offset from the first row.
@@ -90,6 +91,8 @@ namespace Saritasa.Tools.Common.Pagination
             this.TotalCount = totalCount > -1 ? totalCount : baseSource.Count();
         }
 
+        #region IMetadataEnumerable<OffsetLimitEnumerableMetadata, T>
+
         /// <summary>
         /// Get offset limit metadata object.
         /// </summary>
@@ -103,5 +106,25 @@ namespace Saritasa.Tools.Common.Pagination
                 TotalCount = TotalCount
             };
         }
+
+        /// <inheritdoc />
+        public new MetadataDto<T> ToMetadataObject()
+        {
+            return new MetadataDto<T>(this, this.GetMetadata());
+        }
+
+        /// <inheritdoc />
+        public new IMetadataEnumerable<OffsetLimitEnumerableMetadata, TNew> CastMetadataEnumerable<TNew>(Func<T, TNew> converter)
+        {
+            return new OffsetLimitEnumerable<TNew>
+            {
+                Source = this.Select(converter),
+                TotalCount = this.TotalCount,
+                Limit = this.Limit,
+                Offset = this.Offset
+            };
+        }
+
+        #endregion
     }
 }

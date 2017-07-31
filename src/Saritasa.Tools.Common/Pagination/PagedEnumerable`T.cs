@@ -11,7 +11,8 @@ namespace Saritasa.Tools.Common.Pagination
     /// Paged enumerable. Also it forces evaluation with Take and Skip methods.
     /// </summary>
     /// <typeparam name="T">Source type.</typeparam>
-    public class PagedEnumerable<T> : OffsetLimitEnumerable<T>, IMetadataEnumerable<PagedEnumerableMetadata>
+    public class PagedEnumerable<T> : OffsetLimitEnumerable<T>,
+        IMetadataEnumerable<PagedEnumerableMetadata, T>
     {
         /// <summary>
         /// Current page. Starts from 1.
@@ -89,6 +90,8 @@ namespace Saritasa.Tools.Common.Pagination
             this.TotalPages = (TotalCount + pageSize - 1) / pageSize;
         }
 
+        #region IMetadataEnumerable<PagedEnumerableMetadata, T>
+
         /// <summary>
         /// Get paged metadata object.
         /// </summary>
@@ -105,5 +108,28 @@ namespace Saritasa.Tools.Common.Pagination
                 TotalCount = TotalCount
             };
         }
+
+        /// <inheritdoc />
+        public new MetadataDto<T> ToMetadataObject()
+        {
+            return new MetadataDto<T>(this, this.GetMetadata());
+        }
+
+        /// <inheritdoc />
+        public new IMetadataEnumerable<PagedEnumerableMetadata, TNew> CastMetadataEnumerable<TNew>(Func<T, TNew> converter)
+        {
+            return new PagedEnumerable<TNew>
+            {
+                Source = this.Select(converter),
+                TotalCount = this.TotalCount,
+                Limit = this.Limit,
+                Offset = this.Offset,
+                TotalPages = this.TotalPages,
+                Page = this.Page,
+                PageSize = this.PageSize
+            };
+        }
+
+        #endregion
     }
 }

@@ -51,6 +51,8 @@ namespace SandBox
         /// </summary>
         static void Init()
         {
+            Paging.Try1();
+
             /*
             var config = Saritasa.Tools.Messages.Configuration.XmlConfiguration.AppConfig;
             CommandPipeline = (ICommandPipeline)config.First();

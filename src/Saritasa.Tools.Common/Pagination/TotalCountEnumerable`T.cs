@@ -14,7 +14,8 @@ namespace Saritasa.Tools.Common.Pagination
     /// The class does not evaluate source query.
     /// </summary>
     /// <seealso cref="IEnumerable{T}" />
-    public class TotalCountEnumerable<T> : IEnumerable<T>, IMetadataEnumerable<TotalCountEnumerableMetadata>
+    public class TotalCountEnumerable<T> :
+        IMetadataEnumerable<TotalCountEnumerableMetadata, T>
     {
         /// <summary>
         /// Internal .ctor
@@ -70,6 +71,8 @@ namespace Saritasa.Tools.Common.Pagination
         /// </summary>
         public int TotalCount { get; protected internal set; }
 
+        #region IMetadataEnumerable<TotalCountEnumerableMetadata, T>
+
         /// <summary>
         /// Get metadata object.
         /// </summary>
@@ -81,6 +84,24 @@ namespace Saritasa.Tools.Common.Pagination
                 TotalCount = TotalCount
             };
         }
+
+        /// <inheritdoc />
+        public MetadataDto<T> ToMetadataObject()
+        {
+            return new MetadataDto<T>(this, this.GetMetadata());
+        }
+
+        /// <inheritdoc />
+        public IMetadataEnumerable<TotalCountEnumerableMetadata, TNew> CastMetadataEnumerable<TNew>(Func<T, TNew> converter)
+        {
+            return new TotalCountEnumerable<TNew>
+            {
+                Source = this.Select(converter),
+                TotalCount = this.TotalCount
+            };
+        }
+
+        #endregion
 
         #region Enumerator
 
