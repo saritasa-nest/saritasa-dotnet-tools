@@ -57,13 +57,20 @@ namespace Saritasa.Tools.Domain.Tests
             }
         }
 
+        private class Product
+        {
+            [Required]
+            [MinLength(2)]
+            public string Name { get; set; }
+        }
+
         [Fact]
         public void Domain_validation_exception_should_take_into_account_IValidatableObject()
         {
             // Arrange
             var obj = new User();
 
-            // Act & Assert
+            // Act
             Exceptions.ValidationException validationException = null;
             try
             {
@@ -79,5 +86,85 @@ namespace Saritasa.Tools.Domain.Tests
             Assert.Equal(1, validationException.SummaryErrors.Count());
             Assert.Equal(2, validationException.Errors.Count);
         }
+
+        [Fact]
+        public void Domain_validation_exception_should_not_throw_on_valid_object()
+        {
+            // Arrange
+            var obj = new Product();
+            obj.Name = "Coffee";
+
+            // Act & Assert
+            Saritasa.Tools.Domain.Exceptions.ValidationException.ThrowFromObjectValidation(obj);
+        }
+
+        [Fact]
+        public void Domain_validation_exception_should_throw_on_not_valid_object()
+        {
+            // Arrange
+            var obj = new Product();
+
+            // Act
+            Exceptions.ValidationException validationException = null;
+            try
+            {
+                Saritasa.Tools.Domain.Exceptions.ValidationException.ThrowFromObjectValidation(obj);
+            }
+            catch (Exceptions.ValidationException ex)
+            {
+                validationException = ex;
+            }
+
+            // Assert
+            Assert.NotNull(validationException);
+            Assert.Equal(0, validationException.SummaryErrors.Count());
+            Assert.Equal(1, validationException.Errors.Count);
+        }
+
+#if NET452
+
+        [MetadataType(typeof(JobMetadata))]
+        private class Job
+        {
+            public string Text { get; set; }
+
+            public int DurationMins { get; set; }
+        }
+
+        private class JobMetadata
+        {
+            [Required]
+            [MaxLength(100)]
+            public string Text { get; set; }
+
+            [Range(1, 1500)]
+            public int DurationMins { get; set; }
+        }
+
+        [Fact]
+        public void Domain_validation_should_work_on_MetadataType_attribute()
+        {
+            // Arrange
+            var obj = new Job();
+
+            // Act
+            Exceptions.ValidationException.UseMetadataType = true;
+            Exceptions.ValidationException validationException = null;
+            try
+            {
+                Saritasa.Tools.Domain.Exceptions.ValidationException.ThrowFromObjectValidation(obj);
+            }
+            catch (Exceptions.ValidationException ex)
+            {
+                validationException = ex;
+            }
+
+            // Assert
+            Assert.NotNull(validationException);
+            Assert.Equal(0, validationException.SummaryErrors.Count());
+            Assert.Equal(2, validationException.Errors.Count);
+        }
+
+#endif
     }
 }

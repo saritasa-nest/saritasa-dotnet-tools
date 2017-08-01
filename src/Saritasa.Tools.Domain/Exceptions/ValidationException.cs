@@ -2,7 +2,9 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.ComponentModel.DataAnnotations;
 #if NET40
@@ -217,6 +219,11 @@ namespace Saritasa.Tools.Domain.Exceptions
                 throw new ArgumentNullException(nameof(obj));
             }
 
+            if (UseMetadataType)
+            {
+                RegisterMetadataType(obj.GetType());
+            }
+
             var validationResults = new List<ValidationResult>();
             var result = Validator.TryValidateObject(obj, new ValidationContext(obj, serviceProvider, items),
                 validationResults, true);
@@ -238,6 +245,38 @@ namespace Saritasa.Tools.Domain.Exceptions
                     }
                 }
                 throw ex;
+            }
+        }
+
+        /// <summary>
+        /// If <c>true</c> there will be additional check for <see cref="MetadataTypeAttribute" />
+        /// and metadata type registration. <c>False</c> by default.
+        /// </summary>
+        public static bool UseMetadataType { get; set; } = false;
+
+        private static readonly ConcurrentDictionary<Type, bool> registeredMetadataType =
+            new ConcurrentDictionary<Type, bool>();
+
+        /// <summary>
+        /// For some reason if type hase <see cref="MetadataTypeAttribute" /> type that contains
+        /// validation attributes they will not be taked into account. This is workaround that
+        /// registers them explicitly.
+        /// </summary>
+        /// <param name="t">Type to register.</param>
+        private static void RegisterMetadataType(Type t)
+        {
+            var attributes = t.GetCustomAttributes(typeof(MetadataTypeAttribute), true);
+            if (attributes.Length > 0)
+            {
+                registeredMetadataType.GetOrAdd(t, type =>
+                {
+                    foreach (MetadataTypeAttribute attribute in attributes)
+                    {
+                        TypeDescriptor.AddProviderTransparent(
+                            new AssociatedMetadataTypeTypeDescriptionProvider(type, attribute.MetadataClassType), type);
+                    }
+                    return true;
+                });
             }
         }
 #else
