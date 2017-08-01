@@ -11,4 +11,3 @@ Development tools for company projects.
     messages/index
     misc/index
     emails
-    logging
