@@ -28,6 +28,10 @@ Pipeline is a set of middlewares to process your commands/queries. Here is a sam
 
 Middleware makes an action on your message context. You can create and insert your own custom middleware into pipeline to add additional logic to whole application.
 
+    .. image:: messages-overview.png
+
+    *mc - message context (IMessageContext interface)*
+
 Overview
 --------
 
