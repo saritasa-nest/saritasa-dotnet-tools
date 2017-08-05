@@ -86,8 +86,18 @@ Content              Content object to process.
 Status               Status of execution. NotInitialized, Processing, Completed, Failed, Rejected.
 FailException        Exception that occures during execution.
 Pipeline             Current pipeline used in execution.
-Items                Dictionart of custom items that are shared acrossed middlewares and request.
+Items                Dictionary of custom items that are shared across middlewares and request.
 ==================== ==============================================================================================
+
+Status mapping table of ``MessageContext.Status``:
+
+==================== == ===========================================================================================
+NotInitialized       0  Message just created and no middlewares were invoked yet. Initial state.
+Processing           1  Message is in processing by middlewares state.
+Completed            2  Message has been processed successfully.
+Failed               3  Message has not been processed successfully. Look at ``MessageContext.FailException``.
+Rejected             4  Message is not going to be processed. For example it was filtered or no handler.
+==================== == ===========================================================================================
 
 Middlewares
 -----------
