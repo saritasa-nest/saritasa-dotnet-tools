@@ -3,12 +3,12 @@
     "number": "#0",
     "type": "BasicInformationStep",
     "content": {
-      "name": "Test",
-      "author": null,
-      "created": "2017-07-25T17:14:02.5116096+07:00",
-      "description": null,
+      "name": "Cannot edit project for another user",
+      "author": "Ivan Kozhin",
+      "created": "2017-07-25T17:14:02",
+      "description": "The test registers two users and projects for them. Afterward it tries to edit project of user 1 using user 2. Exception should be thrown.",
       "tags": [
-        null
+        "users"
       ]
     }
   },

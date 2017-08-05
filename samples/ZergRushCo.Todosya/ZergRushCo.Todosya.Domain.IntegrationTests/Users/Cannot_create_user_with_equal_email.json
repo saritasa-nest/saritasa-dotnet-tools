@@ -3,12 +3,12 @@
     "number": "#0",
     "type": "BasicInformationStep",
     "content": {
-      "name": "Test",
-      "author": null,
-      "created": "2017-07-25T13:37:01.1044866+07:00",
-      "description": null,
+      "name": "Cannot create user with equal email",
+      "author": "Ivan Kozhin",
+      "created": "2017-07-25T13:37:01",
+      "description": "The test registers two users with email ivan+test99@saritasa.com . Finally we should have domain exception,",
       "tags": [
-        null
+        "users"
       ]
     }
   },

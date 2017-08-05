@@ -1,6 +1,6 @@
 ﻿using System;
 using Saritasa.Tools.Domain.Exceptions;
-using Saritasa.Tools.Messages.TestRuns.Loaders;
+using Saritasa.Tools.Messages.TestRuns;
 using Xunit;
 
 namespace ZergRushCo.Todosya.Domain.IntegrationTests
@@ -12,26 +12,22 @@ namespace ZergRushCo.Todosya.Domain.IntegrationTests
     {
         private readonly AppTestRunRunner runner = new AppTestRunRunner();
 
-        [Fact]
-        public void Cannot_create_user_with_equal_email()
+        [Theory]
+        [TestRunFile("Users.Cannot_create_user_with_equal_email")]
+        public void Cannot_create_user_with_equal_email(TestRun testRun)
         {
-            using (var stream = TestHelpers.GetManifestStream(@"Users.Cannot_create_user_with_equal_email.json"))
-            {
-                var result = runner.Run(new StreamLoader(stream));
-                Assert.False(result.IsSuccess);
-                Assert.IsType<DomainException>(result.FailException.InnerException);
-            }
+            var result = runner.Run(testRun);
+            Assert.False(result.IsSuccess);
+            Assert.IsType<DomainException>(result.FailException.InnerException);
         }
 
-        [Fact]
-        public void Cannot_edit_project_for_another_user()
+        [Theory]
+        [TestRunFile("Users.Cannot_edit_project_for_another_user")]
+        public void Cannot_edit_project_for_another_user(TestRun testRun)
         {
-            using (var stream = TestHelpers.GetManifestStream(@"Users.Cannot_edit_project_for_another_user.json"))
-            {
-                var result = runner.Run(new StreamLoader(stream));
-                Assert.False(result.IsSuccess);
-                Assert.IsType<ForbiddenException>(result.FailException.InnerException);
-            }
+            var result = runner.Run(testRun);
+            Assert.False(result.IsSuccess);
+            Assert.IsType<ForbiddenException>(result.FailException.InnerException);
         }
 
         public void Dispose()

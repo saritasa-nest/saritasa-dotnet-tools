@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Saritasa.Tools.Messages.TestRuns.Steps;
@@ -124,6 +123,14 @@ namespace Saritasa.Tools.Messages.TestRuns
         }
 
         /// <summary>
+        /// Empty test run.
+        /// </summary>
+        public static readonly TestRun Empty = new TestRun("Empty.")
+        {
+            Description = "Test run without steps only for test purposes."
+        };
+
+        /// <summary>
         /// Load test run data from stream.
         /// </summary>
         /// <param name="reader">Stream reader.</param>
@@ -158,32 +165,6 @@ namespace Saritasa.Tools.Messages.TestRuns
             }
 
             return testRun;
-        }
-
-        private static bool IsDelimeterLine(string line) => line.StartsWith("/*>!") && line.EndsWith("*/");
-
-        /// <summary>
-        /// Possible formates are: #X Type, Type
-        /// </summary>
-        /// <param name="line">Line to parse.</param>
-        /// <returns>Type name or empty string.</returns>
-        private static string GetTypeNameFromDelimeterLine(string line)
-        {
-            if (string.IsNullOrEmpty(line))
-            {
-                return string.Empty;
-            }
-            line = line.Replace("/*>!", string.Empty).Replace("*/", string.Empty).Trim();
-            var arr = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            if (arr.Length > 1 && arr[0].Length > 0 && arr[0][0] == '#')
-            {
-                return arr[1];
-            }
-            if (arr.Length > 0)
-            {
-                return arr[0];
-            }
-            return string.Empty;
         }
 
         /// <summary>

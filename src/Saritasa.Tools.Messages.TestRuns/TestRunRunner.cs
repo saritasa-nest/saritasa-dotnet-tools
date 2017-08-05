@@ -2,6 +2,7 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using Saritasa.Tools.Messages.Abstractions;
 
 namespace Saritasa.Tools.Messages.TestRuns
@@ -12,10 +13,22 @@ namespace Saritasa.Tools.Messages.TestRuns
     /// </summary>
     public abstract class TestRunRunner : IDisposable
     {
+        private bool isInitialized;
+
         /// <summary>
         /// Service provider factory.
         /// </summary>
         public IServiceProviderFactory ServiceProviderFactory { get; set; }
+
+        /// <summary>
+        /// Has test runner been initialized.
+        /// </summary>
+        public virtual bool IsInitialized => isInitialized;
+
+        /// <summary>
+        /// Synchronization object.
+        /// </summary>
+        public object SyncRoot { get; } = new object();
 
         /// <summary>
         /// Setup and initialize tests environment. Setup context resolver if needed.
@@ -53,34 +66,144 @@ namespace Saritasa.Tools.Messages.TestRuns
         }
 
         /// <summary>
-        /// Run step of test run.
+        /// Run test run with assert method. OnAfterTestRun will be called afterwards.
         /// </summary>
-        public virtual TestRunResult Run(ITestRunLoader loader, ITestRunLogger logger = null)
+        /// <param name="testRun">Test run.</param>
+        /// <param name="assert">Assert method.</param>
+        /// <param name="logger">Logger. Console is used by default.</param>
+        /// <returns>Test run result.</returns>
+        public virtual TestRunResult RunWithAssert(
+            TestRun testRun,
+            Action<TestRun, TestRunResult> assert,
+            ITestRunLogger logger = null)
         {
-            if (loader == null)
+            TestRunExecutionContext context = null;
+            try
             {
-                throw new ArgumentNullException(nameof(loader));
+                var result = RunInternal(testRun, logger, out context);
+                context.Logger.LogWithTime("Run asserts.");
+                assert(testRun, result);
+                return result;
+            }
+            finally
+            {
+                context?.Logger.LogWithTime("Run OnAfterTestRun.");
+                OnAfterTestRun(context);
+            }
+        }
+
+        /// <summary>
+        /// Run test run.
+        /// </summary>
+        /// <param name="testRun">Test run.</param>
+        /// <param name="logger">Logger. Console is used by default.</param>
+        /// <returns>Test run result.</returns>
+        public virtual TestRunResult Run(TestRun testRun, ITestRunLogger logger = null)
+        {
+            TestRunExecutionContext context = null;
+            try
+            {
+                return RunInternal(testRun, logger, out context);
+            }
+            finally
+            {
+                context?.Logger.LogWithTime("Run OnAfterTestRun.");
+                OnAfterTestRun(context);
+            }
+        }
+
+        /// <summary>
+        /// Run multiple test runs.
+        /// </summary>
+        /// <param name="testRuns">Test runs list.</param>
+        /// <param name="logger">Logger to be used.</param>
+        /// <returns>Results.</returns>
+        public virtual IList<TestRunResult> Run(IList<TestRun> testRuns, ITestRunLogger logger = null)
+        {
+            if (testRuns == null)
+            {
+                throw new ArgumentNullException(nameof(testRuns));
             }
             if (logger == null)
             {
                 logger = new ConsoleTestRunLogger();
             }
 
-            var context = new TestRunExecutionContext
+            var results = new List<TestRunResult>(testRuns.Count);
+            foreach (TestRun testRun in testRuns)
+            {
+                Run(testRun, logger);
+            }
+            return results;
+        }
+
+        /// <summary>
+        /// Run multiple test runs from test run loader.
+        /// </summary>
+        /// <param name="testRunLoader">Test run loader.</param>
+        /// <param name="logger">Logger to be used.</param>
+        /// <returns>Results.</returns>
+        public virtual IList<TestRunResult> Run(ITestRunLoader testRunLoader, ITestRunLogger logger = null)
+        {
+            if (testRunLoader == null)
+            {
+                throw new ArgumentNullException(nameof(testRunLoader));
+            }
+            if (logger == null)
+            {
+                logger = new ConsoleTestRunLogger();
+            }
+
+            var results = new List<TestRunResult>();
+            foreach (TestRun testRun in testRunLoader.Get())
+            {
+                Run(testRun, logger);
+            }
+            return results;
+        }
+
+        private void Initialize(TestRunExecutionContext context)
+        {
+            if (!isInitialized)
+            {
+                lock (SyncRoot)
+                {
+                    if (!isInitialized)
+                    {
+                        context.Logger.LogWithTime("Run initialization.");
+                        OnInitialize(context);
+                        isInitialized = true;
+                    }
+                }
+            }
+        }
+
+        private TestRunResult RunInternal(TestRun testRun, ITestRunLogger logger,
+            out TestRunExecutionContext context)
+        {
+            if (testRun == null)
+            {
+                throw new ArgumentNullException(nameof(testRun));
+            }
+            if (logger == null)
+            {
+                logger = new ConsoleTestRunLogger();
+            }
+
+            logger.LogWithTime($"Started to run \"{testRun.Name}\" test.");
+            context = new TestRunExecutionContext
             {
                 StartedAt = DateTime.Now,
                 Logger = logger
             };
 
-            OnInitialize(context);
+            Initialize(context);
 
-            var result = new TestRunResult();
-            foreach (TestRun testRun in loader.Get())
-            {
-                InvokeTestRun(testRun, context, result, logger);
-            }
-
-            OnShutdown(context);
+            context.Logger.LogWithTime("Run OnBeforeTestRun.");
+            OnBeforeTestRun(context);
+            var result = new TestRunResult(testRun.Name);
+            context.Logger.LogWithTime("Run Test.");
+            InvokeTestRun(testRun, context, result, logger);
 
             return result;
         }
@@ -119,6 +242,7 @@ namespace Saritasa.Tools.Messages.TestRuns
             }
             catch (TestRunAssertException)
             {
+                result.AddStep(new TestRunStepResult(context.StepNumber, step.ToString(), false));
                 throw;
             }
             catch (Exception ex)
@@ -134,6 +258,7 @@ namespace Saritasa.Tools.Messages.TestRuns
                     context.LastException = ex;
                 }
             }
+            result.AddStep(new TestRunStepResult(context.StepNumber, step.ToString(), result.IsSuccess));
         }
 
         #region Dispose
@@ -150,6 +275,8 @@ namespace Saritasa.Tools.Messages.TestRuns
             {
                 if (disposing)
                 {
+                    var disposableServiceProviderFactory = ServiceProviderFactory as IDisposable;
+                    disposableServiceProviderFactory?.Dispose();
                 }
                 OnShutdown(TestRunExecutionContext.Empty);
                 disposed = true;

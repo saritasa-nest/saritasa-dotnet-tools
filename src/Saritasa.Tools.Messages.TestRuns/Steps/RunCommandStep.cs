@@ -29,6 +29,21 @@ namespace Saritasa.Tools.Messages.TestRuns.Steps
         private readonly bool typeWasResolved;
 
         /// <summary>
+        /// Command id.
+        /// </summary>
+        public Guid CommandId => id;
+
+        /// <summary>
+        /// Command content.
+        /// </summary>
+        public object CommandContent => command;
+
+        /// <summary>
+        /// Command type.
+        /// </summary>
+        public string CommandType => commandType;
+
+        /// <summary>
         /// .ctor
         /// </summary>
         /// <param name="id">Command id.</param>

@@ -6,6 +6,7 @@ using System.Configuration;
 using System.Data.SqlClient;
 using Autofac;
 using Saritasa.Tools.Messages.TestRuns;
+using ZergRushCo.Todosya.DataAccess;
 using ZergRushCo.Todosya.Infrastructure;
 
 namespace ZergRushCo.Todosya.Domain.IntegrationTests
@@ -15,69 +16,54 @@ namespace ZergRushCo.Todosya.Domain.IntegrationTests
     /// </summary>
     public class AppTestRunRunner : TestRunRunner
     {
-        protected string DatabaseSnapshotName => ConfigurationManager.AppSettings["TestRun:SnapshotDatabaseName"];
-
-        protected string DatabaseSnapshotFile => ConfigurationManager.AppSettings["TestRun:SnapshotFile"];
+        private IContainer container;
 
         /// <inheritdoc />
         public override void OnInitialize(TestRunExecutionContext context)
         {
             var builder = new ContainerBuilder();
             DiConfig.Setup(builder, testingMode: true);
-            var container = builder.Build();
+            container = builder.Build();
             ServiceProviderFactory = new AutofacServiceProviderFactory(container);
-
-            using (var sqlConnection = new SqlConnection(ConfigurationManager.ConnectionStrings["AppDbContext"].ConnectionString))
-            {
-                sqlConnection.Open();
-                var query =
-                    $"DROP DATABASE IF EXISTS [{DatabaseSnapshotName}];" +
-                    $"CREATE DATABASE [{DatabaseSnapshotName}] ON (NAME = [{sqlConnection.Database}], FILENAME = '{DatabaseSnapshotFile}') " +
-                    $"AS SNAPSHOT OF [{sqlConnection.Database}];";
-                RunQuery(query, sqlConnection);
-            }
         }
 
         /// <inheritdoc />
         public override void OnBeforeTestRun(TestRunExecutionContext context)
         {
+            using (var sqlConnection = new SqlConnection(GetConnectionString()))
+            {
+                var dbContext = new AppDbContext(sqlConnection);
+                dbContext.Database.CreateIfNotExists();
+            }
         }
 
         /// <inheritdoc />
         public override void OnShutdown(TestRunExecutionContext context)
         {
-            
         }
 
         /// <inheritdoc />
         public override void OnAfterTestRun(TestRunExecutionContext context)
         {
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-            using (var sqlConnection = new SqlConnection(ConfigurationManager.ConnectionStrings["AppDbContext"].ConnectionString))
+            using (var sqlConnection = new SqlConnection(GetConnectionString()))
             {
-                sqlConnection.Open();
-
-                var originalDatabaseName = sqlConnection.Database;
-                var query =
-                    $"USE [master];" +
-                    $"ALTER DATABASE [{originalDatabaseName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;" +
-                    $"RESTORE DATABASE [{originalDatabaseName}] FROM DATABASE_SNAPSHOT = '{DatabaseSnapshotName}';" +
-                    $"ALTER DATABASE [{originalDatabaseName}] SET MULTI_USER;";
-                RunQuery(query, sqlConnection);
-                RunQuery($"DROP DATABASE IF EXISTS [{DatabaseSnapshotName}];", sqlConnection);
+                var dbContext = new AppDbContext(sqlConnection);
+                dbContext.Database.Delete();
             }
         }
 
-        private int RunQuery(string sql, SqlConnection sqlConnection)
+        private string GetConnectionString(string database = null)
         {
-            using (var sqlCommand = new SqlCommand(sql, sqlConnection))
+            var cs = ConfigurationManager.ConnectionStrings["AppDbContext"].ConnectionString;
+            if (!string.IsNullOrEmpty(database))
             {
-                return sqlCommand.ExecuteNonQuery();
+                var csBuilder = new SqlConnectionStringBuilder(cs)
+                {
+                    InitialCatalog = database
+                };
+                cs = csBuilder.ConnectionString;
             }
+            return cs;
         }
     }
 }

@@ -32,6 +32,7 @@ namespace Saritasa.Tools.Messages.Common
         /// <inheritdoc />
         public virtual void Invoke(IMessageContext messageContext)
         {
+            messageContext.Status = ProcessingStatus.Processing;
             for (int i = 0; i < Middlewares.Length; i++)
             {
                 Middlewares[i].Handle(messageContext);

@@ -36,7 +36,7 @@ namespace Saritasa.Tools.Messages.TestRuns.Loaders
         {
             using (var streamReader = new StreamReader(this.stream))
             {
-                return new TestRun[] { TestRun.Load(streamReader) };
+                return new[] { TestRun.Load(streamReader) };
             }
         }
     }

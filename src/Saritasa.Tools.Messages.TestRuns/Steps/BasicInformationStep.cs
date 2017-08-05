@@ -71,25 +71,25 @@ namespace Saritasa.Tools.Messages.TestRuns.Steps
             }
 
             var j = body;
-            if (j[KeyName] != null && j[KeyName].HasValues)
+            if (j[KeyName] != null)
             {
                 Name = j[KeyName].ToString();
             }
-            if (j[KeyAuthor] != null && j[KeyAuthor].HasValues)
+            if (j[KeyAuthor] != null)
             {
                 Author = j[KeyAuthor].ToString();
             }
-            if (j[KeyDescription] != null && j[KeyDescription].HasValues)
+            if (j[KeyDescription] != null)
             {
                 Description = j[KeyDescription].ToString();
             }
-            if (j[KeyCreated] != null && j[KeyCreated].HasValues)
+            if (!string.IsNullOrEmpty(j[KeyCreated]?.ToString()))
             {
                 CreatedAt = DateTime.Parse(j[KeyCreated].ToString());
             }
             if (j[KeyTags] != null && j[KeyTags].HasValues)
             {
-                Tags = new JArray(j[KeyTags]).Select(t => t.First.ToString()).ToList();
+                Tags = j[KeyTags].ToObject<List<string>>();
             }
         }
 

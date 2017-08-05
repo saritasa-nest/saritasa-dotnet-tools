@@ -14,13 +14,16 @@ namespace Saritasa.Tools.Messages.TestRuns.Steps
         /// <inheritdoc />
         public void Run(TestRunExecutionContext context)
         {
-            throw new NotImplementedException();
+            if (context.LastResult == null)
+            {
+                TestRunAssertException.ThrowWithExecutionContext("Expected to have result.", context, this);
+            }
         }
 
         /// <inheritdoc />
         public JObject Save()
         {
-            throw new NotImplementedException();
+            return new JObject();
         }
     }
 }
