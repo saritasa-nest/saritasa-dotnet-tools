@@ -64,7 +64,7 @@ namespace Saritasa.Tools.EF.ObjectContext
         /// <inheritdoc />
         public virtual IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate)
         {
-            return Set.Where(predicate);
+            return Set.Where(predicate).ToList();
         }
 
         /// <inheritdoc />

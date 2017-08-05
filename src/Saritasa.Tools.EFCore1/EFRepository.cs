@@ -58,7 +58,7 @@ namespace Saritasa.Tools.EFCore
         /// <inheritdoc />
         public virtual IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate)
         {
-            return Set.Where(predicate);
+            return Set.Where(predicate).ToList();
         }
 
         /// <inheritdoc />
@@ -70,7 +70,7 @@ namespace Saritasa.Tools.EFCore
             {
                 query = query.Include(include);
             }
-            return query;
+            return query.ToList();
         }
 
         /// <inheritdoc />
@@ -87,7 +87,7 @@ namespace Saritasa.Tools.EFCore
         /// <inheritdoc />
         public virtual IEnumerable<TEntity> GetAll()
         {
-            return Set.AsQueryable();
+            return Set.ToList();
         }
 
         /// <inheritdoc />

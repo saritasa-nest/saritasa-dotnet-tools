@@ -1,4 +1,7 @@
-﻿0.2.2 [2017-07-18]
+﻿0.3.0 [TBD]
+[*] Force return result (ToList) for repository methods.
+
+0.2.2 [2017-07-18]
 [*] Decreased dependencies to netstandard1.3 and net452.
 [*] EFQueryableRepository now supports async queries.
 

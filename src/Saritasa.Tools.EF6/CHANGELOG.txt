@@ -1,4 +1,7 @@
-﻿0.2.1 [2017-07-11]
+﻿0.3.0 [TBD]
+[*] Force return result (ToList) for repository methods.
+
+0.2.1 [2017-07-11]
 [*] Fix reference to Domain assembly.
 
 0.2.0 [2017-07-10]
