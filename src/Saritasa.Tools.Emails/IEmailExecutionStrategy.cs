@@ -7,7 +7,6 @@ using System.Net.Mail;
 #endif
 using System.Threading;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 
 using NameValueDict = System.Collections.Generic.IDictionary<string, object>;
 
@@ -27,8 +26,8 @@ namespace Saritasa.Tools.Emails
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Task.</returns>
         Task Execute(
-            [NotNull] Func<MailMessage, NameValueDict, Task> handler,
-            [NotNull] MailMessage message, NameValueDict data,
+            Func<MailMessage, NameValueDict, Task> handler,
+            MailMessage message, NameValueDict data,
             CancellationToken cancellationToken);
     }
 }

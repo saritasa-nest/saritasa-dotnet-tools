@@ -6,7 +6,6 @@ using System;
 using System.Net.Mail;
 #endif
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 
 namespace Saritasa.Tools.Emails
 {
@@ -20,6 +19,6 @@ namespace Saritasa.Tools.Emails
         /// </summary>
         /// <param name="mailMessage">The mail message.</param>
         /// <returns>Task with email sending operation.</returns>
-        Task SendAsync([NotNull] MailMessage mailMessage);
+        Task SendAsync(MailMessage mailMessage);
     }
 }

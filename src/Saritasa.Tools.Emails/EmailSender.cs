@@ -8,7 +8,6 @@ using System.Net.Mail;
 #endif
 using System.Threading.Tasks;
 using System.Threading;
-using JetBrains.Annotations;
 
 namespace Saritasa.Tools.Emails
 {
@@ -24,7 +23,7 @@ namespace Saritasa.Tools.Emails
         /// <summary>
         /// Send message.
         /// </summary>
-        protected abstract Task Process([NotNull] MailMessage message, [NotNull] NameValueDict data);
+        protected abstract Task Process(MailMessage message, NameValueDict data);
 
         /// <summary>
         /// Execution strategy. <see cref="DefaultEmailExecutionStrategy" /> used by default. Determines the way how we should proceed
@@ -76,7 +75,7 @@ namespace Saritasa.Tools.Emails
         /// Add interceptor.
         /// </summary>
         /// <param name="interceptor">Interceptor.</param>
-        public EmailSender AddInterceptor([NotNull] IEmailInterceptor interceptor)
+        public EmailSender AddInterceptor(IEmailInterceptor interceptor)
         {
             if (interceptor == null)
             {

@@ -6,7 +6,6 @@ using System.Collections.Generic;
 #if NET452
 using System.Net.Mail;
 #endif
-using JetBrains.Annotations;
 
 namespace Saritasa.Tools.Emails
 {
@@ -20,7 +19,7 @@ namespace Saritasa.Tools.Emails
         /// </summary>
         /// <param name="mailMessage">Mail message.</param>
         /// <param name="data">Additional data.</param>
-        void Sent([NotNull] MailMessage mailMessage, [NotNull] IDictionary<string, object> data);
+        void Sent(MailMessage mailMessage, IDictionary<string, object> data);
 
         /// <summary>
         /// The method is called before email sending.
@@ -29,8 +28,8 @@ namespace Saritasa.Tools.Emails
         /// <param name="data">Additional data.</param>
         /// <param name="cancel">Should the email sending be cancelled.</param>
         void Sending(
-            [NotNull] MailMessage mailMessage,
-            [NotNull] IDictionary<string, object> data,
+            MailMessage mailMessage,
+            IDictionary<string, object> data,
             ref bool cancel);
     }
 }
