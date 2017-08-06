@@ -143,7 +143,7 @@ namespace Saritasa.Tools.EF.ObjectContext
         public virtual Task AddAsync(TEntity entity, CancellationToken cancellationToken)
         {
             Set.AddObject(entity);
-            return Task.FromResult(1);
+            return InternalHelpers.CompletedTask;
         }
 
         /// <inheritdoc />
@@ -153,7 +153,7 @@ namespace Saritasa.Tools.EF.ObjectContext
             {
                 Set.AddObject(entity);
             }
-            return Task.FromResult(1);
+            return InternalHelpers.CompletedTask;
         }
 
         /// <inheritdoc />
@@ -206,7 +206,7 @@ namespace Saritasa.Tools.EF.ObjectContext
         public virtual Task RemoveAsync(TEntity entity, CancellationToken cancellationToken)
         {
             Set.DeleteObject(entity);
-            return Task.FromResult(1);
+            return InternalHelpers.CompletedTask;
         }
 
         /// <inheritdoc />
@@ -216,7 +216,7 @@ namespace Saritasa.Tools.EF.ObjectContext
             {
                 Set.DeleteObject(entity);
             }
-            return Task.FromResult(1);
+            return InternalHelpers.CompletedTask;
         }
 
         #endregion

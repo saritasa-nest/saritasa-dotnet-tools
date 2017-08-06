@@ -188,14 +188,14 @@ namespace Saritasa.Tools.EFCore
         public virtual Task RemoveAsync(TEntity entity, CancellationToken cancellationToken)
         {
             Set.Remove(entity);
-            return Task.FromResult(1);
+            return InternalHelpers.CompletedTask;
         }
 
         /// <inheritdoc />
         public virtual Task RemoveRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken)
         {
             Set.RemoveRange(entities);
-            return Task.FromResult(1);
+            return InternalHelpers.CompletedTask;
         }
 
         #endregion
