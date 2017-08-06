@@ -7,7 +7,7 @@ using System.Threading;
 namespace Saritasa.Tools.Messages.Abstractions.Queries
 {
     /// <summary>
-    /// Queries specific pipeline.
+    /// Query pipeline.
     /// </summary>
     public interface IQueryPipeline : IMessagePipeline
     {

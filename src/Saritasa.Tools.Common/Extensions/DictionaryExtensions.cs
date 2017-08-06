@@ -8,7 +8,7 @@ using Saritasa.Tools.Common.Utils;
 namespace Saritasa.Tools.Common.Extensions
 {
     /// <summary>
-    /// Dictionary extensions.
+    /// <see cref="IDictionary{TKey,TValue}" /> extensions.
     /// </summary>
     public static class DictionaryExtensions
     {

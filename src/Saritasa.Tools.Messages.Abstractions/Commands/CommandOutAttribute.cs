@@ -6,7 +6,7 @@ using System;
 namespace Saritasa.Tools.Messages.Abstractions.Commands
 {
     /// <summary>
-    /// Marks property as output. Is not for processing.
+    /// Marks property as output. Not for processing.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
     public class CommandOutAttribute : Attribute

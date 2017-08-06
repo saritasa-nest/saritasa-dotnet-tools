@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 namespace Saritasa.Tools.Messages.Abstractions
 {
     /// <summary>
-    /// Default message pipeline.
+    /// Message pipeline. The base abstract pipeline interface.
     /// </summary>
     public interface IMessagePipeline
     {
         /// <summary>
-        /// Available message types the pipeline as able to process.
+        /// Available message types the pipeline is able to process.
         /// </summary>
         byte[] MessageTypes { get; }
 
@@ -35,6 +35,7 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// </summary>
         /// <param name="messageContext">Message context.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+        /// <returns>The task specifies current async operation.</returns>
         Task InvokeAsync(IMessageContext messageContext,
             CancellationToken cancellationToken = default(CancellationToken));
     }

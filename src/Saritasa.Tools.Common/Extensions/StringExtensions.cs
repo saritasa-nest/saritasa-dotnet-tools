@@ -7,7 +7,7 @@ using System.Diagnostics;
 namespace Saritasa.Tools.Common.Extensions
 {
     /// <summary>
-    /// String class extensions.
+    /// <see cref="String" /> class extensions.
     /// </summary>
     public static class StringExtensions
     {
@@ -19,7 +19,6 @@ namespace Saritasa.Tools.Common.Extensions
         /// <param name="format">Target string.</param>
         /// <param name="arg0">Argument 1.</param>
         /// <returns>Formatted string.</returns>
-        [DebuggerStepThrough]
         public static string FormatWith(this string format, object arg0)
         {
             return string.Format(format, arg0);
@@ -32,7 +31,6 @@ namespace Saritasa.Tools.Common.Extensions
         /// <param name="arg0">Argument 1.</param>
         /// <param name="arg1">Argument 2.</param>
         /// <returns>Formatted string.</returns>
-        [DebuggerStepThrough]
         public static string FormatWith(
             this string format,
             object arg0,
@@ -49,7 +47,6 @@ namespace Saritasa.Tools.Common.Extensions
         /// <param name="arg1">Argument 2.</param>
         /// <param name="arg2">Argument 3.</param>
         /// <returns>Formatted string.</returns>
-        [DebuggerStepThrough]
         public static string FormatWith(
             this string format,
             object arg0,
@@ -65,7 +62,6 @@ namespace Saritasa.Tools.Common.Extensions
         /// <param name="format">Target string.</param>
         /// <param name="args">Arguments.</param>
         /// <returns>Formatted string.</returns>
-        [DebuggerStepThrough]
         public static string FormatWith(this string format, params object[] args)
         {
             return string.Format(format, args);
@@ -78,7 +74,6 @@ namespace Saritasa.Tools.Common.Extensions
         /// <param name="provider">Format provider.</param>
         /// <param name="args">Arguments.</param>
         /// <returns>Formatted string.</returns>
-        [DebuggerStepThrough]
         public static string FormatWith(
             this string format,
             IFormatProvider provider,

@@ -10,7 +10,7 @@ using System.Linq.Expressions;
 namespace Saritasa.Tools.Common.Extensions
 {
     /// <summary>
-    /// Collections extensions.
+    /// Collection extensions.
     /// </summary>
     public static class CollectionExtensions
     {

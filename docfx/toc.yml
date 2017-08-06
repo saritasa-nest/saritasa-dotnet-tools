@@ -1,0 +1,8 @@
+- name: Common
+  href: api/common/
+- name: Domain
+  href: api/domain/
+- name: Messages
+  href: api/messages/
+- name: Emails
+  href: api/emails/

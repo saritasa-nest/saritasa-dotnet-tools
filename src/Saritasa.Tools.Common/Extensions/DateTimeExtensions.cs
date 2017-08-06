@@ -8,7 +8,7 @@ using Saritasa.Tools.Common.Utils;
 namespace Saritasa.Tools.Common.Extensions
 {
     /// <summary>
-    /// Helper methods for DateTime class.
+    /// Extension methods of <see cref="DateTime" /> class.
     /// </summary>
     public static class DateTimeExtensions
     {

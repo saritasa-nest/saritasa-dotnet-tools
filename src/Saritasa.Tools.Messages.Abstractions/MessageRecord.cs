@@ -44,7 +44,7 @@ namespace Saritasa.Tools.Messages.Abstractions
         public IDictionary<string, string> Data { get; set; }
 
         /// <summary>
-        /// Contains exception if any error occured during message processing.
+        /// Contains exception if any error occurred during message processing.
         /// </summary>
         public Exception Error { get; set; }
 

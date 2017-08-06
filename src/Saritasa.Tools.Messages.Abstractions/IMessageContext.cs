@@ -8,6 +8,7 @@ namespace Saritasa.Tools.Messages.Abstractions
 {
     /// <summary>
     /// Message context. Contains objects to execute, metadata and current execution state.
+    /// The specific instance is created for every request.
     /// </summary>
     public interface IMessageContext
     {
@@ -23,7 +24,7 @@ namespace Saritasa.Tools.Messages.Abstractions
 
         /// <summary>
         /// Identifier for content. Can be used to determine unique
-        /// processing content type.
+        /// processing content type and where to find base class.
         /// </summary>
         string ContentId { get; set; }
 

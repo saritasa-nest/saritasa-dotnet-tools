@@ -24,7 +24,7 @@ namespace Saritasa.Tools.Messages.Abstractions
         Completed,
 
         /// <summary>
-        /// Command has been failed while execution. Mostly exception occured
+        /// Command has been failed while execution. Mostly exception occurred
         /// in handler.
         /// </summary>
         Failed,

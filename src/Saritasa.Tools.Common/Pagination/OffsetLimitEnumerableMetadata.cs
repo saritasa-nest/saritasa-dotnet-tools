@@ -14,12 +14,12 @@ namespace Saritasa.Tools.Common.Pagination
     public class OffsetLimitEnumerableMetadata : TotalCountEnumerableMetadata
     {
         /// <summary>
-        /// Zero based offset of current page.
+        /// Zero based data offset.
         /// </summary>
         public int Offset { get; set; }
 
         /// <summary>
-        /// Count of returned items.
+        /// Max number of returned items.
         /// </summary>
         public int Limit { get; set; }
     }

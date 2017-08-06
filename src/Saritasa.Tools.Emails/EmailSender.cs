@@ -27,7 +27,7 @@ namespace Saritasa.Tools.Emails
         protected abstract Task Process([NotNull] MailMessage message, [NotNull] NameValueDict data);
 
         /// <summary>
-        /// Execution strategy. DefaultEmailExecutionStrategy used by default. Determines the way how we should proceed
+        /// Execution strategy. <see cref="DefaultEmailExecutionStrategy" /> used by default. Determines the way how we should proceed
         /// actual email sending.
         /// </summary>
         protected IEmailExecutionStrategy ExecutionStrategy { get; } = new DefaultEmailExecutionStrategy();

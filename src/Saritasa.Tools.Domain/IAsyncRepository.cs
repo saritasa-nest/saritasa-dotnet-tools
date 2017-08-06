@@ -10,9 +10,10 @@ using System.Threading.Tasks;
 namespace Saritasa.Tools.Domain
 {
     /// <summary>
-    /// Async repository abstraction.
-    /// <typeparam name="TEntity">The entity that repository wraps.</typeparam>
+    /// Async repository abstraction. Target implementation may not support all possible async
+    /// operations or support <see cref="CancellationToken" /> monitor.
     /// </summary>
+    /// <typeparam name="TEntity">The entity that repository wraps.</typeparam>
     public interface IAsyncRepository<TEntity> where TEntity : class
     {
         /// <summary>

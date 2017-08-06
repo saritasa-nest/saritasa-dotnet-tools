@@ -9,8 +9,8 @@ namespace Saritasa.Tools.Domain
 {
     /// <summary>
     /// Repository abstraction.
-    /// <typeparam name="TEntity">The entity that repository wraps.</typeparam>
     /// </summary>
+    /// <typeparam name="TEntity">The entity that repository wraps.</typeparam>
     public interface IRepository<TEntity> where TEntity : class
     {
         /// <summary>

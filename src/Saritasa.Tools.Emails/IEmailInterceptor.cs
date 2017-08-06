@@ -11,7 +11,7 @@ using JetBrains.Annotations;
 namespace Saritasa.Tools.Emails
 {
     /// <summary>
-    /// Email interceptor to be used with EmailSender.
+    /// Email interceptor to be used with <see cref="EmailSender" />.
     /// </summary>
     public interface IEmailInterceptor
     {

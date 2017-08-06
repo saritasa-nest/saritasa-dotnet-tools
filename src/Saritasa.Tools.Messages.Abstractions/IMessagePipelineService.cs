@@ -6,7 +6,8 @@ using System;
 namespace Saritasa.Tools.Messages.Abstractions
 {
     /// <summary>
-    /// Pipelines service.
+    /// Pipelines service. The inteface describes class properties requires for
+    /// base pipelinse service that will be used for all messages processing.
     /// </summary>
     public interface IMessagePipelineService
     {

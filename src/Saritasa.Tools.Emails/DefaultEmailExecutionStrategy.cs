@@ -13,7 +13,7 @@ using NameValueDict = System.Collections.Generic.IDictionary<string, object>;
 namespace Saritasa.Tools.Emails
 {
     /// <summary>
-    /// This execution strategy does not do any operation. It calls handler method itself.
+    /// This execution strategy does not do any operation itself. It just calls handler method.
     /// </summary>
     public class DefaultEmailExecutionStrategy : IEmailExecutionStrategy
     {

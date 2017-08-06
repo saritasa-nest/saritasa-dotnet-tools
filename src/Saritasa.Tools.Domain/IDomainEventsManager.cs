@@ -29,7 +29,7 @@ namespace Saritasa.Tools.Domain
         /// Determines whether events manager has handlers for specific event.
         /// </summary>
         /// <typeparam name="TEvent">Event type.</typeparam>
-        /// <returns>True if event can be handled.</returns>
+        /// <returns><c>True</c> if event can be handled.</returns>
         bool HasHandlers<TEvent>() where TEvent : class;
     }
 }

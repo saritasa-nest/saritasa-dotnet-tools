@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace Saritasa.Tools.Common.Pagination
 {
     /// <summary>
-    /// Enumerable that is able to return metadata.
+    /// Enumerable that is able to return its metadata.
     /// </summary>
     /// <typeparam name="TMetadata">Metadata type.</typeparam>
     /// <typeparam name="T">Enumerable type.</typeparam>
@@ -30,7 +30,7 @@ namespace Saritasa.Tools.Common.Pagination
         /// using delegate. All existing metadata properties are kept.
         /// </summary>
         /// <typeparam name="TNew">New enumerable type.</typeparam>
-        /// <param name="converter">Delegate to convert source enumerable fron existing type to new one.</param>
+        /// <param name="converter">Delegate to convert source enumerable from existing type to new one.</param>
         /// <returns>Metadata enumerable with new type.</returns>
         IMetadataEnumerable<TMetadata, TNew> CastMetadataEnumerable<TNew>(Func<T, TNew> converter);
     }
