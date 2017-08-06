@@ -7,24 +7,30 @@ using Newtonsoft.Json.Linq;
 namespace Saritasa.Tools.Messages.TestRuns.Steps
 {
     /// <summary>
-    /// Asserts that current context does not have exceptions initialized.
+    /// The step is to provide comment text within steps list
     /// </summary>
-    public class AssertNoExceptionsStep : ITestRunStep
+    public class CommentStep : ITestRunStep
     {
+        private const string KeyComment = "comment";
+
+        /// <summary>
+        /// Comment text.
+        /// </summary>
+        public string Comment { get; set; }
+
         /// <inheritdoc />
         public void Run(TestRunExecutionContext context)
         {
-            if (context.FirstException != null || context.LastException != null)
-            {
-                TestRunAssertException.ThrowWithExecutionContext(
-                    "There are exception(-s) from last step(-s) when no expected.", context, this);
-            }
         }
 
         /// <inheritdoc />
         public JObject Save()
         {
-            return new JObject();
+            var j = new JObject
+            {
+                [KeyComment] = Comment
+            };
+            return j;
         }
     }
 }
