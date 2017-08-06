@@ -28,9 +28,9 @@ namespace SandBox
 
         public static IEventPipeline EventPipeline { get; private set; }
 
-        static InMemoryMessageRepository inMemoryMessageRepository;
+        private static InMemoryMessageRepository inMemoryMessageRepository;
 
-        static readonly IProductsRepository productsRepository = new ProductsRepository();
+        private static readonly IProductsRepository productsRepository = new ProductsRepository();
 
         /// <summary>
         /// Simple dependency injection resolver.

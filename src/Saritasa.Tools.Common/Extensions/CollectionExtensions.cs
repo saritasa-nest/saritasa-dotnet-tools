@@ -86,7 +86,7 @@ namespace Saritasa.Tools.Common.Extensions
 #endif
 
         /// <summary>
-        /// Breaks a list of items into chunks of a specific size and yeilds T items.
+        /// Breaks a list of items into chunks of a specific size and yields T items.
         /// </summary>
         /// <param name="source">Source list.</param>
         /// <param name="chunkSize">Chunk size.</param>
