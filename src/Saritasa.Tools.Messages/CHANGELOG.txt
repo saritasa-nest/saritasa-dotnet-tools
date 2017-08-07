@@ -1,4 +1,4 @@
-﻿0.2.1 [TBD]
+﻿0.3.0 [2017-08-07]
 [*] Fix AddQueryPipeline method.
 
 0.2.0 [2017-07-27]

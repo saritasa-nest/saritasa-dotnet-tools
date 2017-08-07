@@ -1,4 +1,4 @@
-﻿0.3.0 [TBD]
+﻿0.3.0 [2017-08-07]
 [*] Force return result (ToList) for repository methods.
 [+] Async repository implementation.
 

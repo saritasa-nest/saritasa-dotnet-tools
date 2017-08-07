@@ -78,6 +78,7 @@ Repository
 A Repository mediates between the domain and data mapping layers, acting like an in-memory domain object collection. In our implementation repository works in a context of unit of work. There are two interfaces available:
 
 - ``IRepository``. Contains methods to get, find, add and remove entities from in-memory collection.
+- ``IAsyncRepository``. Similar to ``IRepository`` but contains async methods.
 - ``IQueryableRepository``. Provides the same methods as ``IRepository`` but also implements ``IQueryable`` interface. So you can query you data easily. Generally it is not recommended to return ``IQueryable`` from repository because it breaks pattern idea - the query is executed out of repository boundaries. But sometimes it may be convenient and useful.
 
 .. note:: In ``Saritasa.Tools.EF6`` assembly you will find general implementations ``EFRepository`` and ``EFQueryableRepository``.

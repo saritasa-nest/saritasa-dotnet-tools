@@ -32,6 +32,7 @@ $packages = @(
     'Saritasa.Tools.Emails' # emails
     'Saritasa.Tools.Messages' # messages
     'Saritasa.Tools.Messages.Abstractions' # messages-abstractions
+    'Saritasa.Tools.Messages.TestRuns' # testruns
     'Saritasa.Tools.Misc' # misc
 )
 

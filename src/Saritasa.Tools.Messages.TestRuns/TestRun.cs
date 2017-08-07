@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -15,6 +16,7 @@ namespace Saritasa.Tools.Messages.TestRuns
     /// <summary>
     /// Test run. Wraps series of steps to be executed for test run.
     /// </summary>
+    [DebuggerDisplay("Name = {" + nameof(Name) + "}")]
     public class TestRun
     {
         /// <summary>

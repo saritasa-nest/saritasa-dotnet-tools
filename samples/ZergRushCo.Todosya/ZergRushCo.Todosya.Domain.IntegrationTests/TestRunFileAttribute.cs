@@ -40,7 +40,7 @@ namespace ZergRushCo.Todosya.Domain.IntegrationTests
                     yield return new object[]
                     {
                         TestRun.Load(streamReader)
-                };
+                    };
                 }
             }
         }
