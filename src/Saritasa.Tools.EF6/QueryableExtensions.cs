@@ -24,7 +24,7 @@ namespace Saritasa.Tools.EF
         /// <returns>Queryable with included properties.</returns>
         public static IQueryable<TEntity> Include<TEntity, TProperty>(
             this IQueryable<TEntity> source,
-            IEnumerable<Expression<Func<TEntity, TProperty>>> includes)
+            Expression<Func<TEntity, TProperty>>[] includes)
             where TEntity : class
         {
             var query = source;

@@ -18,7 +18,7 @@ namespace Saritasa.Tools.EFCore
     /// </summary>
     /// <typeparam name="TEntity">Entity type.</typeparam>
     /// <typeparam name="TContext">Database context type.</typeparam>
-    public class EFRepository<TEntity, TContext> : IRepository<TEntity>, IAsyncRepository<TEntity>
+    public class EFRepository<TEntity, TContext> : IRepository<TEntity>
         where TEntity : class where TContext : DbContext
     {
         /// <summary>
@@ -48,36 +48,6 @@ namespace Saritasa.Tools.EFCore
         #region IRepository
 
         /// <inheritdoc />
-        public virtual void Add(TEntity entity)
-        {
-            Set.Add(entity);
-        }
-
-        /// <inheritdoc />
-        public virtual void AddRange(IEnumerable<TEntity> entities)
-        {
-            Set.AddRange(entities);
-        }
-
-        /// <inheritdoc />
-        public virtual IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate)
-        {
-            return Set.Where(predicate).ToArray();
-        }
-
-        /// <inheritdoc />
-        public virtual IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate,
-            IEnumerable<Expression<Func<TEntity, object>>> includes)
-        {
-            var query = Context.Set<TEntity>().Where(predicate);
-            foreach (var include in includes)
-            {
-                query = query.Include(include);
-            }
-            return query.ToArray();
-        }
-
-        /// <inheritdoc />
         public virtual TEntity Get(params object[] keyValues)
         {
             var entity = Set.Find(keyValues);
@@ -89,13 +59,7 @@ namespace Saritasa.Tools.EFCore
         }
 
         /// <inheritdoc />
-        public virtual IEnumerable<TEntity> GetAll()
-        {
-            return Set.ToArray();
-        }
-
-        /// <inheritdoc />
-        public virtual IEnumerable<TEntity> GetAll(IEnumerable<Expression<Func<TEntity, object>>> includes)
+        public virtual IEnumerable<TEntity> GetAll(Expression<Func<TEntity, object>>[] includes)
         {
             var query = Set.AsQueryable();
             foreach (var include in includes)
@@ -103,6 +67,31 @@ namespace Saritasa.Tools.EFCore
                 query = query.Include(include);
             }
             return query.ToArray();
+        }
+
+        /// <inheritdoc />
+        public virtual IEnumerable<TEntity> Find(
+            Expression<Func<TEntity, bool>> predicate,
+            Expression<Func<TEntity, object>>[] includes)
+        {
+            var query = Context.Set<TEntity>().Where(predicate);
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+            return query.ToArray();
+        }
+
+        /// <inheritdoc />
+        public virtual void Add(TEntity entity)
+        {
+            Set.Add(entity);
+        }
+
+        /// <inheritdoc />
+        public virtual void AddRange(IEnumerable<TEntity> entities)
+        {
+            Set.AddRange(entities);
         }
 
         /// <inheritdoc />
@@ -122,40 +111,7 @@ namespace Saritasa.Tools.EFCore
         #region IAsyncRepository
 
         /// <inheritdoc />
-        public virtual Task AddAsync(TEntity entity, CancellationToken cancellationToken)
-        {
-            return Set.AddAsync(entity, cancellationToken);
-        }
-
-        /// <inheritdoc />
-        public virtual Task AddRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken)
-        {
-            return Set.AddRangeAsync(entities, cancellationToken);
-        }
-
-        /// <inheritdoc />
-        public virtual async Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate,
-            CancellationToken cancellationToken)
-        {
-            return await Set.Where(predicate).ToArrayAsync(cancellationToken).ConfigureAwait(false);
-        }
-
-        /// <inheritdoc />
-        public virtual async Task<IEnumerable<TEntity>> FindAsync(
-            Expression<Func<TEntity, bool>> predicate,
-            IEnumerable<Expression<Func<TEntity, object>>> includes,
-            CancellationToken cancellationToken)
-        {
-            var query = Context.Set<TEntity>().Where(predicate);
-            foreach (var include in includes)
-            {
-                query = query.Include(include);
-            }
-            return await query.ToArrayAsync(cancellationToken).ConfigureAwait(false);
-        }
-
-        /// <inheritdoc />
-        public virtual async Task<TEntity> GetAsync(object[] keyValues, CancellationToken cancellationToken)
+        public virtual async Task<TEntity> GetAsync(CancellationToken cancellationToken, params object[] keyValues)
         {
             var entity = await Set.FindAsync(keyValues, cancellationToken).ConfigureAwait(false);
             if (entity == null)
@@ -166,15 +122,9 @@ namespace Saritasa.Tools.EFCore
         }
 
         /// <inheritdoc />
-        public virtual async Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken)
-        {
-            return await Set.ToArrayAsync(cancellationToken).ConfigureAwait(false);
-        }
-
-        /// <inheritdoc />
         public virtual async Task<IEnumerable<TEntity>> GetAllAsync(
-            IEnumerable<Expression<Func<TEntity, object>>> includes,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken,
+            params Expression<Func<TEntity, object>>[] includes)
         {
             var query = Set.AsQueryable();
             foreach (var include in includes)
@@ -185,16 +135,30 @@ namespace Saritasa.Tools.EFCore
         }
 
         /// <inheritdoc />
-        public virtual Task RemoveAsync(TEntity entity, CancellationToken cancellationToken)
+        public virtual async Task<IEnumerable<TEntity>> FindAsync(
+            Expression<Func<TEntity, bool>> predicate,
+            CancellationToken cancellationToken,
+            params Expression<Func<TEntity, object>>[] includes)
         {
-            Set.Remove(entity);
+            var query = Context.Set<TEntity>().Where(predicate);
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+            return await query.ToArrayAsync(cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <inheritdoc />
+        public virtual Task AddAsync(TEntity entity, CancellationToken cancellationToken)
+        {
+            Set.Add(entity);
             return InternalHelpers.CompletedTask;
         }
 
         /// <inheritdoc />
-        public virtual Task RemoveRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken)
+        public virtual Task RemoveAsync(TEntity entity, CancellationToken cancellationToken)
         {
-            Set.RemoveRange(entities);
+            Set.Remove(entity);
             return InternalHelpers.CompletedTask;
         }
 

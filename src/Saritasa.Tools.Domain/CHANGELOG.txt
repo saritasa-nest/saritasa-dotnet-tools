@@ -1,4 +1,9 @@
-﻿0.2.5 [2017-08-07]
+﻿0.3.0
+[-] Remove IAsyncRepository, move methods to IRepository.
+[-] Remove GetOrAdd, GetOrThrow methods.
+[*] Update async methods for repository, some methods were made as extensions.
+
+0.2.5 [2017-08-07]
 [*] ValidationException.ThrowFromObjectValidation takes into account MetadataType attribute.
 [+] Async repository abstraction.
 
