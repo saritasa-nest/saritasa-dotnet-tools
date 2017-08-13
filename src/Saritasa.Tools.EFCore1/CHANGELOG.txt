@@ -1,5 +1,5 @@
-﻿0.4.0 [TBD]
-[*] Repository update according latest domain.
+﻿0.4.0 [2017-08-13]
+[*] Repository class update according latest domain interface.
 
 0.3.0 [2017-08-07]
 [*] Force return result (ToList) for repository methods.

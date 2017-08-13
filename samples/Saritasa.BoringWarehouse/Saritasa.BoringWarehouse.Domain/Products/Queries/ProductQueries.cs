@@ -1,4 +1,6 @@
-﻿namespace Saritasa.BoringWarehouse.Domain.Products.Queries
+﻿using System.Linq;
+
+namespace Saritasa.BoringWarehouse.Domain.Products.Queries
 {
     using System.Collections.Generic;
 
@@ -20,7 +22,7 @@
 
         public IEnumerable<Product> GetAll()
         {
-            return uow.ProductRepository.GetAll(Product.DefaultInclude);
+            return uow.ProductRepository.GetAll(Product.DefaultInclude.ToArray());
         }
 
         public PagedResult<Product> Search(ProductsObjectQuery objectQuery)

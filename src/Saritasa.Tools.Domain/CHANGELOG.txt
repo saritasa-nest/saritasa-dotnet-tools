@@ -1,4 +1,4 @@
-﻿0.3.0
+﻿0.3.0 [2017-08-13]
 [-] Remove IAsyncRepository, move methods to IRepository.
 [-] Remove GetOrAdd, GetOrThrow methods.
 [*] Update async methods for repository, some methods were made as extensions.
