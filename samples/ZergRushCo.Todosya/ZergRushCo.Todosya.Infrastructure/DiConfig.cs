@@ -38,9 +38,12 @@ namespace ZergRushCo.Todosya.Infrastructure
             // Pipelines container.
             var pipelinesContainer = RegisterPipelines();
             builder.RegisterInstance(pipelinesContainer).As<IMessagePipelineContainer>().SingleInstance();
-            builder.RegisterType<DefaultMessagePipelineService>().As<IMessagePipelineService>().InstancePerRequest()
+            builder.RegisterType<DefaultMessagePipelineService>().As<IMessagePipelineService>()
+                .InstancePerRequest()
                 .InstancePerLifetimeScope();
-            builder.RegisterType<AutofacServiceProvider>().As<IServiceProvider>().InstancePerRequest()
+            builder.RegisterType<Autofac.Extensions.DependencyInjection.AutofacServiceProvider>()
+                .As<IServiceProvider>()
+                .InstancePerRequest()
                 .InstancePerLifetimeScope();
 
             // Register queries as separate objects.

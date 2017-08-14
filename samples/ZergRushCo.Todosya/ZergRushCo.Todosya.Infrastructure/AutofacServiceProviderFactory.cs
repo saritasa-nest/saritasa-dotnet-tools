@@ -1,5 +1,6 @@
 ﻿using System;
 using Autofac;
+using Autofac.Extensions.DependencyInjection;
 using Saritasa.Tools.Messages.Abstractions;
 
 namespace ZergRushCo.Todosya.Infrastructure
