@@ -1,4 +1,5 @@
-﻿0.1.3 [TBD]
+﻿0.2.0 [TBD]
+[+] Upgrade to netstandard 2.0, remove MailMessage stubs.
 
 0.1.2 [2017-02-11]
 [*] MultiSmtpClientEmailSender now sets ServicePoint.ConnectionLimit to make separates connections.

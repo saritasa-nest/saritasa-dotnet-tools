@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-#if NET452
 using System;
 using System.Collections.Generic;
 using System.Net.Mail;
@@ -42,7 +41,7 @@ namespace Saritasa.Tools.Emails.Interceptors
             AfterSend = afterSend;
         }
 
-        void Save(MailMessage message)
+        private void Save(MailMessage message)
         {
             // Sometimes we have emails sending at the same second, add postfix in that case.
             lock (@lock)
@@ -56,7 +55,7 @@ namespace Saritasa.Tools.Emails.Interceptors
             }
         }
 
-#region IEmailInterceptor implementation
+        #region IEmailInterceptor implementation
 
         /// <inheritdoc />
         public void Sending(MailMessage mailMessage, IDictionary<string, object> data, ref bool cancel)
@@ -76,14 +75,14 @@ namespace Saritasa.Tools.Emails.Interceptors
             }
         }
 
-#endregion
+        #endregion
 
         /// <summary>
         /// Saves the specified message to disk.
         /// </summary>
         /// <param name="message">The message.</param>
         /// <param name="fileName">Name of the file.</param>
-        static void SaveMailMessage(MailMessage message, string fileName)
+        private static void SaveMailMessage(MailMessage message, string fileName)
         {
             var assembly = typeof(SmtpClient).Assembly;
             var mailWriterType = assembly.GetType("System.Net.Mail.MailWriter");
@@ -144,4 +143,3 @@ namespace Saritasa.Tools.Emails.Interceptors
         }
     }
 }
-#endif

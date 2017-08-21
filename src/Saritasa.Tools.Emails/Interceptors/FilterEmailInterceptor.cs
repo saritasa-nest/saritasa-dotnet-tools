@@ -3,9 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-#if NET452
 using System.Net.Mail;
-#endif
 using System.Text.RegularExpressions;
 
 namespace Saritasa.Tools.Emails.Interceptors
@@ -15,7 +13,7 @@ namespace Saritasa.Tools.Emails.Interceptors
     /// </summary>
     public class FilterEmailInterceptor : IEmailInterceptor
     {
-        readonly IList<string> approvedAddresses = new List<string>();
+        private readonly IList<string> approvedAddresses = new List<string>();
 
         /// <summary>
         /// Gets approved addresses. Emails that do not match to these address patterns will not be sent.

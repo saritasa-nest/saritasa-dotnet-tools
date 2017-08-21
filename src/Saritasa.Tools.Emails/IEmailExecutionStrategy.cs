@@ -2,9 +2,7 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-#if NET452
 using System.Net.Mail;
-#endif
 using System.Threading;
 using System.Threading.Tasks;
 

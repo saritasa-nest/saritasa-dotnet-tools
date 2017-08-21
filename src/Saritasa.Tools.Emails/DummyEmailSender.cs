@@ -3,9 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-#if NET452
 using System.Net.Mail;
-#endif
 using System.Threading.Tasks;
 
 namespace Saritasa.Tools.Emails
