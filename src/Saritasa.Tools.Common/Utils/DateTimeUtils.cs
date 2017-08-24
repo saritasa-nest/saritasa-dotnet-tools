@@ -66,6 +66,9 @@ namespace Saritasa.Tools.Common.Utils
             var result = target.Truncate(period);
             switch (period)
             {
+                case DateTimePeriod.Millisecond:
+                    result = result.AddMilliseconds(1);
+                    break;
                 case DateTimePeriod.Second:
                     result = result.AddSeconds(1);
                     break;
@@ -90,6 +93,9 @@ namespace Saritasa.Tools.Common.Utils
                 case DateTimePeriod.Year:
                     result = result.AddYears(1);
                     break;
+                case DateTimePeriod.Decade:
+                    result = result.AddYears(10);
+                    break;
                 case DateTimePeriod.None:
                 default:
                     return target;
@@ -109,6 +115,9 @@ namespace Saritasa.Tools.Common.Utils
         {
             switch (period)
             {
+                case DateTimePeriod.Millisecond:
+                    return new DateTime(target.Year, target.Month, target.Day, target.Hour, target.Minute, target.Second,
+                        value, target.Kind);
                 case DateTimePeriod.Second:
                     return new DateTime(target.Year, target.Month, target.Day, target.Hour, target.Minute, value,
                         target.Millisecond, target.Kind);
@@ -128,10 +137,13 @@ namespace Saritasa.Tools.Common.Utils
                     return new DateTime(target.Year, value, target.Day, target.Hour, target.Minute, target.Second,
                         target.Millisecond, target.Kind);
                 case DateTimePeriod.Quarter:
-                    throw new ArgumentException(string.Format(Properties.Strings.ArgumentCannotBeThePeriod, period.ToString()), nameof(period));
+                    throw new ArgumentException(string.Format(Properties.Strings.ArgumentCannotBeThePeriod, period), nameof(period));
                 case DateTimePeriod.Year:
                     return new DateTime(value, target.Month, target.Day, target.Hour, target.Minute, target.Second,
                         target.Millisecond, target.Kind);
+                case DateTimePeriod.Decade:
+                    throw new ArgumentException(
+                        String.Format(Properties.Strings.ArgumentCannotBeThePeriod, period), nameof(period));
                 case DateTimePeriod.None:
                 default:
                     return target;
@@ -147,16 +159,19 @@ namespace Saritasa.Tools.Common.Utils
         /// <returns>Truncated date.</returns>
         public static DateTime Truncate(DateTime target, DateTimePeriod period, CultureInfo cultureInfo = null)
         {
+            // For reference https://www.postgresql.org/docs/9.5/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
             switch (period)
             {
+                case DateTimePeriod.Millisecond:
+                    return target;
                 case DateTimePeriod.Second:
-                    return new DateTime(target.Year, target.Month, target.Day, target.Hour, target.Minute, 0, target.Kind);
+                    return new DateTime(target.Year, target.Month, target.Day, target.Hour, target.Minute, target.Second, target.Kind);
                 case DateTimePeriod.Minute:
-                    return new DateTime(target.Year, target.Month, target.Day, target.Hour, 0, 0, target.Kind);
+                    return new DateTime(target.Year, target.Month, target.Day, target.Hour, target.Minute, 0, target.Kind);
                 case DateTimePeriod.Hour:
-                    return new DateTime(target.Year, target.Month, target.Day, 0, 0, 0, target.Kind);
+                    return new DateTime(target.Year, target.Month, target.Day, target.Hour, 0, 0, target.Kind);
                 case DateTimePeriod.Day:
-                    return new DateTime(target.Year, target.Month, 1, 0, 0, 0, target.Kind);
+                    return new DateTime(target.Year, target.Month, target.Day, 0, 0, 0, target.Kind);
                 case DateTimePeriod.Week:
                     var firstDayOfWeek = cultureInfo?.DateTimeFormat.FirstDayOfWeek ?? CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek;
                     return new DateTime(target.Year, target.Month, target.Day, 0, 0, 0, target.Kind)
@@ -168,6 +183,8 @@ namespace Saritasa.Tools.Common.Utils
                         .AddMonths(-(target.Month - 1) % 3);
                 case DateTimePeriod.Year:
                     return new DateTime(target.Year, 1, 1, 0, 0, 0, target.Kind);
+                case DateTimePeriod.Decade:
+                    return new DateTime(target.Year - (target.Year % 10), 1, 1, 0, 0, 0, target.Kind);
                 case DateTimePeriod.None:
                 default:
                     return target;
@@ -234,6 +251,8 @@ namespace Saritasa.Tools.Common.Utils
 
             switch (period)
             {
+                case DateTimePeriod.Millisecond:
+                    return (target2 - target1).TotalMilliseconds;
                 case DateTimePeriod.Second:
                     return (target2 - target1).TotalSeconds;
                 case DateTimePeriod.Minute:
@@ -250,6 +269,8 @@ namespace Saritasa.Tools.Common.Utils
                     return GetMonthDiff(target2, target1) / 3;
                 case DateTimePeriod.Year:
                     return GetMonthDiff(target2, target1) / 12;
+                case DateTimePeriod.Decade:
+                    return GetMonthDiff(target2, target1) / 12 * 10;
             }
 
             throw new ArgumentException(nameof(period));

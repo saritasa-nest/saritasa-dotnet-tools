@@ -13,6 +13,7 @@ using Saritasa.Tools.Messages.Queries.PipelineMiddlewares;
 using SandBox.Commands;
 using SandBox.Events;
 using SandBox.Queries;
+using Saritasa.Tools.Common.Utils;
 using Saritasa.Tools.Messages.Abstractions.Commands;
 using Saritasa.Tools.Messages.Abstractions.Events;
 using Saritasa.Tools.Messages.Abstractions.Queries;
@@ -49,7 +50,7 @@ namespace SandBox
         /// <summary>
         /// Demo init.
         /// </summary>
-        static void Init()
+        private static void Init()
         {
             Paging.Try1();
 
@@ -87,7 +88,7 @@ namespace SandBox
             );
         }
 
-        static void Test()
+        private static void Test()
         {
             var pipelineService = new DefaultMessagePipelineService();
             pipelineService.ServiceProvider = new FuncServiceProvider(Resolver);
@@ -125,7 +126,7 @@ namespace SandBox
         /// Entry point.
         /// </summary>
         /// <param name="args">Arguments.</param>
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             Init();
             Test();

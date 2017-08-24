@@ -14,22 +14,27 @@ namespace Saritasa.Tools.Common.Utils
         None,
 
         /// <summary>
-        /// Second. Truncation example: 2016-03-08 07:05:23 -> 2016-03-08 07:05:00.
+        /// Millisecond. Does not have truncation.
+        /// </summary>
+        Millisecond,
+
+        /// <summary>
+        /// Second. Truncation example: 2016-03-08 07:05:23.100 -> 2016-03-08 07:05:23.
         /// </summary>
         Second,
 
         /// <summary>
-        /// Minute. Truncation example: 2016-03-08 07:05:23 -> 2016-03-08 07:00:00.
+        /// Minute. Truncation example: 2016-03-08 07:05:23 -> 2016-03-08 07:05:00.
         /// </summary>
         Minute,
 
         /// <summary>
-        /// Hour. Truncation example: 2016-03-08 07:05:23 -> 2016-03-08 00:00:00.
+        /// Hour. Truncation example: 2016-03-08 07:05:23 -> 2016-03-08 07:00:00.
         /// </summary>
         Hour,
 
         /// <summary>
-        /// Day. Truncation example: 2016-03-08 07:05:23 -> 2016-03-01 00:00:00.
+        /// Day. Truncation example: 2016-03-08 07:05:23 -> 2016-03-08 00:00:00.
         /// </summary>
         Day,
 
@@ -52,6 +57,11 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Year. Truncation example: 2016-03-08 07:05:23 -> 2016-01-01 00:00:00.
         /// </summary>
-        Year
+        Year,
+
+        /// <summary>
+        /// Decade. Truncation example: 2016-03-08 07:05:23 -> 2010-01-01 00:00:00.
+        /// </summary>
+        Decade
     }
 }

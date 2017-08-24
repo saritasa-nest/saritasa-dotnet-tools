@@ -1,6 +1,8 @@
-﻿0.4.0 [TBD]
+﻿0.4.0 [2017-08-24]
 [*] Improve pagination API. Instead of Wrap methods introduce ToMetadataObject and CastMetadataEnumerable.
 [*] XML documentation fixes.
+[+] Add Decade datetime period.
+[*] Fix truncation for seconds, minutes, hours and date.
 
 0.3.3 [2017-07-06]
 [*] Guard.IsNotEmpty does not check white spaces anymore, use Guard.IsNotEmptyOrWhiteSpace .

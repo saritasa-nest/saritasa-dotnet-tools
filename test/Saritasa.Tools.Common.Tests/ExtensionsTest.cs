@@ -29,7 +29,7 @@ namespace Saritasa.Tools.Common.Tests
         public void Dictionary_get_default_value_should_get_default()
         {
             // Arrange
-            Dictionary<int, string> dict = new Dictionary<int, string>();
+            IDictionary<int, string> dict = new Dictionary<int, string>();
             dict.Add(1, "abc");
             dict.Add(2, "bca");
 
@@ -42,7 +42,7 @@ namespace Saritasa.Tools.Common.Tests
         public void Dictionary_add_or_update_should_return_new_value()
         {
             // Arrange
-            Dictionary<int, int> dict = new Dictionary<int, int>();
+            IDictionary<int, int> dict = new Dictionary<int, int>();
             dict[1] = 10;
 
             // Act
