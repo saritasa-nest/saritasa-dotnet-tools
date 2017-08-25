@@ -163,7 +163,8 @@ namespace Saritasa.Tools.Common.Utils
             switch (period)
             {
                 case DateTimePeriod.Millisecond:
-                    return target;
+                    return new DateTime(target.Year, target.Month, target.Day, target.Hour, target.Minute, target.Second,
+                        target.Millisecond, target.Kind);
                 case DateTimePeriod.Second:
                     return new DateTime(target.Year, target.Month, target.Day, target.Hour, target.Minute, target.Second, target.Kind);
                 case DateTimePeriod.Minute:

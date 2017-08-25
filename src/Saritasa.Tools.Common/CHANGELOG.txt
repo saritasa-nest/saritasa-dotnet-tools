@@ -1,4 +1,7 @@
-﻿0.4.0 [2017-08-24]
+﻿0.4.1 [TBD]
+[*] Fix datetime millisecond truncation.
+
+0.4.0 [2017-08-24]
 [*] Improve pagination API. Instead of Wrap methods introduce ToMetadataObject and CastMetadataEnumerable.
 [*] XML documentation fixes.
 [+] Add Decade datetime period.

@@ -14,7 +14,7 @@ namespace Saritasa.Tools.Common.Utils
         None,
 
         /// <summary>
-        /// Millisecond. Does not have truncation.
+        /// Millisecond. Truncates nanoseconds part.
         /// </summary>
         Millisecond,
 
