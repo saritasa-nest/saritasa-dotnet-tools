@@ -95,7 +95,7 @@ namespace Saritasa.Tools.Messages.Benchmark
             var uowFactory = (IUowFactory)InterfacesResolver(typeof(IUowFactory));
             for (int i = 0; i < NumberOfInterations; i++)
             {
-                var cmd = new CreateUserCommand()
+                var cmd = new CreateUserCommand
                 {
                     FirstName = "Ivan",
                     LastName = "Ivanov",
@@ -113,9 +113,9 @@ namespace Saritasa.Tools.Messages.Benchmark
             piplinesService.PipelineContainer.AddCommandPipeline()
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
                     typeof(CreateUserCommand).GetTypeInfo().Assembly))
-                .AddMiddleware(new Commands.PipelineMiddlewares.CommandExecutorMiddleware
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerResolverMiddleware())
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerExecutorMiddleware
                 {
-                    UseInternalObjectResolver = true,
                     UseParametersResolve = true
                 });
 

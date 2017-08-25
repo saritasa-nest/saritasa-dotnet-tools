@@ -14,7 +14,7 @@ namespace Saritasa.Tools.Messages.Common
     /// <summary>
     /// Provides common functionality for Command/Query/Event executor middlewares.
     /// </summary>
-    public abstract class BaseExecutorMiddleware : IMessagePipelineMiddleware, IAsyncMessagePipelineMiddleware
+    public abstract class BaseHandlerExecutorMiddleware : IMessagePipelineMiddleware, IAsyncMessagePipelineMiddleware
     {
         private const string KeyId = "id";
 
@@ -34,7 +34,7 @@ namespace Saritasa.Tools.Messages.Common
         /// <summary>
         /// .ctor
         /// </summary>
-        protected BaseExecutorMiddleware(IDictionary<string, string> parameters) : this()
+        protected BaseHandlerExecutorMiddleware(IDictionary<string, string> parameters) : this()
         {
             if (parameters == null)
             {
@@ -50,7 +50,7 @@ namespace Saritasa.Tools.Messages.Common
         /// <summary>
         /// .ctor
         /// </summary>
-        protected BaseExecutorMiddleware()
+        protected BaseHandlerExecutorMiddleware()
         {
             Id = this.GetType().Name;
         }

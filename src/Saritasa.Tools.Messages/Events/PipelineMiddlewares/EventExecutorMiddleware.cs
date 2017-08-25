@@ -17,7 +17,7 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
     /// <summary>
     /// Default event executor. It does not process events with Rejected status.
     /// </summary>
-    public class EventExecutorMiddleware : BaseExecutorMiddleware
+    public class EventExecutorMiddleware : BaseHandlerExecutorMiddleware
     {
         /// <summary>
         /// Include execution duration.

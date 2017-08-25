@@ -41,7 +41,7 @@ namespace Saritasa.Tools.Messages.Commands
         public CommandPipelineBuilder UseDefaultMiddlewares(params Assembly[] assemblies)
         {
             Pipeline.AddMiddlewares(new PipelineMiddlewares.CommandHandlerLocatorMiddleware(assemblies));
-            Pipeline.AddMiddlewares(new PipelineMiddlewares.CommandExecutorMiddleware());
+            Pipeline.AddMiddlewares(new PipelineMiddlewares.CommandHandlerExecutorMiddleware());
             return this;
         }
     }

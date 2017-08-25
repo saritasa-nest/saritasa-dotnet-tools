@@ -13,7 +13,7 @@ using Saritasa.Tools.Messages.Internal;
 namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
 {
     /// <summary>
-    /// Locate command hanlder.
+    /// Locate command handler.
     /// </summary>
     public class CommandHandlerLocatorMiddleware : BaseHandlerLocatorMiddleware
     {

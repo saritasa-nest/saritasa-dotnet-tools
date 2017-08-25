@@ -78,7 +78,8 @@ namespace Saritasa.Tools.Messages.Tests
         {
             builder.AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
                 typeof(CommandsTests).GetTypeInfo().Assembly))
-            .AddMiddleware(new Commands.PipelineMiddlewares.CommandExecutorMiddleware
+            .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerResolverMiddleware())
+            .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerExecutorMiddleware
             {
                 UseInternalObjectResolver = true,
                 UseParametersResolve = true
@@ -97,6 +98,42 @@ namespace Saritasa.Tools.Messages.Tests
             pipelineService.HandleCommand(cmd);
 
             // Assert
+            Assert.Equal("result", cmd.Out);
+        }
+
+        #endregion
+
+        #region Can_run_default_simple_generic_command
+
+        public class SimpleTestGenericCommand<T>
+        {
+            public T Id { get; set; }
+
+            public string Out { get; set; }
+        }
+
+        [CommandHandlers]
+        public class TestGenericCommandHandlers1
+        {
+            public void HandleTestCommand<T>(SimpleTestGenericCommand<T> command)
+            {
+                command.Out = "result";
+            }
+        }
+
+        [Fact]
+        public void Can_run_default_simple_generic_command()
+        {
+            // Arrange
+            var builder = pipelineService.PipelineContainer.AddCommandPipeline();
+            SetupCommandPipeline(builder);
+            var cmd = new SimpleTestGenericCommand<string> { Id = "99" };
+
+            // Act
+            pipelineService.HandleCommand(cmd);
+
+            // Assert
+            Assert.Equal("99", cmd.Id);
             Assert.Equal("result", cmd.Out);
         }
 
@@ -264,7 +301,7 @@ namespace Saritasa.Tools.Messages.Tests
             .AddMiddleware(new Commands.PipelineMiddlewares.CommandValidationMiddleware())
             .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
                 typeof(CommandsTests).GetTypeInfo().Assembly))
-            .AddMiddleware(new Commands.PipelineMiddlewares.CommandExecutorMiddleware()
+            .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerExecutorMiddleware()
             {
                 UseInternalObjectResolver = true,
                 UseParametersResolve = true
@@ -293,7 +330,7 @@ namespace Saritasa.Tools.Messages.Tests
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandValidationMiddleware())
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
                     typeof(CommandsTests).GetTypeInfo().Assembly))
-                .AddMiddleware(new Commands.PipelineMiddlewares.CommandExecutorMiddleware
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerExecutorMiddleware
                 {
                     UseInternalObjectResolver = true,
                     UseParametersResolve = true
@@ -336,7 +373,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Can find command handler by class name
+        #region Can_find_command_handler_by_class_name
 
         public class SimpleTestCommand2
         {
@@ -363,7 +400,8 @@ namespace Saritasa.Tools.Messages.Tests
                 {
                     HandlerSearchMethod = HandlerSearchMethod.ClassSuffix
                 })
-                .AddMiddleware(new Commands.PipelineMiddlewares.CommandExecutorMiddleware
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerResolverMiddleware())
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerExecutorMiddleware
                 {
                     UseInternalObjectResolver = true,
                     UseParametersResolve = true

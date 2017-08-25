@@ -17,7 +17,7 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
     /// <summary>
     /// Resolve and locate object handler for query.
     /// </summary>
-    public class QueryObjectResolverMiddleware : BaseExecutorMiddleware
+    public class QueryObjectResolverMiddleware : BaseHandlerExecutorMiddleware
     {
         private readonly IDictionary<Type, Type> interfaceResolveDict =
             new Dictionary<Type, Type>();
@@ -82,6 +82,10 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
             }
             if (queryParams.QueryObject == null)
             {
+                if (!UseInternalObjectResolver && queryParams.Method.DeclaringType.GetTypeInfo().IsInterface)
+                {
+                    queryObjectType = queryParams.Method.DeclaringType;
+                }
                 queryParams.QueryObject = ResolveObject(queryObjectType, messageContext.ServiceProvider,
                     nameof(QueryObjectResolverMiddleware));
                 if (UseInternalObjectResolver)

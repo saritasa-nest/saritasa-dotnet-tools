@@ -272,6 +272,52 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
+        #region Should_use_interface_in_case_of_external_resolver
+
+        public interface IProductQueries
+        {
+            int GetByNameCount(string name);
+        }
+
+        [QueryHandlers]
+        public class ProductQueries : IProductQueries
+        {
+            public int GetByNameCount(string name) => 974;
+
+            public static object Resolver(Type type)
+            {
+                if (type == typeof(IProductQueries))
+                {
+                    return new ProductQueries();
+                }
+                return null;
+            }
+        }
+
+        [Fact]
+        public void Should_use_interface_in_case_of_external_resolver()
+        {
+            // Arrange
+            pipelineService.ServiceProvider = new FuncServiceProvider(ProductQueries.Resolver);
+            pipelineService.PipelineContainer.AddQueryPipeline()
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectResolverMiddleware(
+                    typeof(UserQueries).GetTypeInfo().Assembly)
+                {
+                    UseInternalObjectResolver = false,
+                    UseParametersResolve = true,
+                })
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware())
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectReleaseMiddleware());
+
+            // Act
+            var result = pipelineService.Query<IProductQueries>().With(q => q.GetByNameCount("Test"));
+
+            // Assert
+            Assert.Equal(974, result);
+        }
+
+        #endregion
+
         #region Query object should not require parameterless ctor
 
         public class UserQueries2Dep

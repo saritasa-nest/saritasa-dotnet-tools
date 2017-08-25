@@ -2,6 +2,7 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,15 +15,31 @@ namespace Saritasa.Tools.Messages.Common
     /// </summary>
     public class MessagePipeline : IMessagePipeline, IDisposable
     {
+        private IMessagePipelineMiddleware[] middlewares;
+
         /// <summary>
         /// Middlewares list.
         /// </summary>
-        public IMessagePipelineMiddleware[] Middlewares { get; set; }
+        public IMessagePipelineMiddleware[] Middlewares
+        {
+            get => middlewares;
+            set
+            {
+                middlewares = value;
+                InitializeMiddlewaresChains();
+            }
+        }
 
         /// <summary>
         /// Options.
         /// </summary>
         public MessagePipelineOptions Options { get; set; } = new MessagePipelineOptions();
+
+        private Action<IMessageContext>[] middlewaresChain;
+
+        private Func<IMessageContext, CancellationToken, Task>[] asyncMiddlewaresChain;
+
+        private readonly object objLock = new object();
 
         #region IMessagePipeline
 
@@ -32,10 +49,11 @@ namespace Saritasa.Tools.Messages.Common
         /// <inheritdoc />
         public virtual void Invoke(IMessageContext messageContext)
         {
+            var localMiddlewaresChain = middlewaresChain;
             messageContext.Status = ProcessingStatus.Processing;
-            for (int i = 0; i < Middlewares.Length; i++)
+            for (int i = 0; i < localMiddlewaresChain.Length; i++)
             {
-                Middlewares[i].Handle(messageContext);
+                localMiddlewaresChain[i](messageContext);
             }
             if (Options.ThrowExceptionOnFail && messageContext.FailException != null)
             {
@@ -53,17 +71,11 @@ namespace Saritasa.Tools.Messages.Common
         public virtual async Task InvokeAsync(IMessageContext messageContext, CancellationToken cancellationToken)
         {
             // Execute message thru all middlewares.
-            for (int i = 0; i < Middlewares.Length; i++)
+            var localAsyncMiddlewaresChain = asyncMiddlewaresChain;
+            messageContext.Status = ProcessingStatus.Processing;
+            for (int i = 0; i < localAsyncMiddlewaresChain.Length; i++)
             {
-                var asyncHandler = Middlewares[i] as IAsyncMessagePipelineMiddleware;
-                if (asyncHandler != null)
-                {
-                    await asyncHandler.HandleAsync(messageContext, cancellationToken).ConfigureAwait(false);
-                }
-                else
-                {
-                    Middlewares[i].Handle(messageContext);
-                }
+                await localAsyncMiddlewaresChain[i](messageContext, cancellationToken);
             }
             if (Options.ThrowExceptionOnFail && messageContext.FailException != null)
             {
@@ -73,11 +85,79 @@ namespace Saritasa.Tools.Messages.Common
 
         #endregion
 
+        private Func<IMessageContext, CancellationToken, Task> CreateTaskCallWrapper(Action<IMessageContext> action)
+        {
+            Func<IMessageContext, CancellationToken, Task> func = (mc, ct) =>
+            {
+                action(mc);
+                return Task.FromResult(0);
+            };
+            return func;
+        }
+
+        private void InitializeMiddlewaresChains()
+        {
+            lock (objLock)
+            {
+                var localMiddlewares = middlewares;
+                middlewaresChain = CreateSyncMiddlewaresChain(localMiddlewares).ToArray();
+                asyncMiddlewaresChain = CreateAsyncMiddlewaresChain(localMiddlewares).ToArray();
+            }
+        }
+
+        private List<Action<IMessageContext>> CreateSyncMiddlewaresChain(IMessagePipelineMiddleware[] localMiddlewares)
+        {
+            var list = new List<Action<IMessageContext>>();
+            for (int i = 0; i < localMiddlewares.Length; i++)
+            {
+                list.Add(localMiddlewares[i].Handle);
+            }
+            for (int i = localMiddlewares.Length - 1; i >= 0; i--)
+            {
+                var postActionMiddleware = localMiddlewares[i] as IMessagePipelinePostAction;
+                if (postActionMiddleware != null)
+                {
+                    list.Add(postActionMiddleware.PostHandle);
+                }
+            }
+            return list;
+        }
+
+        private List<Func<IMessageContext, CancellationToken, Task>> CreateAsyncMiddlewaresChain(
+            IMessagePipelineMiddleware[] localMiddlewares)
+        {
+            var list = new List<Func<IMessageContext, CancellationToken, Task>>();
+            for (int i = 0; i < localMiddlewares.Length; i++)
+            {
+                var asyncMiddleware = localMiddlewares[i] as IAsyncMessagePipelineMiddleware;
+                if (asyncMiddleware != null)
+                {
+                    list.Add(asyncMiddleware.HandleAsync);
+                }
+                else
+                {
+                    list.Add(CreateTaskCallWrapper(localMiddlewares[i].Handle));
+                }
+            }
+            for (int i = localMiddlewares.Length - 1; i >= 0; i--)
+            {
+                var postActionMiddleware = localMiddlewares[i] as IMessagePipelinePostAction;
+                if (postActionMiddleware != null)
+                {
+                    list.Add(CreateTaskCallWrapper(postActionMiddleware.PostHandle));
+                }
+            }
+            return list;
+        }
+
         #region Dispose
 
         bool disposed;
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Releases middleware resources.
+        /// </summary>
+        /// <param name="disposing">Is called from Dispose method.</param>
         protected virtual void Dispose(bool disposing)
         {
             if (!disposed)

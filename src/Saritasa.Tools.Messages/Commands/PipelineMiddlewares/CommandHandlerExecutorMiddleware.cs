@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
@@ -17,7 +16,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
     /// <summary>
     /// Default command executor. It does not process commands with Rejected status.
     /// </summary>
-    public class CommandExecutorMiddleware : BaseExecutorMiddleware
+    public class CommandHandlerExecutorMiddleware : BaseHandlerExecutorMiddleware
     {
         /// <summary>
         /// Include execution duration.
@@ -27,7 +26,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         /// <summary>
         /// .ctor
         /// </summary>
-        public CommandExecutorMiddleware()
+        public CommandHandlerExecutorMiddleware()
         {
             Id = this.GetType().Name;
         }
@@ -36,48 +35,16 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         /// .ctor
         /// </summary>
         /// <param name="parameters">Input parameters as parameters.</param>
-        public CommandExecutorMiddleware(IDictionary<string, string> parameters) : base(parameters)
+        public CommandHandlerExecutorMiddleware(IDictionary<string, string> parameters) : base(parameters)
         {
             Id = this.GetType().Name;
-        }
-
-#if !NET40 && !NET35
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
-        private object GetHandler(IMessageContext messageContext, MethodInfo handlerMethod)
-        {
-            // Rejected commands are not needed to process.
-            if (messageContext.Status == ProcessingStatus.Rejected)
-            {
-                return null;
-            }
-
-            object handler = null;
-
-            // When command class contains Handle method within.
-            if (handlerMethod.DeclaringType == messageContext.Content.GetType())
-            {
-                handler = messageContext.Content;
-            }
-            else
-            {
-                handler = ResolveObject(handlerMethod.DeclaringType, messageContext.ServiceProvider, nameof(CommandExecutorMiddleware));
-            }
-
-            // If we don't have handler - throw exception.
-            if (handler == null)
-            {
-                messageContext.Status = ProcessingStatus.Rejected;
-                throw new CommandHandlerNotFoundException(messageContext.Content.GetType().Name);
-            }
-            return handler;
         }
 
         /// <inheritdoc />
         public override void Handle(IMessageContext messageContext)
         {
             var handlerMethod = messageContext.GetItemByKey<MethodInfo>(CommandHandlerLocatorMiddleware.HandlerMethodKey);
-            var handler = GetHandler(messageContext, handlerMethod);
+            var handler = messageContext.GetItemByKey<object>(CommandHandlerResolverMiddleware.HandlerObjectKey);
             if (handler == null)
             {
                 return;
@@ -99,7 +66,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             catch (TargetInvocationException ex)
             {
                 InternalLogger.Warn(string.Format(Properties.Strings.ExceptionWhileProcess,
-                    nameof(TargetInvocationException), handler, ex), nameof(CommandExecutorMiddleware));
+                    nameof(TargetInvocationException), handler, ex), nameof(CommandHandlerExecutorMiddleware));
                 messageContext.Status = ProcessingStatus.Failed;
                 if (ex.InnerException != null)
                 {
@@ -109,7 +76,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             catch (TargetException ex)
             {
                 InternalLogger.Warn(string.Format(Properties.Strings.ExceptionWhileProcess,
-                    nameof(TargetException), handler, ex), nameof(CommandExecutorMiddleware));
+                    nameof(TargetException), handler, ex), nameof(CommandHandlerExecutorMiddleware));
                 messageContext.Status = ProcessingStatus.Failed;
                 if (ex.InnerException != null)
                 {
@@ -119,19 +86,12 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             catch (Exception ex)
             {
                 InternalLogger.Warn(string.Format(Properties.Strings.ExceptionWhileProcess,
-                    nameof(Exception), handler, ex), nameof(CommandExecutorMiddleware));
+                    nameof(Exception), handler, ex), nameof(CommandHandlerExecutorMiddleware));
                 messageContext.Status = ProcessingStatus.Failed;
                 messageContext.FailException = ex;
             }
             finally
             {
-                // Release handler.
-                if (UseInternalObjectResolver)
-                {
-                    var disposable = handler as IDisposable;
-                    disposable?.Dispose();
-                }
-
                 if (stopwatch != null)
                 {
                     stopwatch.Stop();
@@ -149,7 +109,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         public override async Task HandleAsync(IMessageContext messageContext, CancellationToken cancellationToken)
         {
             var handlerMethod = messageContext.GetItemByKey<MethodInfo>(CommandHandlerLocatorMiddleware.HandlerMethodKey);
-            var handler = GetHandler(messageContext, handlerMethod);
+            var handler = messageContext.GetItemByKey<object>(CommandHandlerResolverMiddleware.HandlerObjectKey);
             if (handler == null)
             {
                 return;
@@ -171,7 +131,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             catch (TargetInvocationException ex)
             {
                 InternalLogger.Warn(string.Format(Properties.Strings.ExceptionWhileProcess,
-                    nameof(TargetInvocationException), handler, ex), nameof(CommandExecutorMiddleware));
+                    nameof(TargetInvocationException), handler, ex), nameof(CommandHandlerExecutorMiddleware));
                 messageContext.Status = ProcessingStatus.Failed;
                 if (ex.InnerException != null)
                 {
@@ -181,7 +141,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             catch (TargetException ex)
             {
                 InternalLogger.Warn(string.Format(Properties.Strings.ExceptionWhileProcess,
-                    nameof(TargetException), handler, ex), nameof(CommandExecutorMiddleware));
+                    nameof(TargetException), handler, ex), nameof(CommandHandlerExecutorMiddleware));
                 messageContext.Status = ProcessingStatus.Failed;
                 if (ex.InnerException != null)
                 {
@@ -191,19 +151,12 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             catch (Exception ex)
             {
                 InternalLogger.Warn(string.Format(Properties.Strings.ExceptionWhileProcess,
-                    nameof(Exception), handler, ex), nameof(CommandExecutorMiddleware));
+                    nameof(Exception), handler, ex), nameof(CommandHandlerExecutorMiddleware));
                 messageContext.Status = ProcessingStatus.Failed;
                 messageContext.FailException = ex;
             }
             finally
             {
-                // Release handler.
-                if (UseInternalObjectResolver)
-                {
-                    var disposable = handler as IDisposable;
-                    disposable?.Dispose();
-                }
-
                 if (stopwatch != null)
                 {
                     stopwatch.Stop();

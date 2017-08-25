@@ -50,7 +50,8 @@ namespace Saritasa.Tools.Messages.Tests
             pipelineService.PipelineContainer.AddCommandPipeline()
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
                     typeof(CommandsTests).GetTypeInfo().Assembly))
-                .AddMiddleware(new Commands.PipelineMiddlewares.CommandExecutorMiddleware
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerResolverMiddleware())
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerExecutorMiddleware
                 {
                     UseInternalObjectResolver = true,
                     UseParametersResolve = true
@@ -71,7 +72,8 @@ namespace Saritasa.Tools.Messages.Tests
             pipelineService.PipelineContainer.AddCommandPipeline()
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
                     typeof(CommandsTests).GetTypeInfo().Assembly))
-                .AddMiddleware(new Commands.PipelineMiddlewares.CommandExecutorMiddleware
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerResolverMiddleware())
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerExecutorMiddleware
                 {
                     UseInternalObjectResolver = true,
                     UseParametersResolve = true
@@ -171,9 +173,12 @@ namespace Saritasa.Tools.Messages.Tests
             pipelineService.PipelineContainer.AddCommandPipeline()
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
                     typeof(CommandsTests).GetTypeInfo().Assembly))
-                .AddMiddleware(new Commands.PipelineMiddlewares.CommandExecutorMiddleware
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerResolverMiddleware
                 {
                     UseInternalObjectResolver = false,
+                })
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerExecutorMiddleware
+                {
                     UseParametersResolve = true
                 });
             var cmd = new TestCommand();
