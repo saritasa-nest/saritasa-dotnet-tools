@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Saritasa.Tools.Messages.Abstractions;
-using JetBrains.Annotations;
 using Saritasa.Tools.Messages.Configuration;
 
 namespace Saritasa.Tools.Messages.Common

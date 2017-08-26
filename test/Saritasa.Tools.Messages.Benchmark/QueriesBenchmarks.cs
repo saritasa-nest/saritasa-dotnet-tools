@@ -41,8 +41,7 @@ namespace Saritasa.Tools.Messages.Benchmark
             pipelineService.PipelineContainer.AddQueryPipeline()
                 .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectResolverMiddleware()
                 {
-                    UseInternalObjectResolver = true,
-                    UseParametersResolve = true,
+                    UseInternalObjectResolver = true
                 })
                 .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware())
                 .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectReleaseMiddleware());

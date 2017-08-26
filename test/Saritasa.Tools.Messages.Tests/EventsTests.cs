@@ -94,7 +94,6 @@ namespace Saritasa.Tools.Messages.Tests
                 .AddMiddleware(new Events.PipelineMiddlewares.EventHandlerResolverMiddleware())
                 .AddMiddleware(new Events.PipelineMiddlewares.EventHandlerExecutorMiddleware
                 {
-                    UseInternalObjectResolver = true,
                     UseParametersResolve = true
                 });
         }
@@ -155,7 +154,6 @@ namespace Saritasa.Tools.Messages.Tests
                 .AddMiddleware(new Events.PipelineMiddlewares.EventHandlerResolverMiddleware())
                 .AddMiddleware(new Events.PipelineMiddlewares.EventHandlerExecutorMiddleware
                 {
-                    UseInternalObjectResolver = true,
                     UseParametersResolve = true
                 });
             var ev = new DomainTestEvent();
@@ -228,7 +226,6 @@ namespace Saritasa.Tools.Messages.Tests
                 .AddMiddleware(new Events.PipelineMiddlewares.EventHandlerResolverMiddleware())
                 .AddMiddleware(new Events.PipelineMiddlewares.EventHandlerExecutorMiddleware
                 {
-                    UseInternalObjectResolver = true,
                     UseParametersResolve = true
                 });
 

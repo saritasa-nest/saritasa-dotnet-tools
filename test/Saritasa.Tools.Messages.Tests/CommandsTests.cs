@@ -81,7 +81,6 @@ namespace Saritasa.Tools.Messages.Tests
             .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerResolverMiddleware())
             .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerExecutorMiddleware
             {
-                UseInternalObjectResolver = true,
                 UseParametersResolve = true
             });
         }
@@ -303,7 +302,6 @@ namespace Saritasa.Tools.Messages.Tests
                 typeof(CommandsTests).GetTypeInfo().Assembly))
             .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerExecutorMiddleware()
             {
-                UseInternalObjectResolver = true,
                 UseParametersResolve = true
             });
             var cmd = new CommandWithValidation
@@ -332,10 +330,9 @@ namespace Saritasa.Tools.Messages.Tests
                     typeof(CommandsTests).GetTypeInfo().Assembly))
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerExecutorMiddleware
                 {
-                    UseInternalObjectResolver = true,
                     UseParametersResolve = true
                 });
-            var cmd = new CommandWithValidation()
+            var cmd = new CommandWithValidation
             {
                 PercentInt = 20,
                 Name = "Mr Robot",
@@ -403,7 +400,6 @@ namespace Saritasa.Tools.Messages.Tests
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerResolverMiddleware())
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerExecutorMiddleware
                 {
-                    UseInternalObjectResolver = true,
                     UseParametersResolve = true
                 });
             var cmd = new SimpleTestCommand2 { Id = 6 };

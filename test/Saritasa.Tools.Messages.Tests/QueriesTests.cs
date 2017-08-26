@@ -66,10 +66,6 @@ namespace Saritasa.Tools.Messages.Tests
 
             public IList<int> SimpleQueryWithDependency(int a, int b, IInterfaceB dependencyB)
             {
-                if (dependencyB == null)
-                {
-                    return null;
-                }
                 return new List<int> { a, b };
             }
         }
@@ -79,8 +75,7 @@ namespace Saritasa.Tools.Messages.Tests
             builder
                 .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectResolverMiddleware()
                 {
-                    UseInternalObjectResolver = true,
-                    UseParametersResolve = true,
+                    UseInternalObjectResolver = true
                 })
                 .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware())
                 .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectReleaseMiddleware());
@@ -127,22 +122,6 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         #endregion
-
-        [Fact]
-        public void Can_run_query_with_resolving()
-        {
-            // Arrange
-            pipelineService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
-            SetupQueryPipeline(pipelineService.PipelineContainer.AddQueryPipeline());
-
-            // Act
-            var result = pipelineService.Query<QueryObject>().With(q => q.SimpleQueryWithDependency(10, 20, null));
-
-            // Assert
-            Assert.NotNull(result);
-            Assert.Equal(2, result.Count);
-            Assert.Equal(20, result[1]);
-        }
 
         [Fact]
         public void Can_run_query_from_raw_message()
@@ -257,8 +236,7 @@ namespace Saritasa.Tools.Messages.Tests
                 .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectResolverMiddleware(
                     typeof(UserQueries).GetTypeInfo().Assembly)
                 {
-                    UseInternalObjectResolver = true,
-                    UseParametersResolve = true,
+                    UseInternalObjectResolver = true
                 })
                 .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware())
                 .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectReleaseMiddleware());
@@ -304,7 +282,6 @@ namespace Saritasa.Tools.Messages.Tests
                     typeof(UserQueries).GetTypeInfo().Assembly)
                 {
                     UseInternalObjectResolver = false,
-                    UseParametersResolve = true,
                 })
                 .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware())
                 .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectReleaseMiddleware());

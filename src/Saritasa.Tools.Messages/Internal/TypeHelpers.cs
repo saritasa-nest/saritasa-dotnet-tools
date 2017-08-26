@@ -79,34 +79,6 @@ namespace Saritasa.Tools.Messages.Internal
             return obj;
         }
 
-        internal static void ResolveForParameters(object[] parameterValues, ParameterInfo[] parameters,
-            Func<Type, object> resolver, string loggingSource = "")
-        {
-            if (parameterValues.Length != parameters.Length)
-            {
-                InternalLogger.Warn("Provided parameters count does not match method parameters count.", loggingSource);
-                return;
-            }
-
-            for (int i = 0; i < parameterValues.Length; i++)
-            {
-                if (parameterValues[i] != null)
-                {
-                    continue;
-                }
-
-                var type = parameters[i].ParameterType;
-                try
-                {
-                    parameterValues[i] = resolver(type);
-                }
-                catch (Exception ex)
-                {
-                    InternalLogger.Warn($"Cannot resolve parameter of type {type}: {ex}.", loggingSource);
-                }
-            }
-        }
-
         /// <summary>
         /// Converts obj to type.
         /// </summary>

@@ -53,7 +53,6 @@ namespace Saritasa.Tools.Messages.Tests
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerResolverMiddleware())
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerExecutorMiddleware
                 {
-                    UseInternalObjectResolver = true,
                     UseParametersResolve = true
                 });
             var cmd = new TestCommand();
@@ -75,7 +74,6 @@ namespace Saritasa.Tools.Messages.Tests
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerResolverMiddleware())
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerExecutorMiddleware
                 {
-                    UseInternalObjectResolver = true,
                     UseParametersResolve = true
                 });
             var cmd = new TestCommand();
@@ -111,8 +109,7 @@ namespace Saritasa.Tools.Messages.Tests
             pipelineService.PipelineContainer.AddQueryPipeline()
                 .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectResolverMiddleware
                 {
-                    UseInternalObjectResolver = true,
-                    UseParametersResolve = true
+                    UseInternalObjectResolver = true
                 })
                 .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware())
                 .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectReleaseMiddleware());
@@ -148,8 +145,7 @@ namespace Saritasa.Tools.Messages.Tests
             pipelineService.PipelineContainer.AddQueryPipeline()
                 .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectResolverMiddleware
                 {
-                    UseInternalObjectResolver = false,
-                    UseParametersResolve = true
+                    UseInternalObjectResolver = false
                 })
                 .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware())
                 .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectReleaseMiddleware());

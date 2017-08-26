@@ -15,16 +15,10 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
     /// </summary>
     public class QueryExecutorMiddleware : IMessagePipelineMiddleware, IAsyncMessagePipelineMiddleware
     {
-        /// <inheritdoc />
-        public string Id { get; set; }
-
         /// <summary>
-        /// .ctor
+        /// Middleware identifier.
         /// </summary>
-        public QueryExecutorMiddleware()
-        {
-            Id = this.GetType().Name;
-        }
+        public string Id { get; set; } = nameof(QueryExecutorMiddleware);
 
         /// <inheritdoc />
         public virtual void Handle(IMessageContext messageContext)

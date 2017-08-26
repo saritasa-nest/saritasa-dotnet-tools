@@ -17,10 +17,16 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
     /// <summary>
     /// Resolve and locate object handler for query.
     /// </summary>
-    public class QueryObjectResolverMiddleware : BaseHandlerExecutorMiddleware
+    public class QueryObjectResolverMiddleware : BaseHandlerResolverMiddleware,
+        IMessagePipelineMiddleware, IAsyncMessagePipelineMiddleware
     {
         private readonly IDictionary<Type, Type> interfaceResolveDict =
             new Dictionary<Type, Type>();
+
+        /// <summary>
+        /// Middleware identifier.
+        /// </summary>
+        public string Id { get; set; } = nameof(QueryObjectResolverMiddleware);
 
         /// <summary>
         /// .ctor
@@ -50,16 +56,8 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
                 );
         }
 
-        /// <summary>
-        /// .ctor
-        /// </summary>
-        /// <param name="parameters">Dictionary with parameters.</param>
-        public QueryObjectResolverMiddleware(IDictionary<string, string> parameters) : base(parameters)
-        {
-        }
-
         /// <inheritdoc />
-        public override void Handle(IMessageContext messageContext)
+        public void Handle(IMessageContext messageContext)
         {
             var queryParams = messageContext.GetItemByKey<QueryParameters>(QueryPipeline.QueryParametersKey);
 
@@ -86,8 +84,10 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
                 {
                     queryObjectType = queryParams.Method.DeclaringType;
                 }
-                queryParams.QueryObject = ResolveObject(queryObjectType, messageContext.ServiceProvider,
-                    nameof(QueryObjectResolverMiddleware));
+                queryParams.QueryObject = UseInternalObjectResolver ?
+                    TypeHelpers.ResolveObjectForType(queryObjectType, messageContext.ServiceProvider.GetService,
+                        nameof(QueryObjectResolverMiddleware)) :
+                    messageContext.ServiceProvider.GetService(queryObjectType);
                 if (UseInternalObjectResolver)
                 {
                     messageContext.Items[QueryObjectReleaseMiddleware.IsInternalResolverUsedKey] = true;
@@ -98,17 +98,12 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
                 throw new InvalidOperationException(
                     string.Format(Properties.Strings.CannotResolveQueryObject, queryObjectType));
             }
-            if (UseParametersResolve)
-            {
-                TypeHelpers.ResolveForParameters(queryParams.Parameters, queryParams.Method.GetParameters(),
-                    messageContext.ServiceProvider.GetService);
-            }
         }
 
         private static readonly Task<bool> completedTask = Task.FromResult(true);
 
         /// <inheritdoc />
-        public override Task HandleAsync(IMessageContext messageContext, CancellationToken cancellationToken)
+        public Task HandleAsync(IMessageContext messageContext, CancellationToken cancellationToken)
         {
             Handle(messageContext);
             return completedTask;

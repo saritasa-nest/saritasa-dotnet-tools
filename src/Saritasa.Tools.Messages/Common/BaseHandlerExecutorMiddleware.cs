@@ -7,7 +7,6 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Threading;
 using Saritasa.Tools.Messages.Abstractions;
-using Saritasa.Tools.Messages.Internal;
 
 namespace Saritasa.Tools.Messages.Common
 {
@@ -22,11 +21,6 @@ namespace Saritasa.Tools.Messages.Common
         /// Middleware identifier.
         /// </summary>
         public string Id { get; set; }
-
-        /// <summary>
-        /// If true the middleware will resolve project using internal resolver. Default is <c>true</c>.
-        /// </summary>
-        public bool UseInternalObjectResolver { get; set; } = true;
 
         /// <summary>
         /// If true the middleware will try to resolve executing method parameters. Default is <c>true</c>.
@@ -62,21 +56,6 @@ namespace Saritasa.Tools.Messages.Common
 
         /// <inheritdoc />
         public abstract Task HandleAsync(IMessageContext messageContext, CancellationToken cancellationToken);
-
-        /// <summary>
-        /// If UseInternalObjectResolver is turned off internal IoC container is used. Otherwise
-        /// it relies on provided IoC implementation.
-        /// </summary>
-        /// <param name="type">Type to resolve.</param>
-        /// <param name="serviceProvider">Service provider.</param>
-        /// <param name="loggingSource">Logging source. Optional.</param>
-        /// <returns>Object or null if cannot be resolved.</returns>
-        protected object ResolveObject(Type type, IServiceProvider serviceProvider, string loggingSource = "")
-        {
-            return UseInternalObjectResolver ?
-                TypeHelpers.ResolveObjectForType(type, serviceProvider.GetService, loggingSource) :
-                serviceProvider.GetService(type);
-        }
 
         private object[] GetAndResolveHandlerParameters(object obj, IServiceProvider serviceProvider,
             MethodBase handlerMethod)
