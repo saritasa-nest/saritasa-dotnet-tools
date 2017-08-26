@@ -91,7 +91,8 @@ namespace Saritasa.Tools.Messages.Tests
             builder
                 .AddMiddleware(new Events.PipelineMiddlewares.EventHandlerLocatorMiddleware(
                     typeof(EventsTests).GetTypeInfo().Assembly))
-                .AddMiddleware(new Events.PipelineMiddlewares.EventExecutorMiddleware
+                .AddMiddleware(new Events.PipelineMiddlewares.EventHandlerResolverMiddleware())
+                .AddMiddleware(new Events.PipelineMiddlewares.EventHandlerExecutorMiddleware
                 {
                     UseInternalObjectResolver = true,
                     UseParametersResolve = true
@@ -151,7 +152,8 @@ namespace Saritasa.Tools.Messages.Tests
             pipelinesService.ServiceProvider = new FuncServiceProvider(Resolver);
             pipelinesService.PipelineContainer.AddEventPipeline()
                 .AddMiddleware(new Events.PipelineMiddlewares.DomainEventLocatorMiddleware(eventsManager))
-                .AddMiddleware(new Events.PipelineMiddlewares.EventExecutorMiddleware
+                .AddMiddleware(new Events.PipelineMiddlewares.EventHandlerResolverMiddleware())
+                .AddMiddleware(new Events.PipelineMiddlewares.EventHandlerExecutorMiddleware
                 {
                     UseInternalObjectResolver = true,
                     UseParametersResolve = true
@@ -223,7 +225,8 @@ namespace Saritasa.Tools.Messages.Tests
                 .AddMiddleware(new Events.PipelineMiddlewares.DomainEventLocatorMiddleware(eventsManager))
                 .AddMiddleware(new Events.PipelineMiddlewares.EventHandlerLocatorMiddleware(
                     typeof(EventsTests).GetTypeInfo().Assembly))
-                .AddMiddleware(new Events.PipelineMiddlewares.EventExecutorMiddleware
+                .AddMiddleware(new Events.PipelineMiddlewares.EventHandlerResolverMiddleware())
+                .AddMiddleware(new Events.PipelineMiddlewares.EventHandlerExecutorMiddleware
                 {
                     UseInternalObjectResolver = true,
                     UseParametersResolve = true

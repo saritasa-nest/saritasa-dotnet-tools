@@ -13,20 +13,11 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
     /// The middleware to resolve handler object. The resolved object will be stored to
     /// "handler-object" context items.
     /// </summary>
-    public class CommandHandlerResolverMiddleware : IMessagePipelineMiddleware, IMessagePipelinePostAction
+    public class CommandHandlerResolverMiddleware : BaseHandlerResolverMiddleware,
+        IMessagePipelineMiddleware, IMessagePipelinePostAction
     {
-        /// <summary>
-        /// Handle object key.
-        /// </summary>
-        public const string HandlerObjectKey = "handler-object";
-
         /// <inheritdoc />
         public string Id { get; set; } = nameof(CommandHandlerResolverMiddleware);
-
-        /// <summary>
-        /// If <c>true</c> the middleware will resolve project using internal resolver. Default is <c>true</c>.
-        /// </summary>
-        public bool UseInternalObjectResolver { get; set; } = true;
 
         /// <inheritdoc />
         public void Handle(IMessageContext messageContext)

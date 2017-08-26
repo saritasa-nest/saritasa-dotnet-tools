@@ -4,8 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
@@ -17,7 +15,7 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
     /// <summary>
     /// Default event executor. It does not process events with Rejected status.
     /// </summary>
-    public class EventExecutorMiddleware : BaseHandlerExecutorMiddleware
+    public class EventHandlerExecutorMiddleware : BaseHandlerExecutorMiddleware
     {
         /// <summary>
         /// Include execution duration.
@@ -28,14 +26,14 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
         /// .ctor
         /// </summary>
         /// <param name="parameters">Parameters dictionary.</param>
-        public EventExecutorMiddleware(IDictionary<string, string> parameters) : base(parameters)
+        public EventHandlerExecutorMiddleware(IDictionary<string, string> parameters) : base(parameters)
         {
         }
 
         /// <summary>
         /// .ctor
         /// </summary>
-        public EventExecutorMiddleware() : base()
+        public EventHandlerExecutorMiddleware() : base()
         {
             Id = this.GetType().Name;
         }
@@ -44,39 +42,16 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
             bool async = false)
         {
             var exceptions = new List<Exception>(3); // Stores exceptions from all handlers.
-            var handlerMethods = (EventHandlerMethodWithObject[])
-                messageContext.Items[EventHandlerLocatorMiddleware.HandlerMethodsKey];
+            var handlerMethods =
+                messageContext.GetItemByKey<EventHandlerMethodWithObject[]>(EventHandlerLocatorMiddleware.HandlerMethodsKey);
+            var handlers = messageContext.GetItemByKey<object[]>(BaseHandlerResolverMiddleware.HandlerObjectKey);
 
             // Executes every handle method.
             for (int i = 0; i < handlerMethods.Length; i++)
             {
-                object handler = null;
-                // Event already implements Handle method within it.
-                if (handlerMethods[i].Method.DeclaringType == messageContext.Content.GetType())
-                {
-                    handler = messageContext.Content;
-                }
-                if (handler == null && handlerMethods[i].Object != null)
-                {
-                    handler = handlerMethods[i].Object;
-                }
+                object handler = handlers[i];
                 if (handler == null)
                 {
-                    try
-                    {
-                        handler = ResolveObject(handlerMethods[i].Method.DeclaringType, messageContext.ServiceProvider,
-                            nameof(EventExecutorMiddleware));
-                    }
-                    catch (Exception ex)
-                    {
-                        InternalLogger.Info(string.Format(Properties.Strings.ExceptionOnResolve,
-                            handlerMethods[i].Method.Name, ex), nameof(EventExecutorMiddleware));
-                    }
-                }
-                if (handler == null)
-                {
-                    InternalLogger.Warn(string.Format(Properties.Strings.CannotResolveHandler,
-                        handlerMethods[i].Method.Name), nameof(EventExecutorMiddleware));
                     continue;
                 }
 
@@ -104,7 +79,7 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
                 catch (Exception ex)
                 {
                     InternalLogger.Warn(string.Format(Properties.Strings.ExceptionWhileProcess, handler, ex),
-                        nameof(EventExecutorMiddleware));
+                        nameof(EventHandlerExecutorMiddleware));
                     var innerException = ex.InnerException;
                     if (innerException != null)
                     {
@@ -113,18 +88,11 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
                     else
                     {
                         InternalLogger.Warn(string.Format(Properties.Strings.InnerExceptionIsNull, ex.GetType()),
-                            nameof(EventExecutorMiddleware));
+                            nameof(EventHandlerExecutorMiddleware));
                     }
                 }
                 finally
                 {
-                    // Release handler.
-                    if (UseInternalObjectResolver)
-                    {
-                        var disposable = handler as IDisposable;
-                        disposable?.Dispose();
-                    }
-
                     if (stopwatch != null)
                     {
                         stopwatch.Stop();

@@ -7,7 +7,8 @@ using Saritasa.Tools.Messages.Abstractions;
 namespace Saritasa.Tools.Messages.Common
 {
     /// <summary>
-    /// Message pipeline post action.
+    /// Message pipeline post action. The action will be executed after all pipelines handlers
+    /// execution.
     /// </summary>
     public interface IMessagePipelinePostAction
     {

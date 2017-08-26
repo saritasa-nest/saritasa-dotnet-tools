@@ -2,12 +2,12 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Threading;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Internal;
-using System.Collections.Generic;
-using System.Threading;
 
 namespace Saritasa.Tools.Messages.Common
 {
@@ -18,7 +18,9 @@ namespace Saritasa.Tools.Messages.Common
     {
         private const string KeyId = "id";
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Middleware identifier.
+        /// </summary>
         public string Id { get; set; }
 
         /// <summary>

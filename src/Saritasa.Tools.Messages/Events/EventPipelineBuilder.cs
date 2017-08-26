@@ -41,7 +41,8 @@ namespace Saritasa.Tools.Messages.Events
         public EventPipelineBuilder UseDefaultMiddlewares(params Assembly[] assemblies)
         {
             Pipeline.AddMiddlewares(new PipelineMiddlewares.EventHandlerLocatorMiddleware(assemblies));
-            Pipeline.AddMiddlewares(new PipelineMiddlewares.EventExecutorMiddleware());
+            Pipeline.AddMiddlewares(new PipelineMiddlewares.EventHandlerResolverMiddleware());
+            Pipeline.AddMiddlewares(new PipelineMiddlewares.EventHandlerExecutorMiddleware());
             return this;
         }
     }
