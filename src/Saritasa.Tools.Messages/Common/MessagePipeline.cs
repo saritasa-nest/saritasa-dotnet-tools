@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Common.PipelineMiddlewares;
 
 namespace Saritasa.Tools.Messages.Common
 {
@@ -55,10 +56,6 @@ namespace Saritasa.Tools.Messages.Common
             {
                 localMiddlewaresChain[i](messageContext);
             }
-            if (Options.ThrowExceptionOnFail && messageContext.FailException != null)
-            {
-                throw new MessageProcessingException("Processing exception.", messageContext.FailException);
-            }
         }
 
         /// <summary>
@@ -77,22 +74,19 @@ namespace Saritasa.Tools.Messages.Common
             {
                 await localAsyncMiddlewaresChain[i](messageContext, cancellationToken);
             }
-            if (Options.ThrowExceptionOnFail && messageContext.FailException != null)
-            {
-                throw new MessageProcessingException("Processing exception.", messageContext.FailException);
-            }
         }
 
         #endregion
 
-        private Func<IMessageContext, CancellationToken, Task> CreateTaskCallWrapper(Action<IMessageContext> action)
+        private Func<IMessageContext, CancellationToken, Task> CreateAsyncCallWrapper(Action<IMessageContext> action)
         {
-            Func<IMessageContext, CancellationToken, Task> func = (mc, ct) =>
+            Task Func(IMessageContext mc, CancellationToken ct)
             {
                 action(mc);
                 return Task.FromResult(0);
-            };
-            return func;
+            }
+
+            return Func;
         }
 
         private void InitializeMiddlewaresChains()
@@ -120,6 +114,11 @@ namespace Saritasa.Tools.Messages.Common
                     list.Add(postActionMiddleware.PostHandle);
                 }
             }
+            if (Options.ThrowExceptionOnFail)
+            {
+                var throwExceptionMiddleware = new ThrowExceptionOnFailMiddleware();
+                list.Add(throwExceptionMiddleware.Handle);
+            }
             return list;
         }
 
@@ -136,7 +135,7 @@ namespace Saritasa.Tools.Messages.Common
                 }
                 else
                 {
-                    list.Add(CreateTaskCallWrapper(localMiddlewares[i].Handle));
+                    list.Add(CreateAsyncCallWrapper(localMiddlewares[i].Handle));
                 }
             }
             for (int i = localMiddlewares.Length - 1; i >= 0; i--)
@@ -144,8 +143,13 @@ namespace Saritasa.Tools.Messages.Common
                 var postActionMiddleware = localMiddlewares[i] as IMessagePipelinePostAction;
                 if (postActionMiddleware != null)
                 {
-                    list.Add(CreateTaskCallWrapper(postActionMiddleware.PostHandle));
+                    list.Add(CreateAsyncCallWrapper(postActionMiddleware.PostHandle));
                 }
+            }
+            if (Options.ThrowExceptionOnFail)
+            {
+                var throwExceptionMiddleware = new ThrowExceptionOnFailMiddleware();
+                list.Add(CreateAsyncCallWrapper(throwExceptionMiddleware.Handle));
             }
             return list;
         }

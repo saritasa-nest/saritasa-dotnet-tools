@@ -353,7 +353,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #region If_command_handler_not_found_generate_exception
 
-        class CommandWithNoHandler
+        private class CommandWithNoHandler
         {
         }
 
@@ -413,6 +413,32 @@ namespace Saritasa.Tools.Messages.Tests
 
             // Assert
             Assert.Equal("out", cmd.Out);
+        }
+
+        #endregion
+
+        #region Should_generate_in_pipeline_exception_on_fail
+
+        private class CommandWithFail
+        {
+            public void Handle(CommandWithFail command)
+            {
+                throw new NotImplementedException("Test exception.");
+            }
+        }
+
+        [Fact]
+        public void Should_generate_in_pipeline_exception_on_fail()
+        {
+            // Arrange
+            var builder = pipelineService.PipelineContainer.AddCommandPipeline();
+            SetupCommandPipeline(builder);
+
+            // Act & assert
+            Assert.Throws<MessageProcessingException>(() =>
+            {
+                pipelineService.HandleCommand(new CommandWithFail());
+            });
         }
 
         #endregion
