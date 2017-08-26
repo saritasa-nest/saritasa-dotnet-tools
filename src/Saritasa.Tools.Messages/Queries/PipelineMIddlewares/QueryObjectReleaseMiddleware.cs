@@ -14,15 +14,7 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
         internal const string IsInternalResolverUsedKey = "internal-resolver-used";
 
         /// <inheritdoc />
-        public string Id { get; set; }
-
-        /// <summary>
-        /// .ctor
-        /// </summary>
-        public QueryObjectReleaseMiddleware()
-        {
-            Id = this.GetType().Name;
-        }
+        public string Id { get; set; } = nameof(QueryObjectReleaseMiddleware);
 
         /// <inheritdoc />
         public virtual void Handle(IMessageContext messageContext)

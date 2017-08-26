@@ -2,60 +2,20 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
-using System.Threading;
-using Saritasa.Tools.Messages.Abstractions;
 
 namespace Saritasa.Tools.Messages.Common
 {
     /// <summary>
     /// Provides common functionality for Command/Query/Event executor middlewares.
     /// </summary>
-    public abstract class BaseHandlerExecutorMiddleware : IMessagePipelineMiddleware, IAsyncMessagePipelineMiddleware
+    public abstract class BaseHandlerExecutorMiddleware
     {
-        private const string KeyId = "id";
-
-        /// <summary>
-        /// Middleware identifier.
-        /// </summary>
-        public string Id { get; set; }
-
         /// <summary>
         /// If true the middleware will try to resolve executing method parameters. Default is <c>true</c>.
         /// </summary>
         public bool UseParametersResolve { get; set; } = true;
-
-        /// <summary>
-        /// .ctor
-        /// </summary>
-        protected BaseHandlerExecutorMiddleware(IDictionary<string, string> parameters) : this()
-        {
-            if (parameters == null)
-            {
-                throw new ArgumentNullException(nameof(parameters));
-            }
-
-            if (parameters.ContainsKey(KeyId))
-            {
-                Id = parameters[KeyId];
-            }
-        }
-
-        /// <summary>
-        /// .ctor
-        /// </summary>
-        protected BaseHandlerExecutorMiddleware()
-        {
-            Id = this.GetType().Name;
-        }
-
-        /// <inheritdoc />
-        public abstract void Handle(IMessageContext messageContext);
-
-        /// <inheritdoc />
-        public abstract Task HandleAsync(IMessageContext messageContext, CancellationToken cancellationToken);
 
         private object[] GetAndResolveHandlerParameters(object obj, IServiceProvider serviceProvider,
             MethodBase handlerMethod)

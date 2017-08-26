@@ -110,7 +110,22 @@ namespace Saritasa.Tools.Messages.Configuration
                 {
                     throw new MessagesConfigurationException($"Cannot instaniate pipeline middleware {type.Name}.");
                 }
+
+                SetIdProperty(middleware, node);
+
                 pipeline.AddMiddlewares(middleware);
+            }
+        }
+
+        private void SetIdProperty(IMessagePipelineMiddleware middleware, XmlNode node)
+        {
+            if (node.Attributes["id"] != null)
+            {
+                var idProperty = node.GetType().GetProperty("Id");
+                if (idProperty != null && idProperty.CanWrite)
+                {
+                    idProperty.SetValue(middleware, node.Attributes["id"].Value);
+                }
             }
         }
     }

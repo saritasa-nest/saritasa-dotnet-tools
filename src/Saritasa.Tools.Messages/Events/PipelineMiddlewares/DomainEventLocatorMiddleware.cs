@@ -17,7 +17,7 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
     public class DomainEventLocatorMiddleware : IMessagePipelineMiddleware
     {
         /// <inheritdoc />
-        public string Id { get; set; }
+        public string Id { get; set; } = nameof(DomainEventLocatorMiddleware);
 
         private readonly IDomainEventsManager eventsManager;
 

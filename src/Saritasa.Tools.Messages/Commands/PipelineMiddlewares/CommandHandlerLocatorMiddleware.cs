@@ -15,8 +15,14 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
     /// <summary>
     /// Locate command handler.
     /// </summary>
-    public class CommandHandlerLocatorMiddleware : BaseHandlerLocatorMiddleware
+    public class CommandHandlerLocatorMiddleware : BaseHandlerLocatorMiddleware,
+        IMessagePipelineMiddleware
     {
+        /// <summary>
+        /// Middleware identifier.
+        /// </summary>
+        public string Id { get; set; } = nameof(CommandHandlerLocatorMiddleware);
+
         private const string HandlerPrefix = "Handle";
 
         internal const string HandlerMethodKey = "handler-method";
@@ -81,7 +87,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public override void Handle(IMessageContext messageContext)
+        public void Handle(IMessageContext messageContext)
         {
             // Find handler method, first try to find cached value.
             var cmdtype = messageContext.Content.GetType();

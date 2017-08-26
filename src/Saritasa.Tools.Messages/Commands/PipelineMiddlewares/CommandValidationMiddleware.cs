@@ -14,20 +14,12 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
     public class CommandValidationMiddleware : IMessagePipelineMiddleware
     {
         /// <inheritdoc />
-        public string Id { get; set; }
+        public string Id { get; set; } = nameof(CommandValidationMiddleware);
 
         /// <summary>
         /// Throw exception if object is not valid.
         /// </summary>
         public bool ThrowException { get; set; } = true;
-
-        /// <summary>
-        /// .ctor
-        /// </summary>
-        public CommandValidationMiddleware()
-        {
-            Id = this.GetType().Name;
-        }
 
         /// <inheritdoc />
         public virtual void Handle(IMessageContext messageContext)

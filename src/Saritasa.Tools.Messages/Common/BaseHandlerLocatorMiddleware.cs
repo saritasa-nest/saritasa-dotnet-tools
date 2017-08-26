@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Configuration;
 
 namespace Saritasa.Tools.Messages.Common
@@ -13,11 +12,8 @@ namespace Saritasa.Tools.Messages.Common
     /// <summary>
     /// Locates handler base middleware.
     /// </summary>
-    public abstract class BaseHandlerLocatorMiddleware : IMessagePipelineMiddleware
+    public abstract class BaseHandlerLocatorMiddleware
     {
-        /// <inheritdoc />
-        public string Id { get; set; }
-
         /// <summary>
         /// Assemblies to search in.
         /// </summary>
@@ -28,7 +24,6 @@ namespace Saritasa.Tools.Messages.Common
         /// </summary>
         protected BaseHandlerLocatorMiddleware()
         {
-            Id = this.GetType().Name;
         }
 
         /// <summary>
@@ -42,14 +37,6 @@ namespace Saritasa.Tools.Messages.Common
                 throw new ArgumentNullException(nameof(dict));
             }
 
-            if (dict.ContainsKey("id"))
-            {
-                Id = dict["id"];
-            }
-            else
-            {
-                Id = this.GetType().Name;
-            }
             if (dict.ContainsKey("assemblies"))
             {
                 var assemblies = new List<Assembly>();
@@ -134,9 +121,6 @@ namespace Saritasa.Tools.Messages.Common
                 }
             }
         }
-
-        /// <inheritdoc />
-        public abstract void Handle(IMessageContext message);
 
         /// <summary>
         /// Initialize middleware.

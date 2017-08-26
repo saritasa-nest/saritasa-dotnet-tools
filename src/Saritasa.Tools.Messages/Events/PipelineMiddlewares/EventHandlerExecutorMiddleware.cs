@@ -15,28 +15,18 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
     /// <summary>
     /// Default event executor. It does not process events with Rejected status.
     /// </summary>
-    public class EventHandlerExecutorMiddleware : BaseHandlerExecutorMiddleware
+    public class EventHandlerExecutorMiddleware : BaseHandlerExecutorMiddleware,
+        IMessagePipelineMiddleware, IAsyncMessagePipelineMiddleware
     {
+        /// <summary>
+        /// Middleware identifier.
+        /// </summary>
+        public string Id { get; set; } = nameof(EventHandlerExecutorMiddleware);
+
         /// <summary>
         /// Include execution duration.
         /// </summary>
         public bool IncludeExecutionDuration { get; set; } = true;
-
-        /// <summary>
-        /// .ctor
-        /// </summary>
-        /// <param name="parameters">Parameters dictionary.</param>
-        public EventHandlerExecutorMiddleware(IDictionary<string, string> parameters) : base(parameters)
-        {
-        }
-
-        /// <summary>
-        /// .ctor
-        /// </summary>
-        public EventHandlerExecutorMiddleware() : base()
-        {
-            Id = this.GetType().Name;
-        }
 
         private async Task InternalHandle(IMessageContext messageContext, CancellationToken cancellationToken,
             bool async = false)
@@ -109,7 +99,7 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public override void Handle(IMessageContext messageContext)
+        public void Handle(IMessageContext messageContext)
         {
             // Rejected events are not needed to process.
             if (messageContext.Status == ProcessingStatus.Rejected)
@@ -124,7 +114,7 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public override async Task HandleAsync(IMessageContext messageContext, CancellationToken cancellationToken)
+        public async Task HandleAsync(IMessageContext messageContext, CancellationToken cancellationToken)
         {
             // Rejected events are not needed to process.
             if (messageContext.Status == ProcessingStatus.Rejected)

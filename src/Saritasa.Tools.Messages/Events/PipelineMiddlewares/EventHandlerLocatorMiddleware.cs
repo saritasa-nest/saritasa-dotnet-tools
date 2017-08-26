@@ -15,8 +15,12 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
     /// <summary>
     /// Locates event handler.
     /// </summary>
-    public class EventHandlerLocatorMiddleware : BaseHandlerLocatorMiddleware
+    public class EventHandlerLocatorMiddleware : BaseHandlerLocatorMiddleware,
+        IMessagePipelineMiddleware
     {
+        /// <inheritdoc />
+        public string Id { get; set; } = nameof(EventHandlerLocatorMiddleware);
+
         private const string HandlerPrefix = "Handle";
 
         internal const string HandlerMethodsKey = "handler-methods";
@@ -63,7 +67,7 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public override void Handle(IMessageContext messageContext)
+        public void Handle(IMessageContext messageContext)
         {
             // Find handler methods.
             var eventtype = messageContext.Content.GetType();

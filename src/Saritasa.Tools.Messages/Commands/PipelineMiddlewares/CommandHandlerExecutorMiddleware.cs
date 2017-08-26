@@ -16,32 +16,21 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
     /// <summary>
     /// Default command executor. It does not process commands with Rejected status.
     /// </summary>
-    public class CommandHandlerExecutorMiddleware : BaseHandlerExecutorMiddleware
+    public class CommandHandlerExecutorMiddleware : BaseHandlerExecutorMiddleware,
+        IMessagePipelineMiddleware, IAsyncMessagePipelineMiddleware
     {
+        /// <summary>
+        /// Middleware identifier.
+        /// </summary>
+        public string Id { get; set; } = nameof(CommandHandlerExecutorMiddleware);
+
         /// <summary>
         /// Include execution duration.
         /// </summary>
         public bool IncludeExecutionDuration { get; set; } = true;
 
-        /// <summary>
-        /// .ctor
-        /// </summary>
-        public CommandHandlerExecutorMiddleware()
-        {
-            Id = this.GetType().Name;
-        }
-
-        /// <summary>
-        /// .ctor
-        /// </summary>
-        /// <param name="parameters">Input parameters as parameters.</param>
-        public CommandHandlerExecutorMiddleware(IDictionary<string, string> parameters) : base(parameters)
-        {
-            Id = this.GetType().Name;
-        }
-
         /// <inheritdoc />
-        public override void Handle(IMessageContext messageContext)
+        public void Handle(IMessageContext messageContext)
         {
             var handlerMethod = messageContext.GetItemByKey<MethodInfo>(CommandHandlerLocatorMiddleware.HandlerMethodKey);
             var handler = messageContext.GetItemByKey<object>(CommandHandlerResolverMiddleware.HandlerObjectKey);
@@ -106,7 +95,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
          */
 
         /// <inheritdoc />
-        public override async Task HandleAsync(IMessageContext messageContext, CancellationToken cancellationToken)
+        public async Task HandleAsync(IMessageContext messageContext, CancellationToken cancellationToken)
         {
             var handlerMethod = messageContext.GetItemByKey<MethodInfo>(CommandHandlerLocatorMiddleware.HandlerMethodKey);
             var handler = messageContext.GetItemByKey<object>(CommandHandlerResolverMiddleware.HandlerObjectKey);
