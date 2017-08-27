@@ -111,8 +111,7 @@ namespace Saritasa.Tools.Messages.Tests
                 {
                     UseInternalObjectResolver = true
                 })
-                .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware())
-                .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectReleaseMiddleware());
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware());
 
             // Act
             pipelineService.Query<QueryClass>().With(q => q.Query());
@@ -147,8 +146,7 @@ namespace Saritasa.Tools.Messages.Tests
                 {
                     UseInternalObjectResolver = false
                 })
-                .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware())
-                .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectReleaseMiddleware());
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware());
 
             // Act
             pipelineService.ServiceProvider = new FuncServiceProvider(Activator.CreateInstance);

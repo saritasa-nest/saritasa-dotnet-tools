@@ -18,7 +18,7 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
     /// Resolve and locate object handler for query.
     /// </summary>
     public class QueryObjectResolverMiddleware : BaseHandlerResolverMiddleware,
-        IMessagePipelineMiddleware, IAsyncMessagePipelineMiddleware
+        IMessagePipelineMiddleware, IAsyncMessagePipelineMiddleware, IMessagePipelinePostAction
     {
         private readonly IDictionary<Type, Type> interfaceResolveDict =
             new Dictionary<Type, Type>();
@@ -84,13 +84,13 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
                 {
                     queryObjectType = queryParams.Method.DeclaringType;
                 }
-                queryParams.QueryObject = UseInternalObjectResolver ?
-                    TypeHelpers.ResolveObjectForType(queryObjectType, messageContext.ServiceProvider.GetService,
-                        nameof(QueryObjectResolverMiddleware)) :
-                    messageContext.ServiceProvider.GetService(queryObjectType);
                 if (UseInternalObjectResolver)
                 {
-                    messageContext.Items[QueryObjectReleaseMiddleware.IsInternalResolverUsedKey] = true;
+                    queryParams.QueryObject = CreateHandlerWithCache(queryObjectType, messageContext.ServiceProvider, Id);
+                }
+                else
+                {
+                    queryParams.QueryObject = messageContext.ServiceProvider.GetService(queryObjectType);
                 }
             }
             if (queryParams.QueryObject == null)
@@ -107,6 +107,18 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
         {
             Handle(messageContext);
             return completedTask;
+        }
+
+        /// <inheritdoc />
+        public void PostHandle(IMessageContext messageContext)
+        {
+            if (UseInternalObjectResolver)
+            {
+                var queryParams = (QueryParameters)messageContext.Items[QueryPipeline.QueryParametersKey];
+                var disposable = queryParams.QueryObject as IDisposable;
+                disposable?.Dispose();
+                queryParams.QueryObject = null;
+            }
         }
     }
 }

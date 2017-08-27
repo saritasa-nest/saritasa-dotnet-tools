@@ -45,7 +45,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #region Shared events and handlers
 
-        class CreateUserEvent
+        private class CreateUserEvent
         {
             public int UserId { get; set; }
 
@@ -62,7 +62,7 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [EventHandlers]
-        class UserEventHandlers
+        private class UserEventHandlers
         {
             public IInterfaceA InterfaceA1 { get; set; }
 
@@ -76,7 +76,7 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [EventHandlers]
-        class UserSimpleHandler
+        private class UserSimpleHandler
         {
             public void HandleOnUserCreate(CreateUserEvent @event)
             {
@@ -103,7 +103,17 @@ namespace Saritasa.Tools.Messages.Tests
         {
             // Arrange
             pipelinesService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
-            SetupEventPipeline(pipelinesService.PipelineContainer.AddEventPipeline());
+            pipelinesService.PipelineContainer.AddEventPipeline()
+                .AddMiddleware(new Events.PipelineMiddlewares.EventHandlerLocatorMiddleware(
+                    typeof(EventsTests).GetTypeInfo().Assembly))
+                .AddMiddleware(new Events.PipelineMiddlewares.EventHandlerResolverMiddleware
+                {
+                    UsePropertiesResolving = true
+                })
+                .AddMiddleware(new Events.PipelineMiddlewares.EventHandlerExecutorMiddleware
+                {
+                    UseParametersResolve = true
+                });
             var ev = new CreateUserEvent
             {
                 UserId = 10,

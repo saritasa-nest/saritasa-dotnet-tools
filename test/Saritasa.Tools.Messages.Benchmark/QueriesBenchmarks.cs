@@ -39,12 +39,11 @@ namespace Saritasa.Tools.Messages.Benchmark
         {
             var pipelineService = new DefaultMessagePipelineService();
             pipelineService.PipelineContainer.AddQueryPipeline()
-                .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectResolverMiddleware()
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectResolverMiddleware
                 {
                     UseInternalObjectResolver = true
                 })
-                .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware())
-                .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectReleaseMiddleware());
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware());
             decimal result = 0;
 
             for (int i = 0; i < NumberOfInterations; i++)

@@ -2,6 +2,8 @@
 [*] Separate object resolving to separate middleware (CommandHandlerResolverMiddleware, EventHandlerResolverMiddleware).
 [-] Remove UseParametersResolve parameter for queries pipeline.
 [+] Add IMessagePipelinePostAction interface. The handler will be executed after all middleware execution.
+[+] Optimize handlers resolving.
+[*] Do not resolve object hanlders public properties by default, set UsePropertiesResolving to true for this.
 
 0.3.0 [2017-08-07]
 [*] Fix AddQueryPipeline method.

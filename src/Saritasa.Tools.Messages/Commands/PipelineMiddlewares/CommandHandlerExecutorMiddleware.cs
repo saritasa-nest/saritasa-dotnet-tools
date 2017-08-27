@@ -2,7 +2,6 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
@@ -33,7 +32,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         public void Handle(IMessageContext messageContext)
         {
             var handlerMethod = messageContext.GetItemByKey<MethodInfo>(CommandHandlerLocatorMiddleware.HandlerMethodKey);
-            var handler = messageContext.GetItemByKey<object>(CommandHandlerResolverMiddleware.HandlerObjectKey);
+            var handler = messageContext.GetItemByKey<object>(BaseHandlerResolverMiddleware.HandlerObjectKey);
             if (handler == null)
             {
                 return;
@@ -98,7 +97,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         public async Task HandleAsync(IMessageContext messageContext, CancellationToken cancellationToken)
         {
             var handlerMethod = messageContext.GetItemByKey<MethodInfo>(CommandHandlerLocatorMiddleware.HandlerMethodKey);
-            var handler = messageContext.GetItemByKey<object>(CommandHandlerResolverMiddleware.HandlerObjectKey);
+            var handler = messageContext.GetItemByKey<object>(BaseHandlerResolverMiddleware.HandlerObjectKey);
             if (handler == null)
             {
                 return;

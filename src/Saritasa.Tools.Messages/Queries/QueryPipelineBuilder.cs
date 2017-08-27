@@ -41,7 +41,6 @@ namespace Saritasa.Tools.Messages.Queries
         {
             Pipeline.AddMiddlewares(new PipelineMiddlewares.QueryObjectResolverMiddleware());
             Pipeline.AddMiddlewares(new PipelineMiddlewares.QueryExecutorMiddleware());
-            Pipeline.AddMiddlewares(new PipelineMiddlewares.QueryObjectReleaseMiddleware());
             return this;
         }
     }

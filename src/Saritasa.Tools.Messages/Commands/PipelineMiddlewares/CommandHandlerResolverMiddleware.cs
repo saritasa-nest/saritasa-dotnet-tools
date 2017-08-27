@@ -5,7 +5,6 @@ using System;
 using System.Reflection;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Common;
-using Saritasa.Tools.Messages.Internal;
 
 namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
 {
@@ -40,9 +39,14 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             }
             else
             {
-                handler = UseInternalObjectResolver ?
-                    TypeHelpers.ResolveObjectForType(type, messageContext.ServiceProvider.GetService, Id) :
-                    messageContext.ServiceProvider.GetService(type);
+                if (UseInternalObjectResolver)
+                {
+                    handler = CreateHandlerWithCache(type, messageContext.ServiceProvider, Id);
+                }
+                else
+                {
+                    handler = messageContext.ServiceProvider.GetService(type);
+                }
             }
 
             // If we don't have handler - throw exception.

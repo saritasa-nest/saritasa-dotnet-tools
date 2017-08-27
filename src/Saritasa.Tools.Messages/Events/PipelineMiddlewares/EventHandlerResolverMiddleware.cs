@@ -40,10 +40,15 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
                 {
                     try
                     {
-                        handler = UseInternalObjectResolver ?
-                            TypeHelpers.ResolveObjectForType(handlerMethods[i].Method.DeclaringType,
-                                messageContext.ServiceProvider.GetService, nameof(EventHandlerResolverMiddleware)) :
-                            messageContext.ServiceProvider.GetService(handlerMethods[i].Method.DeclaringType);
+                        if (UseInternalObjectResolver)
+                        {
+                            handler = CreateHandlerWithCache(handlerMethods[i].Method.DeclaringType,
+                                messageContext.ServiceProvider, Id);
+                        }
+                        else
+                        {
+                            handler = messageContext.ServiceProvider.GetService(handlerMethods[i].Method.DeclaringType);
+                        }
                     }
                     catch (Exception ex)
                     {

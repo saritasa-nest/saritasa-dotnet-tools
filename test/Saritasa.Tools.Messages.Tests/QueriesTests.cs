@@ -73,12 +73,11 @@ namespace Saritasa.Tools.Messages.Tests
         public void SetupQueryPipeline(QueryPipelineBuilder builder)
         {
             builder
-                .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectResolverMiddleware()
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectResolverMiddleware
                 {
                     UseInternalObjectResolver = true
                 })
-                .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware())
-                .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectReleaseMiddleware());
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware());
         }
 
         [Fact]
@@ -238,8 +237,7 @@ namespace Saritasa.Tools.Messages.Tests
                 {
                     UseInternalObjectResolver = true
                 })
-                .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware())
-                .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectReleaseMiddleware());
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware());
 
             // Act
             var result = pipelineService.Query<IUserQueries>().With(q => q.GetByNameCount("Test"));
@@ -283,8 +281,7 @@ namespace Saritasa.Tools.Messages.Tests
                 {
                     UseInternalObjectResolver = false,
                 })
-                .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware())
-                .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectReleaseMiddleware());
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware());
 
             // Act
             var result = pipelineService.Query<IProductQueries>().With(q => q.GetByNameCount("Test"));

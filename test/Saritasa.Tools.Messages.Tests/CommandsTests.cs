@@ -76,13 +76,14 @@ namespace Saritasa.Tools.Messages.Tests
 
         private void SetupCommandPipeline(CommandPipelineBuilder builder)
         {
-            builder.AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
-                typeof(CommandsTests).GetTypeInfo().Assembly))
-            .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerResolverMiddleware())
-            .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerExecutorMiddleware
-            {
-                UseParametersResolve = true
-            });
+            builder
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
+                    typeof(CommandsTests).GetTypeInfo().Assembly))
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerResolverMiddleware())
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerExecutorMiddleware
+                {
+                    UseParametersResolve = true
+                });
         }
 
         [Fact]
@@ -209,9 +210,15 @@ namespace Saritasa.Tools.Messages.Tests
         {
             public IInterfaceA DependencyA { get; set; }
 
+            public IInterfaceA DependencyB { get; }
+
+            public IInterfaceB DependencyC { get; set; } = new ImplementationB();
+
             public void HandleTestCommand(TestCommand2 command)
             {
-                command.Param = DependencyA.GetTestValue() == "A" ? 1 : 0;
+                command.Param = DependencyA.GetTestValue() == "A"
+                    && DependencyB == null
+                    && DependencyC != null ? 1 : 0;
             }
         }
 
@@ -221,7 +228,17 @@ namespace Saritasa.Tools.Messages.Tests
             // Arrange
             pipelineService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
             var builder = pipelineService.PipelineContainer.AddCommandPipeline();
-            SetupCommandPipeline(builder);
+            builder
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
+                    typeof(CommandsTests).GetTypeInfo().Assembly))
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerResolverMiddleware
+                {
+                    UsePropertiesResolving = true
+                })
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerExecutorMiddleware
+                {
+                    UseParametersResolve = true
+                });
             var cmd = new TestCommand2();
 
             // Act
@@ -233,7 +250,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Can_run_command_handler_with_ctor_properties_resolve
+        #region Can_run_command_handler_with_ctor_resolve
 
         public class TestCommand3
         {
@@ -257,9 +274,9 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [Fact]
-        public void Can_run_command_handler_with_ctor_properties_resolve()
+        public void Can_run_command_handler_with_ctor_resolve()
         {
-            // Arrange
+            // Arrange;
             pipelineService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
             var builder = pipelineService.PipelineContainer.AddCommandPipeline();
             SetupCommandPipeline(builder);
@@ -277,7 +294,7 @@ namespace Saritasa.Tools.Messages.Tests
         #region Validation_command_attributes_should_generate_exception
 
 #if NET452
-        class CommandWithValidation
+        private class CommandWithValidation
         {
             [Range(0, 100)]
             public int PercentInt { get; set; }

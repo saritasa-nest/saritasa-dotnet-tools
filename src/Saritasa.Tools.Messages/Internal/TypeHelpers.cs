@@ -16,69 +16,6 @@ namespace Saritasa.Tools.Messages.Internal
     /// </summary>
     internal static class TypeHelpers
     {
-        internal static object ResolveObjectForType(Type type, Func<Type, object> resolver, string loggingSource = "")
-        {
-            object obj = null;
-
-            var typeInfo = type.GetTypeInfo();
-
-            // Try default parameterless ctor.
-            var ctor = typeInfo.GetConstructor(new Type[] { });
-            if (ctor != null)
-            {
-                obj = ctor.Invoke(null);
-            }
-
-            // Try another ctor.
-            if (obj == null)
-            {
-                var ctors = typeInfo.GetConstructors(BindingFlags.Public | BindingFlags.Instance |
-                    BindingFlags.FlattenHierarchy);
-                if (ctors.Length > 0)
-                {
-                    ctor = ctors[0];
-                }
-                else
-                {
-                    return null;
-                }
-                var ctorparams = ctor.GetParameters();
-                var ctorparamsValues = new object[ctorparams.Length];
-                for (int i = 0; i < ctorparams.Length; i++)
-                {
-                    ctorparamsValues[i] = resolver(ctorparams[i].ParameterType);
-                }
-                obj = ctor.Invoke(ctorparamsValues);
-            }
-
-            // Prefill public dependencies.
-            if (obj != null)
-            {
-                var props = obj.GetType().GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance |
-                    BindingFlags.FlattenHierarchy);
-                for (var i = 0; i < props.Length; i++)
-                {
-                    var prop = props[i];
-                    if (prop.GetValue(obj) != null)
-                    {
-                        continue;
-                    }
-
-                    try
-                    {
-                        prop.SetValue(obj, resolver(prop.PropertyType));
-                    }
-                    catch (Exception ex)
-                    {
-                        InternalLogger.Error($"Cannot set value for handler {obj} of type {type}. {ex}.",
-                            loggingSource);
-                    }
-                }
-            }
-
-            return obj;
-        }
-
         /// <summary>
         /// Converts obj to type.
         /// </summary>

@@ -27,7 +27,7 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
 
             // Invoke method and resolve parameters if needed.
             Stopwatch stopwatch = null;
-            var queryPipeline = (QueryPipeline)messageContext.Pipeline;
+            var queryPipeline = messageContext.Pipeline as QueryPipeline;
             if (queryPipeline != null && queryPipeline.Options.IncludeExecutionDuration)
             {
                 stopwatch = new Stopwatch();
@@ -66,7 +66,7 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
 
             // Invoke method and resolve parameters if needed.
             Stopwatch stopwatch = null;
-            var queryPipeline = (QueryPipeline)messageContext.Pipeline;
+            var queryPipeline = messageContext.Pipeline as QueryPipeline;
             if (queryPipeline != null && queryPipeline.Options.IncludeExecutionDuration)
             {
                 stopwatch = new Stopwatch();
