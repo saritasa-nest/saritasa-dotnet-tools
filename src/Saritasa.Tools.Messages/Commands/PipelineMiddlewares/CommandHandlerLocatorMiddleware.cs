@@ -69,13 +69,14 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         /// </summary>
         protected override void Initialize()
         {
-            // Precache all types with command handlers.
+            // Precache all non-generic types with command handlers.
             commandHandlers = Assemblies.SelectMany(a => a.GetTypes())
                 .Where(t =>
                     HandlerSearchMethod == HandlerSearchMethod.ClassAttribute ?
                         t.GetTypeInfo().GetCustomAttribute<CommandHandlersAttribute>() != null :
                         t.Name.EndsWith("Handlers"))
                 .SelectMany(t => t.GetTypeInfo().GetMethods())
+                .Where(m => m.GetParameters().Length > 0)
                 .Where(m => m.Name.StartsWith(HandlerPrefix))
                 .ToArray();
             if (!commandHandlers.Any())
@@ -91,11 +92,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         {
             // Find handler method, first try to find cached value.
             var cmdtype = messageContext.Content.GetType();
-            var method = cache.GetOrAdd(cmdtype, handlerCmdType =>
-            {
-                return commandHandlers
-                    .FirstOrDefault(m => m.GetParameters().Any(pt => pt.ParameterType == handlerCmdType));
-            });
+            var method = cache.GetOrAdd(cmdtype, FindOrCreateMethodHandler);
 
             if (InternalLogger.IsDebugEnabled)
             {
@@ -119,6 +116,30 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
                     nameof(CommandHandlerLocatorMiddleware));
             }
             messageContext.Items[HandlerMethodKey] = method;
+        }
+
+        private MethodInfo FindOrCreateMethodHandler(Type commandType)
+        {
+            var commandTypeInfo = commandType.GetTypeInfo();
+            // Non-generic command lookup.
+            if (!commandTypeInfo.IsGenericType)
+            {
+                return commandHandlers
+                    .FirstOrDefault(m =>
+                        m.GetParameters().First().ParameterType == commandType);
+            }
+
+            // For generic command we should find suitable method and make generic method.
+            var commandGenericType = commandTypeInfo.GetGenericTypeDefinition();
+            var genericCommandMethod = commandHandlers
+                .FirstOrDefault(m =>
+                    m.IsGenericMethod &&
+                    m.GetParameters().Any(pt => pt.ParameterType.GetGenericTypeDefinition() == commandGenericType));
+            if (genericCommandMethod == null)
+            {
+                return null;
+            }
+            return genericCommandMethod.MakeGenericMethod(commandType.GetTypeInfo().GetGenericArguments());
         }
     }
 }
