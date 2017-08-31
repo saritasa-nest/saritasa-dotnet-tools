@@ -25,7 +25,12 @@ namespace Saritasa.Tools.Common.Utils
         public static string GetDescription(Enum target)
         {
             var descAttribute = GetAttribute<DescriptionAttribute>(target);
-            return descAttribute?.Description;
+            if (descAttribute == null)
+            {
+                return target.ToString();
+            }
+
+            return descAttribute.Description;
         }
 #endif
 
