@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace Saritasa.Tools.Emails
 {
-    using NameValueDict = System.Collections.Generic.IDictionary<string, object>;
+    using NameValueDict = IDictionary<string, object>;
 
     /// <summary>
     /// Abstract email sender implementation with interceptors support.

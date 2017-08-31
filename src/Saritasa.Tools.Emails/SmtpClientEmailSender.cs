@@ -20,7 +20,7 @@ namespace Saritasa.Tools.Emails
         /// We provide another task to client since actual email sending can be delayed
         /// (enqueued).
         /// </summary>
-        struct MailMessageWithTaskSource
+        private struct MailMessageWithTaskSource
         {
             /// <summary>
             /// Completion source for task.
@@ -46,15 +46,15 @@ namespace Saritasa.Tools.Emails
         /// <summary>
         /// Pending email messages queue.
         /// </summary>
-        readonly ConcurrentQueue<MailMessageWithTaskSource> queue =
+        private readonly ConcurrentQueue<MailMessageWithTaskSource> queue =
             new ConcurrentQueue<MailMessageWithTaskSource>();
 
         /// <summary>
         /// Indicates the email message is currently sending.
         /// </summary>
-        bool isBusy;
+        private bool isBusy;
 
-        readonly object @lock = new object();
+        private readonly object @lock = new object();
 
         /// <summary>
         /// Instance of SmtpClient.
@@ -66,6 +66,13 @@ namespace Saritasa.Tools.Emails
         /// <see cref="EmailQueueExceededException" /> exception will be thrown.
         /// </summary>
         public int MaxQueueSize { get; set; } = 10240;
+
+        /// <summary>
+        /// Minimum delay between emails sending. Zero by default.
+        /// </summary>
+        public TimeSpan MinDelay { get; } = TimeSpan.Zero;
+
+        private DateTime lastSendTime = DateTime.Now;
 
         /// <summary>
         /// .ctor
@@ -91,9 +98,20 @@ namespace Saritasa.Tools.Emails
             Client.SendCompleted += OnEmailSent;
         }
 
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        /// <param name="smtpClient">Smtp client.</param>
+        /// <param name="minDelay">Minimum delay between emails sending.</param>
+        public SmtpClientEmailSender(SmtpClient smtpClient, TimeSpan minDelay) : this(smtpClient)
+        {
+            MinDelay = minDelay;
+            lastSendTime -= minDelay;
+        }
+
         private void OnEmailSent(object sender, AsyncCompletedEventArgs args)
         {
-            // the callback is called before the task
+            // The callback is called before the task.
             isBusy = false;
             ProcessInternal();
         }
@@ -122,10 +140,9 @@ namespace Saritasa.Tools.Emails
         /// <param name="message">Mail message.</param>
         /// <param name="data">Additional data.</param>
         /// <returns>Async task operation.</returns>
-        internal Task SendAsyncInternal(MailMessage message, IDictionary<string, object> data)
-        {
-            return Process(message, data);
-        }
+        internal Task SendAsyncInternal(MailMessage message, IDictionary<string, object> data) => Process(message, data);
+
+        private bool isDelayScheduled;
 
         private void ProcessInternal()
         {
@@ -138,20 +155,20 @@ namespace Saritasa.Tools.Emails
              * */
             lock (@lock)
             {
-                if (isBusy)
+                if (isBusy || ScheduleDelay())
                 {
                     return;
                 }
 
-                MailMessageWithTaskSource messageTask;
-                if (queue.TryDequeue(out messageTask))
+                if (queue.TryDequeue(out var messageTask))
                 {
                     isBusy = true;
                     try
                     {
+                        lastSendTime = DateTime.Now;
                         Client.SendMailAsync(messageTask.MailMessage).ContinueWith(t =>
                         {
-                            // sync current task status (from email) with one that is waited by user
+                            // Sync current task status (from email) with one that is waited by user.
                             if (t.IsFaulted)
                             {
                                 if (t.Exception?.InnerExceptions != null)
@@ -161,7 +178,7 @@ namespace Saritasa.Tools.Emails
                                 else
                                 {
                                     messageTask.TaskCompletionSource.SetException(
-                                        new InvalidOperationException("Unexpected exception"));
+                                        new InvalidOperationException("Unexpected exception."));
                                 }
                             }
                             else if (t.IsCanceled)
@@ -180,6 +197,36 @@ namespace Saritasa.Tools.Emails
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Schedule delay between emails send.
+        /// </summary>
+        /// <returns>Delay is scheduled and no need to do email send.</returns>
+        private bool ScheduleDelay()
+        {
+            if (MinDelay == TimeSpan.Zero)
+            {
+                return false;
+            }
+            var diff = DateTime.Now - lastSendTime;
+            if (diff <= MinDelay)
+            {
+                if (isDelayScheduled)
+                {
+                    return true;
+                }
+                isDelayScheduled = true;
+                Task.Delay(MinDelay - diff, CancellationToken)
+                    .ContinueWith(t =>
+                    {
+                        isDelayScheduled = false;
+                        OnEmailSent(this, null);
+                    }, CancellationToken)
+                    .ConfigureAwait(false);
+                return true;
+            }
+            return false;
         }
 
         #region Dispose

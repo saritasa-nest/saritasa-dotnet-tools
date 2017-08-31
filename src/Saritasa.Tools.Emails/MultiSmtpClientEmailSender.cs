@@ -13,11 +13,11 @@ namespace Saritasa.Tools.Emails
     /// </summary>
     public class MultiSmtpClientEmailSender : EmailSender, IDisposable
     {
-        SmtpClientEmailSender[] clientInstances;
+        private SmtpClientEmailSender[] clientInstances;
 
-        readonly object @lock = new object();
+        private readonly object @lock = new object();
 
-        int currentInstanceIndex;
+        private int currentInstanceIndex;
 
         /// <summary>
         /// .ctor
@@ -61,7 +61,7 @@ namespace Saritasa.Tools.Emails
                 DeliveryMethod = client.DeliveryMethod,
                 EnableSsl = client.EnableSsl,
                 PickupDirectoryLocation = client.PickupDirectoryLocation,
-                Timeout = client.Timeout,
+                Timeout = client.Timeout
             };
             return newClient;
         }
