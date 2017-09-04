@@ -5,6 +5,7 @@ using System;
 #if NET40 || NET452 || NET461
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Text.RegularExpressions;
 #endif
 using System.Linq;
 using System.Reflection;
@@ -18,19 +19,22 @@ namespace Saritasa.Tools.Common.Utils
     {
 #if NET40 || NET452 || NET461
         /// <summary>
-        /// Gets the value of Description attribute.
+        /// Gets a description of enum value. If <see cref="DescriptionAttribute"/> is specified for it, its value will be returned.
         /// </summary>
-        /// <param name="target">Enum.</param>
-        /// <returns>Description text.</returns>
+        /// <param name="target">Enum value.</param>
+        /// <returns>Description of the value.</returns>
         public static string GetDescription(Enum target)
         {
             var descAttribute = GetAttribute<DescriptionAttribute>(target);
-            if (descAttribute == null)
+            if (descAttribute != null)
             {
-                return target.ToString();
+                return descAttribute.Description;
             }
 
-            return descAttribute.Description;
+            var value = target.ToString();
+
+            // Split the value with spaces if it is intercapped.
+            return Regex.Replace(value, @"((?<=[a-z])([A-Z])|(?<=[A-Z])([A-Z][a-z]))", " $1", RegexOptions.Compiled);
         }
 #endif
 
