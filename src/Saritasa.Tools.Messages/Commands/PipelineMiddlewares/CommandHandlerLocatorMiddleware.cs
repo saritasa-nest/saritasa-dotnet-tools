@@ -101,13 +101,13 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             if (method == null)
             {
                 method = cmdtype.GetTypeInfo().GetMethod(HandlerPrefix);
-            }
-            if (method == null)
-            {
-                var assembliesStr = string.Join(",", Assemblies.Select(a => a.FullName));
-                InternalLogger.Warn(string.Format(Properties.Strings.SearchCommandHandlerNotFound, cmdtype.Name, assembliesStr),
-                    nameof(CommandHandlerLocatorMiddleware));
-                throw new CommandHandlerNotFoundException(cmdtype.Name);
+                if (method == null)
+                {
+                    var assembliesStr = string.Join(",", Assemblies.Select(a => a.FullName));
+                    InternalLogger.Warn(string.Format(Properties.Strings.SearchCommandHandlerNotFound, cmdtype.Name, assembliesStr),
+                        nameof(CommandHandlerLocatorMiddleware));
+                    throw new CommandHandlerNotFoundException(cmdtype.Name);
+                }
             }
             if (InternalLogger.IsDebugEnabled)
             {

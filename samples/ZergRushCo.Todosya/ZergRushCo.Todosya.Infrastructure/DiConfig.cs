@@ -97,9 +97,9 @@ namespace ZergRushCo.Todosya.Infrastructure
                 .AddMiddleware(
                     new Saritasa.Tools.Messages.Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
                         System.Reflection.Assembly.GetAssembly(typeof(Domain.UserContext.Entities.User))))
-                .AddMiddleware(new Saritasa.Tools.Messages.Commands.PipelineMiddlewares.CommandExecutorMiddleware
+                .AddMiddleware(new Saritasa.Tools.Messages.Commands.PipelineMiddlewares.CommandHandlerResolverMiddleware())
+                .AddMiddleware(new Saritasa.Tools.Messages.Commands.PipelineMiddlewares.CommandHandlerExecutorMiddleware
                 {
-                    UseInternalObjectResolver = true,
                     UseParametersResolve = true
                 })
                 .AddMiddleware(repositoryMiddleware)
@@ -110,10 +110,8 @@ namespace ZergRushCo.Todosya.Infrastructure
                 .AddMiddleware(new Saritasa.Tools.Messages.Queries.PipelineMiddlewares.QueryObjectResolverMiddleware
                 {
                     UseInternalObjectResolver = true,
-                    UseParametersResolve = true,
                 })
                 .AddMiddleware(new Saritasa.Tools.Messages.Queries.PipelineMiddlewares.QueryExecutorMiddleware())
-                .AddMiddleware(new Saritasa.Tools.Messages.Queries.PipelineMiddlewares.QueryObjectReleaseMiddleware())
                 .AddMiddleware(repositoryMiddleware)
                 .AddMiddleware(recordRepositoryMiddleware);
 
@@ -121,7 +119,7 @@ namespace ZergRushCo.Todosya.Infrastructure
             pipelinesContainer.AddEventPipeline()
                 .AddMiddleware(new Saritasa.Tools.Messages.Events.PipelineMiddlewares.EventHandlerLocatorMiddleware(
                     System.Reflection.Assembly.GetAssembly(typeof(Domain.UserContext.Entities.User))))
-                .AddMiddleware(new Saritasa.Tools.Messages.Events.PipelineMiddlewares.EventExecutorMiddleware())
+                .AddMiddleware(new Saritasa.Tools.Messages.Events.PipelineMiddlewares.EventHandlerExecutorMiddleware())
                 .AddMiddleware(repositoryMiddleware)
                 .AddMiddleware(recordRepositoryMiddleware);
 
