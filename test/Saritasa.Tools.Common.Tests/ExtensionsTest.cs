@@ -7,6 +7,7 @@ using System.Linq;
 using Xunit;
 using Saritasa.Tools.Common.Extensions;
 using Saritasa.Tools.Common.Utils;
+using System.ComponentModel;
 
 namespace Saritasa.Tools.Common.Tests
 {
@@ -103,15 +104,21 @@ namespace Saritasa.Tools.Common.Tests
             Assert.Equal(31125, sum);
         }
 
+        private const string OverridenDescriptionName = "Description Override";
 
         public class TestAttribute : Attribute { }
 
         public enum TestEnum
         {
             [Test]
+            [Description(OverridenDescriptionName)]
             A,
 
-            B
+            B,
+
+            Simple,
+
+            TargetDBConnection,
         }
 
         [Fact]
@@ -153,5 +160,46 @@ namespace Saritasa.Tools.Common.Tests
             // Arrange
             Assert.Null(attr);
         }
+
+#if NET40 || NET452 || NET461
+        [Fact]
+        public void Enum_description_should_covert_to_string()
+        {
+            // Arrange
+            var val = TestEnum.Simple;
+
+            // Act
+            var stringRepresentation = EnumUtils.GetDescription(val);
+
+            // Arrange
+            Assert.Equal(stringRepresentation, "Simple");
+        }
+
+        [Fact]
+        public void Enum_description_should_covert_to_string_with_smart_separation()
+        {
+            // Arrange
+            var val = TestEnum.TargetDBConnection;
+
+            // Act
+            var stringRepresentation = EnumUtils.GetDescription(val);
+
+            // Arrange
+            Assert.Equal(stringRepresentation, "Target DB Connection");
+        }
+
+        [Fact]
+        public void Enum_description_should_use_description_attribute()
+        {
+            // Arrange
+            var val = TestEnum.A;
+
+            // Act
+            var stringRepresentation = EnumUtils.GetDescription(val);
+
+            // Arrange
+            Assert.Equal(stringRepresentation, OverridenDescriptionName);
+        }
+#endif
     }
 }
