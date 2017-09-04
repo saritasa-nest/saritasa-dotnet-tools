@@ -22,21 +22,21 @@ namespace Saritasa.Tools.Messages.Tests
 
         #region Shared interfaces
 
-        public interface IInterfaceA
+        public interface Ns01_IInterfaceA
         {
             string GetTestValue();
         }
 
-        public class ImplementationA : IInterfaceA
+        public class Ns01_ImplementationA : Ns01_IInterfaceA
         {
             public string GetTestValue() => "A";
         }
 
-        public static object InterfacesResolver(Type t)
+        public static object Ns01_InterfacesResolver(Type t)
         {
-            if (t == typeof(IInterfaceA))
+            if (t == typeof(Ns01_IInterfaceA))
             {
-                return new ImplementationA();
+                return new Ns01_ImplementationA();
             }
             return null;
         }
@@ -45,7 +45,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #region Shared events and handlers
 
-        private class CreateUserEvent
+        private class Ns01_CreateUserEvent
         {
             public int UserId { get; set; }
 
@@ -62,13 +62,13 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [EventHandlers]
-        private class UserEventHandlers
+        private class Ns01_UserEventHandlers
         {
-            public IInterfaceA InterfaceA1 { get; set; }
+            public Ns01_IInterfaceA Ns01IInterfaceA1 { get; set; }
 
-            public void Handle(CreateUserEvent @event, IInterfaceA interfaceA2)
+            public void Handle(Ns01_CreateUserEvent @event, Ns01_IInterfaceA ns01IInterfaceA2)
             {
-                if (InterfaceA1 != null && interfaceA2 != null)
+                if (Ns01IInterfaceA1 != null && ns01IInterfaceA2 != null)
                 {
                     @event.HandlersCount++;
                 }
@@ -76,15 +76,13 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [EventHandlers]
-        private class UserSimpleHandler
+        private class Ns01_UserSimpleHandler
         {
-            public void HandleOnUserCreate(CreateUserEvent @event)
+            public void HandleOnUserCreate(Ns01_CreateUserEvent @event)
             {
                 @event.HandlersCount++;
             }
         }
-
-        #endregion
 
         private void SetupEventPipeline(EventPipelineBuilder builder)
         {
@@ -98,11 +96,13 @@ namespace Saritasa.Tools.Messages.Tests
                 });
         }
 
+        #endregion
+
         [Fact]
         public void Events_should_be_fired_withing_all_classes()
         {
             // Arrange
-            pipelinesService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
+            pipelinesService.ServiceProvider = new FuncServiceProvider(Ns01_InterfacesResolver);
             pipelinesService.PipelineContainer.AddEventPipeline()
                 .AddMiddleware(new Events.PipelineMiddlewares.EventHandlerLocatorMiddleware(
                     typeof(EventsTests).GetTypeInfo().Assembly))
@@ -114,7 +114,7 @@ namespace Saritasa.Tools.Messages.Tests
                 {
                     UseParametersResolve = true
                 });
-            var ev = new CreateUserEvent
+            var ev = new Ns01_CreateUserEvent
             {
                 UserId = 10,
                 FirstName = "Ivan",
@@ -130,14 +130,14 @@ namespace Saritasa.Tools.Messages.Tests
 
         #region Domain_events_can_be_integrated_to_events_pipeline
 
-        private class DomainTestEvent
+        private class Ns02_DomainTestEvent
         {
             public int Param { get; set; }
         }
 
-        private class DomainTestEventHandler : IDomainEventHandler<DomainTestEvent>
+        private class Ns02_DomainTestEventHandler : IDomainEventHandler<Ns02_DomainTestEvent>
         {
-            public void Handle(DomainTestEvent @event)
+            public void Handle(Ns02_DomainTestEvent @event)
             {
                 @event.Param = 42;
             }
@@ -148,7 +148,7 @@ namespace Saritasa.Tools.Messages.Tests
         {
             // Arrange
             var eventsManager = new DomainEventsManager();
-            eventsManager.Register(new DomainTestEventHandler());
+            eventsManager.Register(new Ns02_DomainTestEventHandler());
             object Resolver(Type type)
             {
                 if (type == typeof(IDomainEventsManager))
@@ -166,7 +166,7 @@ namespace Saritasa.Tools.Messages.Tests
                 {
                     UseParametersResolve = true
                 });
-            var ev = new DomainTestEvent();
+            var ev = new Ns02_DomainTestEvent();
 
             // Act
             pipelinesService.RaiseEvent(ev);
@@ -179,46 +179,46 @@ namespace Saritasa.Tools.Messages.Tests
 
         #region Can combine domain event with class events
 
-        private class DomainTestEvent2
+        private class Ns03_DomainTestEvent
         {
         }
 
-        private class DomainTestEventHandler2 : IDomainEventHandler<DomainTestEvent>
+        private class Ns03_DomainTestEventHandler : IDomainEventHandler<Ns02_DomainTestEvent>
         {
-            public void Handle(DomainTestEvent @event)
+            public void Handle(Ns02_DomainTestEvent @event)
             {
-                EventHandler1.CallCount++;
+                Ns03_EventHandler.CallCount++;
             }
         }
 
-        public class Event1 { }
+        public class Ns03_Event1 { }
 
-        public class Event2 { }
+        public class Ns03_Event2 { }
 
-        public class Event3 { }
+        public class Ns03_Event3 { }
 
         [EventHandlers]
-        public class EventHandler1
+        public class Ns03_EventHandler
         {
             public static int CallCount = 0;
 
-            public void Handle(Event1 ev)
+            public void Handle(Ns03_Event1 ev)
             {
                 CallCount++;
             }
 
-            public void Handle(Event2 ev)
+            public void Handle(Ns03_Event2 ev)
             {
                 CallCount++;
             }
         }
 
         [EventHandlers]
-        public class EventHandler2
+        public class Ns03_EventHandler2
         {
-            public void Handle(Event3 ev)
+            public void Handle(Ns03_Event3 ev)
             {
-                EventHandler1.CallCount++;
+                Ns03_EventHandler.CallCount++;
             }
         }
 
@@ -227,7 +227,7 @@ namespace Saritasa.Tools.Messages.Tests
         {
             // Arrange
             var eventsManager = new DomainEventsManager();
-            eventsManager.Register(new DomainTestEventHandler2());
+            eventsManager.Register(new Ns03_DomainTestEventHandler());
 
             pipelinesService.PipelineContainer.AddEventPipeline()
                 .AddMiddleware(new Events.PipelineMiddlewares.DomainEventLocatorMiddleware(eventsManager))
@@ -240,13 +240,56 @@ namespace Saritasa.Tools.Messages.Tests
                 });
 
             // Act
-            await pipelinesService.RaiseEventAsync(new DomainTestEvent());
-            await pipelinesService.RaiseEventAsync(new Event1());
-            await pipelinesService.RaiseEventAsync(new Event2());
-            await pipelinesService.RaiseEventAsync(new Event3());
+            await pipelinesService.RaiseEventAsync(new Ns02_DomainTestEvent());
+            await pipelinesService.RaiseEventAsync(new Ns03_Event1());
+            await pipelinesService.RaiseEventAsync(new Ns03_Event2());
+            await pipelinesService.RaiseEventAsync(new Ns03_Event3());
 
             // Assert
-            Assert.Equal(4, EventHandler1.CallCount);
+            Assert.Equal(4, Ns03_EventHandler.CallCount);
+        }
+
+        #endregion
+
+        #region Can_run_default_simple_generic_command
+
+        public class Ns04_SimpleGenericEvent<T>
+        {
+            public T Id { get; set; }
+
+            public string Out { get; set; }
+        }
+
+        [EventHandlers]
+        public class Ns03_TestEventHandler
+        {
+            public void HandleTestEvent1<T>(Ns04_SimpleGenericEvent<T> command)
+            {
+                command.Out += "1";
+            }
+
+            public void HandleTestEvent2<T>(Ns04_SimpleGenericEvent<T> command)
+            {
+                command.Out += "1";
+            }
+        }
+
+        [Fact]
+        public void Can_run_default_simple_generic_command()
+        {
+            // Arrange
+            SetupEventPipeline(pipelinesService.PipelineContainer.AddEventPipeline());
+
+            // Act
+            var ev = new Ns04_SimpleGenericEvent<string>
+            {
+                Id = "GameOfThrones"
+            };
+            pipelinesService.RaiseEvent(ev);
+
+            // Assert
+            Assert.Equal("GameOfThrones", ev.Id);
+            Assert.Equal("11", ev.Out);
         }
 
         #endregion

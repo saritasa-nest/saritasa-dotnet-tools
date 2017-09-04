@@ -15,8 +15,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
     /// <summary>
     /// Locate command handler.
     /// </summary>
-    public class CommandHandlerLocatorMiddleware : BaseHandlerLocatorMiddleware,
-        IMessagePipelineMiddleware
+    public class CommandHandlerLocatorMiddleware : BaseHandlerLocatorMiddleware, IMessagePipelineMiddleware
     {
         /// <summary>
         /// Middleware identifier.
@@ -121,6 +120,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         private MethodInfo FindOrCreateMethodHandler(Type commandType)
         {
             var commandTypeInfo = commandType.GetTypeInfo();
+
             // Non-generic command lookup.
             if (!commandTypeInfo.IsGenericType)
             {
@@ -139,7 +139,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             {
                 return null;
             }
-            return genericCommandMethod.MakeGenericMethod(commandType.GetTypeInfo().GetGenericArguments());
+            return genericCommandMethod.MakeGenericMethod(commandTypeInfo.GetGenericArguments());
         }
     }
 }

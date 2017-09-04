@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
+using System.Net.Mail;
 using System.Reflection;
+using System.Threading;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Commands;
 using Saritasa.Tools.Messages.Commands.PipelineMiddlewares;
@@ -14,6 +16,7 @@ using SandBox.Commands;
 using SandBox.Events;
 using SandBox.Queries;
 using Saritasa.Tools.Common.Utils;
+using Saritasa.Tools.Emails;
 using Saritasa.Tools.Messages.Abstractions.Commands;
 using Saritasa.Tools.Messages.Abstractions.Events;
 using Saritasa.Tools.Messages.Abstractions.Queries;
@@ -67,7 +70,7 @@ namespace SandBox
             CommandPipeline.AddMiddlewares(
                 new CommandValidationMiddleware(),
                 new CommandHandlerLocatorMiddleware(Assembly.GetEntryAssembly()),
-                new CommandExecutorMiddleware(),
+                new CommandHandlerExecutorMiddleware(),
                 new RepositoryMiddleware(inMemoryMessageRepository)
             );
 
@@ -83,7 +86,7 @@ namespace SandBox
             EventPipeline = new EventPipeline();
             EventPipeline.AddMiddlewares(
                 new EventHandlerLocatorMiddleware(Assembly.GetEntryAssembly()),
-                new EventExecutorMiddleware(),
+                new EventHandlerExecutorMiddleware(),
                 new RepositoryMiddleware(inMemoryMessageRepository)
             );
         }
@@ -120,6 +123,19 @@ namespace SandBox
             pipelineService.RaiseEvent(new UpdateProductEvent { Id = 1 });
             Console.WriteLine(inMemoryMessageRepository.Dump());
             inMemoryMessageRepository.Messages.Clear();
+        }
+
+        private static void EmailsSend()
+        {
+            var emailSender = new Saritasa.Tools.Emails.SmtpClientEmailSender(new SmtpClient(), TimeSpan.FromSeconds(10));
+            for (int i = 0; i < 2; i++)
+            {
+                new System.Threading.Thread(() =>
+                {
+                    emailSender.SendAsync(new MailMessage("ivan@saritasa.com", "ivan@saritasa.com", "test", "body"));
+                    emailSender.SendAsync(new MailMessage("ivan@saritasa.com", "ivan@saritasa.com", "test2-" + i, "body"));
+                }).Start();
+            }
         }
 
         /// <summary>

@@ -62,7 +62,7 @@ namespace Saritasa.Tools.Messages.Common
             Initialize();
         }
 
-        HandlerSearchMethod handlerSearchMethod = HandlerSearchMethod.ClassAttribute;
+        private HandlerSearchMethod handlerSearchMethod = HandlerSearchMethod.ClassAttribute;
 
         /// <summary>
         /// Uses various combinations to find assembly.

@@ -163,6 +163,10 @@
       <Project>{D1AD1713-BC18-4340-B8DB-23D86D22FB7F}</Project>
       <Name>Saritasa.Tools.EF6</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\src\Saritasa.Tools.Emails\Saritasa.Tools.Emails.csproj">
+      <Project>{de528a0f-2741-4fb0-ab64-14b7a93a9c83}</Project>
+      <Name>Saritasa.Tools.Emails</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\src\Saritasa.Tools.Messages.Abstractions\Saritasa.Tools.Messages.Abstractions.csproj">
       <Project>{e16b2300-a1d4-49bb-b3fc-c2891e7d1177}</Project>
       <Name>Saritasa.Tools.Messages.Abstractions</Name>
