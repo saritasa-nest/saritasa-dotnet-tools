@@ -104,14 +104,14 @@ namespace Saritasa.Tools.Common.Tests
             Assert.Equal(31125, sum);
         }
 
-        private const string OverridenDescriptionName = "Description Override";
+        private const string OverriddenDescriptionName = "Description Override";
 
         public class TestAttribute : Attribute { }
 
         public enum TestEnum
         {
             [Test]
-            [Description(OverridenDescriptionName)]
+            [Description(OverriddenDescriptionName)]
             A,
 
             B,
@@ -198,7 +198,7 @@ namespace Saritasa.Tools.Common.Tests
             var stringRepresentation = EnumUtils.GetDescription(val);
 
             // Arrange
-            Assert.Equal(stringRepresentation, OverridenDescriptionName);
+            Assert.Equal(stringRepresentation, OverriddenDescriptionName);
         }
 #endif
     }
