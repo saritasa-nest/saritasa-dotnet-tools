@@ -19,6 +19,12 @@ namespace Saritasa.Tools.Common.Utils
     {
 #if NET40 || NET452 || NET461
         /// <summary>
+        /// Splits intercapped string.
+        /// </summary>
+        /// <example>TestDBConnection will be parsed into "Test", "DB", "Connection" parts.</example>
+        private static readonly Regex IntercappedStringSplitRegex = new Regex(@"((?<=[a-z])([A-Z])|(?<=[A-Z])([A-Z][a-z]))", RegexOptions.Compiled);
+
+        /// <summary>
         /// Gets a description of enum value. If <see cref="DescriptionAttribute"/> is specified for it, its value will be returned.
         /// </summary>
         /// <param name="target">Enum value.</param>
@@ -34,7 +40,7 @@ namespace Saritasa.Tools.Common.Utils
             var value = target.ToString();
 
             // Split the value with spaces if it is intercapped.
-            return Regex.Replace(value, @"((?<=[a-z])([A-Z])|(?<=[A-Z])([A-Z][a-z]))", " $1", RegexOptions.Compiled);
+            return IntercappedStringSplitRegex.Replace(value, " $1");
         }
 #endif
 
