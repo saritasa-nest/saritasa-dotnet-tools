@@ -130,7 +130,7 @@ namespace Saritasa.Tools.Common.Tests
             // Act
             var attr = EnumUtils.GetAttribute<TestAttribute>(val);
 
-            // Arrange
+            // Assert
             Assert.NotNull(attr);
             Assert.IsType<TestAttribute>(attr);
         }
@@ -144,7 +144,7 @@ namespace Saritasa.Tools.Common.Tests
             // Act
             var attr = EnumUtils.GetAttribute<TestAttribute>(val);
 
-            // Arrange
+            // Assert
             Assert.Null(attr);
         }
 
@@ -157,7 +157,7 @@ namespace Saritasa.Tools.Common.Tests
             // Act
             var attr = EnumUtils.GetAttribute<ObsoleteAttribute>(val);
 
-            // Arrange
+            // Assert
             Assert.Null(attr);
         }
 
@@ -171,7 +171,7 @@ namespace Saritasa.Tools.Common.Tests
             // Act
             var stringRepresentation = EnumUtils.GetDescription(val);
 
-            // Arrange
+            // Assert
             Assert.Equal(stringRepresentation, "Simple");
         }
 
@@ -184,7 +184,7 @@ namespace Saritasa.Tools.Common.Tests
             // Act
             var stringRepresentation = EnumUtils.GetDescription(val);
 
-            // Arrange
+            // Assert
             Assert.Equal(stringRepresentation, "Target DB Connection");
         }
 
@@ -197,7 +197,7 @@ namespace Saritasa.Tools.Common.Tests
             // Act
             var stringRepresentation = EnumUtils.GetDescription(val);
 
-            // Arrange
+            // Assert
             Assert.Equal(stringRepresentation, OverriddenDescriptionName);
         }
 #endif

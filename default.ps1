@@ -138,7 +138,7 @@ function CompileDocs
 
 function ReplaceVersionInAssemblyInfo($file, $attribute, $version)
 {
-    $pattern = "$attribute\(""[0-9]+(\.([0-9a-z\-]+|\*)){1,3}""\)"
+    $pattern = "$attribute\(""[0-9]+(\.([0-9a-zA-Z\-]+|\*)){1,3}""\)"
     $version = "$attribute(""$version"")"
 
     (Get-Content $file) | ForEach-Object `
