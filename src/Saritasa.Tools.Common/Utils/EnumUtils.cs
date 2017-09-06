@@ -5,6 +5,7 @@ using System;
 #if NET40 || NET452 || NET461
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Text.RegularExpressions;
 #endif
 using System.Linq;
 using System.Reflection;
@@ -18,14 +19,28 @@ namespace Saritasa.Tools.Common.Utils
     {
 #if NET40 || NET452 || NET461
         /// <summary>
-        /// Gets the value of Description attribute.
+        /// Splits intercapped string.
         /// </summary>
-        /// <param name="target">Enum.</param>
-        /// <returns>Description text.</returns>
+        /// <example>TestDBConnection will be parsed into "Test", "DB", "Connection" parts.</example>
+        private static readonly Regex IntercappedStringSplitRegex = new Regex(@"((?<=[a-z])([A-Z])|(?<=[A-Z])([A-Z][a-z]))", RegexOptions.Compiled);
+
+        /// <summary>
+        /// Gets a description of enum value. If <see cref="DescriptionAttribute"/> is specified for it, its value will be returned.
+        /// </summary>
+        /// <param name="target">Enum value.</param>
+        /// <returns>Description of the value.</returns>
         public static string GetDescription(Enum target)
         {
             var descAttribute = GetAttribute<DescriptionAttribute>(target);
-            return descAttribute?.Description;
+            if (descAttribute != null)
+            {
+                return descAttribute.Description;
+            }
+
+            var value = target.ToString();
+
+            // Split the value with spaces if it is intercapped.
+            return IntercappedStringSplitRegex.Replace(value, " $1");
         }
 #endif
 
