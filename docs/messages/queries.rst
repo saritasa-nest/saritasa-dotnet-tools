@@ -64,4 +64,4 @@ Default Pipeline
 
     ::
 
-        QueryObjectResolverMiddleware ---> QueryExecutorMiddleware ---> QueryObjectReleaseMiddleware
+        QueryObjectResolverMiddleware ---> QueryExecutorMiddleware

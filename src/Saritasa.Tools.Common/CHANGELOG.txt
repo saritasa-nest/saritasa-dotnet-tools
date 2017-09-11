@@ -1,5 +1,6 @@
 ﻿0.4.1 [TBD]
 [*] Fix datetime millisecond truncation.
+[*] Change EnumUtils.GetDescription behavior when there is not Description attribute.
 
 0.4.0 [2017-08-24]
 [*] Improve pagination API. Instead of Wrap methods introduce ToMetadataObject and CastMetadataEnumerable.

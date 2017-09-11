@@ -11,6 +11,7 @@ The main idea is to process application business logic in general way.
     events
     repositories
     di
+    configuration
 
 You can setup your application to process everything thru single pipelines:
 
@@ -24,7 +25,7 @@ Pipeline is a set of middlewares to process your commands/queries. Here is a sam
 
     ::
 
-        CommandValidation ---> CommandHandlerLocator ---> CommandExecutor ---> Repository
+        CommandValidation ---> CommandHandlerLocator ---> CommandHandlerExecutor ---> Repository
 
 Middleware makes an action on your message context. You can create and insert your own custom middleware into pipeline to add additional logic to whole application. Here is a brief diagram:
 

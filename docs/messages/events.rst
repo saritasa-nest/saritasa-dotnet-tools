@@ -15,7 +15,7 @@ Here is how it can be used:
 1. Setup pipeline service. Also you need to register it with your DI container since it can be injected to command hanlders.
 
 2. Create event class:
-   
+
     .. code-block:: c#
 
         public class UserCreatedEvent
@@ -49,7 +49,7 @@ Middlewares
 
         Uses domain events manager to raise events.
 
-    .. class:: EventExecutorMiddleware
+    .. class:: EventHandlerExecutorMiddleware
 
         Included to default pipeline. Default event executor. It does not process events with Rejected status.
 
@@ -62,4 +62,4 @@ Default Pipeline
 
     ::
 
-        EventHandlerLocatorMiddleware ---> EventExecutorMiddleware
+        EventHandlerLocatorMiddleware ---> EventHandlerResolverMiddleware -> EventHandlerExecutorMiddleware

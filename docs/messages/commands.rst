@@ -59,7 +59,7 @@ Middlewares
 
         Included to default pipeline. Locates for command handler class using provided assemblies. Handler class must have ``CommandHandlers`` attribute, method should begin with ``Handle`` work and first argument must be command type.
 
-    .. class:: CommandExecutorMiddleware
+    .. class:: CommandHandlerExecutorMiddleware
 
         Included to default pipeline. Executes command against found command handler.
 
@@ -72,4 +72,4 @@ Default Pipeline
 
     ::
 
-        CommandHandlerLocatorMiddleware ---> CommandExecutorMiddleware
+        CommandHandlerLocatorMiddleware ---> CommandHandlerResolverMiddleware -> CommandHandlerExecutorMiddleware

@@ -26,6 +26,7 @@ namespace Saritasa.Tools.Common.Utils
 
         /// <summary>
         /// Gets a description of enum value. If <see cref="DescriptionAttribute"/> is specified for it, its value will be returned.
+        /// Instead split with spaces enums text will be returned (for example "IsActive" will be transformed to "Is Active").
         /// </summary>
         /// <param name="target">Enum value.</param>
         /// <returns>Description of the value.</returns>
