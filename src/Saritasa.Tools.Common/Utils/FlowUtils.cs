@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-#if NETSTANDARD1_2
+#if NETSTANDARD1_2 || NETSTANDARD1_6 || NETSTANDARD2_0
 using System.Reflection;
 #endif
 
@@ -24,12 +24,12 @@ namespace Saritasa.Tools.Common.Utils
             where TEventArgs : EventArgs
 #endif
         {
-#if NETSTANDARD1_2
+#if NETSTANDARD1_2 || NETSTANDARD1_6 || NETSTANDARD2_0
             var temp = Volatile.Read(ref eventDelegate);
 #else
             var temp = eventDelegate;
 #endif
-#if NET40 || NET452 || NET461
+#if NET40 || NET452 || NET461 || NETSTANDARD2_0
             Thread.MemoryBarrier();
 #endif
             if (temp == null)

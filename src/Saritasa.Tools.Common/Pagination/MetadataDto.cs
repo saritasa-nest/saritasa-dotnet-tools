@@ -10,7 +10,7 @@ namespace Saritasa.Tools.Common.Pagination
     /// Metadata data transfer object. Combines metadata and enumerable items.
     /// </summary>
     /// <typeparam name="T">Metadata items type.</typeparam>
-#if NET40 || NET452 || NET461
+#if NET40 || NET452 || NET461 || NETSTANDARD2_0
     [Serializable]
 #endif
     public class MetadataDto<T>

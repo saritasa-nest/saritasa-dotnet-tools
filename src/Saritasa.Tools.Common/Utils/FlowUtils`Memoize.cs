@@ -17,7 +17,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Throw the exception to skip item memoization.
         /// </summary>
-#if NET40 || NET452 || NET461
+#if NET40 || NET452 || NET461 || NETSTANDARD2_0
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "GetObjectData is not needed")]
         [Serializable]
 #endif
@@ -155,7 +155,7 @@ namespace Saritasa.Tools.Common.Utils
             return CreateMaxAgeCacheStrategy<Tuple<T1, T2, T3>, TResult>(maxAge);
         }
 
-#endregion
+        #endregion
 
         #region MaxCountCacheStrategy
 

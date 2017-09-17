@@ -51,7 +51,7 @@ namespace Saritasa.Tools.Common.Utils
             return sortOrder == SortOrder.Ascending ? source.OrderBy(keySelector, comparer) : source.OrderByDescending(keySelector, comparer);
         }
 
-#if NET40 || NET452 || NET461
+#if NET40 || NET452 || NET461 || NETSTANDARD1_2 || NETSTANDARD1_6 || NETSTANDARD2_0
         /// <summary>
         /// Sorts the elements of a sequence in ascending or descending order.
         /// </summary>

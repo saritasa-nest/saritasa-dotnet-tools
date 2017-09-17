@@ -4,7 +4,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-#if NETSTANDARD1_2
+#if NETSTANDARD1_2 || NETSTANDARD1_6 || NETSTANDARD2_0
 using System.Reflection;
 #endif
 
@@ -71,7 +71,7 @@ namespace Saritasa.Tools.Common.Utils
                     }
                     if (delay.TotalMilliseconds > 0)
                     {
-#if NETSTANDARD1_2
+#if NETSTANDARD1_2 || NETSTANDARD1_6 || NETSTANDARD2_0
                         System.Threading.Tasks.Task.Delay(delay).Wait();
 #else
                         Thread.Sleep((int)delay.TotalMilliseconds);
@@ -193,7 +193,7 @@ namespace Saritasa.Tools.Common.Utils
 
                     if (delay.TotalMilliseconds > 0)
                     {
-#if NETSTANDARD1_2
+#if NETSTANDARD1_2 || NETSTANDARD1_6 || NETSTANDARD2_0
                         System.Threading.Tasks.Task.Delay((int)delay.TotalMilliseconds).Wait();
 #else
                         Thread.Sleep((int)delay.TotalMilliseconds);
@@ -252,7 +252,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 #endif
 
-#if NET452 || NET461 || NETSTANDARD1_2
+#if NET452 || NET461 || NETSTANDARD1_2 || NETSTANDARD1_6 || NETSTANDARD2_0
         /// <summary>
         /// Provides the async implementation of the retry mechanism for unreliable actions and transient conditions.
         /// </summary>
@@ -314,7 +314,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 #endif
 
-#if NET452 || NET461 || NETSTANDARD1_2
+#if NET452 || NET461 || NETSTANDARD1_2 || NETSTANDARD1_6 || NETSTANDARD2_0
         /// <summary>
         /// Provides the async implementation of the retry mechanism for unreliable actions and transient conditions.
         /// </summary>
@@ -353,7 +353,7 @@ namespace Saritasa.Tools.Common.Utils
             Type executedExceptionType = executedException.GetType();
             foreach (var exceptionType in exceptionsTypes)
             {
-#if NETSTANDARD1_2
+#if NETSTANDARD1_2 || NETSTANDARD1_6 || NETSTANDARD2_0
                 if (executedExceptionType == exceptionType || executedExceptionType.GetTypeInfo().IsSubclassOf(exceptionType))
 #else
                 if (executedExceptionType == exceptionType || executedExceptionType.IsSubclassOf(exceptionType))

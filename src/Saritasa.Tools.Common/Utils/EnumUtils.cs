@@ -2,7 +2,7 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-#if NET40 || NET452 || NET461
+#if NET40 || NET452 || NET461 || NETSTANDARD2_0
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
@@ -17,7 +17,8 @@ namespace Saritasa.Tools.Common.Utils
     /// </summary>
     public static class EnumUtils
     {
-#if NET40 || NET452 || NET461
+#if NET40 || NET452 || NET461 || NETSTANDARD2_0
+
         /// <summary>
         /// Splits intercapped string.
         /// </summary>
@@ -25,7 +26,7 @@ namespace Saritasa.Tools.Common.Utils
         private static readonly Regex intercappedStringSplitRegex = new Regex(@"((?<=[a-z])([A-Z])|(?<=[A-Z])([A-Z][a-z]))", RegexOptions.Compiled);
 
         /// <summary>
-        /// Gets a description of enum value. If <see cref="DescriptionAttribute"/> is specified for it, its value will be returned.
+        /// Gets a description of enum value. If <see cref="DescriptionAttribute" /> is specified for it, its value will be returned.
         /// Instead split with spaces enums text will be returned (for example "IsActive" will be transformed to "Is Active").
         /// </summary>
         /// <param name="target">Enum value.</param>
@@ -71,7 +72,7 @@ namespace Saritasa.Tools.Common.Utils
                 return null;
             }
 
-#if NETSTANDARD1_2
+#if NETSTANDARD1_2 || NETSTANDARD1_6 || NETSTANDARD2_0
             var attributes = fieldInfo.GetCustomAttributes<TAttribute>(false);
 #else
             var attributes =

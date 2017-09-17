@@ -15,7 +15,7 @@ namespace Saritasa.Tools.Common.Utils
     /// </summary>
     public static class SecurityUtils
     {
-#if NET40 || NET452 || NET461
+#if NET40 || NET452 || NET461 || NETSTANDARD1_6 || NETSTANDARD2_0
         const char PasswordMethodHashSeparator = '$';
 
         /// <summary>

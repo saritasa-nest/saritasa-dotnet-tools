@@ -8,7 +8,7 @@ namespace Saritasa.Tools.Common.Pagination
     /// <summary>
     /// Enumerable with total count metadata.
     /// </summary>
-#if NET40 || NET452 || NET461
+#if NET40 || NET452 || NET461 || NETSTANDARD2_0
     [Serializable]
 #endif
     public class TotalCountEnumerableMetadata
