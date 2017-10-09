@@ -9,8 +9,7 @@ namespace Saritasa.Tools.Domain
     /// <summary>
     /// The class provides existing unit of work instead of creating new one. It may be useful for example
     /// when you already have Unit of work instance and you want to call another method that requires
-    /// <see cref="Domain.IUnitOfWorkFactory{T}" /> interface.
-    /// You should instaniate the class and pass your unit of work.
+    /// <see cref="Domain.IUnitOfWorkFactory{T}" /> interface. You should instaniate the class and pass your unit of work.
     /// </summary>
     /// <typeparam name="TUnitOfWork">Unit of work type.</typeparam>
     public class InstanceUnitOfWorkFactory<TUnitOfWork> : IUnitOfWorkFactory<TUnitOfWork> where TUnitOfWork : class

@@ -21,16 +21,13 @@ namespace Saritasa.Tools.Domain.Exceptions
 #endif
     public class ValidationException : DomainException
     {
-        const string SummaryKey = "";
+        private const string SummaryKey = "";
 
         /// <summary>
         /// Errors dictionary. Key is a member name, value is an enumerable of error
         /// messages. Empty member name relates to summary error message.
         /// </summary>
-        public virtual IDictionary<string, IEnumerable<string>> Errors
-        {
-            get => errors;
-        }
+        public virtual IDictionary<string, IEnumerable<string>> Errors => errors;
 
         private readonly IDictionary<string, IEnumerable<string>> errors
             = new Dictionary<string, IEnumerable<string>>();
@@ -51,10 +48,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         /// <summary>
         /// Summary errors. Returns zero array if not defined.
         /// </summary>
-        public IEnumerable<string> SummaryErrors
-        {
-            get => errors.ContainsKey(SummaryKey) ? errors[SummaryKey] : new string[0];
-        }
+        public IEnumerable<string> SummaryErrors => errors.ContainsKey(SummaryKey) ? errors[SummaryKey] : new string[0];
 
         /// <summary>
         /// .ctor
@@ -140,8 +134,7 @@ namespace Saritasa.Tools.Domain.Exceptions
                 throw new ArgumentException(DomainErrorDescriber.Default.ValidationErrorIsEmpty(), nameof(error));
             }
 
-            IEnumerable<string> list;
-            if (errors.TryGetValue(member, out list))
+            if (errors.TryGetValue(member, out var list))
             {
                 ((IList<string>)list).Add(error);
             }
@@ -174,8 +167,7 @@ namespace Saritasa.Tools.Domain.Exceptions
             {
                 foreach (string error in member.Value)
                 {
-                    IEnumerable<string> list;
-                    if (dict.TryGetValue(error, out list))
+                    if (dict.TryGetValue(error, out var list))
                     {
                         ((IList<string>)list).Add(member.Key);
                     }

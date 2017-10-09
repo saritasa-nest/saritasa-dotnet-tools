@@ -90,7 +90,29 @@ namespace Saritasa.Tools.Common.Utils
                 currentPosition += chunkSize;
             }
         }
+
 #endif
+
+        /// <summary>
+        /// Breaks a list of items into chunks of a specific size.
+        /// </summary>
+        /// <param name="source">Source list.</param>
+        /// <param name="chunkSize">Chunk size.</param>
+        /// <returns>Enumeration of enumerable collections.</returns>
+        public static IEnumerable<IEnumerable<T>> ChunkSelectRange<T>(
+            IEnumerable<T> source,
+            int chunkSize = DefaultChunkSize)
+        {
+            long totalNumberOfElements = source.LongCount();
+            int currentPosition = 0;
+            var originalSource = source;
+            while (totalNumberOfElements > currentPosition)
+            {
+                yield return originalSource.Take(chunkSize);
+                originalSource = originalSource.Skip(chunkSize);
+                currentPosition += chunkSize;
+            }
+        }
 
         /// <summary>
         /// Breaks a list of items into chunks of a specific size and yeilds T items.

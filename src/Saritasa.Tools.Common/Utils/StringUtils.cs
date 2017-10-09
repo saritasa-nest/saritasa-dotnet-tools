@@ -52,8 +52,9 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Retrieves a substring from this instance. If start index had negative value it will be replaced
-        /// to 0. If substring exceed length of target string the end of string will be returned.
+        /// Retrieves a substring from this instance. If start index has negative value it will be replaced
+        /// to 0. If substring exceed length of target string the end of string will be returned. <c>null</c> will
+        /// be converted to empty string.
         /// </summary>
         /// <param name="target">Target string.</param>
         /// <param name="startIndex">The zero-based starting character position of a substring in this instance.</param>
@@ -61,7 +62,10 @@ namespace Saritasa.Tools.Common.Utils
         /// <returns>Substring.</returns>
         public static string SafeSubstring(string target, int startIndex, int length = 0)
         {
-            Guard.IsNotEmpty(target, nameof(target));
+            if (target == null)
+            {
+                return string.Empty;
+            }
 
             if (startIndex < 0)
             {
