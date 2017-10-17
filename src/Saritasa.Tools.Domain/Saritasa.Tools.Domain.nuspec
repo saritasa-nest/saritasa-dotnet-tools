@@ -17,8 +17,6 @@
     <repository type="git" url="https://github.com/Saritasa/SaritasaTools" />
     <dependencies>
       <group targetFramework="netstandard1.2">
-        <dependency id="NETStandard.Library" version="[1.6.0, )" />
-        <dependency id="System.Data.Common" version="4.3.0" />
       </group>
       <group targetFramework="net40" />
     </dependencies>

@@ -30,11 +30,5 @@ namespace Saritasa.Tools.EF.ObjectContext
         {
             return new EFUnitOfWork<TContext>(createContext());
         }
-
-        /// <inheritdoc />
-        public virtual EFUnitOfWork<TContext> Create(IsolationLevel isolationLevel)
-        {
-            return new EFUnitOfWork<TContext>(createContext());
-        }
     }
 }

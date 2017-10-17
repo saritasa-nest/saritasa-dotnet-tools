@@ -2,7 +2,6 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Data;
 
 namespace Saritasa.Tools.Domain
 {
@@ -16,12 +15,5 @@ namespace Saritasa.Tools.Domain
         /// </summary>
         /// <returns>Unit of work.</returns>
         TUnitOfWork Create();
-
-        /// <summary>
-        /// Creates unit of work with specified isolation level.
-        /// </summary>
-        /// <param name="isolationLevel">Isolation level.</param>
-        /// <returns>Unit of work.</returns>
-        TUnitOfWork Create(IsolationLevel isolationLevel);
     }
 }

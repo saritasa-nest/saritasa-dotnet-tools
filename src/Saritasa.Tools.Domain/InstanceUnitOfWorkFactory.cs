@@ -2,7 +2,6 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Data;
 
 namespace Saritasa.Tools.Domain
 {
@@ -31,12 +30,6 @@ namespace Saritasa.Tools.Domain
 
         /// <inheritdoc />
         public TUnitOfWork Create()
-        {
-            return unitOfWork;
-        }
-
-        /// <inheritdoc />
-        public TUnitOfWork Create(IsolationLevel isolationLevel)
         {
             return unitOfWork;
         }
