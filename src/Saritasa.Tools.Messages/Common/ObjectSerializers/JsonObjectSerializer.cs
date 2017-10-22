@@ -3,6 +3,7 @@
 
 using System;
 using Newtonsoft.Json;
+using Saritasa.Tools.Messages.Internal;
 
 namespace Saritasa.Tools.Messages.Common.ObjectSerializers
 {
@@ -11,9 +12,10 @@ namespace Saritasa.Tools.Messages.Common.ObjectSerializers
     /// </summary>
     public class JsonObjectSerializer : IObjectSerializer
     {
-        static readonly JsonSerializerSettings jsonSerializerSettings = new JsonSerializerSettings()
+        private static readonly JsonSerializerSettings jsonSerializerSettings = new JsonSerializerSettings
         {
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            ContractResolver = new SkipMetaPropertiesContractResolver()
         };
 
         /// <inheritdoc />
