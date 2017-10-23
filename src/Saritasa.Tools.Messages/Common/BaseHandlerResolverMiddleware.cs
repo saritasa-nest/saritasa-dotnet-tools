@@ -53,7 +53,7 @@ namespace Saritasa.Tools.Messages.Common
         }
 
         /// <summary>
-        /// Creates new object factory.
+        /// Creates new object factory. Find public ctor and inject services.
         /// </summary>
         /// <param name="type">Object type.</param>
         /// <param name="logger">Logger marker.</param>

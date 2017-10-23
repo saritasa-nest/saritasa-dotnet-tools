@@ -328,6 +328,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = queryProvider.GetFilterScript(messageQuery);
+                command.CommandTimeout = 120; // Set timeout to 2 mins since query may take long time.
                 using (var reader = await command.ExecuteReaderAsync(cancellationToken))
                 {
                     while (await reader.ReadAsync(cancellationToken))
@@ -351,9 +352,15 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                         {
                             messageRecord.ErrorMessage = reader.GetString(7);
                             messageRecord.ErrorType = reader.GetString(8);
-                            var error = serializer.IsText ? Encoding.UTF8.GetBytes(reader.GetString(7)) : (byte[])reader[7];
                             var errorType = Type.GetType(messageRecord.ErrorType);
-                            messageRecord.Error = serializer.Deserialize(error, errorType) as Exception;
+                            if (!reader.IsDBNull(6) && !string.IsNullOrEmpty(messageRecord.ErrorType))
+                            {
+                                var error = serializer.IsText ? Encoding.UTF8.GetBytes(reader.GetString(6)) : (byte[])reader[6];
+                                if (error.Length > 0)
+                                {
+                                    messageRecord.Error = serializer.Deserialize(error, errorType) as Exception;
+                                }
+                            }
                         }
                         messageRecord.CreatedAt = reader.GetDateTime(9);
                         messageRecord.ExecutionDuration = reader.GetInt32(10);

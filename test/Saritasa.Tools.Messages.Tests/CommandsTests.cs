@@ -315,7 +315,7 @@ namespace Saritasa.Tools.Messages.Tests
         [Fact]
         public void Can_run_command_handler_with_ctor_resolve()
         {
-            // Arrange;
+            // Arrange
             pipelineService.ServiceProvider = new FuncServiceProvider(Ns01_InterfacesResolver);
             var builder = pipelineService.PipelineContainer.AddCommandPipeline();
             SetupCommandPipeline(builder);
