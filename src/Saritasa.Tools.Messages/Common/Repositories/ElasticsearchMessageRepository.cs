@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Net.Http;
-using System.Net.Http.Headers;
+using System.Text;
 using System.Threading;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Common.ObjectSerializers;
@@ -22,16 +22,17 @@ namespace Saritasa.Tools.Messages.Common.Repositories
     public class ElasticsearchMessageRepository : IMessageRepository, IDisposable
     {
         private const string KeyUrl = "uri";
+        private const string ContentTypeJson = "application/json";
 
         /// <summary>
         /// Elasticsearch index.
         /// </summary>
-        private const string IndexName = "saritasa";
+        public string IndexName { get; private set; } = "saritasa";
 
         /// <summary>
         /// Elasticsearch index type.
         /// </summary>
-        private const string IndexTypeName = "messages";
+        public string IndexTypeName { get; private set; } = "messages";
 
         /// <summary>
         /// Elasticsearch web url.
@@ -60,8 +61,27 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             }
             this.uri = uri.TrimEnd('/');
             this.serializer = new JsonObjectSerializer();
-            this.client.DefaultRequestHeaders.UserAgent.Add(
-                new ProductInfoHeaderValue(new ProductHeaderValue("SaritasaTools")));
+        }
+
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        /// <param name="uri">Uri to Elastictsearch service.</param>
+        /// <param name="indexName">Index name.</param>
+        /// <param name="indexType">Index type name.</param>
+        public ElasticsearchMessageRepository(string uri, string indexName, string indexType)
+            : this(uri)
+        {
+            if (string.IsNullOrEmpty(indexName))
+            {
+                throw new ArgumentNullException(nameof(indexName));
+            }
+            if (string.IsNullOrEmpty(indexType))
+            {
+                throw new ArgumentNullException(nameof(indexType));
+            }
+            IndexName = indexName;
+            IndexTypeName = indexType;
         }
 
         /// <summary>
@@ -81,13 +101,19 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                 throw new ObjectDisposedException(null);
             }
 
-            await client
+            var id = messageRecord.Id.ToString("N");
+            var response = await client
                 .PutAsync(
-                    $"{uri}/{IndexName}/{IndexTypeName}/{messageRecord.Id}",
-                    new ByteArrayContent(serializer.Serialize(messageRecord)),
+                    $"{uri}/{IndexName}/{IndexTypeName}/{id}",
+                    new StringContent(Encoding.UTF8.GetString(serializer.Serialize(messageRecord)),
+                        Encoding.UTF8, ContentTypeJson),
                     cancellationToken
                 )
                 .ConfigureAwait(false);
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new InvalidOperationException($"Cannot insert message with id {id}: {await response.Content.ReadAsStringAsync()}");
+            }
         }
 
         /// <inheritdoc />
@@ -105,13 +131,22 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
             var response = await client.PostAsync(
                 $"{uri}/{IndexName}/{IndexTypeName}/_search",
-                new ByteArrayContent(serializer.Serialize(searchQuery)),
+                new StringContent(Encoding.UTF8.GetString(serializer.Serialize(searchQuery)),
+                    Encoding.UTF8, ContentTypeJson),
                 cancellationToken
             );
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new InvalidOperationException($"Cannot select messages: {await response.Content.ReadAsStringAsync()}");
+            }
 
             var result = await response.Content.ReadAsByteArrayAsync();
             var root = (Root)serializer.Deserialize(result, typeof(Root));
-            var messages = root.Hits.Items.Select(x => x.Source).ToArray(); // message.Content deserialized as JObject.
+            var messages = root.Hits.Items.Select(x => x.Source).ToArray(); // message.Content, message.Error deserialized as JObject.
+            foreach (var message in messages)
+            {
+                message.Content = Deserialize(message.Content.ToString(), Type.GetType(message.ContentType));
+            }
 
             return messages;
         }
@@ -164,6 +199,16 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                 });
             }
             return filterQueries;
+        }
+
+        private object Deserialize(string str, Type t)
+        {
+            if (string.IsNullOrEmpty(str))
+            {
+                return null;
+            }
+            var bytes = Encoding.UTF8.GetBytes(str);
+            return serializer.Deserialize(bytes, t);
         }
 
         #region Dispose

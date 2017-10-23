@@ -233,7 +233,8 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                         Data = Deserialize<IDictionary<string, string>>(fields[6]),
                         ErrorType = fields[7],
                         ErrorMessage = fields[8],
-                        Error = null // 9
+                        Error = null, // 9
+                        ExecutionDuration = int.Parse(fields[10])
                     };
                     messageRecord.Content = Deserialize(fields[5], Type.GetType(messageRecord.ContentType));
                     if (!string.IsNullOrEmpty(messageRecord.ErrorType))
