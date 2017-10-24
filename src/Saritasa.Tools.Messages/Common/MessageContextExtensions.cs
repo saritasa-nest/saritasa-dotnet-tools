@@ -22,11 +22,9 @@ namespace Saritasa.Tools.Messages.Common
         public static T GetItemByKey<T>(this IMessageContext messageContext, string key)
             where T : class
         {
-            object obj;
-            if (messageContext.Items.TryGetValue(key, out obj))
+            if (messageContext.Items.TryGetValue(key, out object obj))
             {
-                var typedObj = obj as T;
-                if (typedObj != null)
+                if (obj is T typedObj)
                 {
                     return typedObj;
                 }

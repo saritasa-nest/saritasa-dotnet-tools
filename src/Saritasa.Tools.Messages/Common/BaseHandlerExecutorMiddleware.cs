@@ -16,7 +16,7 @@ namespace Saritasa.Tools.Messages.Common
     public abstract class BaseHandlerExecutorMiddleware
     {
         /// <summary>
-        /// If true the middleware will try to resolve executing method parameters. Default is <c>true</c>.
+        /// If <c>true</c> the middleware will try to resolve executing method parameters. Default is <c>true</c>.
         /// </summary>
         public bool UseParametersResolve { get; set; } = true;
 

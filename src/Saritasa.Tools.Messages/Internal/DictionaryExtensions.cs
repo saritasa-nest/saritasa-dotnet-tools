@@ -25,8 +25,7 @@ namespace Saritasa.Tools.Messages.Internal
             TKey key,
             TValue defaultValue = default(TValue))
         {
-            TValue value;
-            bool success = target.TryGetValue(key, out value);
+            bool success = target.TryGetValue(key, out TValue value);
             return success ? value : defaultValue;
         }
 
@@ -43,8 +42,7 @@ namespace Saritasa.Tools.Messages.Internal
             TKey key,
             Action<TKey> action)
         {
-            TValue value;
-            bool success = target.TryGetValue(key, out value);
+            bool success = target.TryGetValue(key, out TValue value);
             if (success)
             {
                 return value;

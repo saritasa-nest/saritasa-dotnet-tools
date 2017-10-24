@@ -21,12 +21,12 @@ namespace Saritasa.Tools.Messages.Common
         public const string HandlerObjectKey = "handler-object";
 
         /// <summary>
-        /// If <c>true</c> the middleware will resolve project using internal resolver. Default is <c>true</c>.
+        /// If <c>true</c> the middleware resolves dependencies using internal resolver. Default is <c>true</c>.
         /// </summary>
         public bool UseInternalObjectResolver { get; set; } = true;
 
         /// <summary>
-        /// Resolve handler object public properties using service provider.
+        /// Resolve handler object public properties using service provider. Default is <c>true</c>.
         /// </summary>
         public bool UsePropertiesResolving { get; set; } = false;
 
