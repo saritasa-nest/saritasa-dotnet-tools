@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Internal;
 
 namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
 {
@@ -15,13 +16,13 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         /// <inheritdoc />
         public string Id { get; set; }
 
-        readonly Action<IDictionary<object, object>> action;
+        private readonly Action<IDictionary<string, string>> action;
 
         /// <summary>
         /// .ctor
         /// </summary>
         /// <param name="action">The action to be executed.</param>
-        public DataMiddleware(Action<IDictionary<object, object>> action)
+        public DataMiddleware(Action<IDictionary<string, string>> action)
         {
             if (action == null)
             {
@@ -34,7 +35,12 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         /// <inheritdoc />
         public virtual void Handle(IMessageContext messageContext)
         {
-            action(messageContext.Items);
+            var obj = messageContext.Items.GetValueOrDefault(MessageContextConstants.DataKey,
+                new Dictionary<string, string>());
+            if (obj is IDictionary<string, string> data)
+            {
+                action(data);
+            }
         }
     }
 }
