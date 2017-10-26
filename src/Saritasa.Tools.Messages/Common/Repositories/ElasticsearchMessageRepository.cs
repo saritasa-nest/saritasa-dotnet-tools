@@ -27,7 +27,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <summary>
         /// Elasticsearch index.
         /// </summary>
-        public string IndexName { get; private set; } = "saritasa";
+        public string IndexName { get; private set; } = "saritasa-tools";
 
         /// <summary>
         /// Elasticsearch index type.
@@ -112,7 +112,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                 .ConfigureAwait(false);
             if (!response.IsSuccessStatusCode)
             {
-                throw new InvalidOperationException($"Cannot insert message with id {id}: {await response.Content.ReadAsStringAsync()}");
+                throw new InvalidOperationException($"Cannot insert message with id {id}: {await response.Content.ReadAsStringAsync()}.");
             }
         }
 
@@ -137,7 +137,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             );
             if (!response.IsSuccessStatusCode)
             {
-                throw new InvalidOperationException($"Cannot select messages: {await response.Content.ReadAsStringAsync()}");
+                throw new InvalidOperationException($"Cannot select messages: {await response.Content.ReadAsStringAsync()}.");
             }
 
             var result = await response.Content.ReadAsByteArrayAsync();
