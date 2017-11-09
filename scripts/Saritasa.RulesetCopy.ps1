@@ -1,5 +1,5 @@
 #
-# Script installs Saritasa stylecop analyzer ruleset into Visual Studio directory.
+# Script copies Saritasa stylecop analyzer ruleset into Visual Studio directory.
 #
 
 # check that script is running under admin rights
