@@ -1,2 +1,13 @@
-﻿0.1.0 [2017-01-11]
+﻿0.3.0 [2017-08-07]
+[*] Move NullServiceProvider, minor updates.
+
+0.2.0 [2017-07-27]
+[+] Global pipelines refactoring. Instead of register and using every pipeline separately use IMessagePipelineService.
+[*] Downgrade dependencies to netstandard1.5 and net452.
+[*] Add cancellation token to command and event pipelines.
+
+0.1.1 [2017-02-15]
+[+] Add method CloneToMessage to IMessage interface.
+
+0.1.0 [2017-01-11]
 [+] Initial release.

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNet.Identity;
-using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Abstractions.Commands;
 using ZergRushCo.Todosya.Domain.UserContext.Entities;
 
 namespace ZergRushCo.Todosya.Domain.UserContext.Commands
@@ -11,6 +11,11 @@ namespace ZergRushCo.Todosya.Domain.UserContext.Commands
     /// </summary>
     public class RegisterUserCommand
     {
+        /// <summary>
+        /// Optional user id. Should be set manually for testing.
+        /// </summary>
+        public Guid UserId { get; set; } = Guid.Empty;
+
         /// <summary>
         /// User's email.
         /// </summary>

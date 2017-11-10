@@ -1,18 +1,15 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using System.Net.Mail;
+using System.Threading.Tasks;
+using System.Threading;
+
 namespace Saritasa.Tools.Emails
 {
-    using System;
-    using System.Collections.Generic;
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
-    using System.Net.Mail;
-#endif
-    using System.Threading.Tasks;
-    using System.Threading;
-    using JetBrains.Annotations;
-
-    using NameValueDict = System.Collections.Generic.IDictionary<string, object>;
+    using NameValueDict = IDictionary<string, object>;
 
     /// <summary>
     /// Abstract email sender implementation with interceptors support.
@@ -24,10 +21,10 @@ namespace Saritasa.Tools.Emails
         /// <summary>
         /// Send message.
         /// </summary>
-        protected abstract Task Process([NotNull] MailMessage message, [NotNull] NameValueDict data);
+        protected abstract Task Process(MailMessage message, NameValueDict data);
 
         /// <summary>
-        /// Execution strategy. DefaultEmailExecutionStrategy used by default. Determines the way how we should proceed
+        /// Execution strategy. <see cref="DefaultEmailExecutionStrategy" /> used by default. Determines the way how we should proceed
         /// actual email sending.
         /// </summary>
         protected IEmailExecutionStrategy ExecutionStrategy { get; } = new DefaultEmailExecutionStrategy();
@@ -38,12 +35,12 @@ namespace Saritasa.Tools.Emails
         public CancellationToken CancellationToken { get; set; } = CancellationToken.None;
 
         /// <inheritdoc />
-        public Task SendAsync([NotNull] MailMessage message)
+        public Task SendAsync(MailMessage message)
         {
             var data = new Dictionary<string, object>();
             bool cancel = false;
 
-            // run pre process interceptors
+            // Run pre process interceptors.
             foreach (var interceptor in interceptors)
             {
                 interceptor.Sending(message, data, ref cancel);
@@ -59,7 +56,7 @@ namespace Saritasa.Tools.Emails
                 }
             }
 
-            // send email and run post process interceptors
+            // Send email and run post process interceptors.
             return ExecutionStrategy.Execute(Process, message, data, CancellationToken).ContinueWith(task =>
             {
                 if (!task.IsFaulted)
@@ -76,7 +73,7 @@ namespace Saritasa.Tools.Emails
         /// Add interceptor.
         /// </summary>
         /// <param name="interceptor">Interceptor.</param>
-        public EmailSender AddInterceptor([NotNull] IEmailInterceptor interceptor)
+        public EmailSender AddInterceptor(IEmailInterceptor interceptor)
         {
             if (interceptor == null)
             {

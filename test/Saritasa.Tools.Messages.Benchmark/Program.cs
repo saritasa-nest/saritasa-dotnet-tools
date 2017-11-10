@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using BenchmarkDotNet.Running;
-using Saritasa.Tools.Messages.Abstractions;
 
 namespace Saritasa.Tools.Messages.Benchmark
 {
@@ -18,7 +17,7 @@ namespace Saritasa.Tools.Messages.Benchmark
         {
             if (args.Length < 1)
             {
-                Console.WriteLine("Usage: Saritasa.Tools.Messages.Benchmark.exe [TypeName]");
+                Console.WriteLine("Usage: Saritasa.Tools.Messages.Benchmark.exe [TypeName].");
                 return;
             }
             var typeName = args[0];
@@ -26,7 +25,7 @@ namespace Saritasa.Tools.Messages.Benchmark
                 .FirstOrDefault(t => t.Name == typeName);
             if (type == null)
             {
-                Console.WriteLine("Cannot find benchmark class");
+                Console.WriteLine("Cannot find benchmark class.");
                 return;
             }
             BenchmarkRunner.Run(type);

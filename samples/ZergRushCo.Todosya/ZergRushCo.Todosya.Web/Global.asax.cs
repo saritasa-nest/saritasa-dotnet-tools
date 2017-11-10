@@ -13,8 +13,8 @@ namespace ZergRushCo.Todosya.Web
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
-            DiConfig.Register();
-            DebugEndpointConfig.Register();
+            var container = DiConfig.Register();
+            DebugEndpointConfig.Register(container);
         }
     }
 }

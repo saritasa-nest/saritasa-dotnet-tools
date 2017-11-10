@@ -48,12 +48,13 @@ For example when user updates product details following JSON will be stored to c
 
 You can see that it contains command content, error details (included stacktrace) and execution duration.
 
-To use it you should call ``AppendMiddleware`` on your message pipeline and pass ``RepositoryMiddleware`` instance. The class requires ``IMessageRepository`` object. Here is an example:
+To use it you should call ``AddMiddlewares`` on your message pipeline and pass ``RepositoryMiddleware`` instance. The class requires ``IMessageRepository`` object. Here is an example:
 
     .. code-block:: c#
 
         var inMemoryMessageRepository = new InMemoryMessageRepository();
-        QueryPipeline.AppendMiddlewares(new RepositoryMiddleware(inMemoryMessageRepository));  
+        PipelineService.AddCommandPipline()
+            .AppendMiddlewares(new RepositoryMiddleware(inMemoryMessageRepository));
 
 You can also set ``RepositoryMessagesFilter`` to filter what messages to store. Repository middleware's name is the type name of repository type. For example if you use ``InMemoryMessageRepository`` the name of ``RepositoryMiddleware`` will be ``InMemoryMessageRepository`` as well.
 

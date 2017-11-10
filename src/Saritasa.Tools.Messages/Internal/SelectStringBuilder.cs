@@ -1,12 +1,12 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
+
+using System.Collections.Generic;
+using Saritasa.Tools.Messages.Internal.Clauses;
+using Saritasa.Tools.Messages.Internal.Enums;
 
 namespace Saritasa.Tools.Messages.Internal
 {
-    using System.Collections.Generic;
-    using Clauses;
-    using Enums;
-
     /// <summary>
     /// The SELECT statement abstract builder.
     /// </summary>
@@ -35,6 +35,7 @@ namespace Saritasa.Tools.Messages.Internal
         /// <inheritdoc />
         public IList<string> SelectedTables { get; }
 
+        /// <inheritdoc />
         public IList<JoinClause> JoinStatement { get; }
 
         /// <inheritdoc />

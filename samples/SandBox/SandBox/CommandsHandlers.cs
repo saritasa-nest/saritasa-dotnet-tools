@@ -1,6 +1,7 @@
 ﻿using System;
 using SandBox.Commands;
 using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Abstractions.Commands;
 
 namespace SandBox
 {

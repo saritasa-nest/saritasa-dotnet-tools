@@ -1,88 +1,104 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
+
+using System;
+using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Common;
 
 namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
 {
-    using System;
-    using System.Threading.Tasks;
-    using Abstractions;
-
     /// <summary>
     /// Executes query delegate.
     /// </summary>
     public class QueryExecutorMiddleware : IMessagePipelineMiddleware, IAsyncMessagePipelineMiddleware
     {
-        /// <inheritdoc />
-        public string Id => "QueryExecutor";
+        /// <summary>
+        /// Middleware identifier.
+        /// </summary>
+        public string Id { get; set; } = nameof(QueryExecutorMiddleware);
 
         /// <inheritdoc />
-        public virtual void Handle(IMessage message)
+        public virtual void Handle(IMessageContext messageContext)
         {
-            var queryMessage = message as QueryMessage;
-            if (queryMessage == null)
+            var queryParams = messageContext.GetItemByKey<QueryParameters>(QueryPipeline.QueryParametersKey);
+
+            // Invoke method and resolve parameters if needed.
+            Stopwatch stopwatch = null;
+            var queryPipeline = messageContext.Pipeline as QueryPipeline;
+            if (queryPipeline != null && queryPipeline.Options.IncludeExecutionDuration)
             {
-                throw new ArgumentException("Message should be QueryMessage type");
+                stopwatch = new Stopwatch();
+                stopwatch.Start();
             }
 
-            // invoke method and resolve parameters if needed
-            var stopWatch = System.Diagnostics.Stopwatch.StartNew();
             try
             {
-                queryMessage.Result = queryMessage.Method.Invoke(queryMessage.QueryObject, queryMessage.Parameters);
-                queryMessage.Status = ProcessingStatus.Completed;
+                queryParams.Result = queryParams.Method.Invoke(queryParams.QueryObject, queryParams.Parameters);
+                messageContext.Items[MessageContextConstants.ResultKey] = queryParams.Result;
+                messageContext.Status = ProcessingStatus.Completed;
             }
             catch (Exception ex)
             {
-                queryMessage.Status = ProcessingStatus.Failed;
+                messageContext.Status = ProcessingStatus.Failed;
                 var innerException = ex.InnerException;
                 if (innerException != null)
                 {
-                    queryMessage.Error = innerException;
-                    queryMessage.ErrorDispatchInfo = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(innerException);
+                    messageContext.FailException = innerException;
                 }
             }
             finally
             {
-                stopWatch.Stop();
-                queryMessage.ExecutionDuration = (int)stopWatch.ElapsedMilliseconds;
+                if (stopwatch != null)
+                {
+                    stopwatch.Stop();
+                    messageContext.Items[MessageContextConstants.ExecutionDurationKey] = (int)stopwatch.ElapsedMilliseconds;
+                }
             }
         }
 
         /// <inheritdoc />
-        public virtual async Task HandleAsync(IMessage message)
+        public virtual async Task HandleAsync(IMessageContext messageContext, CancellationToken cancellationToken)
         {
-            var queryMessage = message as QueryMessage;
-            if (queryMessage == null)
+            var queryParams = (QueryParameters)messageContext.Items[QueryPipeline.QueryParametersKey];
+
+            // Invoke method and resolve parameters if needed.
+            Stopwatch stopwatch = null;
+            var queryPipeline = messageContext.Pipeline as QueryPipeline;
+            if (queryPipeline != null && queryPipeline.Options.IncludeExecutionDuration)
             {
-                throw new ArgumentException("Message should be QueryMessage type");
+                stopwatch = new Stopwatch();
+                stopwatch.Start();
             }
 
-            // invoke method and resolve parameters if needed
-            var stopWatch = System.Diagnostics.Stopwatch.StartNew();
             try
             {
-                queryMessage.Result = queryMessage.Method.Invoke(queryMessage.QueryObject, queryMessage.Parameters);
-                var taskResult = queryMessage.Result as Task;
+                queryParams.Result = queryParams.Method.Invoke(queryParams.QueryObject, queryParams.Parameters);
+                var taskResult = queryParams.Result as Task;
                 if (taskResult != null)
                 {
                     await taskResult;
                 }
-                queryMessage.Status = ProcessingStatus.Completed;
+                messageContext.Status = ProcessingStatus.Completed;
             }
             catch (Exception ex)
             {
-                queryMessage.Status = ProcessingStatus.Failed;
+                messageContext.Status = ProcessingStatus.Failed;
                 var innerException = ex.InnerException;
                 if (innerException != null)
                 {
-                    queryMessage.Error = innerException;
-                    queryMessage.ErrorDispatchInfo = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(innerException);
+                    messageContext.FailException = innerException;
                 }
             }
             finally
             {
-                stopWatch.Stop();
-                queryMessage.ExecutionDuration = (int)stopWatch.ElapsedMilliseconds;
+                if (stopwatch != null)
+                {
+                    stopwatch.Stop();
+                    messageContext.Items[MessageContextConstants.ExecutionDurationKey] = (int)stopwatch.ElapsedMilliseconds;
+                }
             }
         }
     }

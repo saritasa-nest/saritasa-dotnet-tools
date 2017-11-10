@@ -26,6 +26,9 @@ msbuild.log
 # visual studio 2015
 .vs/
 
+# visual studion code
+.vscode/
+
 # mstest test results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*

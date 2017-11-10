@@ -1,15 +1,15 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
+
+using System;
+using System.Linq;
+using System.Text;
+using Saritasa.Tools.Messages.Internal;
+using Saritasa.Tools.Messages.Internal.Clauses;
+using Saritasa.Tools.Messages.Internal.Enums;
 
 namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
 {
-    using System;
-    using System.Linq;
-    using System.Text;
-    using Internal;
-    using Internal.Clauses;
-    using Internal.Enums;
-
     /// <summary>
     /// The SELECT statement SqLite builder.
     /// </summary>
@@ -21,22 +21,22 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
         {
             var sb = new StringBuilder("SELECT ");
 
-            // Output Distinct
+            // Output Distinct.
             if (IsDistinct)
             {
                 sb.Append("DISTINCT ");
             }
 
-            // Output column names
+            // Output column names.
             sb.Append(SelectedColumns.Any() ? string.Join(", ", SelectedColumns.Select(WrapVariable)) : "*");
 
-            // Output table names
+            // Output table names.
             if (SelectedTables.Any())
             {
                 sb.Append($" FROM {string.Join(", ", SelectedTables.Select(WrapVariable))}");
             }
 
-            // Output joins
+            // Output joins.
             if (JoinStatement.Any())
             {
                 foreach (var clause in JoinStatement)
@@ -51,7 +51,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
                             sb.Append("LEFT OUTER JOIN ");
                             break;
                         default:
-                            throw new ArgumentOutOfRangeException(nameof(clause.JoinType), $"SqLite doesn't support {clause.JoinType} join type.");
+                            throw new ArgumentOutOfRangeException(nameof(clause.JoinType), $"SqLite does not support {clause.JoinType} join type.");
                     }
                     sb.Append($"{clause.ToTable} ON ");
                     sb.Append(CreateComparisonClause(
@@ -61,21 +61,21 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
                 }
             }
 
-            // Output where statement
+            // Output where statement.
             if (WhereStatement.Any())
             {
                 sb.AppendLine();
                 sb.Append($"WHERE {string.Join(" AND ", WhereStatement.Select(BuildWhereClauseString))}");
             }
 
-            // Output GroupBy statement
+            // Output GroupBy statement.
             if (GroupByColumns.Count > 0)
             {
                 sb.AppendLine();
                 sb.Append($"GROUP BY {string.Join(", ", GroupByColumns.Select(WrapVariable))}");
             }
 
-            // Output OrderBy statement
+            // Output OrderBy statement.
             if (OrderByStatement.Any())
             {
                 sb.AppendLine();
@@ -93,7 +93,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
                 }
             }
 
-            // Return the built query
+            // Return the built query.
             return sb.ToString();
         }
 
@@ -125,7 +125,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
                         return $"NOT {columnName} IS NULL";
                     default:
                         throw new ArgumentOutOfRangeException(nameof(comparisonOperatorOperator),
-                            $"Cannot use comparison operator {comparisonOperatorOperator} for NULL values.");
+                            string.Format(Properties.Strings.CannotUseComparisonOperatorNull, comparisonOperatorOperator));
                 }
             }
 
@@ -151,7 +151,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
                     return $"{columnName} IN ({FormatSqlValue(value)})";
                 default:
                     throw new ArgumentOutOfRangeException(nameof(comparisonOperatorOperator),
-                        $"Cannot use comparison operator {comparisonOperatorOperator}.");
+                        string.Format(Properties.Strings.CannotUseComparisonOperator, comparisonOperatorOperator));
             }
         }
 
@@ -171,7 +171,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
             }
             if (someValue is DateTime)
             {
-                return $"\'{(DateTime)someValue:yyyy/MM/dd hh:mm:ss}\'";
+                return $"\'{(DateTime)someValue:yyyy-MM-dd hh:mm:ss}\'";
             }
             if (someValue is bool)
             {

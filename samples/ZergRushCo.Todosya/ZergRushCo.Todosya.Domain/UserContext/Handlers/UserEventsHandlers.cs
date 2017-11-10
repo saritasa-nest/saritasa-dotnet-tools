@@ -1,6 +1,7 @@
 ﻿using System.Net.Mail;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Abstractions.Events;
 using ZergRushCo.Todosya.Domain.UserContext.Events;
 
 namespace ZergRushCo.Todosya.Domain.UserContext.Handlers
@@ -20,7 +21,7 @@ namespace ZergRushCo.Todosya.Domain.UserContext.Handlers
             UserCreatedEvent userCreatedEvent,
             Saritasa.Tools.Emails.IEmailSender emailSender)
         {
-            var message = new MailMessage()
+            var message = new MailMessage
             {
                 To =
                 {

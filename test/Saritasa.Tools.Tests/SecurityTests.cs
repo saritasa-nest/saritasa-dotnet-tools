@@ -1,12 +1,12 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
+
+using System;
+using Xunit;
+using Saritasa.Tools.Misc.Security;
 
 namespace Saritasa.Tools.Tests
 {
-    using System;
-    using Xunit;
-    using Misc.Security;
-
     /// <summary>
     /// Security tests.
     /// </summary>
@@ -32,10 +32,15 @@ namespace Saritasa.Tools.Tests
         [Fact]
         public void Test_password_entropy_match()
         {
+            // Arrange
             PasswordGenerator passwordGenerator = new PasswordGenerator();
             passwordGenerator.PasswordLength = 10;
             passwordGenerator.SetCharactersPool("0123456789"); // 10 symbols
+
+            // Act
             var entropy = passwordGenerator.GetEntropy();
+
+            // Assert
             Assert.InRange(entropy, 33.119, 33.319);
         }
 

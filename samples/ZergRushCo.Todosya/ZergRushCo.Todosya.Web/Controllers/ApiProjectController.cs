@@ -4,6 +4,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.Extensions.Logging;
 using Saritasa.Tools.Messages.Abstractions;
 using ZergRushCo.Todosya.Domain.TaskContext.Queries;
+using Saritasa.Tools.Messages.Abstractions.Queries;
 
 namespace ZergRushCo.Todosya.Web.Controllers
 {
@@ -15,10 +16,9 @@ namespace ZergRushCo.Todosya.Web.Controllers
     public class ApiProjectController : BaseController
     {
         public ApiProjectController(
-            ICommandPipeline commandPipeline,
-            IQueryPipeline queryPipeline,
+            IMessagePipelineService pipelinesService,
             ILoggerFactory loggerFactory) :
-            base(commandPipeline, queryPipeline, loggerFactory)
+            base(pipelinesService, loggerFactory)
         {
         }
 
@@ -27,7 +27,7 @@ namespace ZergRushCo.Todosya.Web.Controllers
         public ActionResult Get()
         {
             var userId = User.Identity.GetUserId();
-            var data = QueryPipeline.Query<ProjectsQueries>().With(q => q.GetByUserDto(userId));
+            var data = PipelineService.Query<ProjectsQueries>().With(q => q.GetByUserDto(userId));
             return Json(data, JsonRequestBehavior.AllowGet);
         }
     }

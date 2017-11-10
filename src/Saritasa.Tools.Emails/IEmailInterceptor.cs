@@ -1,17 +1,14 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using System.Net.Mail;
+
 namespace Saritasa.Tools.Emails
 {
-    using System;
-    using System.Collections.Generic;
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
-    using System.Net.Mail;
-#endif
-    using JetBrains.Annotations;
-
     /// <summary>
-    /// Email interceptor to be used with EmailSender.
+    /// Email interceptor to be used with <see cref="EmailSender" />.
     /// </summary>
     public interface IEmailInterceptor
     {
@@ -20,7 +17,7 @@ namespace Saritasa.Tools.Emails
         /// </summary>
         /// <param name="mailMessage">Mail message.</param>
         /// <param name="data">Additional data.</param>
-        void Sent([NotNull] MailMessage mailMessage, [NotNull] IDictionary<string, object> data);
+        void Sent(MailMessage mailMessage, IDictionary<string, object> data);
 
         /// <summary>
         /// The method is called before email sending.
@@ -29,8 +26,8 @@ namespace Saritasa.Tools.Emails
         /// <param name="data">Additional data.</param>
         /// <param name="cancel">Should the email sending be cancelled.</param>
         void Sending(
-            [NotNull] MailMessage mailMessage,
-            [NotNull] IDictionary<string, object> data,
+            MailMessage mailMessage,
+            IDictionary<string, object> data,
             ref bool cancel);
     }
 }

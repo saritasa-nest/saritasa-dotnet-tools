@@ -1,20 +1,21 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
+#if NET452
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using Saritasa.Tools.Messages.Abstractions;
+
 namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
 {
-    using System;
-    using System.Diagnostics;
-    using Abstractions;
-
     /// <summary>
     /// Represents performance counter that count total messages passed.
     /// </summary>
     public class PerformanceCounterMiddleware : IMessagePipelineMiddleware, IDisposable
     {
         /// <inheritdoc />
-        public string Id { get; set; } = "PerformanceCounter";
+        public string Id { get; set; }
 
         /// <summary>
         /// Total processed messages counter.
@@ -36,14 +37,34 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         /// </summary>
         public const string AverageMessagesDurationBase = "Base Average Message Processing Duration";
 
-        bool initialized;
+        private bool initialized;
 
-        readonly string category;
+        private readonly string category;
 
-        PerformanceCounter performanceCounterTotal;
-        PerformanceCounter performanceCounterRate;
-        PerformanceCounter performanceCounterAvg;
-        PerformanceCounter performanceCounterAvgBase;
+        private PerformanceCounter performanceCounterTotal;
+        private PerformanceCounter performanceCounterRate;
+        private PerformanceCounter performanceCounterAvg;
+        private PerformanceCounter performanceCounterAvgBase;
+
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        /// <param name="dict">Parameters.</param>
+        public PerformanceCounterMiddleware(IDictionary<string, string> dict)
+        {
+            if (dict.ContainsKey("id"))
+            {
+                Id = dict["id"];
+            }
+            else
+            {
+                Id = this.GetType().Name;
+            }
+            if (dict.ContainsKey("category"))
+            {
+                this.category = dict["category"];
+            }
+        }
 
         /// <summary>
         /// .ctor
@@ -52,6 +73,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         public PerformanceCounterMiddleware(string category = "Saritasa Tools Messages")
         {
             this.category = category;
+            Id = this.GetType().Name;
         }
 
         void Initialize()
@@ -86,7 +108,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public virtual void Handle(IMessage message)
+        public virtual void Handle(IMessageContext messageContext)
         {
             if (!initialized)
             {
@@ -95,7 +117,10 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
 
             performanceCounterTotal.Increment();
             performanceCounterRate.Increment();
-            performanceCounterAvg.IncrementBy(message.ExecutionDuration);
+            if (messageContext.Items.TryGetValue(MessageContextConstants.ExecutionDurationKey, out object durationObj))
+            {
+                performanceCounterAvg.IncrementBy((long)durationObj);
+            }
             performanceCounterAvgBase.Increment();
         }
 

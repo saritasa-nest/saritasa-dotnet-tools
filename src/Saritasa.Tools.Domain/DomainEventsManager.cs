@@ -1,13 +1,12 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace Saritasa.Tools.Domain
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using JetBrains.Annotations;
-
     /// <summary>
     /// Domain events manager in-memory implementation.
     /// </summary>
@@ -22,13 +21,13 @@ namespace Saritasa.Tools.Domain
 
         /// <inheritdoc />
         public virtual void Register<TEvent>(
-            [NotNull] IDomainEventHandler<TEvent> handler) where TEvent : class
+            IDomainEventHandler<TEvent> handler) where TEvent : class
         {
             Handlers.Add(handler);
         }
 
         /// <inheritdoc />
-        public virtual void Raise<TEvent>([NotNull] TEvent @event) where TEvent : class
+        public virtual void Raise<TEvent>(TEvent @event) where TEvent : class
         {
             var registeredHandlers = handlers.Where(h => h is IDomainEventHandler<TEvent>);
             foreach (IDomainEventHandler<TEvent> handler in registeredHandlers)

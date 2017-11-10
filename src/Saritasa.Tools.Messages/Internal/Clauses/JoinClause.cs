@@ -1,10 +1,10 @@
-// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
+
+using Saritasa.Tools.Messages.Internal.Enums;
 
 namespace Saritasa.Tools.Messages.Internal.Clauses
 {
-    using Enums;
-
     /// <summary>
     /// Represents a JOIN clause to be used with SELECT statements.
     /// </summary>
@@ -70,7 +70,8 @@ namespace Saritasa.Tools.Messages.Internal.Clauses
         /// <param name="operator">The operator.</param>
         /// <param name="fromTableName">Name of from table.</param>
         /// <param name="fromColumnName">Name of from column.</param>
-        public JoinClause(ISelectStringBuilder builder, JoinType joinType, string toTableName, string toColumnName, ComparisonOperator @operator,
+        public JoinClause(ISelectStringBuilder builder, JoinType joinType, string toTableName, string toColumnName,
+            ComparisonOperator @operator,
             string fromTableName, string fromColumnName) : this(builder, joinType, toTableName)
         {
             FromTable = fromTableName;
@@ -104,7 +105,7 @@ namespace Saritasa.Tools.Messages.Internal.Clauses
         }
 
         /// <summary>
-        /// Finishes the clause initialization with <see cref="ComparisonOperator.Equals" /> comparison operator.
+        /// Finishes the clause initialization with <see cref="ComparisonOperator" /> comparison operator.
         /// </summary>
         /// <param name="fromTableName">Name of from table.</param>
         /// <param name="fromColumnName">Name of from column.</param>

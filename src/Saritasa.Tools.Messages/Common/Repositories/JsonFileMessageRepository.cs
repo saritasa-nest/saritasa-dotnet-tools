@@ -1,83 +1,68 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Common.ObjectSerializers;
+
 namespace Saritasa.Tools.Messages.Common.Repositories
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Text;
-    using System.Threading.Tasks;
-    using Abstractions;
-    using ObjectSerializers;
-
     /// <summary>
     /// JSON file target. Write JSON serialized messages separated by new line.
     /// </summary>
     /// <remarks>
     /// JSON processing utilities can be used to parse files. For example jl-sql (https://github.com/avz/jl-sql), jq.
     /// </remarks>
-    public class JsonFileMessageRepository : IMessageRepository, IDisposable
+    public class JsonFileMessageRepository : BaseFileRepository, IMessageRepository, IDisposable
     {
-        /// <summary>
-        /// Logs path.
-        /// </summary>
-        public string LogsPath { get; }
+        private FileStream currentFileStream;
 
-        FileStream currentFileStream;
-
-        readonly IObjectSerializer serializer;
-
-        readonly string prefix;
-
-        readonly bool buffer;
-
-        static readonly object objLock = new object();
+        /// <inheritdoc />
+        public override string FileNameExtension => ".json";
 
         /// <summary>
         /// .ctor
         /// </summary>
-        /// <param name="logsPath">Logs path.</param>
+        /// <param name="path">Logs path.</param>
         /// <param name="buffer">Should the output stream be buffered.</param>
         /// <param name="prefix">Files names prefix.</param>
-        public JsonFileMessageRepository(string logsPath, string prefix = "", bool buffer = true)
+        public JsonFileMessageRepository(string path, string prefix = "", bool buffer = true)
         {
-            if (string.IsNullOrEmpty(logsPath))
-            {
-                throw new ArgumentException(nameof(logsPath));
-            }
-            this.LogsPath = logsPath;
-            this.serializer = new JsonObjectSerializer();
-            this.prefix = prefix;
-            this.buffer = buffer;
-            Directory.CreateDirectory(LogsPath);
+            this.Path = path;
+            this.FileNamePrefix = prefix;
+            this.BufferStream = buffer;
+            ValidateAndInit();
         }
 
-        string GetFileNameByDate(DateTime date, int count)
+        /// <summary>
+        /// Create repository from dictionary.
+        /// </summary>
+        /// <param name="parameters">Parameters dictionary.</param>
+        public JsonFileMessageRepository(IDictionary<string, string> parameters) : base(parameters)
         {
-            var name = $"{date:yyyyMMdd}-{count:000}.json";
-            if (!string.IsNullOrEmpty(prefix))
-            {
-                name = prefix + "-" + name;
-            }
-            return name;
+            ValidateAndInit();
         }
 
-        string GetAvailableFileNameByDate(DateTime date)
+        /// <inheritdoc />
+        protected override void ValidateAndInit()
         {
-            if (currentFileStream != null)
+            if (!(this.Serializer is JsonObjectSerializer))
             {
-                return Path.GetFileName(currentFileStream.Name);
+                this.Serializer = new JsonObjectSerializer();
             }
-
-            return GetFileNameByDate(date, 0);
+            base.ValidateAndInit();
         }
 
-        static readonly byte[] newLine = Encoding.UTF8.GetBytes(Environment.NewLine);
+        private static readonly byte[] newLine = Encoding.UTF8.GetBytes(Environment.NewLine);
 
-        void WriteToFile(IMessage message)
+        private void WriteToFile(MessageRecord message)
         {
-            var jsonBytes = serializer.Serialize(message.CloneToMessage());
+            var jsonBytes = Serializer.Serialize(message);
             currentFileStream.Write(jsonBytes, 0, jsonBytes.Length);
             currentFileStream.Write(newLine, 0, newLine.Length);
         }
@@ -87,57 +72,68 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         static readonly Task<bool> completedTask = Task.FromResult(true);
 
         /// <inheritdoc />
-        public Task AddAsync(IMessage message)
+        public Task AddAsync(MessageRecord messageRecord, CancellationToken cancellationToken)
         {
             if (disposed)
             {
                 throw new ObjectDisposedException("The repository has been disposed.");
             }
 
-            lock (objLock)
+            lock (SyncRoot)
             {
-                string name = GetAvailableFileNameByDate(DateTime.Now);
-                if (currentFileStream == null || Path.GetFileName(currentFileStream.Name) != name)
+                string name = GetAvailableFileNameByDate(currentFileStream, DateTime.Now);
+                if (currentFileStream == null || System.IO.Path.GetFileName(currentFileStream.Name) != name)
                 {
                     Close();
-                    currentFileStream = new FileStream(Path.Combine(LogsPath, name), FileMode.Append);
+                    currentFileStream = new FileStream(System.IO.Path.Combine(Path, name), FileMode.Append);
                 }
-                WriteToFile(message);
+                WriteToFile(messageRecord);
             }
 
-            if (!buffer)
+            if (!BufferStream)
             {
-                lock (objLock)
+                lock (SyncRoot)
                 {
-                    currentFileStream.FlushAsync();
+                    currentFileStream.Flush();
                 }
             }
 
             return completedTask;
         }
 
-        /// <inheritdoc />
-        public Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <inheritdoc />
-        public void SaveState(IDictionary<string, object> dict)
-        {
-            dict[nameof(LogsPath)] = LogsPath;
-            dict[nameof(buffer)] = buffer;
-            dict[nameof(prefix)] = prefix;
-        }
-
         #endregion
+
+        /// <inheritdoc />
+        protected override IEnumerable<MessageRecord> ReadMessagesFromStream(Stream stream,
+            MessageQuery query)
+        {
+            using (var streamReader = new StreamReader(stream))
+            {
+                var line = streamReader.ReadLine();
+                var messageRecord = (MessageRecord)Serializer.Deserialize(Encoding.UTF8.GetBytes(line),
+                    typeof(MessageRecord));
+
+                var contentType = Type.GetType(messageRecord.ContentType);
+                var contentBytes = Encoding.UTF8.GetBytes(messageRecord.Content.ToString());
+                messageRecord.Content = Serializer.Deserialize(contentBytes, contentType);
+
+                if (messageRecord.Error != null)
+                {
+                    var errorType = Type.GetType(messageRecord.ErrorType);
+                    var errorBytes = Encoding.UTF8.GetBytes(messageRecord.Error.ToString());
+                    messageRecord.Error = Serializer.Deserialize(errorBytes, errorType) as Exception;
+                }
+
+                yield return messageRecord;
+            }
+        }
 
         /// <summary>
         /// Close all streams.
         /// </summary>
         public void Close()
         {
-            lock (objLock)
+            lock (SyncRoot)
             {
                 if (currentFileStream != null)
                 {
@@ -172,20 +168,5 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         #endregion
-
-        /// <summary>
-        /// Create repository from dictionary.
-        /// </summary>
-        /// <param name="dict">Properties.</param>
-        /// <returns>Message repository.</returns>
-        public static IMessageRepository CreateFromState(IDictionary<string, object> dict)
-        {
-            return new CsvFileMessageRepository(
-                dict[nameof(LogsPath)].ToString(),
-                (IObjectSerializer)Activator.CreateInstance(Type.GetType(dict[nameof(serializer)].ToString())),
-                dict[nameof(prefix)].ToString(),
-                Convert.ToBoolean(dict[nameof(buffer)])
-            );
-        }
     }
 }

@@ -1,5 +1,5 @@
-FlowUtils
-=========
+Flow
+====
 
 Method to affect application flow.
 
@@ -71,21 +71,6 @@ Method to affect application flow.
                     }),
                     FlowUtils.CreateMaxCountCacheStrategy<int, int>(maxCount: 3, removeCount: 2)
                 );
-
-.. function:: void Raise<TEventArgs>(object sender, TEventArgs e, ref EventHandler<TEventArgs> eventDelegate)
-
-    Helps to raise event handlers.
-
-    If you develop your own class with events it is not handy to raise it. You should check whther it is null. Even in that case your code is not thread safe. This method makes these two checks and calls event. Example:
-
-        .. code-block:: c#
-
-            // without Saritasa extensions, not thread safe
-            if (TestEvent != null)
-                TestEvent(sender, eventArgs);
-
-            // with Saritasa extensions
-            FlowsUtils.Raise(eventArgs, sender, ref TestEvent);
 
 .. function:: void RaiseAll<TEventArgs>(object sender, TEventArgs e, ref EventHandler<TEventArgs> eventDelegate)
 

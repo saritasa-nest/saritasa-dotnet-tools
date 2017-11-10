@@ -1,17 +1,13 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+
 namespace Saritasa.Tools.Common.Utils
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Globalization;
-    using System.Linq;
-    using System.Text.RegularExpressions;
-    using JetBrains.Annotations;
-    using Extensions;
-
     /// <summary>
     /// Strings utils.
     /// </summary>
@@ -23,10 +19,8 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="target">Target string.</param>
         /// <param name="maxLength">Max length.</param>
         /// <returns>Truncated string.</returns>
-        [DebuggerStepThrough]
-        public static string Truncate([NotNull] string target, int maxLength)
+        public static string SafeTruncate(string target, int maxLength)
         {
-            Guard.IsNotEmpty(target, nameof(target));
             Guard.IsNotNegativeOrZero(maxLength, nameof(maxLength));
             return target.Length <= maxLength ? target : target.Substring(0, maxLength);
         }
@@ -37,12 +31,11 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="separator">The string to use as a separator.</param>
         /// <param name="values">The values.</param>
         /// <returns>Concatenated string.</returns>
-        [DebuggerStepThrough]
-        public static string JoinIgnoreEmpty([NotNull] string separator, params string[] values)
+        public static string JoinIgnoreEmpty(string separator, params string[] values)
         {
             Guard.IsNotEmpty(separator, nameof(separator));
             Guard.IsNotNull(values, nameof(values));
-            return string.Join(separator, values.Where(x => x.IsNotEmpty()));
+            return string.Join(separator, values.Where(x => !string.IsNullOrEmpty(x)));
         }
 
         /// <summary>
@@ -51,53 +44,28 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="separator">The string to use as a separator.</param>
         /// <param name="values">The values.</param>
         /// <returns>Concatenated string.</returns>
-        [DebuggerStepThrough]
-        public static string JoinIgnoreEmpty([NotNull] string separator, [NotNull] IEnumerable<string> values)
+        public static string JoinIgnoreEmpty(string separator, IEnumerable<string> values)
         {
             Guard.IsNotEmpty(separator, nameof(separator));
             Guard.IsNotNull(values, nameof(values));
-            return string.Join(separator, values.Where(x => x.IsNotEmpty()));
+            return string.Join(separator, values.Where(x => !string.IsNullOrEmpty(x)));
         }
 
         /// <summary>
-        /// Converts wildcards to regex. Determines what reg exp correspond to string with * and ? chars.
-        /// </summary>
-        /// <param name="pattern">The wildcards pattern.</param>
-        /// <returns></returns>
-        [DebuggerStepThrough]
-        public static string WildcardToRegex([NotNull] string pattern)
-        {
-            Guard.IsNotEmpty(pattern, nameof(pattern));
-            return ("^" + Regex.Escape(pattern)).Replace("\\*", ".*").Replace("\\?", ".") + "$";
-        }
-
-        /// <summary>
-        /// Reverse string characters. "123" -> "321".
-        /// </summary>
-        /// <param name="target">Target string.</param>
-        /// <returns>Reversed string.</returns>
-        [DebuggerStepThrough]
-        public static string Reverse([NotNull] string target)
-        {
-            Guard.IsNotEmpty(target, nameof(target));
-
-            char[] arr = target.ToCharArray();
-            Array.Reverse(arr);
-            return new string(arr);
-        }
-
-        /// <summary>
-        /// Retrieves a substring from this instance. If start index had negative value it will be replaced
-        /// to 0. If substring exceed length of target string the end of string will be returned.
+        /// Retrieves a substring from this instance. If start index has negative value it will be replaced
+        /// to 0. If substring exceed length of target string the end of string will be returned. <c>null</c> will
+        /// be converted to empty string.
         /// </summary>
         /// <param name="target">Target string.</param>
         /// <param name="startIndex">The zero-based starting character position of a substring in this instance.</param>
         /// <param name="length">The number of characters in the substring.</param>
         /// <returns>Substring.</returns>
-        [DebuggerStepThrough]
-        public static string SafeSubstring([NotNull] string target, int startIndex, int length = 0)
+        public static string SafeSubstring(string target, int startIndex, int length = 0)
         {
-            Guard.IsNotEmpty(target, nameof(target));
+            if (target == null)
+            {
+                return string.Empty;
+            }
 
             if (startIndex < 0)
             {
@@ -119,12 +87,13 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Converts the string to snake case style (HelloWorld -> Hello_World). The string will have underscore (_) in front of
-        /// each upper case letter. The function does not remove spaces and does not make string lower case.
+        /// Returns empty string if target string is null or string itself.
         /// </summary>
-        public static string ConvertToSnakeCase([NotNull] string target)
+        /// <param name="target">Target string.</param>
+        /// <returns>Empty string if null or target string.</returns>
+        public static string NullSafe(string target)
         {
-            return string.Concat(target.Select((ch, index) => index > 0 && char.IsUpper(ch) ? "_" + ch.ToString() : ch.ToString()).ToArray());
+            return target ?? string.Empty;
         }
 
         #region Parse with default
@@ -132,8 +101,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert target string to Boolean. If fails returns default value.
         /// </summary>
-        [DebuggerStepThrough]
-        public static Boolean ParseDefault(string target, Boolean defaultValue)
+        public static Boolean ParseOrDefault(string target, Boolean defaultValue)
         {
             Boolean result;
             var success = Boolean.TryParse(target, out result);
@@ -145,10 +113,9 @@ namespace Saritasa.Tools.Common.Utils
 
         /// <summary>
         /// Tries to convert target string to Boolean. If fails returns default value.
-        /// Set extended parameter to true to be able to parse from values "0", "1", "Yes", "No".
+        /// SetPart extended parameter to true to be able to parse from values "0", "1", "Yes", "No".
         /// </summary>
-        [DebuggerStepThrough]
-        public static Boolean ParseDefault(string target, Boolean defaultValue, Boolean extended)
+        public static Boolean ParseOrDefault(string target, Boolean defaultValue, Boolean extended)
         {
             Boolean result;
             var success = Boolean.TryParse(target, out result);
@@ -172,8 +139,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert target string to Byte. If fails returns default value.
         /// </summary>
-        [DebuggerStepThrough]
-        public static Byte ParseDefault(string target, Byte defaultValue)
+        public static Byte ParseOrDefault(string target, Byte defaultValue)
         {
             Byte result;
             var success = Byte.TryParse(target, out result);
@@ -183,8 +149,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert target string to Byte. If fails returns default value.
         /// </summary>
-        [DebuggerStepThrough]
-        public static Byte ParseDefault(string target, NumberStyles style, IFormatProvider provider, Byte defaultValue)
+        public static Byte ParseOrDefault(string target, NumberStyles style, IFormatProvider provider, Byte defaultValue)
         {
             Byte result;
             var success = Byte.TryParse(target, style, provider, out result);
@@ -194,8 +159,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert target string to Char. If fails returns default value.
         /// </summary>
-        [DebuggerStepThrough]
-        public static Char ParseDefault(string target, Char defaultValue)
+        public static Char ParseOrDefault(string target, Char defaultValue)
         {
             Char result;
             var success = Char.TryParse(target, out result);
@@ -205,8 +169,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert target string to DateTime. If fails returns default value.
         /// </summary>
-        [DebuggerStepThrough]
-        public static DateTime ParseDefault(string target, DateTime defaultValue)
+        public static DateTime ParseOrDefault(string target, DateTime defaultValue)
         {
             DateTime result;
             var success = DateTime.TryParse(target, out result);
@@ -216,8 +179,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert target string to DateTime. If fails returns default value.
         /// </summary>
-        [DebuggerStepThrough]
-        public static DateTime ParseDefault(string target, IFormatProvider provider, DateTimeStyles styles, DateTime defaultValue)
+        public static DateTime ParseOrDefault(string target, IFormatProvider provider, DateTimeStyles styles, DateTime defaultValue)
         {
             DateTime result;
             var success = DateTime.TryParse(target, provider, styles, out result);
@@ -227,8 +189,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert target string to Decimal. If fails returns default value.
         /// </summary>
-        [DebuggerStepThrough]
-        public static Decimal ParseDefault(string target, Decimal defaultValue)
+        public static Decimal ParseOrDefault(string target, Decimal defaultValue)
         {
             Decimal result;
             var success = Decimal.TryParse(target, out result);
@@ -238,8 +199,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert target string to Decimal. If fails returns default value.
         /// </summary>
-        [DebuggerStepThrough]
-        public static Decimal ParseDefault(string target, NumberStyles style, IFormatProvider provider, Decimal defaultValue)
+        public static Decimal ParseOrDefault(string target, NumberStyles style, IFormatProvider provider, Decimal defaultValue)
         {
             Decimal result;
             var success = Decimal.TryParse(target, style, provider, out result);
@@ -249,8 +209,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert target string to Double. If fails returns default value.
         /// </summary>
-        [DebuggerStepThrough]
-        public static Double ParseDefault(string target, Double defaultValue)
+        public static Double ParseOrDefault(string target, Double defaultValue)
         {
             Double result;
             var success = Double.TryParse(target, out result);
@@ -260,8 +219,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert target string to Double. If fails returns default value.
         /// </summary>
-        [DebuggerStepThrough]
-        public static Double ParseDefault(string target, NumberStyles style, IFormatProvider provider, Double defaultValue)
+        public static Double ParseOrDefault(string target, NumberStyles style, IFormatProvider provider, Double defaultValue)
         {
             Double result;
             var success = Double.TryParse(target, style, provider, out result);
@@ -271,8 +229,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert target string to Int16. If fails returns default value.
         /// </summary>
-        [DebuggerStepThrough]
-        public static Int16 ParseDefault(string target, Int16 defaultValue)
+        public static Int16 ParseOrDefault(string target, Int16 defaultValue)
         {
             Int16 result;
             var success = Int16.TryParse(target, out result);
@@ -282,8 +239,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert target string to Int16. If fails returns default value.
         /// </summary>
-        [DebuggerStepThrough]
-        public static Int16 ParseDefault(string target, NumberStyles style, IFormatProvider provider, Int16 defaultValue)
+        public static Int16 ParseOrDefault(string target, NumberStyles style, IFormatProvider provider, Int16 defaultValue)
         {
             Int16 result;
             var success = Int16.TryParse(target, style, provider, out result);
@@ -293,8 +249,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert target string to int. If fails returns default value.
         /// </summary>
-        [DebuggerStepThrough]
-        public static Int32 ParseDefault(string target, Int32 defaultValue)
+        public static Int32 ParseOrDefault(string target, Int32 defaultValue)
         {
             Int32 result;
             var success = Int32.TryParse(target, out result);
@@ -304,8 +259,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert target string to int. If fails returns default value.
         /// </summary>
-        [DebuggerStepThrough]
-        public static Int32 ParseDefault(string target, NumberStyles style, IFormatProvider provider, Int32 defaultValue)
+        public static Int32 ParseOrDefault(string target, NumberStyles style, IFormatProvider provider, Int32 defaultValue)
         {
             Int32 result;
             var success = Int32.TryParse(target, style, provider, out result);
@@ -315,8 +269,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert target string to Int64. If fails returns default value.
         /// </summary>
-        [DebuggerStepThrough]
-        public static Int64 ParseDefault(string target, Int64 defaultValue)
+        public static Int64 ParseOrDefault(string target, Int64 defaultValue)
         {
             Int64 result;
             var success = Int64.TryParse(target, out result);
@@ -326,8 +279,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert target string to Int64. If fails returns default value.
         /// </summary>
-        [DebuggerStepThrough]
-        public static Int64 ParseDefault(string target, NumberStyles style, IFormatProvider provider, Int64 defaultValue)
+        public static Int64 ParseOrDefault(string target, NumberStyles style, IFormatProvider provider, Int64 defaultValue)
         {
             Int64 result;
             var success = Int64.TryParse(target, style, provider, out result);
@@ -338,8 +290,7 @@ namespace Saritasa.Tools.Common.Utils
         /// Tries to convert target string to SByte. If fails returns default value.
         /// </summary>
         [CLSCompliant(false)]
-        [DebuggerStepThrough]
-        public static SByte ParseDefault(string target, SByte defaultValue)
+        public static SByte ParseOrDefault(string target, SByte defaultValue)
         {
             SByte result;
             var success = SByte.TryParse(target, out result);
@@ -350,8 +301,7 @@ namespace Saritasa.Tools.Common.Utils
         /// Tries to convert target string to SByte. If fails returns default value.
         /// </summary>
         [CLSCompliant(false)]
-        [DebuggerStepThrough]
-        public static SByte ParseDefault(string target, NumberStyles style, IFormatProvider provider, SByte defaultValue)
+        public static SByte ParseOrDefault(string target, NumberStyles style, IFormatProvider provider, SByte defaultValue)
         {
             SByte result;
             var success = SByte.TryParse(target, style, provider, out result);
@@ -361,8 +311,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert target string to Single. If fails returns default value.
         /// </summary>
-        [DebuggerStepThrough]
-        public static Single ParseDefault(string target, Single defaultValue)
+        public static Single ParseOrDefault(string target, Single defaultValue)
         {
             Single result;
             var success = Single.TryParse(target, out result);
@@ -372,8 +321,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert target string to Single. If fails returns default value.
         /// </summary>
-        [DebuggerStepThrough]
-        public static Double ParseDefault(string target, NumberStyles style, IFormatProvider provider, Single defaultValue)
+        public static Double ParseOrDefault(string target, NumberStyles style, IFormatProvider provider, Single defaultValue)
         {
             Single result;
             var success = Single.TryParse(target, style, provider, out result);
@@ -383,9 +331,8 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert target string to UInt16. If fails returns default value.
         /// </summary>
-        [DebuggerStepThrough]
         [CLSCompliant(false)]
-        public static UInt16 ParseDefault(string target, UInt16 defaultValue)
+        public static UInt16 ParseOrDefault(string target, UInt16 defaultValue)
         {
             UInt16 result;
             var success = UInt16.TryParse(target, out result);
@@ -395,9 +342,8 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert target string to UInt16. If fails returns default value.
         /// </summary>
-        [DebuggerStepThrough]
         [CLSCompliant(false)]
-        public static UInt16 ParseDefault(string target, NumberStyles style, IFormatProvider provider, UInt16 defaultValue)
+        public static UInt16 ParseOrDefault(string target, NumberStyles style, IFormatProvider provider, UInt16 defaultValue)
         {
             UInt16 result;
             var success = UInt16.TryParse(target, style, provider, out result);
@@ -407,9 +353,8 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert target string to Uint. If fails returns default value.
         /// </summary>
-        [DebuggerStepThrough]
         [CLSCompliant(false)]
-        public static UInt32 ParseDefault(string target, UInt32 defaultValue)
+        public static UInt32 ParseOrDefault(string target, UInt32 defaultValue)
         {
             UInt32 result;
             var success = UInt32.TryParse(target, out result);
@@ -419,9 +364,8 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert target string to Uint. If fails returns default value.
         /// </summary>
-        [DebuggerStepThrough]
         [CLSCompliant(false)]
-        public static UInt32 ParseDefault(string target, NumberStyles style, IFormatProvider provider, UInt32 defaultValue)
+        public static UInt32 ParseOrDefault(string target, NumberStyles style, IFormatProvider provider, UInt32 defaultValue)
         {
             UInt32 result;
             var success = UInt32.TryParse(target, style, provider, out result);
@@ -431,9 +375,8 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert target string to UInt64. If fails returns default value.
         /// </summary>
-        [DebuggerStepThrough]
         [CLSCompliant(false)]
-        public static UInt64 ParseDefault(string target, UInt64 defaultValue)
+        public static UInt64 ParseOrDefault(string target, UInt64 defaultValue)
         {
             UInt64 result;
             var success = UInt64.TryParse(target, out result);
@@ -443,9 +386,8 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert target string to UInt64. If fails returns default value.
         /// </summary>
-        [DebuggerStepThrough]
         [CLSCompliant(false)]
-        public static UInt64 ParseDefault(string target, NumberStyles style, IFormatProvider provider, UInt64 defaultValue)
+        public static UInt64 ParseOrDefault(string target, NumberStyles style, IFormatProvider provider, UInt64 defaultValue)
         {
             UInt64 result;
             var success = UInt64.TryParse(target, style, provider, out result);
@@ -455,8 +397,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert target string to Enum. If fails returns default value.
         /// </summary>
-        [DebuggerStepThrough]
-        public static T ParseDefault<T>(string target, T defaultValue) where T : struct
+        public static T ParseOrDefault<T>(string target, T defaultValue) where T : struct
         {
             return Enum.IsDefined(typeof(T), target) ? (T)Enum.Parse(typeof(T), target, true) : defaultValue;
         }
@@ -464,8 +405,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert target string to Enum. If fails returns default value.
         /// </summary>
-        [DebuggerStepThrough]
-        public static T ParseDefault<T>(string target, Boolean ignoreCase, T defaultValue) where T : struct
+        public static T ParseOrDefault<T>(string target, Boolean ignoreCase, T defaultValue) where T : struct
         {
             return Enum.IsDefined(typeof(T), target) ? (T)Enum.Parse(typeof(T), target, ignoreCase) : defaultValue;
         }

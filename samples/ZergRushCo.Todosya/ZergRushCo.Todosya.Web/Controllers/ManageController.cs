@@ -1,12 +1,11 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
-using Saritasa.Tools.Messages.Abstractions;
-using ZergRushCo.Todosya.Web.Models;
-using ZergRushCo.Todosya.Domain.UserContext.Services;
 using Microsoft.Extensions.Logging;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Abstractions.Commands;
+using Saritasa.Tools.Messages.Abstractions.Queries;
 using ZergRushCo.Todosya.Domain.UserContext.Commands;
 using ZergRushCo.Todosya.Domain.UserContext.Entities;
 
@@ -23,12 +22,11 @@ namespace ZergRushCo.Todosya.Web.Controllers
         readonly Domain.UserContext.Queries.UsersQueries userQueries;
 
         public ManageController(
-            ICommandPipeline commandPipeline,
-            IQueryPipeline queryPipeline,
+            IMessagePipelineService pipelineService,
             ILoggerFactory loggerFactory,
             SignInManager<User, string> signInManager,
             Domain.UserContext.Queries.UsersQueries userQueries) :
-            base(commandPipeline, queryPipeline, loggerFactory)
+            base(pipelineService, loggerFactory)
         {
             this.signInManager = signInManager;
             this.userQueries = userQueries;
@@ -40,7 +38,7 @@ namespace ZergRushCo.Todosya.Web.Controllers
             ViewBag.StatusMessage = isUpdated ? "Profile updated" : string.Empty;
 
             var userId = User.Identity.GetUserId();
-            var model = new UpdateUserCommand(QueryPipeline.Query(userQueries).With(q => q.GetById(userId)));
+            var model = new UpdateUserCommand(PipelineService.Query(userQueries).With(q => q.GetById(userId)));
             return View(model);
         }
 
@@ -53,7 +51,7 @@ namespace ZergRushCo.Todosya.Web.Controllers
             }
 
             command.UserId = User.Identity.GetUserId();
-            CommandPipeline.Handle(command);
+            PipelineService.HandleCommand(command);
             return View(command);
         }
 

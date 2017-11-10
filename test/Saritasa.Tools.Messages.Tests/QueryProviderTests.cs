@@ -1,14 +1,14 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using Xunit;
+using Saritasa.Tools.Messages.Common;
+using Saritasa.Tools.Messages.Common.ObjectSerializers;
+using Saritasa.Tools.Messages.Common.Repositories.QueryProviders;
+
 namespace Saritasa.Tools.Messages.Tests
 {
-    using System;
-    using Xunit;
-    using Common;
-    using Common.ObjectSerializers;
-    using Common.Repositories.QueryProviders;
-
     /// <summary>
     /// Query provider tests.
     /// </summary>
@@ -51,7 +51,7 @@ WHERE ([ContentId] = '{guid}')";
             // Assert
             var expectedResult =
 $@"SELECT TOP 1000 * FROM [SaritasaMessages]
-WHERE ([CreatedAt] >= '{startDate:yyyy/MM/dd hh:mm:ss}') AND ([CreatedAt] <= '{endDate:yyyy/MM/dd hh:mm:ss}')";
+WHERE ([CreatedAt] >= '{startDate:yyyy-MM-dd hh:mm:ss}') AND ([CreatedAt] <= '{endDate:yyyy-MM-dd hh:mm:ss}')";
             Assert.Equal(expectedResult, result);
         }
 
@@ -113,7 +113,7 @@ LIMIT 1000";
             // Assert
             var expectedResult =
 $@"SELECT * FROM `saritasa_messages`
-WHERE (`created_at` >= '{startDate:yyyy/MM/dd hh:mm:ss}') AND (`created_at` <= '{endDate:yyyy/MM/dd hh:mm:ss}')
+WHERE (`created_at` >= '{startDate:yyyy-MM-dd hh:mm:ss}') AND (`created_at` <= '{endDate:yyyy-MM-dd hh:mm:ss}')
 LIMIT 1000";
             Assert.Equal(expectedResult, result);
         }
@@ -174,7 +174,7 @@ LIMIT 1000";
             // Assert
             var expectedResult =
 $@"SELECT * FROM saritasa_messages
-WHERE (created_at >= '{startDate:yyyy/MM/dd hh:mm:ss}') AND (created_at <= '{endDate:yyyy/MM/dd hh:mm:ss}')
+WHERE (created_at >= '{startDate:yyyy-MM-dd hh:mm:ss}') AND (created_at <= '{endDate:yyyy-MM-dd hh:mm:ss}')
 LIMIT 1000";
             Assert.Equal(expectedResult, result);
         }

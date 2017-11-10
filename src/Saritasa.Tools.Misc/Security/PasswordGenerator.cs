@@ -1,23 +1,34 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security;
+using System.Text;
+using System.Text.RegularExpressions;
+#if NET452
+using System.Security.Cryptography;
+#endif
+using JetBrains.Annotations;
+
 namespace Saritasa.Tools.Misc.Security
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Security;
-    using System.Text;
-    using System.Text.RegularExpressions;
-#if !PORTABLE
-    using System.Security.Cryptography;
-#endif
-    using JetBrains.Annotations;
-
     /// <summary>
     /// Passwords generation and strength estimation.
     /// </summary>
     public class PasswordGenerator
     {
+        /// <summary>
+        /// Minimum password length.
+        /// </summary>
+        public const int MinPasswordLength = 2;
+
+        /// <summary>
+        /// Default password length.
+        /// </summary>
+        public const int DefaultPasswordLength = 10;
+
         /// <summary>
         /// Enum specifies what characters to use for password generation.
         /// </summary>
@@ -196,7 +207,7 @@ namespace Saritasa.Tools.Misc.Security
         /// <summary>
         /// Instance of random generation class.
         /// </summary>
-#if !PORTABLE
+#if NET452
         public static RandomNumberGenerator RandomService { get; protected set; }
 #else
         public static Random RandomService { get; protected set; }
@@ -262,7 +273,7 @@ namespace Saritasa.Tools.Misc.Security
         /// </summary>
         public PasswordGenerator()
         {
-            this.PasswordLength = 10;
+            this.PasswordLength = DefaultPasswordLength;
             this.CharacterClasses = CharacterClass.All;
             this.GeneratorFlags = GeneratorFlag.None;
         }
@@ -275,9 +286,9 @@ namespace Saritasa.Tools.Misc.Security
         /// <param name="generatorFlags">Special generator flags.</param>
         public PasswordGenerator(int passwordLength, CharacterClass characterClasses, GeneratorFlag generatorFlags) : this()
         {
-            if (passwordLength < 2)
+            if (passwordLength < MinPasswordLength)
             {
-                throw new ArgumentException("Password length should be at least 2 characters");
+                throw new ArgumentException(string.Format(Properties.Strings.PasswordLengthMin, MinPasswordLength));
             }
 
             this.PasswordLength = passwordLength;
@@ -290,7 +301,7 @@ namespace Saritasa.Tools.Misc.Security
         /// </summary>
         static PasswordGenerator()
         {
-#if !PORTABLE
+#if NET452
             RandomService = RandomNumberGenerator.Create();
 #else
             RandomService = new Random();
@@ -306,7 +317,7 @@ namespace Saritasa.Tools.Misc.Security
         {
             if (string.IsNullOrEmpty(pool))
             {
-                throw new ArgumentException("Characters pool cannot be empty");
+                throw new ArgumentException(Properties.Strings.CharactersPoolEmpty);
             }
             this.CharactersPool = pool;
         }
@@ -342,7 +353,7 @@ namespace Saritasa.Tools.Misc.Security
             return sb.ToString();
         }
 
-#if !PORTABLE && !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
+#if NET452
         /// <summary>
         /// Generates new password to SecureString.
         /// </summary>
@@ -387,7 +398,7 @@ namespace Saritasa.Tools.Misc.Security
         {
             if (string.IsNullOrEmpty(password))
             {
-                throw new ArgumentException("Password cannot be empty");
+                throw new ArgumentException(Properties.Strings.PasswordNotSet);
             }
 
             var passwordLower = password.ToLowerInvariant();
@@ -410,7 +421,7 @@ namespace Saritasa.Tools.Misc.Security
 
             score = password.Length * FactorLength;
 
-            // loop through password to check for Symbol, Numeric, Lowercase and Uppercase pattern matches
+            // Loop through password to check for Symbol, Numeric, Lowercase and Uppercase pattern matches.
             for (var a = 0; a < password.Length; a++)
             {
                 if (char.IsUpper(password[a]))
@@ -461,11 +472,12 @@ namespace Saritasa.Tools.Misc.Security
                     tempSymbolIndex = a;
                     symbolsCount++;
                 }
-                // internal loop through password to check for repeat characters
+
+                // Internal loop through password to check for repeat characters.
                 var charExists = false;
                 for (var b = 0; b < password.Length; b++)
                 {
-                    // repeat character exists
+                    // Repeat character exists.
                     if (password[a] == password[b] && a != b)
                     {
                         charExists = true;
@@ -484,7 +496,7 @@ namespace Saritasa.Tools.Misc.Security
                 }
             }
 
-            // check for sequential alpha string patterns (forward and reverse)
+            // Check for sequential alpha string patterns (forward and reverse).
             for (var s = 0; s < PoolAlphas.Length - 3; s++)
             {
                 var forward = PoolAlphas.Substring(s, 3);
@@ -497,7 +509,7 @@ namespace Saritasa.Tools.Misc.Security
                 }
             }
 
-            // check for sequential numeric string patterns (forward and reverse)
+            // Check for sequential numeric string patterns (forward and reverse).
             for (var s = 0; s < PoolNumerics.Length - 3; s++)
             {
                 var forward = PoolNumerics.Substring(s, 3);
@@ -510,7 +522,7 @@ namespace Saritasa.Tools.Misc.Security
                 }
             }
 
-            // check for sequential symbol string patterns (forward and reverse)
+            // Check for sequential symbol string patterns (forward and reverse).
             for (var s = 0; s < PoolSymbols.Length - 3; s++)
             {
                 var forward = PoolSymbols.Substring(s, 3);
@@ -523,9 +535,9 @@ namespace Saritasa.Tools.Misc.Security
                 }
             }
 
-            // Modify overall score value based on usage vs requirements //
+            // Modify overall score value based on usage vs requirements.
 
-            // General point assignment
+            // General point assignment.
             if (alphasUpperCount > 0 && alphasUpperCount < password.Length)
             {
                 score += (password.Length - alphasUpperCount) * 2;
@@ -547,61 +559,61 @@ namespace Saritasa.Tools.Misc.Security
                 score += middleCharsCount * FactorMiddleChar;
             }
 
-            // Point deductions for poor practices //
+            // Point deductions for poor practices.
 
-            // only Letters
+            // Only Letters.
             if ((alphasLowerCount > 0 || alphasUpperCount > 0) && symbolsCount == 0 && digitsCount == 0)
             {
                 score = score - password.Length;
                 alphasOnlyCount = password.Length;
             }
-            // only Numbers
+            // Only Numbers.
             if (alphasLowerCount == 0 && alphasUpperCount == 0 && symbolsCount == 0 && digitsCount > 0)
             {
                 score = score - password.Length;
                 numbersOnlyCount = password.Length;
             }
-            // same character exists more than once
+            // Same character exists more than once.
             if (repeatCharsCount > 0)
             {
                 score = (int)(score - repeatIncrement);
             }
-            // consecutive uppercase letters exist
+            // Consecutive uppercase letters exist.
             if (consequenceAlphasUpperCount > 0)
             {
                 score -= consequenceAlphasUpperCount * FactorConsequenceAlphaUpper;
             }
-            // consecutive lowercase letters exist
+            // Consecutive lowercase letters exist.
             if (consequenceAlphasLowerCount > 0)
             {
                 score -= consequenceAlphasLowerCount * FactorConsequenceAlphaLower;
             }
-            // consecutive numbers exist
+            // Consecutive numbers exist.
             if (consequenceDigitsCount > 0)
             {
                 score -= consequenceDigitsCount * FactorConsequenceNumber;
             }
-            // sequential alpha strings exist (3 characters or more)
+            // Sequential alpha strings exist (3 characters or more).
             if (sequenceAlphasCount > 0)
             {
                 score -= sequenceAlphasCount * FactorSequenceAlpha;
             }
-            // sequential numeric strings exist (3 characters or more)
+            // Sequential numeric strings exist (3 characters or more).
             if (sequenceNumbersCount > 0)
             {
                 score -= sequenceNumbersCount * FactorSequenceNumber;
             }
-            // sequential symbol strings exist (3 characters or more)
+            // Sequential symbol strings exist (3 characters or more).
             if (sequenceSymbolsCount > 0)
             {
                 score -= sequenceSymbolsCount * FactorSequenceSymbol;
             }
 
-            // determine if mandatory requirements have been met and set image indicators accordingly
+            // Determine if mandatory requirements have been met and set image indicators accordingly.
             var arrChars = new[] { password.Length, alphasUpperCount, alphasLowerCount, digitsCount, symbolsCount };
             for (var c = 0; c < arrChars.Length; c++)
             {
-                // password length
+                // Password length.
                 int minValue = c == 0 ? MinimumPasswordLength - 1 : 0;
                 if (arrChars[c] == minValue + 1 || arrChars[c] > minValue + 1)
                 {
@@ -610,13 +622,14 @@ namespace Saritasa.Tools.Misc.Security
             }
             requirements = requiredCharsCount;
             var minRequiredChars = password.Length >= MinimumPasswordLength ? 3 : 4;
-            // one or more required characters exist
+
+            // One or more required characters exist.
             if (requirements > minRequiredChars)
             {
                 score += requirements * 2;
             }
 
-            // determine if additional bonuses need to be applied and set image indicators accordingly
+            // Determine if additional bonuses need to be applied and set image indicators accordingly.
             additions = new Dictionary<Addition, int>(10)
             {
                 [Addition.MiddleNumbersOrSymbols] = middleCharsCount,
@@ -729,7 +742,7 @@ namespace Saritasa.Tools.Misc.Security
         /// <returns>The random number between zero and maxValue.</returns>
         static int GetNextRandom(int maxValue)
         {
-#if !PORTABLE
+#if NET452
             var bytes = new byte[4];
             lock (randomServiceLock)
             {
@@ -743,9 +756,7 @@ namespace Saritasa.Tools.Misc.Security
 
         static string Reverse(string target)
         {
-            var arr = target.ToCharArray();
-            Array.Reverse(arr);
-            return new string(arr);
+            return string.Join(string.Empty, target.Reverse());
         }
     }
 }

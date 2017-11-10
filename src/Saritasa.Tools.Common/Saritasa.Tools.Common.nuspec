@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Saritasa.Tools.Common</id>
+    <title>Saritasa Tools Useful Utilities and Shortcuts</title>
+    <summary>Useful set of utilities that mostly used in development.</summary>
+    <version>0.0.0</version>
+    <description>The package is a part of Saritasa Tools project. Saritasa.Tools.Common contains various utilities and extensions for DateTime convertion, strings manipulation, validation utils (Guard), parse with default, flow (memoize, retry), collection processing (chunk select), atomic (CAS, swap), strings hash (md5, sha1, sha2), paged enumerable.</description>
+    <authors>Saritasa</authors>
+    <owners>Saritasa</owners>
+    <licenseUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/LICENSE.txt</licenseUrl>
+    <projectUrl>https://github.com/saritasa/saritasatools</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <copyright>(c) Saritasa, 2016-2017</copyright>
+    <tags>uow repository domain ef6 objectcontext dbcontext</tags>
+    <repository type="git" url="https://github.com/Saritasa/SaritasaTools" />
+    <dependencies>
+      <group targetFramework="netstandard1.2">
+        <dependency id="System.Linq.Queryable" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="NETStandard.Library" version="[1.6.0, )" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework="netstandard1.6">
+        <dependency id="System.Linq.Queryable" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="NETStandard.Library" version="[1.6.0, )" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework="netstandard2.0">
+        <dependency id="System.Linq.Queryable" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="NETStandard.Library" version="[2.0.0, )" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework="net40" />
+      <group targetFramework="net452" />
+      <group targetFramework="net461" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin\Release\**\Saritasa.Tools.Common*.dll" target="lib" />
+    <file src="bin\Release\**\Saritasa.Tools.Common.xml" target="lib" />
+  </files>
+</package>

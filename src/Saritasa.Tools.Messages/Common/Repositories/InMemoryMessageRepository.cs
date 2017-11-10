@@ -1,16 +1,17 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Saritasa.Tools.Messages.Abstractions;
 
 namespace Saritasa.Tools.Messages.Common.Repositories
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-    using Newtonsoft.Json;
-    using Abstractions;
-
     /// <summary>
     /// Simple in memory message repository.
     /// </summary>
@@ -19,24 +20,32 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <summary>
         /// All stored messages.
         /// </summary>
-        public IList<IMessage> Messages { get; }
+        public IList<MessageRecord> Messages { get; }
 
-        readonly object objLock = new object();
+        private readonly object objLock = new object();
 
         #region IMessageRepository
 
-        static readonly Task<bool> completedTask = Task.FromResult(true);
+        private static readonly Task<bool> completedTask = Task.FromResult(true);
 
         /// <summary>
         /// .ctor
         /// </summary>
         public InMemoryMessageRepository()
         {
-            Messages = new List<IMessage>();
+            Messages = new List<MessageRecord>();
+        }
+
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        /// <param name="parameters">Parameters dictionary.</param>
+        public InMemoryMessageRepository(IDictionary<string, string> parameters) : this()
+        {
         }
 
         /// <inheritdoc />
-        public Task AddAsync(IMessage message)
+        public Task AddAsync(MessageRecord message, CancellationToken cancellationToken)
         {
             lock (objLock)
             {
@@ -46,7 +55,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <inheritdoc />
-        public Task<IEnumerable<IMessage>> GetAsync(MessageQuery messageQuery)
+        public Task<IEnumerable<MessageRecord>> GetAsync(MessageQuery messageQuery, CancellationToken cancellationToken)
         {
             lock (objLock)
             {
@@ -57,9 +66,9 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         #endregion
 
         /// <inheritdoc />
-        public void SaveState(IDictionary<string, object> dict)
+        public void SaveState(IDictionary<string, string> parameters)
         {
-            // no need to implement since repository does not have state
+            // No need to implement since repository does not have state.
         }
 
         /// <summary>

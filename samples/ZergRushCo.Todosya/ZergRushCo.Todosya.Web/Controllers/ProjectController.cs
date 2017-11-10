@@ -1,8 +1,6 @@
-﻿using System;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using Microsoft.Extensions.Logging;
-using Saritasa.Tools.Common;
 using Saritasa.Tools.Messages.Abstractions;
 using ZergRushCo.Todosya.Domain.TaskContext.Queries;
 using ZergRushCo.Todosya.Domain.TaskContext.Commands;
@@ -15,17 +13,16 @@ namespace ZergRushCo.Todosya.Web.Controllers
     public class ProjectController : BaseController
     {
         public ProjectController(
-            ICommandPipeline commandPipeline,
-            IQueryPipeline queryPipeline,
+            IMessagePipelineService pipelinesService,
             ILoggerFactory loggerFactory) :
-            base(commandPipeline, queryPipeline, loggerFactory)
+            base(pipelinesService, loggerFactory)
         {
         }
 
         public ActionResult Index(int page = 1)
         {
             var userId = User.Identity.GetUserId();
-            return View(QueryPipeline.Query<ProjectsQueries>().With(q => q.GetByUser(userId, page, 10)));
+            return View(PipelineService.Query<ProjectsQueries>().With(q => q.GetByUser(userId, page, 10)));
         }
 
         [HttpGet]
@@ -43,14 +40,14 @@ namespace ZergRushCo.Todosya.Web.Controllers
             }
 
             command.CreatedByUserId = User.Identity.GetUserId();
-            CommandPipeline.Handle(command);
+            PipelineService.HandleCommand(command);
             return RedirectToAction("Index");
         }
 
         [HttpGet]
         public ActionResult Edit(int id)
         {
-            var project = QueryPipeline.Query<ProjectsQueries>().With(q => q.GetById(id));
+            var project = PipelineService.Query<ProjectsQueries>().With(q => q.GetById(id));
             if (project == null)
             {
                 return HttpNotFound();
@@ -74,14 +71,14 @@ namespace ZergRushCo.Todosya.Web.Controllers
                 return View(command);
             }
 
-            CommandPipeline.Handle(command);
+            PipelineService.HandleCommand(command);
             return RedirectToAction("Index");
         }
 
         [HttpGet]
         public ActionResult Remove(int id)
         {
-            var project = QueryPipeline.Query<ProjectsQueries>().With(q => q.GetById(id));
+            var project = PipelineService.Query<ProjectsQueries>().With(q => q.GetById(id));
             if (project == null)
             {
                 return HttpNotFound();
@@ -94,7 +91,7 @@ namespace ZergRushCo.Todosya.Web.Controllers
         [ActionName("Remove")]
         public ActionResult RemovePost(int id)
         {
-            CommandPipeline.Handle(new RemoveProjectCommand()
+            PipelineService.HandleCommand(new RemoveProjectCommand()
             {
                 ProjectId = id,
                 UpdatedByUserId = User.Identity.GetUserId(),

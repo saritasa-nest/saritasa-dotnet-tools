@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Messages.Abstractions
@@ -24,7 +24,7 @@ namespace Saritasa.Tools.Messages.Abstractions
         Completed,
 
         /// <summary>
-        /// Command has been failed while execution. Mostly exception occured
+        /// Command has been failed while execution. Mostly exception occurred
         /// in handler.
         /// </summary>
         Failed,
@@ -32,6 +32,6 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// <summary>
         /// Command has been rejected. It may be validation error.
         /// </summary>
-        Rejected,
+        Rejected
     }
 }

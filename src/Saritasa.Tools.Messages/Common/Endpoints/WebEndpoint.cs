@@ -1,20 +1,22 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
+#if NET452
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using JetBrains.Annotations;
+using Newtonsoft.Json;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Internal;
+
 namespace Saritasa.Tools.Messages.Common.Endpoints
 {
-    using System;
-    using System.IO;
-    using System.Linq;
-    using System.Net;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using JetBrains.Annotations;
-    using Newtonsoft.Json;
-    using Abstractions;
-    using Internal;
-
     /// <summary>
     /// Web endpoint. Allows to send messages directly to application. Must be POST request.
     /// Sample:
@@ -23,6 +25,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
     /// </summary>
     public class WebEndpoint : IMessageEndpoint, IDisposable
     {
+        private const string HttpVerbGet = "GET";
         private const string HttpVerbPost = "POST";
         private const int DefaultConnectionWaitTime = 550; // ms
         private const string ContentTypeJson = "application/json";
@@ -30,32 +33,48 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
         private const string Server = "Saritasa.Tools WebEndpoint/1.0.0";
         private const string DefaultAddress = "127.0.0.1";
 
+        private const int HttpStatusOk = 200;
+        private const int HttpStatusBadRequest = 400;
+        private const int HttpStatusNotFound = 404;
+        private const int HttpStatusMethodNotAllowed = 405;
+        private const int HttpStatusServerError = 500;
+
         /// <summary>
-        /// Default TCP port;
+        /// Default TCP port.
         /// </summary>
         public const int DefaultPort = 26025;
 
-        IMessagePipeline[] pipelines;
+        private IMessagePipeline[] pipelines;
 
-        HttpListener listener;
+        private HttpListener listener;
 
-        readonly int port;
+        private readonly IServiceProviderFactory serviceProviderFactory;
 
-        readonly string address;
+        private readonly int port;
 
-        CancellationToken cancellationToken = CancellationToken.None;
+        private readonly string address;
 
-        CancellationTokenSource cancellationTokenSource;
+        private CancellationToken cancellationToken = CancellationToken.None;
 
-        ManualResetEventSlim threadWaitEvent = new ManualResetEventSlim();
+        private CancellationTokenSource cancellationTokenSource;
+
+        private ManualResetEventSlim threadWaitEvent = new ManualResetEventSlim();
+
+        private static readonly IObjectSerializer serializer = new ObjectSerializers.JsonObjectSerializer();
 
         /// <summary>
         /// .ctor
+        /// <param name="serviceProviderFactory">Service provider factory.</param>
         /// <param name="address">Address to bind, loopback by default.</param>
         /// <param name="port">TCP port. By default 26025.</param>
         /// </summary>
-        public WebEndpoint([NotNull] string address = DefaultAddress, int port = DefaultPort)
+        public WebEndpoint([NotNull] IServiceProviderFactory serviceProviderFactory,
+            [NotNull] string address = DefaultAddress, int port = DefaultPort)
         {
+            if (serviceProviderFactory == null)
+            {
+                throw new ArgumentNullException(nameof(serviceProviderFactory));
+            }
             if (string.IsNullOrWhiteSpace(address))
             {
                 throw new ArgumentNullException(nameof(address));
@@ -64,6 +83,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
             {
                 throw new ArgumentOutOfRangeException(nameof(port));
             }
+            this.serviceProviderFactory = serviceProviderFactory;
             this.port = port;
             this.address = address;
             listener = new HttpListener();
@@ -71,7 +91,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
         }
 
         /// <summary>
-        /// Start tcp port listening.
+        /// Start TCP port listening.
         /// </summary>
         public virtual void Start()
         {
@@ -83,7 +103,8 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
             {
                 return;
             }
-            InternalLogger.Trace($"Web endpoint starting on {address}:{port}", nameof(WebEndpoint));
+            InternalLogger.Trace(string.Format(Properties.Strings.WebEndpoint_StartingOn, address, port),
+                nameof(WebEndpoint));
 
             if (cancellationTokenSource == null)
             {
@@ -100,7 +121,8 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
             };
             thread.Start();
 
-            InternalLogger.Trace($"Web endpoint started on {address}:{port}", nameof(WebEndpoint));
+            InternalLogger.Trace(string.Format(Properties.Strings.WebEndpoint_StartedOn, address, port),
+                nameof(WebEndpoint));
         }
 
         /// <summary>
@@ -118,7 +140,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
                 return;
             }
 
-            InternalLogger.Trace("Web endpoint stop requested", nameof(WebEndpoint));
+            InternalLogger.Trace(Properties.Strings.WebEndpoint_Stop, nameof(WebEndpoint));
             cancellationTokenSource.Cancel();
             cancellationTokenSource = null;
             if (wait)
@@ -137,7 +159,9 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
                 taskContext.ContinueWith(t =>
                 {
                     var context = t.Result;
-                    InternalLogger.Info($"Incoming request from {context.Request.UserHostAddress} {context.Request.HttpMethod}",
+                    InternalLogger.Info(
+                        string.Format(Properties.Strings.WebEndpoint_Request, context.Request.UserHostAddress,
+                            context.Request.HttpMethod),
                         nameof(WebEndpoint));
                     try
                     {
@@ -145,7 +169,8 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
                     }
                     catch (Exception ex)
                     {
-                        InternalLogger.Error($"Error while executing message: {ex.ToString()}", nameof(WebEndpoint));
+                        InternalLogger.Error(string.Format(Properties.Strings.WebEndpoint_ErrorExecuteMessage, ex),
+                            nameof(WebEndpoint));
                     }
                 }, cancellationToken, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
 
@@ -156,7 +181,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
                 }
             }
 
-            InternalLogger.Trace("Web endpoint stopped", nameof(WebEndpoint));
+            InternalLogger.Trace(Properties.Strings.WebEndpoint_Stopped, nameof(WebEndpoint));
             threadWaitEvent.Set();
         }
 
@@ -170,7 +195,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
 
                 if (request.HttpMethod == HttpVerbPost)
                 {
-                    var message = new Message
+                    var message = new MessageRecord
                     {
                         Type = GetMessageTypeFromUri(request.Url),
                         ContentType = GetMessageContentTypeFromUri(request.Url),
@@ -180,20 +205,17 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
                     response.ContentType = ContentTypeJson;
                     using (var streamReader = new StreamReader(request.InputStream))
                     {
+                        byte[] bytes = null;
                         try
                         {
                             var body = streamReader.ReadToEnd();
-                            message.Content = JsonConvert.DeserializeObject(body);
-                            TypeHelpers.ResolveTypeForContent(
-                                message,
-                                System.Text.Encoding.UTF8.GetBytes(message.Content.ToString()),
-                                new ObjectSerializers.JsonObjectSerializer(), // only json is supported
-                                AppDomain.CurrentDomain.GetAssemblies() // pretend that all types are loaded into current domain
-                            );
+                            bytes = Encoding.Default.GetBytes(body);
+                            var t = Type.GetType(message.ContentType);
+                            message.Content = serializer.Deserialize(bytes, t);
                         }
                         catch (Exception ex)
                         {
-                            response.StatusCode = 400;
+                            response.StatusCode = HttpStatusBadRequest;
                             response.ContentType = ContentTypePlainText;
                             FormatStreamFromString(ex.ToString(), response);
                         }
@@ -204,7 +226,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
                         }
                         catch (Exception ex)
                         {
-                            response.StatusCode = 400;
+                            response.StatusCode = HttpStatusBadRequest;
                             response.ContentType = ContentTypePlainText;
                             FormatStreamFromString(ex.ToString(), response);
                         }
@@ -213,7 +235,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
                 }
                 else
                 {
-                    response.StatusCode = 405;
+                    response.StatusCode = HttpStatusMethodNotAllowed;
                     response.ContentType = ContentTypePlainText;
                     FormatStreamFromString("Method Not Allowed", response);
                 }
@@ -246,22 +268,21 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
                 return cmdnum;
             }
 
-            switch (cmd)
+            var code = MessageContextConstants.MessageTypeCodes.FirstOrDefault(c => c.Value == cmd).Key;
+            if (code > 0)
             {
-                case "command": return Message.MessageTypeCommand;
-                case "query": return Message.MessageTypeQuery;
-                case "event": return Message.MessageTypeEvent;
+                return code;
             }
 
-            throw new ArgumentException(nameof(uri));
+            throw new ArgumentException(Properties.Strings.WebEndpoint_IncorrectRequest, nameof(uri));
         }
 
-        static string GetMessageContentTypeFromUri(Uri uri)
+        private static string GetMessageContentTypeFromUri(Uri uri)
         {
-            var str = uri.PathAndQuery.Trim();
+            var str = Uri.UnescapeDataString(uri.PathAndQuery.Trim());
             if (string.IsNullOrEmpty(str))
             {
-                throw new ArgumentException(nameof(uri));
+                throw new ArgumentException(Properties.Strings.WebEndpoint_IncorrectRequest, nameof(uri));
             }
 
             if (str[0] == '/')
@@ -272,10 +293,10 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
             var ind = str.IndexOf(@"/", StringComparison.Ordinal);
             if (ind < 0)
             {
-                throw new ArgumentException(nameof(uri));
+                throw new ArgumentException(Properties.Strings.WebEndpoint_IncorrectRequest, nameof(uri));
             }
 
-            var contentType = str.Substring(ind + 1, uri.PathAndQuery.Length - ind - 2);
+            var contentType = str.Substring(ind + 1, str.Length - ind - 1);
             if (string.IsNullOrEmpty(contentType))
             {
                 throw new ArgumentNullException(nameof(uri));
@@ -293,38 +314,53 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
             output.Flush();
         }
 
-        private void ProcessMessage(Message message)
+        private void ProcessMessage(MessageRecord messageRecord)
         {
-            InternalLogger.Trace($"Processing message id: {message.Id} contenttype: {message.ContentType}",
-                nameof(WebEndpoint));
+            InternalLogger.Trace(string.Format(Properties.Strings.WebEndpoint_ProcessingMessage, messageRecord.Id,
+                messageRecord.ContentType), nameof(WebEndpoint));
             var isPipelineFound = false;
             foreach (IMessagePipeline pipeline in pipelines)
             {
-                if (pipeline.MessageTypes.Contains(message.Type))
+                if (pipeline.MessageTypes.Contains(messageRecord.Type))
                 {
-                    pipeline.ProcessRaw(message);
+                    var converter = pipeline as IMessageRecordConverter;
+                    if (converter != null)
+                    {
+                        var pipelineService = new DefaultMessagePipelineService();
+                        pipelineService.ServiceProvider = serviceProviderFactory.Create();
+                        var message = converter.CreateMessageContext(pipelineService, messageRecord);
+                        try
+                        {
+                            pipeline.Invoke(message);
+                        }
+                        finally
+                        {
+                            var disposable = pipelineService.ServiceProvider as IDisposable;
+                            disposable?.Dispose();
+                        }
+                    }
                     isPipelineFound = true;
                 }
             }
 
             if (!isPipelineFound)
             {
-                InternalLogger.Warn($"Pipeline not found for message type {message.Type}" +
-                    "id: {message.Id} contenttype: {message.ContentType}", nameof(WebEndpoint));
+                InternalLogger.Warn(string.Format(Properties.Strings.WebEndpoint_PipelineNotFound,
+                    messageRecord.Type, messageRecord.Id, messageRecord.ContentType), nameof(WebEndpoint));
             }
         }
 
         /// <inheritdoc />
-        public virtual void RegisterPipelines(params IMessagePipeline[] pipelines)
+        public virtual void RegisterPipelines(IMessagePipelineContainer container)
         {
-            if (pipelines.Length == 0)
+            if (container.Pipelines.Length == 0)
             {
-                throw new ArgumentException("Value cannot be an empty collection.", nameof(pipelines));
+                throw new ArgumentException(Properties.Strings.WebEndpoint_ValueCannotBeEmptyColleciton, nameof(container.Pipelines));
             }
-            this.pipelines = pipelines;
+            this.pipelines = container.Pipelines;
         }
 
-        #region Dispose
+#region Dispose
 
         bool disposed;
 
@@ -367,7 +403,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
             GC.SuppressFinalize(this);
         }
 
-        #endregion
+#endregion
     }
 }
 #endif

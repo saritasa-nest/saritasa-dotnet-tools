@@ -1,14 +1,14 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
+
+using System;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
+using System.Text;
 
 namespace Saritasa.Tools.Messages.Internal
 {
-    using System;
-    using System.Diagnostics;
-    using System.Globalization;
-    using System.IO;
-    using System.Text;
-
     /// <summary>
     /// The is to be used for internal logging purposes.
     /// </summary>
@@ -16,7 +16,7 @@ namespace Saritasa.Tools.Messages.Internal
     {
         static readonly object lockObj = new object();
 
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
+#if NET452
         static readonly TraceSource traceSource = new TraceSource("Saritasa.Tools");
 #endif
 
@@ -165,7 +165,7 @@ namespace Saritasa.Tools.Messages.Internal
                     Console.Write(sb.ToString());
                 }
 
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
+#if NET452
                 if (LogToTrace)
                 {
                     TraceEventType eventType;
@@ -192,7 +192,7 @@ namespace Saritasa.Tools.Messages.Internal
             }
             catch (Exception)
             {
-                // we have no place to log the message to so we ignore it
+                // We have no place to log the message to so we ignore it.
             }
         }
 

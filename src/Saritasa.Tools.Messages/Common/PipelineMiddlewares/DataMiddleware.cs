@@ -1,26 +1,27 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
+
+using System;
+using System.Collections.Generic;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Internal;
 
 namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
 {
-    using System;
-    using System.Collections.Generic;
-    using Abstractions;
-
     /// <summary>
     /// Appends additional data to message.
     /// </summary>
     public class DataMiddleware : IMessagePipelineMiddleware
     {
         /// <inheritdoc />
-        public string Id { get; set; } = "Data";
+        public string Id { get; set; }
 
-        readonly Action<IDictionary<string, string>> action;
+        private readonly Action<IDictionary<string, string>> action;
 
         /// <summary>
         /// .ctor
         /// </summary>
-        /// <param name="action">The action to execute.</param>
+        /// <param name="action">The action to be executed.</param>
         public DataMiddleware(Action<IDictionary<string, string>> action)
         {
             if (action == null)
@@ -28,12 +29,18 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
                 throw new ArgumentNullException(nameof(action));
             }
             this.action = action;
+            this.Id = this.GetType().Name;
         }
 
         /// <inheritdoc />
-        public virtual void Handle(IMessage context)
+        public virtual void Handle(IMessageContext messageContext)
         {
-            action(context.Data);
+            var obj = messageContext.Items.GetValueOrDefault(MessageContextConstants.DataKey,
+                new Dictionary<string, string>());
+            if (obj is IDictionary<string, string> data)
+            {
+                action(data);
+            }
         }
     }
 }

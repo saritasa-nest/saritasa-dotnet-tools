@@ -1,19 +1,25 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Threading.Tasks;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Abstractions.Queries;
+using Xunit;
+using Saritasa.Tools.Messages.Common;
+using Saritasa.Tools.Messages.Queries;
+
 namespace Saritasa.Tools.Messages.Tests
 {
-    using System;
-    using System.Collections.Generic;
-    using Xunit;
-    using Common;
-    using Queries;
-
     /// <summary>
     /// Message queries tests.
     /// </summary>
     public class QueriesTests
     {
+        readonly IMessagePipelineService pipelineService = new DefaultMessagePipelineService();
+
         #region Interfaces
 
         public interface IInterfaceA
@@ -60,58 +66,73 @@ namespace Saritasa.Tools.Messages.Tests
 
             public IList<int> SimpleQueryWithDependency(int a, int b, IInterfaceB dependencyB)
             {
-                if (dependencyB == null)
-                {
-                    return null;
-                }
-                return new List<int>() { a, b };
+                return new List<int> { a, b };
             }
         }
 
-        #region Can_run_simple_query
+        public void SetupQueryPipeline(QueryPipelineBuilder builder)
+        {
+            builder
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectResolverMiddleware
+                {
+                    UseInternalObjectResolver = true
+                })
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware());
+        }
 
         [Fact]
         public void Can_run_simple_query()
         {
             // Arrange
-            var qp = QueryPipeline.CreateDefaultPipeline(QueryPipeline.NullResolver).UseInternalResolver(true);
+            SetupQueryPipeline(pipelineService.PipelineContainer.AddQueryPipeline());
 
             // Act
-            var result = qp.Query<QueryObject>().With(q => q.SimpleQuery(10, 20));
+            var result = pipelineService.Query<QueryObject>().With(q => q.SimpleQuery(10, 20));
 
             // Assert
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
             Assert.Equal(20, result[1]);
+        }
+
+        #region Can_run_simple_async_query
+
+        [QueryHandlers]
+        public class AsyncQueryObject
+        {
+            public async Task<string> GetString()
+            {
+                await Task.Delay(100);
+                return await Task.FromResult("LP");
+            }
+        }
+
+        [Fact]
+        public async Task Can_run_simple_async_query()
+        {
+            // Arrange
+            SetupQueryPipeline(pipelineService.PipelineContainer.AddQueryPipeline());
+
+            // Act
+            var result = await pipelineService.Query<AsyncQueryObject>().WithAsync(q => q.GetString());
+
+            // Assert
+            Assert.Equal("LP", result);
         }
 
         #endregion
 
         [Fact]
-        public void Can_run_query_with_resolving()
-        {
-            // Arrange
-            var qp = QueryPipeline.CreateDefaultPipeline(QueriesTests.InterfacesResolver).UseInternalResolver();
-
-            // Act
-            var result = qp.Query<QueryObject>().With(q => q.SimpleQueryWithDependency(10, 20, null));
-
-            // Assert
-            Assert.NotNull(result);
-            Assert.Equal(2, result.Count);
-            Assert.Equal(20, result[1]);
-        }
-
-        [Fact]
         public void Can_run_query_from_raw_message()
         {
             // Arrange
-            var qp = QueryPipeline.CreateDefaultPipeline(QueriesTests.InterfacesResolver).UseInternalResolver();
-            var message = new Message()
+            pipelineService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
+            SetupQueryPipeline(pipelineService.PipelineContainer.AddQueryPipeline());
+            var messageRecord = new MessageRecord
             {
-                ContentType = "Saritasa.Tools.Messages.Tests.QueriesTests+QueryObject.SimpleQueryWithDependency",
-                Type = Message.MessageTypeQuery,
-                Content = new Dictionary<string, object>()
+                ContentType = "Saritasa.Tools.Messages.Tests.QueriesTests+QueryObject.SimpleQueryWithDependency," +
+                    "Saritasa.Tools.Messages.Tests",
+                Content = new Dictionary<string, object>
                 {
                     ["a"] = 10,
                     ["b"] = 20,
@@ -120,10 +141,13 @@ namespace Saritasa.Tools.Messages.Tests
             };
 
             // Act
-            qp.ProcessRaw(message);
+            var queryPipeline = pipelineService.GetPipelineOfType<IQueryPipeline>();
+            var queryConverter = pipelineService.GetPipelineOfType<IQueryPipeline>() as IMessageRecordConverter;
+            var messageContext = queryConverter.CreateMessageContext(pipelineService, messageRecord);
+            queryPipeline.Invoke(messageContext);
 
             // Assert
-            Assert.IsType<List<int>>(message.Content);
+            Assert.IsType<List<int>>(messageContext.GetResult<object>());
         }
 
         #region Can_run_query_with_private_object_ctor
@@ -145,7 +169,7 @@ namespace Saritasa.Tools.Messages.Tests
 
             public IList<string> Query()
             {
-                return new List<string>() { dependencyA.GetTestValue(), dependencyB.GetTestValue() };
+                return new List<string> { dependencyA.GetTestValue(), dependencyB.GetTestValue() };
             }
         }
 
@@ -153,15 +177,153 @@ namespace Saritasa.Tools.Messages.Tests
         public void Can_run_query_with_private_object_ctor()
         {
             // Arrange
-            var qp = QueryPipeline.CreateDefaultPipeline(QueriesTests.InterfacesResolver).UseInternalResolver();
+            pipelineService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
+            SetupQueryPipeline(pipelineService.PipelineContainer.AddQueryPipeline());
 
             // Act
-            var result = qp.Query<QueryObjectWithPrivateCtor>().With(q => q.Query());
+            var result = pipelineService.Query<QueryObjectWithPrivateCtor>().With(q => q.Query());
 
             // Assert
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
             Assert.Equal("A", result[0]);
+        }
+
+        #endregion
+
+        #region Can_run_query_from_raw_message_2
+
+        [Fact]
+        public void Can_run_query_from_raw_message_2()
+        {
+            // Arrange
+            pipelineService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
+            SetupQueryPipeline(pipelineService.PipelineContainer.AddQueryPipeline());
+            var messageContext = new MessageContext(pipelineService);
+            var queryPipeline = pipelineService.GetPipelineOfType<IQueryPipeline>();
+            var ret = queryPipeline.CreateMessageContext<QueriesTests.QueryObject>(pipelineService, messageContext)
+                .With(q => q.SimpleQuery(10, 10));
+
+            // Act
+            queryPipeline.Invoke(messageContext);
+
+            // Assert
+            var result = messageContext.GetResult<object>();
+            Assert.IsType<List<int>>(result);
+        }
+
+        #endregion
+
+        #region Can_use_interfaces_to_run_query
+
+        public interface IUserQueries
+        {
+            int GetByNameCount(string name);
+        }
+
+        [QueryHandlers]
+        public class UserQueries : IUserQueries
+        {
+            public int GetByNameCount(string name) => 34;
+        }
+
+        [Fact]
+        public void Can_use_interfaces_to_run_query()
+        {
+            // Arrange
+            pipelineService.PipelineContainer.AddQueryPipeline()
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectResolverMiddleware(
+                    typeof(UserQueries).GetTypeInfo().Assembly)
+                {
+                    UseInternalObjectResolver = true
+                })
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware());
+
+            // Act
+            var result = pipelineService.Query<IUserQueries>().With(q => q.GetByNameCount("Test"));
+
+            // Assert
+            Assert.Equal(34, result);
+        }
+
+        #endregion
+
+        #region Should_use_interface_in_case_of_external_resolver
+
+        public interface IProductQueries
+        {
+            int GetByNameCount(string name);
+        }
+
+        [QueryHandlers]
+        public class ProductQueries : IProductQueries
+        {
+            public int GetByNameCount(string name) => 974;
+
+            public static object Resolver(Type type)
+            {
+                if (type == typeof(IProductQueries))
+                {
+                    return new ProductQueries();
+                }
+                return null;
+            }
+        }
+
+        [Fact]
+        public void Should_use_interface_in_case_of_external_resolver()
+        {
+            // Arrange
+            pipelineService.ServiceProvider = new FuncServiceProvider(ProductQueries.Resolver);
+            pipelineService.PipelineContainer.AddQueryPipeline()
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectResolverMiddleware(
+                    typeof(UserQueries).GetTypeInfo().Assembly)
+                {
+                    UseInternalObjectResolver = false,
+                })
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware());
+
+            // Act
+            var result = pipelineService.Query<IProductQueries>().With(q => q.GetByNameCount("Test"));
+
+            // Assert
+            Assert.Equal(974, result);
+        }
+
+        #endregion
+
+        #region Query object should not require parameterless ctor
+
+        public class UserQueries2Dep
+        {
+            public string Name { get; } = "Quake Champions";
+        }
+
+        [QueryHandlers]
+        public class UserQueries2
+        {
+            private readonly UserQueries2Dep dep;
+
+            public UserQueries2(UserQueries2Dep dep)
+            {
+                this.dep = dep;
+            }
+
+            public string GetString() => dep.Name;
+        }
+
+        [Fact]
+        public void Query_object_should_not_require_parameterles_ctor()
+        {
+            // Arrange
+            SetupQueryPipeline(pipelineService.PipelineContainer.AddQueryPipeline());
+            pipelineService.ServiceProvider = new FuncServiceProvider(Activator.CreateInstance);
+
+            // Act
+            var result = pipelineService.Query<UserQueries2>().With(q => q.GetString());
+
+            // Assert
+            Assert.Equal("Quake Champions", result);
         }
 
         #endregion

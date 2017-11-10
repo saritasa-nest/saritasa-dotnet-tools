@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNet.Identity;
+using Saritasa.Tools.Common.Utils;
 
 namespace ZergRushCo.Todosya.Domain.UserContext.Services
 {
@@ -14,14 +15,14 @@ namespace ZergRushCo.Todosya.Domain.UserContext.Services
         /// <returns>Hashed user password.</returns>
         public string HashPassword(string password)
         {
-            return Candy.SecurityUtils.Hash(password, Candy.SecurityUtils.HashMethods.Sha256);
+            return SecurityUtils.Hash(password, SecurityUtils.HashMethod.Sha256);
         }
 
         /// <inheritdoc />
         public PasswordVerificationResult VerifyHashedPassword(string hashedPassword, string providedPassword)
         {
-            // should not be there
-            return Candy.SecurityUtils.CheckHash(providedPassword, hashedPassword) ?
+            // Should not be there.
+            return SecurityUtils.CheckHash(providedPassword, hashedPassword) ?
                 PasswordVerificationResult.Success : PasswordVerificationResult.Failed;
         }
     }

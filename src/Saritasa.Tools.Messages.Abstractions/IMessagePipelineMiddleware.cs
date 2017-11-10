@@ -1,11 +1,10 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+
 namespace Saritasa.Tools.Messages.Abstractions
 {
-    using System;
-    using JetBrains.Annotations;
-
     /// <summary>
     /// Pipeline handler to process message. It may change message context.
     /// </summary>
@@ -19,7 +18,7 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// <summary>
         /// Handles the message in context.
         /// </summary>
-        /// <param name="message">Message execution context.</param>
-        void Handle([NotNull] IMessage message);
+        /// <param name="messageContext">Message execution context.</param>
+        void Handle(IMessageContext messageContext);
     }
 }

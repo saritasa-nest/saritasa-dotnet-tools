@@ -1,13 +1,11 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
+
+using System;
+using Saritasa.Tools.Messages.Abstractions;
 
 namespace Saritasa.Tools.Messages.Common
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Reflection;
-    using Abstractions;
-
     /// <summary>
     /// Message query parameters. Always filters with AND condition.
     /// </summary>
@@ -59,11 +57,6 @@ namespace Saritasa.Tools.Messages.Common
         public int? ExecutionDurationBelow { get; private set; }
 
         /// <summary>
-        /// Assemblies to load types.
-        /// </summary>
-        public IList<Assembly> Assemblies { get; } = new List<Assembly>();
-
-        /// <summary>
         /// How many messages to skip.
         /// </summary>
         public int Skip { get; private set; }
@@ -73,7 +66,7 @@ namespace Saritasa.Tools.Messages.Common
         /// </summary>
         public int Take { get; private set; } = 1000;
 
-        MessageQuery()
+        private MessageQuery()
         {
         }
 
@@ -200,7 +193,8 @@ namespace Saritasa.Tools.Messages.Common
         {
             if (ExecutionDurationBelow.HasValue && ExecutionDurationBelow.Value > duration)
             {
-                throw new ArgumentOutOfRangeException($"{nameof(duration)} must be greater than ${nameof(ExecutionDurationBelow)}");
+                throw new ArgumentOutOfRangeException(nameof(duration),
+                    string.Format(Properties.Strings.ArgumentMustBeGreaterThan, nameof(duration), nameof(ExecutionDurationBelow)));
             }
             ExecutionDurationAbove = duration;
             return this;
@@ -215,7 +209,8 @@ namespace Saritasa.Tools.Messages.Common
         {
             if (ExecutionDurationAbove.HasValue && ExecutionDurationAbove.Value < duration)
             {
-                throw new ArgumentOutOfRangeException($"{nameof(duration)} must be lower than ${nameof(ExecutionDurationAbove)}");
+                throw new ArgumentOutOfRangeException(nameof(duration),
+                    string.Format(Properties.Strings.ArgumentMustBeLessThan, nameof(duration), nameof(ExecutionDurationAbove)));
             }
             ExecutionDurationBelow = duration;
             return this;
@@ -246,43 +241,43 @@ namespace Saritasa.Tools.Messages.Common
         /// <summary>
         /// Does the message match criterias of query.
         /// </summary>
-        /// <param name="message">Message.</param>
+        /// <param name="messageRecord">Message record.</param>
         /// <returns>True if message matches criteries.</returns>
-        public bool Match(IMessage message)
+        public bool Match(MessageRecord messageRecord)
         {
-            if (Id.HasValue && message.Id != Id.Value)
+            if (Id.HasValue && messageRecord.Id != Id.Value)
             {
                 return false;
             }
-            if (CreatedStartDate.HasValue && message.CreatedAt < CreatedStartDate.Value)
+            if (CreatedStartDate.HasValue && messageRecord.CreatedAt < CreatedStartDate.Value)
             {
                 return false;
             }
-            if (CreatedEndDate.HasValue && message.CreatedAt > CreatedEndDate.Value)
+            if (CreatedEndDate.HasValue && messageRecord.CreatedAt > CreatedEndDate.Value)
             {
                 return false;
             }
-            if (!string.IsNullOrEmpty(ContentType) && message.ContentType != ContentType)
+            if (!string.IsNullOrEmpty(ContentType) && messageRecord.ContentType != ContentType)
             {
                 return false;
             }
-            if (!string.IsNullOrEmpty(ErrorType) && message.ErrorType != ErrorType)
+            if (!string.IsNullOrEmpty(ErrorType) && messageRecord.ErrorType != ErrorType)
             {
                 return false;
             }
-            if (Status.HasValue && message.Status != Status.Value)
+            if (Status.HasValue && messageRecord.Status != Status.Value)
             {
                 return false;
             }
-            if (Type.HasValue && message.Type != Type.Value)
+            if (Type.HasValue && messageRecord.Type != Type.Value)
             {
                 return false;
             }
-            if (ExecutionDurationAbove.HasValue && message.ExecutionDuration < ExecutionDurationAbove.Value)
+            if (ExecutionDurationAbove.HasValue && messageRecord.ExecutionDuration < ExecutionDurationAbove.Value)
             {
                 return false;
             }
-            if (ExecutionDurationBelow.HasValue && message.ExecutionDuration > ExecutionDurationBelow.Value)
+            if (ExecutionDurationBelow.HasValue && messageRecord.ExecutionDuration > ExecutionDurationBelow.Value)
             {
                 return false;
             }

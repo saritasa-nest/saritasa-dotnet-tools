@@ -1,5 +1,4 @@
-﻿using System;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using Microsoft.Extensions.Logging;
 using Saritasa.Tools.Messages.Abstractions;
@@ -16,9 +15,8 @@ namespace ZergRushCo.Todosya.Web.Controllers
     public class ApiTaskController : BaseController
     {
         public ApiTaskController(
-            ICommandPipeline commandPipeline,
-            IQueryPipeline queryPipeline,
-            ILoggerFactory loggerFactory) : base(commandPipeline, queryPipeline, loggerFactory)
+            IMessagePipelineService pipelineService,
+            ILoggerFactory loggerFactory) : base(pipelineService, loggerFactory)
         {
         }
 
@@ -27,7 +25,7 @@ namespace ZergRushCo.Todosya.Web.Controllers
         public ActionResult Get()
         {
             var userId = User.Identity.GetUserId();
-            var data = QueryPipeline.Query<TasksQueries>().With(q => q.GetByUserDto(userId));
+            var data = PipelineService.Query<TasksQueries>().With(q => q.GetByUserDto(userId));
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
@@ -37,8 +35,8 @@ namespace ZergRushCo.Todosya.Web.Controllers
         {
             var userId = User.Identity.GetUserId();
             command.UserId = userId;
-            CommandPipeline.Handle(command);
-            var data = QueryPipeline.Query<TasksQueries>().With(q => q.GetByIdDto(command.TaskId));
+            PipelineService.HandleCommand(command);
+            var data = PipelineService.Query<TasksQueries>().With(q => q.GetByIdDto(command.TaskId));
             return Json(data);
         }
 
@@ -48,8 +46,8 @@ namespace ZergRushCo.Todosya.Web.Controllers
         {
             var userId = User.Identity.GetUserId();
             command.UserId = userId;
-            CommandPipeline.Handle(command);
-            var data = QueryPipeline.Query<TasksQueries>().With(q => q.GetByIdDto(command.Id));
+            PipelineService.HandleCommand(command);
+            var data = PipelineService.Query<TasksQueries>().With(q => q.GetByIdDto(command.Id));
             return Json(data);
         }
 
@@ -63,7 +61,7 @@ namespace ZergRushCo.Todosya.Web.Controllers
                 UserId = userId,
                 TaskId = id,
             };
-            CommandPipeline.Handle(command);
+            PipelineService.HandleCommand(command);
             return Json(true);
         }
 
@@ -73,7 +71,7 @@ namespace ZergRushCo.Todosya.Web.Controllers
         {
             var userId = User.Identity.GetUserId();
             command.UserId = userId;
-            CommandPipeline.Handle(command);
+            PipelineService.HandleCommand(command);
             return Json(true);
         }
     }

@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>Saritasa.Tools.Messages</id>
+    <version>0.0.0</version>
+    <title>Saritasa Tools Messages</title>
+    <authors>Saritasa</authors>
+    <owners>Saritasa</owners>
+    <licenseUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/Saritasa/SaritasaTools</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>The package is a part of Saritasa Tools project. Saritasa.Tools.Messages contains CQRS infrastructure that includes command, queryies and events.</description>
+    <summary>CQRS infrastructure.</summary>
+    <copyright>(c) Saritasa, 2016-2017</copyright>
+    <tags>cqrs cqs commands queries events pipeline</tags>
+    <dependencies>
+      <group targetFramework="net452">
+        <dependency id="Newtonsoft.Json" version="[10.0.0, )" />
+        <dependency id="Saritasa.Tools.Messages.Abstractions" version="[0.3.0, )" />
+        <dependency id="Saritasa.Tools.Domain" version="[0.2.0, )" />
+      </group>
+      <group targetFramework="netstandard1.5">
+        <dependency id="NETStandard.Library" version="[1.6.0, )" />
+        <dependency id="System.Data.Common" version="[4.3.0, )" />
+        <dependency id="System.Runtime.Loader" version="[4.3.0, )" />
+        <dependency id="System.Net.Http" version="[4.3.0, )" />
+        <dependency id="Newtonsoft.Json" version="[10.0.0, )" />
+        <dependency id="Saritasa.Tools.Messages.Abstractions" version="[0.3.0, )" />
+        <dependency id="Saritasa.Tools.Domain" version="[0.2.0, )" />
+      </group>
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System.Xml" targetFramework=".NETFramework4.5.2" />
+      <frameworkAssembly assemblyName="System.ComponentModel.DataAnnotations" targetFramework=".NETFramework4.5.2" />
+      <frameworkAssembly assemblyName="System.Net.Http" targetFramework=".NETFramework4.5.2" />
+    </frameworkAssemblies>
+  </metadata>
+  <files>
+    <file src="bin\Release\**\Saritasa.Tools.Messages*.dll" target="lib" />
+    <file src="bin\Release\**\Saritasa.Tools.Messages.xml" target="lib" />
+  </files>
+</package>

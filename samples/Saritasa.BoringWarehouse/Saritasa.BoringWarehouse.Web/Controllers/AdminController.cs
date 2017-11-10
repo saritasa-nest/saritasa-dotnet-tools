@@ -20,21 +20,21 @@
     [Authorize(UserRole.Admin)]
     public class AdminController : Controller
     {
-        private readonly ICommandPipeline commandPipeline;
+        private readonly IMessagePipelineService commandPipeline;
         private readonly UserQueries userQueries;
 
-        public AdminController(ICommandPipeline commandPipline, UserQueries userQueries)
+        public AdminController(IMessagePipelineService pipelineService, UserQueries userQueries)
         {
-            if (commandPipline == null)
+            if (pipelineService == null)
             {
-                throw new ArgumentNullException("commandPipline");
+                throw new ArgumentNullException(nameof(pipelineService));
             }
             if (userQueries == null)
             {
-                throw new ArgumentNullException("userQueries");
+                throw new ArgumentNullException(nameof(userQueries));
             }
 
-            this.commandPipeline = commandPipline;
+            this.commandPipeline = pipelineService;
             this.userQueries = userQueries;
         }
 
@@ -93,7 +93,7 @@
             }
             try
             {
-                commandPipeline.Handle(command);
+                commandPipeline.HandleCommand(command);
             }
             catch (DomainException ex)
             {
@@ -121,7 +121,7 @@
             }
             try
             {
-                commandPipeline.Handle(command);
+                commandPipeline.HandleCommand(command);
             }
             catch (DomainException ex)
             {

@@ -2,7 +2,9 @@
 using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Abstractions.Commands;
 using Saritasa.Tools.Messages.Commands;
+using Saritasa.Tools.Messages.Common;
 
 namespace Saritasa.Tools.Messages.Benchmark
 {
@@ -93,7 +95,7 @@ namespace Saritasa.Tools.Messages.Benchmark
             var uowFactory = (IUowFactory)InterfacesResolver(typeof(IUowFactory));
             for (int i = 0; i < NumberOfInterations; i++)
             {
-                var cmd = new CreateUserCommand()
+                var cmd = new CreateUserCommand
                 {
                     FirstName = "Ivan",
                     LastName = "Ivanov",
@@ -106,18 +108,26 @@ namespace Saritasa.Tools.Messages.Benchmark
         [Benchmark]
         public void RunCommandWithPipeline()
         {
-            var commandsPipeline = CommandPipeline.CreateDefaultPipeline(InterfacesResolver,
-                Assembly.GetAssembly(typeof(CreateUserCommand)))
-                .UseInternalResolver();
+            var piplinesService = new DefaultMessagePipelineService();
+            piplinesService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
+            piplinesService.PipelineContainer.AddCommandPipeline()
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
+                    typeof(CreateUserCommand).GetTypeInfo().Assembly))
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerResolverMiddleware())
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerExecutorMiddleware
+                {
+                    UseParametersResolve = true
+                });
+
             for (int i = 0; i < NumberOfInterations; i++)
             {
-                var cmd = new CreateUserCommand()
+                var cmd = new CreateUserCommand
                 {
                     FirstName = "Ivan",
                     LastName = "Ivanov",
                     BirthDay = new DateTime(1985, 1, 1),
                 };
-                commandsPipeline.Handle(cmd);
+                piplinesService.HandleCommand(cmd);
             }
         }
     }

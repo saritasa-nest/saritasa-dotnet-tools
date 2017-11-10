@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Domain.Exceptions;
+using Saritasa.Tools.Messages.Abstractions.Commands;
+using Saritasa.Tools.Messages.Abstractions.Events;
 using ZergRushCo.Todosya.Domain.UserContext.Commands;
 using ZergRushCo.Todosya.Domain.UserContext.Entities;
 using ZergRushCo.Todosya.Domain.UserContext.Events;
@@ -38,17 +41,17 @@ namespace ZergRushCo.Todosya.Domain.UserContext.Handlers
         /// Handle user registration.
         /// </summary>
         /// <param name="command">Command.</param>
-        /// <param name="eventsPipeline">Events pipeline.</param>
+        /// <param name="pipelineService">Pipeline service.</param>
         public async Task HandleRegisterUser(
             RegisterUserCommand command,
-            IEventPipeline eventsPipeline)
+            IMessagePipelineService pipelineService)
         {
             using (var uow = uowFactory.Create())
             {
                 var email = command.Email.ToLowerInvariant().Trim();
                 if (uow.UserRepository.Any(x => x.Email == email))
                 {
-                    throw new DomainException("The user with the same email already exists");
+                    throw new DomainException("The user with the same email already exists.");
                 }
 
                 var user = new User
@@ -61,6 +64,10 @@ namespace ZergRushCo.Todosya.Domain.UserContext.Handlers
                     Email = command.Email,
                     UserName = email,
                 };
+                if (command.UserId != Guid.Empty)
+                {
+                    user.Id = command.UserId.ToString();
+                }
                 user.Clean();
                 command.Result = await userManager.CreateAsync(user, command.Password);
                 if (!command.Result.Succeeded)
@@ -68,7 +75,7 @@ namespace ZergRushCo.Todosya.Domain.UserContext.Handlers
                     throw new IdentityException(command.Result);
                 }
 
-                await eventsPipeline.RaiseAsync(new UserCreatedEvent()
+                await pipelineService.RaiseEventAsync(new UserCreatedEvent
                 {
                     User = user,
                 });
@@ -87,7 +94,7 @@ namespace ZergRushCo.Todosya.Domain.UserContext.Handlers
             var user = await userManager.FindByIdAsync(command.UserId);
             if (user == null)
             {
-                throw new NotFoundException("User not found");
+                throw new NotFoundException("User not found.");
             }
 
             user.Email = command.Email;

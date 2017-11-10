@@ -1,103 +1,62 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace Saritasa.Tools.Domain
 {
-    using System;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using Exceptions;
-    using JetBrains.Annotations;
-
     /// <summary>
     /// <see cref="IRepository{TEntity}" /> extension methods.
     /// </summary>
     public static class RepositoryExtensions
     {
         /// <summary>
-        /// A convenience method for looking up an object with the given PKs, creating one if necessary.
-        /// Returns existing object from database on new one.
+        /// Get all entities of specified type.
         /// </summary>
-        /// <typeparam name="TEntity">Entity type of repository. Must have parameterless constructor.</typeparam>
-        /// <param name="repository">Repository.</param>
-        /// <param name="keyValues">Key values to lookup by.</param>
-        /// <returns>Existing entity from repository or newly created one.</returns>
-        [NotNull]
-        public static TEntity GetOrAdd<TEntity>(
-            [NotNull] IRepository<TEntity> repository,
-            params object[] keyValues) where TEntity : class, new()
+        /// <param name="repository">Repository instance.</param>
+        /// <param name="includes">Relations to include.</param>
+        /// <returns>Task with result of enumerable of entities.</returns>
+        public static Task<IEnumerable<TEntity>> GetAllAsync<TEntity>(
+            this IRepository<TEntity> repository,
+            params Expression<Func<TEntity, object>>[] includes) where TEntity : class
         {
-            var entity = repository.Get(keyValues);
-            if (entity == null)
-            {
-                entity = new TEntity();
-                repository.Add(entity);
-            }
-            return entity;
+            return repository.GetAllAsync(CancellationToken.None, includes);
         }
 
         /// <summary>
-        /// A convenience method for looking up an object with the given delegate, creating one if necessary.
-        /// Returns existing object from database on new one.
+        /// Finds for range of entities based on predicate.
         /// </summary>
-        /// <typeparam name="TEntity">Entity type of repository. Must have parameterless constructor.</typeparam>
-        /// <param name="repository">Repository.</param>
-        /// <param name="expression">Expression to lookup the entity.</param>
-        /// <returns>Existing entity from repository or newly created one.</returns>
-        [NotNull]
-        public static TEntity GetOrAdd<TEntity>(
-            [NotNull] IRepository<TEntity> repository,
-            Expression<Func<TEntity, bool>> expression) where TEntity : class, new()
+        /// <param name="repository">Repository instance.</param>
+        /// <param name="predicate">Filter predicate.</param>
+        /// <param name="includes">Includes.</param>
+        /// <returns>Enumerable of enitites.</returns>
+        public static Task<IEnumerable<TEntity>> FindAsync<TEntity>(
+            this IRepository<TEntity> repository,
+            Expression<Func<TEntity, bool>> predicate,
+            params Expression<Func<TEntity, object>>[] includes) where TEntity : class
         {
-            var entity = repository.Find(expression).Single();
-            if (entity == null)
-            {
-                entity = new TEntity();
-                repository.Add(entity);
-            }
-            return entity;
+            return repository.FindAsync(predicate, CancellationToken.None, includes);
         }
 
         /// <summary>
-        /// A convenience method for looking up an object with the given PKs. Throws
-        /// <see cref="NotFoundException" /> if no records were found.
+        /// Returns entity instance by id. In some implementations it is not the same as getting item by id
+        /// with Single or First method. It may return cached item if it already exists in identity map.
+        /// If entity is not found the <see cref="Saritasa.Tools.Domain.Exceptions.NotFoundException" /> will be
+        /// generated.
         /// </summary>
-        /// <typeparam name="TEntity">Entity type of repository.</typeparam>
-        /// <param name="repository">Repository.</param>
-        /// <param name="keyValues">Key values to lookup by.</param>
-        /// <returns>Existing entity from repository.</returns>
-        [NotNull]
-        public static TEntity GetOrThrow<TEntity>(
-            [NotNull] IRepository<TEntity> repository,
+        /// <param name="repository">Repository instance.</param>
+        /// <param name="keyValues">Entity ids.</param>
+        /// <exception cref="Saritasa.Tools.Domain.Exceptions.NotFoundException">Is generated when entity is not found.</exception>
+        /// <returns>Task with result of entity instance.</returns>
+        public static Task<TEntity> GetAsync<TEntity>(
+            this IRepository<TEntity> repository,
             params object[] keyValues) where TEntity : class
         {
-            var entity = repository.Get(keyValues);
-            if (entity == null)
-            {
-                throw new NotFoundException($"Cannot find {typeof(TEntity).Name}");
-            }
-            return entity;
-        }
-
-        /// <summary>
-        /// A convenience method for looking up an object with the given delegate. Throws
-        /// <see cref="NotFoundException" /> if no records were found.
-        /// </summary>
-        /// <typeparam name="TEntity">Entity type of repository.</typeparam>
-        /// <param name="repository">Repository.</param>
-        /// <param name="expression">Expression to lookup the entity.</param>
-        /// <returns>Existing entity from repository.</returns>
-        [NotNull]
-        public static TEntity GetOrThrow<TEntity>(
-            [NotNull] IRepository<TEntity> repository,
-            Expression<Func<TEntity, bool>> expression) where TEntity : class
-        {
-            var entity = repository.Find(expression).Single();
-            if (entity == null)
-            {
-                throw new NotFoundException($"Cannot find {typeof(TEntity).Name}");
-            }
-            return entity;
+            return repository.GetAsync(CancellationToken.None, keyValues);
         }
     }
 }

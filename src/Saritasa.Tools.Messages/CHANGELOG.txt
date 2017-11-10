@@ -1,2 +1,25 @@
-﻿0.1.0 [TBD]
+﻿0.4.0 [2017-09-13]
+[*] Separate object resolving to separate middleware (CommandHandlerResolverMiddleware, EventHandlerResolverMiddleware).
+[-] Remove UseParametersResolve parameter for queries pipeline.
+[+] Add IMessagePipelinePostAction interface. The handler will be executed after all middleware execution.
+[+] Optimize handlers resolving.
+[*] Do not resolve object hanlders public properties by default, set UsePropertiesResolving to true for this.
+[+] Generic commands.
+[+] Generic events.
+
+0.3.0 [2017-08-07]
+[*] Fix AddQueryPipeline method.
+
+0.2.0 [2017-07-27]
+[+] Global pipelines refactoring. Instead of register and using every pipeline separately use IMessagePipelineService.
+[*] Refactor and improve work for files and ADO.NET repositories.
+[*] Add cancellation token to async method for pipelines and repositories.
+[*] Refactor common messages repositories, bugfix.
+[*] Add pipelines configuration loading from .config file.
+[*] Downgrade dependencies to netstandard1.5 and net452.
+
+0.1.1 [2017-02-13]
+[*] Fix reference to Saritasa.Tools.Domain .
+
+0.1.0 [2017-02-11]
 [+] Initial release.

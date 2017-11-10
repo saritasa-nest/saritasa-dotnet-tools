@@ -1,45 +1,24 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Xunit;
+using Saritasa.Tools.Common.Pagination;
+using Saritasa.Tools.Common.Utils;
 
 namespace Saritasa.Tools.Common.Tests
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Xunit;
-    using Extensions;
-    using Pagination;
-    using Utils;
-
     /// <summary>
     /// Flow, enumerable tests.
     /// </summary>
     public class FlowTests
     {
         private event EventHandler<EventArgs> EventArgsTestEvent;
-
-        [Fact]
-        public void Raise_should_call_test_handler()
-        {
-            // Arrange
-            int a = 10;
-            EventArgs eventArgs = new EventArgs();
-            EventHandler<EventArgs> testDelegate = (sender, args) =>
-            {
-                a = 20;
-            };
-            EventArgsTestEvent = null;
-            EventArgsTestEvent += testDelegate;
-
-            // Act
-            FlowUtils.Raise(this, eventArgs, ref EventArgsTestEvent);
-
-            // Assert
-            Assert.Equal(20, a);
-        }
 
         [Fact]
         public void Raise_all_should_call_test_handlers()
@@ -96,7 +75,6 @@ namespace Saritasa.Tools.Common.Tests
             EventArgs eventArgs = new EventArgs();
 
             // Act
-            FlowUtils.Raise(this, eventArgs, ref EventArgsTestEvent);
             FlowUtils.RaiseAll(this, eventArgs, ref EventArgsTestEvent);
 
             // Assert
@@ -116,14 +94,14 @@ namespace Saritasa.Tools.Common.Tests
             // Act
             var pagedList = new PagedEnumerable<int>(list, 10, 10);
             var pagedList2 = new PagedEnumerable<int>(list, 10, 10);
-            var pagedList3 = list.AsPage(13, 25);
-            var pagedList4 = list.AsPage(20, 13);
+            var pagedList3 = list.ToPaged(13, 25);
+            var pagedList4 = list.ToPaged(20, 13);
 
             // Assert
             Assert.Equal(25, pagedList.TotalPages);
             Assert.Equal(10, pagedList2.Count());
             Assert.Equal(10, pagedList3.TotalPages);
-            Assert.Equal(13, pagedList3.CurrentPage);
+            Assert.Equal(13, pagedList3.Page);
             Assert.Equal(20, pagedList4.TotalPages);
             Assert.Equal(3, pagedList4.Count());
         }
@@ -150,10 +128,7 @@ namespace Saritasa.Tools.Common.Tests
         public void Repeat_with_fixed_retry_strategy_should_throw_exceptions()
         {
             // Arrange
-            Action customMethodReturnWithCustomException = () =>
-            {
-                throw new CustomException();
-            };
+            Action customMethodReturnWithCustomException = () => throw new CustomException();
 
             // Act & assert
             Assert.Throws<CustomException>(
@@ -171,10 +146,7 @@ namespace Saritasa.Tools.Common.Tests
         public void Repeat_with_fixed_retry_strategy_should_delay_correctly()
         {
             // Arrange
-            Action customMethodReturnWithCustomException = () =>
-            {
-                throw new CustomException();
-            };
+            Action customMethodReturnWithCustomException = () => throw new CustomException();
             var stopwatch = new Stopwatch();
 
             // Act
@@ -197,10 +169,7 @@ namespace Saritasa.Tools.Common.Tests
         public void Repeat_with_fixed_retry_strategy_and_first_fast_should_work()
         {
             // Arrange
-            Action customMethodReturnWithCustomException = () =>
-            {
-                throw new CustomException();
-            };
+            Action customMethodReturnWithCustomException = () => throw new CustomException();
             var stopwatch = new Stopwatch();
 
             // Act
@@ -227,10 +196,7 @@ namespace Saritasa.Tools.Common.Tests
         public void Repeat_with_log_handler_should_log()
         {
             // Arrange
-            Action customMethodReturnWithCustomException = () =>
-            {
-                throw new CustomException();
-            };
+            Action customMethodReturnWithCustomException = () => throw new CustomException();
             int totalAttempts = 0;
             var callback = new FlowUtils.RetryCallback((a, e) =>
             {
@@ -287,7 +253,7 @@ namespace Saritasa.Tools.Common.Tests
         {
             // Arrange
             Func<Task<int>> customMethodReturnWithCustomExceptionAsync = () =>
-                Task.Factory.StartNew<int>(() => { throw new CustomException(); });
+                Task.Factory.StartNew<int>(() => throw new CustomException());
             var stopwatch = new Stopwatch();
 
             // Act
@@ -313,7 +279,7 @@ namespace Saritasa.Tools.Common.Tests
         {
             // Arrange
             Func<Task<int>> customMethodReturnWithCustomExceptionAsync = () =>
-                Task.Factory.StartNew<int>(() => { throw new CustomException(); });
+                Task.Factory.StartNew<int>(() => throw new CustomException());
             int totalAttempts = 0;
             var callback = new FlowUtils.RetryCallback((a, e) =>
             {
@@ -381,10 +347,7 @@ namespace Saritasa.Tools.Common.Tests
             // Arrange
             int value = 0;
             var memoized1 = FlowUtils.Memoize(
-                new Func<int>(() =>
-                {
-                    throw new FlowUtils.SkipMemoizeException<int>(++value);
-                })
+                new Func<int>(() => throw new FlowUtils.SkipMemoizeException<int>(++value))
             );
 
             // Act & Assert

@@ -1,50 +1,40 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
+
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Linq;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Abstractions.Events;
+using Saritasa.Tools.Messages.Common;
+using Saritasa.Tools.Messages.Internal;
 
 namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Reflection;
-    using System.Linq;
-    using Abstractions;
-    using Common;
-    using Internal;
-
     /// <summary>
-    /// Locates command hanlder.
+    /// Locates event handler.
     /// </summary>
-    public class EventHandlerLocatorMiddleware : IMessagePipelineMiddleware
+    public class EventHandlerLocatorMiddleware : BaseHandlerLocatorMiddleware,
+        IMessagePipelineMiddleware
     {
         /// <inheritdoc />
-        public string Id { get; set; } = "EventLocator";
+        public string Id { get; set; } = nameof(EventHandlerLocatorMiddleware);
 
-        const string HandlerPrefix = "Handle";
+        private const string HandlerPrefix = "Handle";
 
-        readonly Assembly[] assemblies;
+        internal const string HandlerMethodsKey = "handler-methods";
 
-        IList<MethodInfo> eventHandlers;
+        private readonly Assembly[] assemblies;
 
-        HandlerSearchMethod handlerSearchMethod = HandlerSearchMethod.ClassAttribute;
+        private MethodInfo[] eventHandlers;
 
-        /// <summary>
-        /// What method to use to search command handler class.
-        /// </summary>
-        public HandlerSearchMethod HandlerSearchMethod
+        private readonly System.Collections.Concurrent.ConcurrentDictionary<Type, MethodInfo[]> cache =
+            new System.Collections.Concurrent.ConcurrentDictionary<Type, MethodInfo[]>();
+
+        /// <inheritdoc />
+        public EventHandlerLocatorMiddleware(IDictionary<string, string> dict) : base(dict)
         {
-            get
-            {
-                return handlerSearchMethod;
-            }
-
-            set
-            {
-                if (handlerSearchMethod != value)
-                {
-                    handlerSearchMethod = value;
-                    Init();
-                }
-            }
         }
 
         /// <summary>
@@ -55,75 +45,108 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
         {
             if (assemblies == null || assemblies.Length < 1)
             {
-                throw new ArgumentException("Assemblies to search handlers were not specified");
+                throw new ArgumentException(Properties.Strings.AssembliesNotSpecified);
             }
             if (assemblies.Any(a => a == null))
             {
                 throw new ArgumentNullException(nameof(assemblies));
             }
             this.assemblies = assemblies;
-            Init();
+            Initialize();
         }
 
-        private void Init()
+        /// <inheritdoc />
+        protected override void Initialize()
         {
-            // precache all types with event handlers
+            // Precache all types with event handlers.
             eventHandlers = assemblies.SelectMany(a => a.GetTypes())
-                .Where(t => HandlerSearchMethod == HandlerSearchMethod.ClassAttribute ?
-                    t.GetTypeInfo().GetCustomAttribute<EventHandlersAttribute>() != null :
-                    t.Name.EndsWith("Handlers"))
+                .Where(t =>
+                    HandlerSearchMethod == HandlerSearchMethod.ClassAttribute
+                        ? t.GetTypeInfo().GetCustomAttribute<EventHandlersAttribute>() != null
+                        : t.Name.EndsWith("Handlers"))
                 .SelectMany(t => t.GetTypeInfo().GetMethods())
                 .Where(m => m.Name.StartsWith(HandlerPrefix))
                 .ToArray();
         }
 
         /// <inheritdoc />
-        public virtual void Handle(IMessage message)
+        public void Handle(IMessageContext messageContext)
         {
-            var eventMessage = message as EventMessage;
-            if (eventMessage == null)
-            {
-                throw new NotSupportedException("Message should be EventMessage type");
-            }
-
-            // find handler methods
-            var eventtype = eventMessage.Content.GetType();
+            // Find handler methods.
+            var eventtype = messageContext.Content.GetType();
             if (InternalLogger.IsDebugEnabled)
             {
-                InternalLogger.Debug($"Finding command handler for type {eventtype.Name}", nameof(EventHandlerLocatorMiddleware));
+                InternalLogger.Debug(string.Format(Properties.Strings.SearchEventHandler, eventtype.Name),
+                    nameof(EventHandlerLocatorMiddleware));
             }
-            var methods = eventHandlers
-                .Where(m => m.GetParameters().Any(pt => pt.ParameterType == eventtype))
-                .ToList();
-            var selfMethod = eventtype.GetTypeInfo().GetMethod(HandlerPrefix);
+            var methods = cache.GetOrAdd(eventtype, FindOrCreateMethodHandlers);
+            if (InternalLogger.IsDebugEnabled)
+            {
+                DumpFoundMethods(methods, eventtype);
+            }
+
+            messageContext.Items.TryGetValue(HandlerMethodsKey, out object handlersObj);
+            var methodsWrap = methods.Select(m => new EventHandlerMethodWithObject(m)).ToArray();
+            var handlers = handlersObj as EventHandlerMethodWithObject[];
+            messageContext.Items[HandlerMethodsKey] =
+                ArrayHelpers.AddItems(handlers, methodsWrap);
+        }
+
+        private void DumpFoundMethods(MethodInfo[] methods, Type eventtype)
+        {
+            if (methods.Any())
+            {
+                for (var i = 0; i < methods.Length; i++)
+                {
+                    InternalLogger.Debug(
+                        string.Format(Properties.Strings.EventHandlerFound, Properties.Strings.EventHandlerFound,
+                            methods[i].Name, eventtype), nameof(EventHandlerLocatorMiddleware));
+                }
+            }
+            else
+            {
+                InternalLogger.Debug(string.Format(Properties.Strings.EventHandlerNotFound, eventtype),
+                    nameof(EventHandlerLocatorMiddleware));
+            }
+        }
+
+        private MethodInfo[] FindOrCreateMethodHandlers(Type eventType)
+        {
+            var eventTypeInfo = eventType.GetTypeInfo();
+
+            // Non-generic events lookup.
+            var methods = new List<MethodInfo>();
+            if (!eventTypeInfo.IsGenericType)
+            {
+                methods.AddRange(
+                    eventHandlers
+                        .Where(m => m.GetParameters().Any(pt => pt.ParameterType == eventType))
+                        .ToList());
+            }
+
+            // If event has its own handler.
+            var selfMethod = eventType.GetTypeInfo().GetMethod(HandlerPrefix);
             if (selfMethod != null)
             {
                 methods.Add(selfMethod);
             }
-            if (InternalLogger.IsDebugEnabled)
-            {
-                if (methods.Any())
-                {
-                    for (var i = 0; i < methods.Count; i++)
-                    {
-                        InternalLogger.Debug($"Found \"{methods[i].Name}\" for event {eventtype}",
-                            nameof(EventHandlerLocatorMiddleware));
-                    }
-                }
-                else
-                {
-                    InternalLogger.Debug($"No handlers found for event {eventtype}");
-                }
-            }
 
-            if (eventMessage.HandlerMethods == null)
+            // For generic event we should find suitable method and make generic method.
+            if (eventTypeInfo.IsGenericType)
             {
-                eventMessage.HandlerMethods = methods;
+                var eventGenericType = eventTypeInfo.GetGenericTypeDefinition();
+                var genericEventMethods = eventHandlers
+                    .Where(m =>
+                        m.IsGenericMethod &&
+                        m.GetParameters().Any(pt => pt.ParameterType.GetGenericTypeDefinition() == eventGenericType));
+                if (genericEventMethods != null && genericEventMethods.Any())
+                {
+                    methods.AddRange(
+                        genericEventMethods.Select(m => m.MakeGenericMethod(eventType.GetTypeInfo().GetGenericArguments())
+                    ));
+                }
             }
-            else
-            {
-                eventMessage.HandlerMethods.AddRange(methods);
-            }
+            return methods.ToArray();
         }
     }
 }

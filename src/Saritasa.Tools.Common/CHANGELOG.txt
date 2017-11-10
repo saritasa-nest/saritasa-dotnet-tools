@@ -1,10 +1,46 @@
-﻿0.1.3 [TBD]
+﻿0.4.5 [2017-09-16]
+[+] Add support .NET Standard 1.6 and .NET Standard 2.0 .
+
+0.4.1 [2017-09-13]
+[*] Fix datetime millisecond truncation.
+[*] Change EnumUtils.GetDescription behavior when there is not Description attribute.
+
+0.4.0 [2017-08-24]
+[*] Improve pagination API. Instead of Wrap methods introduce ToMetadataObject and CastMetadataEnumerable.
+[*] XML documentation fixes.
+[+] Add Decade datetime period.
+[*] Fix truncation for seconds, minutes, hours and date.
+
+0.3.3 [2017-07-06]
+[*] Guard.IsNotEmpty does not check white spaces anymore, use Guard.IsNotEmptyOrWhiteSpace .
+
+0.3.2 [2017-07-05]
+[+] Add CollectionUtils.DistinctBy method.
+[+] Overall updates for Pagination namespace. Add EnumerableWithTotalCount, OffsetLimitEnumerable.
+[*] Rename SortOrder.Asc and SortOrder.Desc.
+
+0.3.0 [2017-06-29]
+[+] A lot of refactoring and renamings.
+[+] Add DateTimeUtils.Set method.
+[*] Update Microsoft.NETCore.App to 1.1.1 .
+[-] Remove DateTimeExtensions.IsHoliday and more other utils and extensions.
+[+] Most of extension methods now have utils equivalent. Extenstions are shortcuts for utils methods.
+[+] Add ObjectUtils.CreateTypeFactory method.
+[+] Add more CRC-32 and CRC-64 checks.
+
+0.2.1 [2017-02-11]
+[*] Rename DateTimeUtils.BeginOf to DateTimeUtils.StartOf .
+[+] Add DateTimeUtils.Diff function.
+[*] Docs update.
+
+0.1.3 [2017-01-26]
 [+] Add method PagedEnumerable.Map .
 [*] Rename PagedExtensions.GetPaged to PagedExtensions.AsPage .
 [*] Add PagedExtensions.AsOnePage method.
 [+] Add Offset to PagedMetadata.
 [+] Move DateTimePeriod out of DateTimeExtensions class.
 [+] New DateTime extension method CompareTo with truncation.
+[*] DateTimeExtensions.Truncate by months fix.
 
 0.1.2 [2017-01-11]
 [+] EnumExtensions.GetDescription for .NET 4.0 .

@@ -1,58 +1,124 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Abstractions.Queries;
+using Saritasa.Tools.Messages.Internal;
+using Saritasa.Tools.Messages.Common;
 
 namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
 {
-    using System;
-    using System.Threading.Tasks;
-    using Abstractions;
-    using Internal;
-    using Common;
-
     /// <summary>
-    /// Resolve object handler for query.
+    /// Resolve and locate object handler for query.
     /// </summary>
-    public class QueryObjectResolverMiddleware : BaseExecutorMiddleware
+    public class QueryObjectResolverMiddleware : BaseHandlerResolverMiddleware,
+        IMessagePipelineMiddleware, IAsyncMessagePipelineMiddleware, IMessagePipelinePostAction
     {
+        private readonly IDictionary<Type, Type> interfaceResolveDict =
+            new Dictionary<Type, Type>();
+
+        /// <summary>
+        /// Middleware identifier.
+        /// </summary>
+        public string Id { get; set; } = nameof(QueryObjectResolverMiddleware);
+
         /// <summary>
         /// .ctor
         /// </summary>
-        /// <param name="resolver">Resolver func.</param>
-        public QueryObjectResolverMiddleware(Func<Type, object> resolver) : base(resolver)
+        public QueryObjectResolverMiddleware()
         {
-            Id = "QueryResolver";
+        }
+
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        /// <param name="assemblies">Assemblies to search query handler.</param>
+        public QueryObjectResolverMiddleware(params Assembly[] assemblies)
+        {
+            interfaceResolveDict = assemblies
+                .SelectMany(a => a.GetTypes())
+                .Select(t => t.GetTypeInfo())
+                .Where(t => t.GetCustomAttribute<QueryHandlersAttribute>() != null)
+                .SelectMany(t => t.GetInterfaces().Where(i => !i.FullName.StartsWith("System")).Select(i => new
+                {
+                    iface = i,
+                    type = t
+                }))
+                .ToDictionary(
+                    k => k.iface,
+                    v => v.type.AsType()
+                );
         }
 
         /// <inheritdoc />
-        public override void Handle(IMessage message)
+        public void Handle(IMessageContext messageContext)
         {
-            var queryMessage = message as QueryMessage;
-            if (queryMessage == null)
-            {
-                throw new NotSupportedException("Message should be QueryMessage type");
-            }
+            var queryParams = messageContext.GetItemByKey<QueryParameters>(QueryPipeline.QueryParametersKey);
 
-            if (queryMessage.FakeQueryObject)
+            var queryObjectType = queryParams.Method.DeclaringType;
+            if (queryObjectType == null)
             {
-                queryMessage.QueryObject = ResolveObject(queryMessage.QueryObject.GetType(), nameof(QueryObjectResolverMiddleware));
+                throw new InvalidOperationException("Query method does not have DeclaringType.");
             }
-            if (queryMessage.QueryObject == null)
+            if (queryObjectType.GetTypeInfo().IsInterface)
             {
-                throw new InvalidOperationException($"Query object of type {queryMessage.QueryObject.GetType()} cannot be resolved");
+                if (interfaceResolveDict.ContainsKey(queryObjectType))
+                {
+                    queryObjectType = interfaceResolveDict[queryObjectType];
+                }
+                else
+                {
+                    throw new InvalidOperationException(
+                        $"Cannot find implementation for query with type {queryObjectType.FullName}.");
+                }
             }
-            if (UseParametersResolve)
+            if (queryParams.QueryObject == null)
             {
-                TypeHelpers.ResolveForParameters(queryMessage.Parameters, queryMessage.Method.GetParameters(), Resolver);
+                if (!UseInternalObjectResolver && queryParams.Method.DeclaringType.GetTypeInfo().IsInterface)
+                {
+                    queryObjectType = queryParams.Method.DeclaringType;
+                }
+                if (UseInternalObjectResolver)
+                {
+                    queryParams.QueryObject = CreateHandlerWithCache(queryObjectType, messageContext.ServiceProvider, Id);
+                }
+                else
+                {
+                    queryParams.QueryObject = messageContext.ServiceProvider.GetService(queryObjectType);
+                }
+            }
+            if (queryParams.QueryObject == null)
+            {
+                throw new InvalidOperationException(
+                    string.Format(Properties.Strings.CannotResolveQueryObject, queryObjectType));
             }
         }
 
-        static readonly Task<bool> completedTask = Task.FromResult(true);
+        private static readonly Task<bool> completedTask = Task.FromResult(true);
 
         /// <inheritdoc />
-        public override Task HandleAsync(IMessage message)
+        public Task HandleAsync(IMessageContext messageContext, CancellationToken cancellationToken)
         {
-            Handle(message);
+            Handle(messageContext);
             return completedTask;
+        }
+
+        /// <inheritdoc />
+        public void PostHandle(IMessageContext messageContext)
+        {
+            if (UseInternalObjectResolver)
+            {
+                var queryParams = (QueryParameters)messageContext.Items[QueryPipeline.QueryParametersKey];
+                var disposable = queryParams.QueryObject as IDisposable;
+                disposable?.Dispose();
+                queryParams.QueryObject = null;
+            }
         }
     }
 }

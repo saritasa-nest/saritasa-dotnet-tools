@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Abstractions.Queries;
 using ZergRushCo.Todosya.Domain.UserContext.Entities;
 
 namespace ZergRushCo.Todosya.Domain.UserContext.Queries

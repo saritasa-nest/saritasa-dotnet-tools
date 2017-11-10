@@ -21,10 +21,9 @@ namespace ZergRushCo.Todosya.Web.Controllers
         readonly SignInManager<User, string> signInManager;
 
         public AccountController(
-            ICommandPipeline commandPipeline,
-            IQueryPipeline queryPipeline,
+            IMessagePipelineService pipelineService,
             ILoggerFactory loggerFactory,
-            SignInManager<User, string> signInManager) : base(commandPipeline, queryPipeline, loggerFactory)
+            SignInManager<User, string> signInManager) : base(pipelineService, loggerFactory)
         {
             this.signInManager = signInManager;
         }

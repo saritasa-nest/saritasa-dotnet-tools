@@ -1,4 +1,6 @@
-﻿namespace Saritasa.BoringWarehouse.Domain.Products.Handlers
+﻿using Saritasa.Tools.Messages.Abstractions.Commands;
+
+namespace Saritasa.BoringWarehouse.Domain.Products.Handlers
 {
     using System;
     using System.Collections.Generic;

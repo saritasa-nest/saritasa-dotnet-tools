@@ -1,10 +1,12 @@
-﻿namespace Saritasa.BoringWarehouse.Infrastructure
-{
-    using System.Configuration;
+﻿using System;
+using System.Configuration;
+using Saritasa.Tools.Messages.Common;
+using Autofac;
 
+namespace Saritasa.BoringWarehouse.Infrastructure
+{
     using Tools.Messages.Abstractions;
 
-    using Autofac;
     using Tools.Messages.Commands;
 
     /// <summary>
@@ -20,7 +22,9 @@
         {
             var builder = new ContainerBuilder();
 
-            // other bindings
+            // Bindings.
+            builder.RegisterType<AutofacServiceProvider>().As<IServiceProvider>().InstancePerRequest()
+                .InstancePerLifetimeScope();
             builder.RegisterType<DataAccess.AppDbContext>().AsSelf();
             builder.RegisterType<DataAccess.AppUnitOfWorkFactory>().AsSelf().AsImplementedInterfaces();
             builder.Register(c => c.Resolve<DataAccess.AppUnitOfWorkFactory>().Create()).AsImplementedInterfaces();
@@ -28,26 +32,23 @@
             builder.RegisterType<Domain.Products.Queries.ProductQueries>().AsSelf();
             builder.RegisterType<Domain.Products.Queries.CompanyQueries>().AsSelf();
 
-            // command pipeline
-            builder.Register<ICommandPipeline>(c =>
-                {
-                    var context = c.Resolve<IComponentContext>();
-                    var commandPipeline = CommandPipeline.CreateDefaultPipeline(context.Resolve,
-                        System.Reflection.Assembly.GetAssembly(typeof(Domain.Users.Entities.User)));
-                    var connectionString = ConfigurationManager.ConnectionStrings["AppDbContext"];
-                    commandPipeline.AppendMiddlewares(
-                        new Tools.Messages.Common.PipelineMiddlewares.RepositoryMiddleware(
-                            new Tools.Messages.Common.Repositories.AdoNetMessageRepository(
-                                System.Data.Common.DbProviderFactories.GetFactory(connectionString.ProviderName),
-                                connectionString.ConnectionString,
-                                Tools.Messages.Common.Repositories.AdoNetMessageRepository.Dialect.SqlServer
-                            )
-                        )
-                    );
-                    commandPipeline.UseInternalResolver();
+            // Repository for messages.
+            var connectionString = ConfigurationManager.ConnectionStrings["AppDbContext"];
+            var adoNetRepositoryMiddleware = new Tools.Messages.Common.PipelineMiddlewares.RepositoryMiddleware(
+                new Tools.Messages.Common.Repositories.AdoNetMessageRepository(
+                    System.Data.Common.DbProviderFactories.GetFactory(connectionString.ProviderName),
+                    connectionString.ConnectionString,
+                    Tools.Messages.Common.Repositories.AdoNetMessageRepository.Dialect.SqlServer
+                )
+            );
 
-                    return commandPipeline;
-                }).SingleInstance();
+            // Command pipeline.
+            var messagePipelineContainer = new DefaultMessagePipelineContainer();
+            messagePipelineContainer.AddCommandPipeline()
+                .UseDefaultMiddlewares(System.Reflection.Assembly.GetAssembly(typeof(Domain.Users.Entities.User)))
+                .AddMiddleware(adoNetRepositoryMiddleware);
+            builder.RegisterInstance(messagePipelineContainer).As<IMessagePipelineContainer>().SingleInstance();
+            builder.RegisterType<DefaultMessagePipelineService>().As<IMessagePipelineService>();
 
             return builder;
         }

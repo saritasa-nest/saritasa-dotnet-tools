@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Saritasa.Tools.Domain</id>
+    <title>Saritasa Tools Domain</title>
+    <version>0.0.0</version>
+    <description>The package is a part of Saritasa Tools project. Saritasa.Tools.Domain contains abstractions for unit of work, repository, domain events. Also there are domain exceptions (not found, validation, security). The implementation can be found in Saritasa.Tools.EFCore1, Saritasa.Tools.EF6 packages.</description>
+    <summary>Domain Driven Design related abstractions.</summary>
+    <authors>Saritasa</authors>
+    <owners>Saritasa</owners>
+    <licenseUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/LICENSE.txt</licenseUrl>
+    <projectUrl>https://github.com/saritasa/saritasatools</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <copyright>(c) Saritasa, 2016-2017</copyright>
+    <tags>uow repository domain</tags>
+    <repository type="git" url="https://github.com/Saritasa/SaritasaTools" />
+    <dependencies>
+      <group targetFramework="netstandard1.2">
+      </group>
+      <group targetFramework="net40" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin\Release\**\Saritasa.Tools.Domain*.dll" target="lib" />
+    <file src="bin\Release\**\Saritasa.Tools.Domain.xml" target="lib" />
+  </files>
+</package>

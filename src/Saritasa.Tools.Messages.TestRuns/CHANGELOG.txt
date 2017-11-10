@@ -1,0 +1,2 @@
+﻿0.2.0 [2017-08-07]
+[+] Initial alpha release.

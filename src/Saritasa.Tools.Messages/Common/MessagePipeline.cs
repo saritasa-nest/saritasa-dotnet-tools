@@ -1,23 +1,46 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Common.PipelineMiddlewares;
 
 namespace Saritasa.Tools.Messages.Common
 {
-    using System;
-    using System.Linq;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using Abstractions;
-
     /// <summary>
     /// Messages processing pipeline.
     /// </summary>
     public class MessagePipeline : IMessagePipeline, IDisposable
     {
+        private IMessagePipelineMiddleware[] middlewares;
+
         /// <summary>
         /// Middlewares list.
         /// </summary>
-        protected IList<IMessagePipelineMiddleware> Middlewares { get; set; } = new List<IMessagePipelineMiddleware>();
+        public IMessagePipelineMiddleware[] Middlewares
+        {
+            get => middlewares;
+            set
+            {
+                middlewares = value;
+                InitializeMiddlewaresChains();
+            }
+        }
+
+        /// <summary>
+        /// Options.
+        /// </summary>
+        public MessagePipelineOptions Options { get; set; } = new MessagePipelineOptions();
+
+        private Action<IMessageContext>[] middlewaresChain;
+
+        private Func<IMessageContext, CancellationToken, Task>[] asyncMiddlewaresChain;
+
+        private readonly object objLock = new object();
 
         #region IMessagePipeline
 
@@ -25,118 +48,13 @@ namespace Saritasa.Tools.Messages.Common
         public virtual byte[] MessageTypes => new byte[] { };
 
         /// <inheritdoc />
-        public void AppendMiddlewares(params IMessagePipelineMiddleware[] middlewares)
+        public virtual void Invoke(IMessageContext messageContext)
         {
-            foreach (var middleware in middlewares)
+            var localMiddlewaresChain = middlewaresChain;
+            messageContext.Status = ProcessingStatus.Processing;
+            for (int i = 0; i < localMiddlewaresChain.Length; i++)
             {
-                Middlewares.Add(middleware);
-            }
-            var ids = Middlewares.GroupBy(m => m.Id).Where(m => m.Count() > 1).ToArray();
-            if (ids.Any())
-            {
-                Middlewares.Clear();
-                throw new ArgumentException($"There are middlewares with duplicated identifiers: {ids.First().Key}");
-            }
-        }
-
-        /// <inheritdoc />
-        public IMessagePipelineMiddleware GetMiddlewareById(string id)
-        {
-            return Middlewares.FirstOrDefault(m => m.Id == id);
-        }
-
-        /// <inheritdoc />
-        public void InsertMiddlewareAfter(IMessagePipelineMiddleware middleware, string insertAfterId = null)
-        {
-            if (middleware == null)
-            {
-                throw new ArgumentNullException(nameof(middleware));
-            }
-            if (GetMiddlewareById(middleware.Id) != null)
-            {
-                throw new ArgumentException($"Middleware with id {middleware.Id} already exists");
-            }
-
-            if (string.IsNullOrEmpty(insertAfterId))
-            {
-                Middlewares.Add(middleware);
-            }
-            else
-            {
-                var insertAfterMiddleware = GetMiddlewareById(insertAfterId);
-                if (insertAfterMiddleware == null)
-                {
-                    throw new MiddlewareNotFoundException();
-                }
-                Middlewares.Insert(Middlewares.IndexOf(insertAfterMiddleware) + 1, middleware);
-            }
-        }
-
-        /// <inheritdoc />
-        public void InsertMiddlewareBefore(IMessagePipelineMiddleware middleware, string insertBeforeId = null)
-        {
-            if (middleware == null)
-            {
-                throw new ArgumentNullException(nameof(middleware));
-            }
-            if (GetMiddlewareById(middleware.Id) != null)
-            {
-                throw new ArgumentException($"Middleware with id {middleware.Id} already exists");
-            }
-
-            if (string.IsNullOrEmpty(insertBeforeId))
-            {
-                Middlewares.Insert(0, middleware);
-            }
-            else
-            {
-                var insertBeforeMiddleware = GetMiddlewareById(insertBeforeId);
-                if (insertBeforeMiddleware == null)
-                {
-                    throw new MiddlewareNotFoundException();
-                }
-                Middlewares.Insert(Middlewares.IndexOf(insertBeforeMiddleware), middleware);
-            }
-        }
-
-        /// <inheritdoc />
-        public void RemoveMiddleware(string id)
-        {
-            var middleware = GetMiddlewareById(id);
-            if (middleware == null)
-            {
-                throw new MiddlewareNotFoundException();
-            }
-            Middlewares.Remove(middleware);
-        }
-
-        /// <inheritdoc />
-        public IEnumerable<IMessagePipelineMiddleware> GetMiddlewares()
-        {
-            return Middlewares;
-        }
-
-        /// <inheritdoc />
-        public virtual void ProcessRaw(IMessage message)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
-
-        /// <summary>
-        /// Processes the message thru all middlewares.
-        /// </summary>
-        /// <param name="message">The message.</param>
-        protected void ProcessMiddlewares(IMessage message)
-        {
-            // set execution context
-            MessageExecutionContext.Current = new MessageExecutionContext(message, this);
-
-            // execute message thru all middlewares
-            for (int i = 0; i < Middlewares.Count; i++)
-            {
-                Middlewares[i].Handle(message);
+                localMiddlewaresChain[i](messageContext);
             }
         }
 
@@ -145,32 +63,105 @@ namespace Saritasa.Tools.Messages.Common
         /// <see cref="IAsyncMessagePipelineMiddleware" /> interface. Otherwise it will be called
         /// in sync mode.
         /// </summary>
-        /// <param name="message">The message.</param>
-        protected async Task ProcessMiddlewaresAsync(IMessage message)
+        /// <param name="messageContext">The message context.</param>
+        /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+        public virtual async Task InvokeAsync(IMessageContext messageContext, CancellationToken cancellationToken)
         {
-            // set execution context
-            MessageExecutionContext.Current = new MessageExecutionContext(message, this);
-
-            // execute message thru all middlewares
-            for (int i = 0; i < Middlewares.Count; i++)
+            // Execute message thru all middlewares.
+            var localAsyncMiddlewaresChain = asyncMiddlewaresChain;
+            messageContext.Status = ProcessingStatus.Processing;
+            for (int i = 0; i < localAsyncMiddlewaresChain.Length; i++)
             {
-                var asyncHandler = Middlewares[i] as IAsyncMessagePipelineMiddleware;
-                if (asyncHandler != null)
+                await localAsyncMiddlewaresChain[i](messageContext, cancellationToken);
+            }
+        }
+
+        #endregion
+
+        private Func<IMessageContext, CancellationToken, Task> CreateAsyncCallWrapper(Action<IMessageContext> action)
+        {
+            Task Func(IMessageContext mc, CancellationToken ct)
+            {
+                action(mc);
+                return Task.FromResult(0);
+            }
+
+            return Func;
+        }
+
+        private void InitializeMiddlewaresChains()
+        {
+            lock (objLock)
+            {
+                var localMiddlewares = middlewares;
+                middlewaresChain = CreateSyncMiddlewaresChain(localMiddlewares).ToArray();
+                asyncMiddlewaresChain = CreateAsyncMiddlewaresChain(localMiddlewares).ToArray();
+            }
+        }
+
+        private List<Action<IMessageContext>> CreateSyncMiddlewaresChain(IMessagePipelineMiddleware[] localMiddlewares)
+        {
+            var list = new List<Action<IMessageContext>>();
+            for (int i = 0; i < localMiddlewares.Length; i++)
+            {
+                list.Add(localMiddlewares[i].Handle);
+            }
+            for (int i = localMiddlewares.Length - 1; i >= 0; i--)
+            {
+                var postActionMiddleware = localMiddlewares[i] as IMessagePipelinePostAction;
+                if (postActionMiddleware != null)
                 {
-                    await asyncHandler.HandleAsync(message).ConfigureAwait(false);
+                    list.Add(postActionMiddleware.PostHandle);
+                }
+            }
+            if (Options.ThrowExceptionOnFail)
+            {
+                var throwExceptionMiddleware = new ThrowExceptionOnFailMiddleware();
+                list.Add(throwExceptionMiddleware.Handle);
+            }
+            return list;
+        }
+
+        private List<Func<IMessageContext, CancellationToken, Task>> CreateAsyncMiddlewaresChain(
+            IMessagePipelineMiddleware[] localMiddlewares)
+        {
+            var list = new List<Func<IMessageContext, CancellationToken, Task>>();
+            for (int i = 0; i < localMiddlewares.Length; i++)
+            {
+                var asyncMiddleware = localMiddlewares[i] as IAsyncMessagePipelineMiddleware;
+                if (asyncMiddleware != null)
+                {
+                    list.Add(asyncMiddleware.HandleAsync);
                 }
                 else
                 {
-                    Middlewares[i].Handle(message);
+                    list.Add(CreateAsyncCallWrapper(localMiddlewares[i].Handle));
                 }
             }
+            for (int i = localMiddlewares.Length - 1; i >= 0; i--)
+            {
+                var postActionMiddleware = localMiddlewares[i] as IMessagePipelinePostAction;
+                if (postActionMiddleware != null)
+                {
+                    list.Add(CreateAsyncCallWrapper(postActionMiddleware.PostHandle));
+                }
+            }
+            if (Options.ThrowExceptionOnFail)
+            {
+                var throwExceptionMiddleware = new ThrowExceptionOnFailMiddleware();
+                list.Add(CreateAsyncCallWrapper(throwExceptionMiddleware.Handle));
+            }
+            return list;
         }
 
         #region Dispose
 
         bool disposed;
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Releases middleware resources.
+        /// </summary>
+        /// <param name="disposing">Is called from Dispose method.</param>
         protected virtual void Dispose(bool disposing)
         {
             if (!disposed)
@@ -182,7 +173,6 @@ namespace Saritasa.Tools.Messages.Common
                         var disposableMiddleware = middleware as IDisposable;
                         disposableMiddleware?.Dispose();
                     }
-                    Middlewares.Clear();
                     Middlewares = null;
                 }
                 disposed = true;
@@ -197,5 +187,11 @@ namespace Saritasa.Tools.Messages.Common
         }
 
         #endregion
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return GetType().Name + ": " + string.Join(" >> ", Middlewares.Select(m => m.Id));
+        }
     }
 }

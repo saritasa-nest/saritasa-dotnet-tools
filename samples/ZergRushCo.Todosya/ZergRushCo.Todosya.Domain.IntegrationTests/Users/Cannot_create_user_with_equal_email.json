@@ -1,0 +1,109 @@
+[
+  {
+    "number": "#0",
+    "type": "BasicInformationStep",
+    "content": {
+      "name": "Cannot create user with equal email",
+      "author": "Ivan Kozhin",
+      "created": "2017-07-25T13:37:01",
+      "description": "The test registers two users with email ivan+test99@saritasa.com . Finally we should have domain exception,",
+      "tags": [
+        "users"
+      ]
+    }
+  },
+  {
+    "number": "#1",
+    "type": "RunCommandStep",
+    "content": {
+      "id": "f350fba8-0ce2-4cf0-887e-66b12c900660",
+      "type": "ZergRushCo.Todosya.Domain.UserContext.Commands.RegisterUserCommand, ZergRushCo.Todosya.Domain",
+      "content": {
+        "Email": "ivan+test99@saritasa.com",
+        "Password": "111111",
+        "ConfirmPassword": "111111",
+        "FirstName": "Test",
+        "LastName": "Test",
+        "Country": null,
+        "City": "Krasnoyarsk",
+        "BirthDay": null,
+        "Result": {
+          "Succeeded": true,
+          "Errors": []
+        },
+        "User": {
+          "FirstName": "Test",
+          "LastName": "Test",
+          "Country": null,
+          "City": "Krasnoyarsk",
+          "BirthDay": null,
+          "IsActive": true,
+          "CreatedAt": "2017-07-25T13:37:24.4808031+07:00",
+          "UpdatedAt": null,
+          "Email": "ivan+test99@saritasa.com",
+          "EmailConfirmed": false,
+          "PasswordHash": "SHA256$BCB15F821479B4D5772BD0CA866C00AD5F926E3580720659CC80D39C9D09802A",
+          "SecurityStamp": "0890832d-9ecc-453e-a3a4-513d18c18c29",
+          "PhoneNumber": null,
+          "PhoneNumberConfirmed": false,
+          "TwoFactorEnabled": false,
+          "LockoutEndDateUtc": null,
+          "LockoutEnabled": false,
+          "AccessFailedCount": 0,
+          "Roles": [],
+          "Claims": [],
+          "Logins": [],
+          "Id": "7bd06904-1864-44eb-bc23-07b9545cc146",
+          "UserName": "ivan+test99@saritasa.com"
+        }
+      }
+    }
+  },
+  {
+    "number": "#2",
+    "type": "RunCommandStep",
+    "content": {
+      "id": "f350fba8-0ce2-4cf0-887e-66b12c900660",
+      "type": "ZergRushCo.Todosya.Domain.UserContext.Commands.RegisterUserCommand, ZergRushCo.Todosya.Domain",
+      "content": {
+        "Email": "ivan+test99@saritasa.com",
+        "Password": "111111",
+        "ConfirmPassword": "111111",
+        "FirstName": "Test",
+        "LastName": "Test",
+        "Country": null,
+        "City": "Krasnoyarsk",
+        "BirthDay": null,
+        "Result": {
+          "Succeeded": true,
+          "Errors": []
+        },
+        "User": {
+          "FirstName": "Test",
+          "LastName": "Test",
+          "Country": null,
+          "City": "Krasnoyarsk",
+          "BirthDay": null,
+          "IsActive": true,
+          "CreatedAt": "2017-07-25T13:37:24.4808031+07:00",
+          "UpdatedAt": null,
+          "Email": "ivan+test99@saritasa.com",
+          "EmailConfirmed": false,
+          "PasswordHash": "SHA256$BCB15F821479B4D5772BD0CA866C00AD5F926E3580720659CC80D39C9D09802A",
+          "SecurityStamp": "0890832d-9ecc-453e-a3a4-513d18c18c29",
+          "PhoneNumber": null,
+          "PhoneNumberConfirmed": false,
+          "TwoFactorEnabled": false,
+          "LockoutEndDateUtc": null,
+          "LockoutEnabled": false,
+          "AccessFailedCount": 0,
+          "Roles": [],
+          "Claims": [],
+          "Logins": [],
+          "Id": "7bd06904-1864-44eb-bc23-07b9545cc146",
+          "UserName": "ivan+test99@saritasa.com"
+        }
+      }
+    }
+  }
+]

@@ -8,7 +8,7 @@ namespace ZergRushCo.Todosya.DataAccess
     /// </summary>
     public class AppUnitOfWorkFactory : IAppUnitOfWorkFactory
     {
-        private AppDbContext context;
+        private readonly AppDbContext context;
 
         public AppUnitOfWorkFactory(AppDbContext context)
         {

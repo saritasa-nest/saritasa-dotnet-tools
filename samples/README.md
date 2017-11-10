@@ -9,7 +9,7 @@ Simple sample application. Do not forget to update AppDbContext connection strin
 ZergRushCo.Todosya
 ------------------
 
-This is the sample project that shows how to use repository with unit of work, events, emails. Before start run following commands within `ZergRushCo.Todosya` directory:
+This is the sample project that shows how to use repository with unit of work, events, emails. Before start run following commands within `ZergRushCo.Todosya.Web` directory:
 
 ```
 bower install

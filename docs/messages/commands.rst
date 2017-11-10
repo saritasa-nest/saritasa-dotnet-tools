@@ -6,14 +6,7 @@ Overview
 
 Command is something that changes the state (database insert/update/delete) of application. It utilizes Command behavioral design pattern: you should separate data for command and its handler. Here is a general usage:
 
-1. Setup command pipeline, you can start with general one:
-
-    .. code-block:: c#
-
-        var commandPipeline = Saritasa.Tools.Commands.CommandPipeline.CreateDefaultPipeline(container.Resolve,
-            System.Reflection.Assembly.GetAssembly(typeof(Domain.Users.Entities.User)));
-
-    It will locate command handler and executes it. First argument is delegate to resolve dependencies. Second is set of assemblies where to locate handlers.
+1. Setup pipeline service.
 
 2. Create command, it should be POCO:
 
@@ -36,16 +29,16 @@ Command is something that changes the state (database insert/update/delete) of a
         {
             public void HandleCreateProject(CreateProjectCommand command, IAppUnitOfWorkFactory uowFactory)
             {
-                // processing...
+                // Processing...
             }
         }
 
-4. Execute command using command pipeline:
+4. Execute command using pipeline service:
    
     .. code-block:: c#
 
         CreateProjectCommand command = new CreateProjectCommand() { Name = "Test", CreatedByUserId = CurrentUser.Id };
-        CommandPipeline.Handle(command);
+        ServicePipeline.HandleCommand(command);
 
 That's it!
 
@@ -64,19 +57,19 @@ Middlewares
 
     .. class:: CommandHandlerLocatorMiddleware
 
-        Included to default pipeline. Locates for command handler class. Default id is ``CommandHandlerLocator``.
+        Included to default pipeline. Locates for command handler class using provided assemblies. Handler class must have ``CommandHandlers`` attribute, method should begin with ``Handle`` work and first argument must be command type.
 
-    .. class:: CommandExecutorMiddleware
+    .. class:: CommandHandlerExecutorMiddleware
 
-        Included to default pipeline. Executes command against found command handler. Default id is ``CommandExecutor``.
+        Included to default pipeline. Executes command against found command handler.
 
     .. class:: CommandValidationMiddleware
 
-        Validates command against data annotation attributes. Generates ``CommandValidationException``. Id is ``CommandValidation``.
+        Validates command against data annotation attributes. Generates ``ValidationException``.
 
 Default Pipeline
 ----------------
 
     ::
 
-        CommandHandlerLocatorMiddleware [CommandHandlerLocator] ---> CommandExecutorMiddleware [CommandExecutor]
+        CommandHandlerLocatorMiddleware ---> CommandHandlerResolverMiddleware -> CommandHandlerExecutorMiddleware

@@ -1,11 +1,10 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
+
+using System;
 
 namespace Saritasa.Tools.Domain
 {
-    using System;
-    using System.Data;
-
     /// <summary>
     /// Unit of work factory abstraction.
     /// </summary>
@@ -16,12 +15,5 @@ namespace Saritasa.Tools.Domain
         /// </summary>
         /// <returns>Unit of work.</returns>
         TUnitOfWork Create();
-
-        /// <summary>
-        /// Creates unit of work with specified isolation level.
-        /// </summary>
-        /// <param name="isolationLevel">Isolation level.</param>
-        /// <returns>Unit of work.</returns>
-        TUnitOfWork Create(IsolationLevel isolationLevel);
     }
 }

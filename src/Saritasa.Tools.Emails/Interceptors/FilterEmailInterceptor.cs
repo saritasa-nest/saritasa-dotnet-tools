@@ -1,21 +1,19 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
+
+using System;
+using System.Collections.Generic;
+using System.Net.Mail;
+using System.Text.RegularExpressions;
 
 namespace Saritasa.Tools.Emails.Interceptors
 {
-    using System;
-    using System.Collections.Generic;
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
-    using System.Net.Mail;
-#endif
-    using System.Text.RegularExpressions;
-
     /// <summary>
     /// Filters users to whom send an email.
     /// </summary>
     public class FilterEmailInterceptor : IEmailInterceptor
     {
-        readonly IList<string> approvedAddresses = new List<string>();
+        private readonly IList<string> approvedAddresses = new List<string>();
 
         /// <summary>
         /// Gets approved addresses. Emails that do not match to these address patterns will not be sent.

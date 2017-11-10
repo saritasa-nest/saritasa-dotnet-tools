@@ -1,28 +1,36 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.Domain.Exceptions
-{
-    using System;
-    using System.Collections.Generic;
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
-    using System.Runtime.Serialization;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.ComponentModel.DataAnnotations;
+#if NET40
+using System.Runtime.Serialization;
 #endif
 
+namespace Saritasa.Tools.Domain.Exceptions
+{
     /// <summary>
     /// Validation exception. Can be mapped to 400 HTTP status code.
     /// </summary>
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
+#if NET40
     [Serializable]
 #endif
     public class ValidationException : DomainException
     {
-        const string SummaryKey = "";
+        private const string SummaryKey = "";
 
         /// <summary>
-        /// Errors dictionary. Empty string key relates to summary error message.
+        /// Errors dictionary. Key is a member name, value is an enumerable of error
+        /// messages. Empty member name relates to summary error message.
         /// </summary>
-        public IDictionary<string, string> Errors = new Dictionary<string, string>();
+        public virtual IDictionary<string, IEnumerable<string>> Errors => errors;
+
+        private readonly IDictionary<string, IEnumerable<string>> errors
+            = new Dictionary<string, IEnumerable<string>>();
 
         /// <inheritdoc />
         public override string Message
@@ -31,16 +39,21 @@ namespace Saritasa.Tools.Domain.Exceptions
             {
                 if (Errors.ContainsKey(SummaryKey))
                 {
-                    return Errors[SummaryKey];
+                    return Errors[SummaryKey].First();
                 }
                 return base.Message;
             }
         }
 
         /// <summary>
+        /// Summary errors. Returns zero array if not defined.
+        /// </summary>
+        public IEnumerable<string> SummaryErrors => errors.ContainsKey(SummaryKey) ? errors[SummaryKey] : new string[0];
+
+        /// <summary>
         /// .ctor
         /// </summary>
-        public ValidationException()
+        public ValidationException() : base(DomainErrorDescriber.Default.ValidationErrors())
         {
         }
 
@@ -50,7 +63,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         /// </summary>
         public ValidationException(string message) : base(message)
         {
-            Errors[SummaryKey] = message;
+            AddError(message);
         }
 
         /// <summary>
@@ -60,10 +73,43 @@ namespace Saritasa.Tools.Domain.Exceptions
         /// </summary>
         public ValidationException(string message, Exception innerException) : base(message, innerException)
         {
-            Errors[SummaryKey] = message;
+            AddError(message);
         }
 
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
+        /// <summary>
+        /// .ctor with dictionary contain member field as key and error message as value.
+        /// </summary>
+        /// <param name="errors">Member error dictionary.</param>
+        public ValidationException(IDictionary<string, string> errors) :
+            base(DomainErrorDescriber.Default.ValidationErrors())
+        {
+            if (errors == null)
+            {
+                throw new ArgumentNullException(nameof(errors));
+            }
+
+            foreach (var error in errors)
+            {
+                this.errors[error.Key] = new[] { error.Value };
+            }
+        }
+
+        /// <summary>
+        /// .ctor with dictionary contain member field as key and error messages as value.
+        /// </summary>
+        /// <param name="errors">Member errors dictionary.</param>
+        public ValidationException(IDictionary<string, IEnumerable<string>> errors) :
+            base(DomainErrorDescriber.Default.ValidationErrors())
+        {
+            if (errors == null)
+            {
+                throw new ArgumentNullException(nameof(errors));
+            }
+
+            this.errors = errors;
+        }
+
+#if NET40
         /// <summary>
         /// .ctor for deserialization.
         /// </summary>
@@ -73,6 +119,197 @@ namespace Saritasa.Tools.Domain.Exceptions
         protected ValidationException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
+        }
+#endif
+
+        /// <summary>
+        /// Add error to errors list for specific member.
+        /// </summary>
+        /// <param name="member">Member of field name. Can be empty.</param>
+        /// <param name="error">Error message.</param>
+        public void AddError(string member, string error)
+        {
+            if (string.IsNullOrEmpty(error))
+            {
+                throw new ArgumentException(DomainErrorDescriber.Default.ValidationErrorIsEmpty(), nameof(error));
+            }
+
+            if (errors.TryGetValue(member, out var list))
+            {
+                ((IList<string>)list).Add(error);
+            }
+            else
+            {
+                list = new List<string>();
+                ((IList<string>)list).Add(error);
+                errors.Add(member, list);
+            }
+        }
+
+        /// <summary>
+        /// Add summar error.
+        /// </summary>
+        /// <param name="error">Error message.</param>
+        public void AddError(string error)
+        {
+            AddError(SummaryKey, error);
+        }
+
+        /// <summary>
+        /// Returns opposite dictionary where key is error message and value is an
+        /// enumerable with member names related to the error.
+        /// </summary>
+        /// <returns>Error members dictionary.</returns>
+        public IDictionary<string, IEnumerable<string>> GetErrorMembersDictionary()
+        {
+            var dict = new Dictionary<string, IEnumerable<string>>();
+            foreach (KeyValuePair<string, IEnumerable<string>> member in errors)
+            {
+                foreach (string error in member.Value)
+                {
+                    if (dict.TryGetValue(error, out var list))
+                    {
+                        ((IList<string>)list).Add(member.Key);
+                    }
+                    else
+                    {
+                        list = new List<string>();
+                        ((IList<string>)list).Add(member.Key);
+                        dict.Add(error, list);
+                    }
+                }
+            }
+            return dict;
+        }
+
+        /// <summary>
+        /// Returns dictionary that contains only one first error message per member name.
+        /// </summary>
+        /// <returns>Member error dictionary.</returns>
+        public IDictionary<string, string> GetOneErrorDictionary()
+        {
+            return errors.ToDictionary(k => k.Key, v => v.Value.FirstOrDefault() ?? string.Empty);
+        }
+
+#if NET40
+        /// <summary>
+        /// Creates on throws instance of <see cref="ValidationException" /> based on validation results
+        /// of object.
+        /// </summary>
+        /// <param name="obj">The object to validate.</param>
+        /// <param name="serviceProvider">The object that implements the <see cref="IServiceProvider" /> interface.
+        /// This parameter is optional.</param>
+        /// <param name="items">A dictionary of key/value pairs to make available to the service consumers.
+        /// This parameter is optional.</param>
+        public static void ThrowFromObjectValidation(
+            object obj,
+            IServiceProvider serviceProvider = null,
+            IDictionary<object, object> items = null)
+        {
+            if (obj == null)
+            {
+                throw new ArgumentNullException(nameof(obj));
+            }
+
+            if (UseMetadataType)
+            {
+                RegisterMetadataType(obj.GetType());
+            }
+
+            var validationResults = new List<ValidationResult>();
+            var result = Validator.TryValidateObject(obj, new ValidationContext(obj, serviceProvider, items),
+                validationResults, true);
+            if (!result)
+            {
+                var ex = new ValidationException();
+                foreach (ValidationResult validationResult in validationResults)
+                {
+                    if (validationResult.MemberNames != null && validationResult.MemberNames.Any())
+                    {
+                        foreach (var memberName in validationResult.MemberNames)
+                        {
+                            ex.AddError(memberName, validationResult.ErrorMessage);
+                        }
+                    }
+                    else
+                    {
+                        ex.AddError(validationResult.ErrorMessage);
+                    }
+                }
+                throw ex;
+            }
+        }
+
+        /// <summary>
+        /// If <c>true</c> there will be additional check for <see cref="MetadataTypeAttribute" />
+        /// and metadata type registration. <c>False</c> by default.
+        /// </summary>
+        public static bool UseMetadataType { get; set; } = false;
+
+        private static readonly ConcurrentDictionary<Type, bool> registeredMetadataType =
+            new ConcurrentDictionary<Type, bool>();
+
+        /// <summary>
+        /// For some reason if type hase <see cref="MetadataTypeAttribute" /> type that contains
+        /// validation attributes they will not be taked into account. This is workaround that
+        /// registers them explicitly.
+        /// </summary>
+        /// <param name="t">Type to register.</param>
+        private static void RegisterMetadataType(Type t)
+        {
+            var attributes = t.GetCustomAttributes(typeof(MetadataTypeAttribute), true);
+            if (attributes.Length > 0)
+            {
+                registeredMetadataType.GetOrAdd(t, type =>
+                {
+                    foreach (MetadataTypeAttribute attribute in attributes)
+                    {
+                        TypeDescriptor.AddProviderTransparent(
+                            new AssociatedMetadataTypeTypeDescriptionProvider(type, attribute.MetadataClassType), type);
+                    }
+                    return true;
+                });
+            }
+        }
+#else
+        /// <summary>
+        /// Creates on throws instance of <see cref="ValidationException" /> based on validation results
+        /// of object.
+        /// </summary>
+        /// <param name="obj">The object to validate.</param>
+        /// <param name="items">A dictionary of key/value pairs to make available to the service consumers.
+        /// This parameter is optional.</param>
+        public static void ThrowFromObjectValidation(
+            object obj,
+            IDictionary<object, object> items = null)
+        {
+            if (obj == null)
+            {
+                throw new ArgumentNullException(nameof(obj));
+            }
+
+            var validationResults = new List<ValidationResult>();
+            var result = Validator.TryValidateObject(obj, new ValidationContext(obj, items),
+                validationResults, true);
+            if (!result)
+            {
+                var ex = new ValidationException();
+                foreach (ValidationResult validationResult in validationResults)
+                {
+                    if (validationResult.MemberNames != null && validationResult.MemberNames.Any())
+                    {
+                        foreach (var memberName in validationResult.MemberNames)
+                        {
+                            ex.AddError(memberName, validationResult.ErrorMessage);
+                        }
+                    }
+                    else
+                    {
+                        ex.AddError(validationResult.ErrorMessage);
+                    }
+                }
+                throw ex;
+            }
         }
 #endif
     }

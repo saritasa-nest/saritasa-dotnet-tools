@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Common;
+﻿using System.Data.Common;
 using System.Data.Entity;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Saritasa.Tools.Domain;
 
 namespace SandBox
@@ -48,13 +43,13 @@ namespace SandBox
         /// <summary>
         /// 3. User repository implementation. Should be in data access part of application.
         /// </summary>
-        public class ProductRepository : Saritasa.Tools.Ef.EfRepository<Product, AppDbContext>, IProductRepository
+        public class ProductRepository : Saritasa.Tools.EF.EFRepository<Product, AppDbContext>, IProductRepository
         {
             public ProductRepository(AppDbContext context) : base(context)
             {
             }
 
-            public int GetSomethingFromStoredProcedure() => 42; // raw sql, stored procedures, etc
+            public int GetSomethingFromStoredProcedure() => 42; // Raw sql, stored procedures, etc.
         }
 
         /// <summary>
@@ -68,7 +63,7 @@ namespace SandBox
         /// <summary>
         /// 5. Application unit of work implementation. Should be in data access part of application.
         /// </summary>
-        public class AppUnitOfWork : Saritasa.Tools.Ef.EfUnitOfWork<AppDbContext>, IAppUnitOfWork
+        public class AppUnitOfWork : Saritasa.Tools.EF.EFUnitOfWork<AppDbContext>, IAppUnitOfWork
         {
             public AppUnitOfWork(AppDbContext context) : base(context)
             {
@@ -149,14 +144,14 @@ namespace SandBox
         /// <summary>
         /// 3. Application unit of work implementation. Should be in data access part of application.
         /// </summary>
-        public class AppUnitOfWork : Saritasa.Tools.Ef.EfUnitOfWork<AppDbContext>, IAppUnitOfWork
+        public class AppUnitOfWork : Saritasa.Tools.EF.EFUnitOfWork<AppDbContext>, IAppUnitOfWork
         {
             public AppUnitOfWork(AppDbContext context) : base(context)
             {
             }
 
             public IQueryableRepository<Product> ProductRepository =>
-                new Saritasa.Tools.Ef.EfQueryableRepository<Product, AppDbContext>(Context);
+                new Saritasa.Tools.EF.EFQueryableRepository<Product, AppDbContext>(Context);
         }
 
         /// <summary>

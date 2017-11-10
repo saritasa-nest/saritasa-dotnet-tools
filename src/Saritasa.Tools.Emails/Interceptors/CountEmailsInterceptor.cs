@@ -1,15 +1,13 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
+
+using System;
+using System.Collections.Generic;
+using System.Net.Mail;
+using System.Threading;
 
 namespace Saritasa.Tools.Emails.Interceptors
 {
-    using System;
-    using System.Collections.Generic;
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
-    using System.Net.Mail;
-#endif
-    using System.Threading;
-
     /// <summary>
     /// Contains counters of sending and sent emails. Thread safe.
     /// </summary>

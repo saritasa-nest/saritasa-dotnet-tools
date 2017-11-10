@@ -1,14 +1,13 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
+
+using System;
+using System.Linq;
+using System.Text.RegularExpressions;
+using Saritasa.Tools.Messages.Abstractions;
 
 namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text.RegularExpressions;
-    using Abstractions;
-
     /// <summary>
     /// Repository messages filter.
     /// </summary>
@@ -24,7 +23,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         /// <summary>
         /// Custom predicate that filters incoming messages.
         /// </summary>
-        public Predicate<IMessage> Predicate { get; private set; }
+        public Predicate<MessageRecord> Predicate { get; private set; }
 
         ProcessingStatus[] statuses;
 
@@ -64,7 +63,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         /// </summary>
         /// <param name="message">Message to match.</param>
         /// <returns>True if matches, otherwise false.</returns>
-        public bool IsMatch(IMessage message)
+        public bool IsMatch(MessageRecord message)
         {
             if (Predicate?.Invoke(message) == false ||
                 Statuses?.Contains(message.Status) == false ||
@@ -92,7 +91,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         /// </summary>
         /// <param name="predicate">Preducate action.</param>
         /// <returns>Current repository messages filter.</returns>
-        public RepositoryMessagesFilter WithPredicate(Predicate<IMessage> predicate)
+        public RepositoryMessagesFilter WithPredicate(Predicate<MessageRecord> predicate)
         {
             Predicate = predicate;
             return this;

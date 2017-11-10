@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
-using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Domain.Exceptions;
+using Saritasa.Tools.Messages.Abstractions.Commands;
 using ZergRushCo.Todosya.Domain.TaskContext.Commands;
 
 namespace ZergRushCo.Todosya.Domain.TaskContext.Handlers
@@ -46,7 +46,7 @@ namespace ZergRushCo.Todosya.Domain.TaskContext.Handlers
 
                 if (project.User.Id != command.UpdatedByUserId)
                 {
-                    throw new DomainException("Only user who created project can update it.");
+                    throw new ForbiddenException("Only user who created project can update it.");
                 }
 
                 project.Name = command.Name;
@@ -69,7 +69,7 @@ namespace ZergRushCo.Todosya.Domain.TaskContext.Handlers
 
                 if (project.User.Id != command.UpdatedByUserId)
                 {
-                    throw new DomainException("Only user who created project can remove it.");
+                    throw new ForbiddenException("Only user who created project can remove it.");
                 }
 
                 uow.TaskRepository.RemoveRange(uow.TaskRepository.Where(t => t.Project.Id == project.Id));

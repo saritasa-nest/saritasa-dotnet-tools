@@ -1,24 +1,23 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
+using System;
+using System.Collections.Generic;
+using System.Net.Mail;
+using System.Threading.Tasks;
+
 namespace Saritasa.Tools.Emails
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Net.Mail;
-    using System.Threading.Tasks;
-
     /// <summary>
     /// Handles several smtp clients to send emails using round-robin method.
     /// </summary>
     public class MultiSmtpClientEmailSender : EmailSender, IDisposable
     {
-        SmtpClientEmailSender[] clientInstances;
+        private SmtpClientEmailSender[] clientInstances;
 
-        readonly object @lock = new object();
+        private readonly object @lock = new object();
 
-        int currentInstanceIndex;
+        private int currentInstanceIndex;
 
         /// <summary>
         /// .ctor
@@ -30,7 +29,8 @@ namespace Saritasa.Tools.Emails
         {
             if (smtpClientInstancesCount <= 0)
             {
-                throw new ArgumentOutOfRangeException($"{smtpClientInstancesCount} must be greater then zero.");
+                throw new ArgumentOutOfRangeException(string.Format(Properties.Strings.ArgumentMustBeGreaterThan,
+                    smtpClientInstancesCount, "zero"));
             }
             clientInstances = new SmtpClientEmailSender[smtpClientInstancesCount];
             for (int i = 0; i < smtpClientInstancesCount; i++)
@@ -61,7 +61,7 @@ namespace Saritasa.Tools.Emails
                 DeliveryMethod = client.DeliveryMethod,
                 EnableSsl = client.EnableSsl,
                 PickupDirectoryLocation = client.PickupDirectoryLocation,
-                Timeout = client.Timeout,
+                Timeout = client.Timeout
             };
             return newClient;
         }
@@ -128,4 +128,3 @@ namespace Saritasa.Tools.Emails
         #endregion
     }
 }
-#endif

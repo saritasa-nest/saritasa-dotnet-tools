@@ -16,16 +16,16 @@
     [Authorize]
     public class CompaniesController : Controller
     {
-        private readonly ICommandPipeline commandPipline;
+        private readonly IMessagePipelineService pipelineService;
         private readonly CompanyQueries companyQueries;
 
-        public CompaniesController(ICommandPipeline commandPipline, CompanyQueries companyQueries)
+        public CompaniesController(IMessagePipelineService pipelineService, CompanyQueries companyQueries)
         {
-            if (commandPipline == null)
+            if (pipelineService == null)
             {
-                throw new ArgumentNullException(nameof(commandPipline));
+                throw new ArgumentNullException(nameof(pipelineService));
             }
-            this.commandPipline = commandPipline;
+            this.pipelineService = pipelineService;
             this.companyQueries = companyQueries;
         }
 
@@ -63,7 +63,7 @@
             try
             {
                 command.CreatedByUserId = Core.TicketUserData.FromContext(HttpContext).UserId;
-                commandPipline.Handle(command);
+                pipelineService.HandleCommand(command);
             }
             catch (DomainException ex)
             {
@@ -87,7 +87,7 @@
         {
             try
             {
-                commandPipline.Handle(command);
+                pipelineService.HandleCommand(command);
             }
             catch (DomainException ex)
             {
@@ -112,7 +112,8 @@
             return View(company);
         }
 
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
+        [ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
@@ -120,7 +121,7 @@
 
             try
             {
-                commandPipline.Handle(new DeleteCompanyCommand(company));
+                pipelineService.HandleCommand(new DeleteCompanyCommand(company));
             }
             catch (DomainException ex)
             {

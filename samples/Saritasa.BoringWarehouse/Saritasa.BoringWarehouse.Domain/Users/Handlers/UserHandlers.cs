@@ -1,4 +1,6 @@
-﻿namespace Saritasa.BoringWarehouse.Domain.Users.Handlers
+﻿using Saritasa.Tools.Messages.Abstractions.Commands;
+
+namespace Saritasa.BoringWarehouse.Domain.Users.Handlers
 {
     using System;
     using System.Linq;
@@ -30,7 +32,7 @@
                 {
                     Email = email,
                     PasswordHashed = Tools.Common.Utils.SecurityUtils.Hash(command.Password,
-                        Tools.Common.Utils.SecurityUtils.HashMethods.Sha256),
+                        Tools.Common.Utils.SecurityUtils.HashMethod.Sha256),
                     FirstName = command.FirstName.Trim(),
                     LastName = command.LastName.Trim(),
                     Phone = command.Phone,
@@ -89,7 +91,7 @@
                 if (string.IsNullOrEmpty(command.Password) == false)
                 {
                     dbUser.PasswordHashed = Tools.Common.Utils.SecurityUtils.Hash(command.Password,
-                        Tools.Common.Utils.SecurityUtils.HashMethods.Sha256);
+                        Tools.Common.Utils.SecurityUtils.HashMethod.Sha256);
                 }
                 uow.SaveChanges();
             }

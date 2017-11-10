@@ -1,17 +1,17 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.Domain.Exceptions
-{
-    using System;
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
-    using System.Runtime.Serialization;
+using System;
+#if NET40
+using System.Runtime.Serialization;
 #endif
 
+namespace Saritasa.Tools.Domain.Exceptions
+{
     /// <summary>
     /// Domain forbidden security exception. Can be mapped to 403 HTTP status code.
     /// </summary>
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
+#if NET40
     [Serializable]
 #endif
     public class ForbiddenException : DomainException
@@ -19,7 +19,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         /// <summary>
         /// .ctor
         /// </summary>
-        public ForbiddenException() : base("Forbidden")
+        public ForbiddenException() : base(DomainErrorDescriber.Default.Forbidden())
         {
         }
 
@@ -37,7 +37,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         {
         }
 
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
+#if NET40
         /// <summary>
         /// .ctor for deserialization.
         /// </summary>

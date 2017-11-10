@@ -41,7 +41,7 @@
         public DateTime? UpdatedAt { get; set; }
 
         /// <summary>
-        /// Include Many to One and One to One relations
+        /// Include Many to One and One to One relations.
         /// </summary>
         public static IEnumerable<Expression<Func<Product, object>>> DefaultInclude
         {

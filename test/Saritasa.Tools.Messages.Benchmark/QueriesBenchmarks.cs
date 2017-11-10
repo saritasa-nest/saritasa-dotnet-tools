@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Abstractions.Queries;
+using Saritasa.Tools.Messages.Common;
 using Saritasa.Tools.Messages.Queries;
 
 namespace Saritasa.Tools.Messages.Benchmark
@@ -39,11 +37,18 @@ namespace Saritasa.Tools.Messages.Benchmark
         [Benchmark]
         public decimal RunQueryWithPipeline()
         {
+            var pipelineService = new DefaultMessagePipelineService();
+            pipelineService.PipelineContainer.AddQueryPipeline()
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectResolverMiddleware
+                {
+                    UseInternalObjectResolver = true
+                })
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware());
             decimal result = 0;
-            var queryPipeline = QueryPipeline.CreateDefaultPipeline(QueryPipeline.NullResolver);
+
             for (int i = 0; i < NumberOfInterations; i++)
             {
-                result += queryPipeline.Query<MathQueryHandlers>().With(q => q.Sum(2, 3));
+                result += pipelineService.Query<MathQueryHandlers>().With(q => q.Sum(2, 3));
             }
             return result;
         }

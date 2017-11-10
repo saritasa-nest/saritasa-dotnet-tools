@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Saritasa.Tools.NLog;
+﻿using Microsoft.Extensions.Logging;
+using NLog.Extensions.Logging;
 
 namespace SandBox
 {
@@ -18,7 +13,7 @@ namespace SandBox
             ILoggerProvider loggerProvider = new NLogLoggerProvider();
             var logger = loggerProvider.CreateLogger("test");
 
-            // simple
+            // Simple.
             logger.LogTrace("trace");
             logger.LogDebug("debug");
             logger.LogInformation("info");
@@ -26,7 +21,7 @@ namespace SandBox
             logger.LogWarning("warning");
             logger.LogCritical("critical");
 
-            // scopes
+            // Scopes.
             using (logger.BeginScope("(scope 1)"))
             {
                 logger.LogInformation("test 1");

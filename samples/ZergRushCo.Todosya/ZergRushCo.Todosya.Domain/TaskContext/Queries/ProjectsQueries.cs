@@ -4,6 +4,7 @@ using System.Linq;
 using Saritasa.Tools.Common;
 using Saritasa.Tools.Common.Pagination;
 using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Abstractions.Queries;
 using ZergRushCo.Todosya.Domain.TaskContext.Dtos;
 using ZergRushCo.Todosya.Domain.TaskContext.Entities;
 
@@ -53,7 +54,7 @@ namespace ZergRushCo.Todosya.Domain.TaskContext.Queries
         public PagedEnumerable<ProjectDto> GetByUser(string userId, int page, int pageSize = 10)
         {
             var query = uow.ProjectRepository.Find(p => p.User.Id == userId).Select(p => new ProjectDto(p));
-            return new PagedEnumerable<ProjectDto>(query, page, pageSize);
+            return PagedEnumerable.Create(query, page, pageSize);
         }
 
         /// <summary>

@@ -1,19 +1,19 @@
 ﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-namespace Saritasa.Tools.Domain.Exceptions
-{
-    using System;
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
-    using System.Runtime.Serialization;
+using System;
+#if NET40
+using System.Runtime.Serialization;
 #endif
 
+namespace Saritasa.Tools.Domain.Exceptions
+{
     /// <summary>
     /// Domain conflict exception. Indicates that the request could not be
     /// processed because of conflict in the request, such as an edit conflict between multiple simultaneous updates.
     /// Can be mapped to 409 HTTP status code.
     /// </summary>
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
+#if NET40
     [Serializable]
 #endif
     public class ConflictException : DomainException
@@ -21,7 +21,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         /// <summary>
         /// .ctor
         /// </summary>
-        public ConflictException() : base("Conflict occurred")
+        public ConflictException() : base(DomainErrorDescriber.Default.Conflict())
         {
         }
 
@@ -39,7 +39,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         {
         }
 
-#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
+#if NET40
         /// <summary>
         /// .ctor for deserialization.
         /// </summary>

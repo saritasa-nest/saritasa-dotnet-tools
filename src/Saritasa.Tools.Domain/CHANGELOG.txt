@@ -1,9 +1,38 @@
-﻿0.1.1 [TBD]
+﻿0.5.0 [TBD]
+[-] Remove IsolationLevel parameter from IUnitOfWorkFactory.
+
+0.3.0 [2017-08-13]
+[-] Remove IAsyncRepository, move methods to IRepository.
+[-] Remove GetOrAdd, GetOrThrow methods.
+[*] Update async methods for repository, some methods were made as extensions.
+
+0.2.5 [2017-08-07]
+[*] ValidationException.ThrowFromObjectValidation takes into account MetadataType attribute.
+[+] Async repository abstraction.
+
+0.2.4 [2017-07-29]
+[*] ValidationException: Take into account error messages without member names.
+
+0.2.3 [2017-07-27]
+[+] ValidationException.ThrowFromObjectValidation support for NET Standard.
+
+0.2.2 [2017-07-17]
+[*] Set dependencies only to .NET 4.0 and NET Standard 1.2 .
+
+0.2.0 [2017-07-10]
+[+] Change ValidationException class to accept multiple errors per member, ability to create from IValidatableObject.
+
+0.1.2 [2017-06-07]
+[*] IRepository: remove Get with includes, change signature for GetAll and Find with includes.
+
+0.1.1 [2017-01-28]
 [*] Update dependencies, .NET Core 1.1 support.
 [*] Rename SecurityException to ForbiddenException.
 [+] Add ConflictException and UnauthorizedException.
 [+] Add Errors to ValidationException.
 [+] Extension methods for IRepository. GetOrAdd and GetOrThrow.
+[+] Add support .NET 4.0 .
+[+] Add localization support thru DomainErrorDescriber class.
 
 0.1.0 [2016-11-14]
 [+] Initial release.

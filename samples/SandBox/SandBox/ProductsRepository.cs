@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SandBox
 {
     /// <inheritdoc />
     public class ProductsRepository : IProductsRepository
     {
-        readonly List<Product> list = new List<Product>()
+        private readonly List<Product> list = new List<Product>
         {
             new Product(1, "Milk", new DateTime(2016, 10, 20)),
             new Product(2, "GeForce GTX970"),
