@@ -23,7 +23,7 @@ Task pre-build -depends download-nuget `
 
     # Use following command to revert the files:
     # git checkout -- **/AssemblyInfo.cs
-    GitVersion.exe /updateassemblyinfo
+    Exec { GitVersion.exe /updateassemblyinfo }
 }
 
 Task get-version `
