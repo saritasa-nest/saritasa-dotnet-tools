@@ -1,9 +1,12 @@
+$root = $PSScriptRoot
+$workspace = Resolve-Path "$root\.."
+
 Task docker-zergrushco -depends package-zergrushco `
 {
     $dockerContext = "$samples\ZergRushCo.Todosya\Docker"
     $version = (gitversion /showvariable SemVer)
 
-    Exec { docker build -t zerg/web:latest -t "zerg/web:$version" -f "$dockerContext\Dockerfile.web" $dockerContext }
+    Exec { docker build -t zerg/web:latest -t "zerg/web:$version" -f "$dockerContext\Dockerfile.web" $workspace }
     Exec { docker build -t zerg/db:latest -t "zerg/db:$version" -f "$dockerContext\Dockerfile.db" $dockerContext }
 }
 
@@ -12,7 +15,7 @@ Task docker-boringwarehouse -depends package-boringwarehouse `
     $dockerContext = "$samples\Saritasa.BoringWarehouse\Docker"
     $version = (gitversion /showvariable SemVer)
 
-    Exec { docker build -t bw/web:latest -t "bw/web:$version" -f "$dockerContext\Dockerfile.web" $dockerContext }
+    Exec { docker build -t bw/web:latest -t "bw/web:$version" -f "$dockerContext\Dockerfile.web" $workspace }
     Exec { docker build -t bw/db:latest -t "bw/db:$version" -f "$dockerContext\Dockerfile.db" $dockerContext }
 }
 

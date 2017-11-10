@@ -14,8 +14,8 @@ services:
           - bwdb
   web:
     build:
-      context: ./Docker
-      dockerfile: Dockerfile.web
+      context: ../..
+      dockerfile: samples/Saritasa.BoringWarehouse/Docker/Dockerfile.web
     image: bw/web
     depends_on:
       - "db"

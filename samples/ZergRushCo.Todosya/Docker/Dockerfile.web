@@ -14,8 +14,10 @@ RUN `
     # Install WebDeploy.
     choco install webdeploy -y
 
-COPY Run.ps1 Temp\Run.ps1
-COPY ZergRushCo.zip Temp\ZergRushCo.zip
+ENV DockerDir samples\ZergRushCo.Todosya\Docker
+
+COPY ${DockerDir}\Run.ps1 Temp\Run.ps1
+COPY ${DockerDir}\ZergRushCo.zip Temp\ZergRushCo.zip
 
 RUN C:\Temp\Run.ps1
 
