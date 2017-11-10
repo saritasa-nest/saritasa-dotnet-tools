@@ -12,7 +12,7 @@
 RootModule = 'Saritasa.General'
 
 # Version number of this module.
-ModuleVersion = '1.1.0'
+ModuleVersion = '1.3.0'
 
 # ID used to uniquely identify this module
 GUID = '7c7dc05c-033b-4838-8619-b84792571317'
@@ -24,7 +24,7 @@ Author = 'Anton Zimin'
 CompanyName = 'Saritasa'
 
 # Copyright statement for this module
-Copyright = '(c) 2016 Saritasa. All rights reserved.'
+Copyright = '(c) 2016-2017 Saritasa. All rights reserved.'
 
 # Description of the functionality provided by this module
 Description = 'Contains general PowerShell helpers.'
@@ -66,7 +66,7 @@ Description = 'Contains general PowerShell helpers.'
 # NestedModules = @()
 
 # Functions to export from this module
-FunctionsToExport = @('Get-CallerPreference')
+FunctionsToExport = @('Get-CallerPreference', 'Test-IsLocalhost', 'Use-Object')
 
 # Cmdlets to export from this module
 CmdletsToExport = @()

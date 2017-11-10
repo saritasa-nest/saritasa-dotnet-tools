@@ -12,7 +12,7 @@
 RootModule = 'Saritasa.Test'
 
 # Version number of this module.
-ModuleVersion = '1.2.3'
+ModuleVersion = '1.4.0'
 
 # ID used to uniquely identify this module
 GUID = '97046c41-6b19-4e13-9434-ead6834a5338'
@@ -68,7 +68,7 @@ RequiredModules = @(
 # NestedModules = @()
 
 # Functions to export from this module
-FunctionsToExport = @('Invoke-Nunit3Runner')
+FunctionsToExport = @('Invoke-Nunit3Runner', 'Invoke-XunitRunner')
 
 # Cmdlets to export from this module
 CmdletsToExport = @()
