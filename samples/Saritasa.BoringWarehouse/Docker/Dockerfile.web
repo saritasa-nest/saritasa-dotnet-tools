@@ -16,6 +16,9 @@ COPY default.ps1 C:\Temp\default.ps1
 
 COPY BoringWarehouse.zip C:\Temp\BoringWarehouse.zip
 
+ENV SemVer=0.0.0 `
+    MajorMinorPatch=0.0.0
+
 WORKDIR C:\Temp
 RUN ["psake.bat", "publish-boringwarehouse", "-properties", "@{ServerHost='localhost';SiteName='Default Web Site'}"]
 

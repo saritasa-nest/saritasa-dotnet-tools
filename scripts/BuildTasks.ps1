@@ -1,6 +1,8 @@
 Properties `
 {
     $Configuration = $null
+    $SemVer = $null
+    $MajorMinorPatch = $null
 }
 
 $root = $PSScriptRoot
@@ -18,7 +20,10 @@ Task pre-build `
 
     # Use following command to revert the files:
     # git checkout -- **/AssemblyInfo.cs
-    Exec { GitVersion.exe /updateassemblyinfo }
+    if ($MajorMinorPatch -ne '0.0.0')
+    {
+        Exec { GitVersion.exe /updateassemblyinfo }
+    }
 }
 
 Task build-samples -depends build-zergrushco, build-boringwarehouse
