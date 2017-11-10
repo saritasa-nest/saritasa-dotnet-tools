@@ -3,17 +3,7 @@ $src = "$root\..\src"
 $samples = "$root\..\samples"
 $tools = "$root\..\tools"
 
-Task download-nuget `
-{
-    if (!(Test-Path $tools))
-    {
-        New-Item -ItemType Directory $tools
-    }
-
-    Install-NugetCli -Destination $tools
-}
-
-Task pre-build -depends download-nuget `
+Task pre-build `
 {
     Initialize-MSBuild
     Invoke-NugetRestore -SolutionPath "$src\..\Saritasa.Tools.sln"
@@ -28,7 +18,7 @@ Task pre-build -depends download-nuget `
 
 Task get-version `
 {
-    $script:Version = GitVersion.exe /showvariable MajorMinorPatch
+    $script:Version = Exec { GitVersion.exe /showvariable MajorMinorPatch }
 }
 
 Task build-samples -depends build-zergrushco, build-boringwarehouse

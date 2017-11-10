@@ -38,7 +38,7 @@ $packages = @(
 
 $docsRoot = "$PSScriptRoot\docs"
 
-Task pack -depends download-nuget -description 'Build the library, test it and prepare nuget packages' `
+Task pack -description 'Build the library, test it and prepare nuget packages' `
 {
     $revcount = &'git' @('rev-list', '--all', '--count') | Out-String | ForEach-Object { $_ -replace [Environment]::NewLine, '' }
     $hash = &'git' @('log', '--pretty=format:%h', '-n', '1') | Out-String | ForEach-Object { $_ -replace [Environment]::NewLine, '' }
@@ -70,7 +70,7 @@ Task pack -depends download-nuget -description 'Build the library, test it and p
             '-Exclude', '*.snk')
         if ($LASTEXITCODE)
         {
-            throw 'Nuget pack failed.'
+            throw 'Dotnet pack failed.'
         }
     }
 
@@ -104,7 +104,6 @@ Task clean -description 'Clean solution' `
     Remove-Item './src/StyleCop.Cache' -Force -ErrorAction SilentlyContinue
     Remove-Item './docs/_build' -Recurse -Force -ErrorAction SilentlyContinue
     Remove-Item './docs/conf.py' -ErrorAction SilentlyContinue
-    Remove-Item './scripts/nuget.exe' -ErrorAction SilentlyContinue
 }
 
 Task docs -depends get-version -description 'Compile and open documentation' `
