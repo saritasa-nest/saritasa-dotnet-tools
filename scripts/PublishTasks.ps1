@@ -1,10 +1,30 @@
+Properties `
+{
+    $ServerHost = $null
+    $SiteName = $null
+    $DeployUsername = $null
+    $DeployPassword = $null
+}
+
 $root = $PSScriptRoot
 $src = "$root\..\src"
 $samples = "$root\..\samples"
+$workspace = Resolve-Path "$root\.."
+
+Task pre-publish -description 'Set common publish settings for all deployments.' `
+{
+    $credential = $null # Use NTLM authentication.
+
+    if ($DeployUsername)
+    {
+        $credential = New-Object System.Management.Automation.PSCredential($DeployUsername, (ConvertTo-SecureString $DeployPassword -AsPlainText -Force))
+    }
+    Initialize-WebDeploy -Credential $credential
+}
 
 Task package-zergrushco -depends build-zergrushco `
 {
-    $packagePath = "$samples\ZergRushCo.Todosya\Docker\ZergRushCo.zip"
+    $packagePath = "$workspace\ZergRushCo.zip"
     Invoke-PackageBuild -ProjectPath "$samples\ZergRushCo.Todosya\ZergRushCo.Todosya.Web\ZergRushCo.Todosya.Web.csproj" `
         -PackagePath $packagePath -Configuration $Configuration `
         -BuildParams @("/p:ProjectParametersXMLFile=$samples\ZergRushCo.Todosya\ZergRushCo.Todosya.Web\WebDeployParameters.xml")
@@ -12,34 +32,24 @@ Task package-zergrushco -depends build-zergrushco `
 
 Task package-boringwarehouse -depends pre-build `
 {
-    $packagePath = "$samples\Saritasa.BoringWarehouse\Docker\BoringWarehouse.zip"
+    $packagePath = "$workspace\BoringWarehouse.zip"
     Invoke-PackageBuild -ProjectPath "$samples\Saritasa.BoringWarehouse\Saritasa.BoringWarehouse.Web\Saritasa.BoringWarehouse.Web.csproj" `
         -PackagePath $packagePath -Configuration $Configuration
 }
 
-function DeployLocalProject([string] $packagePath, [string] $connectionString, [string[]] $params)
+Task publish-zergrushco -depends pre-publish `
+    -requiredVariables @('ServerHost', 'SiteName') `
 {
-    $allParams = @('-verb:sync',
-        "-source:package='$packagePath'",
-        '-dest:auto',
-        "-setParam:name='IIS Web Application Name',value='Default Web Site/'",
-        "-setParam:name='AppDbContext-Web.config Connection String',value='$connectionString'")
-
-    if ($params)
-    {
-        $allParams += $params
-    }
-
-    Start-Process -Wait -NoNewWindow -PassThru 'C:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe' $allParams
+    Invoke-WebDeployment -PackagePath "$workspace\ZergRushCo.zip" -ServerHost $ServerHost `
+        -SiteName $SiteName -Application '' `
+        -MSDeployParams @("-setParam:name='AppDbContext-Web.config Connection String',value='Data Source=zergdb;Initial Catalog=ZergRushCo;User ID=TestUser;Password=gHJT2SCm'",
+            "-setParam:name='AppDbContextProviderName',value='System.Data.SqlClient'")
 }
 
-Task publish-zergrushco `
+Task publish-boringwarehouse -depends pre-publish `
+    -requiredVariables @('ServerHost', 'SiteName') `
 {
-    DeployLocalProject 'ZergRushCo.zip' 'Data Source=zergdb;Initial Catalog=ZergRushCo;User ID=TestUser;Password=gHJT2SCm' `
-        "-setParam:name='AppDbContextProviderName',value='System.Data.SqlClient'"
-}
-
-Task publish-boringwarehouse `
-{
-    DeployLocalProject 'BoringWarehouse.zip' 'Data Source=bwdb;Initial Catalog=BoringWarehouse;User ID=TestUser;Password=gHJT2SCm'
+    Invoke-WebDeployment -PackagePath "$workspace\BoringWarehouse.zip" -ServerHost $ServerHost `
+        -SiteName $SiteName -Application '' `
+        -MSDeployParams @("-setParam:name='AppDbContext-Web.config Connection String',value='Data Source=bwdb;Initial Catalog=BoringWarehouse;User ID=TestUser;Password=gHJT2SCm'")
 }

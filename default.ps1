@@ -36,7 +36,7 @@ $packages = @(
     'Saritasa.Tools.Misc' # misc
 )
 
-$docsRoot = Resolve-Path "$PSScriptRoot\docs"
+$docsRoot = "$PSScriptRoot\docs"
 
 Task pack -depends download-nuget -description 'Build the library, test it and prepare nuget packages' `
 {

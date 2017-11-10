@@ -14,15 +14,12 @@ RUN `
     # Install WebDeploy, Psake.
     choco install webdeploy psake -y
 
-COPY docs C:\Temp\docs
 COPY scripts C:\Temp\scripts
 COPY default.ps1 C:\Temp\default.ps1
 
-ENV DockerDir samples\ZergRushCo.Todosya\Docker
-
-COPY ${DockerDir}\ZergRushCo.zip Temp\ZergRushCo.zip
+COPY ZergRushCo.zip Temp\ZergRushCo.zip
 
 WORKDIR C:\Temp
-RUN psake publish-zergrushco
+RUN ["psake.bat", "publish-zergrushco", "-properties", "@{ServerHost='localhost';SiteName='Default Web Site'}"]
 
 EXPOSE 80
