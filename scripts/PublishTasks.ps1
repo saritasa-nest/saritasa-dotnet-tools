@@ -23,6 +23,7 @@ Task pre-publish -description 'Set common publish settings for all deployments.'
 }
 
 Task package-zergrushco -depends build-zergrushco `
+    -requiredVariables @('Configuration') `
 {
     $packagePath = "$workspace\ZergRushCo.zip"
     Invoke-PackageBuild -ProjectPath "$samples\ZergRushCo.Todosya\ZergRushCo.Todosya.Web\ZergRushCo.Todosya.Web.csproj" `
@@ -31,6 +32,7 @@ Task package-zergrushco -depends build-zergrushco `
 }
 
 Task package-boringwarehouse -depends pre-build `
+    -requiredVariables @('Configuration') `
 {
     $packagePath = "$workspace\BoringWarehouse.zip"
     Invoke-PackageBuild -ProjectPath "$samples\Saritasa.BoringWarehouse\Saritasa.BoringWarehouse.Web\Saritasa.BoringWarehouse.Web.csproj" `

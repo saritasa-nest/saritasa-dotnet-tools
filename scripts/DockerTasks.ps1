@@ -1,26 +1,33 @@
+Properties `
+{
+    $Configuration = $null
+    $SemVer = $null
+}
+
 $root = $PSScriptRoot
 $workspace = Resolve-Path "$root\.."
 
 Task docker-zergrushco -depends package-zergrushco `
+    -requiredVariables @('SemVer') `
 {
     $dockerContext = "$samples\ZergRushCo.Todosya\Docker"
-    $version = Exec { GitVersion.exe /showvariable SemVer }
 
-    Exec { docker build -t zerg/web:latest -t "zerg/web:$version" -f "$dockerContext\Dockerfile.web" $workspace }
-    Exec { docker build -t zerg/db:latest -t "zerg/db:$version" -f "$dockerContext\Dockerfile.db" $dockerContext }
+    Exec { docker build -t zerg/web:latest -t "zerg/web:$SemVer" -f "$dockerContext\Dockerfile.web" $workspace }
+    Exec { docker build -t zerg/db:latest -t "zerg/db:$SemVer" -f "$dockerContext\Dockerfile.db" $dockerContext }
 }
 
 Task docker-boringwarehouse -depends package-boringwarehouse `
+    -requiredVariables @('SemVer') `
 {
     $dockerContext = "$samples\Saritasa.BoringWarehouse\Docker"
-    $version = Exec { GitVersion.exe /showvariable SemVer }
 
-    Exec { docker build -t bw/web:latest -t "bw/web:$version" -f "$dockerContext\Dockerfile.web" $workspace }
-    Exec { docker build -t bw/db:latest -t "bw/db:$version" -f "$dockerContext\Dockerfile.db" $dockerContext }
+    Exec { docker build -t bw/web:latest -t "bw/web:$SemVer" -f "$dockerContext\Dockerfile.web" $workspace }
+    Exec { docker build -t bw/db:latest -t "bw/db:$SemVer" -f "$dockerContext\Dockerfile.db" $dockerContext }
 }
 
 # Docker images should be built before run (docker-boringwarehouse task).
 Task run-boringwarehouse-tests `
+    -requiredVariables @('Configuration') `
 {
     # Recreate and containers.
     Exec { docker-compose -f "$samples\Saritasa.BoringWarehouse\docker-compose.yml" up --force-recreate -d db }

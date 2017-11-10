@@ -9,6 +9,7 @@ if ($PSVersionTable.PSVersion.Major -lt 3)
     throw "PowerShell 3 is required.`nhttp://www.microsoft.com/en-us/download/details.aspx?id=40855"
 }
 
+. .\Scripts\Saritasa.PsakeExtensions.ps1
 . .\scripts\Saritasa.PsakeTasks.ps1
 
 . .\scripts\BuildTasks.ps1
@@ -17,12 +18,16 @@ if ($PSVersionTable.PSVersion.Major -lt 3)
 
 Properties `
 {
-    $Version = '0.1.0'
+    $SemVer = $env:SemVer
+    $MajorMinorPatch = $env:MajorMinorPatch
     $Configuration = 'Release'
-}
 
-# Global variables.
-$script:Version = '0.0.0'
+    # For samples.
+    $ServerHost = $null
+    $SiteName = $null
+    $DeployUsername = $null
+    $DeployPassword = $null
+}
 
 $packages = @(
     'Saritasa.Tools.Common'# common
@@ -83,30 +88,7 @@ Task pack -description 'Build the library, test it and prepare nuget packages' `
     }
 }
 
-Task clean -description 'Clean solution' `
-{
-    Remove-Item './Saritasa.*.nupkg' -ErrorAction SilentlyContinue
-    Remove-Item './Saritasa.*.zip' -ErrorAction SilentlyContinue
-    Remove-Item './src/*.suo' -Recurse -Force -ErrorAction SilentlyContinue
-    foreach ($package in $packages)
-    {
-        Remove-Item "./src/$package/bin/*" -Recurse -Force -ErrorAction SilentlyContinue
-        Remove-Item "./src/$package/obj/*" -Recurse -Force -ErrorAction SilentlyContinue
-    }
-    Remove-Item "./test/Saritasa.Tools.Common.Tests/bin/*" -Recurse -Force -ErrorAction SilentlyContinue
-    Remove-Item "./test/Saritasa.Tools.Common.Tests/obj/*" -Recurse -Force -ErrorAction SilentlyContinue
-    Remove-Item "./test/Saritasa.Tools.Messages.Benchmark/bin/*" -Recurse -Force -ErrorAction SilentlyContinue
-    Remove-Item "./test/Saritasa.Tools.Messages.Benchmark/obj/*" -Recurse -Force -ErrorAction SilentlyContinue
-    Remove-Item "./test/Saritasa.Tools.Messages.Tests/bin/*" -Recurse -Force -ErrorAction SilentlyContinue
-    Remove-Item "./test/Saritasa.Tools.Messages.Tests/obj/*" -Recurse -Force -ErrorAction SilentlyContinue
-    Remove-Item "./test/Saritasa.Tools.Tests/bin/*" -Recurse -Force -ErrorAction SilentlyContinue
-    Remove-Item "./test/Saritasa.Tools.Tests/obj/*" -Recurse -Force -ErrorAction SilentlyContinue
-    Remove-Item './src/StyleCop.Cache' -Force -ErrorAction SilentlyContinue
-    Remove-Item './docs/_build' -Recurse -Force -ErrorAction SilentlyContinue
-    Remove-Item './docs/conf.py' -ErrorAction SilentlyContinue
-}
-
-Task docs -depends get-version -description 'Compile and open documentation' `
+Task docs -description 'Compile and open documentation' `
 {
     CompileDocs
     Invoke-Item './docs/_build/html/index.html'
@@ -126,7 +108,7 @@ function GetPackageAssemblyVersion($package)
 function CompileDocs
 {
     Copy-Item "$docsRoot\conf.py.template" "$docsRoot\conf.py"
-    (Get-Content "$docsRoot\conf.py").Replace('VX.VY', $Version) | Set-Content "$docsRoot\conf.py"
+    (Get-Content "$docsRoot\conf.py").Replace('VX.VY', $MajorMinorPatch) | Set-Content "$docsRoot\conf.py"
 
     python -m sphinx.__init__ -b html -d "$docsRoot\_build\doctrees" $docsRoot "$docsRoot\_build\html"
     if ($LASTEXITCODE)
@@ -144,4 +126,19 @@ function ReplaceVersionInAssemblyInfo($file, $attribute, $version)
         {
             ForEach-Object { $_ -replace $pattern, $version }
         } | Set-Content $file -Encoding UTF8
+}
+
+TaskSetup `
+{
+    if (!$SemVer)
+    {
+        # 1.2.3-beta.1
+        Expand-PsakeConfiguration @{ SemVer = Exec { GitVersion.exe /showvariable SemVer } }
+    }
+
+    if (!$MajorMinorPatch)
+    {
+        # 1.2.3
+        Expand-PsakeConfiguration @{ MajorMinorPatch = Exec { GitVersion.exe /showvariable MajorMinorPatch } }
+    }
 }
