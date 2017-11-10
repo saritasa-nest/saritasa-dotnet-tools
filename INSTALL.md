@@ -43,3 +43,12 @@ There is also `scripts\Saritasa.RulesetInstall.ps1` script that allows to setup 
     ```
     PS W:\crm> W:\SaritasaTools\scripts\Saritasa.RulesetInstall.ps1 -exclude OldOrmProject.*
     ```
+
+Run Samples in Docker
+---------------------
+
+```
+PS psake docker-run-all
+```
+
+See IP addresses of running web sites in output.

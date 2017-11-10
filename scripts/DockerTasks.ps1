@@ -69,4 +69,10 @@ Task docker-run-all -depends docker-boringwarehouse, docker-zergrushco `
 {
     Exec { docker-compose -f "$samples\Saritasa.BoringWarehouse\docker-compose.yml" up -d }
     Exec { docker-compose -f "$samples\ZergRushCo.Todosya\docker-compose.yml" up -d }
+
+    $ipAddress = Exec { docker inspect saritasaboringwarehouse_web_1 -f '{{ .NetworkSettings.Networks.nat.IPAddress }}' }
+    Write-Information "Saritasa.BoringWarehouse: http://$ipAddress"
+
+    $ipAddress = Exec { docker inspect zergrushcotodosya_web_1 -f '{{ .NetworkSettings.Networks.nat.IPAddress }}' }
+    Write-Information "ZergRushCo.Todosya: http://$ipAddress"
 }
