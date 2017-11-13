@@ -273,7 +273,7 @@
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Frontend\sass\style.scss" />
-    <Content Include=".eslintrc" />
+    <Content Include=".eslintrc.js" />
     <None Include="gulpfile.js\bundle-app-pages.js" />
     <None Include="gulpfile.js\bundle-app-requirejs.js" />
     <None Include="gulpfile.js\bundle-app.js" />
