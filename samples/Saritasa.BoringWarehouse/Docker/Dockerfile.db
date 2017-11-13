@@ -9,6 +9,7 @@ ENV `
 
 COPY CreateDB.sql C:\Temp\CreateDB.sql
 
-# TODO: Wait for SQL Server start here.
+# Wait for SQL Server to start.
+RUN for ($i = 1; $i -le 10; $i++) { $result = Test-NetConnection localhost -Port 1433; if ($result.TcpTestSucceeded) { break }; Start-Sleep 1 }
 
 RUN sqlcmd -i C:\Temp\CreateDB.sql
