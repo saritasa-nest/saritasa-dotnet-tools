@@ -1,5 +1,5 @@
 # escape=`
-FROM microsoft/mssql-server-windows-express
+FROM microsoft/mssql-server-windows-express:2017-CU1
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop';"]
 
 ENV `
