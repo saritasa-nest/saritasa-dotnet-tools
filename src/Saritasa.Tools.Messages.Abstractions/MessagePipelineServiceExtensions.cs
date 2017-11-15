@@ -29,8 +29,8 @@ namespace Saritasa.Tools.Messages.Abstractions
                     return pipeline;
                 }
             }
-            throw new InvalidOperationException("Cannot find command pipeline. Make sure you called any of AddPipeline " +
-                                                "extension method.");
+            throw new InvalidOperationException($"Cannot find {typeof(T)} pipeline. Make sure you called correct " +
+                                                " Add{X}Pipeline extension method.");
         }
 
         /// <summary>

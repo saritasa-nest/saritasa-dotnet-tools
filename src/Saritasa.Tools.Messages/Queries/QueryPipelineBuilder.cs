@@ -16,7 +16,7 @@ namespace Saritasa.Tools.Messages.Queries
         /// <summary>
         /// .ctor
         /// </summary>
-        /// <param name="pipeline">Event pipeline.</param>
+        /// <param name="pipeline">Query pipeline.</param>
         public QueryPipelineBuilder(IQueryPipeline pipeline) : base(pipeline)
         {
         }

@@ -13,7 +13,7 @@
     <iconUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <copyright>(c) Saritasa, 2016-2017</copyright>
-    <tags>uow repository domain efcore6 dbcontext</tags>
+    <tags>uow repository domain efcore dbcontext</tags>
     <repository type="git" url="https://github.com/Saritasa/SaritasaTools" />
     <dependencies>
       <group targetFramework="net452">

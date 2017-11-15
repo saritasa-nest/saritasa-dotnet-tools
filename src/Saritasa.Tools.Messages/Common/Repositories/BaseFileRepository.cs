@@ -80,7 +80,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             }
 
             Path = parameters.GetValueOrInvoke(KeyPath, RepositoryConfigurationException.ThrowParameterNotExists);
-            FileNamePrefix = parameters.GetValueOrInvoke(KeyPrefix, RepositoryConfigurationException.ThrowParameterNotExists);
+            FileNamePrefix = parameters.GetValueOrDefault(KeyPrefix, string.Empty);
             BufferStream = Convert.ToBoolean(parameters.GetValueOrDefault(KeyBuffer, false.ToString()));
             if (parameters.ContainsKey(KeySerializer))
             {
