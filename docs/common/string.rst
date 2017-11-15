@@ -23,7 +23,7 @@ String utils.
 .. function:: string JoinIgnoreEmpty(string separator, params string[] values)
               string JoinIgnoreEmpty(string separator, IEnumerable<string> values)
 
-.. function:: ParseDefault
+.. function:: ParseOrDefault
 
     Sometimes when we try to convert some type from string to another one (`int.Parse` for example) we don't need to know if is it possible to do that or not. Having default value in that case is good for us. This set of methods `TryParseXDefault` try to parse input value and if it is not possible return default one.
 

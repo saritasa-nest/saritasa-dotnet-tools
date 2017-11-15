@@ -6,6 +6,7 @@ The main idea is to process application business logic in general way.
 .. toctree::
     :titlesonly:
 
+    getting-started
     commands
     queries
     events
