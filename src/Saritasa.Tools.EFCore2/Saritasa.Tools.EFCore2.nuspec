@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Saritasa.Tools.EFCore2</id>
+    <title>Saritasa Tools for Entity Framework Core 2</title>
+    <version>0.0.0</version>
+    <description>The package is a part of Saritasa Tools project. Saritasa.Tools.EfCore1 contains implementations for unit of work, repository interfaces.</description>
+    <summary>DDD implementatons for Entity Core 2.</summary>
+    <authors>Saritasa</authors>
+    <owners>Saritasa</owners>
+    <licenseUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/LICENSE.txt</licenseUrl>
+    <projectUrl>https://github.com/saritasa/saritasatools</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <copyright>(c) Saritasa, 2016-2017</copyright>
+    <tags>uow repository domain efcore dbcontext</tags>
+    <repository type="git" url="https://github.com/Saritasa/SaritasaTools" />
+    <dependencies>
+      <group targetFramework="net461">
+        <dependency id="Microsoft.EntityFrameworkCore" version="[2.0.0, )" />
+        <dependency id="Saritasa.Tools.Domain" version="[0.5.0, )" />
+      </group>
+      <group targetFramework="netstandard1.3">
+        <dependency id="Microsoft.EntityFrameworkCore" version="[2.0.0, )" />
+        <dependency id="System.Reflection.Emit.Lightweight" version="[4.3.0, )" />
+        <dependency id="Saritasa.Tools.Domain" version="[0.5.0, )" />
+      </group>
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System.Data" targetFramework=".NETFramework4.6.1" />
+    </frameworkAssemblies>
+  </metadata>
+  <files>
+    <file src="bin\Release\**\Saritasa.Tools.EFCore2*.dll" target="lib" />
+    <file src="bin\Release\**\Saritasa.Tools.EFCore2.xml" target="lib" />
+  </files>
+</package>
