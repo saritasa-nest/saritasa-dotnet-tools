@@ -1,4 +1,11 @@
-﻿0.4.0 [2017-09-13]
+﻿0.4.3 [2017-11-17]
+[+] Exclude few fields from deserialization: WatsonBuckets, TargetSite.
+[*] Elasticsearch and csv fields missed fix.
+[*] Fix DataMiddleware items handle.
+[*] Fix Newtonsoft.Json version. 
+[*] Minor fixes.
+
+0.4.0 [2017-09-13]
 [*] Separate object resolving to separate middleware (CommandHandlerResolverMiddleware, EventHandlerResolverMiddleware).
 [-] Remove UseParametersResolve parameter for queries pipeline.
 [+] Add IMessagePipelinePostAction interface. The handler will be executed after all middleware execution.
