@@ -10,7 +10,7 @@ Checkout sample project to any directory on your computer.
 
     ::
 
-        git checkout https://github.com/aspnet/MusicStore.git
+        git clone https://github.com/aspnet/MusicStore.git
 
 
 Brief setup is  required. You can open ``MusicStore.sln`` and change connection string in ``config.json``.
@@ -24,10 +24,9 @@ Add to Card Command
 
     .. code-block:: c#
 
-        PM> Install-Package Saritasa.Tools.Messages.Abstractions
         PM> Install-Package Saritasa.Tools.Messages
 
-2. When user adds something to card the ``AddToCart`` action is called of ``ShoppingCartController``. Since we modify something we should use command pipeline. Command data and command handler are separate concepts and we can start with command class first. Add new class to ``MusicStore.Controllers`` namespace:
+2. When user adds something to card the ``AddToCart`` action is called of ``ShoppingCartController``. Since we modify something we should use command pipeline. Command data and command handler are separate concepts and we can start with command class first. Add new class to ``MusicStore.Commands`` namespace:
 
     .. code-block:: c#
 
@@ -47,7 +46,7 @@ Add to Card Command
             }
         }
 
-As you see to add album to cart we should know ``UserId`` who does adding, ``AlbumId`` and user's ``CartId``. ``CartId`` will be generated in handler and is marked as out parameter.
+As you see to add album to cart we should know ``UserId`` who does adding, ``AlbumId`` and user's ``CartId``. ``CartId`` will be generated or reused in handler and is marked as out parameter.
 
 3. Then we need handler class. We can copy-paste code that we already have working in controller. Our new class can look like this:
 
@@ -105,7 +104,7 @@ And call command within ``AddToCart`` action:
 
         public async Task<IActionResult> AddToCart(int id, CancellationToken requestAborted)
         {
-            var ctx = await _pipelineService.HandleCommandAsync(new AddToCartCommand
+            await _pipelineService.HandleCommandAsync(new AddToCartCommand
             {
                 AlbumId = id,
                 UserId = HttpContext.User.Identity.Name
@@ -166,9 +165,9 @@ Log Our Messages
 
         pipelinesContainer.AddCommandPipeline()
             .UseDefaultMiddlewares(Assembly.GetExecutingAssembly())
-            .AddMiddleware(messagesRepository);
+            .AddMiddleware(messagesRepository); // Add this line.
         pipelinesContainer.AddQueryPipeline()
             .UseDefaultMiddlewares()
-            .AddMiddleware(messagesRepository);
+            .AddMiddleware(messagesRepository); // Add this line.
 
 Now run the app and add albums to your card. In database you should find ``SaritasaMessages`` table with detailed actions in your application.

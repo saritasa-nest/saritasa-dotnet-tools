@@ -28,6 +28,7 @@
     <PackageReference Include="JetBrains.Annotations" Version="11.0.0">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.4.0" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
