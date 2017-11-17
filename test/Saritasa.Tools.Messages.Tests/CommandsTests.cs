@@ -60,10 +60,7 @@ namespace Saritasa.Tools.Messages.Tests
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
                     typeof(CommandsTests).GetTypeInfo().Assembly))
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerResolverMiddleware())
-                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerExecutorMiddleware
-                {
-                    UseParametersResolve = true
-                });
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerExecutorMiddleware());
         }
 
         #endregion
@@ -491,6 +488,41 @@ namespace Saritasa.Tools.Messages.Tests
             {
                 pipelineService.HandleCommand(new Ns11_CommandWithFail());
             });
+        }
+
+        #endregion
+
+        #region Should_not_resolve_if_service_provider_not_defined
+
+        public class Ns13_Command
+        {
+        }
+
+        [CommandHandlers]
+        public class Ns13_CommandHandlersWithDeps
+        {
+            public Ns13_CommandHandlersWithDeps(object dep)
+            {
+            }
+
+            public void Handle(Ns13_Command ns13Command, Ns01_IInterfaceA dep1, Ns01_IInterfaceB dep2)
+            {
+                if (dep1 != null || dep2 != null)
+                {
+                    throw new InvalidOperationException("Something went wrong.");
+                }
+            }
+        }
+
+        [Fact]
+        public void Should_not_resolve_if_service_provider_not_defined()
+        {
+            // Arrange
+            var builder = pipelineService.PipelineContainer.AddCommandPipeline();
+            SetupCommandPipeline(builder);
+
+            // Act & assert
+            pipelineService.HandleCommand(new Ns13_Command());
         }
 
         #endregion
