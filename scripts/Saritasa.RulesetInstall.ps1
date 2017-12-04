@@ -33,7 +33,7 @@ foreach ($projectFile in $projectFiles)
 
     # is .NET Core project
     $isCoreProject = $false
-    if ($projectXml.Sdk)
+    if ($projectXml.Project.Sdk -ne $null)
     {
         $isCoreProject = $true
     }
@@ -56,7 +56,14 @@ foreach ($projectFile in $projectFiles)
             {
                 continue
             }
-            $el = $projectXml.CreateElement("CodeAnalysisRuleSet", "http://schemas.microsoft.com/developer/msbuild/2003")
+            if ($isCoreProject -eq $true)
+            {
+                $el = $projectXml.CreateElement("CodeAnalysisRuleSet")
+            }
+            else
+            {
+                $el = $projectXml.CreateElement("CodeAnalysisRuleSet", "http://schemas.microsoft.com/developer/msbuild/2003")
+            }
             $el.InnerText = $target
             Write-Output "Add to file $projectFile"
             $propertyGroup.AppendChild($el) | out-null
@@ -76,7 +83,7 @@ foreach ($projectFile in $projectFiles)
     }
     $projectXml.Save((Resolve-Path $projectFile))
 
-    # check that StyleCop is install for project
+    # check that StyleCop is installed for project
     $stylecopNodes = $projectXml.SelectNodes("//*[contains(@Include, 'StyleCop.Analyzers')]")
     if ($stylecopNodes.Count -eq 0)
     {

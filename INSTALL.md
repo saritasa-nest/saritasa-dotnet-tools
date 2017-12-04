@@ -43,3 +43,9 @@ There is also `scripts\Saritasa.RulesetInstall.ps1` script that allows to setup 
     ```
     PS W:\crm> W:\SaritasaTools\scripts\Saritasa.RulesetInstall.ps1 -exclude OldOrmProject.*
     ```
+
+To install StyleCop analyzers for all projects within solution run following command in package manager console:
+
+    ```
+    Get-Project -All | Install-Package StyleCop.Analyzers
+    ```
