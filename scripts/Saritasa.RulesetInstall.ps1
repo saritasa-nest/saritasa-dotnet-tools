@@ -51,8 +51,7 @@ foreach ($projectFile in $projectFiles)
 
         if ($propertyGroup.CodeAnalysisRuleSet -eq $null)
         {
-            # for standard .NET project we also should check Condition block existance
-            if ($isCoreProject -eq $false -and $propertyGroup.Condition -eq $null -or $remove -eq $true)
+            if ($propertyGroup.Condition -ne $null -and $remove -eq $false)
             {
                 continue
             }
