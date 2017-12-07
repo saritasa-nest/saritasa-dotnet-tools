@@ -72,5 +72,11 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// Processing status.
         /// </summary>
         public ProcessingStatus Status { get; set; }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return Id + "-" + ContentType;
+        }
     }
 }

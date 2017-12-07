@@ -25,7 +25,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         /// </summary>
         public Predicate<MessageRecord> Predicate { get; private set; }
 
-        ProcessingStatus[] statuses;
+        private ProcessingStatus[] statuses;
 
         /// <summary>
         /// Only messages with specified statuses will be stored.
@@ -37,21 +37,21 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         /// </summary>
         public int ExecutionDurationAbove { get; private set; }
 
-        Regex[] includeContentTypes;
+        private Regex[] includeContentTypes;
 
         /// <summary>
         /// Only messages that matches regexp selected content type pattern will be stored.
         /// </summary>
         public Regex[] IncludeContentTypes => includeContentTypes;
 
-        Regex[] excludedContentTypes;
+        private Regex[] excludedContentTypes;
 
         /// <summary>
         /// Messages with matched content types will be excluded.
         /// </summary>
         public Regex[] ExcludedContentTypes => excludedContentTypes;
 
-        byte[] types;
+        private byte[] types;
 
         /// <summary>
         /// Only specified messages types will be stored.
@@ -59,10 +59,10 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         public byte[] Types => types;
 
         /// <summary>
-        /// Returns true if message matches current filter criterias.
+        /// Returns <c>true</c> if message matches current filter criterias.
         /// </summary>
         /// <param name="message">Message to match.</param>
-        /// <returns>True if matches, otherwise false.</returns>
+        /// <returns><c>True</c> if matches, otherwise <c>false</c>.</returns>
         public bool IsMatch(MessageRecord message)
         {
             if (Predicate?.Invoke(message) == false ||

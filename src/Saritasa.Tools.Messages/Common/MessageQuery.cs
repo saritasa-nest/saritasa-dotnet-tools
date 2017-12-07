@@ -3,6 +3,7 @@
 
 using System;
 using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Internal;
 
 namespace Saritasa.Tools.Messages.Common
 {
@@ -77,6 +78,69 @@ namespace Saritasa.Tools.Messages.Common
         public static MessageQuery Create()
         {
             return new MessageQuery();
+        }
+
+        /// <summary>
+        /// Create query object from string. Only AND clause is used. Example: startdate=2017-01-01,take=10.
+        /// </summary>
+        /// <param name="queryString">Formatted query string.</param>
+        /// <returns>Message query.</returns>
+        public static MessageQuery CreateFromString(string queryString)
+        {
+            if (string.IsNullOrEmpty(queryString))
+            {
+                throw new ArgumentNullException(nameof(queryString));
+            }
+
+            var query = new MessageQuery();
+            var paramsArr = StringHelpers.GetFieldsFromLine(queryString);
+            foreach (string param in paramsArr)
+            {
+                var equalIndex = param.IndexOf('=');
+                if (equalIndex < 0)
+                {
+                    continue;
+                }
+                var key = param.Substring(0, equalIndex).Trim();
+                var value = param.Substring(equalIndex + 1).Trim();
+                switch (key.ToLowerInvariant())
+                {
+                    case "id":
+                        query.Id = Guid.Parse(value);
+                        break;
+                    case "status":
+                        query.Status = (ProcessingStatus)Enum.Parse(typeof(ProcessingStatus), value, true);
+                        break;
+                    case "type":
+                        query.Type = byte.Parse(value);
+                        break;
+                    case "startdate":
+                        query.CreatedStartDate = DateTime.Parse(value);
+                        break;
+                    case "enddate":
+                        query.CreatedEndDate = DateTime.Parse(value);
+                        break;
+                    case "durationabove":
+                        query.ExecutionDurationAbove = int.Parse(value);
+                        break;
+                    case "durationbelow":
+                        query.ExecutionDurationBelow = int.Parse(value);
+                        break;
+                    case "take":
+                        query.Take = int.Parse(value);
+                        break;
+                    case "skip":
+                        query.Skip = int.Parse(value);
+                        break;
+                    case "contenttype":
+                        query.ContentType = value;
+                        break;
+                    case "errortype":
+                        query.ErrorType = value;
+                        break;
+                }
+            }
+            return query;
         }
 
         /// <summary>
