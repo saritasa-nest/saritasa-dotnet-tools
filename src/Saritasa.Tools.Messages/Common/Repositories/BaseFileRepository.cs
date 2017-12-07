@@ -139,9 +139,8 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             // Correct start and end dates, so minimum date will be first file in list, and max date last file.
             if (allFiles.Any())
             {
-                DateTime tmp;
                 if (DateTime.TryParseExact(GetFileDatePart(allFiles.First()), DateTimeFormat,
-                        System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat, System.Globalization.DateTimeStyles.None, out tmp) && tmp > startDate)
+                        System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat, System.Globalization.DateTimeStyles.None, out DateTime tmp) && tmp > startDate)
                 {
                     startDate = tmp;
                 }
@@ -163,8 +162,14 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             // Actual search.
             var targetList = new List<MessageRecord>(150);
             var date = startDate;
+            int skipCount = 0, takeCount = 0;
             while (date <= endDate)
             {
+                // Do not go further if we reach take count.
+                if (messageQuery.Take > 0 && takeCount >= messageQuery.Take)
+                {
+                    break;
+                }
                 for (var i = 0; i < 1000; i++)
                 {
                     var fileName = GetFileNameByDate(date, i);
@@ -179,7 +184,20 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                         stream = new FileStream(System.IO.Path.Combine(Path, fileName), FileMode.Open, FileAccess.Read,
                             FileShare.ReadWrite);
                         var messages = ReadMessagesFromStream(stream, messageQuery);
-                        targetList.AddRange(messages);
+                        foreach (MessageRecord messageRecord in messages)
+                        {
+                            if (messageQuery.Skip > 0 && skipCount < messageQuery.Skip)
+                            {
+                                skipCount++;
+                                continue;
+                            }
+                            if (messageQuery.Take > 0 && takeCount >= messageQuery.Take)
+                            {
+                                continue;
+                            }
+                            targetList.Add(messageRecord);
+                            takeCount++;
+                        }
                     }
                     finally
                     {
