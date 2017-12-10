@@ -38,7 +38,8 @@ $packages = @(
 
 $docsRoot = Resolve-Path "$PSScriptRoot\docs"
 
-Task pack -depends download-nuget -description 'Build the library, test it and prepare nuget packages' `
+Task pack -depends download-nuget, clean -description `
+    'Build the library, test it and prepare nuget packages' `
 {
     $revcount = &'git' @('rev-list', '--all', '--count') | Out-String | ForEach-Object { $_ -replace [Environment]::NewLine, '' }
     $hash = &'git' @('log', '--pretty=format:%h', '-n', '1') | Out-String | ForEach-Object { $_ -replace [Environment]::NewLine, '' }
