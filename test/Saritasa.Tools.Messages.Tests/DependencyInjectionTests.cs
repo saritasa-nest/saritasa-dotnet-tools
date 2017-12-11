@@ -150,10 +150,10 @@ namespace Saritasa.Tools.Messages.Tests
 
             // Act
             pipelineService.ServiceProvider = new FuncServiceProvider(Activator.CreateInstance);
-            pipelineService.Query<QueryClass>().With(q => q.Query());
+            pipelineService.Query<QueryClass2>().With(q => q.Query());
 
             // Assert
-            Assert.False(QueryClass.IsDisposed);
+            Assert.False(QueryClass2.IsDisposed);
         }
 
         #endregion

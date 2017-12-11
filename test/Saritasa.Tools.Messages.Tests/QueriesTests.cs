@@ -70,7 +70,7 @@ namespace Saritasa.Tools.Messages.Tests
             }
         }
 
-        public void SetupQueryPipeline(QueryPipelineBuilder builder)
+        private void SetupQueryPipeline(QueryPipelineBuilder builder)
         {
             builder
                 .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectResolverMiddleware

@@ -83,7 +83,7 @@ namespace Saritasa.Tools.Domain.Tests
 
             // Assert
             Assert.NotNull(validationException);
-            Assert.Equal(1, validationException.SummaryErrors.Count());
+            Assert.Single(validationException.SummaryErrors);
             Assert.Equal(2, validationException.Errors.Count);
         }
 
@@ -117,8 +117,8 @@ namespace Saritasa.Tools.Domain.Tests
 
             // Assert
             Assert.NotNull(validationException);
-            Assert.Equal(0, validationException.SummaryErrors.Count());
-            Assert.Equal(1, validationException.Errors.Count);
+            Assert.Empty(validationException.SummaryErrors);
+            Assert.Single(validationException.Errors);
         }
 
 #if NET452
@@ -161,7 +161,7 @@ namespace Saritasa.Tools.Domain.Tests
 
             // Assert
             Assert.NotNull(validationException);
-            Assert.Equal(0, validationException.SummaryErrors.Count());
+            Assert.Empty(validationException.SummaryErrors);
             Assert.Equal(2, validationException.Errors.Count);
         }
 
