@@ -2,6 +2,8 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -56,6 +58,12 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
                     stopwatch.Stop();
                     messageContext.Items[MessageContextConstants.ExecutionDurationKey] = (int)stopwatch.ElapsedMilliseconds;
                 }
+            }
+
+            var contentDict = messageContext.Content as IDictionary<string, object>;
+            if (contentDict != null)
+            {
+                contentDict["@result"] = queryParams.Result;
             }
         }
 

@@ -1,4 +1,9 @@
-﻿0.4.3 [2017-11-17]
+﻿0.4.5 [2017-12-11]
+[*] Fix incorrect package included versions.
+[+] Log query results to repository using "@result" key.
+[*] Fix skip, take query methods for files repositories.
+
+0.4.3 [2017-11-17]
 [+] Exclude few fields from deserialization: WatsonBuckets, TargetSite.
 [*] Elasticsearch and csv fields missed fix.
 [*] Fix DataMiddleware items handle.
