@@ -251,6 +251,7 @@ namespace Saritasa.Tools.Messages.TestRuns
                 if (context.FirstException == null)
                 {
                     result.FailException = ex;
+                    result.FailStepNumber = context.StepNumber;
                     context.FirstException = ex;
                 }
                 else

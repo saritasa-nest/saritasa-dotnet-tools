@@ -15,17 +15,22 @@ namespace Saritasa.Tools.Messages.TestRuns
         /// <summary>
         /// Was test run succeed.
         /// </summary>
-        public bool IsSuccess { get; set;  } = true;
+        public bool IsSuccess { get; internal set; } = true;
 
         /// <summary>
         /// Test run name. Getting from <see cref="BasicInformationStep" /> step.
         /// </summary>
-        public string Name { get; set;  } = "(none)";
+        public string Name { get; internal set; } = "(none)";
 
         /// <summary>
         /// Exception if any occured.
         /// </summary>
-        public Exception FailException { get; set;  }
+        public Exception FailException { get; internal set; }
+
+        /// <summary>
+        /// Fail test step number where <see cref="FailException" /> occurred. -1 by default.
+        /// </summary>
+        public int FailStepNumber { get; internal set; } = -1;
 
         private readonly IList<TestRunStepResult> steps = new List<TestRunStepResult>();
 
@@ -69,13 +74,32 @@ namespace Saritasa.Tools.Messages.TestRuns
         public void Dump(ITestRunLogger logger)
         {
             logger.Log(new string('-', 96));
-            logger.Log(string.Format("{0,-90}{1,6}", TruncateString(Name, 90), GetSuccessString(IsSuccess)));
+            logger.Log($"{TruncateString(Name, 90), -90}{GetSuccessString(IsSuccess), 6}");
             foreach (TestRunStepResult step in Steps)
             {
-                logger.Log(string.Format("{0,-4}{1,-86}{2,6}", "#" + step.StepNum, TruncateString(step.Name, 86),
-                    GetSuccessString(step.IsSuccess)));
+                logger.Log(
+                    $"{"#" + step.StepNum, -4}{TruncateString(step.Name, 86), -86}{GetSuccessString(step.IsSuccess), 6}");
             }
             logger.Log(new string('-', 96));
+        }
+
+        /// <summary>
+        /// Throw <see cref="TestRunException" /> if test run was not succeed.
+        /// </summary>
+        public void Assert()
+        {
+            if (!IsSuccess)
+            {
+                if (FailException != null)
+                {
+                    throw new TestRunException(
+                        $"Test run \"{Name}\" execution failed on step {FailStepNumber}.", FailException);
+                }
+                else
+                {
+                    throw new TestRunException($"Test run \"{Name}\" execution failed.");
+                }
+            }
         }
 
         private static string TruncateString(string target, int maxLength)
