@@ -11,15 +11,10 @@ namespace Saritasa.Tools.Messages.Events
     /// <summary>
     /// Events pipeline.
     /// </summary>
-    public class EventPipeline : MessagePipeline, IEventPipeline, IMessageRecordConverter
+    public class EventPipeline : MessagePipeline<EventPipelineOptions>, IEventPipeline, IMessageRecordConverter
     {
         /// <inheritdoc />
         public override byte[] MessageTypes { get; } = { MessageContextConstants.MessageTypeEvent };
-
-        /// <summary>
-        /// Options.
-        /// </summary>
-        public new EventPipelineOptions Options { get; } = new EventPipelineOptions();
 
         #region IEventPipeline
 

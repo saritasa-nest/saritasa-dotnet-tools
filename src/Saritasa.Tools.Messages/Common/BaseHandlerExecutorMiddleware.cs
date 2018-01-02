@@ -6,7 +6,9 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
+using Saritasa.Tools.Messages.Abstractions;
 
 namespace Saritasa.Tools.Messages.Common
 {
@@ -19,6 +21,12 @@ namespace Saritasa.Tools.Messages.Common
         /// If <c>true</c> the middleware will try to resolve executing method parameters. Default is <c>true</c>.
         /// </summary>
         public bool UseParametersResolve { get; set; } = true;
+
+        /// <summary>
+        /// Captures <see cref="ExceptionDispatchInfo" /> of original execution exception
+        /// as item with ".exception-dispatch" key. Default is <c>false</c>.
+        /// </summary>
+        public bool CaptureExceptionDispatchInfo { get; set; } = false;
 
         private delegate object HandlerCall(object handler, object obj, IServiceProvider serviceProvider);
 
@@ -39,6 +47,20 @@ namespace Saritasa.Tools.Messages.Common
             var result = func(handler, obj, serviceProvider);
             var task = result as Task;
             task?.ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Captures <see cref="ExceptionDispatchInfo" /> of original execution exception
+        /// as item with ".exception-dispatch" key. Default is <c>false</c>.
+        /// </summary>
+        /// <param name="messageContext">Message context.</param>
+        protected void CaptureException(IMessageContext messageContext)
+        {
+            if (messageContext.FailException != null)
+            {
+                messageContext.Items[MessageContextConstants.ExceptionDispatchInfoKey] =
+                    ExceptionDispatchInfo.Capture(messageContext.FailException);
+            }
         }
 
         /// <summary>

@@ -12,15 +12,10 @@ namespace Saritasa.Tools.Messages.Commands
     /// <summary>
     /// Commands specific pipeline.
     /// </summary>
-    public class CommandPipeline : MessagePipeline, ICommandPipeline, IMessageRecordConverter
+    public class CommandPipeline : MessagePipeline<CommandPipelineOptions>, ICommandPipeline, IMessageRecordConverter
     {
         /// <inheritdoc />
         public override byte[] MessageTypes { get; } = { MessageContextConstants.MessageTypeCommand };
-
-        /// <summary>
-        /// Options.
-        /// </summary>
-        public new CommandPipelineOptions Options { get; } = new CommandPipelineOptions();
 
         #region ICommandPipeline
 

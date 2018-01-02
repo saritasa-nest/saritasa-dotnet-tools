@@ -70,6 +70,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
                 {
                     messageContext.FailException = ex.InnerException;
                 }
+                //ExceptionDispatchInfo.Capture(messageContext)
             }
             catch (Exception ex)
             {
@@ -85,6 +86,10 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
                     stopwatch.Stop();
                     messageContext.Items[MessageContextConstants.ExecutionDurationKey] = (int)stopwatch.ElapsedMilliseconds;
                 }
+            }
+            if (CaptureExceptionDispatchInfo)
+            {
+                CaptureException(messageContext);
             }
         }
 
@@ -150,6 +155,10 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
                     stopwatch.Stop();
                     messageContext.Items[MessageContextConstants.ExecutionDurationKey] = (int)stopwatch.ElapsedMilliseconds;
                 }
+            }
+            if (CaptureExceptionDispatchInfo)
+            {
+                CaptureException(messageContext);
             }
         }
     }

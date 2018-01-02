@@ -15,7 +15,7 @@ namespace Saritasa.Tools.Messages.Common
         /// <summary>
         /// Pipeline to build.
         /// </summary>
-        protected TPipeline Pipeline { get; set; }
+        public TPipeline Pipeline { get; set; }
 
         /// <summary>
         /// .ctor

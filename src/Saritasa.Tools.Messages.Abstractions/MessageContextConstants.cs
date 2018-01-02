@@ -24,6 +24,12 @@ namespace Saritasa.Tools.Messages.Abstractions
         public const string DataKey = ".data";
 
         /// <summary>
+        /// Contains <see cref="System.Runtime.ExceptionServices.ExceptionDispatchInfo " />
+        /// of original exception.
+        /// </summary>
+        public const string ExceptionDispatchInfoKey = ".exception-dispatch";
+
+        /// <summary>
         /// Execution processing duration key.
         /// </summary>
         public const string ExecutionDurationKey = ".execution-duration";
@@ -56,7 +62,7 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// <summary>
         /// Dictionary that maps message type to string code.
         /// </summary>
-        public static readonly IDictionary<byte, string> MessageTypeCodes = new Dictionary<byte, string>()
+        public static readonly IDictionary<byte, string> MessageTypeCodes = new Dictionary<byte, string>
         {
             [MessageTypeUnknown] = "unknown",
             [MessageTypeCommand] = "command",

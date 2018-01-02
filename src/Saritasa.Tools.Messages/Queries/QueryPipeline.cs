@@ -16,7 +16,7 @@ namespace Saritasa.Tools.Messages.Queries
     /// <summary>
     /// Query pipeline.
     /// </summary>
-    public class QueryPipeline : MessagePipeline, IQueryPipeline, IMessageRecordConverter
+    public class QueryPipeline : MessagePipeline<QueryPipelineOptions>, IQueryPipeline, IMessageRecordConverter
     {
         internal const string QueryParametersKey = ".query-parameters";
 
@@ -24,11 +24,6 @@ namespace Saritasa.Tools.Messages.Queries
 
         /// <inheritdoc />
         public override byte[] MessageTypes => availableMessageTypes;
-
-        /// <summary>
-        /// Options.
-        /// </summary>
-        public new QueryPipelineOptions Options { get; set; } = new QueryPipelineOptions();
 
         private static QueryParameters CreateMessage(Delegate func, params object[] args)
         {

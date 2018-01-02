@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Abstractions.Commands;
+using Saritasa.Tools.Messages.Commands.PipelineMiddlewares;
 
 namespace Saritasa.Tools.Messages.Commands
 {
@@ -35,7 +36,7 @@ namespace Saritasa.Tools.Messages.Commands
             if (messagePipelineContainer.Pipelines.Any(p => p is ICommandPipeline))
             {
                 throw new InvalidOperationException("Command pipeline already exists in global context items. " +
-                    "Use RemovePipeline method to clean up existins pipeline.");
+                    "Use RemovePipeline method to clean up existing pipeline.");
             }
 
             var commandPipeline = new CommandPipeline();

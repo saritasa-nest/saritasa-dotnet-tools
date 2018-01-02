@@ -2,6 +2,7 @@
 using System.Data.Entity;
 using System.Data;
 using Saritasa.Tools.Domain;
+using Saritasa.Tools.EF;
 
 namespace SandBox
 {
@@ -82,7 +83,7 @@ namespace SandBox
         /// <summary>
         /// 7. Implementation of application unit of work factory in data access part.
         /// </summary>
-        public class AppUnitOfWorkFactory : IAppUnitOfWorkFactory
+        public class AppUnitOfWorkFactory : EFUnitOfWorkFactory<AppDbContext>
         {
             public IAppUnitOfWork Create() => new AppUnitOfWork(new AppDbContext());
 
@@ -94,10 +95,10 @@ namespace SandBox
         /// </summary>
         public void Usage()
         {
-            // register with DI container
+            // Register with DI container.
             var appUnitOfWorkFactory = new AppUnitOfWorkFactory();
 
-            // in handler
+            // In handler.
             using (var uow = appUnitOfWorkFactory.Create())
             {
                 var product = uow.ProductRepository.Get(10);
@@ -169,10 +170,10 @@ namespace SandBox
         /// </summary>
         public void Usage()
         {
-            // register with DI container
+            // Register with DI container.
             var appUnitOfWorkFactory = new AppUnitOfWorkFactory();
 
-            // in handler
+            // In handler.
             using (var uow = appUnitOfWorkFactory.Create())
             {
                 var product = uow.ProductRepository.Get(10);

@@ -14,7 +14,8 @@ namespace Saritasa.Tools.Messages.Common
     /// <summary>
     /// Messages processing pipeline.
     /// </summary>
-    public class MessagePipeline : IMessagePipeline, IDisposable
+    public abstract class MessagePipeline<TOptions> : IMessagePipeline, IDisposable
+        where TOptions : MessagePipelineOptions, new()
     {
         private IMessagePipelineMiddleware[] middlewares;
 
@@ -34,7 +35,7 @@ namespace Saritasa.Tools.Messages.Common
         /// <summary>
         /// Options.
         /// </summary>
-        public MessagePipelineOptions Options { get; set; } = new MessagePipelineOptions();
+        public TOptions Options { get; } = new TOptions();
 
         private Action<IMessageContext>[] middlewaresChain;
 

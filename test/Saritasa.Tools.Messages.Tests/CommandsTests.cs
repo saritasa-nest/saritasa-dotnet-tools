@@ -526,5 +526,31 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         #endregion
+
+        public class Ns14_Exception : Exception
+        {
+        }
+
+        public class Ns14_SimpleTestCommand
+        {
+            public void Handle()
+            {
+                throw new Ns14_Exception();
+            }
+        }
+
+        [Fact]
+        public void Should_throw_original_exception_if_option_set()
+        {
+            // Arrange
+            var builder = pipelineService.PipelineContainer.AddCommandPipeline()
+                .UseDefaultMiddlewares(typeof(CommandsTests).GetTypeInfo().Assembly);
+
+            // Act & assert
+            Assert.Throws<Ns14_Exception>(() =>
+            {
+                pipelineService.HandleCommand(new Ns14_SimpleTestCommand());
+            });
+        }
     }
 }

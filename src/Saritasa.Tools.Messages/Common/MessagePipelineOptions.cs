@@ -11,7 +11,9 @@ namespace Saritasa.Tools.Messages.Common
     public class MessagePipelineOptions
     {
         /// <summary>
-        /// Throw exception if execution were failes.
+        /// Throw exception if execution was failed.
+        /// By default <see cref="Saritasa.Tools.Messages.Abstractions.MessageProcessingException" />
+        /// will be thrown.
         /// </summary>
         public bool ThrowExceptionOnFail { get; set; } = true;
     }
