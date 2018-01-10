@@ -1,11 +1,12 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Reflection;
+using System.Linq;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Abstractions.Commands;
 using Saritasa.Tools.Messages.Common;
+using Saritasa.Tools.Messages.Common.PipelineMiddlewares;
 
 namespace Saritasa.Tools.Messages.Commands
 {
@@ -36,13 +37,30 @@ namespace Saritasa.Tools.Messages.Commands
         /// <summary>
         /// Use default middlewares configuration. Includes command handler locator and executor.
         /// </summary>
-        /// <param name="assemblies">Assemblies to search command handlers.</param>
+        /// <param name="optionsAction">Action to configure options.</param>
         /// <returns>Command pipeline builder.</returns>
-        public CommandPipelineBuilder UseDefaultMiddlewares(params Assembly[] assemblies)
+        public CommandPipelineBuilder Configure(Action<CommandPipelineOptions> optionsAction)
         {
-            Pipeline.AddMiddlewares(new PipelineMiddlewares.CommandHandlerLocatorMiddleware(assemblies));
-            Pipeline.AddMiddlewares(new PipelineMiddlewares.CommandHandlerResolverMiddleware());
-            Pipeline.AddMiddlewares(new PipelineMiddlewares.CommandHandlerExecutorMiddleware());
+            var options = new CommandPipelineOptions();
+            optionsAction(options);
+
+            if (options.DefaultCommandPipelineOptions.UseDefaultPipeline)
+            {
+                Pipeline.AddMiddlewares(new PipelineMiddlewares.CommandHandlerLocatorMiddleware(
+                    options.DefaultCommandPipelineOptions.Assemblies.ToArray()));
+                Pipeline.AddMiddlewares(new PipelineMiddlewares.CommandHandlerResolverMiddleware());
+                Pipeline.AddMiddlewares(new PipelineMiddlewares.CommandHandlerExecutorMiddleware
+                {
+                    CaptureExceptionDispatchInfo = options.DefaultCommandPipelineOptions.UseExceptionDispatchInfo
+                });
+                if (options.DefaultCommandPipelineOptions.ThrowExceptionOnFail)
+                {
+                    Pipeline.AddMiddlewares(new ThrowExceptionOnFailMiddleware
+                    {
+                        CheckExceptionDispatchInfo = options.DefaultCommandPipelineOptions.UseExceptionDispatchInfo
+                    });
+                }
+            }
             return this;
         }
     }

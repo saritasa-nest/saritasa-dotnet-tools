@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -18,9 +18,9 @@ namespace Saritasa.Tools.Messages.Tests
     /// </summary>
     public class QueriesTests
     {
-        readonly IMessagePipelineService pipelineService = new DefaultMessagePipelineService();
+        private readonly IMessagePipelineService pipelineService = new DefaultMessagePipelineService();
 
-        #region Interfaces
+        #region Shared interfaces and objects
 
         public interface IInterfaceA
         {
@@ -55,8 +55,6 @@ namespace Saritasa.Tools.Messages.Tests
             return null;
         }
 
-        #endregion
-
         public class QueryObject
         {
             public IList<int> SimpleQuery(int a, int b)
@@ -80,6 +78,10 @@ namespace Saritasa.Tools.Messages.Tests
                 .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware());
         }
 
+        #endregion
+
+        #region Can run simple query
+
         [Fact]
         public void Can_run_simple_query()
         {
@@ -95,7 +97,9 @@ namespace Saritasa.Tools.Messages.Tests
             Assert.Equal(20, result[1]);
         }
 
-        #region Can_run_simple_async_query
+        #endregion
+
+        #region Can run simple async query
 
         [QueryHandlers]
         public class AsyncQueryObject
@@ -121,6 +125,8 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         #endregion
+
+        #region Can run query from raw message
 
         [Fact]
         public void Can_run_query_from_raw_message()
@@ -150,12 +156,14 @@ namespace Saritasa.Tools.Messages.Tests
             Assert.IsType<List<int>>(messageContext.GetResult<object>());
         }
 
-        #region Can_run_query_with_private_object_ctor
+        #endregion
 
-        class QueryObjectWithPrivateCtor
+        #region Can run query with private object ctor
+
+        private class QueryObjectWithPrivateCtor
         {
-            readonly IInterfaceA dependencyA;
-            readonly IInterfaceB dependencyB;
+            private readonly IInterfaceA dependencyA;
+            private readonly IInterfaceB dependencyB;
 
             private QueryObjectWithPrivateCtor()
             {
@@ -191,7 +199,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Can_run_query_from_raw_message_2
+        #region Can run query from raw message 2
 
         [Fact]
         public void Can_run_query_from_raw_message_2()
@@ -214,7 +222,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Can_use_interfaces_to_run_query
+        #region Can use interfaces to run query
 
         public interface IUserQueries
         {
@@ -248,7 +256,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Should_use_interface_in_case_of_external_resolver
+        #region Should use interface in case of external resolver
 
         public interface IProductQueries
         {
@@ -324,6 +332,32 @@ namespace Saritasa.Tools.Messages.Tests
 
             // Assert
             Assert.Equal("Quake Champions", result);
+        }
+
+        #endregion
+
+        #region Should generate message processing exception in case of fail
+
+        [QueryHandlers]
+        public class QueryObjectWithException
+        {
+            public string GetString()
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        [Fact]
+        public void Should_generate_message_processing_exception_in_case_of_fail()
+        {
+            // Arrange
+            pipelineService.PipelineContainer.AddQueryPipeline().Configure();
+
+            // Act & Assert
+            Assert.Throws<MessageProcessingException>(() =>
+            {
+                pipelineService.Query<QueryObjectWithException>().With(q => q.GetString());
+            });
         }
 
         #endregion

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -9,6 +9,7 @@ using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Abstractions.Commands;
 using Saritasa.Tools.Messages.Common;
 using Saritasa.Tools.Messages.Commands;
+using Saritasa.Tools.Messages.Common.PipelineMiddlewares;
 
 namespace Saritasa.Tools.Messages.Tests
 {
@@ -60,7 +61,8 @@ namespace Saritasa.Tools.Messages.Tests
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
                     typeof(CommandsTests).GetTypeInfo().Assembly))
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerResolverMiddleware())
-                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerExecutorMiddleware());
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerExecutorMiddleware())
+                .AddMiddleware(new ThrowExceptionOnFailMiddleware());
         }
 
         #endregion
@@ -350,13 +352,14 @@ namespace Saritasa.Tools.Messages.Tests
             // Arrange
             pipelineService.ServiceProvider = new FuncServiceProvider(Ns01_InterfacesResolver);
             pipelineService.PipelineContainer.AddCommandPipeline()
-            .AddMiddleware(new Commands.PipelineMiddlewares.CommandValidationMiddleware())
-            .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
-                typeof(CommandsTests).GetTypeInfo().Assembly))
-            .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerExecutorMiddleware()
-            {
-                UseParametersResolve = true
-            });
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandValidationMiddleware())
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
+                    typeof(CommandsTests).GetTypeInfo().Assembly))
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerResolverMiddleware())
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerExecutorMiddleware
+                {
+                    UseParametersResolve = true
+                });
             var cmd = new Ns08_CommandWithValidation
             {
                 PercentInt = -10,
@@ -381,6 +384,7 @@ namespace Saritasa.Tools.Messages.Tests
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandValidationMiddleware())
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
                     typeof(CommandsTests).GetTypeInfo().Assembly))
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerResolverMiddleware())
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerExecutorMiddleware
                 {
                     UseParametersResolve = true
@@ -544,7 +548,12 @@ namespace Saritasa.Tools.Messages.Tests
         {
             // Arrange
             var builder = pipelineService.PipelineContainer.AddCommandPipeline()
-                .UseDefaultMiddlewares(typeof(CommandsTests).GetTypeInfo().Assembly);
+                .Configure(options =>
+                {
+                    options.DefaultCommandPipelineOptions.Assemblies =
+                        new[] { typeof(CommandsTests).GetTypeInfo().Assembly };
+                    options.DefaultCommandPipelineOptions.UseExceptionDispatchInfo = true;
+                });
 
             // Act & assert
             Assert.Throws<Ns14_Exception>(() =>
@@ -554,3 +563,4 @@ namespace Saritasa.Tools.Messages.Tests
         }
     }
 }
+

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -122,10 +122,6 @@ namespace Saritasa.Tools.Messages.Queries
             {
                 queryPipeline.Invoke(messageContext);
             }
-            if (queryPipeline.Options.ThrowExceptionOnFail && messageContext.FailException != null)
-            {
-                throw new MessageProcessingException("Query processing error.", messageContext.FailException);
-            }
             return (TResult)queryParameters.Result;
         }
 
@@ -143,10 +139,6 @@ namespace Saritasa.Tools.Messages.Queries
             if (invokeQuery)
             {
                 await queryPipeline.InvokeAsync(messageContext, cancellationToken);
-            }
-            if (queryPipeline.Options.ThrowExceptionOnFail && messageContext.FailException != null)
-            {
-                throw new MessageProcessingException("Query processing error.", messageContext.FailException);
             }
             return ((Task<TResult>)queryParameters.Result).Result;
         }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -98,6 +98,8 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
+        #region Events should be fired withing all classes
+
         [Fact]
         public void Events_should_be_fired_withing_all_classes()
         {
@@ -128,7 +130,9 @@ namespace Saritasa.Tools.Messages.Tests
             Assert.Equal(3, ev.HandlersCount);
         }
 
-        #region Domain_events_can_be_integrated_to_events_pipeline
+        #endregion
+
+        #region Domain events can be integrated to events pipeline
 
         private class Ns02_DomainTestEvent
         {
@@ -251,7 +255,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Can_run_default_simple_generic_command
+        #region Can run default simple generic command
 
         public class Ns04_SimpleGenericEvent<T>
         {

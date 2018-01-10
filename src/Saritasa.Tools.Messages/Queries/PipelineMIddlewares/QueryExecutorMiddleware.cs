@@ -1,8 +1,7 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -22,6 +21,11 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
         /// </summary>
         public string Id { get; set; } = nameof(QueryExecutorMiddleware);
 
+        /// <summary>
+        /// Include execution duration.
+        /// </summary>
+        public bool IncludeExecutionDuration { get; set; } = true;
+
         /// <inheritdoc />
         public virtual void Handle(IMessageContext messageContext)
         {
@@ -30,7 +34,7 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
             // Invoke method and resolve parameters if needed.
             Stopwatch stopwatch = null;
             var queryPipeline = messageContext.Pipeline as QueryPipeline;
-            if (queryPipeline != null && queryPipeline.Options.IncludeExecutionDuration)
+            if (queryPipeline != null && IncludeExecutionDuration)
             {
                 stopwatch = new Stopwatch();
                 stopwatch.Start();
@@ -75,7 +79,7 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
             // Invoke method and resolve parameters if needed.
             Stopwatch stopwatch = null;
             var queryPipeline = messageContext.Pipeline as QueryPipeline;
-            if (queryPipeline != null && queryPipeline.Options.IncludeExecutionDuration)
+            if (queryPipeline != null && IncludeExecutionDuration)
             {
                 stopwatch = new Stopwatch();
                 stopwatch.Start();

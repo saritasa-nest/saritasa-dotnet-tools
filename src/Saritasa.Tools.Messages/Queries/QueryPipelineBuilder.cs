@@ -1,10 +1,11 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Abstractions.Queries;
 using Saritasa.Tools.Messages.Common;
+using Saritasa.Tools.Messages.Common.PipelineMiddlewares;
 
 namespace Saritasa.Tools.Messages.Queries
 {
@@ -33,14 +34,37 @@ namespace Saritasa.Tools.Messages.Queries
         }
 
         /// <summary>
-        /// Use default middlewares configuration. Includes command handler resolver, executor and
-        /// releaser.
+        /// Use default middlewares configuration. Includes query handler resolver and executor
+        /// </summary>
+        public QueryPipelineBuilder Configure()
+        {
+            return Configure(options => { });
+        }
+
+        /// <summary>
+        /// Use default middlewares configuration. Includes query handler resolver and executor
         /// </summary>
         /// <returns>Query pipeline builder.</returns>
-        public QueryPipelineBuilder UseDefaultMiddlewares()
+        public QueryPipelineBuilder Configure(Action<QueryPipelineOptions> optionsAction)
         {
-            Pipeline.AddMiddlewares(new PipelineMiddlewares.QueryObjectResolverMiddleware());
-            Pipeline.AddMiddlewares(new PipelineMiddlewares.QueryExecutorMiddleware());
+            var options = new QueryPipelineOptions();
+            optionsAction(options);
+
+            if (options.DefaultQueryPipelineOptions.UseDefaultPipeline)
+            {
+                Pipeline.AddMiddlewares(new PipelineMiddlewares.QueryObjectResolverMiddleware());
+                Pipeline.AddMiddlewares(new PipelineMiddlewares.QueryExecutorMiddleware
+                {
+                    IncludeExecutionDuration = options.DefaultQueryPipelineOptions.IncludeExecutionDuration
+                });
+                if (options.DefaultQueryPipelineOptions.ThrowExceptionOnFail)
+                {
+                    Pipeline.AddMiddlewares(new ThrowExceptionOnFailMiddleware
+                    {
+                        CheckExceptionDispatchInfo = options.DefaultQueryPipelineOptions.UseExceptionDispatchInfo
+                    });
+                }
+            }
             return this;
         }
     }

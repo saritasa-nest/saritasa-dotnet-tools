@@ -1,11 +1,12 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Reflection;
+using System.Linq;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Abstractions.Events;
 using Saritasa.Tools.Messages.Common;
+using Saritasa.Tools.Messages.Common.PipelineMiddlewares;
 
 namespace Saritasa.Tools.Messages.Events
 {
@@ -36,13 +37,31 @@ namespace Saritasa.Tools.Messages.Events
         /// <summary>
         /// Use default middlewares configuration. Includes event handler locator and executor.
         /// </summary>
-        /// <param name="assemblies">Assemblies to search event handlers.</param>
+        /// <param name="optionsAction">Delegate to configure actions.</param>
         /// <returns>Event pipeline builder.</returns>
-        public EventPipelineBuilder UseDefaultMiddlewares(params Assembly[] assemblies)
+        public EventPipelineBuilder Configure(Action<EventPipelineOptions> optionsAction)
         {
-            Pipeline.AddMiddlewares(new PipelineMiddlewares.EventHandlerLocatorMiddleware(assemblies));
-            Pipeline.AddMiddlewares(new PipelineMiddlewares.EventHandlerResolverMiddleware());
-            Pipeline.AddMiddlewares(new PipelineMiddlewares.EventHandlerExecutorMiddleware());
+            var options = new EventPipelineOptions();
+            optionsAction(options);
+
+            if (options.DefaultEventPipelineOptions.UseDefaultPipeline)
+            {
+                Pipeline.AddMiddlewares(new PipelineMiddlewares.EventHandlerLocatorMiddleware(
+                    options.DefaultEventPipelineOptions.Assemblies.ToArray()));
+                Pipeline.AddMiddlewares(new PipelineMiddlewares.EventHandlerResolverMiddleware());
+                Pipeline.AddMiddlewares(new PipelineMiddlewares.EventHandlerExecutorMiddleware
+                {
+                    CaptureExceptionDispatchInfo = options.DefaultEventPipelineOptions.UseExceptionDispatchInfo
+                });
+                if (options.DefaultEventPipelineOptions.ThrowExceptionOnFail)
+                {
+                    Pipeline.AddMiddlewares(new ThrowExceptionOnFailMiddleware
+                    {
+                        CheckExceptionDispatchInfo = options.DefaultEventPipelineOptions.UseExceptionDispatchInfo
+                    });
+                }
+            }
+
             return this;
         }
     }

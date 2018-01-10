@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -7,15 +7,13 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
-using Saritasa.Tools.Messages.Common.PipelineMiddlewares;
 
 namespace Saritasa.Tools.Messages.Common
 {
     /// <summary>
     /// Messages processing pipeline.
     /// </summary>
-    public abstract class MessagePipeline<TOptions> : IMessagePipeline, IDisposable
-        where TOptions : MessagePipelineOptions, new()
+    public abstract class MessagePipeline : IMessagePipeline, IDisposable
     {
         private IMessagePipelineMiddleware[] middlewares;
 
@@ -32,14 +30,10 @@ namespace Saritasa.Tools.Messages.Common
             }
         }
 
-        /// <summary>
-        /// Options.
-        /// </summary>
-        public TOptions Options { get; } = new TOptions();
+        private Action<IMessageContext>[] middlewaresChain = new Action<IMessageContext>[0];
 
-        private Action<IMessageContext>[] middlewaresChain;
-
-        private Func<IMessageContext, CancellationToken, Task>[] asyncMiddlewaresChain;
+        private Func<IMessageContext, CancellationToken, Task>[] asyncMiddlewaresChain =
+            new Func<IMessageContext, CancellationToken, Task>[0];
 
         private readonly object objLock = new object();
 
@@ -115,11 +109,6 @@ namespace Saritasa.Tools.Messages.Common
                     list.Add(postActionMiddleware.PostHandle);
                 }
             }
-            if (Options.ThrowExceptionOnFail)
-            {
-                var throwExceptionMiddleware = new ThrowExceptionOnFailMiddleware();
-                list.Add(throwExceptionMiddleware.Handle);
-            }
             return list;
         }
 
@@ -146,11 +135,6 @@ namespace Saritasa.Tools.Messages.Common
                 {
                     list.Add(CreateAsyncCallWrapper(postActionMiddleware.PostHandle));
                 }
-            }
-            if (Options.ThrowExceptionOnFail)
-            {
-                var throwExceptionMiddleware = new ThrowExceptionOnFailMiddleware();
-                list.Add(CreateAsyncCallWrapper(throwExceptionMiddleware.Handle));
             }
             return list;
         }
