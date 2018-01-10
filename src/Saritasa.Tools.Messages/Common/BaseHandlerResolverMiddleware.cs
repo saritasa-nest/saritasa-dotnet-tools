@@ -147,7 +147,8 @@ namespace Saritasa.Tools.Messages.Common
                 );
                 expressions.Add(expr);
             }
-            return Expression.Block(expressions);
+
+            return expressions.Count > 0 ? Expression.Block(expressions) : (Expression) Expression.Empty();
         }
     }
 }
