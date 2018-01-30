@@ -74,5 +74,18 @@ namespace Saritasa.Tools.Common.Tests
             // Assert
             Assert.Equal("1 2 3", result);
         }
+
+        [Fact]
+        public void Capitalize_should_make_first_character_upper()
+        {
+            // Arrange
+            var target = "form";
+
+            // Act
+            var result = StringUtils.Capitalize(target);
+
+            // Assert
+            Assert.Equal("Form", result);
+        }
     }
 }
