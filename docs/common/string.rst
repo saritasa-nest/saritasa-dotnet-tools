@@ -20,6 +20,10 @@ String utils.
             var str1 = str1 ?? string.Empty;
             var str2 = StringUtils.NullSage(str2);
 
+.. function:: static string Capitalize(string target)
+
+    Captalize the return word if the parameter is not capitalized.
+
 .. function:: string JoinIgnoreEmpty(string separator, params string[] values)
               string JoinIgnoreEmpty(string separator, IEnumerable<string> values)
 

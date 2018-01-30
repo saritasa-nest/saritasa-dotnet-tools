@@ -1,6 +1,7 @@
 ﻿0.4.6 [TBD]
 [*] Fix FlowUtils.RetryAsync non async exception behavior for .NET 4.0 .
 [+] Add EnglishUtils.PluralizeWithNumber and EnglishUtils.Pluralize .
+[+] Add StringUtils.Capitalize .
 
 0.4.5 [2017-09-16]
 [+] Add support .NET Standard 1.6 and .NET Standard 2.0 .

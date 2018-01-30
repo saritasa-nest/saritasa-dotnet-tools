@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 
 namespace Saritasa.Tools.Common.Utils
 {
@@ -94,6 +95,29 @@ namespace Saritasa.Tools.Common.Utils
         public static string NullSafe(string target)
         {
             return target ?? string.Empty;
+        }
+
+        /// <summary>
+        /// Captalize the return word if the parameter is not capitalized.
+        /// For example if word is "Table", then returns "Tables".
+        /// The method skips empty or null strings.
+        /// </summary>
+        /// <param name="target">Target word.</param>
+        /// <returns>Capitalized target.</returns>
+        public static string Capitalize(string target)
+        {
+            if (string.IsNullOrEmpty(target) || char.IsUpper(target, 0))
+            {
+                return target;
+            }
+            if (target.Length == 0)
+            {
+                return target;
+            }
+            var stringBuilder = new StringBuilder(target.Length);
+            stringBuilder.Append(char.ToUpperInvariant(target[0]));
+            stringBuilder.Append(target.Substring(1));
+            return stringBuilder.ToString();
         }
 
         #region Parse with default
