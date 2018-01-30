@@ -1,4 +1,9 @@
-﻿0.4.5 [2017-12-11]
+﻿0.5.0 [TBD]
+[+] Implement throwing original exception. Look UseExceptionDispatchInfo option.
+[*] Fix empty ctor expression generate.
+[*] Refactor pipeline initialization logic. New pipeline builder Configure method.
+
+0.4.5 [2017-12-11]
 [*] Fix incorrect package included versions.
 [+] Log query results to repository using "@result" key.
 [*] Fix skip, take query methods for files repositories.

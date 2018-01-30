@@ -5,9 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using Xunit;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Abstractions.Queries;
-using Xunit;
 using Saritasa.Tools.Messages.Common;
 using Saritasa.Tools.Messages.Queries;
 

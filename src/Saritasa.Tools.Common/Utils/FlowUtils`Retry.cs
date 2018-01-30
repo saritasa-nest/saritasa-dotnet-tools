@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -148,14 +148,26 @@ namespace Saritasa.Tools.Common.Utils
             catch (Exception executedException)
             {
                 // Check sync call, if exception occurs before task creation.
-                bool isSubclass = IsSubtypeOf(executedException, transientExceptions);
-                if (isSubclass == false)
+                bool isTransient = IsSubtypeOf(executedException, transientExceptions);
+                if (!isTransient)
                 {
                     throw;
                 }
+
+                TimeSpan delay;
+                bool shouldStop = retryStrategy(attemptCount, executedException, out delay);
+                if (shouldStop)
+                {
+                    throw;
+                }
+                if (delay.TotalMilliseconds > 0)
+                {
+                    Thread.Sleep((int)delay.TotalMilliseconds);
+                }
+
                 var tcs2 = new TaskCompletionSource<T>();
-                tcs2.SetCanceled();
-                return tcs2.Task;
+                tcs2.SetException(executedException);
+                task = tcs2.Task;
             }
 
             // Success case.
@@ -401,7 +413,7 @@ namespace Saritasa.Tools.Common.Utils
         /// Creates incremental wait time retry strategy. Wait time is incremented by "increment" time.
         /// </summary>
         /// <param name="numberOfTries">Maximum number of tries, default is 3.</param>
-        /// <param name="delay">Delay between calls. Default is zero.</param>
+        /// <param name="delay">Delay between calls. Default is 0.</param>
         /// <param name="increment">Increment time with every call. Default is 0.</param>
         /// <param name="firstFastRetry">Do not delay for second attempt.</param>
         /// <returns>Retry strategy delegate.</returns>
@@ -442,9 +454,10 @@ namespace Saritasa.Tools.Common.Utils
         /// A retry strategy with backoff parameters for calculating the exponential delay between retries.
         /// </summary>
         /// <param name="numberOfTries">Maximum number of tries, default is 3.</param>
-        /// <param name="minBackoff">The minimum backoff time.</param>
-        /// <param name="maxBackoff">The maximum backoff time</param>
-        /// <param name="deltaBackoff">The value that will be used to calculate a random delta in the exponential delay between retries.</param>
+        /// <param name="minBackoff">The minimum backoff time, default is 1.</param>
+        /// <param name="maxBackoff">The maximum backoff time, default is 30.</param>
+        /// <param name="deltaBackoff">The value that will be used to calculate a random delta in the exponential delay between retries.
+        /// Default is 10.</param>
         /// <param name="firstFastRetry">Do not delay for second attempt.</param>
         /// <returns>Retry strategy delegate.</returns>
         public static RetryStrategy CreateExponentialBackoffDelayRetryStrategy(
