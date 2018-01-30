@@ -10,7 +10,7 @@ namespace Saritasa.Tools.Common.Tests
     /// <summary>
     /// Atomic tests.
     /// </summary>
-    public class AtomicTest
+    public class AtomicTests
     {
         [Fact]
         public void Cas_should_process()

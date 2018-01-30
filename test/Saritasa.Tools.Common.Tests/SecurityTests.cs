@@ -11,7 +11,7 @@ namespace Saritasa.Tools.Common.Tests
     /// <summary>
     /// Security tests.
     /// </summary>
-    public class SecurityTest
+    public class SecurityTests
     {
 #if NET40 || NET452 || NET461
 

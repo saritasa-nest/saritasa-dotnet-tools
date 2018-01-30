@@ -14,7 +14,7 @@ namespace Saritasa.Tools.Common.Tests
     /// <summary>
     /// All extension methods tests.
     /// </summary>
-    public class ExtensionsTest
+    public class ExtensionsTests
     {
         [Fact]
         public void String_format_should_format()
@@ -172,7 +172,7 @@ namespace Saritasa.Tools.Common.Tests
             var stringRepresentation = EnumUtils.GetDescription(val);
 
             // Assert
-            Assert.Equal(stringRepresentation, "Simple");
+            Assert.Equal("Simple", stringRepresentation);
         }
 
         [Fact]
@@ -185,7 +185,7 @@ namespace Saritasa.Tools.Common.Tests
             var stringRepresentation = EnumUtils.GetDescription(val);
 
             // Assert
-            Assert.Equal(stringRepresentation, "Target DB Connection");
+            Assert.Equal("Target DB Connection", stringRepresentation);
         }
 
         [Fact]

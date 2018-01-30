@@ -11,7 +11,7 @@ namespace Saritasa.Tools.Common.Tests
     /// <summary>
     /// Date time tests.
     /// </summary>
-    public class DateTimeTest
+    public class DateTimeTests
     {
         [Fact]
         public void Begin_of_month_should_truncate_date()

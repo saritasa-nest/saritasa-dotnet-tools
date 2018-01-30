@@ -10,7 +10,7 @@ namespace Saritasa.Tools.Common.Tests
     /// <summary>
     /// String utils tests.
     /// </summary>
-    public class StringTest
+    public class StringTests
     {
         [Theory]
         [InlineData("1234567890", 5, 5)]
