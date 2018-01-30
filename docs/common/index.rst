@@ -12,6 +12,7 @@ We tried to collect such little things in one place to be able to use it in all 
     collection
     datetime
     dictionary
+    english
     enum
     flow
     guard
