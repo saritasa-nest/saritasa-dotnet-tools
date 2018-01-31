@@ -3,9 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
-using Saritasa.Tools.Common.Utils;
 using System.Linq.Expressions;
+using Saritasa.Tools.Common.Utils;
 
 namespace Saritasa.Tools.Common.Extensions
 {
@@ -28,7 +29,7 @@ namespace Saritasa.Tools.Common.Extensions
         public static IOrderedEnumerable<TSource> Order<TSource, TKey>(
             this IEnumerable<TSource> source,
             Func<TSource, TKey> keySelector,
-            SortOrder sortOrder)
+            ListSortDirection sortOrder)
         {
             return CollectionUtils.Order(source, keySelector, sortOrder);
         }
@@ -47,7 +48,7 @@ namespace Saritasa.Tools.Common.Extensions
             this IEnumerable<TSource> source,
             Func<TSource, TKey> keySelector,
             IComparer<TKey> comparer,
-            SortOrder sortOrder)
+            ListSortDirection sortOrder)
         {
             return CollectionUtils.Order(source, keySelector, comparer, sortOrder);
         }
@@ -65,7 +66,7 @@ namespace Saritasa.Tools.Common.Extensions
         public static IOrderedQueryable<TSource> Order<TSource, TKey>(
             this IQueryable<TSource> source,
             Expression<Func<TSource, TKey>> keySelector,
-            SortOrder sortOrder)
+            ListSortDirection sortOrder)
         {
             return CollectionUtils.Order(source, keySelector, sortOrder);
         }

@@ -18,7 +18,7 @@ namespace Saritasa.Tools.Common.Tests
         [InlineData("", 4, 0)]
         public void Truncate_should_trim_string(string target, int truncate, int expectedLength)
         {
-            // Act
+            // Arrange & Act
             var str = StringUtils.SafeTruncate(target, truncate);
 
             // Assert

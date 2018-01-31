@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -27,9 +28,9 @@ namespace Saritasa.Tools.Common.Utils
         public static IOrderedEnumerable<TSource> Order<TSource, TKey>(
             IEnumerable<TSource> source,
             Func<TSource, TKey> keySelector,
-            SortOrder sortOrder)
+            ListSortDirection sortOrder)
         {
-            return sortOrder == SortOrder.Ascending ? source.OrderBy(keySelector) : source.OrderByDescending(keySelector);
+            return sortOrder == ListSortDirection.Ascending ? source.OrderBy(keySelector) : source.OrderByDescending(keySelector);
         }
 
         /// <summary>
@@ -46,9 +47,9 @@ namespace Saritasa.Tools.Common.Utils
             IEnumerable<TSource> source,
             Func<TSource, TKey> keySelector,
             IComparer<TKey> comparer,
-            SortOrder sortOrder)
+            ListSortDirection sortOrder)
         {
-            return sortOrder == SortOrder.Ascending ? source.OrderBy(keySelector, comparer) : source.OrderByDescending(keySelector, comparer);
+            return sortOrder == ListSortDirection.Ascending ? source.OrderBy(keySelector, comparer) : source.OrderByDescending(keySelector, comparer);
         }
 
 #if NET40 || NET452 || NET461 || NETSTANDARD1_2 || NETSTANDARD1_6 || NETSTANDARD2_0
@@ -64,9 +65,9 @@ namespace Saritasa.Tools.Common.Utils
         public static IOrderedQueryable<TSource> Order<TSource, TKey>(
             IQueryable<TSource> source,
             Expression<Func<TSource, TKey>> keySelector,
-            SortOrder sortOrder)
+            ListSortDirection sortOrder)
         {
-            return sortOrder == SortOrder.Ascending ? source.OrderBy(keySelector) : source.OrderByDescending(keySelector);
+            return sortOrder == ListSortDirection.Ascending ? source.OrderBy(keySelector) : source.OrderByDescending(keySelector);
         }
 
         /// <summary>
