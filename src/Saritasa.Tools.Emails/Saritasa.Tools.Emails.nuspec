@@ -12,7 +12,7 @@
     <projectUrl>https://github.com/saritasa/saritasatools</projectUrl>
     <iconUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <copyright>(c) Saritasa, 2016-2017</copyright>
+    <copyright>(c) Saritasa, 2016-2018</copyright>
     <tags>email emails</tags>
     <repository type="git" url="https://github.com/Saritasa/SaritasaTools" />
     <dependencies>

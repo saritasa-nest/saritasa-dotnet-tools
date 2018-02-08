@@ -12,7 +12,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>The package is a part of Saritasa Tools project. Saritasa.Tools.Messages contains CQRS infrastructure that includes command, queries and events.</description>
     <summary>CQRS infrastructure.</summary>
-    <copyright>(c) Saritasa, 2016-2017</copyright>
+    <copyright>(c) Saritasa, 2016-2018</copyright>
     <tags>cqrs cqs commands queries events pipeline</tags>
     <dependencies>
       <group targetFramework="net452">
