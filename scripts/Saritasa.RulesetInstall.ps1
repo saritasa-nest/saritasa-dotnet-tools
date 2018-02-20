@@ -4,6 +4,8 @@
 #   ps Saritasa.RulesetInstall.ps1
 #   ps Saritasa.RulesetInstall.ps1 -remove 1 -exclude MyProject.*
 #
+# If you put ruleset file into ./tools directory it will be used instead global one.
+#
 
 param (
     # remove CodeAnalysisRuleSet values
@@ -38,47 +40,53 @@ foreach ($projectFile in $projectFiles)
         $isCoreProject = $true
     }
 
-    # update projects
-    foreach ($propertyGroup in $projectXml.Project.PropertyGroup)
+    # get first PropertyGroup without Condition attribute
+    $propertyGroup = $projectXml.Project.PropertyGroup | Where-Object { $_.Condition -eq $null } `
+        | Select-Object -First 1
+    if ($propertyGroup -eq $null)
     {
-        [string] $target = $rulesetPath
-        if ($rulesetLocal)
-        {
-            Set-Location ([System.IO.Path]::GetDirectoryName($projectFile))
-            $target = Resolve-Path $rulesetPath -Relative
-            Set-Location $currentLocation
-        }
+        Write-Error "Cannot find default PropertyGroup"
+        return 1
+    }
 
-        if ($propertyGroup.CodeAnalysisRuleSet -eq $null)
+    # update project
+    [string] $target = $rulesetPath
+    if ($rulesetLocal)
+    {
+        Set-Location ([System.IO.Path]::GetDirectoryName($projectFile))
+        $target = Resolve-Path $rulesetPath -Relative
+        Set-Location $currentLocation
+    }
+
+    if ($propertyGroup.CodeAnalysisRuleSet -eq $null)
+    {
+        if ($propertyGroup.Condition -ne $null -and $remove -eq $false)
         {
-            if ($propertyGroup.Condition -ne $null -and $remove -eq $false)
-            {
-                continue
-            }
-            if ($isCoreProject -eq $true)
-            {
-                $el = $projectXml.CreateElement("CodeAnalysisRuleSet")
-            }
-            else
-            {
-                $el = $projectXml.CreateElement("CodeAnalysisRuleSet", "http://schemas.microsoft.com/developer/msbuild/2003")
-            }
-            $el.InnerText = $target
-            Write-Output "Add to file $projectFile"
-            $propertyGroup.AppendChild($el) | out-null
+            continue
+        }
+        if ($isCoreProject -eq $true)
+        {
+            $el = $projectXml.CreateElement("CodeAnalysisRuleSet")
         }
         else
         {
-            if ($remove -eq $false)
-            {
-                $propertyGroup.CodeAnalysisRuleSet = $target
-            }
-            else
-            {
-                $propertyGroup.CodeAnalysisRuleSet = ''
-            }
-            Write-Output "Update file $projectFile"
+            $el = $projectXml.CreateElement("CodeAnalysisRuleSet", "http://schemas.microsoft.com/developer/msbuild/2003")
         }
+        $el.InnerText = $target
+        Write-Output "Add to file $projectFile"
+        $propertyGroup.AppendChild($el) | out-null
+    }
+    else
+    {
+        if ($remove -eq $false)
+        {
+            $propertyGroup.CodeAnalysisRuleSet = $target
+        }
+        else
+        {
+            $propertyGroup.CodeAnalysisRuleSet = ''
+        }
+        Write-Output "Update file $projectFile"
     }
     $projectXml.Save((Resolve-Path $projectFile))
 
