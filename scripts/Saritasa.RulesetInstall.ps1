@@ -33,67 +33,81 @@ foreach ($projectFile in $projectFiles)
 {
     [xml] $projectXml = Get-Content $projectFile
 
-    # is .NET Core project
-    $isCoreProject = $false
-    if ($projectXml.Project.Sdk -ne $null)
+    # remove case
+    if ($remove -eq $false)
     {
-        $isCoreProject = $true
-    }
-
-    # get first PropertyGroup without Condition attribute
-    $propertyGroup = $projectXml.Project.PropertyGroup | Where-Object { $_.Condition -eq $null } `
-        | Select-Object -First 1
-    if ($propertyGroup -eq $null)
-    {
-        Write-Error "Cannot find default PropertyGroup"
-        return 1
-    }
-
-    # update project
-    [string] $target = $rulesetPath
-    if ($rulesetLocal)
-    {
-        Set-Location ([System.IO.Path]::GetDirectoryName($projectFile))
-        $target = Resolve-Path $rulesetPath -Relative
-        Set-Location $currentLocation
-    }
-
-    if ($propertyGroup.CodeAnalysisRuleSet -eq $null)
-    {
-        if ($propertyGroup.Condition -ne $null -and $remove -eq $false)
+        # is .NET Core project
+        $isCoreProject = $false
+        if ($projectXml.Project.Sdk -ne $null)
         {
+            $isCoreProject = $true
+        }
+
+        # get first PropertyGroup without Condition attribute
+        $propertyGroup = $projectXml.Project.PropertyGroup | Where-Object { $_.Condition -eq $null } `
+            | Select-Object -First 1
+        if ($propertyGroup -eq $null)
+        {
+            Write-Error "Cannot find default PropertyGroup"
             continue
         }
-        if ($isCoreProject -eq $true)
+
+        # update project
+        [string] $target = $rulesetPath
+        if ($rulesetLocal)
         {
-            $el = $projectXml.CreateElement("CodeAnalysisRuleSet")
+            Set-Location ([System.IO.Path]::GetDirectoryName($projectFile))
+            $target = Resolve-Path $rulesetPath -Relative
+            Set-Location $currentLocation
+        }
+
+        if ($propertyGroup.CodeAnalysisRuleSet -eq $null)
+        {
+            if ($propertyGroup.Condition -ne $null)
+            {
+                continue
+            }
+            if ($isCoreProject -eq $true)
+            {
+                $el = $projectXml.CreateElement("CodeAnalysisRuleSet")
+            }
+            else
+            {
+                $el = $projectXml.CreateElement("CodeAnalysisRuleSet", "http://schemas.microsoft.com/developer/msbuild/2003")
+            }
+            $el.InnerText = $target
+            Write-Output "Add to file $projectFile"
+            $propertyGroup.AppendChild($el) | Out-Null
         }
         else
         {
-            $el = $projectXml.CreateElement("CodeAnalysisRuleSet", "http://schemas.microsoft.com/developer/msbuild/2003")
+            $propertyGroup.CodeAnalysisRuleSet = $target
+            Write-Output "Update file $projectFile"
         }
-        $el.InnerText = $target
-        Write-Output "Add to file $projectFile"
-        $propertyGroup.AppendChild($el) | out-null
+
+        # check that StyleCop is installed for project
+        $stylecopNodes = $projectXml.SelectNodes("//*[contains(@Include, 'StyleCop.Analyzers')]")
+        if ($stylecopNodes.Count -eq 0)
+        {
+            Write-Warning "StyleCop seems not installed for project $projectFile"
+        }
     }
     else
     {
-        if ($remove -eq $false)
+        foreach ($propertyGroup in $projectXml.Project.PropertyGroup)
         {
-            $propertyGroup.CodeAnalysisRuleSet = $target
+            if ($propertyGroup.SelectNodes)
+            {
+                $codeAnalysisNode = $propertyGroup.SelectNodes('*') | Where-Object { $_.Name -eq "CodeAnalysisRuleSet" } `
+                    | Select-Object -First 1
+                if ($codeAnalysisNode -ne $null)
+                {
+                    Write-Output "Remove CodeAnalysisRuleSet from $projectFile"
+                    $codeAnalysisNode.ParentNode.RemoveChild($codeAnalysisNode) | Out-Null
+                }
+            }
         }
-        else
-        {
-            $propertyGroup.CodeAnalysisRuleSet = ''
-        }
-        Write-Output "Update file $projectFile"
     }
-    $projectXml.Save((Resolve-Path $projectFile))
 
-    # check that StyleCop is installed for project
-    $stylecopNodes = $projectXml.SelectNodes("//*[contains(@Include, 'StyleCop.Analyzers')]")
-    if ($stylecopNodes.Count -eq 0)
-    {
-        Write-Warning "StyleCop seems not installed for project $projectFile"
-    }
+    $projectXml.Save((Resolve-Path $projectFile))
 }
