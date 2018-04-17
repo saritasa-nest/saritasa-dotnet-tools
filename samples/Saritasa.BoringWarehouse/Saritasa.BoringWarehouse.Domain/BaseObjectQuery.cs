@@ -1,10 +1,13 @@
-﻿using Saritasa.Tools.Common.Utils;
+﻿using System.ComponentModel;
 
 namespace Saritasa.BoringWarehouse.Domain
 {
+    /// <summary>
+    /// Base query object to be used for sorting and filtering.
+    /// </summary>
     public abstract class BaseObjectQuery
     {
-        private SortOrder sortOrder;
+        private ListSortDirection sortOrder;
         private string sortOrderName;
 
         public int Limit { get; set; } = 100;
@@ -26,7 +29,7 @@ namespace Saritasa.BoringWarehouse.Domain
             }
         }
 
-        public SortOrder SortOrder
+        public ListSortDirection SortOrder
         {
             get => sortOrder;
 
@@ -37,13 +40,13 @@ namespace Saritasa.BoringWarehouse.Domain
             }
         }
 
-        public static SortOrder ParseSortOrder(string value)
+        public static ListSortDirection ParseSortOrder(string value)
         {
             if (string.IsNullOrEmpty(value))
             {
-                return SortOrder.Ascending;
+                return ListSortDirection.Ascending;
             }
-            return value.ToLower().StartsWith("asc") ? SortOrder.Ascending : SortOrder.Descending;
+            return value.ToLower().StartsWith("asc") ? ListSortDirection.Ascending : ListSortDirection.Descending;
         }
     }
 }

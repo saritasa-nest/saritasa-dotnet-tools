@@ -1,12 +1,11 @@
-﻿namespace Saritasa.BoringWarehouse.Domain.Products.Entities
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq.Expressions;
+using Saritasa.BoringWarehouse.Domain.Users.Entities;
+
+namespace Saritasa.BoringWarehouse.Domain.Products.Entities
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel.DataAnnotations;
-    using System.Linq.Expressions;
-
-    using Users.Entities;
-
     /// <summary>
     /// Just simple product.
     /// </summary>
@@ -52,7 +51,7 @@
         }
 
         /// <summary>
-        /// Include all relations
+        /// Include all relations.
         /// </summary>
         public static IEnumerable<Expression<Func<Product, object>>> IncludeAll
         {

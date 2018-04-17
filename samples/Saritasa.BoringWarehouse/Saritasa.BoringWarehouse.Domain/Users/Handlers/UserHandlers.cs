@@ -1,16 +1,12 @@
-﻿using Saritasa.Tools.Messages.Abstractions.Commands;
+﻿using System;
+using System.Linq;
+using Saritasa.Tools.Domain.Exceptions;
+using Saritasa.Tools.Messages.Abstractions.Commands;
+using Saritasa.BoringWarehouse.Domain.Users.Commands;
+using Saritasa.BoringWarehouse.Domain.Users.Entities;
 
 namespace Saritasa.BoringWarehouse.Domain.Users.Handlers
 {
-    using System;
-    using System.Linq;
-
-    using Tools.Messages.Abstractions;
-    using Tools.Domain.Exceptions;
-
-    using Commands;
-    using Entities;
-
     /// <summary>
     /// User handlers.
     /// </summary>
@@ -25,7 +21,7 @@ namespace Saritasa.BoringWarehouse.Domain.Users.Handlers
 
                 if (uow.Users.Any(x => x.Email == email))
                 {
-                    throw new DomainException("The user with the same email already exists");
+                    throw new DomainException("The user with the same email already exists.");
                 }
 
                 var user = new User()
@@ -77,7 +73,7 @@ namespace Saritasa.BoringWarehouse.Domain.Users.Handlers
 
                 if (uow.Users.Any(x => x.Email == email && x.Id != command.UserId))
                 {
-                    throw new DomainException("The user with the same email already exists");
+                    throw new DomainException("The user with the same email already exists.");
                 }
 
                 var dbUser = uow.UserRepository.Get(command.UserId);

@@ -1,8 +1,8 @@
-﻿namespace Saritasa.BoringWarehouse.Web
-{
-    using System.Web.Mvc;
-    using System.Web.Routing;
+﻿using System.Web.Mvc;
+using System.Web.Routing;
 
+namespace Saritasa.BoringWarehouse.Web
+{
     public class RouteConfig
     {
         public static void RegisterRoutes(RouteCollection routes)

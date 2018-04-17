@@ -1,14 +1,12 @@
-﻿namespace Saritasa.BoringWarehouse.Domain.Products.Handlers
+﻿using System.Linq;
+using Saritasa.Tools.Domain.Exceptions;
+using Saritasa.Tools.Messages.Abstractions.Commands;
+using Saritasa.BoringWarehouse.Domain.Products.Commands;
+using Saritasa.BoringWarehouse.Domain.Products.Entities;
+using Saritasa.BoringWarehouse.Domain.Users.Entities;
+
+namespace Saritasa.BoringWarehouse.Domain.Products.Handlers
 {
-    using System.Linq;
-
-    using Tools.Domain.Exceptions;
-
-    using Commands;
-    using Entities;
-    using Users.Entities;
-    using Saritasa.Tools.Messages.Abstractions.Commands;
-
     /// <summary>
     /// Company handlers.
     /// </summary>
@@ -29,7 +27,7 @@
                 User creator = uow.Users.FirstOrDefault(u => u.Id == command.CreatedByUserId);
                 if (creator == null)
                 {
-                    throw new DomainException("Cannot find creator.");
+                    throw new NotFoundException("Cannot find creator.");
                 }
                 var company = new Company
                 {

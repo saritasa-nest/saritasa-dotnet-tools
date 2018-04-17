@@ -1,8 +1,8 @@
-﻿namespace Saritasa.BoringWarehouse.DataAccess.Repositories
-{
-    using Domain.Users.Entities;
-    using Domain.Users.Repositories;
+﻿using Saritasa.BoringWarehouse.Domain.Users.Entities;
+using Saritasa.BoringWarehouse.Domain.Users.Repositories;
 
+namespace Saritasa.BoringWarehouse.DataAccess.Repositories
+{
     /// <summary>
     /// Custom user repository.
     /// </summary>

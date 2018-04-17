@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Configuration;
 using System.Linq;
 using Autofac;
 using NUnit.Framework;
@@ -10,6 +9,9 @@ using Saritasa.Tools.Messages.Abstractions;
 
 namespace Saritasa.BoringWarehouse.IntegrationTests
 {
+    /// <summary>
+    /// Company related tests.
+    /// </summary>
     public class CompanyTest
     {
         private IContainer container;

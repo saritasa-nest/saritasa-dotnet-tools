@@ -1,7 +1,7 @@
-﻿namespace Saritasa.BoringWarehouse.Web
-{
-    using System.Web.Mvc;
+﻿using System.Web.Mvc;
 
+namespace Saritasa.BoringWarehouse.Web
+{
     public class FilterConfig
     {
         public static void RegisterGlobalFilters(GlobalFilterCollection filters)

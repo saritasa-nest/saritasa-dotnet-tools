@@ -1,7 +1,10 @@
-﻿namespace Saritasa.BoringWarehouse.Domain.Products.Commands
-{
-    using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
+namespace Saritasa.BoringWarehouse.Domain.Products.Commands
+{
+    /// <summary>
+    /// Command to delete product by id.
+    /// </summary>
     public class DeleteProductCommand
     {
         public DeleteProductCommand(int id)

@@ -1,7 +1,7 @@
-﻿namespace Saritasa.BoringWarehouse.Domain
-{
-    using Tools.Domain;
+﻿using Saritasa.Tools.Domain;
 
+namespace Saritasa.BoringWarehouse.Domain
+{
     /// <summary>
     /// Application unit of work factory.
     /// </summary>

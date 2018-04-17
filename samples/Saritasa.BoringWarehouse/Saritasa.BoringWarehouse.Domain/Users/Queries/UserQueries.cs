@@ -1,13 +1,13 @@
-﻿namespace Saritasa.BoringWarehouse.Domain.Users.Queries
-{
-    using Entities;
+﻿using Saritasa.BoringWarehouse.Domain.Users.Entities;
 
+namespace Saritasa.BoringWarehouse.Domain.Users.Queries
+{
     /// <summary>
     /// Various users queries.
     /// </summary>
     public class UserQueries
     {
-        IAppUnitOfWork uow;
+        private readonly IAppUnitOfWork uow;
 
         public UserQueries(IAppUnitOfWork uow)
         {

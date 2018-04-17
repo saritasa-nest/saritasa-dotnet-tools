@@ -1,12 +1,11 @@
-﻿namespace Saritasa.BoringWarehouse.Web.Core
+﻿using System;
+using System.Globalization;
+using System.Web;
+using System.Web.Security;
+using Saritasa.BoringWarehouse.Domain.Users.Entities;
+
+namespace Saritasa.BoringWarehouse.Web.Core
 {
-    using System;
-    using System.Globalization;
-    using System.Web;
-    using System.Web.Security;
-
-    using Domain.Users.Entities;
-
     /// <summary>
     /// User ticket.
     /// </summary>

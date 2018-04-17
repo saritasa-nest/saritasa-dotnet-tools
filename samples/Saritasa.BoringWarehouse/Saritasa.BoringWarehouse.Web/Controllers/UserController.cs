@@ -1,27 +1,25 @@
-﻿namespace Saritasa.BoringWarehouse.Web.Controllers
+﻿using System;
+using System.Web;
+using System.Web.Mvc;
+using System.Web.Security;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Domain.Exceptions;
+using Saritasa.BoringWarehouse.Web.Core;
+using Saritasa.BoringWarehouse.Domain.Users.Commands;
+using Saritasa.BoringWarehouse.Domain.Users.Entities;
+using Saritasa.BoringWarehouse.Domain.Users.Queries;
+using Saritasa.BoringWarehouse.Web.Models;
+
+namespace Saritasa.BoringWarehouse.Web.Controllers
 {
-    using System;
-    using System.Web;
-    using System.Web.Mvc;
-    using System.Web.Security;
-
-    using Tools.Messages.Abstractions;
-    using Tools.Domain.Exceptions;
-
-    using Core;
-    using Domain.Users.Commands;
-    using Domain.Users.Entities;
-    using Domain.Users.Queries;
-    using Models;
-
     /// <summary>
     /// User controller.
     /// </summary>
     [AllowAnonymous]
     public class UserController : Controller
     {
-        readonly IMessagePipelineService pipelineService;
-        readonly UserQueries userQueries;
+        private readonly IMessagePipelineService pipelineService;
+        private readonly UserQueries userQueries;
 
         public UserController(IMessagePipelineService pipelineService, UserQueries userQueries)
         {
@@ -116,7 +114,7 @@
             pipelineService.HandleCommand(command);
             if (!command.IsSuccess)
             {
-                ModelState.AddModelError(string.Empty, "Incorrect login or password");
+                ModelState.AddModelError(string.Empty, "Incorrect login or password.");
                 return View(command);
             }
 

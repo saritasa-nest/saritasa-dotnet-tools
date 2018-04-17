@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Configuration;
-using Saritasa.Tools.Messages.Common;
 using Autofac;
+using Saritasa.Tools.Messages.Common;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Commands;
 
 namespace Saritasa.BoringWarehouse.Infrastructure
 {
-    using Tools.Messages.Abstractions;
-
-    using Tools.Messages.Commands;
-
     /// <summary>
     /// Dependency injection configuration.
     /// </summary>
@@ -45,7 +43,13 @@ namespace Saritasa.BoringWarehouse.Infrastructure
             // Command pipeline.
             var messagePipelineContainer = new DefaultMessagePipelineContainer();
             messagePipelineContainer.AddCommandPipeline()
-                .UseDefaultMiddlewares(System.Reflection.Assembly.GetAssembly(typeof(Domain.Users.Entities.User)))
+                .Configure(options =>
+                {
+                    options.DefaultCommandPipelineOptions.Assemblies = new []
+                    {
+                        System.Reflection.Assembly.GetAssembly(typeof(Domain.Users.Entities.User))
+                    };
+                })
                 .AddMiddleware(adoNetRepositoryMiddleware);
             builder.RegisterInstance(messagePipelineContainer).As<IMessagePipelineContainer>().SingleInstance();
             builder.RegisterType<DefaultMessagePipelineService>().As<IMessagePipelineService>();

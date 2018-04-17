@@ -1,18 +1,14 @@
-﻿using Saritasa.Tools.Messages.Abstractions.Commands;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Saritasa.Tools.Messages.Abstractions.Commands;
+using Saritasa.Tools.Domain.Exceptions;
+using Saritasa.BoringWarehouse.Domain.Products.Commands;
+using Saritasa.BoringWarehouse.Domain.Products.Entities;
+using Saritasa.BoringWarehouse.Domain.Users.Entities;
 
 namespace Saritasa.BoringWarehouse.Domain.Products.Handlers
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
-    using Tools.Messages.Abstractions;
-    using Tools.Domain.Exceptions;
-
-    using Commands;
-    using Entities;
-    using Users.Entities;
-
     /// <summary>
     /// Product handlers.
     /// </summary>
@@ -26,12 +22,12 @@ namespace Saritasa.BoringWarehouse.Domain.Products.Handlers
                 Company company = uow.CompanyRepository.Get(command.CompanyId);
                 if (company == null)
                 {
-                    throw new DomainException("The assigned company not found");
+                    throw new NotFoundException("The assigned company not found.");
                 }
                 User creator = uow.Users.FirstOrDefault(u => u.Id == command.CreatedByUserId);
                 if (creator == null)
                 {
-                    throw new DomainException("Can not find creator");
+                    throw new NotFoundException("Cannot find creator.");
                 }
                 var product = new Product
                 {
@@ -58,9 +54,9 @@ namespace Saritasa.BoringWarehouse.Domain.Products.Handlers
                 Product product = uow.ProductRepository.Get(command.ProductId, Product.IncludeAll);
                 if (product == null)
                 {
-                    throw new NotFoundException("Deleted product not found");
+                    throw new NotFoundException("Deleted product not found.");
                 }
-                // Delete properties before
+                // Delete properties before.
                 uow.ProductPropertyRepository.RemoveRange(product.Properties);
                 uow.ProductRepository.Remove(product);
                 uow.SaveChanges();
@@ -75,27 +71,27 @@ namespace Saritasa.BoringWarehouse.Domain.Products.Handlers
                 Company company = uow.CompanyRepository.Get(command.CompanyId);
                 if (company == null)
                 {
-                    throw new DomainException("The assigned company not found");
+                    throw new NotFoundException("The assigned company not found.");
                 }
                 User updater = uow.Users.FirstOrDefault(u => u.Id == command.UpdatedByUserId);
                 if (updater == null)
                 {
-                    throw new DomainException("Can not find updater");
+                    throw new NotFoundException("Cannot find updater.");
                 }
-                // Delete properties
+                // Delete properties.
                 foreach (ProductProperty removedProperty in product.Properties.Where(oldP => !command.Properties.Any(newP => newP.Id == oldP.Id)).ToList())
                 {
                     product.Properties.Remove(removedProperty);
                     uow.ProductPropertyRepository.Remove(removedProperty);
                 }
-                // Update existing properties
+                // Update existing properties.
                 foreach (ProductProperty existProperty in product.Properties)
                 {
                     ProductProperty updatedProperty = command.Properties.SingleOrDefault(pp => pp.Id == existProperty.Id);
                     existProperty.Name = updatedProperty.Name;
                     existProperty.Value = updatedProperty.Value;
                 }
-                // Add new properties
+                // Add new properties.
                 foreach (ProductProperty property in command.Properties.Where(pp => pp.Id == 0))
                 {
                     product.Properties.Add(property);

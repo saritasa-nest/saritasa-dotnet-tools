@@ -1,11 +1,10 @@
-﻿namespace Saritasa.BoringWarehouse.DataAccess
+﻿using System;
+using System.Data.Entity;
+using Saritasa.BoringWarehouse.Domain.Products.Entities;
+using Saritasa.BoringWarehouse.Domain.Users.Entities;
+
+namespace Saritasa.BoringWarehouse.DataAccess
 {
-    using System;
-    using System.Data.Entity;
-
-    using Domain.Products.Entities;
-    using Domain.Users.Entities;
-
     /// <summary>
     /// Database context initializer.
     /// </summary>
@@ -13,7 +12,7 @@
     {
         protected override void Seed(AppDbContext context)
         {
-            // Add admin user
+            // Add admin user.
             var user = new User
             {
                 FirstName = "admin",
@@ -25,8 +24,9 @@
                 PasswordHashed = "SHA256$8C6976E5B5410415BDE908BD4DEE15DFB167A9C873FC4BB8A81F6F2AB448A918"
             };
             context.Users.Add(user);
-            // Prefill
-            // Company
+
+            // Prefill.
+            // Company.
             var company = new Company
             {
                 Name = "My Company",
@@ -34,7 +34,7 @@
                 CreatedAt = DateTime.Now
             };
             context.Companies.Add(company);
-            // Products
+            // Products.
             var random = new Random();
             for (int productIndex = 0; productIndex < 100; productIndex++)
             {
@@ -49,7 +49,7 @@
                     CreatedAt = DateTime.Now,
                     Company = company
                 };
-                // Add properties
+                // Add properties.
                 int propertiesCount = random.Next(0, 10);
                 for (int propertyIndex = 0; propertyIndex < propertiesCount; propertyIndex++)
                 {
@@ -61,7 +61,7 @@
                     };
                     product.Properties.Add(property);
                 }
-                // Add to context
+                // Add to context.
                 context.Products.Add(product);
             }
             base.Seed(context);

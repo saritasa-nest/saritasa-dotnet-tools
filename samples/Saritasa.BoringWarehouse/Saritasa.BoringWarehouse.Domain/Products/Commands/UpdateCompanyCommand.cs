@@ -1,11 +1,10 @@
-﻿namespace Saritasa.BoringWarehouse.Domain.Products.Commands
+﻿using System.ComponentModel.DataAnnotations;
+using Saritasa.BoringWarehouse.Domain.Products.Entities;
+
+namespace Saritasa.BoringWarehouse.Domain.Products.Commands
 {
-    using System.ComponentModel.DataAnnotations;
-
-    using Entities;
-
     /// <summary>
-    /// Update company command
+    /// Update company command.
     /// </summary>
     public class UpdateCompanyCommand
     {

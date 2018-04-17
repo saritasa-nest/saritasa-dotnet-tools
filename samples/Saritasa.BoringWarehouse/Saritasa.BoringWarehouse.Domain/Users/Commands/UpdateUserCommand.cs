@@ -1,9 +1,11 @@
-﻿namespace Saritasa.BoringWarehouse.Domain.Users.Commands
+﻿using System.ComponentModel.DataAnnotations;
+using Saritasa.BoringWarehouse.Domain.Users.Entities;
+
+namespace Saritasa.BoringWarehouse.Domain.Users.Commands
 {
-    using System.ComponentModel.DataAnnotations;
-
-    using Entities;
-
+    /// <summary>
+    /// Update user command.
+    /// </summary>
     public class UpdateUserCommand
     {
         public UpdateUserCommand()

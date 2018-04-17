@@ -1,28 +1,29 @@
-﻿namespace Saritasa.BoringWarehouse.Domain.Users.Queries
+﻿using System.Collections.Generic;
+using System.Linq;
+using Saritasa.Tools.Common.Extensions;
+using Saritasa.BoringWarehouse.Domain.Users.Entities;
+
+namespace Saritasa.BoringWarehouse.Domain.Users.Queries
 {
-    using System.Collections.Generic;
-    using System.Linq;
-
-    using Tools.Common.Extensions;
-
-    using Entities;
-
+    /// <summary>
+    /// Users related queries.
+    /// </summary>
     public class UsersObjectQuery : BaseObjectQuery
     {
         public PagedResult<User> Search(IEnumerable<User> users)
         {
-            // Get total record count
+            // Get total record count.
             long total = users.LongCount();
-            // Filtering
+            // Filtering.
             if (!string.IsNullOrEmpty(SearchPattern))
             {
-                // Find by name
+                // Find by name.
                 users = users.Where(u => u.FirstName.StartsWith(SearchPattern) ||
                                             u.LastName.StartsWith(SearchPattern) ||
                                             u.Email.StartsWith(SearchPattern) ||
                                             u.Phone.StartsWith(SearchPattern));
             }
-            // Get count after filtering
+            // Get count after filtering.
             long filteredCount = users.LongCount();
             // Order
             switch (OrderColumn?.ToLower())

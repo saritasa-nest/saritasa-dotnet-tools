@@ -1,7 +1,7 @@
-﻿namespace Saritasa.BoringWarehouse.Web.Models
-{
-    using System.Collections;
+﻿using System.Collections;
 
+namespace Saritasa.BoringWarehouse.Web.Models
+{
 #pragma warning disable SA1300 // Element must begin with upper-case letter
     public class DataTablesSearchResultViewModel
     {

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -166,5 +166,16 @@ namespace Saritasa.Tools.Domain.Tests
         }
 
 #endif
+
+        [Fact]
+        public void Domain_validation_should_keep_message_from_ctor()
+        {
+            // Arrange & act.
+            var ex = new Exceptions.ValidationException("The custom message");
+
+            // Assert.
+            Assert.Equal("The custom message", ex.Message);
+            Assert.Empty(ex.Errors);
+        }
     }
 }

@@ -1,10 +1,12 @@
-﻿namespace Saritasa.BoringWarehouse.Domain.Products.Commands
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using Saritasa.BoringWarehouse.Domain.Products.Entities;
+
+namespace Saritasa.BoringWarehouse.Domain.Products.Commands
 {
-    using System.Collections.Generic;
-    using System.ComponentModel.DataAnnotations;
-
-    using Entities;
-
+    /// <summary>
+    /// Command to create new product.
+    /// </summary>
     public class CreateProductCommand
     {
         [Key]

@@ -1,9 +1,8 @@
-﻿namespace Saritasa.BoringWarehouse.Web.Models
+﻿using System.ComponentModel.DataAnnotations;
+using Saritasa.BoringWarehouse.Domain.Users.Entities;
+
+namespace Saritasa.BoringWarehouse.Web.Models
 {
-    using System.ComponentModel.DataAnnotations;
-
-    using Domain.Users.Entities;
-
     public class UserProfileVM
     {
         public UserProfileVM()

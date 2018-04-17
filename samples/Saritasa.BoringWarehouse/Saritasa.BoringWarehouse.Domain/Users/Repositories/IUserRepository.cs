@@ -1,9 +1,11 @@
-﻿namespace Saritasa.BoringWarehouse.Domain.Users.Repositories
+﻿using Saritasa.Tools.Domain;
+using Saritasa.BoringWarehouse.Domain.Users.Entities;
+
+namespace Saritasa.BoringWarehouse.Domain.Users.Repositories
 {
-    using Tools.Domain;
-
-    using Entities;
-
+    /// <summary>
+    /// Users repository.
+    /// </summary>
     public interface IUserRepository : IRepository<User>
     {
     }

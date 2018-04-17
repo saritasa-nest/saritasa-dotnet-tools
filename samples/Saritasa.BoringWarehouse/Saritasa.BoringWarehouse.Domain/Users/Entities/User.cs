@@ -1,8 +1,8 @@
-﻿namespace Saritasa.BoringWarehouse.Domain.Users.Entities
-{
-    using System;
-    using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
+namespace Saritasa.BoringWarehouse.Domain.Users.Entities
+{
     /// <summary>
     /// User roles.
     /// </summary>

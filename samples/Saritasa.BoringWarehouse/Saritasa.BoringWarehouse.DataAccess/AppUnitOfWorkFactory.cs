@@ -1,15 +1,14 @@
-﻿namespace Saritasa.BoringWarehouse.DataAccess
+﻿using System.Data;
+using Saritasa.BoringWarehouse.Domain;
+
+namespace Saritasa.BoringWarehouse.DataAccess
 {
-    using System.Data;
-
-    using Domain;
-
     /// <summary>
     /// Application unit of work factory.
     /// </summary>
     public class AppUnitOfWorkFactory : IAppUnitOfWorkFactory
     {
-        private AppDbContext context;
+        private readonly AppDbContext context;
 
         public AppUnitOfWorkFactory(AppDbContext context)
         {

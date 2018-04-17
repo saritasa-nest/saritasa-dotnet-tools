@@ -1,22 +1,21 @@
-﻿namespace Saritasa.BoringWarehouse.Web.Controllers
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web.Mvc;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Domain.Exceptions;
+using Saritasa.BoringWarehouse.Domain.Users.Entities;
+using Saritasa.BoringWarehouse.Domain;
+using Saritasa.BoringWarehouse.Domain.Users.Commands;
+using Saritasa.BoringWarehouse.Domain.Users.Queries;
+using Saritasa.BoringWarehouse.Web.Models;
+using AuthorizeAttribute = Saritasa.BoringWarehouse.Web.Core.AuthorizeAttribute;
+
+namespace Saritasa.BoringWarehouse.Web.Controllers
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Web.Mvc;
-
-    using Domain.Users.Entities;
-
-    using Tools.Messages.Abstractions;
-    using Tools.Domain.Exceptions;
-
-    using Domain;
-    using Domain.Users.Commands;
-    using Domain.Users.Queries;
-    using Models;
-
-    using AuthorizeAttribute = Core.AuthorizeAttribute;
-
+    /// <summary>
+    /// Administrative controller.
+    /// </summary>
     [Authorize(UserRole.Admin)]
     public class AdminController : Controller
     {

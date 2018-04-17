@@ -1,11 +1,13 @@
-﻿namespace Saritasa.BoringWarehouse.Web.Core
+﻿using System;
+using System.Linq;
+using System.Web.Mvc;
+using Saritasa.BoringWarehouse.Domain.Users.Entities;
+
+namespace Saritasa.BoringWarehouse.Web.Core
 {
-    using System;
-    using System.Linq;
-    using System.Web.Mvc;
-
-    using Domain.Users.Entities;
-
+    /// <summary>
+    /// Custom application authorization attribute.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class AuthorizeAttribute : System.Web.Mvc.AuthorizeAttribute
     {

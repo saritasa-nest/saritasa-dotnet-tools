@@ -1,11 +1,10 @@
-﻿using Saritasa.BoringWarehouse.Infrastructure;
+﻿using System.Web.Mvc;
+using Autofac;
+using Autofac.Integration.Mvc;
+using Saritasa.BoringWarehouse.Infrastructure;
 
 namespace Saritasa.BoringWarehouse.Web
 {
-    using System.Web.Mvc;
-
-    using Autofac;
-    using Autofac.Integration.Mvc;
 
     /// <summary>
     /// Dependency injection configuration.
@@ -16,19 +15,19 @@ namespace Saritasa.BoringWarehouse.Web
         {
             var builder = CommonDIConfig.CreateBuilder();
 
-            // register MVC controllers
+            // Register MVC controllers.
             builder.RegisterControllers(typeof(MvcApplication).Assembly);
 
-            // register web abstractions like HttpContextBase
+            // Register web abstractions like HttpContextBase.
             builder.RegisterModule<AutofacWebTypesModule>();
 
-            // enable property injection in view pages
+            // Enable property injection in view pages.
             builder.RegisterSource(new ViewRegistrationSource());
 
-            // enable property injection into action filters
+            // Enable property injection into action filters.
             builder.RegisterFilterProvider();
 
-            // set the dependency resolver to be Autofac
+            // Set the dependency resolver to be Autofac.
             var container = builder.Build();
             DependencyResolver.SetResolver(new AutofacDependencyResolver(container));
         }

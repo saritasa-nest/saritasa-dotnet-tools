@@ -1,11 +1,12 @@
 ﻿using System.Linq;
+using System.Collections.Generic;
+using Saritasa.BoringWarehouse.Domain.Products.Entities;
 
 namespace Saritasa.BoringWarehouse.Domain.Products.Queries
 {
-    using System.Collections.Generic;
-
-    using Entities;
-
+    /// <summary>
+    /// Product related queries.
+    /// </summary>
     public class ProductQueries
     {
         private readonly IAppUnitOfWork uow;

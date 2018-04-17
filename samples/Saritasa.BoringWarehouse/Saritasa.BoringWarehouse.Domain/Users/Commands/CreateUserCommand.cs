@@ -1,13 +1,9 @@
-﻿using Saritasa.Tools.Messages.Abstractions.Commands;
+﻿using System.ComponentModel.DataAnnotations;
+using Saritasa.Tools.Messages.Abstractions.Commands;
+using Saritasa.BoringWarehouse.Domain.Users.Entities;
 
 namespace Saritasa.BoringWarehouse.Domain.Users.Commands
 {
-    using System.ComponentModel.DataAnnotations;
-
-    using Tools.Messages.Abstractions;
-
-    using Entities;
-
     /// <summary>
     /// Create user.
     /// </summary>

@@ -1,9 +1,11 @@
-﻿namespace Saritasa.BoringWarehouse.Domain.Products.Queries
+﻿using System.Collections.Generic;
+using Saritasa.BoringWarehouse.Domain.Products.Entities;
+
+namespace Saritasa.BoringWarehouse.Domain.Products.Queries
 {
-    using System.Collections.Generic;
-
-    using Entities;
-
+    /// <summary>
+    /// Company related queries.
+    /// </summary>
     public class CompanyQueries
     {
         private readonly IAppUnitOfWork uow;

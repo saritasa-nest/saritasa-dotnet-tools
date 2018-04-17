@@ -1,7 +1,7 @@
-﻿namespace Saritasa.BoringWarehouse.Web.Controllers
-{
-    using System.Web.Mvc;
+﻿using System.Web.Mvc;
 
+namespace Saritasa.BoringWarehouse.Web.Controllers
+{
     /// <summary>
     /// Index.
     /// </summary>

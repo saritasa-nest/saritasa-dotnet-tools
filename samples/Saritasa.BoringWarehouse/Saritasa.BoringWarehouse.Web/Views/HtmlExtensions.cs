@@ -1,9 +1,7 @@
-﻿using System.Linq;
-using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Web.Mvc;
-using System.ComponentModel.DataAnnotations;
-using System;
 using System.ComponentModel;
 
 public static class HtmlExtensions

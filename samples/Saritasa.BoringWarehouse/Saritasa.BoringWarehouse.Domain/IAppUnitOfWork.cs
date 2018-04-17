@@ -1,14 +1,12 @@
-﻿namespace Saritasa.BoringWarehouse.Domain
+﻿using System.Linq;
+using Saritasa.Tools.Domain;
+using Saritasa.BoringWarehouse.Domain.Products.Entities;
+using Saritasa.BoringWarehouse.Domain.Products.Repositories;
+using Saritasa.BoringWarehouse.Domain.Users.Entities;
+using Saritasa.BoringWarehouse.Domain.Users.Repositories;
+
+namespace Saritasa.BoringWarehouse.Domain
 {
-    using System.Linq;
-
-    using Tools.Domain;
-
-    using Products.Entities;
-    using Products.Repositories;
-    using Users.Entities;
-    using Users.Repositories;
-
     /// <summary>
     /// Application unit of work. Logical wrapper of database context but with additional
     /// features.

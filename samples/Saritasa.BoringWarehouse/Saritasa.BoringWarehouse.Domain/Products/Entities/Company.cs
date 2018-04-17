@@ -1,12 +1,11 @@
-﻿namespace Saritasa.BoringWarehouse.Domain.Products.Entities
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using Saritasa.BoringWarehouse.Domain.Users.Entities;
+
+namespace Saritasa.BoringWarehouse.Domain.Products.Entities
 {
-    using System;
-    using System.ComponentModel.DataAnnotations;
-
-    using Users.Entities;
-
     /// <summary>
-    /// Company that made product.
+    /// Company that makes products.
     /// </summary>
     public class Company
     {

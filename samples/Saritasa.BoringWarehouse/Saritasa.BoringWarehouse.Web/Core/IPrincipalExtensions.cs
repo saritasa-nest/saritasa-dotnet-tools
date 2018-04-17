@@ -1,10 +1,12 @@
-﻿namespace Saritasa.BoringWarehouse.Web.Core
+﻿using System.Linq;
+using System.Security.Principal;
+using Saritasa.BoringWarehouse.Domain.Users.Entities;
+
+namespace Saritasa.BoringWarehouse.Web.Core
 {
-    using System.Linq;
-    using System.Security.Principal;
-
-    using Domain.Users.Entities;
-
+    /// <summary>
+    /// Extensions for <see cref="IPrincipal" />.
+    /// </summary>
     public static class IPrincipalExtensions
     {
         public static bool IsInRoles(this IPrincipal principal, params UserRole[] roles)

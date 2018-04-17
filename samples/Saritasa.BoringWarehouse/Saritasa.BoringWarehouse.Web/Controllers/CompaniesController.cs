@@ -1,17 +1,15 @@
-﻿namespace Saritasa.BoringWarehouse.Web.Controllers
+﻿using System;
+using System.Web.Mvc;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Domain.Exceptions;
+using Saritasa.BoringWarehouse.Domain.Products.Commands;
+using Saritasa.BoringWarehouse.Domain.Products.Entities;
+using Saritasa.BoringWarehouse.Domain.Products.Queries;
+
+namespace Saritasa.BoringWarehouse.Web.Controllers
 {
-    using System;
-    using System.Web.Mvc;
-
-    using Tools.Messages.Abstractions;
-    using Tools.Domain.Exceptions;
-
-    using Domain.Products.Commands;
-    using Domain.Products.Entities;
-    using Domain.Products.Queries;
-
     /// <summary>
-    /// Companies controller
+    /// Companies controller.
     /// </summary>
     [Authorize]
     public class CompaniesController : Controller

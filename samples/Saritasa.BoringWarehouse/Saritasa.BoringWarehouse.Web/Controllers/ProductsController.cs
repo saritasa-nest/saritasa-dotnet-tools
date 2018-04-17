@@ -1,22 +1,19 @@
-﻿namespace Saritasa.BoringWarehouse.Web.Controllers
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web.Mvc;
+using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Domain.Exceptions;
+using Saritasa.BoringWarehouse.Domain;
+using Saritasa.BoringWarehouse.Domain.Products.Commands;
+using Saritasa.BoringWarehouse.Domain.Products.Entities;
+using Saritasa.BoringWarehouse.Domain.Products.Queries;
+using Saritasa.BoringWarehouse.Domain.Users.Entities;
+using Saritasa.BoringWarehouse.Web.Models;
+using AuthorizeAttribute = Saritasa.BoringWarehouse.Web.Core.AuthorizeAttribute;
+
+namespace Saritasa.BoringWarehouse.Web.Controllers
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Web.Mvc;
-
-    using Tools.Messages.Abstractions;
-    using Tools.Domain.Exceptions;
-
-    using Domain;
-    using Domain.Products.Commands;
-    using Domain.Products.Entities;
-    using Domain.Products.Queries;
-    using Domain.Users.Entities;
-    using Models;
-
-    using AuthorizeAttribute = Core.AuthorizeAttribute;
-
     /// <summary>
     /// Products controller
     /// </summary>
@@ -122,7 +119,7 @@
         {
             if (!ModelState.IsValid)
             {
-                // Get companies list again
+                // Get companies list again.
                 command.Companies = companyQueries.GetAll();
                 return View(command);
             }

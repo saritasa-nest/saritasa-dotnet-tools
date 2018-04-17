@@ -1,27 +1,28 @@
-﻿namespace Saritasa.BoringWarehouse.Domain.Products.Queries
+﻿using System.Collections.Generic;
+using System.Linq;
+using Saritasa.Tools.Common.Extensions;
+using Saritasa.BoringWarehouse.Domain.Products.Entities;
+
+namespace Saritasa.BoringWarehouse.Domain.Products.Queries
 {
-    using System.Collections.Generic;
-    using System.Linq;
-
-    using Tools.Common.Extensions;
-
-    using Entities;
-
+    /// <summary>
+    /// Products related queries.
+    /// </summary>
     public class ProductsObjectQuery : BaseObjectQuery
     {
         public PagedResult<Product> Search(IEnumerable<Product> products)
         {
-            // Get total record count
+            // Get total record count.
             long total = products.LongCount();
-            // Filtering
+            // Filtering.
             if (!string.IsNullOrEmpty(SearchPattern))
             {
-                // Find by name
+                // Find by name.
                 products = products.Where(p => p.Name.StartsWith(SearchPattern));
             }
-            // Get count after filtering
+            // Get count after filtering.
             long filteredCount = products.LongCount();
-            // Order
+            // Order.
             switch (OrderColumn?.ToLower())
             {
                 case "name":

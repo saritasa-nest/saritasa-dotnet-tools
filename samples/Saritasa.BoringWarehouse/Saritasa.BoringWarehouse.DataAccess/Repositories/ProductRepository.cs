@@ -1,14 +1,15 @@
-﻿namespace Saritasa.BoringWarehouse.DataAccess.Repositories
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using Saritasa.BoringWarehouse.Domain.Products.Entities;
+using Saritasa.BoringWarehouse.Domain.Products.Repositories;
+
+namespace Saritasa.BoringWarehouse.DataAccess.Repositories
 {
-    using System;
-
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Linq.Expressions;
-
-    using Domain.Products.Entities;
-    using Domain.Products.Repositories;
-
+    /// <summary>
+    /// Products repository.
+    /// </summary>
     public class ProductRepository : Tools.EF.EFRepository<Product, AppDbContext>, IProductRepository
     {
         public ProductRepository(AppDbContext context) : base(context)
