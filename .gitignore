@@ -23,10 +23,10 @@ bld/
 [Oo]bj/
 msbuild.log
 
-# visual studio 2015
+# visual studio
 .vs/
 
-# visual studion code
+# visual studio code
 .vscode/
 
 # mstest test results
