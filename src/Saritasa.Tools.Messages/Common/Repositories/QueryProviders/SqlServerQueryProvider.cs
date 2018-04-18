@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -11,9 +11,9 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
     /// </summary>
     internal class SqlServerQueryProvider : IMessageQueryProvider
     {
-        const string TableName = "SaritasaMessages";
+        private const string TableName = "SaritasaMessages";
 
-        readonly IObjectSerializer serializer;
+        private readonly IObjectSerializer serializer;
 
         /// <summary>
         /// .ctor
@@ -47,11 +47,9 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
                     Status tinyint NOT NULL,
 
                     CONSTRAINT PK_{TableName} PRIMARY KEY CLUSTERED (Id),
-                    INDEX IX_{TableName}_Type (Type),
                     INDEX IX_{TableName}_ContentId (ContentId),
                     INDEX IX_{TableName}_ContentType (ContentType),
-                    INDEX IX_{TableName}_ErrorType (ErrorType),
-                    INDEX IX_{TableName}_CreatedAt (CreatedAt)
+                    INDEX IX_{TableName}_ErrorType (ErrorType)
                 );";
         }
 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -7,13 +7,13 @@ using Saritasa.Tools.Messages.Internal;
 namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
 {
     /// <summary>
-    /// MySql sql scripts.
+    /// MySQL/MariaDB sql scripts.
     /// </summary>
     internal class MySqlQueryProvider : IMessageQueryProvider
     {
-        const string TableName = "saritasa_messages";
+        private const string TableName = "saritasa_messages";
 
-        readonly IObjectSerializer serializer;
+        private readonly IObjectSerializer serializer;
 
         /// <summary>
         /// .ctor
@@ -46,11 +46,9 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
                     `execution_duration` INT NOT NULL,
                     `status` TINYINT NOT NULL,
                     PRIMARY KEY (`id`),
-                    INDEX `ix_type` (`type`),
                     INDEX `ix_content_id` (`content_id`),
                     INDEX `ix_content_type` (`content_type`),
-                    INDEX `ix_error_type` (`error_type`),
-                    INDEX `ix_created_at` (`created_at`)
+                    INDEX `ix_error_type` (`error_type`)
                 )";
         }
 
