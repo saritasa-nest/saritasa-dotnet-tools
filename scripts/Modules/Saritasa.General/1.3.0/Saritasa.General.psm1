@@ -61,7 +61,7 @@ function Get-CallerPreference
     {
         $filterHash = @{}
     }
-    
+
     process
     {
         if ($null -ne $Name)
@@ -118,7 +118,7 @@ function Get-CallerPreference
                 ($PSCmdlet.ParameterSetName -eq 'AllVariables' -or $filterHash.ContainsKey($entry.Name)))
             {
                 $variable = $Cmdlet.SessionState.PSVariable.Get($entry.Key)
-                
+
                 if ($null -ne $variable)
                 {
                     if ($SessionState -eq $ExecutionContext.SessionState)
@@ -140,7 +140,7 @@ function Get-CallerPreference
                 if (-not $vars.ContainsKey($varName))
                 {
                     $variable = $Cmdlet.SessionState.PSVariable.Get($varName)
-                
+
                     if ($null -ne $variable)
                     {
                         if ($SessionState -eq $ExecutionContext.SessionState)
@@ -159,3 +159,76 @@ function Get-CallerPreference
     } # end
 
 } # function Get-CallerPreference
+
+<#
+.SYNOPSIS
+Returns $true if hostname represents local PC.
+#>
+function Test-IsLocalhost
+{
+    [CmdletBinding()]
+    param
+    (
+        [string] $ComputerName
+    )
+
+    $ComputerName -match "^(\.|localhost|$env:COMPUTERNAME)`$"
+}
+
+<#
+.SYNOPSIS
+Dispose an object after using it.
+
+.DESCRIPTION
+This cmdlet is designed to use the same way the "using" keyword in C# is used.
+
+.PARAMETER InputObject
+Object to be disposed.
+
+.PARAMETER ScriptBlock
+Script to be executed.
+
+.EXAMPLE
+C:\PS> $text = ""
+C:\PS> $fileStream = New-Object System.IO.FileStream("G:\test\1.txt", [System.IO.FileMode]::Open)
+C:\PS> Use-Object $fileStream `
+{
+    $streamReader = New-Object System.IO.StreamReader($fileStream)
+    Use-Object $streamReader `
+    {
+        $text = $streamReader.ReadToEnd()
+    }
+}
+C:\PS> $text
+#>
+function Use-Object
+{
+    [CmdletBinding()]
+    param
+    (
+        # Object to be disposed.
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyString()]
+        [AllowEmptyCollection()]
+        [AllowNull()]
+        [Object]
+        $InputObject,
+
+        # Code to be executed after which the object will be disposed
+        [Parameter(Mandatory = $true)]
+        [scriptblock]
+        $ScriptBlock
+    )
+
+    try
+    {
+        . $ScriptBlock
+    }
+    finally
+    {
+        if ($null -ne $InputObject -and $InputObject -is [System.IDisposable])
+        {
+            $InputObject.Dispose()
+        }
+    }
+}

@@ -2,7 +2,7 @@
 
 <#PSScriptInfo
 
-.VERSION 1.3.1
+.VERSION 1.3.4
 
 .GUID 966fce03-6946-447c-8e16-29b673f2918b
 
@@ -85,20 +85,42 @@ Task update-gallery -description '* Update all modules from Saritasa PS Gallery.
 
     Get-ChildItem -Path $root -Include 'Saritasa*Tasks.ps1' -Recurse | ForEach-Object `
         {
-            Write-Information "Updating $($_.Name)..."
-            Invoke-WebRequest -Uri "$baseUri/scripts/Psake/$($_.Name)" -OutFile "$root\$($_.Name)"
-            Write-Information 'OK'
+            UpdateScript $_.Name "$root\$($_.Name)" "$baseUri/scripts/Psake/$($_.Name)"
         }
 
+    $otherScripts = @('WebDeploy\AddDelegationRules.ps1', 'WebDeploy\SetupSiteForPublish.ps1')
+
+    foreach ($script in $otherScripts)
+    {
+        $item = Get-Item "$root\$script" -ErrorAction SilentlyContinue
+
+        if ($item)
+        {
+            $uri = "$baseUri/scripts/$script" -replace '\\', '/'
+            UpdateScript $item.Name $item.FullName $uri
+        }
+    }
+
     Invoke-Task add-scripts-to-git
+}
+
+function UpdateScript([string] $Name, [string] $Path, [string] $Uri)
+{
+    Write-Information "Updating $Name..."
+    Invoke-WebRequest -Uri $Uri -OutFile $Path
+    Write-Information 'OK'
 }
 
 Task add-scripts-to-git -description 'Add PowerShell scripts and modules to Git.' `
 {
     $root = $PSScriptRoot
+    $badExtensions = @('.bak', '.orig')
 
     Get-ChildItem -Path $root -File -Recurse -Exclude '*.exe' -Force | ForEach-Object `
         {
-            Exec { git add -f $_.FullName }
+            if ($badExtensions -notcontains $_.Extension)
+            {
+                Exec { git add -f $_.FullName }
+            }
         }
 }

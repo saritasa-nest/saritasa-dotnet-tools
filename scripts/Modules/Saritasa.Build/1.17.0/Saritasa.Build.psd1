@@ -12,7 +12,7 @@
 RootModule = 'Saritasa.Build'
 
 # Version number of this module.
-ModuleVersion = '1.15.0'
+ModuleVersion = '1.17.0'
 
 # ID used to uniquely identify this module
 GUID = '5d34804a-169a-4fb1-bc0d-cc81f925f992'
@@ -24,7 +24,7 @@ Author = 'Anton Zimin'
 CompanyName = 'Saritasa'
 
 # Copyright statement for this module
-Copyright = '(c) 2015-2017 Saritasa. All rights reserved.'
+Copyright = '(c) 2015-2018 Saritasa. All rights reserved.'
 
 # Description of the functionality provided by this module
 Description = 'Contains functions to execute MSBuild targets, restore NuGet packages, run EntityFramework migrations.'
@@ -71,7 +71,8 @@ RequiredModules = @(
 # Functions to export from this module
 FunctionsToExport = @('Copy-DotnetConfig', 'Initialize-MSBuild', 'Invoke-EFMigrate',
     'Install-NugetCli', 'Invoke-NugetRestore', 'Invoke-ProjectBuild',
-    'Invoke-SolutionBuild', 'Merge-PackageConfigs', 'Update-AssemblyInfoFile', 'Update-VariablesInFile')
+    'Invoke-SolutionBuild', 'Merge-PackageConfigs', 'Remove-RoslynAnalyzer',
+    'Update-AssemblyInfoFile', 'Update-VariablesInFile')
 
 # Cmdlets to export from this module
 CmdletsToExport = @()
