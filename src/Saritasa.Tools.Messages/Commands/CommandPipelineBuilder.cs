@@ -44,20 +44,20 @@ namespace Saritasa.Tools.Messages.Commands
             var options = new CommandPipelineOptions();
             optionsAction(options);
 
-            if (options.DefaultCommandPipelineOptions.UseDefaultPipeline)
+            if (options.UseDefaultPipeline)
             {
                 Pipeline.AddMiddlewares(new PipelineMiddlewares.CommandHandlerLocatorMiddleware(
-                    options.DefaultCommandPipelineOptions.Assemblies.ToArray()));
+                    options.Assemblies.ToArray()));
                 Pipeline.AddMiddlewares(new PipelineMiddlewares.CommandHandlerResolverMiddleware());
                 Pipeline.AddMiddlewares(new PipelineMiddlewares.CommandHandlerExecutorMiddleware
                 {
-                    CaptureExceptionDispatchInfo = options.DefaultCommandPipelineOptions.UseExceptionDispatchInfo
+                    CaptureExceptionDispatchInfo = options.UseExceptionDispatchInfo
                 });
-                if (options.DefaultCommandPipelineOptions.ThrowExceptionOnFail)
+                if (options.ThrowExceptionOnFail)
                 {
                     Pipeline.AddMiddlewares(new ThrowExceptionOnFailMiddleware
                     {
-                        CheckExceptionDispatchInfo = options.DefaultCommandPipelineOptions.UseExceptionDispatchInfo
+                        CheckExceptionDispatchInfo = options.UseExceptionDispatchInfo
                     });
                 }
             }

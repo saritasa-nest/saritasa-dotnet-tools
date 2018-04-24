@@ -89,7 +89,7 @@ namespace ZergRushCo.Todosya.Infrastructure
                 new Saritasa.Tools.Messages.Common.Repositories.WebServiceRepository()
             )
             {
-                RethrowExceptions = false,
+                RethrowExceptions = false
             };
 
             // Command.

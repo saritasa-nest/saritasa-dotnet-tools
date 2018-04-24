@@ -2,6 +2,7 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Runtime.ExceptionServices;
 
 namespace Saritasa.Tools.Messages.Queries
 {
@@ -11,9 +12,26 @@ namespace Saritasa.Tools.Messages.Queries
     public class QueryPipelineOptions
     {
         /// <summary>
-        /// Setup default query pipeline middlewares.
+        /// Create default middlewares. <c>True</c> by default.
         /// </summary>
-        public DefaultQueryPipelineOptions DefaultQueryPipelineOptions { get; set; } =
-            new DefaultQueryPipelineOptions();
+        public bool UseDefaultPipeline { get; set; } = true;
+
+        /// <summary>
+        /// Throw exception if execution was failed.
+        /// By default <see cref="Saritasa.Tools.Messages.Abstractions.MessageProcessingException" />
+        /// will be thrown.
+        /// </summary>
+        public bool ThrowExceptionOnFail { get; set; } = true;
+
+        /// <summary>
+        /// Captures <see cref="ExceptionDispatchInfo" /> of original execution exception
+        /// as item with ".exception-dispatch" key. Default is <c>false</c>.
+        /// </summary>
+        public bool UseExceptionDispatchInfo { get; set; } = false;
+
+        /// <summary>
+        /// Calculate execution duration time. <c>True</c> by default.
+        /// </summary>
+        public bool IncludeExecutionDuration { get; set; } = true;
     }
 }

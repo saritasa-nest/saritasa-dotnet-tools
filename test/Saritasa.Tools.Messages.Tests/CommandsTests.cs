@@ -531,6 +531,8 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
+        #region Should_throw_original_exception_if_option_set
+
         public class Ns14_Exception : Exception
         {
         }
@@ -550,9 +552,9 @@ namespace Saritasa.Tools.Messages.Tests
             var builder = pipelineService.PipelineContainer.AddCommandPipeline()
                 .Configure(options =>
                 {
-                    options.DefaultCommandPipelineOptions.Assemblies =
+                    options.Assemblies =
                         new[] { typeof(CommandsTests).GetTypeInfo().Assembly };
-                    options.DefaultCommandPipelineOptions.UseExceptionDispatchInfo = true;
+                    options.UseExceptionDispatchInfo = true;
                 });
 
             // Act & assert
@@ -561,6 +563,7 @@ namespace Saritasa.Tools.Messages.Tests
                 pipelineService.HandleCommand(new Ns14_SimpleTestCommand());
             });
         }
+
+        #endregion
     }
 }
-

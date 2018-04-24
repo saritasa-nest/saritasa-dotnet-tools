@@ -34,7 +34,7 @@ namespace Saritasa.Tools.Messages.Queries
         }
 
         /// <summary>
-        /// Use default middlewares configuration. Includes query handler resolver and executor
+        /// Use default middlewares configuration. Includes query handler resolver and executor.
         /// </summary>
         public QueryPipelineBuilder Configure()
         {
@@ -42,7 +42,7 @@ namespace Saritasa.Tools.Messages.Queries
         }
 
         /// <summary>
-        /// Use default middlewares configuration. Includes query handler resolver and executor
+        /// Use default middlewares configuration. Includes query handler resolver and executor.
         /// </summary>
         /// <returns>Query pipeline builder.</returns>
         public QueryPipelineBuilder Configure(Action<QueryPipelineOptions> optionsAction)
@@ -50,18 +50,18 @@ namespace Saritasa.Tools.Messages.Queries
             var options = new QueryPipelineOptions();
             optionsAction(options);
 
-            if (options.DefaultQueryPipelineOptions.UseDefaultPipeline)
+            if (options.UseDefaultPipeline)
             {
                 Pipeline.AddMiddlewares(new PipelineMiddlewares.QueryObjectResolverMiddleware());
                 Pipeline.AddMiddlewares(new PipelineMiddlewares.QueryExecutorMiddleware
                 {
-                    IncludeExecutionDuration = options.DefaultQueryPipelineOptions.IncludeExecutionDuration
+                    IncludeExecutionDuration = options.IncludeExecutionDuration
                 });
-                if (options.DefaultQueryPipelineOptions.ThrowExceptionOnFail)
+                if (options.ThrowExceptionOnFail)
                 {
                     Pipeline.AddMiddlewares(new ThrowExceptionOnFailMiddleware
                     {
-                        CheckExceptionDispatchInfo = options.DefaultQueryPipelineOptions.UseExceptionDispatchInfo
+                        CheckExceptionDispatchInfo = options.UseExceptionDispatchInfo
                     });
                 }
             }

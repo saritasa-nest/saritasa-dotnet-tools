@@ -44,20 +44,20 @@ namespace Saritasa.Tools.Messages.Events
             var options = new EventPipelineOptions();
             optionsAction(options);
 
-            if (options.DefaultEventPipelineOptions.UseDefaultPipeline)
+            if (options.UseDefaultPipeline)
             {
                 Pipeline.AddMiddlewares(new PipelineMiddlewares.EventHandlerLocatorMiddleware(
-                    options.DefaultEventPipelineOptions.Assemblies.ToArray()));
+                    options.Assemblies.ToArray()));
                 Pipeline.AddMiddlewares(new PipelineMiddlewares.EventHandlerResolverMiddleware());
                 Pipeline.AddMiddlewares(new PipelineMiddlewares.EventHandlerExecutorMiddleware
                 {
-                    CaptureExceptionDispatchInfo = options.DefaultEventPipelineOptions.UseExceptionDispatchInfo
+                    CaptureExceptionDispatchInfo = options.UseExceptionDispatchInfo
                 });
-                if (options.DefaultEventPipelineOptions.ThrowExceptionOnFail)
+                if (options.ThrowExceptionOnFail)
                 {
                     Pipeline.AddMiddlewares(new ThrowExceptionOnFailMiddleware
                     {
-                        CheckExceptionDispatchInfo = options.DefaultEventPipelineOptions.UseExceptionDispatchInfo
+                        CheckExceptionDispatchInfo = options.UseExceptionDispatchInfo
                     });
                 }
             }
