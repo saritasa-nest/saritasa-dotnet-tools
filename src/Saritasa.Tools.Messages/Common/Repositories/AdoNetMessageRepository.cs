@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -156,6 +156,8 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                     return new SqlServerQueryProvider(serializer);
                 case Dialect.Sqlite:
                     return new SqliteQueryProvider(serializer);
+                case Dialect.Postgres:
+                    return new PostgreSqlQueryProvider(serializer);
                 default:
                     throw new NotImplementedException($"The sql provider {dialect} is not implemented yet.");
             }

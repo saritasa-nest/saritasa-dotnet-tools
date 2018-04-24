@@ -2,6 +2,8 @@
 [+] Implement throwing original exception. Look UseExceptionDispatchInfo option.
 [*] Fix empty ctor expression generate.
 [*] Refactor pipeline initialization logic. New pipeline builder Configure method.
+[+] Initial PostgreSQL message repository support.
+[-] Remove default table indexes by CreatedAt and Type columns.
 
 0.4.5 [2017-12-11]
 [*] Fix incorrect package included versions.

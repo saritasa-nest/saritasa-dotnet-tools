@@ -67,10 +67,10 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
             ";
         }
 
-        static readonly string[] fieldsList =
+        private static readonly string[] fieldsList =
         {
-            "content_id",
             "type",
+            "content_id",
             "content_type",
             "content",
             "data",

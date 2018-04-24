@@ -7,9 +7,9 @@ using Saritasa.Tools.Messages.Internal;
 namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
 {
     /// <summary>
-    /// SQLite sql scripts.
+    /// PostgreSQL sql scripts.
     /// </summary>
-    internal class SqliteQueryProvider : IMessageQueryProvider
+    internal class PostgreSqlQueryProvider : IMessageQueryProvider
     {
         private const string TableName = "saritasa_messages";
 
@@ -19,7 +19,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
         /// .ctor
         /// </summary>
         /// <param name="serializer">Used object serializer.</param>
-        public SqliteQueryProvider(IObjectSerializer serializer)
+        public PostgreSqlQueryProvider(IObjectSerializer serializer)
         {
             if (serializer == null)
             {
@@ -32,38 +32,37 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
         public string GetCreateTableScript()
         {
             return $@"
-                CREATE TABLE IF NOT EXISTS {TableName} (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    type TINYINT NOT NULL,
-                    content_id CHARACTER(32) NOT NULL,
-                    content_type VARYING CHARACTER(255) NOT NULL,
-                    content {(serializer.IsText ? "TEXT" : "BLOB")} NOT NULL,
-                    data {(serializer.IsText ? "TEXT" : "BLOB")},
-                    error_details {(serializer.IsText ? "TEXT" : "BLOB")},
-                    error_message VARYING CHARACTER(255) NOT NULL DEFAULT '',
-                    error_type VARYING CHARACTER(255) NOT NULL DEFAULT '',
-                    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                    execution_duration INTEGER NOT NULL,
-                    status TINYINT NOT NULL
+                CREATE TABLE {TableName} (
+                    id bigserial primary key,
+                    type smallint not null,
+                    content_id uuid not null,
+                    content_type varchar(255) not null,
+                    content {(serializer.IsText ? "text" : "bytea")} not null,
+                    data {(serializer.IsText ? "text" : "bytea")},
+                    error_details {(serializer.IsText ? "text" : "bytea")},
+                    error_message varchar(255) not null default '',
+                    error_type varchar(255) not null default '',
+                    created_at timestamp not null,
+                    execution_duration int not null,
+                    status smallint not null
                 );
                 CREATE INDEX ix_content_id ON {TableName} (content_id);
                 CREATE INDEX ix_content_type ON {TableName} (content_type);
-                CREATE INDEX ix_error_type ON {TableName} (error_type);
-";
+                CREATE INDEX ix_error_type ON {TableName} (error_type);";
         }
 
         /// <inheritdoc />
         public string GetExistsTableScript()
         {
-            return $"SELECT name FROM sqlite_master WHERE type='table' AND name= '{TableName}'";
+            return $"SELECT 1 FROM information_schema.tables WHERE table_name = '{TableName}';";
         }
 
         /// <inheritdoc />
         public string GetInsertMessageScript()
         {
             return $@"
-                INSERT INTO {TableName} VALUES
-                (NULL, @Type, @ContentId, @ContentType, @Content, @Data, @ErrorDetails, @ErrorMessage, @ErrorType, @CreatedAt, @ExecutionDuration, @Status);
+                INSERT INTO {TableName} (type, content_id, content_type, content, data, error_details, error_message, error_type, created_at, execution_duration, status)
+                VALUES (@Type, @ContentId::uuid, @ContentType, @Content, @Data, @ErrorDetails, @ErrorMessage, @ErrorType, @CreatedAt, @ExecutionDuration, @Status);
             ";
         }
 
@@ -90,7 +89,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
                 throw new ArgumentNullException(nameof(messageQuery));
             }
 
-            return BuildSelectString(messageQuery, new SqLiteSelectStringBuilder());
+            return BuildSelectString(messageQuery, new MySqlSelectStringBuilder());
         }
 
         private static string BuildSelectString(MessageQuery messageQuery, ISelectStringBuilder ssb)
