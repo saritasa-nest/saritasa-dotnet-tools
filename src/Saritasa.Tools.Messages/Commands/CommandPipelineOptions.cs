@@ -34,6 +34,6 @@ namespace Saritasa.Tools.Messages.Commands
         /// <summary>
         /// Assemblies to search handlers.
         /// </summary>
-        public IEnumerable<Assembly> Assemblies { get; set; }
+        public IEnumerable<Assembly> Assemblies { get; set; } = new List<Assembly>();
     }
 }
