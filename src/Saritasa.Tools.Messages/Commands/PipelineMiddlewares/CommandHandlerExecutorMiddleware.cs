@@ -70,7 +70,6 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
                 {
                     messageContext.FailException = ex.InnerException;
                 }
-                //ExceptionDispatchInfo.Capture(messageContext)
             }
             catch (Exception ex)
             {
