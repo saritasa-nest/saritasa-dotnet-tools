@@ -1,4 +1,4 @@
-﻿0.4.7 [2017-02-08]
+﻿0.4.7 [2018-02-08]
 [*] Fix FlowUtils.RetryAsync non async exception behavior for .NET 4.0 .
 [+] Add EnglishUtils.PluralizeWithNumber and EnglishUtils.Pluralize .
 [+] Add StringUtils.Capitalize .

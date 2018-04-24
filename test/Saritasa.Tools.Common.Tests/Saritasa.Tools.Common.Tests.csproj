@@ -5,16 +5,8 @@
     <TargetFrameworks>net452;netcoreapp2.0</TargetFrameworks>
     <AssemblyName>Saritasa.Tools.Common.Tests</AssemblyName>
     <PackageId>Saritasa.Tools.Common.Tests</PackageId>
-    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <RuntimeFrameworkVersion Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">2.0.0</RuntimeFrameworkVersion>
-    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
-    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <CodeAnalysisRuleSet>../../tools/Saritasa.ruleset</CodeAnalysisRuleSet>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile Condition="'$(OS)' == 'Windows_NT'">../../tools/SaritasaTools.snk</AssemblyOriginatorKeyFile>
