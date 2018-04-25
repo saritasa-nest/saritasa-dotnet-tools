@@ -48,10 +48,15 @@ namespace Saritasa.Tools.Messages.Commands
             {
                 Pipeline.AddMiddlewares(new PipelineMiddlewares.CommandHandlerLocatorMiddleware(
                     options.Assemblies.ToArray()));
-                Pipeline.AddMiddlewares(new PipelineMiddlewares.CommandHandlerResolverMiddleware());
+                Pipeline.AddMiddlewares(new PipelineMiddlewares.CommandHandlerResolverMiddleware
+                {
+                    UseInternalObjectResolver = options.InternalResolver.UseInternalObjectResolver,
+                    UsePropertiesResolving = options.InternalResolver.UsePropertiesResolving
+                });
                 Pipeline.AddMiddlewares(new PipelineMiddlewares.CommandHandlerExecutorMiddleware
                 {
-                    CaptureExceptionDispatchInfo = options.UseExceptionDispatchInfo
+                    CaptureExceptionDispatchInfo = options.UseExceptionDispatchInfo,
+                    UseParametersResolve = options.InternalResolver.UseHandlerParametersResolve
                 });
                 if (options.ThrowExceptionOnFail)
                 {

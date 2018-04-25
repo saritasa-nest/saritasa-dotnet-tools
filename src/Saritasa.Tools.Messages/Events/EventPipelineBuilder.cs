@@ -48,10 +48,15 @@ namespace Saritasa.Tools.Messages.Events
             {
                 Pipeline.AddMiddlewares(new PipelineMiddlewares.EventHandlerLocatorMiddleware(
                     options.Assemblies.ToArray()));
-                Pipeline.AddMiddlewares(new PipelineMiddlewares.EventHandlerResolverMiddleware());
+                Pipeline.AddMiddlewares(new PipelineMiddlewares.EventHandlerResolverMiddleware
+                {
+                    UseInternalObjectResolver = options.InternalResolver.UseInternalObjectResolver,
+                    UsePropertiesResolving = options.InternalResolver.UsePropertiesResolving
+                });
                 Pipeline.AddMiddlewares(new PipelineMiddlewares.EventHandlerExecutorMiddleware
                 {
-                    CaptureExceptionDispatchInfo = options.UseExceptionDispatchInfo
+                    CaptureExceptionDispatchInfo = options.UseExceptionDispatchInfo,
+                    UseParametersResolve = options.InternalResolver.UseHandlerParametersResolve
                 });
                 if (options.ThrowExceptionOnFail)
                 {

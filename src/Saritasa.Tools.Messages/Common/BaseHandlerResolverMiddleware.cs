@@ -26,7 +26,7 @@ namespace Saritasa.Tools.Messages.Common
         public bool UseInternalObjectResolver { get; set; } = true;
 
         /// <summary>
-        /// Resolve handler object public properties using service provider. Default is <c>true</c>.
+        /// Resolve handler object public properties using service provider. Default is <c>false</c>.
         /// </summary>
         public bool UsePropertiesResolving { get; set; } = false;
 

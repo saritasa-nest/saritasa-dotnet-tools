@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
+using Saritasa.Tools.Messages.Common;
 
 namespace Saritasa.Tools.Messages.Commands
 {
@@ -35,5 +36,10 @@ namespace Saritasa.Tools.Messages.Commands
         /// Assemblies to search handlers.
         /// </summary>
         public IEnumerable<Assembly> Assemblies { get; set; } = new List<Assembly>();
+
+        /// <summary>
+        /// Options for internal service resolver.
+        /// </summary>
+        public InternalResolverOptions InternalResolver { get; set; } = new InternalResolverOptions();
     }
 }
