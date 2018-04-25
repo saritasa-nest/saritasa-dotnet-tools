@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -22,6 +22,11 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// dictionary with additional processing data. For key/value use <see cref="string" /> type.
         /// </summary>
         public const string DataKey = ".data";
+
+        /// <summary>
+        /// Additional parameter provided for middleware for handling.
+        /// </summary>
+        public const string ParamKey = ".param";
 
         /// <summary>
         /// Contains <see cref="System.Runtime.ExceptionServices.ExceptionDispatchInfo " />

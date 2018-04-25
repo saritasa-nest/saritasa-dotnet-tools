@@ -4,6 +4,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+using System.Threading;
 using Xunit;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Abstractions.Commands;
@@ -16,7 +17,7 @@ namespace Saritasa.Tools.Messages.Tests
     /// <summary>
     /// Command messages tests.
     /// </summary>
-    public class CommandsTests
+    public sealed class CommandsTests
     {
         private readonly IMessagePipelineService pipelineService = new DefaultMessagePipelineService();
 
@@ -565,5 +566,48 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         #endregion
+
+        private class Ns15_TestParamMiddleware : IMessagePipelineMiddleware
+        {
+            public int HasParamCount { get; set; }
+
+            public string Id { get; } = nameof(Ns15_TestParamMiddleware);
+
+            public void Handle(IMessageContext messageContext)
+            {
+                if (messageContext.Items.ContainsKey(MessageContextConstants.ParamKey))
+                {
+                    HasParamCount++;
+                }
+            }
+        }
+
+        private class Ns15_EmptyCommand
+        {
+        }
+
+        [Fact]
+        public async void Should_pass_additional_param_to_middleware()
+        {
+            // Arrange
+            var testParamMiddleware = new Ns15_TestParamMiddleware();
+            var builder = pipelineService.PipelineContainer.AddCommandPipeline()
+                .Configure(options =>
+                {
+                    options.Assemblies =
+                        new[] { typeof(CommandsTests).GetTypeInfo().Assembly };
+                    options.UseDefaultPipeline = false;
+                })
+                .AddMiddleware(testParamMiddleware);
+
+            // Act
+            pipelineService.HandleCommand(new Ns15_EmptyCommand());
+            pipelineService.HandleCommand(new Ns15_EmptyCommand(), 1);
+            await pipelineService.HandleCommandAsync(new Ns15_EmptyCommand());
+            await pipelineService.HandleCommandAsync(new Ns15_EmptyCommand(), 1);
+
+            // Assert
+            Assert.Equal(2, testParamMiddleware.HasParamCount);
+        }
     }
 }
