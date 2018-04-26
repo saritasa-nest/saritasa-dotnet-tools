@@ -567,6 +567,8 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
+        #region Should_pass_additional_param_to_middleware
+
         private class Ns15_TestParamMiddleware : IMessagePipelineMiddleware
         {
             public int HasParamCount { get; set; }
@@ -609,5 +611,7 @@ namespace Saritasa.Tools.Messages.Tests
             // Assert
             Assert.Equal(2, testParamMiddleware.HasParamCount);
         }
+
+        #endregion
     }
 }

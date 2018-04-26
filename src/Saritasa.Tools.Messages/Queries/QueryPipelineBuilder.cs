@@ -52,7 +52,10 @@ namespace Saritasa.Tools.Messages.Queries
 
             if (options.UseDefaultPipeline)
             {
-                Pipeline.AddMiddlewares(new PipelineMiddlewares.QueryObjectResolverMiddleware());
+                Pipeline.AddMiddlewares(new PipelineMiddlewares.QueryObjectResolverMiddleware
+                {
+                    UseInternalObjectResolver = options.UseInternalObjectResolver
+                });
                 Pipeline.AddMiddlewares(new PipelineMiddlewares.QueryExecutorMiddleware
                 {
                     IncludeExecutionDuration = options.IncludeExecutionDuration

@@ -19,7 +19,7 @@ namespace Saritasa.Tools.Messages.Queries
         /// <summary>
         /// Throw exception if execution was failed.
         /// By default <see cref="Saritasa.Tools.Messages.Abstractions.MessageProcessingException" />
-        /// will be thrown.
+        /// will be thrown. <c>True</c> by default.
         /// </summary>
         public bool ThrowExceptionOnFail { get; set; } = true;
 
@@ -33,5 +33,10 @@ namespace Saritasa.Tools.Messages.Queries
         /// Calculate execution duration time. <c>True</c> by default.
         /// </summary>
         public bool IncludeExecutionDuration { get; set; } = true;
+
+        /// <summary>
+        /// If <c>true</c> the middleware resolves dependencies using internal resolver. Default is <c>true</c>.
+        /// </summary>
+        public bool UseInternalObjectResolver { get; set; } = true;
     }
 }
