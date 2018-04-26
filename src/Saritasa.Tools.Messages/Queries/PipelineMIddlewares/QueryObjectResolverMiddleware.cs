@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -9,7 +9,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Abstractions.Queries;
-using Saritasa.Tools.Messages.Internal;
 using Saritasa.Tools.Messages.Common;
 
 namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
@@ -38,10 +37,10 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
         /// <summary>
         /// .ctor
         /// </summary>
-        /// <param name="assemblies">Assemblies to search query handler.</param>
+        /// <param name="assemblies">Assemblies to search query handler. Should be used for internal resolver only.</param>
         public QueryObjectResolverMiddleware(params Assembly[] assemblies)
         {
-            interfaceResolveDict = assemblies
+            var allQueryTypes = assemblies
                 .SelectMany(a => a.GetTypes())
                 .Select(t => t.GetTypeInfo())
                 .Where(t => t.GetCustomAttribute<QueryHandlersAttribute>() != null)
@@ -50,10 +49,20 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
                     iface = i,
                     type = t
                 }))
-                .ToDictionary(
-                    k => k.iface,
-                    v => v.type.AsType()
-                );
+                .ToList();
+
+            var implementationDuplicates = allQueryTypes
+                .GroupBy(qt => qt.iface)
+                .Where(qt => qt.Count() > 1)
+                .ToList();
+            if (implementationDuplicates.Any())
+            {
+                var duplicates = string.Join(", ", implementationDuplicates.Select(x => x.Key.FullName));
+                throw new InvalidOperationException(string.Format(Properties.Strings.CannotResolveQueryMultipleTypes,
+                    duplicates));
+            }
+
+            interfaceResolveDict = allQueryTypes.ToDictionary(k => k.iface, v => v.type.AsType());
         }
 
         /// <inheritdoc />
@@ -66,7 +75,9 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
             {
                 throw new InvalidOperationException("Query method does not have DeclaringType.");
             }
-            if (queryObjectType.GetTypeInfo().IsInterface)
+
+            // Resolve by interface.
+            if (UseInternalObjectResolver && queryObjectType.GetTypeInfo().IsInterface)
             {
                 if (interfaceResolveDict.ContainsKey(queryObjectType))
                 {
@@ -78,20 +89,13 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
                         $"Cannot find implementation for query with type {queryObjectType.FullName}.");
                 }
             }
+
+            // If query object still not resolved - we do that. For interfaces we substitute QueryObject with resolved one.
             if (queryParams.QueryObject == null)
             {
-                if (!UseInternalObjectResolver && queryParams.Method.DeclaringType.GetTypeInfo().IsInterface)
-                {
-                    queryObjectType = queryParams.Method.DeclaringType;
-                }
-                if (UseInternalObjectResolver)
-                {
-                    queryParams.QueryObject = CreateHandlerWithCache(queryObjectType, messageContext.ServiceProvider, Id);
-                }
-                else
-                {
-                    queryParams.QueryObject = messageContext.ServiceProvider.GetService(queryObjectType);
-                }
+                queryParams.QueryObject = UseInternalObjectResolver ?
+                    CreateHandlerWithCache(queryObjectType, messageContext.ServiceProvider, Id) :
+                    messageContext.ServiceProvider.GetService(queryObjectType);
             }
             if (queryParams.QueryObject == null)
             {

@@ -436,5 +436,14 @@ namespace Saritasa.Tools.Messages.Properties {
                 return ResourceManager.GetString("WebEndpoint_ValueCannotBeEmptyColleciton", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///    Looks up a localized string CannotResolveQueryMultipleTypes.
+        /// </summary>
+        public static string CannotResolveQueryMultipleTypes {
+            get {
+                return ResourceManager.GetString("CannotResolveQueryMultipleTypes", resourceCulture);
+            }
+        }
     }
 }
