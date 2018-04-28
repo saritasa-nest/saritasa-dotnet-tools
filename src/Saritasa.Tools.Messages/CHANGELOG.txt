@@ -1,7 +1,7 @@
 ﻿0.5.0 [TBD]
 [+] Implement throwing original exception. Look UseExceptionDispatchInfo option.
-[*] Fix empty ctor expression generate.
-[*] Refactor pipeline initialization logic. New pipeline builder Configure method.
+[*] Fix empty constructor expression generate.
+[*] Refactor pipelines initialization logic. New pipeline builder Configure method.
 [+] Initial PostgreSQL message repository support.
 [+] Ability to pass additional param to middleware for commands and events.
 [-] Remove default table indexes by CreatedAt and Type columns.

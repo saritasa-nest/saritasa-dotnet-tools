@@ -2,8 +2,6 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
-using System.Reflection;
 using System.Runtime.ExceptionServices;
 using Saritasa.Tools.Messages.Common;
 
@@ -31,11 +29,6 @@ namespace Saritasa.Tools.Messages.Commands
         /// as item with ".exception-dispatch" key. Default is <c>false</c>.
         /// </summary>
         public bool UseExceptionDispatchInfo { get; set; } = false;
-
-        /// <summary>
-        /// Assemblies to search handlers.
-        /// </summary>
-        public IEnumerable<Assembly> Assemblies { get; set; } = new List<Assembly>();
 
         /// <summary>
         /// Options for internal service resolver.

@@ -2,9 +2,8 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
-using System.Reflection;
 using System.Runtime.ExceptionServices;
+using Saritasa.Tools.Messages.Common;
 
 namespace Saritasa.Tools.Messages.Queries
 {
@@ -37,13 +36,16 @@ namespace Saritasa.Tools.Messages.Queries
         public bool IncludeExecutionDuration { get; set; } = true;
 
         /// <summary>
-        /// If <c>true</c> the middleware resolves dependencies using internal resolver. Default is <c>true</c>.
+        /// Options for internal service resolver.
         /// </summary>
-        public bool UseInternalObjectResolver { get; set; } = true;
+        public InternalResolverOptions InternalResolver { get; set; } = new InternalResolverOptions();
 
         /// <summary>
-        /// Assemblies to search handlers.
+        /// Default constructor.
         /// </summary>
-        public IEnumerable<Assembly> Assemblies { get; set; } = new List<Assembly>();
+        public QueryPipelineOptions()
+        {
+            InternalResolver.UseHandlerParametersResolve = false;
+        }
     }
 }

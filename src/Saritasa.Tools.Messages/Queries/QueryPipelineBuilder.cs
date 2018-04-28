@@ -55,24 +55,26 @@ namespace Saritasa.Tools.Messages.Queries
 
             if (options.UseDefaultPipeline)
             {
-                if (options.Assemblies == null)
-                {
-                    options.Assemblies = new List<Assembly>();
-                }
-                if (options.Assemblies.Any() && !options.UseInternalObjectResolver)
+                if (options.InternalResolver.HasAssemblies && !options.InternalResolver.UseInternalObjectResolver)
                 {
                     throw new InvalidOperationException(
                         "Assemblies to search handlers were provided but internal object resolver is not used.");
                 }
+                if (options.InternalResolver.UseHandlerParametersResolve)
+                {
+                    throw new InvalidOperationException("Handler method parameters resolve does not work for query pipeline.");
+                }
 
                 // If assemblies were provided that means we use internal object resolver.
-                if (options.Assemblies.Any())
+                if (options.InternalResolver.HasAssemblies)
                 {
-                    Pipeline.AddMiddlewares(new PipelineMiddlewares.QueryObjectResolverMiddleware(options.Assemblies.ToArray()));
+                    Pipeline.AddMiddlewares(new PipelineMiddlewares.QueryObjectResolverMiddleware(
+                        options.InternalResolver.GetAssemblies()));
                 }
                 else
                 {
-                    Pipeline.AddMiddlewares(new PipelineMiddlewares.QueryObjectResolverMiddleware(options.UseInternalObjectResolver));
+                    Pipeline.AddMiddlewares(new PipelineMiddlewares.QueryObjectResolverMiddleware(
+                        options.InternalResolver.UseInternalObjectResolver));
                 }
 
                 Pipeline.AddMiddlewares(new PipelineMiddlewares.QueryExecutorMiddleware

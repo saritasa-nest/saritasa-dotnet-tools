@@ -47,7 +47,7 @@ namespace Saritasa.Tools.Messages.Commands
             if (options.UseDefaultPipeline)
             {
                 Pipeline.AddMiddlewares(new PipelineMiddlewares.CommandHandlerLocatorMiddleware(
-                    options.Assemblies.ToArray()));
+                    options.InternalResolver.GetAssemblies()));
                 Pipeline.AddMiddlewares(new PipelineMiddlewares.CommandHandlerResolverMiddleware(
                     options.InternalResolver.UseInternalObjectResolver)
                 {
