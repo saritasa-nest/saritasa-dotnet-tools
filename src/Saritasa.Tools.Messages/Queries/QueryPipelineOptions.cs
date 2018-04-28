@@ -2,6 +2,8 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Runtime.ExceptionServices;
 
 namespace Saritasa.Tools.Messages.Queries
@@ -38,5 +40,10 @@ namespace Saritasa.Tools.Messages.Queries
         /// If <c>true</c> the middleware resolves dependencies using internal resolver. Default is <c>true</c>.
         /// </summary>
         public bool UseInternalObjectResolver { get; set; } = true;
+
+        /// <summary>
+        /// Assemblies to search handlers.
+        /// </summary>
+        public IEnumerable<Assembly> Assemblies { get; set; } = new List<Assembly>();
     }
 }

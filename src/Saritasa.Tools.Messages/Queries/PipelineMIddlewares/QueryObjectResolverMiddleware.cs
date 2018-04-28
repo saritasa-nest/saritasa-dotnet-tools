@@ -19,8 +19,10 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
     public class QueryObjectResolverMiddleware : BaseHandlerResolverMiddleware,
         IMessagePipelineMiddleware, IAsyncMessagePipelineMiddleware, IMessagePipelinePostAction
     {
-        private readonly IDictionary<Type, Type> interfaceResolveDict =
+        private readonly IDictionary<Type, Type> interfaceResolveDictionary =
             new Dictionary<Type, Type>();
+
+        private readonly Action<IMessageContext> handleAction;
 
         /// <summary>
         /// Middleware identifier.
@@ -30,15 +32,20 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
         /// <summary>
         /// .ctor
         /// </summary>
-        public QueryObjectResolverMiddleware()
+        /// <param name="useInternalObjectResolver">Use internal object resolver for handlers.
+        /// Otherwise <see cref="IServiceProvider" /> will be used. <c>True</c> by default.</param>
+        public QueryObjectResolverMiddleware(bool useInternalObjectResolver = true) :
+            base(useInternalObjectResolver)
         {
+            handleAction = useInternalObjectResolver ? HandleWithInternalResolver :
+                (Action<IMessageContext>)HandleWithoutInternalResolver;
         }
 
         /// <summary>
         /// .ctor
         /// </summary>
         /// <param name="assemblies">Assemblies to search query handler. Should be used for internal resolver only.</param>
-        public QueryObjectResolverMiddleware(params Assembly[] assemblies)
+        public QueryObjectResolverMiddleware(params Assembly[] assemblies) : base(useInternalObjectResolver: true)
         {
             var allQueryTypes = assemblies
                 .SelectMany(a => a.GetTypes())
@@ -62,26 +69,38 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
                     duplicates));
             }
 
-            interfaceResolveDict = allQueryTypes.ToDictionary(k => k.iface, v => v.type.AsType());
+            interfaceResolveDictionary = allQueryTypes.ToDictionary(k => k.iface, v => v.type.AsType());
+            handleAction = HandleWithInternalResolver;
         }
 
         /// <inheritdoc />
         public void Handle(IMessageContext messageContext)
         {
-            var queryParams = messageContext.GetItemByKey<QueryParameters>(QueryPipeline.QueryParametersKey);
+            handleAction(messageContext);
+        }
 
-            var queryObjectType = queryParams.Method.DeclaringType;
+        private static Type GetDeclaringType(QueryParameters queryParameters)
+        {
+            var queryObjectType = queryParameters.Method.DeclaringType;
             if (queryObjectType == null)
             {
                 throw new InvalidOperationException("Query method does not have DeclaringType.");
             }
+            return queryObjectType;
+        }
+
+        private void HandleWithInternalResolver(IMessageContext messageContext)
+        {
+            var queryParameters = messageContext.GetItemByKey<QueryParameters>(QueryPipeline.QueryParametersKey);
+            var queryObjectType = GetDeclaringType(queryParameters);
 
             // Resolve by interface.
-            if (UseInternalObjectResolver && queryObjectType.GetTypeInfo().IsInterface)
+            var isObjectTypeInterface = queryObjectType.GetTypeInfo().IsInterface;
+            if (isObjectTypeInterface)
             {
-                if (interfaceResolveDict.ContainsKey(queryObjectType))
+                if (interfaceResolveDictionary.ContainsKey(queryObjectType))
                 {
-                    queryObjectType = interfaceResolveDict[queryObjectType];
+                    queryObjectType = interfaceResolveDictionary[queryObjectType];
                 }
                 else
                 {
@@ -91,13 +110,28 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
             }
 
             // If query object still not resolved - we do that. For interfaces we substitute QueryObject with resolved one.
-            if (queryParams.QueryObject == null)
+            if (queryParameters.QueryObject == null)
             {
-                queryParams.QueryObject = UseInternalObjectResolver ?
-                    CreateHandlerWithCache(queryObjectType, messageContext.ServiceProvider, Id) :
-                    messageContext.ServiceProvider.GetService(queryObjectType);
+                queryParameters.QueryObject = CreateHandlerWithCache(queryObjectType, messageContext.ServiceProvider);
             }
-            if (queryParams.QueryObject == null)
+            if (queryParameters.QueryObject == null)
+            {
+                throw new InvalidOperationException(
+                    string.Format(Properties.Strings.CannotResolveQueryObject, queryObjectType));
+            }
+        }
+
+        private void HandleWithoutInternalResolver(IMessageContext messageContext)
+        {
+            var queryParameters = messageContext.GetItemByKey<QueryParameters>(QueryPipeline.QueryParametersKey);
+            var queryObjectType = GetDeclaringType(queryParameters);
+
+            // If query object still not resolved - we do that. For interfaces we substitute QueryObject with resolved one.
+            if (queryParameters.QueryObject == null)
+            {
+                queryParameters.QueryObject = messageContext.ServiceProvider.GetService(queryObjectType);
+            }
+            if (queryParameters.QueryObject == null)
             {
                 throw new InvalidOperationException(
                     string.Format(Properties.Strings.CannotResolveQueryObject, queryObjectType));
@@ -118,7 +152,7 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
         {
             if (UseInternalObjectResolver)
             {
-                var queryParams = (QueryParameters)messageContext.Items[QueryPipeline.QueryParametersKey];
+                var queryParams = messageContext.GetItemByKey<QueryParameters>(QueryPipeline.QueryParametersKey);
                 var disposable = queryParams.QueryObject as IDisposable;
                 disposable?.Dispose();
                 queryParams.QueryObject = null;

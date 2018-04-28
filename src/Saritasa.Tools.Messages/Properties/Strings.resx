@@ -142,7 +142,7 @@
     <value>Cannot resolve handler {0}.</value>
   </data>
   <data name="CannotResolveQueryMultipleTypes" xml:space="preserve">
-    <value>There are multiple implementations for following types: {0}. Fix this or do not use internal resolver instead. To do not use internal resolver use parameterless constructor.</value>
+    <value>There are multiple implementations for following types: {0}. Fix this or do not use internal resolver instead. To avoid internal resolver use parameterless constructor.</value>
   </data>
   <data name="CannotResolveQueryObject" xml:space="preserve">
     <value>Query object of type {0} cannot be resolved.</value>

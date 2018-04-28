@@ -71,10 +71,7 @@ namespace Saritasa.Tools.Messages.Tests
         private void SetupQueryPipeline(QueryPipelineBuilder builder)
         {
             builder
-                .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectResolverMiddleware
-                {
-                    UseInternalObjectResolver = true
-                })
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectResolverMiddleware())
                 .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware());
         }
 
@@ -209,7 +206,7 @@ namespace Saritasa.Tools.Messages.Tests
             SetupQueryPipeline(pipelineService.PipelineContainer.AddQueryPipeline());
             var messageContext = new MessageContext(pipelineService);
             var queryPipeline = pipelineService.GetPipelineOfType<IQueryPipeline>();
-            var ret = queryPipeline.CreateMessageContext<QueriesTests.QueryObject>(pipelineService, messageContext)
+            queryPipeline.CreateMessageContext<QueryObject>(pipelineService, messageContext)
                 .With(q => q.SimpleQuery(10, 10));
 
             // Act
@@ -241,10 +238,7 @@ namespace Saritasa.Tools.Messages.Tests
             // Arrange
             pipelineService.PipelineContainer.AddQueryPipeline()
                 .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectResolverMiddleware(
-                    typeof(UserQueries).GetTypeInfo().Assembly)
-                {
-                    UseInternalObjectResolver = true
-                })
+                    typeof(UserQueries).GetTypeInfo().Assembly))
                 .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware());
 
             // Act
@@ -285,10 +279,7 @@ namespace Saritasa.Tools.Messages.Tests
             pipelineService.ServiceProvider = new FuncServiceProvider(ProductQueries.Resolver);
             pipelineService.PipelineContainer.AddQueryPipeline()
                 .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectResolverMiddleware(
-                    typeof(UserQueries).GetTypeInfo().Assembly)
-                {
-                    UseInternalObjectResolver = false,
-                })
+                    typeof(UserQueries).GetTypeInfo().Assembly))
                 .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware());
 
             // Act

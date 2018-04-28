@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -21,14 +21,24 @@ namespace Saritasa.Tools.Messages.Common
         public const string HandlerObjectKey = "handler-object";
 
         /// <summary>
-        /// If <c>true</c> the middleware resolves dependencies using internal resolver. Default is <c>true</c>.
-        /// </summary>
-        public bool UseInternalObjectResolver { get; set; } = true;
-
-        /// <summary>
         /// Resolve handler object public properties using service provider. Default is <c>false</c>.
         /// </summary>
         public bool UsePropertiesResolving { get; set; } = false;
+
+        /// <summary>
+        /// If <c>true</c> the middleware resolves dependencies using internal resolver.
+        /// </summary>
+        protected bool UseInternalObjectResolver { get; set; }
+
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        /// <param name="useInternalObjectResolver">Use internal object resolver for handlers.
+        /// Otherwise <see cref="IServiceProvider" /> will be used.</param>
+        public BaseHandlerResolverMiddleware(bool useInternalObjectResolver)
+        {
+            this.UseInternalObjectResolver = useInternalObjectResolver;
+        }
 
         private readonly ConcurrentDictionary<Type, Func<IServiceProvider, object>> objectFactoriesCache =
             new ConcurrentDictionary<Type, Func<IServiceProvider, object>>();
@@ -41,13 +51,12 @@ namespace Saritasa.Tools.Messages.Common
         /// </summary>
         /// <param name="type">Object type.</param>
         /// <param name="serviceProvider">Service provider.</param>
-        /// <param name="logger">Logger marker.</param>
         /// <returns>Handler object.</returns>
-        protected object CreateHandlerWithCache(Type type, IServiceProvider serviceProvider, string logger)
+        protected object CreateHandlerWithCache(Type type, IServiceProvider serviceProvider)
         {
             var handlerFactory = objectFactoriesCache.GetOrAdd(
                 type,
-                t => CreateNewObjectFactory(t, logger).Compile()
+                t => CreateNewObjectFactory(t).Compile()
             );
             return handlerFactory(serviceProvider);
         }
@@ -56,9 +65,8 @@ namespace Saritasa.Tools.Messages.Common
         /// Creates new object factory. Find public ctor and inject services.
         /// </summary>
         /// <param name="type">Object type.</param>
-        /// <param name="logger">Logger marker.</param>
         /// <returns>Expression.</returns>
-        protected Expression<Func<IServiceProvider, object>> CreateNewObjectFactory(Type type, string logger)
+        protected Expression<Func<IServiceProvider, object>> CreateNewObjectFactory(Type type)
         {
             // Find most descriptive ctor.
             var ctor = type

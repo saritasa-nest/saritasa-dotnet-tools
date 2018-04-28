@@ -48,9 +48,9 @@ namespace Saritasa.Tools.Messages.Events
             {
                 Pipeline.AddMiddlewares(new PipelineMiddlewares.EventHandlerLocatorMiddleware(
                     options.Assemblies.ToArray()));
-                Pipeline.AddMiddlewares(new PipelineMiddlewares.EventHandlerResolverMiddleware
+                Pipeline.AddMiddlewares(new PipelineMiddlewares.EventHandlerResolverMiddleware(
+                    options.InternalResolver.UseInternalObjectResolver)
                 {
-                    UseInternalObjectResolver = options.InternalResolver.UseInternalObjectResolver,
                     UsePropertiesResolving = options.InternalResolver.UsePropertiesResolving
                 });
                 Pipeline.AddMiddlewares(new PipelineMiddlewares.EventHandlerExecutorMiddleware

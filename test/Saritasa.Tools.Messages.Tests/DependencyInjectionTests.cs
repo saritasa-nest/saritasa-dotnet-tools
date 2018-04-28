@@ -107,10 +107,7 @@ namespace Saritasa.Tools.Messages.Tests
         {
             // Arrange
             pipelineService.PipelineContainer.AddQueryPipeline()
-                .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectResolverMiddleware
-                {
-                    UseInternalObjectResolver = true
-                })
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectResolverMiddleware())
                 .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware());
 
             // Act
@@ -142,10 +139,7 @@ namespace Saritasa.Tools.Messages.Tests
         {
             // Arrange
             pipelineService.PipelineContainer.AddQueryPipeline()
-                .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectResolverMiddleware
-                {
-                    UseInternalObjectResolver = false
-                })
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectResolverMiddleware(false))
                 .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware());
 
             // Act
@@ -167,10 +161,7 @@ namespace Saritasa.Tools.Messages.Tests
             pipelineService.PipelineContainer.AddCommandPipeline()
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
                     typeof(CommandsTests).GetTypeInfo().Assembly))
-                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerResolverMiddleware
-                {
-                    UseInternalObjectResolver = false,
-                })
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerResolverMiddleware(false))
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerExecutorMiddleware
                 {
                     UseParametersResolve = true

@@ -39,10 +39,7 @@ namespace Saritasa.Tools.Messages.Benchmark
         {
             var pipelineService = new DefaultMessagePipelineService();
             pipelineService.PipelineContainer.AddQueryPipeline()
-                .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectResolverMiddleware
-                {
-                    UseInternalObjectResolver = true
-                })
+                .AddMiddleware(new Queries.PipelineMiddlewares.QueryObjectResolverMiddleware())
                 .AddMiddleware(new Queries.PipelineMiddlewares.QueryExecutorMiddleware());
             decimal result = 0;
 

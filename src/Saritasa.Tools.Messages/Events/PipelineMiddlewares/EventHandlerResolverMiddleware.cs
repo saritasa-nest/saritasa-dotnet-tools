@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -16,6 +16,15 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
     {
         /// <inheritdoc />
         public string Id { get; set; } = nameof(EventHandlerResolverMiddleware);
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="useInternalObjectResolver">Use internal object resolver for handlers.
+        /// Otherwise <see cref="IServiceProvider" /> will be used. <c>True</c> by default.</param>
+        public EventHandlerResolverMiddleware(bool useInternalObjectResolver = true) : base(useInternalObjectResolver)
+        {
+        }
 
         /// <inheritdoc />
         public void Handle(IMessageContext messageContext)
@@ -43,7 +52,7 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
                         if (UseInternalObjectResolver)
                         {
                             handler = CreateHandlerWithCache(handlerMethods[i].Method.DeclaringType,
-                                messageContext.ServiceProvider, Id);
+                                messageContext.ServiceProvider);
                         }
                         else
                         {

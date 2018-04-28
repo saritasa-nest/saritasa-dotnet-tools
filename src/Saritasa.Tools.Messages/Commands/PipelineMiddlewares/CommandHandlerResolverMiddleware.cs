@@ -18,6 +18,16 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         /// <inheritdoc />
         public string Id { get; set; } = nameof(CommandHandlerResolverMiddleware);
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="useInternalObjectResolver">Use internal object resolver for handlers.
+        /// Otherwise <see cref="IServiceProvider" /> will be used. <c>True</c> by default.</param>
+        public CommandHandlerResolverMiddleware(bool useInternalObjectResolver = true) :
+            base(useInternalObjectResolver)
+        {
+        }
+
         /// <inheritdoc />
         public void Handle(IMessageContext messageContext)
         {
@@ -41,7 +51,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             {
                 if (UseInternalObjectResolver)
                 {
-                    handler = CreateHandlerWithCache(type, messageContext.ServiceProvider, Id);
+                    handler = CreateHandlerWithCache(type, messageContext.ServiceProvider);
                 }
                 else
                 {

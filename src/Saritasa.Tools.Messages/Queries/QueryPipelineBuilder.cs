@@ -2,6 +2,9 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Abstractions.Queries;
 using Saritasa.Tools.Messages.Common;
@@ -52,10 +55,26 @@ namespace Saritasa.Tools.Messages.Queries
 
             if (options.UseDefaultPipeline)
             {
-                Pipeline.AddMiddlewares(new PipelineMiddlewares.QueryObjectResolverMiddleware
+                if (options.Assemblies == null)
                 {
-                    UseInternalObjectResolver = options.UseInternalObjectResolver
-                });
+                    options.Assemblies = new List<Assembly>();
+                }
+                if (options.Assemblies.Any() && !options.UseInternalObjectResolver)
+                {
+                    throw new InvalidOperationException(
+                        "Assemblies to search handlers were provided but internal object resolver is not used.");
+                }
+
+                // If assemblies were provided that means we use internal object resolver.
+                if (options.Assemblies.Any())
+                {
+                    Pipeline.AddMiddlewares(new PipelineMiddlewares.QueryObjectResolverMiddleware(options.Assemblies.ToArray()));
+                }
+                else
+                {
+                    Pipeline.AddMiddlewares(new PipelineMiddlewares.QueryObjectResolverMiddleware(options.UseInternalObjectResolver));
+                }
+
                 Pipeline.AddMiddlewares(new PipelineMiddlewares.QueryExecutorMiddleware
                 {
                     IncludeExecutionDuration = options.IncludeExecutionDuration
