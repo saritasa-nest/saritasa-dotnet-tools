@@ -57,8 +57,7 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>Message context used in execution.</returns>
         public static async Task<IMessageContext> HandleCommandAsync(this IMessagePipelineService pipelineService,
-            object command, object param,
-            CancellationToken cancellationToken = default(CancellationToken))
+            object command, object param, CancellationToken cancellationToken = default(CancellationToken))
         {
             var commandPipeline = pipelineService.GetPipelineOfType<ICommandPipeline>();
             var messageContext = commandPipeline.CreateMessageContext(pipelineService, command);

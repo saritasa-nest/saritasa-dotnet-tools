@@ -5,6 +5,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Abstractions.Commands;
@@ -610,6 +611,41 @@ namespace Saritasa.Tools.Messages.Tests
 
             // Assert
             Assert.Equal(2, testParamMiddleware.HasParamCount);
+        }
+
+        #endregion
+
+        #region Cancellation_token_should_be_passed_to_command_handler
+
+        private class Ns16_EmptyCommand
+        {
+            public CancellationToken CancellationToken { get; set; }
+
+            public Task Handle(Ns16_EmptyCommand command, CancellationToken ct = default(CancellationToken))
+            {
+                CancellationToken = ct;
+                return Task.FromResult(1);
+            }
+        }
+
+        [Fact]
+        public async void Cancellation_token_should_be_passed_to_command_handler()
+        {
+            // Arrange
+            var builder = pipelineService.PipelineContainer.AddCommandPipeline()
+                .Configure(options =>
+                {
+                    options.Assemblies =
+                        new[] { typeof(CommandsTests).GetTypeInfo().Assembly };
+                });
+
+            // Act
+            var cts = new CancellationTokenSource();
+            var command = new Ns16_EmptyCommand();
+            await pipelineService.HandleCommandAsync(command, cts.Token);
+
+            // Assert
+            Assert.Equal(cts.Token, command.CancellationToken);
         }
 
         #endregion

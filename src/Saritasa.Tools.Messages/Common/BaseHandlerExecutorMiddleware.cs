@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
 
@@ -28,7 +29,8 @@ namespace Saritasa.Tools.Messages.Common
         /// </summary>
         public bool CaptureExceptionDispatchInfo { get; set; } = false;
 
-        private delegate object HandlerCall(object handler, object obj, IServiceProvider serviceProvider);
+        private delegate object HandlerCall(object handler, object obj, IServiceProvider serviceProvider,
+            CancellationToken cancellationToken);
 
         private readonly ConcurrentDictionary<MethodInfo, HandlerCall> methodFuncCache =
             new ConcurrentDictionary<MethodInfo, HandlerCall>();
@@ -44,7 +46,7 @@ namespace Saritasa.Tools.Messages.Common
             MethodInfo handlerMethod)
         {
             var func = CreateInvokeHandlerMethodExpressionWithCache(handler, obj, handlerMethod);
-            var result = func(handler, obj, serviceProvider);
+            var result = func(handler, obj, serviceProvider, default(CancellationToken));
             var task = result as Task;
             task?.ConfigureAwait(false).GetAwaiter().GetResult();
         }
@@ -71,11 +73,12 @@ namespace Saritasa.Tools.Messages.Common
         /// <param name="obj">The first argument.</param>
         /// <param name="serviceProvider">Service provider.</param>
         /// <param name="handlerMethod">Method to execute.</param>
+        /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         protected async Task ExecuteHandlerAsync(object handler, object obj, IServiceProvider serviceProvider,
-            MethodInfo handlerMethod)
+            MethodInfo handlerMethod, CancellationToken cancellationToken = default(CancellationToken))
         {
             var func = CreateInvokeHandlerMethodExpressionWithCache(handler, obj, handlerMethod);
-            var task = func(handler, obj, serviceProvider) as Task;
+            var task = func(handler, obj, serviceProvider, cancellationToken) as Task;
             if (task != null)
             {
                 await task;
@@ -104,46 +107,55 @@ namespace Saritasa.Tools.Messages.Common
             var serviceProviderParam = Expression.Parameter(typeof(IServiceProvider), "sp");
             var objectParam = Expression.Parameter(typeof(object), "obj");
             var handlerParam = Expression.Parameter(typeof(object), "handler");
+            var cancellationTokenParam = Expression.Parameter(typeof(CancellationToken), "cancellationToken");
             var getServiceMethod = typeof(IServiceProvider).GetTypeInfo().GetMethod("GetService");
             var paramsExpressions = new List<Expression>();
             var expressions = new List<Expression>();
 
             // Prepare parameters for function call.
+            var handlerMethodParameters = handlerMethod.GetParameters();
             if (UseParametersResolve)
             {
-                var parameters = handlerMethod.GetParameters();
-                if (parameters.Length > 1)
+                if (handlerMethodParameters.Length > 1)
                 {
                     if (handlerMethod.DeclaringType != obj.GetType())
                     {
                         paramsExpressions.Add(Expression.Convert(objectParam, obj.GetType()));
-                        for (int i = 1; i < parameters.Length; i++)
+                        for (int i = 1; i < handlerMethodParameters.Length; i++)
                         {
                             paramsExpressions.Add(Expression.Convert(
                                 Expression.Call(serviceProviderParam, getServiceMethod,
-                                    Expression.Constant(parameters[i].ParameterType)),
-                                parameters[i].ParameterType));
+                                    Expression.Constant(handlerMethodParameters[i].ParameterType)),
+                                handlerMethodParameters[i].ParameterType));
                         }
                     }
                     else
                     {
-                        for (int i = 0; i < parameters.Length; i++)
+                        for (int i = 0; i < handlerMethodParameters.Length; i++)
                         {
                             paramsExpressions.Add(Expression.Convert(
                                 Expression.Call(serviceProviderParam, getServiceMethod,
-                                    Expression.Constant(parameters[i].ParameterType)),
-                                parameters[i].ParameterType));
+                                    Expression.Constant(handlerMethodParameters[i].ParameterType)),
+                                handlerMethodParameters[i].ParameterType));
                         }
                     }
                 }
-                if (parameters.Length == 1)
+                if (handlerMethodParameters.Length == 1)
                 {
                     paramsExpressions.Add(Expression.Convert(objectParam, obj.GetType()));
                 }
             }
-            else if (handlerMethod.GetParameters().Length > 0)
+            else if (handlerMethodParameters.Length > 0)
             {
                 paramsExpressions.Add(Expression.Convert(objectParam, obj.GetType()));
+            }
+
+            // If last parameter is cancellation token - we pass it.
+            if (handlerMethodParameters.Length > 1 &&
+                handlerMethodParameters[handlerMethodParameters.Length - 1].ParameterType == typeof(CancellationToken))
+            {
+                paramsExpressions.RemoveAt(paramsExpressions.Count - 1);
+                paramsExpressions.Add(cancellationTokenParam);
             }
 
             // Call function with parameters.
@@ -160,7 +172,7 @@ namespace Saritasa.Tools.Messages.Common
             }
 
             return Expression.Lambda<HandlerCall>(
-                Expression.Block(expressions), handlerParam, objectParam, serviceProviderParam);
+                Expression.Block(expressions), handlerParam, objectParam, serviceProviderParam, cancellationTokenParam);
         }
     }
 }

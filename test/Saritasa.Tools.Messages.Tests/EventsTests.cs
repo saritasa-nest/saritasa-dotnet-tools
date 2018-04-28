@@ -2,7 +2,9 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 using Saritasa.Tools.Domain;
@@ -294,6 +296,43 @@ namespace Saritasa.Tools.Messages.Tests
             // Assert
             Assert.Equal("GameOfThrones", ev.Id);
             Assert.Equal("11", ev.Out);
+        }
+
+        #endregion
+
+        #region Async event should bypass cancellation token
+
+        public class Ns05_AsyncEvent
+        {
+            public CancellationToken CancellationToken { get; set; }
+        }
+
+        [EventHandlers]
+        private class Ns05_AsyncEventHandler
+        {
+            public Task Handle(Ns05_AsyncEvent ev, CancellationToken token = default(CancellationToken))
+            {
+                ev.CancellationToken = token;
+                return Task.FromResult(1);
+            }
+        }
+
+        [Fact]
+        public async void Async_event_should_bypass_cancellation_token()
+        {
+            // Arrange
+            pipelinesService.PipelineContainer.AddEventPipeline().Configure(options =>
+            {
+                options.Assemblies = new List<Assembly> { typeof(EventsTests).GetTypeInfo().Assembly };
+            });
+
+            // Act
+            var cts = new CancellationTokenSource();
+            var ev = new Ns05_AsyncEvent();
+            await pipelinesService.RaiseEventAsync(ev, cts.Token);
+
+            // Assert
+            Assert.Equal(cts.Token, ev.CancellationToken);
         }
 
         #endregion

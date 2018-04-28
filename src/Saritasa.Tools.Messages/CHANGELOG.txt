@@ -5,6 +5,7 @@
 [+] Initial PostgreSQL message repository support.
 [+] Ability to pass additional param to middleware for commands and events.
 [-] Remove default table indexes by CreatedAt and Type columns.
+[+] If method handler accepts CancellationToken as last parameter the source token will be passed.
 
 0.4.5 [2017-12-11]
 [*] Fix incorrect package included versions.

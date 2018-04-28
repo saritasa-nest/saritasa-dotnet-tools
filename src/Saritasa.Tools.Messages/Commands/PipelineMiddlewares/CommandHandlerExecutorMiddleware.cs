@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -107,6 +107,8 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
                 return;
             }
 
+            cancellationToken.ThrowIfCancellationRequested();
+
             // Invoke method and resolve parameters if needed.
             Stopwatch stopwatch = null;
             if (IncludeExecutionDuration)
@@ -117,7 +119,8 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
 
             try
             {
-                await ExecuteHandlerAsync(handler, messageContext.Content, messageContext.ServiceProvider, handlerMethod);
+                await ExecuteHandlerAsync(handler, messageContext.Content, messageContext.ServiceProvider, handlerMethod,
+                    cancellationToken);
                 messageContext.Status = ProcessingStatus.Completed;
             }
             catch (TargetInvocationException ex)

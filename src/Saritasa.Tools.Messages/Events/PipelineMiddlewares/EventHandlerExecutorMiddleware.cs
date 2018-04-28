@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -58,7 +58,7 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
                     if (async)
                     {
                         await ExecuteHandlerAsync(handler, messageContext.Content, messageContext.ServiceProvider,
-                            handlerMethods[i].Method);
+                            handlerMethods[i].Method, cancellationToken);
                     }
                     else
                     {
