@@ -9,6 +9,7 @@ using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Commands;
 using Saritasa.Tools.Messages.Common;
 using Saritasa.Tools.Messages.Events;
+using Saritasa.Tools.Messages.Internal;
 using Saritasa.Tools.Messages.Queries;
 using ZergRushCo.Todosya.DataAccess;
 
@@ -100,7 +101,8 @@ namespace ZergRushCo.Todosya.Infrastructure
                 .AddMiddleware(new Saritasa.Tools.Messages.Commands.PipelineMiddlewares.CommandHandlerResolverMiddleware())
                 .AddMiddleware(new Saritasa.Tools.Messages.Commands.PipelineMiddlewares.CommandHandlerExecutorMiddleware
                 {
-                    UseParametersResolve = true
+                    UseParametersResolve = true,
+                    CaptureExceptionDispatchInfo = true
                 })
                 .AddMiddleware(repositoryMiddleware)
                 .AddMiddleware(recordRepositoryMiddleware);
@@ -116,9 +118,18 @@ namespace ZergRushCo.Todosya.Infrastructure
             pipelinesContainer.AddEventPipeline()
                 .AddMiddleware(new Saritasa.Tools.Messages.Events.PipelineMiddlewares.EventHandlerLocatorMiddleware(
                     System.Reflection.Assembly.GetAssembly(typeof(Domain.UserContext.Entities.User))))
-                .AddMiddleware(new Saritasa.Tools.Messages.Events.PipelineMiddlewares.EventHandlerExecutorMiddleware())
+                .AddMiddleware(new Saritasa.Tools.Messages.Events.PipelineMiddlewares.EventHandlerResolverMiddleware())
+                .AddMiddleware(new Saritasa.Tools.Messages.Events.PipelineMiddlewares.EventHandlerExecutorMiddleware
+                {
+                    CaptureExceptionDispatchInfo = true
+                })
                 .AddMiddleware(repositoryMiddleware)
                 .AddMiddleware(recordRepositoryMiddleware);
+
+            // Internal logging.
+            Saritasa.Tools.Messages.Internal.InternalLogger.IsEnabled = true;
+            Saritasa.Tools.Messages.Internal.InternalLogger.MinLogLevel = InternalLogger.LogLevel.Trace;
+            Saritasa.Tools.Messages.Internal.InternalLogger.LogToTrace = true;
 
             return pipelinesContainer;
         }
