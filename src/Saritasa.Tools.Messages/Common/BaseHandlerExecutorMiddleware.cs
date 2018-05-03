@@ -10,13 +10,14 @@ using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
+using Saritasa.Tools.Messages.Internal;
 
 namespace Saritasa.Tools.Messages.Common
 {
     /// <summary>
     /// Provides common functionality for Command/Query/Event executor middlewares.
     /// </summary>
-    public abstract class BaseHandlerExecutorMiddleware
+    public abstract class BaseHandlerExecutorMiddleware : IMessagePipelinePostAction
     {
         /// <summary>
         /// If <c>true</c> the middleware will try to resolve executing method parameters. Default is <c>true</c>.
@@ -29,11 +30,22 @@ namespace Saritasa.Tools.Messages.Common
         /// </summary>
         public bool CaptureExceptionDispatchInfo { get; set; } = false;
 
+        private readonly bool throwExceptionsOnFail;
+
         private delegate object HandlerCall(object handler, object obj, IServiceProvider serviceProvider,
             CancellationToken cancellationToken);
 
         private readonly ConcurrentDictionary<MethodInfo, HandlerCall> methodFuncCache =
             new ConcurrentDictionary<MethodInfo, HandlerCall>();
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="throwExceptionsOnFail">If there were exception during processing it will be rethrown. Default is <c>true</c>.</param>
+        protected BaseHandlerExecutorMiddleware(bool throwExceptionsOnFail = true)
+        {
+            this.throwExceptionsOnFail = throwExceptionsOnFail;
+        }
 
         /// <summary>
         /// Execute method. If method is awaitable method will wait for it.
@@ -46,23 +58,8 @@ namespace Saritasa.Tools.Messages.Common
             MethodInfo handlerMethod)
         {
             var func = CreateInvokeHandlerMethodExpressionWithCache(handler, obj, handlerMethod);
-            var result = func(handler, obj, serviceProvider, default(CancellationToken));
-            var task = result as Task;
+            var task = func(handler, obj, serviceProvider, default(CancellationToken)) as Task;
             task?.ConfigureAwait(false).GetAwaiter().GetResult();
-        }
-
-        /// <summary>
-        /// Captures <see cref="ExceptionDispatchInfo" /> of original execution exception
-        /// as item with ".exception-dispatch" key. Default is <c>false</c>.
-        /// </summary>
-        /// <param name="messageContext">Message context.</param>
-        protected void CaptureException(IMessageContext messageContext)
-        {
-            if (messageContext.FailException != null)
-            {
-                messageContext.Items[MessageContextConstants.ExceptionDispatchInfoKey] =
-                    ExceptionDispatchInfo.Capture(messageContext.FailException);
-            }
         }
 
         /// <summary>
@@ -173,6 +170,28 @@ namespace Saritasa.Tools.Messages.Common
 
             return Expression.Lambda<HandlerCall>(
                 Expression.Block(expressions), handlerParam, objectParam, serviceProviderParam, cancellationTokenParam);
+        }
+
+        /// <inheritdoc />
+        public void PostHandle(IMessageContext messageContext)
+        {
+            if (throwExceptionsOnFail)
+            {
+                InternalThrowProcessingException(messageContext, CaptureExceptionDispatchInfo);
+            }
+        }
+
+        internal static void InternalThrowProcessingException(IMessageContext messageContext, bool captureExceptionDispatchInfo)
+        {
+            if (captureExceptionDispatchInfo)
+            {
+                var edi = messageContext.GetItemByKeyOrDefault<System.Runtime.ExceptionServices.ExceptionDispatchInfo>(MessageContextConstants.ExceptionDispatchInfoKey);
+                edi?.Throw();
+            }
+            if (messageContext.FailException != null)
+            {
+                throw new MessageProcessingException("Processing exception.", messageContext.FailException);
+            }
         }
     }
 }

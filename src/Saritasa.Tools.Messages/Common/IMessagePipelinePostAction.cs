@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -10,7 +10,7 @@ namespace Saritasa.Tools.Messages.Common
     /// Message pipeline post action. The action will be executed after all pipelines handlers
     /// execution.
     /// </summary>
-    public interface IMessagePipelinePostAction
+    internal interface IMessagePipelinePostAction
     {
         /// <summary>
         /// Post handler.

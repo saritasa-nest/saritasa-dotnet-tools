@@ -63,8 +63,7 @@ namespace Saritasa.Tools.Messages.Tests
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
                     typeof(CommandsTests).GetTypeInfo().Assembly))
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerResolverMiddleware())
-                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerExecutorMiddleware())
-                .AddMiddleware(new ThrowExceptionOnFailMiddleware());
+                .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerExecutorMiddleware());
         }
 
         #endregion

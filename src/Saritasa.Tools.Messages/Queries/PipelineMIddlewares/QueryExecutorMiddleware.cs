@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
@@ -14,7 +15,8 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
     /// <summary>
     /// Executes query delegate.
     /// </summary>
-    public class QueryExecutorMiddleware : IMessagePipelineMiddleware, IAsyncMessagePipelineMiddleware
+    public class QueryExecutorMiddleware : IMessagePipelineMiddleware, IAsyncMessagePipelineMiddleware,
+        IMessagePipelinePostAction
     {
         /// <summary>
         /// Middleware identifier.
@@ -25,6 +27,23 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
         /// Include execution duration.
         /// </summary>
         public bool IncludeExecutionDuration { get; set; } = true;
+
+        /// <summary>
+        /// Captures <see cref="ExceptionDispatchInfo" /> of original execution exception
+        /// as item with ".exception-dispatch" key. Default is <c>false</c>.
+        /// </summary>
+        public bool CaptureExceptionDispatchInfo { get; set; } = false;
+
+        private readonly bool throwExceptionOnFail;
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="throwExceptionOnFail">If there were exception during processing it will be rethrown. Default is <c>true</c>.</param>
+        public QueryExecutorMiddleware(bool throwExceptionOnFail = true)
+        {
+            this.throwExceptionOnFail = throwExceptionOnFail;
+        }
 
         /// <inheritdoc />
         public virtual void Handle(IMessageContext messageContext)
@@ -102,6 +121,11 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
                 if (innerException != null)
                 {
                     messageContext.FailException = innerException;
+                    if (CaptureExceptionDispatchInfo)
+                    {
+                        messageContext.Items[MessageContextConstants.ExceptionDispatchInfoKey] =
+                            ExceptionDispatchInfo.Capture(messageContext.FailException);
+                    }
                 }
             }
             finally
@@ -111,6 +135,15 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
                     stopwatch.Stop();
                     messageContext.Items[MessageContextConstants.ExecutionDurationKey] = (int)stopwatch.ElapsedMilliseconds;
                 }
+            }
+        }
+
+        /// <inheritdoc />
+        public void PostHandle(IMessageContext messageContext)
+        {
+            if (throwExceptionOnFail)
+            {
+                BaseHandlerExecutorMiddleware.InternalThrowProcessingException(messageContext, CaptureExceptionDispatchInfo);
             }
         }
     }

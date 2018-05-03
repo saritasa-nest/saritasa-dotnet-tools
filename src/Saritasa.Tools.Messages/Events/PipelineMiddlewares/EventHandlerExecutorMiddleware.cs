@@ -28,6 +28,14 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
         /// </summary>
         public bool IncludeExecutionDuration { get; set; } = true;
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="throwExceptionsOnFail">If there were exception during processing it will be rethrown. <c>True</c> by default.</param>
+        public EventHandlerExecutorMiddleware(bool throwExceptionsOnFail = true) : base(throwExceptionsOnFail)
+        {
+        }
+
         private async Task InternalHandle(IMessageContext messageContext, CancellationToken cancellationToken,
             bool async = false)
         {
@@ -99,6 +107,11 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
             if (exceptions.Count > 0)
             {
                 messageContext.FailException = new AggregateException(exceptions);
+                if (CaptureExceptionDispatchInfo)
+                {
+                    messageContext.Items[MessageContextConstants.ExceptionDispatchInfoKey] =
+                        System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(messageContext.FailException);
+                }
             }
             messageContext.Status = ProcessingStatus.Completed;
         }

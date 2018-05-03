@@ -338,7 +338,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region MyRegion
+        #region Event with no handlers should do nothing
 
         public class Ns06_NoHandlerEvent
         {

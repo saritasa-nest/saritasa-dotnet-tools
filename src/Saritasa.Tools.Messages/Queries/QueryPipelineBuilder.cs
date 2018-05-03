@@ -77,17 +77,11 @@ namespace Saritasa.Tools.Messages.Queries
                         options.InternalResolver.UseInternalObjectResolver));
                 }
 
-                Pipeline.AddMiddlewares(new PipelineMiddlewares.QueryExecutorMiddleware
+                Pipeline.AddMiddlewares(new PipelineMiddlewares.QueryExecutorMiddleware(options.ThrowExceptionOnFail)
                 {
-                    IncludeExecutionDuration = options.IncludeExecutionDuration
+                    IncludeExecutionDuration = options.IncludeExecutionDuration,
+                    CaptureExceptionDispatchInfo = options.UseExceptionDispatchInfo
                 });
-                if (options.ThrowExceptionOnFail)
-                {
-                    Pipeline.AddMiddlewares(new ThrowExceptionOnFailMiddleware
-                    {
-                        CheckExceptionDispatchInfo = options.UseExceptionDispatchInfo
-                    });
-                }
             }
             return this;
         }

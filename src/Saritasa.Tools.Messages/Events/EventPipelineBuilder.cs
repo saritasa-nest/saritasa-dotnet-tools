@@ -53,18 +53,11 @@ namespace Saritasa.Tools.Messages.Events
                 {
                     UsePropertiesResolving = options.InternalResolver.UsePropertiesResolving
                 });
-                Pipeline.AddMiddlewares(new PipelineMiddlewares.EventHandlerExecutorMiddleware
+                Pipeline.AddMiddlewares(new PipelineMiddlewares.EventHandlerExecutorMiddleware(options.ThrowExceptionOnFail)
                 {
                     CaptureExceptionDispatchInfo = options.UseExceptionDispatchInfo,
                     UseParametersResolve = options.InternalResolver.UseHandlerParametersResolve
                 });
-                if (options.ThrowExceptionOnFail)
-                {
-                    Pipeline.AddMiddlewares(new ThrowExceptionOnFailMiddleware
-                    {
-                        CheckExceptionDispatchInfo = options.UseExceptionDispatchInfo
-                    });
-                }
             }
 
             return this;

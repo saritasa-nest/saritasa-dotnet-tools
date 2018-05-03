@@ -6,7 +6,6 @@ using System.Linq;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Abstractions.Commands;
 using Saritasa.Tools.Messages.Common;
-using Saritasa.Tools.Messages.Common.PipelineMiddlewares;
 
 namespace Saritasa.Tools.Messages.Commands
 {
@@ -53,18 +52,11 @@ namespace Saritasa.Tools.Messages.Commands
                 {
                     UsePropertiesResolving = options.InternalResolver.UsePropertiesResolving
                 });
-                Pipeline.AddMiddlewares(new PipelineMiddlewares.CommandHandlerExecutorMiddleware
+                Pipeline.AddMiddlewares(new PipelineMiddlewares.CommandHandlerExecutorMiddleware(options.ThrowExceptionOnFail)
                 {
                     CaptureExceptionDispatchInfo = options.UseExceptionDispatchInfo,
                     UseParametersResolve = options.InternalResolver.UseHandlerParametersResolve
                 });
-                if (options.ThrowExceptionOnFail)
-                {
-                    Pipeline.AddMiddlewares(new ThrowExceptionOnFailMiddleware
-                    {
-                        CheckExceptionDispatchInfo = options.UseExceptionDispatchInfo
-                    });
-                }
             }
             return this;
         }

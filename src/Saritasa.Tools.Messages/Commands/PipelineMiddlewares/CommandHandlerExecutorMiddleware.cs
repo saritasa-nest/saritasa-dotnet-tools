@@ -28,6 +28,14 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         /// </summary>
         public bool IncludeExecutionDuration { get; set; } = true;
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="throwExceptionsOnFail">If there were exception during processing it will be rethrown. Default is <c>true</c>.</param>
+        public CommandHandlerExecutorMiddleware(bool throwExceptionsOnFail = true) : base(throwExceptionsOnFail)
+        {
+        }
+
         /// <inheritdoc />
         public void Handle(IMessageContext messageContext)
         {
@@ -60,6 +68,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
                 if (ex.InnerException != null)
                 {
                     messageContext.FailException = ex.InnerException;
+                    CaptureException(messageContext);
                 }
             }
             catch (TargetException ex)
@@ -70,6 +79,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
                 if (ex.InnerException != null)
                 {
                     messageContext.FailException = ex.InnerException;
+                    CaptureException(messageContext);
                 }
             }
             catch (Exception ex)
@@ -78,6 +88,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
                     nameof(Exception), handler, ex), nameof(CommandHandlerExecutorMiddleware));
                 messageContext.Status = ProcessingStatus.Failed;
                 messageContext.FailException = ex;
+                CaptureException(messageContext);
             }
             finally
             {
@@ -86,10 +97,6 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
                     stopwatch.Stop();
                     messageContext.Items[MessageContextConstants.ExecutionDurationKey] = (int)stopwatch.ElapsedMilliseconds;
                 }
-            }
-            if (CaptureExceptionDispatchInfo)
-            {
-                CaptureException(messageContext);
             }
         }
 
@@ -133,6 +140,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
                 if (ex.InnerException != null)
                 {
                     messageContext.FailException = ex.InnerException;
+                    CaptureException(messageContext);
                 }
             }
             catch (TargetException ex)
@@ -143,6 +151,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
                 if (ex.InnerException != null)
                 {
                     messageContext.FailException = ex.InnerException;
+                    CaptureException(messageContext);
                 }
             }
             catch (Exception ex)
@@ -151,6 +160,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
                     nameof(Exception), handler, ex), nameof(CommandHandlerExecutorMiddleware));
                 messageContext.Status = ProcessingStatus.Failed;
                 messageContext.FailException = ex;
+                CaptureException(messageContext);
             }
             finally
             {
@@ -160,9 +170,14 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
                     messageContext.Items[MessageContextConstants.ExecutionDurationKey] = (int)stopwatch.ElapsedMilliseconds;
                 }
             }
+        }
+
+        private void CaptureException(IMessageContext messageContext)
+        {
             if (CaptureExceptionDispatchInfo)
             {
-                CaptureException(messageContext);
+                messageContext.Items[MessageContextConstants.ExceptionDispatchInfoKey] =
+                    System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(messageContext.FailException);
             }
         }
     }
