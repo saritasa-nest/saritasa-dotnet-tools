@@ -69,7 +69,7 @@ namespace Saritasa.Tools.Messages.Queries
                 if (options.InternalResolver.HasAssemblies)
                 {
                     Pipeline.AddMiddlewares(new PipelineMiddlewares.QueryObjectResolverMiddleware(
-                        options.InternalResolver.GetAssemblies()));
+                        options.InternalResolver.Assemblies.ToArray()));
                 }
                 else
                 {

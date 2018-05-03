@@ -10,7 +10,7 @@ namespace Saritasa.Tools.Messages.Commands
     /// <summary>
     /// Command pipeline options.
     /// </summary>
-    public class CommandPipelineOptions
+    public class CommandPipelineOptions : BaseAssembliesOptions
     {
         /// <summary>
         /// Create default middlewares. <c>True</c> by default.

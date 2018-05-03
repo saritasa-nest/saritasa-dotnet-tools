@@ -553,7 +553,7 @@ namespace Saritasa.Tools.Messages.Tests
             var builder = pipelineService.PipelineContainer.AddCommandPipeline()
                 .Configure(options =>
                 {
-                    options.InternalResolver.Assemblies =
+                    options.Assemblies =
                         new[] { typeof(CommandsTests).GetTypeInfo().Assembly };
                     options.UseExceptionDispatchInfo = true;
                 });
@@ -596,7 +596,7 @@ namespace Saritasa.Tools.Messages.Tests
             var builder = pipelineService.PipelineContainer.AddCommandPipeline()
                 .Configure(options =>
                 {
-                    options.InternalResolver.Assemblies =
+                    options.Assemblies =
                         new[] { typeof(CommandsTests).GetTypeInfo().Assembly };
                     options.UseDefaultPipeline = false;
                 })
@@ -634,7 +634,7 @@ namespace Saritasa.Tools.Messages.Tests
             var builder = pipelineService.PipelineContainer.AddCommandPipeline()
                 .Configure(options =>
                 {
-                    options.InternalResolver.Assemblies =
+                    options.Assemblies =
                         new[] { typeof(CommandsTests).GetTypeInfo().Assembly };
                 });
 

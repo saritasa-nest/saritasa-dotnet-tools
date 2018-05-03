@@ -2,7 +2,6 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Linq;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Abstractions.Commands;
 using Saritasa.Tools.Messages.Common;
@@ -46,7 +45,7 @@ namespace Saritasa.Tools.Messages.Commands
             if (options.UseDefaultPipeline)
             {
                 Pipeline.AddMiddlewares(new PipelineMiddlewares.CommandHandlerLocatorMiddleware(
-                    options.InternalResolver.GetAssemblies()));
+                    options.GetAssemblies()));
                 Pipeline.AddMiddlewares(new PipelineMiddlewares.CommandHandlerResolverMiddleware(
                     options.InternalResolver.UseInternalObjectResolver)
                 {

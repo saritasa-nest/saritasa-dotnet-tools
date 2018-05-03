@@ -38,7 +38,7 @@ namespace Saritasa.Tools.Messages.Queries
         /// <summary>
         /// Options for internal service resolver.
         /// </summary>
-        public InternalResolverOptions InternalResolver { get; set; } = new InternalResolverOptions();
+        public QueryPipelineInternalResolverOptions InternalResolver { get; set; } = new QueryPipelineInternalResolverOptions();
 
         /// <summary>
         /// Default constructor.

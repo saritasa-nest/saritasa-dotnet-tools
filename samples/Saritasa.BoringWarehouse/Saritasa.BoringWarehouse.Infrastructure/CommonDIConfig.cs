@@ -45,7 +45,7 @@ namespace Saritasa.BoringWarehouse.Infrastructure
             messagePipelineContainer.AddCommandPipeline()
                 .Configure(options =>
                 {
-                    options.InternalResolver.Assemblies = new []
+                    options.Assemblies = new []
                     {
                         System.Reflection.Assembly.GetAssembly(typeof(Domain.Users.Entities.User))
                     };

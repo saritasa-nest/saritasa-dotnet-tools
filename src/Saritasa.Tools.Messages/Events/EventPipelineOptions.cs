@@ -10,7 +10,7 @@ namespace Saritasa.Tools.Messages.Events
     /// <summary>
     /// Event pipeline options.
     /// </summary>
-    public class EventPipelineOptions
+    public class EventPipelineOptions : BaseAssembliesOptions
     {
         /// <summary>
         /// Create default middlewares. <c>True</c> by default.

@@ -323,7 +323,7 @@ namespace Saritasa.Tools.Messages.Tests
             // Arrange
             pipelinesService.PipelineContainer.AddEventPipeline().Configure(options =>
             {
-                options.InternalResolver.Assemblies =
+                options.Assemblies =
                     new List<Assembly> { typeof(EventsTests).GetTypeInfo().Assembly };
             });
 
@@ -351,7 +351,7 @@ namespace Saritasa.Tools.Messages.Tests
             // Arrange
             pipelinesService.PipelineContainer.AddEventPipeline().Configure(options =>
             {
-                options.InternalResolver.Assemblies =
+                options.Assemblies =
                     new List<Assembly> { typeof(EventsTests).GetTypeInfo().Assembly };
             });
 
