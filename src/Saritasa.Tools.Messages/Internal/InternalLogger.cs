@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -14,11 +14,7 @@ namespace Saritasa.Tools.Messages.Internal
     /// </summary>
     public static class InternalLogger
     {
-        static readonly object lockObj = new object();
-
-#if NET452
-        static readonly TraceSource traceSource = new TraceSource("Saritasa.Tools");
-#endif
+        private static readonly object lockObj = new object();
 
         /// <summary>
         /// Write internal logs to log file.
@@ -73,7 +69,7 @@ namespace Saritasa.Tools.Messages.Internal
             /// <summary>
             /// Error.
             /// </summary>
-            Error,
+            Error
         }
 
         /// <summary>
@@ -168,25 +164,7 @@ namespace Saritasa.Tools.Messages.Internal
 #if NET452
                 if (LogToTrace)
                 {
-                    TraceEventType eventType;
-                    switch (level)
-                    {
-                        case LogLevel.Trace:
-                        case LogLevel.Debug:
-                            eventType = TraceEventType.Verbose;
-                            break;
-                        case LogLevel.Warn:
-                            eventType = TraceEventType.Warning;
-                            break;
-                        case LogLevel.Error:
-                            eventType = TraceEventType.Error;
-                            break;
-                        case LogLevel.Info:
-                        default:
-                            eventType = TraceEventType.Information;
-                            break;
-                    }
-                    traceSource.TraceEvent(eventType, 0, sb.ToString());
+                    System.Diagnostics.Trace.WriteLine(sb.ToString());
                 }
 #endif
             }
@@ -199,26 +177,26 @@ namespace Saritasa.Tools.Messages.Internal
         /// <summary>
         /// Is trace logging enabled.
         /// </summary>
-        public static bool IsTraceEnabled => IsEnabled && MinLogLevel >= LogLevel.Trace;
+        public static bool IsTraceEnabled => IsEnabled && MinLogLevel <= LogLevel.Trace;
 
         /// <summary>
         /// Is debug logging enabled.
         /// </summary>
-        public static bool IsDebugEnabled => IsEnabled && MinLogLevel >= LogLevel.Debug;
+        public static bool IsDebugEnabled => IsEnabled && MinLogLevel <= LogLevel.Debug;
 
         /// <summary>
         /// Is info logging enabled.
         /// </summary>
-        public static bool IsInfoEnabled => IsEnabled && MinLogLevel >= LogLevel.Info;
+        public static bool IsInfoEnabled => IsEnabled && MinLogLevel <= LogLevel.Info;
 
         /// <summary>
         /// Is warning logging enabled.
         /// </summary>
-        public static bool IsWarnEnabled => IsEnabled && MinLogLevel >= LogLevel.Warn;
+        public static bool IsWarnEnabled => IsEnabled && MinLogLevel <= LogLevel.Warn;
 
         /// <summary>
         /// Is error logging enabled.
         /// </summary>
-        public static bool IsErrorEnabled => IsEnabled && MinLogLevel >= LogLevel.Error;
+        public static bool IsErrorEnabled => IsEnabled && MinLogLevel <= LogLevel.Error;
     }
 }
