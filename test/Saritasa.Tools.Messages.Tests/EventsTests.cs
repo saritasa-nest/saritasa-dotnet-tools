@@ -337,5 +337,28 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         #endregion
+
+        #region MyRegion
+
+        public class Ns06_NoHandlerEvent
+        {
+            public CancellationToken CancellationToken { get; set; }
+        }
+
+        [Fact]
+        public void Event_with_no_handlers_should_do_nothing()
+        {
+            // Arrange
+            pipelinesService.PipelineContainer.AddEventPipeline().Configure(options =>
+            {
+                options.InternalResolver.Assemblies =
+                    new List<Assembly> { typeof(EventsTests).GetTypeInfo().Assembly };
+            });
+
+            // Act & Assert
+            pipelinesService.RaiseEvent(new Ns06_NoHandlerEvent());
+        }
+
+        #endregion
     }
 }

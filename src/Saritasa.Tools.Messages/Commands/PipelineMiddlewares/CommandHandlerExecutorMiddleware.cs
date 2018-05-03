@@ -31,11 +31,12 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         /// <inheritdoc />
         public void Handle(IMessageContext messageContext)
         {
-            var handlerMethod = messageContext.GetItemByKey<MethodInfo>(CommandHandlerLocatorMiddleware.HandlerMethodKey);
-            var handler = messageContext.GetItemByKey<object>(BaseHandlerResolverMiddleware.HandlerObjectKey);
-            if (handler == null)
+            var handlerMethod = messageContext.GetItemByKeyOrDefault<MethodInfo>(CommandHandlerLocatorMiddleware.HandlerMethodKey);
+            var handler = messageContext.GetItemByKeyOrDefault(BaseHandlerResolverMiddleware.HandlerObjectKey);
+            if (handlerMethod == null || handler == null)
             {
-                return;
+                throw new InvalidOperationException("Cannot find command handler method and/or command handler object in message context. " +
+                                                    "Please provide \"handler-method\" and \"handler-object\" in message context items.");
             }
 
             // Invoke method and resolve parameters if needed.
@@ -100,11 +101,12 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         /// <inheritdoc />
         public async Task HandleAsync(IMessageContext messageContext, CancellationToken cancellationToken)
         {
-            var handlerMethod = messageContext.GetItemByKey<MethodInfo>(CommandHandlerLocatorMiddleware.HandlerMethodKey);
-            var handler = messageContext.GetItemByKey<object>(BaseHandlerResolverMiddleware.HandlerObjectKey);
-            if (handler == null)
+            var handlerMethod = messageContext.GetItemByKeyOrDefault<MethodInfo>(CommandHandlerLocatorMiddleware.HandlerMethodKey);
+            var handler = messageContext.GetItemByKeyOrDefault(BaseHandlerResolverMiddleware.HandlerObjectKey);
+            if (handlerMethod == null || handler == null)
             {
-                return;
+                throw new InvalidOperationException("Cannot find command handler method and/or command handler object in message context. " +
+                                                    "Please provide \"handler-method\" and \"handler-object\" in message context items.");
             }
 
             cancellationToken.ThrowIfCancellationRequested();

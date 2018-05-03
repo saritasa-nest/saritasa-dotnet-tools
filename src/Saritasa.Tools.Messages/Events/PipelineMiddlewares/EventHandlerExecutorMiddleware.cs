@@ -33,8 +33,13 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
         {
             var exceptions = new List<Exception>(3); // Stores exceptions from all handlers.
             var handlerMethods =
-                messageContext.GetItemByKey<EventHandlerMethodWithObject[]>(EventHandlerLocatorMiddleware.HandlerMethodsKey);
-            var handlers = messageContext.GetItemByKey<object[]>(BaseHandlerResolverMiddleware.HandlerObjectKey);
+                messageContext.GetItemByKeyOrDefault<EventHandlerMethodWithObject[]>(EventHandlerLocatorMiddleware.HandlerMethodsKey);
+            var handlers = messageContext.GetItemByKeyOrDefault<object[]>(BaseHandlerResolverMiddleware.HandlerObjectKey);
+            if (handlerMethods == null || handlers == null)
+            {
+                throw new InvalidOperationException("Cannot find event handler methods and/or event handler objects in message context. " +
+                                                    "Please provide \"handler-method\" and \"handler-object\" in message context items.");
+            }
 
             // Executes every handle method.
             for (int i = 0; i < handlerMethods.Length; i++)
