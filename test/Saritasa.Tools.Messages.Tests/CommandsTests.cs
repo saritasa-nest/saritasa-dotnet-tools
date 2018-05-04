@@ -11,7 +11,6 @@ using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Abstractions.Commands;
 using Saritasa.Tools.Messages.Common;
 using Saritasa.Tools.Messages.Commands;
-using Saritasa.Tools.Messages.Common.PipelineMiddlewares;
 
 namespace Saritasa.Tools.Messages.Tests
 {
