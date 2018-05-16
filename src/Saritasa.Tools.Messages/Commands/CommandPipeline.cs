@@ -5,7 +5,6 @@ using System;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Abstractions.Commands;
 using Saritasa.Tools.Messages.Common;
-using Saritasa.Tools.Messages.Internal;
 
 namespace Saritasa.Tools.Messages.Commands
 {
@@ -22,18 +21,11 @@ namespace Saritasa.Tools.Messages.Commands
         /// <inheritdoc />
         public IMessageContext CreateMessageContext(IMessagePipelineService pipelineService, object command)
         {
-            if (command == null)
+            return new MessageContext(pipelineService)
             {
-                throw new ArgumentNullException(nameof(command));
-            }
-
-            var mc = new MessageContext(pipelineService)
-            {
-                Content = command,
-                ContentId = TypeHelpers.GetPartiallyAssemblyQualifiedName(command.GetType()),
-                Pipeline = this
+                Pipeline = this,
+                Content = command
             };
-            return mc;
         }
 
         #endregion

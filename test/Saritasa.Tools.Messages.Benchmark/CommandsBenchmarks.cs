@@ -13,7 +13,7 @@ namespace Saritasa.Tools.Messages.Benchmark
     /// </summary>
     public class CommandsBenchmarks
     {
-        const int NumberOfInterations = 100000;
+        private const int NumberOfInterations = 100000;
 
         #region Interfaces
 
@@ -111,6 +111,7 @@ namespace Saritasa.Tools.Messages.Benchmark
             var piplinesService = new DefaultMessagePipelineService();
             piplinesService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
             piplinesService.PipelineContainer.AddCommandPipeline()
+                .AddMiddleware(new Common.PipelineMiddlewares.PrepareMessageContextMiddleware())
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
                     typeof(CreateUserCommand).GetTypeInfo().Assembly))
                 .AddMiddleware(new Commands.PipelineMiddlewares.CommandHandlerResolverMiddleware())

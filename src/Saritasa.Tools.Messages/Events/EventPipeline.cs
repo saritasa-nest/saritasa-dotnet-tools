@@ -21,9 +21,11 @@ namespace Saritasa.Tools.Messages.Events
         /// <inheritdoc />
         public IMessageContext CreateMessageContext(IMessagePipelineService pipelineService, object @event)
         {
-            var messageContext = new MessageContext(pipelineService, @event);
-            messageContext.Pipeline = this;
-            return messageContext;
+            return new MessageContext(pipelineService)
+            {
+                Content = @event,
+                Pipeline = this
+            };
         }
 
         #endregion

@@ -2,11 +2,9 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Linq;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Abstractions.Events;
 using Saritasa.Tools.Messages.Common;
-using Saritasa.Tools.Messages.Common.PipelineMiddlewares;
 
 namespace Saritasa.Tools.Messages.Events
 {
@@ -46,6 +44,7 @@ namespace Saritasa.Tools.Messages.Events
 
             if (options.UseDefaultPipeline)
             {
+                Pipeline.AddMiddlewares(new Common.PipelineMiddlewares.PrepareMessageContextMiddleware());
                 Pipeline.AddMiddlewares(new PipelineMiddlewares.EventHandlerLocatorMiddleware(
                     options.GetAssemblies()));
                 Pipeline.AddMiddlewares(new PipelineMiddlewares.EventHandlerResolverMiddleware(

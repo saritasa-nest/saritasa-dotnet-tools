@@ -67,6 +67,25 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
+        #region If_command_is_null_should_raise_invalid_operation_exception
+
+        [Fact]
+        public void If_command_is_null_should_raise_invalid_operation_exception()
+        {
+            // Arrange
+            var builder = pipelineService.PipelineContainer.AddCommandPipeline()
+                .Configure(options =>
+                {
+                    options.Assemblies =
+                        new[] { typeof(CommandsTests).GetTypeInfo().Assembly };
+                });
+
+            // Act & assert
+            Assert.Throws<InvalidOperationException>(() => { pipelineService.HandleCommand(null); });
+        }
+
+        #endregion
+
         #region Can_run_default_simple_pipeline
 
         public class Ns02_SimpleTestCommand
