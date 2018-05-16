@@ -7,13 +7,13 @@ namespace Saritasa.Tools.Messages.Benchmark
     /// <summary>
     /// Program.
     /// </summary>
-    class Program
+    public class Program
     {
         /// <summary>
         /// Main entry point.
         /// </summary>
         /// <param name="args">Command line arguments.</param>
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             if (args.Length < 1)
             {

@@ -13,7 +13,7 @@ namespace Saritasa.Tools.Messages.Abstractions
     public interface IAsyncMessagePipelineMiddleware
     {
         /// <summary>
-        /// Middleware id.
+        /// Middleware identifier.
         /// </summary>
         string Id { get; }
 

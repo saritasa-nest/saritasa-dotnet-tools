@@ -12,7 +12,7 @@ namespace Saritasa.Tools.Messages.Benchmark
     /// </summary>
     public class QueriesBenchmarks
     {
-        const int NumberOfInterations = 250;
+        private const int NumberOfInterations = 250;
 
         [QueryHandlers]
         public sealed class MathQueryHandlers
