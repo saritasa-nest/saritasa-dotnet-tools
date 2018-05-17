@@ -34,7 +34,7 @@ Command is something that changes the state (database insert/update/delete) of a
         }
 
 4. Execute command using pipeline service:
-   
+
     .. code-block:: c#
 
         CreateProjectCommand command = new CreateProjectCommand() { Name = "Test", CreatedByUserId = CurrentUser.Id };

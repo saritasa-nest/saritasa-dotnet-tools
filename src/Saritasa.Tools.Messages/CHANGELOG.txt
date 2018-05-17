@@ -1,5 +1,6 @@
 ﻿0.5.1 [TBD]
 [+] Add PrepareMessageContextMiddleware, move content check and preparation to middleware.
+[+] Add EmptyMiddleware.
 
 0.5.0 [2018-05-04]
 [+] Implement throwing original exception. Look UseExceptionDispatchInfo option.
