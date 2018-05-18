@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -15,7 +15,15 @@ namespace Saritasa.Tools.Messages.Internal
     /// </summary>
     internal class SkipMetaPropertiesContractResolver : DefaultContractResolver
     {
-        private static readonly string[] propertiesToSkip = { "WatsonBuckets", "TargetSite" };
+        private static readonly string[] propertiesToSkip =
+        {
+            "WatsonBuckets", // Watson debugger.
+            "TargetSite", // Method that throws exception, usually we have stack trace.
+
+            // Entity Framework < 5 identifier.
+            "$id",
+            "EntityKey"
+        };
 
         /// <inheritdoc />
         protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
