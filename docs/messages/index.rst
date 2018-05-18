@@ -67,7 +67,7 @@ Simple example:
         var pipelineService = new DefaultMessagePipelineService();
         pipelineService.PipelineContainer
             .AddCommandPipeline()
-                .UseDefaultMiddlewares(Assembly.GetAssembly(typeof(Entities.User)));
+                .AddStandardMiddlewares();
 
         // Use.
         pipelineService.HandleCommand(new Commands.CreateUser
@@ -123,6 +123,10 @@ There are general middlewares that can be used in pipeline.
     .. class:: RepositoryMiddleware
 
         Stores message to repository. See repository section for more details.
+
+    .. class:: EmptyMiddleware
+
+        Middleware that does nothing. Can be useful for example when you need to replace it with another useful middleware after initialization.
 
 Object Serializers
 ------------------

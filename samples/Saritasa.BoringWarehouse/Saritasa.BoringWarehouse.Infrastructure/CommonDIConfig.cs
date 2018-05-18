@@ -45,10 +45,7 @@ namespace Saritasa.BoringWarehouse.Infrastructure
             messagePipelineContainer.AddCommandPipeline()
                 .AddStandardMiddlewares(options =>
                 {
-                    options.Assemblies = new []
-                    {
-                        System.Reflection.Assembly.GetAssembly(typeof(Domain.Users.Entities.User))
-                    };
+                    options.SetAssemblies(System.Reflection.Assembly.GetAssembly(typeof(Domain.Users.Entities.User)));
                 })
                 .AddMiddleware(adoNetRepositoryMiddleware);
             builder.RegisterInstance(messagePipelineContainer).As<IMessagePipelineContainer>().SingleInstance();

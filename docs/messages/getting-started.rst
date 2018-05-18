@@ -120,7 +120,10 @@ And call command within ``AddToCart`` action:
         // Pipelines registration.
         var pipelinesContainer = new DefaultMessagePipelineContainer();
         pipelinesContainer.AddCommandPipeline()
-            .UseDefaultMiddlewares(Assembly.GetExecutingAssembly());
+            .AddStandardMiddlewares(options =>
+            {
+                options.SetAssemblies(Assembly.GetExecutingAssembly());
+            });
         services.AddSingleton<IMessagePipelineContainer>(pipelinesContainer);
         services.AddScoped<IMessagePipelineService, DefaultMessagePipelineService>();
 
@@ -134,7 +137,7 @@ Query Pipeline
     .. code-block:: c#
 
         pipelinesContainer.AddQueryPipeline()
-            .UseDefaultMiddlewares();
+            .AddStandardMiddlewares();
 
 2. Take a look at ``Index`` method in ``ShoppingCartController`` controller. In fact there are two queries: ``cart.GetCartItems()`` and ``cart.GetTotal()``. We can keep it as is and just wrap with query pipeline:
 
@@ -164,10 +167,13 @@ Log Our Messages
     .. code-block:: c#
 
         pipelinesContainer.AddCommandPipeline()
-            .UseDefaultMiddlewares(Assembly.GetExecutingAssembly())
+            .AddStandardMiddlewares(options =>
+            {
+                options.SetAssemblies(Assembly.GetExecutingAssembly());
+            });
             .AddMiddleware(messagesRepository); // Add this line.
         pipelinesContainer.AddQueryPipeline()
-            .UseDefaultMiddlewares()
+            .AddStandardMiddlewares()
             .AddMiddleware(messagesRepository); // Add this line.
 
 Now run the app and add albums to your card. In database you should find ``SaritasaMessages`` table with detailed actions in your application.

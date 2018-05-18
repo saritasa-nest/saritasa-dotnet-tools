@@ -62,4 +62,4 @@ Default Pipeline
 
     ::
 
-        EventHandlerLocatorMiddleware ---> EventHandlerResolverMiddleware -> EventHandlerExecutorMiddleware
+        PrepareMessageContextMiddleware ---> EventHandlerLocatorMiddleware ---> EventHandlerResolverMiddleware ---> EventHandlerExecutorMiddleware

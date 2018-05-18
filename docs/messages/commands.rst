@@ -72,4 +72,4 @@ Default Pipeline
 
     ::
 
-        CommandHandlerLocatorMiddleware ---> CommandHandlerResolverMiddleware -> CommandHandlerExecutorMiddleware
+        PrepareMessageContextMiddleware ---> CommandHandlerLocatorMiddleware ---> CommandHandlerResolverMiddleware ---> CommandHandlerExecutorMiddleware

@@ -110,7 +110,6 @@ namespace ZergRushCo.Todosya.Infrastructure
 
             // Query.
             pipelinesContainer.AddQueryPipeline()
-                .AddMiddleware(new Saritasa.Tools.Messages.Common.PipelineMiddlewares.PrepareMessageContextMiddleware())
                 .AddMiddleware(new Saritasa.Tools.Messages.Queries.PipelineMiddlewares.QueryObjectResolverMiddleware())
                 .AddMiddleware(new Saritasa.Tools.Messages.Queries.PipelineMiddlewares.QueryExecutorMiddleware())
                 .AddMiddleware(repositoryMiddleware)
