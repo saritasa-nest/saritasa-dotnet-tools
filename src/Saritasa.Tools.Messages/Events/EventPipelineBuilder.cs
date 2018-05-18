@@ -33,32 +33,36 @@ namespace Saritasa.Tools.Messages.Events
         }
 
         /// <summary>
+        /// Use default middlewares configuration.
+        /// </summary>
+        public EventPipelineBuilder AddStandardMiddlewares()
+        {
+            return AddStandardMiddlewares(options => { });
+        }
+
+        /// <summary>
         /// Use default middlewares configuration. Includes event handler locator and executor.
         /// </summary>
         /// <param name="optionsAction">Delegate to configure actions.</param>
         /// <returns>Event pipeline builder.</returns>
-        public EventPipelineBuilder Configure(Action<EventPipelineOptions> optionsAction)
+        public EventPipelineBuilder AddStandardMiddlewares(Action<EventPipelineOptions> optionsAction)
         {
             var options = new EventPipelineOptions();
             optionsAction(options);
 
-            if (options.UseDefaultPipeline)
+            Pipeline.AddMiddlewares(new Common.PipelineMiddlewares.PrepareMessageContextMiddleware());
+            Pipeline.AddMiddlewares(new PipelineMiddlewares.EventHandlerLocatorMiddleware(
+                options.GetAssemblies()));
+            Pipeline.AddMiddlewares(new PipelineMiddlewares.EventHandlerResolverMiddleware(
+                options.InternalResolver.UseInternalObjectResolver)
             {
-                Pipeline.AddMiddlewares(new Common.PipelineMiddlewares.PrepareMessageContextMiddleware());
-                Pipeline.AddMiddlewares(new PipelineMiddlewares.EventHandlerLocatorMiddleware(
-                    options.GetAssemblies()));
-                Pipeline.AddMiddlewares(new PipelineMiddlewares.EventHandlerResolverMiddleware(
-                    options.InternalResolver.UseInternalObjectResolver)
-                {
-                    UsePropertiesResolving = options.InternalResolver.UsePropertiesResolving
-                });
-                Pipeline.AddMiddlewares(new PipelineMiddlewares.EventHandlerExecutorMiddleware(options.ThrowExceptionOnFail)
-                {
-                    CaptureExceptionDispatchInfo = options.UseExceptionDispatchInfo,
-                    UseParametersResolve = options.InternalResolver.UseHandlerParametersResolve
-                });
-            }
-
+                UsePropertiesResolving = options.InternalResolver.UsePropertiesResolving
+            });
+            Pipeline.AddMiddlewares(new PipelineMiddlewares.EventHandlerExecutorMiddleware(options.ThrowExceptionOnFail)
+            {
+                CaptureExceptionDispatchInfo = options.UseExceptionDispatchInfo,
+                UseParametersResolve = options.InternalResolver.UseHandlerParametersResolve
+            });
             return this;
         }
     }

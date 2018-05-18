@@ -43,7 +43,7 @@ namespace Saritasa.BoringWarehouse.Infrastructure
             // Command pipeline.
             var messagePipelineContainer = new DefaultMessagePipelineContainer();
             messagePipelineContainer.AddCommandPipeline()
-                .Configure(options =>
+                .AddStandardMiddlewares(options =>
                 {
                     options.Assemblies = new []
                     {

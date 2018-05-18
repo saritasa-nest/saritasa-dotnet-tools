@@ -74,7 +74,7 @@ namespace Saritasa.Tools.Messages.Tests
         {
             // Arrange
             var builder = pipelineService.PipelineContainer.AddCommandPipeline()
-                .Configure(options =>
+                .AddStandardMiddlewares(options =>
                 {
                     options.Assemblies =
                         new[] { typeof(CommandsTests).GetTypeInfo().Assembly };
@@ -569,7 +569,7 @@ namespace Saritasa.Tools.Messages.Tests
         {
             // Arrange
             var builder = pipelineService.PipelineContainer.AddCommandPipeline()
-                .Configure(options =>
+                .AddStandardMiddlewares(options =>
                 {
                     options.Assemblies =
                         new[] { typeof(CommandsTests).GetTypeInfo().Assembly };
@@ -612,12 +612,6 @@ namespace Saritasa.Tools.Messages.Tests
             // Arrange
             var testParamMiddleware = new Ns15_TestParamMiddleware();
             var builder = pipelineService.PipelineContainer.AddCommandPipeline()
-                .Configure(options =>
-                {
-                    options.Assemblies =
-                        new[] { typeof(CommandsTests).GetTypeInfo().Assembly };
-                    options.UseDefaultPipeline = false;
-                })
                 .AddMiddleware(testParamMiddleware);
 
             // Act
@@ -650,7 +644,7 @@ namespace Saritasa.Tools.Messages.Tests
         {
             // Arrange
             var builder = pipelineService.PipelineContainer.AddCommandPipeline()
-                .Configure(options =>
+                .AddStandardMiddlewares(options =>
                 {
                     options.Assemblies =
                         new[] { typeof(CommandsTests).GetTypeInfo().Assembly };

@@ -3,7 +3,6 @@
 
 using System;
 using System.Runtime.ExceptionServices;
-using Saritasa.Tools.Messages.Common;
 
 namespace Saritasa.Tools.Messages.Queries
 {
@@ -12,11 +11,6 @@ namespace Saritasa.Tools.Messages.Queries
     /// </summary>
     public class QueryPipelineOptions
     {
-        /// <summary>
-        /// Create default middlewares. <c>True</c> by default.
-        /// </summary>
-        public bool UseDefaultPipeline { get; set; } = true;
-
         /// <summary>
         /// Throw exception if execution was failed.
         /// By default <see cref="Saritasa.Tools.Messages.Abstractions.MessageProcessingException" />

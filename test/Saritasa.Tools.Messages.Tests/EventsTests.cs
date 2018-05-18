@@ -321,7 +321,7 @@ namespace Saritasa.Tools.Messages.Tests
         public async void Async_event_should_bypass_cancellation_token()
         {
             // Arrange
-            pipelinesService.PipelineContainer.AddEventPipeline().Configure(options =>
+            pipelinesService.PipelineContainer.AddEventPipeline().AddStandardMiddlewares(options =>
             {
                 options.Assemblies =
                     new List<Assembly> { typeof(EventsTests).GetTypeInfo().Assembly };
@@ -349,7 +349,7 @@ namespace Saritasa.Tools.Messages.Tests
         public void Event_with_no_handlers_should_do_nothing()
         {
             // Arrange
-            pipelinesService.PipelineContainer.AddEventPipeline().Configure(options =>
+            pipelinesService.PipelineContainer.AddEventPipeline().AddStandardMiddlewares(options =>
             {
                 options.Assemblies =
                     new List<Assembly> { typeof(EventsTests).GetTypeInfo().Assembly };

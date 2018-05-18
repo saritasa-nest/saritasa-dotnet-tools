@@ -36,50 +36,46 @@ namespace Saritasa.Tools.Messages.Queries
         /// <summary>
         /// Use default middlewares configuration. Includes query handler resolver and executor.
         /// </summary>
-        public QueryPipelineBuilder Configure()
+        public QueryPipelineBuilder AddStandardMiddlewares()
         {
-            return Configure(options => { });
+            return AddStandardMiddlewares(options => { });
         }
 
         /// <summary>
         /// Use default middlewares configuration. Includes query handler resolver and executor.
         /// </summary>
         /// <returns>Query pipeline builder.</returns>
-        public QueryPipelineBuilder Configure(Action<QueryPipelineOptions> optionsAction)
+        public QueryPipelineBuilder AddStandardMiddlewares(Action<QueryPipelineOptions> optionsAction)
         {
             var options = new QueryPipelineOptions();
             optionsAction(options);
 
-            if (options.UseDefaultPipeline)
+            if (options.InternalResolver.HasAssemblies && !options.InternalResolver.UseInternalObjectResolver)
             {
-                if (options.InternalResolver.HasAssemblies && !options.InternalResolver.UseInternalObjectResolver)
-                {
-                    throw new InvalidOperationException(
-                        "Assemblies to search handlers were provided but internal object resolver is not used.");
-                }
-                if (options.InternalResolver.UseHandlerParametersResolve)
-                {
-                    throw new InvalidOperationException("Handler method parameters resolve does not work for query pipeline.");
-                }
-
-                // If assemblies were provided that means we use internal object resolver.
-                if (options.InternalResolver.HasAssemblies)
-                {
-                    Pipeline.AddMiddlewares(new PipelineMiddlewares.QueryObjectResolverMiddleware(
-                        options.InternalResolver.Assemblies.ToArray()));
-                }
-                else
-                {
-                    Pipeline.AddMiddlewares(new PipelineMiddlewares.QueryObjectResolverMiddleware(
-                        options.InternalResolver.UseInternalObjectResolver));
-                }
-
-                Pipeline.AddMiddlewares(new PipelineMiddlewares.QueryExecutorMiddleware(options.ThrowExceptionOnFail)
-                {
-                    IncludeExecutionDuration = options.IncludeExecutionDuration,
-                    CaptureExceptionDispatchInfo = options.UseExceptionDispatchInfo
-                });
+                throw new InvalidOperationException(
+                    "Assemblies to search handlers were provided but internal object resolver is not used.");
             }
+            if (options.InternalResolver.UseHandlerParametersResolve)
+            {
+                throw new InvalidOperationException("Handler method parameters resolve does not work for query pipeline.");
+            }
+
+            // If assemblies were provided that means we use internal object resolver.
+            if (options.InternalResolver.HasAssemblies)
+            {
+                Pipeline.AddMiddlewares(new PipelineMiddlewares.QueryObjectResolverMiddleware(
+                    options.InternalResolver.Assemblies.ToArray()));
+            }
+            else
+            {
+                Pipeline.AddMiddlewares(new PipelineMiddlewares.QueryObjectResolverMiddleware(
+                    options.InternalResolver.UseInternalObjectResolver));
+            }
+            Pipeline.AddMiddlewares(new PipelineMiddlewares.QueryExecutorMiddleware(options.ThrowExceptionOnFail)
+            {
+                IncludeExecutionDuration = options.IncludeExecutionDuration,
+                CaptureExceptionDispatchInfo = options.UseExceptionDispatchInfo
+            });
             return this;
         }
     }

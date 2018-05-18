@@ -13,11 +13,6 @@ namespace Saritasa.Tools.Messages.Commands
     public class CommandPipelineOptions : BaseAssembliesOptions
     {
         /// <summary>
-        /// Create default middlewares. <c>True</c> by default.
-        /// </summary>
-        public bool UseDefaultPipeline { get; set; } = true;
-
-        /// <summary>
         /// Throw exception if execution was failed.
         /// By default <see cref="Saritasa.Tools.Messages.Abstractions.MessageProcessingException" />
         /// will be thrown.

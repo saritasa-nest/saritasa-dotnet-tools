@@ -95,6 +95,7 @@ namespace ZergRushCo.Todosya.Infrastructure
 
             // Command.
             pipelinesContainer.AddCommandPipeline()
+                .AddMiddleware(new Saritasa.Tools.Messages.Common.PipelineMiddlewares.PrepareMessageContextMiddleware())
                 .AddMiddleware(
                     new Saritasa.Tools.Messages.Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware(
                         System.Reflection.Assembly.GetAssembly(typeof(Domain.UserContext.Entities.User))))
@@ -109,6 +110,7 @@ namespace ZergRushCo.Todosya.Infrastructure
 
             // Query.
             pipelinesContainer.AddQueryPipeline()
+                .AddMiddleware(new Saritasa.Tools.Messages.Common.PipelineMiddlewares.PrepareMessageContextMiddleware())
                 .AddMiddleware(new Saritasa.Tools.Messages.Queries.PipelineMiddlewares.QueryObjectResolverMiddleware())
                 .AddMiddleware(new Saritasa.Tools.Messages.Queries.PipelineMiddlewares.QueryExecutorMiddleware())
                 .AddMiddleware(repositoryMiddleware)
@@ -116,6 +118,7 @@ namespace ZergRushCo.Todosya.Infrastructure
 
             // Event.
             pipelinesContainer.AddEventPipeline()
+                .AddMiddleware(new Saritasa.Tools.Messages.Common.PipelineMiddlewares.PrepareMessageContextMiddleware())
                 .AddMiddleware(new Saritasa.Tools.Messages.Events.PipelineMiddlewares.EventHandlerLocatorMiddleware(
                     System.Reflection.Assembly.GetAssembly(typeof(Domain.UserContext.Entities.User))))
                 .AddMiddleware(new Saritasa.Tools.Messages.Events.PipelineMiddlewares.EventHandlerResolverMiddleware())

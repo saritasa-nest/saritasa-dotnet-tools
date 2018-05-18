@@ -342,7 +342,7 @@ namespace Saritasa.Tools.Messages.Tests
         public void Should_generate_message_processing_exception_in_case_of_fail()
         {
             // Arrange
-            pipelineService.PipelineContainer.AddQueryPipeline().Configure();
+            pipelineService.PipelineContainer.AddQueryPipeline().AddStandardMiddlewares();
 
             // Act & Assert
             Assert.Throws<MessageProcessingException>(() =>
