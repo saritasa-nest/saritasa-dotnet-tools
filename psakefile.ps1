@@ -1,6 +1,6 @@
 # Requires psake to run, see README.md for more details.
 
-Framework 4.6
+Framework 4.7
 $InformationPreference = 'Continue'
 $env:PSModulePath += ";$PSScriptRoot\Scripts\Modules"
 
