@@ -6,11 +6,9 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
-using Saritasa.Tools.Messages.Internal;
 
 namespace Saritasa.Tools.Messages.Common
 {
@@ -25,7 +23,7 @@ namespace Saritasa.Tools.Messages.Common
         public bool UseParametersResolve { get; set; } = true;
 
         /// <summary>
-        /// Captures <see cref="ExceptionDispatchInfo" /> of original execution exception
+        /// Captures <see cref="System.Runtime.ExceptionServices.ExceptionDispatchInfo" /> of original execution exception
         /// as item with ".exception-dispatch" key. Default is <c>false</c>.
         /// </summary>
         public bool CaptureExceptionDispatchInfo { get; set; } = false;

@@ -83,10 +83,10 @@ ThreadPool is not a safe place to keep emails processing. See the article `Queue
         /// </summary>
         public class AspNetSmtpEmailSender : IEmailSender
         {
-            readonly IEmailSender actualSender;
+            private readonly IEmailSender actualSender;
 
             /// <summary>
-            /// .ctor
+            /// Constructor.
             /// </summary>
             /// <param name="actualSender">Actual sender need to decorate.</param>
             public AspNetSmtpEmailSender(IEmailSender actualSender)
