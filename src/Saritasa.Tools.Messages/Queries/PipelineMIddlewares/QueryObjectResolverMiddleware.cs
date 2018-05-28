@@ -74,7 +74,7 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public void Handle(IMessageContext messageContext)
+        public virtual void Handle(IMessageContext messageContext)
         {
             handleAction(messageContext);
         }
@@ -141,7 +141,7 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
         private static readonly Task<bool> completedTask = Task.FromResult(true);
 
         /// <inheritdoc />
-        public Task HandleAsync(IMessageContext messageContext, CancellationToken cancellationToken)
+        public virtual Task HandleAsync(IMessageContext messageContext, CancellationToken cancellationToken)
         {
             Handle(messageContext);
             return completedTask;

@@ -117,7 +117,7 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public void Handle(IMessageContext messageContext)
+        public virtual void Handle(IMessageContext messageContext)
         {
             // Rejected events are not needed to process.
             if (messageContext.Status == ProcessingStatus.Rejected)

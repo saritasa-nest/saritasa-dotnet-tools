@@ -37,7 +37,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public void Handle(IMessageContext messageContext)
+        public virtual void Handle(IMessageContext messageContext)
         {
             var handlerMethod = messageContext.GetItemByKeyOrDefault<MethodInfo>(CommandHandlerLocatorMiddleware.HandlerMethodKey);
             var handler = messageContext.GetItemByKeyOrDefault(BaseHandlerResolverMiddleware.HandlerObjectKey);
@@ -106,7 +106,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
          */
 
         /// <inheritdoc />
-        public async Task HandleAsync(IMessageContext messageContext, CancellationToken cancellationToken)
+        public virtual async Task HandleAsync(IMessageContext messageContext, CancellationToken cancellationToken)
         {
             var handlerMethod = messageContext.GetItemByKeyOrDefault<MethodInfo>(CommandHandlerLocatorMiddleware.HandlerMethodKey);
             var handler = messageContext.GetItemByKeyOrDefault(BaseHandlerResolverMiddleware.HandlerObjectKey);

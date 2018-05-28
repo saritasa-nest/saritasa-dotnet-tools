@@ -27,7 +27,7 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
         }
 
         /// <inheritdoc />
-        public void Handle(IMessageContext messageContext)
+        public virtual void Handle(IMessageContext messageContext)
         {
             var handlerMethods = (EventHandlerMethodWithObject[])
                 messageContext.Items[EventHandlerLocatorMiddleware.HandlerMethodsKey];
