@@ -1,4 +1,8 @@
-﻿0.5.2 [2018-05-21]
+﻿0.5.3 [TBD]
+[+] Add additional methods to manipulate with middlewares array.
+[*] Move pipeline initialization to Invoke.
+
+0.5.2 [2018-05-21]
 [+] Add PrepareMessageContextMiddleware, move content check and preparation to middleware.
 [+] Add EmptyMiddleware.
 [*] Exclude "$id" and "EntityKey" Entity Frameworks fields from serialization.

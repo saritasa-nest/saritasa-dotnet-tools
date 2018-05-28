@@ -78,5 +78,11 @@ namespace Saritasa.Tools.Messages.Queries
             });
             return this;
         }
+
+        /// <summary>
+        /// Returns built pipeline.
+        /// </summary>
+        /// <returns>Query pipeline.</returns>
+        public IQueryPipeline Get() => Pipeline;
     }
 }

@@ -65,5 +65,11 @@ namespace Saritasa.Tools.Messages.Events
             });
             return this;
         }
+
+        /// <summary>
+        /// Returns built pipeline.
+        /// </summary>
+        /// <returns>Events pipeline.</returns>
+        public IEventPipeline Get() => Pipeline;
     }
 }

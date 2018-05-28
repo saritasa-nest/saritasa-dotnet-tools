@@ -26,7 +26,8 @@ namespace Saritasa.Tools.Messages.Common
             set
             {
                 middlewares = value;
-                InitializeMiddlewaresChains();
+                invokeDelegate = InternalInvokeInit;
+                invokeDelegateAsync = InternalInvokeInitAsync;
             }
         }
 
@@ -42,16 +43,32 @@ namespace Saritasa.Tools.Messages.Common
         /// <inheritdoc />
         public virtual byte[] MessageTypes => new byte[] { };
 
+        private Action<MessagePipeline, IMessageContext> invokeDelegate = InternalInvokeInit;
+
         /// <inheritdoc />
         public virtual void Invoke(IMessageContext messageContext)
         {
-            var localMiddlewaresChain = middlewaresChain;
+            invokeDelegate(this, messageContext);
+        }
+
+        private static void InternalInvokeProcess(MessagePipeline messagePipeline, IMessageContext messageContext)
+        {
             messageContext.Status = ProcessingStatus.Processing;
-            for (int i = 0; i < localMiddlewaresChain.Length; i++)
+            for (int i = 0; i < messagePipeline.middlewaresChain.Length; i++)
             {
-                localMiddlewaresChain[i](messageContext);
+                messagePipeline.middlewaresChain[i](messageContext);
             }
         }
+
+        private static void InternalInvokeInit(MessagePipeline messagePipeline, IMessageContext messageContext)
+        {
+            messagePipeline.middlewaresChain =
+                messagePipeline.CreateSyncMiddlewaresChain(messagePipeline.middlewares).ToArray();
+            messagePipeline.invokeDelegate = InternalInvokeProcess;
+            messagePipeline.invokeDelegate(messagePipeline, messageContext);
+        }
+
+        private Func<MessagePipeline, IMessageContext, CancellationToken, Task> invokeDelegateAsync = InternalInvokeInitAsync;
 
         /// <summary>
         /// Processes the message thru all middlewares in async mode. Middleware should support
@@ -60,15 +77,29 @@ namespace Saritasa.Tools.Messages.Common
         /// </summary>
         /// <param name="messageContext">The message context.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
-        public virtual async Task InvokeAsync(IMessageContext messageContext, CancellationToken cancellationToken)
+        public virtual Task InvokeAsync(IMessageContext messageContext, CancellationToken cancellationToken)
+        {
+            return invokeDelegateAsync(this, messageContext, cancellationToken);
+        }
+
+        private static async Task InternalInvokeProcessAsync(MessagePipeline messagePipeline, IMessageContext messageContext,
+            CancellationToken cancellationToken)
         {
             // Execute message thru all middlewares.
-            var localAsyncMiddlewaresChain = asyncMiddlewaresChain;
             messageContext.Status = ProcessingStatus.Processing;
-            for (int i = 0; i < localAsyncMiddlewaresChain.Length; i++)
+            for (int i = 0; i < messagePipeline.asyncMiddlewaresChain.Length; i++)
             {
-                await localAsyncMiddlewaresChain[i](messageContext, cancellationToken);
+                await messagePipeline.asyncMiddlewaresChain[i](messageContext, cancellationToken);
             }
+        }
+
+        private static Task InternalInvokeInitAsync(MessagePipeline messagePipeline, IMessageContext messageContext, CancellationToken cancellationToken)
+        {
+            messagePipeline.asyncMiddlewaresChain =
+                messagePipeline.CreateAsyncMiddlewaresChain(messagePipeline.middlewares).ToArray();
+            messagePipeline.invokeDelegateAsync = InternalInvokeProcessAsync;
+            messagePipeline.invokeDelegateAsync(messagePipeline, messageContext, cancellationToken);
+            return Task.FromResult(1);
         }
 
         #endregion

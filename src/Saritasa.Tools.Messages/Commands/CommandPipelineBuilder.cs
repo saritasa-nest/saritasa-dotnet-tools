@@ -65,5 +65,11 @@ namespace Saritasa.Tools.Messages.Commands
             });
             return this;
         }
+
+        /// <summary>
+        /// Returns built pipeline.
+        /// </summary>
+        /// <returns>Command pipeline.</returns>
+        public ICommandPipeline Get() => Pipeline;
     }
 }
