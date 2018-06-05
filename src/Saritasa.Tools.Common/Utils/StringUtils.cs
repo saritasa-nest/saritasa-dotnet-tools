@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -132,8 +132,8 @@ namespace Saritasa.Tools.Common.Utils
             return success ? result : defaultValue;
         }
 
-        private static readonly string[] trueValues = { "yes", "y", "t", "1" };
-        private static readonly string[] falseValues = { "no", "n", "f", "0" };
+        private static readonly string[] trueValues = { "yes", "on", "y", "t", "1" };
+        private static readonly string[] falseValues = { "no", "off", "n", "f", "0" };
 
         /// <summary>
         /// Tries to convert target string to Boolean. If fails returns default value.

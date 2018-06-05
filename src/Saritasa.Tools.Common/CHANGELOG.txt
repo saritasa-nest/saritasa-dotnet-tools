@@ -1,5 +1,6 @@
 ﻿0.4.8 [TBD]
 [+] Add DictionaryUtils.GetValueOrDefault and DictionaryUtils.GetValuesOrDefault for NameValueCollection.
+[+] Add "on" and "off" values for bool ParseOrDefault.
 
 0.4.7 [2018-02-08]
 [*] Fix FlowUtils.RetryAsync non async exception behavior for .NET 4.0 .
