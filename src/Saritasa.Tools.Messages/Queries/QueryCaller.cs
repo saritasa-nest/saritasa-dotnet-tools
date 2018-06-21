@@ -140,7 +140,7 @@ namespace Saritasa.Tools.Messages.Queries
             {
                 await queryPipeline.InvokeAsync(messageContext, cancellationToken);
             }
-            return ((Task<TResult>)queryParameters.Result).Result;
+            return await (Task<TResult>)queryParameters.Result;
         }
     }
 }
