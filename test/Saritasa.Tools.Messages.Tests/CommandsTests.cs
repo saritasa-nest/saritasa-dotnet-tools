@@ -660,5 +660,40 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         #endregion
+
+        #region HandleAsync_CommandWithException_ShouldThrow
+
+        private class Ns17_ExceptionCommand
+        {
+            public Task Handle(Ns17_ExceptionCommand command)
+            {
+                throw new Ns17_Exception();
+                return Task.FromResult(1);
+            }
+        }
+
+        private class Ns17_Exception : Exception
+        {
+        }
+
+        [Fact]
+        public async Task HandleAsync_CommandWithException_ShouldThrow()
+        {
+            // Arrange
+            var builder = pipelineService.PipelineContainer.AddCommandPipeline()
+                .AddStandardMiddlewares(options =>
+                {
+                    options.Assemblies = new[] { typeof(CommandsTests).GetTypeInfo().Assembly };
+                    options.UseExceptionDispatchInfo = true;
+                });
+
+            // Act & assert
+            await Assert.ThrowsAsync<Ns17_Exception>(async () =>
+            {
+                await pipelineService.HandleCommandAsync(new Ns17_ExceptionCommand());
+            });
+        }
+
+        #endregion
     }
 }

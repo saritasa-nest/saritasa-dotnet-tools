@@ -98,8 +98,7 @@ namespace Saritasa.Tools.Messages.Common
             messagePipeline.asyncMiddlewaresChain =
                 messagePipeline.CreateAsyncMiddlewaresChain(messagePipeline.middlewares).ToArray();
             messagePipeline.invokeDelegateAsync = InternalInvokeProcessAsync;
-            messagePipeline.invokeDelegateAsync(messagePipeline, messageContext, cancellationToken);
-            return Task.FromResult(1);
+            return messagePipeline.invokeDelegateAsync(messagePipeline, messageContext, cancellationToken);
         }
 
         #endregion
