@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Concurrent;
 using System.Reflection;
 using System.ComponentModel;
-#if NETSTANDARD1_5
+#if NETSTANDARD1_5 || NETSTANDARD2_1
 using System.Runtime.Loader;
 #endif
 

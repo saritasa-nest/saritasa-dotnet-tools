@@ -115,9 +115,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <param name="parameters">Parameters dictionary.</param>
         public AdoNetMessageRepository(IDictionary<string, string> parameters)
         {
-#if NETSTANDARD1_5
-            throw new NotSupportedException("Not sure how to handle DbProviderFactories for .NET Core.");
-#else
+#if NET452
             this.factory = DbProviderFactories.GetFactory(
                 parameters.GetValueOrInvoke(KeyFactory, RepositoryConfigurationException.ThrowParameterNotExists));
             this.KeepConnection = Convert.ToBoolean(
@@ -130,6 +128,10 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                 this.serializer = (IObjectSerializer)Activator.CreateInstance(Type.GetType(parameters[KeySerializer]));
             }
             ValidateAndInit();
+#elif NETSTANDARD1_5
+            throw new NotSupportedException("DbProviderFactories not supported. Please provide DbProviderFactory explicitly.");
+#elif NETSTANDARD2_1
+            throw new NotSupportedException("Planned for NETStandard 2.1 .");
 #endif
         }
 

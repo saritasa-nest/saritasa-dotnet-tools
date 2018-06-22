@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -82,7 +82,7 @@ namespace Saritasa.Tools.Messages.Common
                 name = System.IO.Path.ChangeExtension(name, ".dll");
             }
 
-#if NETSTANDARD1_5
+#if NETSTANDARD1_5 || NETSTANDARD2_1
             var assembly = System.Runtime.Loader.AssemblyLoadContext.Default.LoadFromAssemblyPath(name);
             if (assembly != null)
             {
