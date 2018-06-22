@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 #if NET452
@@ -10,7 +10,6 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Internal;
@@ -68,8 +67,8 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
         /// <param name="address">Address to bind, loopback by default.</param>
         /// <param name="port">TCP port. By default 26025.</param>
         /// </summary>
-        public WebEndpoint([NotNull] IServiceProviderFactory serviceProviderFactory,
-            [NotNull] string address = DefaultAddress, int port = DefaultPort)
+        public WebEndpoint(IServiceProviderFactory serviceProviderFactory,
+            string address = DefaultAddress, int port = DefaultPort)
         {
             if (serviceProviderFactory == null)
             {

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -8,7 +8,6 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Saritasa.Tools.Messages.Abstractions;
@@ -57,7 +56,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// .ctor
         /// </summary>
         /// <param name="parameters">Parameters dictionary.</param>
-        public WebServiceRepository([NotNull] IDictionary<string, string> parameters)
+        public WebServiceRepository(IDictionary<string, string> parameters)
         {
             this.uri = parameters.GetValueOrInvoke(KeyUri, RepositoryConfigurationException.ThrowParameterNotExists);
             Init();

@@ -1,8 +1,7 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-using JetBrains.Annotations;
 
 namespace Saritasa.Tools.Messages.Common
 {
@@ -16,7 +15,7 @@ namespace Saritasa.Tools.Messages.Common
         /// </summary>
         /// <param name="obj">Object.</param>
         /// <returns>Serialized to bytes object.</returns>
-        byte[] Serialize([NotNull] object obj);
+        byte[] Serialize(object obj);
 
         /// <summary>
         /// Deserialized bytes to object of given type.
@@ -24,7 +23,7 @@ namespace Saritasa.Tools.Messages.Common
         /// <param name="bytes">Bytes.</param>
         /// <param name="type">Type of object.</param>
         /// <returns>Object.</returns>
-        object Deserialize([NotNull] byte[] bytes, Type type);
+        object Deserialize(byte[] bytes, Type type);
 
         /// <summary>
         /// Does serializer represent text string. Binary by default.
