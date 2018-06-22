@@ -46,11 +46,11 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
                     ExecutionDuration int NOT NULL,
                     Status tinyint NOT NULL,
 
-                    CONSTRAINT PK_{TableName} PRIMARY KEY CLUSTERED (Id),
-                    INDEX IX_{TableName}_ContentId (ContentId),
-                    INDEX IX_{TableName}_ContentType (ContentType),
-                    INDEX IX_{TableName}_ErrorType (ErrorType)
-                );";
+                    CONSTRAINT PK_{TableName} PRIMARY KEY CLUSTERED (Id)
+                );
+                CREATE NONCLUSTERED INDEX IX_{TableName}_ContentId ON [{TableName}] (ContentId);
+                CREATE NONCLUSTERED INDEX IX_{TableName}_ContentType ON [{TableName}] (ContentType);
+                CREATE NONCLUSTERED INDEX IX_{TableName}_ErrorType ON [{TableName}] (ErrorType);";
         }
 
         /// <inheritdoc />
