@@ -15,7 +15,7 @@ namespace Saritasa.Tools.Messages.Common
     /// </summary>
     public abstract class MessagePipeline : IMessagePipeline, IDisposable
     {
-        private IMessagePipelineMiddleware[] middlewares;
+        private IMessagePipelineMiddleware[] middlewares = new IMessagePipelineMiddleware[0];
 
         /// <summary>
         /// Middlewares list.
@@ -112,16 +112,6 @@ namespace Saritasa.Tools.Messages.Common
             }
 
             return Func;
-        }
-
-        private void InitializeMiddlewaresChains()
-        {
-            lock (objLock)
-            {
-                var localMiddlewares = middlewares;
-                middlewaresChain = CreateSyncMiddlewaresChain(localMiddlewares).ToArray();
-                asyncMiddlewaresChain = CreateAsyncMiddlewaresChain(localMiddlewares).ToArray();
-            }
         }
 
         private List<Action<IMessageContext>> CreateSyncMiddlewaresChain(IMessagePipelineMiddleware[] localMiddlewares)
