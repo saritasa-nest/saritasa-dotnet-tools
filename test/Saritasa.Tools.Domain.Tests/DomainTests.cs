@@ -170,10 +170,10 @@ namespace Saritasa.Tools.Domain.Tests
         [Fact]
         public void Domain_validation_should_keep_message_from_ctor()
         {
-            // Arrange & act.
+            // Arrange & act
             var ex = new Exceptions.ValidationException("The custom message");
 
-            // Assert.
+            // Assert
             Assert.Equal("The custom message", ex.Message);
             Assert.Empty(ex.Errors);
         }

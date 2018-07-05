@@ -3,7 +3,7 @@ Project Setup
 
 Here are steps you need to do to setup environment to be able to develop. You need following software installed:
 
-- Visual Studio 2017 (https://www.visualstudio.com/downloads/download-visual-studio-vs.aspx)
+- Visual Studio 2017 (https://www.visualstudio.com/downloads/download-visual-studio-vs.aspx) or JetBrains Rider (https://www.jetbrains.com/rider/)
 - psake (https://github.com/psake/psake)
 - PowerShell 5
 - .NET Core (https://www.microsoft.com/net/core)

@@ -21,11 +21,33 @@ namespace Saritasa.Tools.Domain.Exceptions
 #endif
     public class ValidationException : DomainException
     {
-        private const string SummaryKey = "";
+        /// <summary>
+        /// Default summary validation key. Should contain overall message.
+        /// </summary>
+        internal const string SummaryKey = "";
+
+        /// <summary>
+        /// Validation message formatter delegate used for Message property output.
+        /// </summary>
+        /// <param name="defaultMessage">Default message.</param>
+        /// <param name="validationException">Validation exception.</param>
+        /// <returns>Validation message.</returns>
+        /// <remarks>
+        /// Do not use validationException.Message property because it leads to recursion.
+        /// </remarks>
+        public delegate string ValidationMessageFormatter(string defaultMessage, ValidationException validationException);
+
+        /// <summary>
+        /// Validation message formatter. <see cref="ValidationExceptionDelegates.SummaryOrDefaultMessageFormatter" /> by default.
+        /// </summary>
+        public static ValidationMessageFormatter MessageFormatter { get; set; } = ValidationExceptionDelegates.SummaryOrDefaultMessageFormatter;
 
         /// <summary>
         /// Errors dictionary. Key is a member name, value is an enumerable of error
         /// messages. Empty member name relates to summary error message.
+        /// For example:
+        /// - Name: Field is required.
+        /// - ConfirmPassword: Field is required, Should equal to Password field.
         /// </summary>
         public virtual IDictionary<string, IEnumerable<string>> Errors => errors;
 
@@ -33,17 +55,7 @@ namespace Saritasa.Tools.Domain.Exceptions
             = new Dictionary<string, IEnumerable<string>>();
 
         /// <inheritdoc />
-        public override string Message
-        {
-            get
-            {
-                if (Errors.ContainsKey(SummaryKey))
-                {
-                    return Errors[SummaryKey].First();
-                }
-                return base.Message;
-            }
-        }
+        public override string Message => MessageFormatter(base.Message, this);
 
         /// <summary>
         /// Summary errors. Returns zero array if not defined.
@@ -145,7 +157,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         }
 
         /// <summary>
-        /// Add summar error.
+        /// Add summary error.
         /// </summary>
         /// <param name="error">Error message.</param>
         public void AddError(string error)
@@ -191,8 +203,7 @@ namespace Saritasa.Tools.Domain.Exceptions
 
 #if NET40
         /// <summary>
-        /// Creates on throws instance of <see cref="ValidationException" /> based on validation results
-        /// of object.
+        /// If object contains validation errors throws instance of <see cref="ValidationException" />.
         /// </summary>
         /// <param name="obj">The object to validate.</param>
         /// <param name="serviceProvider">The object that implements the <see cref="IServiceProvider" /> interface.
@@ -271,8 +282,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         }
 #else
         /// <summary>
-        /// Creates on throws instance of <see cref="ValidationException" /> based on validation results
-        /// of object.
+        /// If object contains validation errors throws instance of <see cref="ValidationException" />.
         /// </summary>
         /// <param name="obj">The object to validate.</param>
         /// <param name="items">A dictionary of key/value pairs to make available to the service consumers.

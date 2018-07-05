@@ -35,8 +35,8 @@ Here is how it can be used:
             {
                 var message = new MailMessage
                 {
-                    To = { new MailAddress(userCreatedEvent.User.Email) },
-                    Body = $"Thanks for registering to our site!"
+                    To = new MailAddress[] { new MailAddress(userCreatedEvent.User.Email) },
+                    Body = "Thanks for registering to our site!"
                 };
                 emailSender.SendAsync(message);
             }

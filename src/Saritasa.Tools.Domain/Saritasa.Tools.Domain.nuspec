@@ -16,8 +16,7 @@
     <tags>uow repository domain</tags>
     <repository type="git" url="https://github.com/Saritasa/SaritasaTools" />
     <dependencies>
-      <group targetFramework="netstandard1.2">
-      </group>
+      <group targetFramework="netstandard1.2" />
       <group targetFramework="net40" />
     </dependencies>
   </metadata>

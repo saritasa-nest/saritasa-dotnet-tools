@@ -668,7 +668,6 @@ namespace Saritasa.Tools.Messages.Tests
             public Task Handle(Ns17_ExceptionCommand command)
             {
                 throw new Ns17_Exception();
-                return Task.FromResult(1);
             }
         }
 
