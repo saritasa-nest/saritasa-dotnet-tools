@@ -245,11 +245,11 @@ namespace Saritasa.Tools.Common.Utils
 #endif
 
         /// <summary>
-        /// Convert array of bytes to string representation.
+        /// Convert array of bytes to string representation. Replace dashes by empty strings.
         /// </summary>
         /// <param name="bytes">Bytes array.</param>
         /// <returns>Hex string.</returns>
-        internal static string ConvertBytesToString(byte[] bytes)
+        public static string ConvertBytesToString(byte[] bytes)
         {
             Guard.IsNotNull(bytes, nameof(bytes));
             return BitConverter.ToString(bytes).Replace("-", string.Empty);
@@ -260,13 +260,14 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="target">Hex bytes string.</param>
         /// <returns>Bytes array.</returns>
-        internal static byte[] ConvertStringToBytes(string target)
+        public static byte[] ConvertStringToBytes(string target)
         {
             Guard.IsNotNull(target, nameof(target));
             if (target.Length % 2 != 0)
             {
                 throw new ArgumentException(Properties.Strings.TargetStringLengthIncorrect, nameof(target));
             }
+
             var bytes = new byte[target.Length / 2];
             for (int i = 0; i < bytes.Length; i++)
             {

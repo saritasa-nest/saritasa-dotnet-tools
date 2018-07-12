@@ -52,3 +52,11 @@ Contains set of methods based on standard library implementation to work with st
 
         - ``Crc64IsoPolynomial`` *(default)*
         - ``Crc64EcmaPolynomial``
+
+.. function:: string ConvertBytesToString(byte[] bytes)
+
+    Convert array of bytes to string representation. Replace dashes by empty strings.
+
+.. function:: byte[] ConvertStringToBytes(string target)
+
+    Convert string that contains hex representation of bytes to bytes array.

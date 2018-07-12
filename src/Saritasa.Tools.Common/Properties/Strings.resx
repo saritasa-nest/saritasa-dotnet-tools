@@ -136,7 +136,7 @@
     <value>{0} must be between {1}-{2}.</value>
   </data>
   <data name="ArgumentMustBeEnum" xml:space="preserve">
-    <value>Argument must be enum.</value>
+    <value>Argument must be enumeration.</value>
   </data>
   <data name="ArgumentMustBeGreaterThan" xml:space="preserve">
     <value>{0} must be greater than {1}.</value>
