@@ -159,7 +159,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <returns>Truncated date.</returns>
         public static DateTime Truncate(DateTime target, DateTimePeriod period, CultureInfo cultureInfo = null)
         {
-            // For reference https://www.postgresql.org/docs/9.5/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
+            // For reference https://www.postgresql.org/docs/10/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
             switch (period)
             {
                 case DateTimePeriod.Millisecond:
@@ -175,13 +175,12 @@ namespace Saritasa.Tools.Common.Utils
                     return new DateTime(target.Year, target.Month, target.Day, 0, 0, 0, target.Kind);
                 case DateTimePeriod.Week:
                     var firstDayOfWeek = cultureInfo?.DateTimeFormat.FirstDayOfWeek ?? CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek;
-                    return new DateTime(target.Year, target.Month, target.Day, 0, 0, 0, target.Kind)
-                        .AddDays(-(int)target.DayOfWeek + (int)firstDayOfWeek);
+                    int diff = (7 + (target.DayOfWeek - firstDayOfWeek)) % 7;
+                    return new DateTime(target.Year, target.Month, target.Day, 0, 0, 0, target.Kind).AddDays(-1 * diff);
                 case DateTimePeriod.Month:
                     return new DateTime(target.Year, target.Month, 1, 0, 0, 0, target.Kind);
                 case DateTimePeriod.Quarter:
-                    return new DateTime(target.Year, target.Month, 1, 0, 0, 0, target.Kind)
-                        .AddMonths(-(target.Month - 1) % 3);
+                    return new DateTime(target.Year, target.Month, 1, 0, 0, 0, target.Kind).AddMonths(-(target.Month - 1) % 3);
                 case DateTimePeriod.Year:
                     return new DateTime(target.Year, 1, 1, 0, 0, 0, target.Kind);
                 case DateTimePeriod.Decade:

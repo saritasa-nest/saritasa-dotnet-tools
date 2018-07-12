@@ -17,7 +17,7 @@ namespace Saritasa.Tools.Common.Extensions
         /// </summary>
         /// <param name="target">Target date.</param>
         /// <param name="period">Type of truncation.</param>
-        /// <param name="cultureInfo">Specific culture to use. If null current culture is used.</param>
+        /// <param name="cultureInfo">Specific culture to use. If null then current culture is used.</param>
         /// <returns>Truncated date.</returns>
         public static DateTime Truncate(this DateTime target, DateTimePeriod period, CultureInfo cultureInfo = null)
         {

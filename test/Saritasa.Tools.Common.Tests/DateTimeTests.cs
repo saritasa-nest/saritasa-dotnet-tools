@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -62,7 +62,7 @@ namespace Saritasa.Tools.Common.Tests
         }
 
         [Fact]
-        public void Diff_for_months_should_be_correct()
+        public void GetDiff_ThreePairOfDates_26Or50()
         {
             // Arrange
             var diffa1 = new DateTime(2016, 10, 12);
@@ -77,7 +77,7 @@ namespace Saritasa.Tools.Common.Tests
         }
 
         [Fact]
-        public void Combine_date_and_time_with_different_kinds_should_generate_exception()
+        public void CombineDateAndTime_DifferentKind_ThrowArgumentException()
         {
             // Arrange
             var dt1 = new DateTime(2016, 1, 1, 0, 0, 0, DateTimeKind.Local);
@@ -88,14 +88,66 @@ namespace Saritasa.Tools.Common.Tests
         }
 
         [Fact]
-        public void Start_of_week_should_be_culture_correct()
+        public void GetStartOfPeriod_USCulture_ReturnsSunday4()
         {
             // Arrange
             var dt = new DateTime(2017, 6, 5);
 
             // Act & Assert
             Assert.Equal(DayOfWeek.Sunday, DateTimeUtils.GetStartOfPeriod(dt, DateTimePeriod.Week, CultureInfo.InvariantCulture).DayOfWeek);
+            Assert.Equal(4, DateTimeUtils.GetStartOfPeriod(dt, DateTimePeriod.Week, CultureInfo.InvariantCulture).Day);
+        }
+
+        [Fact]
+        public void GetStartOfPeriod_RUCulture_ReturnsMonday5()
+        {
+            // Arrange
+            var dt = new DateTime(2017, 6, 5);
+
+            // Act & Assert
             Assert.Equal(DayOfWeek.Monday, DateTimeUtils.GetStartOfPeriod(dt, DateTimePeriod.Week, new CultureInfo("ru")).DayOfWeek);
+            Assert.Equal(5, DateTimeUtils.GetStartOfPeriod(dt, DateTimePeriod.Week, new CultureInfo("ru")).Day);
+        }
+
+        [Fact]
+        public void Truncate_USCulture_ReturnsJuly8()
+        {
+            // Arrange
+            var date = new DateTime(2018, 7, 14, 0, 0, 0, DateTimeKind.Utc);
+
+            // Act
+            var result = DateTimeUtils.Truncate(date, DateTimePeriod.Week, new CultureInfo("us"));
+
+            // Assert
+            Assert.Equal(8, result.Day);
+        }
+
+        [Fact]
+        public void Truncate_RUCulture_ReturnsJuly9()
+        {
+            // Arrange
+            var date = new DateTime(2018, 7, 15, 0, 0, 0, DateTimeKind.Utc);
+
+            // Act
+            var result = DateTimeUtils.Truncate(date, DateTimePeriod.Week, new CultureInfo("ru"));
+
+            // Assert
+            Assert.Equal(9, result.Day);
+        }
+
+        [Fact]
+        public void Truncate_CustomCulture_ReturnsJuly11()
+        {
+            // Arrange
+            var date = new DateTime(2018, 7, 17, 0, 0, 0, DateTimeKind.Utc);
+            var cultureInfo = new CultureInfo("us");
+            cultureInfo.DateTimeFormat.FirstDayOfWeek = DayOfWeek.Wednesday;
+
+            // Act
+            var result = DateTimeUtils.Truncate(date, DateTimePeriod.Week, cultureInfo);
+
+            // Assert
+            Assert.Equal(11, result.Day);
         }
     }
 }
