@@ -319,7 +319,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities",
             Justification = "Parameters are used")]
         public async Task<IEnumerable<MessageRecord>> GetAsync(MessageQuery messageQuery,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default(CancellationToken))
         {
             if (disposed)
             {

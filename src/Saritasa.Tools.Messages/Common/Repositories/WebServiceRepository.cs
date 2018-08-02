@@ -3,12 +3,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Common.ObjectSerializers;
@@ -86,7 +84,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
         /// <inheritdoc />
         public async Task<IEnumerable<MessageRecord>> GetAsync(MessageQuery messageQuery,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default(CancellationToken))
         {
             if (disposed)
             {

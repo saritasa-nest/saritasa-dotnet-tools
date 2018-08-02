@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 #if !NET40
@@ -117,7 +117,8 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<MessageRecord>> GetAsync(MessageQuery messageQuery, CancellationToken cancellationToken)
+        public async Task<IEnumerable<MessageRecord>> GetAsync(MessageQuery messageQuery,
+            CancellationToken cancellationToken = default(CancellationToken))
         {
             if (disposed)
             {
