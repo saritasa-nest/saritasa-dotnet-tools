@@ -6,14 +6,14 @@ using System;
 namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
 {
     /// <summary>
-    /// Sql query provider for AdoNetMessageRepository.
+    /// SQL query provider for <see cref="AdoNetMessageRepository" />.
     /// </summary>
     internal interface IMessageQueryProvider
     {
         /// <summary>
         /// Create initial table for messages.
         /// </summary>
-        /// <returns>Sql query.</returns>
+        /// <returns>SQL query.</returns>
         string GetCreateTableScript();
 
         /// <summary>
@@ -23,16 +23,16 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
         string GetExistsTableScript();
 
         /// <summary>
-        /// Returns sql script to insert message.
+        /// Returns SQL script to insert message.
         /// </summary>
-        /// <returns>Sql query.</returns>
+        /// <returns>SQL query.</returns>
         string GetInsertMessageScript();
 
         /// <summary>
         /// Get filter script.
         /// </summary>
         /// <param name="messageQuery">Message query to filter by.</param>
-        /// <returns>Sql query.</returns>
+        /// <returns>SQL query.</returns>
         string GetFilterScript(MessageQuery messageQuery);
     }
 }

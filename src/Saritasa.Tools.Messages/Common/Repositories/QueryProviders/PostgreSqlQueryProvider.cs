@@ -7,7 +7,7 @@ using Saritasa.Tools.Messages.Internal;
 namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
 {
     /// <summary>
-    /// PostgreSQL sql scripts.
+    /// PostgreSQL SQL scripts.
     /// </summary>
     internal class PostgreSqlQueryProvider : IMessageQueryProvider
     {

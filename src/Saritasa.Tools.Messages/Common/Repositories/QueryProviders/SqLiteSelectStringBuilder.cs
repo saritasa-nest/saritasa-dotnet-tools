@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -19,46 +19,12 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
         /// <inheritdoc />
         public override string Build()
         {
-            var sb = new StringBuilder("SELECT ");
-
-            // Output Distinct.
-            if (IsDistinct)
-            {
-                sb.Append("DISTINCT ");
-            }
-
-            // Output column names.
-            sb.Append(SelectedColumns.Any() ? string.Join(", ", SelectedColumns.Select(WrapVariable)) : "*");
+            var sb = new StringBuilder("SELECT *");
 
             // Output table names.
-            if (SelectedTables.Any())
+            if (!string.IsNullOrEmpty(SelectedTable))
             {
-                sb.Append($" FROM {string.Join(", ", SelectedTables.Select(WrapVariable))}");
-            }
-
-            // Output joins.
-            if (JoinStatement.Any())
-            {
-                foreach (var clause in JoinStatement)
-                {
-                    sb.AppendLine();
-                    switch (clause.JoinType)
-                    {
-                        case JoinType.InnerJoin:
-                            sb.Append("INNER JOIN ");
-                            break;
-                        case JoinType.LeftJoin:
-                            sb.Append("LEFT OUTER JOIN ");
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException(nameof(clause.JoinType), $"SqLite does not support {clause.JoinType} join type.");
-                    }
-                    sb.Append($"{clause.ToTable} ON ");
-                    sb.Append(CreateComparisonClause(
-                        $"{clause.ToTable}.{clause.ToColumn}",
-                        clause.ComparisonOperator,
-                        new SqlLiteral($"{clause.FromTable}.{clause.FromColumn}")));
-                }
+                sb.Append($" FROM {WrapVariable(SelectedTable)}");
             }
 
             // Output where statement.
@@ -66,13 +32,6 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
             {
                 sb.AppendLine();
                 sb.Append($"WHERE {string.Join(" AND ", WhereStatement.Select(BuildWhereClauseString))}");
-            }
-
-            // Output GroupBy statement.
-            if (GroupByColumns.Count > 0)
-            {
-                sb.AppendLine();
-                sb.Append($"GROUP BY {string.Join(", ", GroupByColumns.Select(WrapVariable))}");
             }
 
             // Output OrderBy statement.

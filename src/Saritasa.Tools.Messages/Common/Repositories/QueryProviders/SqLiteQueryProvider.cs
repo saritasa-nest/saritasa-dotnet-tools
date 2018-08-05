@@ -7,7 +7,7 @@ using Saritasa.Tools.Messages.Internal;
 namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
 {
     /// <summary>
-    /// SQLite sql scripts.
+    /// SQLite SQL scripts.
     /// </summary>
     internal class SqliteQueryProvider : IMessageQueryProvider
     {

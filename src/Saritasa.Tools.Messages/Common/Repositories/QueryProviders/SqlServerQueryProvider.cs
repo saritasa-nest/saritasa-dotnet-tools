@@ -7,7 +7,7 @@ using Saritasa.Tools.Messages.Internal;
 namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
 {
     /// <summary>
-    /// SQL Server sql scripts.
+    /// SQL Server SQL scripts.
     /// </summary>
     internal class SqlServerQueryProvider : IMessageQueryProvider
     {

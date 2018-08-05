@@ -7,7 +7,7 @@ using Saritasa.Tools.Messages.Internal;
 namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
 {
     /// <summary>
-    /// MySQL/MariaDB sql scripts.
+    /// MySQL/MariaDB SQL scripts.
     /// </summary>
     internal class MySqlQueryProvider : IMessageQueryProvider
     {

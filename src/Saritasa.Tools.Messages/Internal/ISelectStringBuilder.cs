@@ -13,36 +13,9 @@ namespace Saritasa.Tools.Messages.Internal
     internal interface ISelectStringBuilder
     {
         /// <summary>
-        /// Gets the selected columns.
+        /// Gets or sets the selected table.
         /// </summary>
-        /// <value>
-        /// The selected columns.
-        /// </value>
-        IList<string> SelectedColumns { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether the SELECT statement has DISTINCT clause.
-        /// </summary>
-        /// <value>
-        /// <c>true</c> if the SELECT statement has DISTINCT clause; otherwise, <c>false</c>.
-        /// </value>
-        bool IsDistinct { get; set; }
-
-        /// <summary>
-        /// Gets or sets the selected tables.
-        /// </summary>
-        /// <value>
-        /// The selected tables.
-        /// </value>
-        IList<string> SelectedTables { get; }
-
-        /// <summary>
-        /// Gets the JOIN statement.
-        /// </summary>
-        /// <value>
-        /// The JOIN statement.
-        /// </value>
-        IList<JoinClause> JoinStatement { get; }
+        string SelectedTable { get; }
 
         /// <summary>
         /// Gets the WHERE statement.
@@ -51,14 +24,6 @@ namespace Saritasa.Tools.Messages.Internal
         /// The WHERE statement.
         /// </value>
         IList<WhereClause> WhereStatement { get; }
-
-        /// <summary>
-        /// Gets the GROUP BY columns.
-        /// </summary>
-        /// <value>
-        /// The GROUP BY columns.
-        /// </value>
-        IList<string> GroupByColumns { get; }
 
         /// <summary>
         /// Gets the ORDER BY statement.
@@ -91,74 +56,11 @@ namespace Saritasa.Tools.Messages.Internal
         ISelectStringBuilder SelectAll();
 
         /// <summary>
-        /// Selects the specified columns.
-        /// </summary>
-        /// <param name="columnNames">The column names.</param>
-        /// <returns>Select string builder.</returns>
-        ISelectStringBuilder Select(params string[] columnNames);
-
-        /// <summary>
-        /// Adds the specified columns to the SELECT statement.
-        /// </summary>
-        /// <param name="columnNames">The column names.</param>
-        /// <returns>Select string builder.</returns>
-        ISelectStringBuilder AddSelect(params string[] columnNames);
-
-        /// <summary>
-        /// Distincts result records.
-        /// </summary>
-        /// <returns>Select string builder.</returns>
-        ISelectStringBuilder Distinct();
-
-        /// <summary>
         /// Sets the specified table names.
         /// </summary>
-        /// <param name="tableNames">The table names.</param>
+        /// <param name="tableName">The table name.</param>
         /// <returns>Select string builder.</returns>
-        ISelectStringBuilder From(params string[] tableNames);
-
-        /// <summary>
-        /// Joins the specified table.
-        /// </summary>
-        /// <param name="tableName">Name of the table.</param>
-        /// <param name="joinType">Type of the join clause.</param>
-        /// <returns>Join clause.</returns>
-        JoinClause Join(string tableName, JoinType joinType = JoinType.InnerJoin);
-
-        /// <summary>
-        /// Joins the specified table with inner join type.
-        /// </summary>
-        /// <param name="tableName">Name of the table.</param>
-        /// <returns>Join clause.</returns>
-        JoinClause InnerJoin(string tableName);
-
-        /// <summary>
-        /// Joins the specified table with left join type.
-        /// </summary>
-        /// <param name="tableName">Name of the table.</param>
-        /// <returns>Join clause.</returns>
-        JoinClause LeftJoin(string tableName);
-
-        /// <summary>
-        /// Joins the specified table with right join type.
-        /// </summary>
-        /// <param name="tableName">Name of the table.</param>
-        /// <returns>Join clause.</returns>
-        JoinClause RightJoin(string tableName);
-
-        /// <summary>
-        /// Joins the specified table with full outer join type.
-        /// </summary>
-        /// <param name="tableName">Name of the table.</param>
-        /// <returns>Join clause.</returns>
-        JoinClause OuterJoin(string tableName);
-
-        /// <summary>
-        /// Sets GROUP BY columns.
-        /// </summary>
-        /// <param name="columnNames">The column names.</param>
-        /// <returns>Select string builder.</returns>
-        ISelectStringBuilder GroupBy(params string[] columnNames);
+        ISelectStringBuilder From(string tableName);
 
         /// <summary>
         /// Sets WHERE statement for the specified column.

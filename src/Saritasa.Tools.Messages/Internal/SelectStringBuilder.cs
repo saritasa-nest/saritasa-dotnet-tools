@@ -18,31 +18,16 @@ namespace Saritasa.Tools.Messages.Internal
         /// </summary>
         protected SelectStringBuilder()
         {
-            SelectedColumns = new List<string>();
-            SelectedTables = new List<string>();
-            JoinStatement = new List<JoinClause>();
+            SelectedTable = string.Empty;
             WhereStatement = new List<WhereClause>();
-            GroupByColumns = new List<string>();
             OrderByStatement = new List<OrderByClause>();
         }
 
         /// <inheritdoc />
-        public IList<string> SelectedColumns { get; }
-
-        /// <inheritdoc />
-        public bool IsDistinct { get; set; }
-
-        /// <inheritdoc />
-        public IList<string> SelectedTables { get; }
-
-        /// <inheritdoc />
-        public IList<JoinClause> JoinStatement { get; }
+        public string SelectedTable { get; set; }
 
         /// <inheritdoc />
         public IList<WhereClause> WhereStatement { get; }
-
-        /// <inheritdoc />
-        public IList<string> GroupByColumns { get; }
 
         /// <inheritdoc />
         public IList<OrderByClause> OrderByStatement { get; }
@@ -56,84 +41,13 @@ namespace Saritasa.Tools.Messages.Internal
         /// <inheritdoc />
         public ISelectStringBuilder SelectAll()
         {
-            SelectedColumns.Clear();
             return this;
         }
 
         /// <inheritdoc />
-        public ISelectStringBuilder Select(params string[] columnNames)
+        public ISelectStringBuilder From(string tableName)
         {
-            SelectedColumns.Clear();
-            return AddSelect(columnNames);
-        }
-
-        /// <inheritdoc />
-        public ISelectStringBuilder AddSelect(params string[] columnNames)
-        {
-            foreach (var column in columnNames)
-            {
-                SelectedColumns.Add(column);
-            }
-            return this;
-        }
-
-        /// <inheritdoc />
-        public ISelectStringBuilder Distinct()
-        {
-            IsDistinct = true;
-            return this;
-        }
-
-        /// <inheritdoc />
-        public ISelectStringBuilder From(params string[] tableNames)
-        {
-            SelectedTables.Clear();
-            foreach (var table in tableNames)
-            {
-                SelectedTables.Add(table);
-            }
-            return this;
-        }
-
-        /// <inheritdoc />
-        public JoinClause Join(string tableName, JoinType joinType = JoinType.InnerJoin)
-        {
-            var clause = new JoinClause(this, joinType, tableName);
-            JoinStatement.Add(clause);
-            return clause;
-        }
-
-        /// <inheritdoc />
-        public JoinClause InnerJoin(string tableName)
-        {
-            return Join(tableName, JoinType.InnerJoin);
-        }
-
-        /// <inheritdoc />
-        public JoinClause LeftJoin(string tableName)
-        {
-            return Join(tableName, JoinType.LeftJoin);
-        }
-
-        /// <inheritdoc />
-        public JoinClause RightJoin(string tableName)
-        {
-            return Join(tableName, JoinType.RightJoin);
-        }
-
-        /// <inheritdoc />
-        public JoinClause OuterJoin(string tableName)
-        {
-            return Join(tableName, JoinType.OuterJoin);
-        }
-
-        /// <inheritdoc />
-        public ISelectStringBuilder GroupBy(params string[] columnNames)
-        {
-            foreach (var columnName in columnNames)
-            {
-                GroupByColumns.Add(columnName);
-            }
+            SelectedTable = tableName;
             return this;
         }
 

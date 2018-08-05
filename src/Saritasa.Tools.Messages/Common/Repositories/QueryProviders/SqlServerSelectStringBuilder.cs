@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -16,89 +16,23 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
     /// <seealso cref="Saritasa.Tools.Messages.Internal.SelectStringBuilder" />
     internal class SqlServerSelectStringBuilder : SelectStringBuilder
     {
-        /// <summary>
-        /// Gets or sets a value indicating whether the TOP statement is PERCENT.
-        /// </summary>
-        /// <value>
-        ///   <c>true</c> if the TOP statement is PERCENT; otherwise, <c>false</c>.
-        /// </value>
-        public bool TopIsPercent { get; set; }
-
-        /// <summary>
-        /// Takes the specified rows count.
-        /// </summary>
-        /// <param name="rows">The rows count.</param>
-        /// <param name="topIsPercent">if set to <c>true</c> the TOP statement is PERCENT.</param>
-        /// <returns></returns>
-        /// <exception cref="System.ArgumentException">TopIsPercent - topIsPercent</exception>
-        public ISelectStringBuilder Take(int rows, bool topIsPercent)
-        {
-            if (SkipRows.HasValue && topIsPercent)
-            {
-                throw new ArgumentException(
-                    $"You must not set {nameof(TopIsPercent)} as true while there has been set {nameof(SkipRows)}.", nameof(topIsPercent));
-            }
-
-            TopIsPercent = true;
-            return this;
-        }
-
         /// <inheritdoc />
         public override string Build()
         {
             var sb = new StringBuilder("SELECT ");
 
-            // Output Distinct.
-            if (IsDistinct)
-            {
-                sb.Append("DISTINCT ");
-            }
-
             if (!SkipRows.HasValue && TakeRows.HasValue)
             {
                 sb.Append($"TOP {TakeRows} ");
-                if (TopIsPercent)
-                {
-                    sb.Append("PERCENT ");
-                }
             }
 
             // Output column names.
-            sb.Append(SelectedColumns.Any() ? string.Join(", ", SelectedColumns.Select(WrapVariable)) : "*");
+            sb.Append("*");
 
             // Output table names.
-            if (SelectedTables.Any())
+            if (!string.IsNullOrEmpty(SelectedTable))
             {
-                sb.Append($" FROM {string.Join(", ", SelectedTables.Select(WrapVariable))}");
-            }
-
-            // Output joins.
-            if (JoinStatement.Any())
-            {
-                foreach (var clause in JoinStatement)
-                {
-                    sb.AppendLine();
-                    switch (clause.JoinType)
-                    {
-                        case JoinType.InnerJoin:
-                            sb.Append("INNER JOIN ");
-                            break;
-                        case JoinType.OuterJoin:
-                            sb.Append("OUTER JOIN ");
-                            break;
-                        case JoinType.LeftJoin:
-                            sb.Append("LEFT JOIN ");
-                            break;
-                        case JoinType.RightJoin:
-                            sb.Append("RIGHT JOIN ");
-                            break;
-                    }
-                    sb.Append($"[{clause.ToTable}] ON ");
-                    sb.Append(CreateComparisonClause(
-                        $"{clause.ToTable}.{clause.ToColumn}",
-                        clause.ComparisonOperator,
-                        new SqlLiteral($"{clause.FromTable}.{clause.FromColumn}")));
-                }
+                sb.Append($" FROM {WrapVariable(SelectedTable)}");
             }
 
             // Output where statement.
@@ -107,33 +41,6 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
                 sb.AppendLine();
                 sb.Append($"WHERE {string.Join(" AND ", WhereStatement.Select(BuildWhereClauseString))}");
             }
-
-            // Output GroupBy statement.
-            if (GroupByColumns.Count > 0)
-            {
-                sb.AppendLine();
-                sb.Append($"GROUP BY {string.Join(", ", GroupByColumns.Select(WrapVariable))}");
-            }
-
-            // TODO: Output having statement.
-            /*
-            if (Having.ClauseLevels > 0)
-            {
-                // Check if a Group By Clause was set
-                if (groupByColumns.Count == 0)
-                {
-                    throw new Exception("Having statement was set without Group By");
-                }
-                if (buildCommand)
-                {
-                    sb.Append(" HAVING " + Having.BuildWhereStatement(() => command));
-                }
-                else
-                {
-                    sb.Append(" HAVING " + Having.BuildWhereStatement());
-                }
-            }
-            */
 
             // Output OrderBy statement.
             if (OrderByStatement.Any())
