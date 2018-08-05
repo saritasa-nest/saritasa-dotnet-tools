@@ -1,7 +1,8 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Linq;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Internal;
 
@@ -12,6 +13,16 @@ namespace Saritasa.Tools.Messages.Common
     /// </summary>
     public class MessageQuery
     {
+        private const string FieldKeyId = "id";
+        private const string FieldKeyCreated = "created";
+        private const string FieldKeyContentType = "contenttype";
+        private const string FieldKeyErrorType = "errortype";
+        private const string FieldKeyStatus = "status";
+        private const string FieldKeyType = "type";
+        private const string FieldKeyDuration = "duration";
+        private const string FieldKeySkip = "skip";
+        private const string FieldKeyTake = "take";
+
         /// <summary>
         /// Message guid to filter.
         /// </summary>
@@ -80,6 +91,13 @@ namespace Saritasa.Tools.Messages.Common
             return new MessageQuery();
         }
 
+        private enum ParseStage : short
+        {
+            Field,
+            Operation,
+            Value
+        }
+
         /// <summary>
         /// Create query object from string. Only AND clause is used. Example: startdate=2017-01-01,take=10.
         /// </summary>
@@ -93,54 +111,122 @@ namespace Saritasa.Tools.Messages.Common
             }
 
             var query = new MessageQuery();
-            var paramsArr = StringHelpers.GetFieldsFromLine(queryString);
-            foreach (string param in paramsArr)
+            var tokens = StringHelpers.Tokenize(queryString, new[] { '=', '>', '<' });
+
+            string fieldName = String.Empty, operation = string.Empty;
+            var status = ParseStage.Field;
+            foreach (string param in tokens)
             {
-                var equalIndex = param.IndexOf('=');
-                if (equalIndex < 0)
+                switch (status)
                 {
-                    continue;
-                }
-                var key = param.Substring(0, equalIndex).Trim();
-                var value = param.Substring(equalIndex + 1).Trim();
-                switch (key.ToLowerInvariant())
-                {
-                    case "id":
-                        query.Id = Guid.Parse(value);
+                    case ParseStage.Field:
+                        fieldName = param;
+                        if (fieldName.Equals(FieldKeySkip, StringComparison.CurrentCultureIgnoreCase) ||
+                            fieldName.Equals(FieldKeyTake, StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            status = ParseStage.Value;
+                        }
+                        else
+                        {
+                            status = ParseStage.Operation;
+                        }
                         break;
-                    case "status":
-                        query.Status = (ProcessingStatus)Enum.Parse(typeof(ProcessingStatus), value, true);
+                    case ParseStage.Operation:
+                        operation = param;
+                        status = ParseStage.Value;
                         break;
-                    case "type":
-                        query.Type = byte.Parse(value);
-                        break;
-                    case "startdate":
-                        query.CreatedStartDate = DateTime.Parse(value);
-                        break;
-                    case "enddate":
-                        query.CreatedEndDate = DateTime.Parse(value);
-                        break;
-                    case "durationabove":
-                        query.ExecutionDurationAbove = int.Parse(value);
-                        break;
-                    case "durationbelow":
-                        query.ExecutionDurationBelow = int.Parse(value);
-                        break;
-                    case "take":
-                        query.Take = int.Parse(value);
-                        break;
-                    case "skip":
-                        query.Skip = int.Parse(value);
-                        break;
-                    case "contenttype":
-                        query.ContentType = value;
-                        break;
-                    case "errortype":
-                        query.ErrorType = value;
+                    case ParseStage.Value:
+                        try
+                        {
+                            AddQuery(query, fieldName, operation, param);
+                        }
+                        catch (FormatException ex)
+                        {
+                            throw new MessageQueryParseException($"Cannot convert {param}.", ex);
+                        }
+                        fieldName = String.Empty;
+                        operation = String.Empty;
+                        status = ParseStage.Field;
                         break;
                 }
             }
             return query;
+        }
+
+        private static void AddQuery(MessageQuery query, string field, string operation, string value)
+        {
+            switch (field.ToLowerInvariant())
+            {
+                // Id.
+                case FieldKeyId when operation == "=":
+                    query.Id = Guid.Parse(value);
+                    break;
+
+                // Created.
+                case FieldKeyCreated when operation == ">":
+                    query.CreatedStartDate = DateTime.Parse(value);
+                    break;
+                case FieldKeyCreated when operation == "<":
+                    query.CreatedEndDate = DateTime.Parse(value);
+                    break;
+                case FieldKeyCreated when operation == "=":
+                    query.CreatedStartDate = DateTime.Parse(value);
+                    query.CreatedEndDate = DateTime.Parse(value);
+                    break;
+
+                // Content type.
+                case FieldKeyContentType when operation == "=":
+                    query.ContentType = value;
+                    break;
+
+                // Error type.
+                case FieldKeyErrorType when operation == "=":
+                    query.ErrorType = value;
+                    break;
+
+                // Status.
+                case FieldKeyStatus when operation == "=":
+                    query.Status = (ProcessingStatus)Enum.Parse(typeof(ProcessingStatus), value, ignoreCase: true);
+                    break;
+
+                // Type.
+                case FieldKeyType when operation == "=":
+                    query.Type = IsStringNumber(value) ?
+                        byte.Parse(value) :
+                        MessageContextConstants.MessageTypeCodes
+                            .FirstOrDefault(mtc => mtc.Value == value.ToLowerInvariant()).Key;
+                    break;
+
+                // Duration.
+                case FieldKeyDuration when operation == ">":
+                    query.ExecutionDurationAbove = int.Parse(value);
+                    break;
+                case FieldKeyDuration when operation == "<":
+                    query.ExecutionDurationBelow = int.Parse(value);
+                    break;
+                case FieldKeyDuration when operation == "=":
+                    query.ExecutionDurationAbove = int.Parse(value);
+                    query.ExecutionDurationBelow = int.Parse(value);
+                    break;
+
+                // Skip.
+                case FieldKeySkip:
+                    query.Skip = int.Parse(value);
+                    break;
+
+                // Take.
+                case FieldKeyTake:
+                    query.Take = int.Parse(value);
+                    break;
+
+                default:
+                    throw new MessageQueryParseException($"Cannot parse {field} {operation} {value} expression.");
+            }
+        }
+
+        private static bool IsStringNumber(string target)
+        {
+            return int.TryParse(target, out int temp);
         }
 
         /// <summary>

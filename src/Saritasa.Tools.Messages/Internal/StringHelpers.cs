@@ -1,9 +1,10 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Saritasa.Tools.Messages.Internal
@@ -16,12 +17,12 @@ namespace Saritasa.Tools.Messages.Internal
         /// <remarks>
         /// Source: https://www.codeproject.com/Tips/823670/Csharp-Light-and-Fast-CSV-Parser
         /// </remarks>
-        public static string[] GetFieldsFromLine(string line, char delimiter = ',')
+        public static string[] GetFieldsFromLine(string target, char delimiter = ',')
         {
             var inQuote = false;
-            var record = new List<string>();
+            var records = new List<string>();
             var sb = new StringBuilder();
-            var reader = new StringReader(line);
+            var reader = new StringReader(target);
 
             while (reader.Peek() != -1)
             {
@@ -45,9 +46,9 @@ namespace Saritasa.Tools.Messages.Internal
                     }
                     else
                     {
-                        if (record.Count > 0 || sb.Length > 0)
+                        if (records.Count > 0 || sb.Length > 0)
                         {
-                            record.Add(sb.ToString());
+                            records.Add(sb.ToString());
                             sb.Clear();
                         }
                     }
@@ -60,7 +61,7 @@ namespace Saritasa.Tools.Messages.Internal
                     }
                     else if (readChar == delimiter)
                     {
-                        record.Add(sb.ToString());
+                        records.Add(sb.ToString());
                         sb.Clear();
                     }
                     else if (char.IsWhiteSpace(readChar))
@@ -80,7 +81,7 @@ namespace Saritasa.Tools.Messages.Internal
                     }
                     else
                     {
-                        record.Add(sb.ToString());
+                        records.Add(sb.ToString());
                         sb.Clear();
                     }
                 }
@@ -109,12 +110,72 @@ namespace Saritasa.Tools.Messages.Internal
                 }
             }
 
-            if (record.Count > 0 || sb.Length > 0)
+            if (records.Count > 0 || sb.Length > 0)
             {
-                record.Add(sb.ToString());
+                records.Add(sb.ToString());
             }
 
-            return record.ToArray();
+            return records.ToArray();
+        }
+
+        public static IList<string> Tokenize(string target, char[] tokens)
+        {
+            var inQuote = false;
+            var records = new List<string>();
+            var sb = new StringBuilder();
+            var reader = new StringReader(target);
+
+            while (reader.Peek() != -1)
+            {
+                var readChar = (char)reader.Read();
+
+                if (readChar == ' ' || readChar == '\r' && (char)reader.Peek() == '\n' ||
+                    readChar == '\n')
+                {
+                    if (!inQuote)
+                    {
+                        if (sb.Length > 0)
+                        {
+                            records.Add(sb.ToString());
+                            sb.Clear();
+                        }
+                    }
+                    else
+                    {
+                        sb.Append(readChar);
+                    }
+                }
+                else if (!inQuote && readChar == '\'' && (char)reader.Peek() == '\'' ||
+                         !inQuote && readChar == '"' && (char)reader.Peek() == '"')
+                {
+                    sb.Append(readChar);
+                    reader.Read();
+                }
+                else if (readChar == '\'' || readChar == '"')
+                {
+                    inQuote = !inQuote;
+                }
+                else if (!inQuote && tokens.Contains(readChar))
+                {
+                    if (sb.Length > 0)
+                    {
+                        records.Add(sb.ToString());
+                        sb.Clear();
+                    }
+                    records.Add(readChar.ToString());
+                }
+                else
+                {
+                    sb.Append(readChar);
+                }
+            }
+
+            if (sb.Length > 0)
+            {
+                records.Add(sb.ToString());
+            }
+
+            return records;
         }
     }
 }
