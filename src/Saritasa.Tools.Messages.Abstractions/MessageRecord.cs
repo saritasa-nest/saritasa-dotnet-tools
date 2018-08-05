@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -10,7 +10,7 @@ using System.Runtime.Serialization;
 namespace Saritasa.Tools.Messages.Abstractions
 {
     /// <summary>
-    /// Message data transfer object used by repositories to save/load.
+    /// Message data transfer object used by repositories to save/load messages.
     /// </summary>
 #if NET452
     [Serializable]
@@ -46,7 +46,7 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// <summary>
         /// Contains exception if any error occurred during message processing.
         /// </summary>
-        public Exception Error { get; set; }
+        public object Error { get; set; }
 
         /// <summary>
         /// Error text message.
@@ -73,10 +73,29 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// </summary>
         public ProcessingStatus Status { get; set; }
 
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
+        public MessageRecord()
+        {
+        }
+
         /// <inheritdoc />
         public override string ToString()
         {
-            return Id + "-" + ContentType;
+            return $"{Id}-{ContentType}";
         }
+
+#if NET452
+        /// <summary>
+        /// Constructor for deserialization.
+        /// </summary>
+        /// <param name="info">Stores all the data needed to serialize or deserialize an object.</param>
+        /// <param name="context">Describes the source and destination of a given serialized stream,
+        /// and provides an additional caller-defined context.</param>
+        protected MessageRecord(SerializationInfo info, StreamingContext context)
+        {
+        }
+#endif
     }
 }

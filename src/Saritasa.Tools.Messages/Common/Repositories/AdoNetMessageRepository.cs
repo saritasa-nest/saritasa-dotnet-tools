@@ -362,7 +362,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                                 var error = serializer.IsText ? Encoding.UTF8.GetBytes(reader.GetString(6)) : (byte[])reader[6];
                                 if (error.Length > 0)
                                 {
-                                    messageRecord.Error = serializer.Deserialize(error, errorType) as Exception;
+                                    messageRecord.Error = serializer.Deserialize(error, errorType);
                                 }
                             }
                         }
