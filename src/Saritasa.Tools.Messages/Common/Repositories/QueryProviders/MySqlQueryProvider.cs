@@ -119,7 +119,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
             }
             if (messageQuery.Status != null)
             {
-                ssb.Where("status").EqualsTo(messageQuery.Status);
+                ssb.Where("status").EqualsTo((byte)messageQuery.Status);
             }
             if (messageQuery.Type != null)
             {
