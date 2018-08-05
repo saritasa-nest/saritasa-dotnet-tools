@@ -7,7 +7,6 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
-using Saritasa.Tools.Domain;
 using Saritasa.Tools.Messages.Abstractions;
 using Saritasa.Tools.Messages.Abstractions.Events;
 using Saritasa.Tools.Messages.Common;
@@ -130,129 +129,6 @@ namespace Saritasa.Tools.Messages.Tests
 
             // Assert
             Assert.Equal(3, ev.HandlersCount);
-        }
-
-        #endregion
-
-        #region Domain events can be integrated to events pipeline
-
-        private class Ns02_DomainTestEvent
-        {
-            public int Param { get; set; }
-        }
-
-        private class Ns02_DomainTestEventHandler : IDomainEventHandler<Ns02_DomainTestEvent>
-        {
-            public void Handle(Ns02_DomainTestEvent @event)
-            {
-                @event.Param = 42;
-            }
-        }
-
-        [Fact]
-        public void Domain_events_can_be_integrated_to_events_pipeline()
-        {
-            // Arrange
-            var eventsManager = new DomainEventsManager();
-            eventsManager.Register(new Ns02_DomainTestEventHandler());
-            object Resolver(Type type)
-            {
-                if (type == typeof(IDomainEventsManager))
-                {
-                    return eventsManager;
-                }
-                return null;
-            }
-
-            pipelinesService.ServiceProvider = new FuncServiceProvider(Resolver);
-            pipelinesService.PipelineContainer.AddEventPipeline()
-                .AddMiddleware(new Events.PipelineMiddlewares.DomainEventLocatorMiddleware(eventsManager))
-                .AddMiddleware(new Events.PipelineMiddlewares.EventHandlerResolverMiddleware())
-                .AddMiddleware(new Events.PipelineMiddlewares.EventHandlerExecutorMiddleware
-                {
-                    UseParametersResolve = true
-                });
-            var ev = new Ns02_DomainTestEvent();
-
-            // Act
-            pipelinesService.RaiseEvent(ev);
-
-            // Assert
-            Assert.Equal(42, ev.Param);
-        }
-
-        #endregion
-
-        #region Can combine domain event with class events
-
-        private class Ns03_DomainTestEvent
-        {
-        }
-
-        private class Ns03_DomainTestEventHandler : IDomainEventHandler<Ns02_DomainTestEvent>
-        {
-            public void Handle(Ns02_DomainTestEvent @event)
-            {
-                Ns03_EventHandler.CallCount++;
-            }
-        }
-
-        public class Ns03_Event1 { }
-
-        public class Ns03_Event2 { }
-
-        public class Ns03_Event3 { }
-
-        [EventHandlers]
-        public class Ns03_EventHandler
-        {
-            public static int CallCount = 0;
-
-            public void Handle(Ns03_Event1 ev)
-            {
-                CallCount++;
-            }
-
-            public void Handle(Ns03_Event2 ev)
-            {
-                CallCount++;
-            }
-        }
-
-        [EventHandlers]
-        public class Ns03_EventHandler2
-        {
-            public void Handle(Ns03_Event3 ev)
-            {
-                Ns03_EventHandler.CallCount++;
-            }
-        }
-
-        [Fact]
-        public async Task Can_combine_domain_event_with_class_events()
-        {
-            // Arrange
-            var eventsManager = new DomainEventsManager();
-            eventsManager.Register(new Ns03_DomainTestEventHandler());
-
-            pipelinesService.PipelineContainer.AddEventPipeline()
-                .AddMiddleware(new Events.PipelineMiddlewares.DomainEventLocatorMiddleware(eventsManager))
-                .AddMiddleware(new Events.PipelineMiddlewares.EventHandlerLocatorMiddleware(
-                    typeof(EventsTests).GetTypeInfo().Assembly))
-                .AddMiddleware(new Events.PipelineMiddlewares.EventHandlerResolverMiddleware())
-                .AddMiddleware(new Events.PipelineMiddlewares.EventHandlerExecutorMiddleware
-                {
-                    UseParametersResolve = true
-                });
-
-            // Act
-            await pipelinesService.RaiseEventAsync(new Ns02_DomainTestEvent());
-            await pipelinesService.RaiseEventAsync(new Ns03_Event1());
-            await pipelinesService.RaiseEventAsync(new Ns03_Event2());
-            await pipelinesService.RaiseEventAsync(new Ns03_Event3());
-
-            // Assert
-            Assert.Equal(4, Ns03_EventHandler.CallCount);
         }
 
         #endregion
