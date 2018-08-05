@@ -19,7 +19,7 @@ namespace Saritasa.Tools.Messages.Common
         /// </summary>
         /// <param name="messageRecord">Message record.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
-        Task AddAsync(MessageRecord messageRecord, CancellationToken cancellationToken);
+        Task AddAsync(MessageRecord messageRecord, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Get messages filtered by expression.
@@ -27,7 +27,8 @@ namespace Saritasa.Tools.Messages.Common
         /// <param name="messageQuery">Query.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>Enumerable of message records.</returns>
-        Task<IEnumerable<MessageRecord>> GetAsync(MessageQuery messageQuery, CancellationToken cancellationToken);
+        Task<IEnumerable<MessageRecord>> GetAsync(MessageQuery messageQuery, CancellationToken cancellationToken
+             = default(CancellationToken));
 
         /// <summary>
         /// Save internal state to dict. The methpd represents the ability of message repository to
