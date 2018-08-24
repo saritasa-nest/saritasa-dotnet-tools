@@ -399,19 +399,19 @@ namespace Saritasa.Tools.Messages.Common
             {
                 return false;
             }
-            if (CreatedStartDate.HasValue && messageRecord.CreatedAt < CreatedStartDate.Value)
+            if (CreatedStartDate.HasValue && messageRecord.CreatedAt <= CreatedStartDate.Value)
             {
                 return false;
             }
-            if (CreatedEndDate.HasValue && messageRecord.CreatedAt > CreatedEndDate.Value)
+            if (CreatedEndDate.HasValue && messageRecord.CreatedAt >= CreatedEndDate.Value)
             {
                 return false;
             }
-            if (!string.IsNullOrEmpty(ContentType) && messageRecord.ContentType != ContentType)
+            if (!string.IsNullOrEmpty(ContentType) && messageRecord.ContentType != null && messageRecord.ContentType.StartsWith(ContentType))
             {
                 return false;
             }
-            if (!string.IsNullOrEmpty(ErrorType) && messageRecord.ErrorType != ErrorType)
+            if (!string.IsNullOrEmpty(ErrorType) && messageRecord.ErrorType != null && messageRecord.ErrorType.StartsWith(ErrorType))
             {
                 return false;
             }
@@ -423,11 +423,11 @@ namespace Saritasa.Tools.Messages.Common
             {
                 return false;
             }
-            if (ExecutionDurationAbove.HasValue && messageRecord.ExecutionDuration < ExecutionDurationAbove.Value)
+            if (ExecutionDurationAbove.HasValue && messageRecord.ExecutionDuration <= ExecutionDurationAbove.Value)
             {
                 return false;
             }
-            if (ExecutionDurationBelow.HasValue && messageRecord.ExecutionDuration > ExecutionDurationBelow.Value)
+            if (ExecutionDurationBelow.HasValue && messageRecord.ExecutionDuration >= ExecutionDurationBelow.Value)
             {
                 return false;
             }
