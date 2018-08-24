@@ -2,7 +2,6 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,7 +16,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
     /// <summary>
     /// Base file repository for file, csv, json formats.
     /// </summary>
-    public abstract class BaseFileRepository
+    public abstract class BaseFileRepository : IMessageRepository
     {
         private const string KeyPath = "path";
         private const string KeyPrefix = "prefix";
@@ -54,12 +53,10 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// </summary>
         public bool BufferStream { get; protected set; }
 
-        private readonly object lockObject = new object();
-
         /// <summary>
         /// Gets the object which can be used to synchronize asynchronous operations that must rely on the.
         /// </summary>
-        protected object SyncRoot => this.lockObject;
+        protected object SyncRoot { get; } = new object();
 
         /// <summary>
         /// .ctor
@@ -125,6 +122,9 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <inheritdoc />
+        public abstract Task AddAsync(MessageRecord messageRecord, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <inheritdoc />
         public Task<IEnumerable<MessageRecord>> GetAsync(MessageQuery messageQuery,
             CancellationToken cancellationToken = default(CancellationToken))
         {
@@ -187,6 +187,10 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                         var messages = ReadMessagesFromStream(stream, messageQuery);
                         foreach (MessageRecord messageRecord in messages)
                         {
+                            if (!messageQuery.Match(messageRecord))
+                            {
+                                continue;
+                            }
                             if (messageQuery.Skip > 0 && skipCount < messageQuery.Skip)
                             {
                                 skipCount++;
@@ -194,7 +198,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                             }
                             if (messageQuery.Take > 0 && takeCount >= messageQuery.Take)
                             {
-                                continue;
+                                break;
                             }
                             targetList.Add(messageRecord);
                             takeCount++;
@@ -205,6 +209,11 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                         stream?.Dispose();
                     }
                     cancellationToken.ThrowIfCancellationRequested();
+
+                    if (messageQuery.Take > 0 && takeCount >= messageQuery.Take)
+                    {
+                        break;
+                    }
                 }
                 date = date.AddDays(1);
             }

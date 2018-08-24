@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -136,11 +136,6 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             }
         }
 
-        private static void WriteBytes(byte bt, Stream stream)
-        {
-            stream.WriteByte(bt);
-        }
-
         private void WriteToFile(MessageRecord messageRecord, CancellationToken cancellationToken)
         {
             // Id,Type,CreatedAt,Status,ContentType,Content,Data,ErrorType,ErrorMessage,ErrorDetails,ExecutionDuration
@@ -165,10 +160,10 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
         #region IMessageRepository
 
-        static readonly Task<bool> completedTask = Task.FromResult(true);
+        private static readonly Task<bool> completedTask = Task.FromResult(true);
 
         /// <inheritdoc />
-        public Task AddAsync(MessageRecord message, CancellationToken cancellationToken)
+        public override Task AddAsync(MessageRecord message, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (disposed)
             {
@@ -284,7 +279,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
         #region Dispose
 
-        bool disposed;
+        private bool disposed;
 
         /// <inheritdoc />
         protected void Dispose(bool disposing)

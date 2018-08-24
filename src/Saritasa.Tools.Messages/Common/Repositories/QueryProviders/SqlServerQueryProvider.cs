@@ -97,11 +97,11 @@ namespace Saritasa.Tools.Messages.Common.Repositories.QueryProviders
             }
             if (messageQuery.ContentType != null)
             {
-                ssb.Where("ContentType").EqualsTo(messageQuery.ContentType);
+                ssb.Where("ContentType").Like(messageQuery.ContentType + "%");
             }
             if (messageQuery.ErrorType != null)
             {
-                ssb.Where("ErrorType").EqualsTo(messageQuery.ErrorType);
+                ssb.Where("ErrorType").Like(messageQuery.ErrorType + "%");
             }
             if (messageQuery.Status != null)
             {

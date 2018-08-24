@@ -1,11 +1,10 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Saritasa.Tools.Messages.Abstractions;
@@ -73,10 +72,10 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
         #region IMessageRepository
 
-        static readonly Task<bool> completedTask = Task.FromResult(true);
+        private static readonly Task<bool> completedTask = Task.FromResult(true);
 
         /// <inheritdoc />
-        public Task AddAsync(MessageRecord messageRecord, CancellationToken cancellationToken)
+        public override Task AddAsync(MessageRecord messageRecord, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (disposed)
             {
@@ -133,10 +132,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             var commandSerializer = new MessageBinarySerializer(stream, Serializer);
             for (MessageRecord message; (message = commandSerializer.Read()) != null;)
             {
-                if (query.Match(message))
-                {
-                    yield return message;
-                }
+                yield return message;
             }
         }
 
@@ -160,7 +156,6 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             }
         }
 
-        /// <inheritdoc />
         protected virtual void Dispose(bool disposing)
         {
             if (disposed)
