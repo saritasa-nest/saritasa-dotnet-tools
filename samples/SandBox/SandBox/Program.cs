@@ -20,7 +20,10 @@ using Saritasa.Tools.Messages.Common;
 
 namespace SandBox
 {
-    class Program
+    /// <summary>
+    /// Main program class.
+    /// </summary>
+    internal class Program
     {
         public static ICommandPipeline CommandPipeline { get; private set; }
 
@@ -36,7 +39,7 @@ namespace SandBox
         /// Simple dependency injection resolver.
         /// </summary>
         /// <param name="type">Type to find object.</param>
-        /// <returns>Instaniated object.</returns>
+        /// <returns>Instantiate object.</returns>
         public static object Resolver(Type type)
         {
             if (type == typeof(IProductsRepository))
@@ -64,7 +67,6 @@ namespace SandBox
             // Create command pipeline manually.
             CommandPipeline = new CommandPipeline();
             CommandPipeline.AddMiddlewares(
-                new CommandValidationMiddleware(),
                 new CommandHandlerLocatorMiddleware(Assembly.GetEntryAssembly()),
                 new CommandHandlerExecutorMiddleware(),
                 new RepositoryMiddleware(inMemoryMessageRepository)

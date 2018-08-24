@@ -1,9 +1,11 @@
 ﻿using System;
-using System.Linq;
 using Saritasa.Tools.Common.Pagination;
 
 namespace SandBox
 {
+    /// <summary>
+    /// Pagination samples.
+    /// </summary>
     public static class Paging
     {
         private class ProductWrapper
