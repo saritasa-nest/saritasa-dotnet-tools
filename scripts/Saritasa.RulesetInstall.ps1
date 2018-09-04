@@ -8,18 +8,18 @@
 #
 
 param (
-    # remove CodeAnalysisRuleSet values
+    # Remove CodeAnalysisRuleSet values.
     [boolean] $remove = $false,
-    # exclude specified files using file mask
+    # Exclude specified files using file mask.
     [string] $exclude = $null
 )
 
-# get all project files first
+# Get all project files first.
 $projectFiles = Get-ChildItem -Path .\ -Filter *.csproj -Recurse -Name -Exclude $exclude
 $projectFiles += Get-ChildItem -Path .\ -Filter *.vbproj -Recurse -Name -Exclude $exclude
 $currentLocation = Get-Location
 
-# determine ruleset path
+# Determine ruleset path.
 $rulesetPath = "Saritasa.ruleset"
 $rulesetLocal = $false
 if (Test-Path "./tools/Saritasa.ruleset")
@@ -28,22 +28,22 @@ if (Test-Path "./tools/Saritasa.ruleset")
     $rulesetLocal = $true
 }
 
-# add code analysis ruleset to every project
+# Add code analysis ruleset to every project.
 foreach ($projectFile in $projectFiles)
 {
     [xml] $projectXml = Get-Content $projectFile
 
-    # remove case
+    # Add case.
     if ($remove -eq $false)
     {
-        # is .NET Core project
+        # Is .NET Core project.
         $isCoreProject = $false
         if ($projectXml.Project.Sdk -ne $null)
         {
             $isCoreProject = $true
         }
 
-        # get first PropertyGroup without Condition attribute
+        # Get first PropertyGroup without Condition attribute.
         $propertyGroup = $projectXml.Project.PropertyGroup | Where-Object { $_.Condition -eq $null } `
             | Select-Object -First 1
         if ($propertyGroup -eq $null)
@@ -52,7 +52,7 @@ foreach ($projectFile in $projectFiles)
             continue
         }
 
-        # update project
+        # Update project.
         [string] $target = $rulesetPath
         if ($rulesetLocal)
         {
@@ -60,7 +60,6 @@ foreach ($projectFile in $projectFiles)
             $target = Resolve-Path $rulesetPath -Relative
             Set-Location $currentLocation
         }
-
         if ($propertyGroup.CodeAnalysisRuleSet -eq $null)
         {
             if ($propertyGroup.Condition -ne $null)
@@ -85,13 +84,14 @@ foreach ($projectFile in $projectFiles)
             Write-Output "Update file $projectFile"
         }
 
-        # check that StyleCop is installed for project
+        # Check that StyleCop is installed for project.
         $stylecopNodes = $projectXml.SelectNodes("//*[contains(@Include, 'StyleCop.Analyzers')]")
         if ($stylecopNodes.Count -eq 0)
         {
             Write-Warning "StyleCop seems not installed for project $projectFile"
         }
     }
+    # Remove case.
     else
     {
         foreach ($propertyGroup in $projectXml.Project.PropertyGroup)
@@ -109,5 +109,6 @@ foreach ($projectFile in $projectFiles)
         }
     }
 
+    # Save project file.
     $projectXml.Save((Resolve-Path $projectFile))
 }
