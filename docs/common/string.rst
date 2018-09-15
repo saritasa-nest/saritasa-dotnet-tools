@@ -18,7 +18,7 @@ String utils.
         .. code-block:: c#
 
             var str1 = str1 ?? string.Empty;
-            var str2 = StringUtils.NullSage(str2);
+            var str2 = StringUtils.NullSafe(str2);
 
 .. function:: static string Capitalize(string target)
 
