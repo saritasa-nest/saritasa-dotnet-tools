@@ -8,7 +8,7 @@ using System.Linq;
 namespace Saritasa.Tools.Common.Pagination
 {
     /// <summary>
-    /// Enumerable with limit and offset feature. Additionaly forces evaluation with Take and Skip methods.
+    /// Enumerable with limit and offset feature. Additionally forces evaluation with Take and Skip methods.
     /// </summary>
     public class OffsetLimitEnumerable<T> : TotalCountEnumerable<T>,
         IMetadataEnumerable<OffsetLimitEnumerableMetadata, T>

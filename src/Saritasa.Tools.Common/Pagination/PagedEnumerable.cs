@@ -8,8 +8,8 @@ using System.Linq;
 namespace Saritasa.Tools.Common.Pagination
 {
     /// <summary>
-    /// Class contains static methods for <see cref="PagedEnumerable{T}" /> and is itended to
-    /// simplify instaniation and better API.
+    /// Class contains static methods for <see cref="PagedEnumerable{T}" /> and is intended to
+    /// simplify instantiation and better API.
     /// </summary>
     public static class PagedEnumerable
     {
