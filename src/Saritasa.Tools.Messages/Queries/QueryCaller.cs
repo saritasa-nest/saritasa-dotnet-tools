@@ -77,8 +77,8 @@ namespace Saritasa.Tools.Messages.Queries
                     var getter = getterLambda.Compile();
                     return getter();
                 default:
-                    throw new InvalidOperationException(
-                        string.Format(Properties.Strings.CannotEvaluateExpression, expression.NodeType));
+                    var lambda = Expression.Lambda(expression);
+                    return lambda.Compile().DynamicInvoke();
             }
         }
 

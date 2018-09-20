@@ -129,9 +129,6 @@
   <data name="CannotCreateDelegate" xml:space="preserve">
     <value>Cannot create delegate.</value>
   </data>
-  <data name="CannotEvaluateExpression" xml:space="preserve">
-    <value>Cannot evaluate type {0}.</value>
-  </data>
   <data name="CannotFindMethod" xml:space="preserve">
     <value>Cannot find method {0}.</value>
   </data>

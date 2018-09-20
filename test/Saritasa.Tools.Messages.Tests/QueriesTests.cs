@@ -77,10 +77,10 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Can run simple query
+        #region QueryWith_SetNumberQuery_NumbersMatch
 
         [Fact]
-        public void Can_run_simple_query()
+        public void QueryWith_SetNumberQuery_NumbersMatch()
         {
             // Arrange
             SetupQueryPipeline(pipelineService.PipelineContainer.AddQueryPipeline());
@@ -96,7 +96,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Can run simple async query
+        #region QueryWithAsync_SetNumberAsyncQuery_NumbersMatch
 
         [QueryHandlers]
         public class AsyncQueryObject
@@ -109,7 +109,7 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [Fact]
-        public async Task Can_run_simple_async_query()
+        public async Task QueryWithAsync_SetNumberAsyncQuery_NumbersMatch()
         {
             // Arrange
             SetupQueryPipeline(pipelineService.PipelineContainer.AddQueryPipeline());
@@ -123,10 +123,10 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Can run query from raw message
+        #region Invoke_QueryWithDependency_CorrectResultType
 
         [Fact]
-        public void Can_run_query_from_raw_message()
+        public void Invoke_QueryWithDependency_CorrectResultType()
         {
             // Arrange
             pipelineService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
@@ -155,7 +155,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Can run query with private object ctor
+        #region QueryWith_PrivateQueryObjectCtor_ExecutedWithCorrectNumbers
 
         private class QueryObjectWithPrivateCtor
         {
@@ -179,7 +179,7 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [Fact]
-        public void Can_run_query_with_private_object_ctor()
+        public void QueryWith_PrivateQueryObjectCtor_ExecutedWithCorrectNumbers()
         {
             // Arrange
             pipelineService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
@@ -196,10 +196,10 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Can run query from raw message 2
+        #region Invoke_MessageContextQueryObject_CorrectResultType
 
         [Fact]
-        public void Can_run_query_from_raw_message_2()
+        public void Invoke_MessageContextQueryObject_CorrectResultType()
         {
             // Arrange
             pipelineService.ServiceProvider = new FuncServiceProvider(InterfacesResolver);
@@ -213,13 +213,12 @@ namespace Saritasa.Tools.Messages.Tests
             queryPipeline.Invoke(messageContext);
 
             // Assert
-            var result = messageContext.GetResult<object>();
-            Assert.IsType<List<int>>(result);
+            Assert.IsType<List<int>>(messageContext.GetResult<object>());
         }
 
         #endregion
 
-        #region Can use interfaces to run query
+        #region QueryWith_PipelineWithNoExternalServiceResolver_ValueFilled
 
         public interface IUserQueries
         {
@@ -233,7 +232,7 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [Fact]
-        public void Can_use_interfaces_to_run_query()
+        public void QueryWith_PipelineWithNoExternalServiceResolver_ValueFilled()
         {
             // Arrange
             pipelineService.PipelineContainer.AddQueryPipeline()
@@ -250,7 +249,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Should use interface in case of external resolver
+        #region QueryWith_PipelineWithExternalServiceResolver_ValueFilled
 
         public interface IProductQueries
         {
@@ -273,7 +272,7 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [Fact]
-        public void Should_use_interface_in_case_of_external_resolver()
+        public void QueryWith_PipelineWithExternalServiceResolver_ValueFilled()
         {
             // Arrange
             pipelineService.ServiceProvider = new FuncServiceProvider(ProductQueries.Resolver);
@@ -291,7 +290,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Query object should not require parameterless ctor
+        #region QueryWith_ObjectQueryWithNoDefaultCtor_NoExceptions
 
         public class UserQueries2Dep
         {
@@ -312,7 +311,7 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [Fact]
-        public void Query_object_should_not_require_parameterles_ctor()
+        public void QueryWith_ObjectQueryWithNoDefaultCtor_NoExceptions()
         {
             // Arrange
             SetupQueryPipeline(pipelineService.PipelineContainer.AddQueryPipeline());
@@ -327,7 +326,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Should generate message processing exception in case of fail
+        #region QueryWith_QueryObjectWithException_GetMessageProcessingException
 
         [QueryHandlers]
         public class QueryObjectWithException
@@ -339,7 +338,7 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [Fact]
-        public void Should_generate_message_processing_exception_in_case_of_fail()
+        public void QueryWith_QueryObjectWithException_GetMessageProcessingException()
         {
             // Arrange
             pipelineService.PipelineContainer.AddQueryPipeline().AddStandardMiddlewares();
@@ -349,6 +348,28 @@ namespace Saritasa.Tools.Messages.Tests
             {
                 pipelineService.Query<QueryObjectWithException>().With(q => q.GetString());
             });
+        }
+
+        #endregion
+
+        #region QueryWith_ExpressionWithNew_NoExceptions
+
+        public class SimpleQueryObject
+        {
+            public int DoSomething(DateTime dt) => 2;
+        }
+
+        [Fact]
+        public void QueryWith_ExpressionWithNew_NoExceptions()
+        {
+            // Arrange
+            SetupQueryPipeline(pipelineService.PipelineContainer.AddQueryPipeline());
+
+            // Act
+            var result = pipelineService.Query<SimpleQueryObject>().With(q => q.DoSomething(new DateTime(2018, 9, 20)));
+
+            // Assert
+            Assert.Equal(2, result);
         }
 
         #endregion

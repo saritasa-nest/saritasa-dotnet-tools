@@ -156,6 +156,10 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             }
         }
 
+        /// <summary>
+        /// Dispose pattern implementation.
+        /// </summary>
+        /// <param name="disposing">Dispose manage resorces.</param>
         protected virtual void Dispose(bool disposing)
         {
             if (disposed)

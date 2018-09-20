@@ -1,4 +1,14 @@
-﻿0.5.4 [2018-06-22]
+﻿0.6.0 [TBD]
+[*] Update ContentType and ErrorType compare logic for repositories.
+[*] Update message query filter logic.
+[+] New message query string constructor.
+[-] Simplify SQL generation functionality.
+[+] Fix status field handle for SQL.
+[-] Remove Saritasa.Tools.Domain dependency and related pipelines.
+[*] Improve query method parameters evaluation.
+[*] Other small bugfixes.
+
+0.5.4 [2018-06-22]
 [*] Fix WithAsync query pipeline call for GetAwaiter.
 [*] Fix exceptions handle for async commands.
 [*] Change SQL Server init script to support older versions.
