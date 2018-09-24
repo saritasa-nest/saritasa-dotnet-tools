@@ -106,6 +106,29 @@ namespace Saritasa.Tools.Common.Tests
             Assert.Equal(3, pagedList4.Count());
         }
 
+        [Fact]
+        public void Paged_enumerable_should_work_with_max_page_size()
+        {
+            // Arrange
+            var sourceData = new List<int>()
+            {
+                1,
+                2
+            };
+
+            // Act
+            var pagedResult = PagedEnumerable.Create(sourceData, 1, int.MaxValue);
+
+            // Assert
+            Assert.Equal(1, pagedResult.TotalPages);
+            Assert.Equal(int.MaxValue, pagedResult.Limit);
+            Assert.Equal(2, pagedResult.TotalCount);
+            Assert.True(pagedResult.IsFirstPage);
+            Assert.True(pagedResult.IsLastPage);
+            Assert.Equal(1, pagedResult.Page);
+            Assert.Equal(int.MaxValue, pagedResult.PageSize);
+        }
+
         /// <summary>
         /// Custom exception for tests only.
         /// </summary>

@@ -68,7 +68,7 @@ namespace Saritasa.Tools.Common.Pagination
         {
             this.Page = page;
             this.PageSize = pageSize;
-            this.TotalPages = (TotalCount + pageSize - 1) / pageSize;
+            this.TotalPages = GetTotalPages(TotalCount, PageSize);
         }
 
         /// <summary>
@@ -87,7 +87,15 @@ namespace Saritasa.Tools.Common.Pagination
         {
             this.Page = page;
             this.PageSize = pageSize;
-            this.TotalPages = (TotalCount + pageSize - 1) / pageSize;
+            this.TotalPages = GetTotalPages(TotalCount, PageSize);
+        }
+
+        private static int GetTotalPages(int totalItemsCount, int pageSize)
+        {
+            long buffer = pageSize;
+            buffer += totalItemsCount;
+            buffer -= 1;
+            return (int)(buffer / pageSize);
         }
 
         #region IMetadataEnumerable<PagedEnumerableMetadata, T>
