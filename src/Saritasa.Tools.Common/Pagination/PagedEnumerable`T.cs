@@ -90,12 +90,16 @@ namespace Saritasa.Tools.Common.Pagination
             this.TotalPages = GetTotalPages(TotalCount, PageSize);
         }
 
+#if NET452 || NET461 || NETSTANDARD1_2 || NETSTANDARD1_6 || NETSTANDARD2_0
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         private static int GetTotalPages(int totalItemsCount, int pageSize)
         {
-            long buffer = pageSize;
-            buffer += totalItemsCount;
-            buffer -= 1;
-            return (int)(buffer / pageSize);
+            if (pageSize >= int.MaxValue - totalItemsCount)
+            {
+                return 1;
+            }
+            return (totalItemsCount + pageSize - 1) / pageSize;
         }
 
         #region IMetadataEnumerable<PagedEnumerableMetadata, T>

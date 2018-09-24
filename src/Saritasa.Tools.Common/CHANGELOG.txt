@@ -1,4 +1,7 @@
-﻿0.4.8 [2018-07-12]
+﻿0.4.9 [TBD]
+[*] Fix pagination usage when page size is int.MaxSize .
+
+0.4.8 [2018-07-12]
 [+] Add DictionaryUtils.GetValueOrDefault and DictionaryUtils.GetValuesOrDefault for NameValueCollection.
 [+] Add "on" and "off" values for bool ParseOrDefault.
 [*] Fix DateTime truncation by weeks.
