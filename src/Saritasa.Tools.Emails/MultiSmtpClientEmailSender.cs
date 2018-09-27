@@ -55,8 +55,8 @@ namespace Saritasa.Tools.Emails
 
             var newClient = new SmtpClient(client.Host, client.Port)
             {
-                Credentials = client.Credentials,
                 UseDefaultCredentials = client.UseDefaultCredentials,
+                Credentials = client.Credentials,
                 DeliveryFormat = client.DeliveryFormat,
                 DeliveryMethod = client.DeliveryMethod,
                 EnableSsl = client.EnableSsl,
