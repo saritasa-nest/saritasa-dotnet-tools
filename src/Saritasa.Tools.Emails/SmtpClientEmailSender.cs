@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -33,7 +33,7 @@ namespace Saritasa.Tools.Emails
             public MailMessage MailMessage { get; }
 
             /// <summary>
-            /// .ctor
+            /// Constructor.
             /// </summary>
             /// <param name="mailMessage">Mail message.</param>
             public MailMessageWithTaskSource(MailMessage mailMessage)
@@ -75,7 +75,7 @@ namespace Saritasa.Tools.Emails
         private DateTime lastSendTime = DateTime.Now;
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         public SmtpClientEmailSender()
         {
@@ -84,7 +84,7 @@ namespace Saritasa.Tools.Emails
         }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="smtpClient">Smtp client.</param>
         public SmtpClientEmailSender(SmtpClient smtpClient)
@@ -99,7 +99,7 @@ namespace Saritasa.Tools.Emails
         }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="smtpClient">Smtp client.</param>
         /// <param name="minDelay">Minimum delay between emails sending.</param>

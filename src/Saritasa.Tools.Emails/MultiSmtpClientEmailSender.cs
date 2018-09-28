@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Saritasa.Tools.Emails
 {
     /// <summary>
-    /// Handles several smtp clients to send emails using round-robin method.
+    /// Handles several SMTP clients to send emails using round-robin method.
     /// </summary>
     public class MultiSmtpClientEmailSender : EmailSender, IDisposable
     {
@@ -20,10 +20,10 @@ namespace Saritasa.Tools.Emails
         private int currentInstanceIndex;
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="smtpClientInstancesCount">Max number of instances. 2 by default.</param>
-        /// <param name="smtpClient">Smtp client to be used as reference object. If null default settings
+        /// <param name="smtpClient">SMTP client to be used as reference object. If null default settings
         /// from configuration will be used.</param>
         public MultiSmtpClientEmailSender(int smtpClientInstancesCount = 2, SmtpClient smtpClient = null)
         {
@@ -44,8 +44,8 @@ namespace Saritasa.Tools.Emails
         /// <summary>
         /// Clones <see cref="SmtpClient" /> instance to new one. If null just creates it.
         /// </summary>
-        /// <param name="client">Original smtp client instance.</param>
-        /// <returns>Cloned smtp client instance.</returns>
+        /// <param name="client">Original SMTP client instance.</param>
+        /// <returns>Cloned SMTP client instance.</returns>
         private static SmtpClient CloneSmtpClient(SmtpClient client)
         {
             if (client == null)

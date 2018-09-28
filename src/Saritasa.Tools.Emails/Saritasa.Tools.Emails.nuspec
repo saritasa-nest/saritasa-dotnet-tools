@@ -5,7 +5,7 @@
     <title>Saritasa Tools Emails</title>
     <version>0.0.0</version>
     <description>The package is a part of Saritasa Tools project. Saritasa.Tools.Emails contains emails sending pipeline and interceptors.</description>
-    <summary>Email abstractions.</summary>
+    <summary>Emails abstractions.</summary>
     <authors>Saritasa</authors>
     <owners>Saritasa</owners>
     <licenseUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/LICENSE.txt</licenseUrl>
@@ -13,7 +13,7 @@
     <iconUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <copyright>(c) Saritasa, 2016-2018</copyright>
-    <tags>email emails</tags>
+    <tags>email emails smtp</tags>
     <repository type="git" url="https://github.com/Saritasa/SaritasaTools" />
     <dependencies>
       <group targetFramework="net452" />

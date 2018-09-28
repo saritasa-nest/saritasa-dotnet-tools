@@ -1,4 +1,7 @@
-﻿0.2.0 [2017-08-31]
+﻿0.2.1 [2018-09-28]
+[*] Fix SMTP client clone with default credentials.
+
+0.2.0 [2017-08-31]
 [+] Upgrade to netstandard 2.0, remove MailMessage stubs.
 [+] Implement throttling for SmtpClientEmailSender.
 
