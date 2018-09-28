@@ -1,4 +1,9 @@
-﻿0.2.1 [2018-09-28]
+﻿1.0.0 [2018-09-28]
+[*] Make IEmailInterceptor interface async.
+[*] Introduce cancellation token to IEmailSender.
+[*] Comments update.
+
+0.2.1 [2018-09-28]
 [*] Fix SMTP client clone with default credentials.
 
 0.2.0 [2017-08-31]

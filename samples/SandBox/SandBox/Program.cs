@@ -10,13 +10,13 @@ using Saritasa.Tools.Messages.Common.PipelineMiddlewares;
 using Saritasa.Tools.Messages.Common.Repositories;
 using Saritasa.Tools.Messages.Queries;
 using Saritasa.Tools.Messages.Queries.PipelineMiddlewares;
-using SandBox.Commands;
-using SandBox.Events;
-using SandBox.Queries;
 using Saritasa.Tools.Messages.Abstractions.Commands;
 using Saritasa.Tools.Messages.Abstractions.Events;
 using Saritasa.Tools.Messages.Abstractions.Queries;
 using Saritasa.Tools.Messages.Common;
+using SandBox.Commands;
+using SandBox.Events;
+using SandBox.Queries;
 
 namespace SandBox
 {
@@ -126,13 +126,17 @@ namespace SandBox
         private static void EmailsSend()
         {
             var emailSender = new Saritasa.Tools.Emails.SmtpClientEmailSender(new SmtpClient(), TimeSpan.FromSeconds(10));
-            for (int i = 0; i < 2; i++)
+            emailSender.AddInterceptor(new Saritasa.Tools.Emails.Interceptors.SaveToFileEmailInterceptor(@"D:\temp"));
+            emailSender.AddInterceptor(new Saritasa.Tools.Emails.Interceptors.CountEmailsInterceptor());
+            for (int i = 0; i < 12; i++)
             {
-                new System.Threading.Thread(() =>
+                var thread = new System.Threading.Thread((object obj) =>
                 {
-                    emailSender.SendAsync(new MailMessage("ivan@saritasa.com", "ivan@saritasa.com", "test", "body"));
-                    emailSender.SendAsync(new MailMessage("ivan@saritasa.com", "ivan@saritasa.com", "test2-" + i, "body"));
-                }).Start();
+                    var num = (int)obj;
+                    emailSender.SendAsync(new MailMessage("ivan@saritasa.com", "ivan@saritasa.com", "test2-" + num,
+                        "body")).GetAwaiter().GetResult();
+                });
+                thread.Start(i);
             }
         }
 
@@ -145,6 +149,8 @@ namespace SandBox
             Init();
             Test();
             LoggingBox.Test();
+            //EmailsSend();
+            Console.WriteLine("Done");
             Console.ReadKey();
         }
     }
