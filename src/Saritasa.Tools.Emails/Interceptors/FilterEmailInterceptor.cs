@@ -1,10 +1,12 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
 using System.Net.Mail;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Saritasa.Tools.Emails.Interceptors
 {
@@ -22,14 +24,14 @@ namespace Saritasa.Tools.Emails.Interceptors
         public IEnumerable<string> ApprovedAddresses => approvedAddresses;
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         public FilterEmailInterceptor()
         {
         }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="emails">Approved emails patterns. You can use ? and * symbols.</param>
         public FilterEmailInterceptor(string emails)
@@ -82,7 +84,8 @@ namespace Saritasa.Tools.Emails.Interceptors
         #region IEmailInterceptor implementation
 
         /// <inheritdoc />
-        public virtual void Sending(MailMessage mailMessage, IDictionary<string, object> data, ref bool cancel)
+        public virtual Task SendingAsync(MailMessage mailMessage, IDictionary<string, object> data, ref bool cancel,
+            CancellationToken cancellationToken)
         {
             FilterAddress(mailMessage.To);
             FilterAddress(mailMessage.CC);
@@ -92,11 +95,14 @@ namespace Saritasa.Tools.Emails.Interceptors
             {
                 cancel = true;
             }
+            return Internals.TaskHelpers.CompletedTask;
         }
 
         /// <inheritdoc />
-        public virtual void Sent(MailMessage mailMessage, IDictionary<string, object> data)
+        public virtual Task SentAsync(MailMessage mailMessage, IDictionary<string, object> data,
+            CancellationToken cancellationToken)
         {
+            return Internals.TaskHelpers.CompletedTask;
         }
 
         #endregion

@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Mail;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Saritasa.Tools.Emails
 {
@@ -17,7 +19,9 @@ namespace Saritasa.Tools.Emails
         /// </summary>
         /// <param name="mailMessage">Mail message.</param>
         /// <param name="data">Additional data.</param>
-        void Sent(MailMessage mailMessage, IDictionary<string, object> data);
+        /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+        Task SentAsync(MailMessage mailMessage, IDictionary<string, object> data,
+            CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// The method is called before email sending.
@@ -25,9 +29,11 @@ namespace Saritasa.Tools.Emails
         /// <param name="mailMessage">Mail message.</param>
         /// <param name="data">Additional data.</param>
         /// <param name="cancel">Should the email sending be cancelled.</param>
-        void Sending(
+        /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+        Task SendingAsync(
             MailMessage mailMessage,
             IDictionary<string, object> data,
-            ref bool cancel);
+            ref bool cancel,
+            CancellationToken cancellationToken = default(CancellationToken));
     }
 }

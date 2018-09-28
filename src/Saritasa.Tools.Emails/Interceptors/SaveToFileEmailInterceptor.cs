@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Net.Mail;
 using System.IO;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Saritasa.Tools.Emails.Interceptors
 {
@@ -27,7 +29,7 @@ namespace Saritasa.Tools.Emails.Interceptors
         private static readonly object @lock = new object();
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="directory">Directory to save emails.</param>
         /// <param name="afterSend">Save only sent emails.</param>
@@ -58,21 +60,25 @@ namespace Saritasa.Tools.Emails.Interceptors
         #region IEmailInterceptor implementation
 
         /// <inheritdoc />
-        public void Sending(MailMessage mailMessage, IDictionary<string, object> data, ref bool cancel)
+        public Task SendingAsync(MailMessage mailMessage, IDictionary<string, object> data, ref bool cancel,
+            CancellationToken cancellationToken)
         {
             if (!AfterSend)
             {
                 Save(mailMessage);
             }
+            return Internals.TaskHelpers.CompletedTask;
         }
 
         /// <inheritdoc />
-        public void Sent(MailMessage mailMessage, IDictionary<string, object> data)
+        public Task SentAsync(MailMessage mailMessage, IDictionary<string, object> data,
+            CancellationToken cancellationToken)
         {
             if (AfterSend)
             {
                 Save(mailMessage);
             }
+            return Internals.TaskHelpers.CompletedTask;
         }
 
         #endregion
@@ -89,8 +95,8 @@ namespace Saritasa.Tools.Emails.Interceptors
 
             using (var fileStream = new FileStream(fileName, FileMode.Create))
             {
-                // Get reflection info for MailWriter contructor.
-                var mailWriterContructor =
+                // Get reflection info for MailWriter constructor.
+                var mailWriterConstructor =
                     mailWriterType.GetConstructor(
                         BindingFlags.Instance | BindingFlags.NonPublic,
                         null,
@@ -98,7 +104,7 @@ namespace Saritasa.Tools.Emails.Interceptors
                         null);
 
                 // Construct MailWriter object with our FileStream.
-                var mailWriter = mailWriterContructor.Invoke(new object[] { fileStream });
+                var mailWriter = mailWriterConstructor.Invoke(new object[] { fileStream });
 
                 // Get reflection info for Send() method on MailMessage.
                 var sendMethod =

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -16,7 +16,8 @@ namespace Saritasa.Tools.Emails
     public class DefaultEmailExecutionStrategy : IEmailExecutionStrategy
     {
         /// <inheritdoc />
-        public Task Execute(Func<MailMessage, NameValueDict, Task> handler, MailMessage message, NameValueDict data, CancellationToken cancellationToken)
+        public Task ExecuteAsync(Func<MailMessage, NameValueDict, Task> handler, MailMessage message,
+            NameValueDict data, CancellationToken cancellationToken)
         {
             return handler(message, data);
         }

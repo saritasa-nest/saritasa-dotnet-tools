@@ -29,44 +29,30 @@ namespace Saritasa.Tools.Emails
         /// </summary>
         protected IEmailExecutionStrategy ExecutionStrategy { get; } = new DefaultEmailExecutionStrategy();
 
-        /// <summary>
-        /// Cancellation token instance. None by default.
-        /// </summary>
-        public CancellationToken CancellationToken { get; set; } = CancellationToken.None;
-
         /// <inheritdoc />
-        public Task SendAsync(MailMessage message)
+        public async Task SendAsync(MailMessage message,
+            CancellationToken cancellationToken = default(CancellationToken))
         {
             var data = new Dictionary<string, object>();
             bool cancel = false;
 
-            // Run pre process interceptors.
+            // Run pre-process interceptors.
             foreach (var interceptor in interceptors)
             {
-                interceptor.Sending(message, data, ref cancel);
+                await interceptor.SendingAsync(message, data, ref cancel, cancellationToken);
                 if (cancel)
                 {
-#if NET452
-                    var tcs = new TaskCompletionSource<bool>();
-                    tcs.SetResult(true);
-                    return tcs.Task;
-#else
-                    return Task.CompletedTask;
-#endif
+                    return;
                 }
             }
 
             // Send email and run post process interceptors.
-            return ExecutionStrategy.Execute(Process, message, data, CancellationToken).ContinueWith(task =>
+            await ExecutionStrategy.ExecuteAsync(Process, message, data, cancellationToken);
+
+            foreach (var interceptor in interceptors)
             {
-                if (!task.IsFaulted)
-                {
-                    foreach (var interceptor in interceptors)
-                    {
-                        interceptor.Sent(message, data);
-                    }
-                }
-            }, CancellationToken);
+                await interceptor.SentAsync(message, data, cancellationToken);
+            }
         }
 
         /// <summary>

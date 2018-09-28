@@ -6,6 +6,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net.Mail;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Saritasa.Tools.Emails
@@ -217,12 +218,12 @@ namespace Saritasa.Tools.Emails
                     return true;
                 }
                 isDelayScheduled = true;
-                Task.Delay(MinDelay - diff, CancellationToken)
+                Task.Delay(MinDelay - diff, CancellationToken.None)
                     .ContinueWith(t =>
                     {
                         isDelayScheduled = false;
                         OnEmailSent(this, null);
-                    }, CancellationToken)
+                    }, CancellationToken.None)
                     .ConfigureAwait(false);
                 return true;
             }

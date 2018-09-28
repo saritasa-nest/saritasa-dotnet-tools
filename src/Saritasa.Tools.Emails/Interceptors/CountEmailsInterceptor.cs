@@ -1,10 +1,11 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
 using System.Net.Mail;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Saritasa.Tools.Emails.Interceptors
 {
@@ -29,15 +30,19 @@ namespace Saritasa.Tools.Emails.Interceptors
         #region IEmailInterceptor implementation
 
         /// <inheritdoc />
-        public void Sending(MailMessage mailMessage, IDictionary<string, object> data, ref bool cancel)
+        public Task SendingAsync(MailMessage mailMessage, IDictionary<string, object> data, ref bool cancel,
+            CancellationToken cancellationToken)
         {
             Interlocked.Increment(ref sendingCallCount);
+            return Internals.TaskHelpers.CompletedTask;
         }
 
         /// <inheritdoc />
-        public void Sent(MailMessage mailMessage, IDictionary<string, object> data)
+        public Task SentAsync(MailMessage mailMessage, IDictionary<string, object> data,
+            CancellationToken cancellationToken)
         {
             Interlocked.Increment(ref sentCallCount);
+            return Internals.TaskHelpers.CompletedTask;
         }
 
         #endregion
