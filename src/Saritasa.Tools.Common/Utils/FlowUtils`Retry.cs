@@ -385,7 +385,7 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="numberOfTries">Maximum number of tries, default is 3.</param>
         /// <param name="delay">Delay between calls. Default is zero.</param>
-        /// <param name="firstFastRetry">Do not delay for second attempt.</param>
+        /// <param name="firstFastRetry">Make first attempt with no delay. This adds extra attempt.</param>
         /// <returns>Retry strategy delegate.</returns>
         public static RetryStrategy CreateFixedDelayRetryStrategy(int numberOfTries = 3, TimeSpan? delay = null, bool firstFastRetry = false)
         {
@@ -398,13 +398,18 @@ namespace Saritasa.Tools.Common.Utils
 
             return (int attemptCount, Exception lastException, out TimeSpan neededDelay) =>
             {
+                if (firstFastRetry)
+                {
+                    attemptCount--;
+                }
+
                 if (attemptCount >= numberOfTries)
                 {
                     neededDelay = TimeSpan.Zero;
                     return true;
                 }
 
-                neededDelay = attemptCount == 1 && firstFastRetry ? TimeSpan.Zero : delay.Value;
+                neededDelay = attemptCount == 0 && firstFastRetry ? TimeSpan.Zero : delay.Value;
                 return false;
             };
         }
@@ -415,7 +420,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="numberOfTries">Maximum number of tries, default is 3.</param>
         /// <param name="delay">Delay between calls. Default is 0.</param>
         /// <param name="increment">Increment time with every call. Default is 0.</param>
-        /// <param name="firstFastRetry">Do not delay for second attempt.</param>
+        /// <param name="firstFastRetry">Make first attempt with no delay. This adds extra attempt.</param>
         /// <returns>Retry strategy delegate.</returns>
         public static RetryStrategy CreateIncrementDelayRetryStrategy(
             int numberOfTries = 3,
@@ -437,13 +442,18 @@ namespace Saritasa.Tools.Common.Utils
 
             return (int attemptCount, Exception lastException, out TimeSpan neededDelay) =>
             {
+                if (firstFastRetry)
+                {
+                    attemptCount--;
+                }
+
                 if (attemptCount >= numberOfTries)
                 {
                     neededDelay = TimeSpan.Zero;
                     return true;
                 }
 
-                neededDelay = attemptCount == 1 && firstFastRetry ?
+                neededDelay = attemptCount == 0 && firstFastRetry ?
                     TimeSpan.Zero :
                     TimeSpan.FromMilliseconds(delay.Value.TotalMilliseconds + (attemptCount * increment.Value.TotalMilliseconds));
                 return false;
@@ -458,6 +468,9 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="maxBackoff">The maximum backoff time, default is 30.</param>
         /// <param name="deltaBackoff">The value that will be used to calculate a random delta in the exponential delay between retries.
         /// Disabled by default.</param>
+        /// <param name="firstFastRetry">Make first attempt with no delay. This adds extra attempt.</param>
+        /// <param name="randomizeDeltaBackoff">Pick random value for deltaBackoff between deltaBackoff * 0.8 and
+        /// deltaBackoff * 1.2 . True by default.</param>
         /// <returns>Retry strategy delegate.</returns>
         /// <remarks>
         /// https://github.com/MicrosoftArchive/transient-fault-handling-application-block/blob/master/source/Source/TransientFaultHandling/ExponentialBackoff.cs#L78
@@ -466,7 +479,9 @@ namespace Saritasa.Tools.Common.Utils
             int numberOfTries = 3,
             TimeSpan? minBackoff = null,
             TimeSpan? maxBackoff = null,
-            TimeSpan? deltaBackoff = null)
+            TimeSpan? deltaBackoff = null,
+            bool firstFastRetry = false,
+            bool randomizeDeltaBackoff = true)
         {
             if (minBackoff == null)
             {
@@ -491,27 +506,47 @@ namespace Saritasa.Tools.Common.Utils
 
             return (int attemptCount, Exception lastException, out TimeSpan neededDelay) =>
             {
+                // Skip first attempt if it is first fail fast.
+                if (firstFastRetry)
+                {
+                    attemptCount--;
+                }
+
                 if (attemptCount >= numberOfTries)
                 {
                     neededDelay = TimeSpan.Zero;
                     return true;
                 }
 
-                // delta = (2 ^ attemptCount - 1)
-                // delta = delta * random(deltaBackoff * 0.8, deltaBackoff * 1.2)
-                // interval = min(minBackoff + delta, maxBackoff)
-                double delta = Math.Pow(2.0, attemptCount) - 1.0;
-                if (deltaBackoff.HasValue)
+                if (attemptCount == 0 && firstFastRetry)
                 {
-                    Random random = new Random();
-                    delta *= random.Next((int)(deltaBackoff.Value.TotalMilliseconds * 0.8), (int)(deltaBackoff.Value.TotalMilliseconds * 1.2));
+                    neededDelay = TimeSpan.Zero;
                 }
                 else
                 {
-                    delta *= 1000;
+                    // delta = (2 ^ attemptCount - 1)
+                    // delta = delta * random(deltaBackoff * 0.8, deltaBackoff * 1.2)
+                    // interval = min(minBackoff + delta, maxBackoff)
+                    double delta = Math.Pow(2.0, attemptCount) - 1.0;
+                    if (deltaBackoff.HasValue)
+                    {
+                        if (randomizeDeltaBackoff)
+                        {
+                            Random random = new Random();
+                            delta *= random.Next((int)(deltaBackoff.Value.TotalMilliseconds * 0.8), (int)(deltaBackoff.Value.TotalMilliseconds * 1.2));
+                        }
+                        else
+                        {
+                            delta *= deltaBackoff.Value.TotalMilliseconds;
+                        }
+                    }
+                    else
+                    {
+                        delta *= 1000;
+                    }
+                    int interval = (int)Math.Min(minBackoff.Value.TotalMilliseconds + delta, maxBackoff.Value.TotalMilliseconds);
+                    neededDelay = TimeSpan.FromMilliseconds(interval);
                 }
-                int interval = (int)Math.Min(minBackoff.Value.TotalMilliseconds + delta, maxBackoff.Value.TotalMilliseconds);
-                neededDelay = TimeSpan.FromMilliseconds(interval);
                 return false;
             };
         }
@@ -523,6 +558,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="numberOfTries">Maximum number of tries, default is 3.</param>
         /// <param name="minBackoff">The minimum backoff time, default is 1.</param>
         /// <param name="maxBackoff">The maximum backoff time, default is 30.</param>
+        /// <param name="firstFastRetry">Make first attempt with no delay. This adds extra attempt.</param>
         /// <returns>Retry strategy delegate.</returns>
         /// <remarks>
         /// https://github.com/MicrosoftArchive/transient-fault-handling-application-block/blob/master/source/Source/TransientFaultHandling/ExponentialBackoff.cs#L78
@@ -530,7 +566,8 @@ namespace Saritasa.Tools.Common.Utils
         public static RetryStrategy CreateExponentialBackoffNormalizedDelayRetryStrategy(
             int numberOfTries = 3,
             TimeSpan? minBackoff = null,
-            TimeSpan? maxBackoff = null)
+            TimeSpan? maxBackoff = null,
+            bool firstFastRetry = false)
         {
             if (minBackoff == null)
             {
@@ -543,30 +580,12 @@ namespace Saritasa.Tools.Common.Utils
             Guard.IsNotNegativeOrZero(numberOfTries, nameof(numberOfTries));
             Guard.IsNotNegative(minBackoff.Value, nameof(minBackoff));
             Guard.IsNotNegative(maxBackoff.Value, nameof(maxBackoff));
-            if (minBackoff > maxBackoff)
-            {
-                throw new ArgumentOutOfRangeException(nameof(minBackoff),
-                    string.Format(Properties.Strings.ArgumentMustBeGreaterThan, nameof(minBackoff), nameof(maxBackoff)));
-            }
 
-            var maxDelay = Math.Pow(2.0, numberOfTries - 1) - 1.0;
-            var minMilliseconds = minBackoff.Value.TotalMilliseconds;
-            var maxMilliseconds = maxBackoff.Value.TotalMilliseconds;
-
-            return (int attemptCount, Exception lastException, out TimeSpan neededDelay) =>
-            {
-                if (attemptCount >= numberOfTries)
-                {
-                    neededDelay = TimeSpan.Zero;
-                    return true;
-                }
-
-                // maxDelay = (2 ^ numberOfTries) - 1
-                // delay = (2 ^ c - 1) / maxDelay * (maxBackoff - minBackoff) + minBackoff
-                int interval = (int)((Math.Pow(2.0, attemptCount) - 1.0) / maxDelay * (maxMilliseconds - minMilliseconds) + minMilliseconds);
-                neededDelay = TimeSpan.FromMilliseconds(interval);
-                return false;
-            };
+            var deltaBackoff = (maxBackoff.Value.TotalMilliseconds - minBackoff.Value.TotalMilliseconds) / Math.Pow(2, numberOfTries - 1);
+            return CreateExponentialBackoffDelayRetryStrategy(numberOfTries, minBackoff, maxBackoff,
+                deltaBackoff: TimeSpan.FromMilliseconds(deltaBackoff),
+                firstFastRetry: firstFastRetry,
+                randomizeDeltaBackoff: false);
         }
 
         /// <summary>

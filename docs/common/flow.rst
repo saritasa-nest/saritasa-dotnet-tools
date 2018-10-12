@@ -48,7 +48,7 @@ Methods that affect application execution flow.
 
             .. image:: flow-retry-incremental.png
 
-    .. function:: CreateExponentialBackoffDelayRetryStrategy(int numberOfTries, TimeSpan? minBackoff, TimeSpan? maxBackoff, TimeSpan? deltaBackoff)
+    .. function:: CreateExponentialBackoffDelayRetryStrategy(int numberOfTries, TimeSpan? minBackoff, TimeSpan? maxBackoff, TimeSpan? deltaBackoff, bool firstFastRetry, bool randomizeDeltaBackoff)
 
         A retry strategy with backoff parameters for calculating the exponential delay between retries. Delta backoff (jitter) requires to randomize next delay. The implementation is equal to Microsoft Enterprise Library exponential backoff transient fault handling. Here is a sample run with delays for configuration numberOfTries=10, minBackoff=2 sec, maxBackoff=35 sec, no delta backoff:
 
@@ -68,7 +68,11 @@ Methods that affect application execution flow.
 
             .. image:: flow-retry-exp.png
 
-    .. function:: CreateExponentialBackoffNormalizedDelayRetryStrategy(int numberOfTries, TimeSpan? minBackoff, TimeSpan? maxBackoff)
+        You can add randomization and change the delay behavior with deltaBackoff parameter. Make it more aggressive or optimistic. For example the same graph with delta backoff 0.5 sec:
+
+            .. image:: flow-retry-exp2.png
+
+    .. function:: CreateExponentialBackoffNormalizedDelayRetryStrategy(int numberOfTries, TimeSpan? minBackoff, TimeSpan? maxBackoff, bool firstFastRetry)
 
         A retry strategy with backoff parameters for calculating the exponential delay between retries. Normalized version scales exponential delay depends on numberOfTries. Here is a sample run with delays for configuration numberOfTries=10, minBackoff=2 sec, maxBackoff=35 sec:
 
@@ -87,6 +91,12 @@ Methods that affect application execution flow.
                 10: 00:35.03  01:23.61
 
             .. image:: flow-retry-expnormalized.png
+
+        It is the same as exponential backoff strategy but deltaBackoff is calculates as
+
+            ::
+
+                deltaBackoff = (maxBackoff - minBackoff) / 2^(numberOfTries-1)
 
     .. function:: CreateCallbackRetryStrategy(RetryCallback callback)
 

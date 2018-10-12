@@ -31,7 +31,16 @@ namespace SandBox
             numberOfTries: maxNumberOfTries,
             minBackoff: TimeSpan.FromSeconds(2),
             maxBackoff: TimeSpan.FromSeconds(35),
-            deltaBackoff: null
+            deltaBackoff: null,
+            firstFastRetry: false
+        );
+
+        private static readonly FlowUtils.RetryStrategy expDelayWithDeltaBackoff = FlowUtils.CreateExponentialBackoffDelayRetryStrategy(
+            numberOfTries: maxNumberOfTries,
+            minBackoff: TimeSpan.FromSeconds(2),
+            maxBackoff: TimeSpan.FromSeconds(35),
+            deltaBackoff: TimeSpan.FromSeconds(0.5),
+            firstFastRetry: false
         );
 
         private static readonly FlowUtils.RetryStrategy expDelayNormalized = FlowUtils.CreateExponentialBackoffNormalizedDelayRetryStrategy(
@@ -58,7 +67,7 @@ namespace SandBox
                 totalStopwatch.Start();
                 Saritasa.Tools.Common.Utils.FlowUtils.Retry(
                     MethodWithException,
-                    expDelayNormalized
+                    expDelayWithDeltaBackoff
                 );
             }
             catch (Exception)
