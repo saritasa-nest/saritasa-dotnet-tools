@@ -457,15 +457,16 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="minBackoff">The minimum backoff time, default is 1.</param>
         /// <param name="maxBackoff">The maximum backoff time, default is 30.</param>
         /// <param name="deltaBackoff">The value that will be used to calculate a random delta in the exponential delay between retries.
-        /// Default is 10.</param>
-        /// <param name="firstFastRetry">Do not delay for second attempt.</param>
+        /// Disabled by default.</param>
         /// <returns>Retry strategy delegate.</returns>
+        /// <remarks>
+        /// https://github.com/MicrosoftArchive/transient-fault-handling-application-block/blob/master/source/Source/TransientFaultHandling/ExponentialBackoff.cs#L78
+        /// </remarks>
         public static RetryStrategy CreateExponentialBackoffDelayRetryStrategy(
             int numberOfTries = 3,
             TimeSpan? minBackoff = null,
             TimeSpan? maxBackoff = null,
-            TimeSpan? deltaBackoff = null,
-            bool firstFastRetry = false)
+            TimeSpan? deltaBackoff = null)
         {
             if (minBackoff == null)
             {
@@ -475,14 +476,13 @@ namespace Saritasa.Tools.Common.Utils
             {
                 maxBackoff = TimeSpan.FromSeconds(30.0);
             }
-            if (deltaBackoff == null)
-            {
-                deltaBackoff = TimeSpan.FromSeconds(10.0);
-            }
             Guard.IsNotNegativeOrZero(numberOfTries, nameof(numberOfTries));
             Guard.IsNotNegative(minBackoff.Value, nameof(minBackoff));
             Guard.IsNotNegative(maxBackoff.Value, nameof(maxBackoff));
-            Guard.IsNotNegative(deltaBackoff.Value, nameof(deltaBackoff));
+            if (deltaBackoff.HasValue)
+            {
+                Guard.IsNotNegative(deltaBackoff.Value, nameof(deltaBackoff));
+            }
             if (minBackoff > maxBackoff)
             {
                 throw new ArgumentOutOfRangeException(nameof(minBackoff),
@@ -497,24 +497,80 @@ namespace Saritasa.Tools.Common.Utils
                     return true;
                 }
 
-                if (attemptCount == 1 && firstFastRetry)
+                // delta = (2 ^ attemptCount - 1)
+                // delta = delta * random(deltaBackoff * 0.8, deltaBackoff * 1.2)
+                // interval = min(minBackoff + delta, maxBackoff)
+                double delta = Math.Pow(2.0, attemptCount) - 1.0;
+                if (deltaBackoff.HasValue)
                 {
-                    neededDelay = TimeSpan.Zero;
+                    Random random = new Random();
+                    delta *= random.Next((int)(deltaBackoff.Value.TotalMilliseconds * 0.8), (int)(deltaBackoff.Value.TotalMilliseconds * 1.2));
                 }
                 else
                 {
-                    Random random = new Random();
-                    int num = (int)((Math.Pow(2.0, attemptCount) - 1.0) *
-                                    random.Next((int)(deltaBackoff.Value.TotalMilliseconds * 0.8), (int)(deltaBackoff.Value.TotalMilliseconds * 1.2)));
-                    int num2 = (int)Math.Min(minBackoff.Value.TotalMilliseconds + num, maxBackoff.Value.TotalMilliseconds);
-                    neededDelay = TimeSpan.FromMilliseconds(num2);
+                    delta *= 1000;
                 }
+                int interval = (int)Math.Min(minBackoff.Value.TotalMilliseconds + delta, maxBackoff.Value.TotalMilliseconds);
+                neededDelay = TimeSpan.FromMilliseconds(interval);
                 return false;
             };
         }
 
         /// <summary>
-        /// Creates wrapper delegate around "RetryCallback". Can be used for loggin or debug purpose.
+        /// A retry strategy with backoff parameters for calculating the exponential delay between retries. Normalized
+        /// version scales exponential delay depends on numberOfTries.
+        /// </summary>
+        /// <param name="numberOfTries">Maximum number of tries, default is 3.</param>
+        /// <param name="minBackoff">The minimum backoff time, default is 1.</param>
+        /// <param name="maxBackoff">The maximum backoff time, default is 30.</param>
+        /// <returns>Retry strategy delegate.</returns>
+        /// <remarks>
+        /// https://github.com/MicrosoftArchive/transient-fault-handling-application-block/blob/master/source/Source/TransientFaultHandling/ExponentialBackoff.cs#L78
+        /// </remarks>
+        public static RetryStrategy CreateExponentialBackoffNormalizedDelayRetryStrategy(
+            int numberOfTries = 3,
+            TimeSpan? minBackoff = null,
+            TimeSpan? maxBackoff = null)
+        {
+            if (minBackoff == null)
+            {
+                minBackoff = TimeSpan.FromSeconds(1.0);
+            }
+            if (maxBackoff == null)
+            {
+                maxBackoff = TimeSpan.FromSeconds(30.0);
+            }
+            Guard.IsNotNegativeOrZero(numberOfTries, nameof(numberOfTries));
+            Guard.IsNotNegative(minBackoff.Value, nameof(minBackoff));
+            Guard.IsNotNegative(maxBackoff.Value, nameof(maxBackoff));
+            if (minBackoff > maxBackoff)
+            {
+                throw new ArgumentOutOfRangeException(nameof(minBackoff),
+                    string.Format(Properties.Strings.ArgumentMustBeGreaterThan, nameof(minBackoff), nameof(maxBackoff)));
+            }
+
+            var maxDelay = Math.Pow(2.0, numberOfTries - 1) - 1.0;
+            var minMilliseconds = minBackoff.Value.TotalMilliseconds;
+            var maxMilliseconds = maxBackoff.Value.TotalMilliseconds;
+
+            return (int attemptCount, Exception lastException, out TimeSpan neededDelay) =>
+            {
+                if (attemptCount >= numberOfTries)
+                {
+                    neededDelay = TimeSpan.Zero;
+                    return true;
+                }
+
+                // maxDelay = (2 ^ numberOfTries) - 1
+                // delay = (2 ^ c - 1) / maxDelay * (maxBackoff - minBackoff) + minBackoff
+                int interval = (int)((Math.Pow(2.0, attemptCount) - 1.0) / maxDelay * (maxMilliseconds - minMilliseconds) + minMilliseconds);
+                neededDelay = TimeSpan.FromMilliseconds(interval);
+                return false;
+            };
+        }
+
+        /// <summary>
+        /// Creates wrapper delegate around "RetryCallback". Can be used for logging or debug purpose.
         /// Please note that this delegate should be passed first when combine with RetryStrategyDelegate.
         /// </summary>
         /// <param name="callback">User callback.</param>
