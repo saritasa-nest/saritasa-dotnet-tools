@@ -50,7 +50,7 @@ Methods that affect application execution flow.
 
     .. function:: CreateExponentialBackoffDelayRetryStrategy(int numberOfTries, TimeSpan? minBackoff, TimeSpan? maxBackoff, TimeSpan? deltaBackoff)
 
-        A retry strategy with backoff parameters for calculating the exponential delay between retries. Delta backoff (jitter) requires to randomize next delay. The implementation is equal to Microsoft Enterprise Library exponential backoff transient fault handling. Here is a sample run with delays for configuration numberOfTries=10, minBackoff=2 sec, maxBackoff=30 sec, no delta backoff:
+        A retry strategy with backoff parameters for calculating the exponential delay between retries. Delta backoff (jitter) requires to randomize next delay. The implementation is equal to Microsoft Enterprise Library exponential backoff transient fault handling. Here is a sample run with delays for configuration numberOfTries=10, minBackoff=2 sec, maxBackoff=35 sec, no delta backoff:
 
             ::
 
@@ -70,7 +70,7 @@ Methods that affect application execution flow.
 
     .. function:: CreateExponentialBackoffNormalizedDelayRetryStrategy(int numberOfTries, TimeSpan? minBackoff, TimeSpan? maxBackoff)
 
-        A retry strategy with backoff parameters for calculating the exponential delay between retries. Normalized version scales exponential delay depends on numberOfTries. Here is a sample run with delays for configuration numberOfTries=10, minBackoff=2 sec, maxBackoff=30 sec:
+        A retry strategy with backoff parameters for calculating the exponential delay between retries. Normalized version scales exponential delay depends on numberOfTries. Here is a sample run with delays for configuration numberOfTries=10, minBackoff=2 sec, maxBackoff=35 sec:
 
             ::
 
@@ -109,7 +109,7 @@ Methods that affect application execution flow.
             // Use increment delay retry strategy with logging.
             FlowUtils.Retry(() =>
                 {
-                    // action
+                    // Action.
                 },
                 FlowUtils.CreateCallbackRetryStrategy((attempt, ex) =>
                 {
@@ -135,7 +135,7 @@ Methods that affect application execution flow.
                 var memoized1 = FlowUtils.Memoize(
                     new Func<int, int>((int a) =>
                     {
-                        return value; // some processing here
+                        return value; // Some processing here.
                     }),
                     FlowUtils.CreateMaxCountCacheStrategy<int, int>(maxCount: 3, removeCount: 2)
                 );
