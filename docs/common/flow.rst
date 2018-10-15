@@ -6,11 +6,11 @@ Methods that affect application execution flow.
 .. function:: T Retry<T>(Func<T> action, RetryStrategy retryStrategy, params Type[] transientExceptions)
 .. function:: Task<T> RetryAsync<T>(Func<Task<T>> action, RetryStrategy retryStrategy, CancellationToken cancellationToken, params Type[] transientExceptions)
 
-    Provides the sync/async implementation of the retry mechanism for unreliable actions and transient conditions. There are following retry strategies:
+    Provides the sync/async implementation of the retry mechanism for unreliable actions and transient conditions. Please note that having ``firstFastRetry`` would add extra attempt to total number of tries. There are following retry strategies:
 
     .. function:: CreateFixedDelayRetryStrategy(int numberOfTries, TimeSpan? delay, bool firstFastRetry)
 
-        There will be fixed time delay between every failed action call. One of the simplest strategies. Here is a sample run with delays for configuration numberOfTries=10, delay=2 sec, no first fast retry:
+        There will be fixed time delay between every failed action call. One of the simplest strategies. Here is a sample run with delays for configuration ``numberOfTries=10``, ``delay=2 sec``, no first fast retry:
 
             ::
 
@@ -30,7 +30,7 @@ Methods that affect application execution flow.
 
     .. function:: CreateIncrementDelayRetryStrategy(int numberOfTries, TimeSpan? delay, TimeSpan? increment, bool firstFastRetry)
 
-        There will be incremented delay between every failed action call. Here is a sample run with delays for configuration numberOfTries=10, delay=2 sec, increment=1 sec, no first fast retry:
+        There will be incremented delay between every failed action call. Here is a sample run with delays for configuration ``numberOfTries=10``, ``delay=2 sec``, ``increment=1 sec``, no first fast retry:
 
             ::
 
@@ -50,7 +50,7 @@ Methods that affect application execution flow.
 
     .. function:: CreateExponentialBackoffDelayRetryStrategy(int numberOfTries, TimeSpan? minBackoff, TimeSpan? maxBackoff, TimeSpan? deltaBackoff, bool firstFastRetry, bool randomizeDeltaBackoff)
 
-        A retry strategy with backoff parameters for calculating the exponential delay between retries. Delta backoff (jitter) requires to randomize next delay. The implementation is equal to Microsoft Enterprise Library exponential backoff transient fault handling. Here is a sample run with delays for configuration numberOfTries=10, minBackoff=2 sec, maxBackoff=35 sec, no delta backoff:
+        A retry strategy with backoff parameters for calculating the exponential delay between retries. Delta backoff (jitter) requires to randomize next delay. The implementation is equal to Microsoft Enterprise Library exponential backoff transient fault handling. Here is a sample run with delays for configuration ``numberOfTries=10``, ``minBackoff=2 sec``, ``maxBackoff=35 sec``, no delta backoff, no first fast retry:
 
             ::
 
@@ -68,13 +68,13 @@ Methods that affect application execution flow.
 
             .. image:: flow-retry-exp.png
 
-        You can add randomization and change the delay behavior with deltaBackoff parameter. Make it more aggressive or optimistic. For example the same graph with delta backoff 0.5 sec:
+        You can add randomization and change the delay behavior with ``deltaBackoff`` parameter. Make it more aggressive or optimistic. For example the same graph with delta backoff 0.5 sec:
 
             .. image:: flow-retry-exp2.png
 
     .. function:: CreateExponentialBackoffNormalizedDelayRetryStrategy(int numberOfTries, TimeSpan? minBackoff, TimeSpan? maxBackoff, bool firstFastRetry)
 
-        A retry strategy with backoff parameters for calculating the exponential delay between retries. Normalized version scales exponential delay depends on numberOfTries. Here is a sample run with delays for configuration numberOfTries=10, minBackoff=2 sec, maxBackoff=35 sec:
+        A retry strategy with backoff parameters for calculating the exponential delay between retries. Normalized version scales exponential delay depends on ``numberOfTries``. Here is a sample run with delays for configuration ``numberOfTries=10``, ``minBackoff=2`` sec, ``maxBackoff=35`` sec, no first fast retry:
 
             ::
 
@@ -92,7 +92,7 @@ Methods that affect application execution flow.
 
             .. image:: flow-retry-expnormalized.png
 
-        It is the same as exponential backoff strategy but deltaBackoff is calculates as
+        It is the same as exponential backoff strategy but ``deltaBackoff`` is calculates as
 
             ::
 
