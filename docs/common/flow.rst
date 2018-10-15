@@ -68,7 +68,7 @@ Methods that affect application execution flow.
 
             .. image:: flow-retry-exp.png
 
-        You can add randomization and change the delay behavior with ``deltaBackoff`` parameter. Make it more aggressive or optimistic. For example the same graph with delta backoff 0.5 sec:
+        You can add randomization and change the delay behavior with ``deltaBackoff`` parameter. Make it more aggressive or optimistic. For example the same graph with delta backoff 0.2 sec:
 
             .. image:: flow-retry-exp2.png
 

@@ -498,6 +498,10 @@ namespace Saritasa.Tools.Common.Utils
             {
                 Guard.IsNotNegative(deltaBackoff.Value, nameof(deltaBackoff));
             }
+            else
+            {
+                deltaBackoff = TimeSpan.FromSeconds(1.0);
+            }
             if (minBackoff > maxBackoff)
             {
                 throw new ArgumentOutOfRangeException(nameof(minBackoff),
@@ -528,21 +532,14 @@ namespace Saritasa.Tools.Common.Utils
                     // delta = delta * random(deltaBackoff * 0.8, deltaBackoff * 1.2)
                     // interval = min(minBackoff + delta, maxBackoff)
                     double delta = Math.Pow(2.0, attemptCount) - 1.0;
-                    if (deltaBackoff.HasValue)
+                    if (randomizeDeltaBackoff)
                     {
-                        if (randomizeDeltaBackoff)
-                        {
-                            Random random = new Random();
-                            delta *= random.Next((int)(deltaBackoff.Value.TotalMilliseconds * 0.8), (int)(deltaBackoff.Value.TotalMilliseconds * 1.2));
-                        }
-                        else
-                        {
-                            delta *= deltaBackoff.Value.TotalMilliseconds;
-                        }
+                        Random random = new Random();
+                        delta *= random.Next((int)(deltaBackoff.Value.TotalMilliseconds * 0.8), (int)(deltaBackoff.Value.TotalMilliseconds * 1.2));
                     }
                     else
                     {
-                        delta *= 1000;
+                        delta *= deltaBackoff.Value.TotalMilliseconds;
                     }
                     int interval = (int)Math.Min(minBackoff.Value.TotalMilliseconds + delta, maxBackoff.Value.TotalMilliseconds);
                     neededDelay = TimeSpan.FromMilliseconds(interval);

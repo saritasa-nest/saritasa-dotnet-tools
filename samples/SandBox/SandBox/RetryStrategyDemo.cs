@@ -32,6 +32,7 @@ namespace SandBox
             minBackoff: TimeSpan.FromSeconds(2),
             maxBackoff: TimeSpan.FromSeconds(35),
             deltaBackoff: null,
+            randomizeDeltaBackoff: false,
             firstFastRetry: false
         );
 
@@ -39,7 +40,8 @@ namespace SandBox
             numberOfTries: maxNumberOfTries,
             minBackoff: TimeSpan.FromSeconds(2),
             maxBackoff: TimeSpan.FromSeconds(35),
-            deltaBackoff: TimeSpan.FromSeconds(0.5),
+            deltaBackoff: TimeSpan.FromSeconds(0.2),
+            randomizeDeltaBackoff: false,
             firstFastRetry: false
         );
 
