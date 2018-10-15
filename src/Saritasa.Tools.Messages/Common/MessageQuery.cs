@@ -99,7 +99,7 @@ namespace Saritasa.Tools.Messages.Common
         }
 
         /// <summary>
-        /// Create query object from string. Only AND clause is used. Example: startdate=2017-01-01,take=10.
+        /// Create query object from string. Only AND clause is used. Example: "startdate=2017-01-01 take=10".
         /// </summary>
         /// <param name="queryString">Formatted query string.</param>
         /// <returns>Message query.</returns>
@@ -185,12 +185,12 @@ namespace Saritasa.Tools.Messages.Common
                     break;
 
                 // Status.
-                case FieldKeyStatus when operation == "=":
+                case FieldKeyStatus when operation == "=" || operation == string.Empty:
                     query.Status = (ProcessingStatus)Enum.Parse(typeof(ProcessingStatus), value, ignoreCase: true);
                     break;
 
                 // Type.
-                case FieldKeyType when operation == "=":
+                case FieldKeyType when operation == "=" || operation == string.Empty:
                     query.Type = IsStringNumber(value) ?
                         byte.Parse(value) :
                         MessageContextConstants.MessageTypeCodes
@@ -210,12 +210,12 @@ namespace Saritasa.Tools.Messages.Common
                     break;
 
                 // Skip.
-                case FieldKeySkip:
+                case FieldKeySkip when operation == "=" || operation == string.Empty:
                     query.Skip = int.Parse(value);
                     break;
 
                 // Take.
-                case FieldKeyTake:
+                case FieldKeyTake when operation == "=" || operation == string.Empty:
                     query.Take = int.Parse(value);
                     break;
 
@@ -392,7 +392,7 @@ namespace Saritasa.Tools.Messages.Common
         /// Does the message match criterias of query.
         /// </summary>
         /// <param name="messageRecord">Message record.</param>
-        /// <returns>True if message matches criteries.</returns>
+        /// <returns>True if message matches criterias.</returns>
         public bool Match(MessageRecord messageRecord)
         {
             if (Id.HasValue && messageRecord.Id != Id.Value)

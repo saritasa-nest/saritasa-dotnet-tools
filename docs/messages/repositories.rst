@@ -152,3 +152,55 @@ There are built in repositories.
             .. attribute:: token
 
                 Customer token. Should be created within Loggly admin panel.
+
+Query Repositories
+------------------
+
+Every repository supports simple query language, it has ``GetAsync`` method. To be able to construct query ``MessageQuery`` class is used. For example:
+
+    .. code-block:: c#
+
+        var repository = new Saritasa.Tools.Messages.Common.Repositories.AdoNetMessageRepository(
+            DbProviderFactories.GetFactory("System.Data.SqlClient"),
+            connectionString);
+        var query = Saritasa.Tools.Messages.Common.MessageQuery.Create()
+            .WithCreatedStartDate(new DateTime(2018, 10, 10))
+            .WithStatus(ProcessingStatus.Failed)
+            .WithRange(0, 500);
+        var messages = repository.GetAsync(query).GetAwaiter().GetResult();
+
+Also you can use string syntax to define query:
+
+    .. code-block:: c#
+
+        var repository = new Saritasa.Tools.Messages.Common.Repositories.AdoNetMessageRepository(
+            DbProviderFactories.GetFactory("System.Data.SqlClient"),
+            connectionString);
+        var query = Saritasa.Tools.Messages.Common.MessageQuery.CreateFromString("created > 2018-10-10 status = failed take 500");
+        var messages = repository.GetAsync(query).GetAwaiter().GetResult();
+
+The query may have following tokens and operations. There is currently only AND operation supported between expressions. "Greater than" operation means "greater than and equal" as well as  "below than" mean "below than and equal".
+
+============= ================== ==============================================================================================
+Token         Operations         Description
+------------- ------------------ ----------------------------------------------------------------------------------------------
+id            ``=``              Identifier of message record. (ex ``id = "b6543f31-9c60-4be1-b2b0-69b8c3159c91"``)
+created       ``>`` ``<`` ``=``  When message record has been created. (ex ``created > 2018-09-01 created < 2018-10-01``)
+contenttype   ``=``              Message content (class) type starts with string.
+                                 (ex ``ContentType = "MyApp.Domain.Commands.User"`` will find
+                                 ``MyApp.Domain.Commands.UserCreate`` and ``MyApp.Domain.Commands.UserUpdate``).
+errortype     ``=``              Error type (class) starts with string. (ex ``ErrorType = "MyApp.Exception"``)
+status        ``=``              Message processing status, possible values are ``NotInitialized``, ``Processing``,
+                                 ``Completed``, ``Failed``, ``Rejected``. (ex ``status = failed``)
+type          ``=``              Message type. Values are 1 for command, 2 for query, 3 for event. (ex ``type = 1``,
+                                 ``type = event``)
+duration      ``>`` ``<`` ``=``  Execution duration limit in ms. (ex ``duration > 1000``)
+skip          ``=``              Number of records to skip. (ex ``skip 10``)
+take          ``=``              Number of records to take. (ex ``take 100``)
+============= ================== ==============================================================================================
+
+Examples:
+
+    - ``created > 2018-10-10 status = failed take 500``
+    - ``created > 2018-10-10 created < 2018-11-10 status = completed skip 100 take 500``
+    - ``contenttype = MyApp.Domain.Commands.JiraSyncCommand duration > 1000``
