@@ -132,10 +132,14 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             var allFiles =
                 Directory.GetFiles(Path, GetSearchPattern()).OrderBy(f => f).Select(System.IO.Path.GetFileName).ToArray();
             var allFilesHash = new HashSet<string>(allFiles);
+            if (!allFiles.Any())
+            {
+                return Task.FromResult(new List<MessageRecord>().AsEnumerable());
+            }
 
             // Init first and last dates.
             var startDate = messageQuery.CreatedStartDate ?? DateTime.MinValue;
-            var endDate = messageQuery.CreatedEndDate ?? DateTime.MaxValue;
+            var endDate = messageQuery.CreatedEndDate ?? DateTime.MaxValue.AddDays(-1);
 
             // Correct start and end dates, so minimum date will be first file in list, and max date last file.
             if (allFiles.Any())
@@ -149,7 +153,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                     System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat, System.Globalization.DateTimeStyles.None, out tmp))
                 {
                     tmp = tmp.AddDays(1);
-                    if (messageQuery.CreatedEndDate != null && tmp < messageQuery.CreatedEndDate.Value)
+                    if (messageQuery.CreatedEndDate.HasValue && tmp < messageQuery.CreatedEndDate.Value)
                     {
                         endDate = tmp;
                     }
