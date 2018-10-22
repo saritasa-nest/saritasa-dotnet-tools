@@ -26,6 +26,9 @@ msbuild.log
 # visual studio
 .vs/
 
+# IDEA (Rider)
+.idea/
+
 # visual studio code
 .vscode/
 
