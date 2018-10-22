@@ -557,9 +557,6 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="maxBackoff">The maximum backoff time, default is 30.</param>
         /// <param name="firstFastRetry">Make first attempt with no delay. This adds extra attempt.</param>
         /// <returns>Retry strategy delegate.</returns>
-        /// <remarks>
-        /// https://github.com/MicrosoftArchive/transient-fault-handling-application-block/blob/master/source/Source/TransientFaultHandling/ExponentialBackoff.cs#L78
-        /// </remarks>
         public static RetryStrategy CreateExponentialBackoffNormalizedDelayRetryStrategy(
             int numberOfTries = 3,
             TimeSpan? minBackoff = null,

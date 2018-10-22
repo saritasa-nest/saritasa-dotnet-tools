@@ -26,10 +26,10 @@ namespace Saritasa.Tools.Common.Tests
             }
 
             // Act
-            var pagedList = new PagedEnumerable<int>(list, 10, 10);
-            var pagedList2 = new PagedEnumerable<int>(list, 10, 10);
-            var pagedList3 = list.ToPaged(13, 25);
-            var pagedList4 = list.ToPaged(20, 13);
+            var pagedList = PagedListFactory.FromSource(list, 10, 10);
+            var pagedList2 = PagedListFactory.FromSource(list, 10, 10);
+            var pagedList3 = PagedListFactory.FromSource(list, 13, 25);
+            var pagedList4 = PagedListFactory.FromSource(list, 20, 13);
 
             // Assert
             Assert.Equal(25, pagedList.TotalPages);
@@ -51,7 +51,7 @@ namespace Saritasa.Tools.Common.Tests
             };
 
             // Act
-            var pagedResult = PagedEnumerable.Create(sourceData, 1, int.MaxValue);
+            var pagedResult = PagedListFactory.FromSource(sourceData, 1, int.MaxValue);
 
             // Assert
             Assert.Equal(1, pagedResult.TotalPages);

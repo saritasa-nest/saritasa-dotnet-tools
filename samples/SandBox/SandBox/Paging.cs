@@ -24,11 +24,12 @@ namespace SandBox
             var products = repository.GetAll();
 
             int offset = 0, limit = 10;
-            var subset = OffsetLimitEnumerable.Create(products, offset, limit);
+            var subset = OffsetLimitListFactory.FromSource(products, offset, limit);
 
-            var all = PagedEnumerable.Create(products, 2, 10);
-            var all2 = all.CastMetadataEnumerable(p => new ProductWrapper(p));
+            var all = PagedListFactory.FromSource(products, 2, 10);
+            var all2 = all.Convert(p => new ProductWrapper(p));
             var dto = all2.ToMetadataObject();
+            var serialized = Newtonsoft.Json.JsonConvert.SerializeObject(dto);
         }
     }
 }

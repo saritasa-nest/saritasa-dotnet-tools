@@ -320,5 +320,29 @@ namespace Saritasa.Tools.Domain.Exceptions
             }
         }
 #endif
+
+        public static void ThrowFromDictionary(IDictionary<string, string> errors)
+        {
+            if (errors == null)
+            {
+                throw new ArgumentNullException(nameof(errors));
+            }
+            if (errors.Count > 0)
+            {
+                throw new ValidationException(errors);
+            }
+        }
+
+        public static void ThrowFromDictionary(IDictionary<string, IEnumerable<string>> errors)
+        {
+            if (errors == null)
+            {
+                throw new ArgumentNullException(nameof(errors));
+            }
+            if (errors.Count > 0)
+            {
+                throw new ValidationException(errors);
+            }
+        }
     }
 }
