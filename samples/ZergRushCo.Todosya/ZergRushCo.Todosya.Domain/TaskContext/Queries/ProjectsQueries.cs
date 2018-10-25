@@ -51,10 +51,10 @@ namespace ZergRushCo.Todosya.Domain.TaskContext.Queries
         /// <param name="page">Page number.</param>
         /// <param name="pageSize">Page size, default is 10.</param>
         /// <returns>Projects paged enumerable.</returns>
-        public PagedEnumerable<ProjectDto> GetByUser(string userId, int page, int pageSize = 10)
+        public PagedList<ProjectDto> GetByUser(string userId, int page, int pageSize = 10)
         {
             var query = uow.ProjectRepository.Find(p => p.User.Id == userId).Select(p => new ProjectDto(p));
-            return PagedEnumerable.Create(query, page, pageSize);
+            return PagedListFactory.FromSource(query, page, pageSize);
         }
 
         /// <summary>
