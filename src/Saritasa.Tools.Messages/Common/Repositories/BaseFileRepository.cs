@@ -145,7 +145,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
             if (allFiles.Any())
             {
                 if (DateTime.TryParseExact(GetFileDatePart(allFiles.First()), DateTimeFormat,
-                        System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat, System.Globalization.DateTimeStyles.None, out DateTime tmp) && tmp > startDate)
+                    System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat, System.Globalization.DateTimeStyles.None, out DateTime tmp) && tmp > startDate)
                 {
                     startDate = tmp;
                 }

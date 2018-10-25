@@ -321,6 +321,11 @@ namespace Saritasa.Tools.Domain.Exceptions
         }
 #endif
 
+        /// <summary>
+        /// Throws <see cref="ValidationException" /> by provided dictionary of errors.
+        /// If dictionary is empty it does nothing.
+        /// </summary>
+        /// <param name="errors">Errors.</param>
         public static void ThrowFromDictionary(IDictionary<string, string> errors)
         {
             if (errors == null)
@@ -333,6 +338,11 @@ namespace Saritasa.Tools.Domain.Exceptions
             }
         }
 
+        /// <summary>
+        /// Throws <see cref="ValidationException" /> by provided dictionary of errors.
+        /// If dictionary is empty it does nothing.
+        /// </summary>
+        /// <param name="errors">Errors.</param>
         public static void ThrowFromDictionary(IDictionary<string, IEnumerable<string>> errors)
         {
             if (errors == null)
