@@ -2,7 +2,7 @@
 
 <#PSScriptInfo
 
-.VERSION 1.3.4
+.VERSION 1.4.0
 
 .GUID 966fce03-6946-447c-8e16-29b673f2918b
 
@@ -10,7 +10,7 @@
 
 .COMPANYNAME Saritasa
 
-.COPYRIGHT (c) 2016 Saritasa. All rights reserved.
+.COPYRIGHT (c) 2016-2018 Saritasa. All rights reserved.
 
 .TAGS Psake
 
@@ -123,4 +123,9 @@ Task add-scripts-to-git -description 'Add PowerShell scripts and modules to Git.
                 Exec { git add -f $_.FullName }
             }
         }
+
+    Get-ChildItem -Path "$root\..\*" -Include *.ps1, *.ps1.template | ForEach-Object `
+    {
+        Exec { git add -f $_.FullName }
+    }
 }

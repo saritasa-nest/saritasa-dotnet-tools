@@ -13,6 +13,17 @@ LONG DESCRIPTION
     with the the Managed Desktop workload for writing projects targeting the
     .NET Framework. See below for more examples.
 
+VARIABLES
+    You can get the version of this module or of the query API the module uses
+    from the `$VSSetupVersionTable` variable.
+
+    PS> $VSSetupVersionTable
+    
+    Name                           Value
+    ----                           -----
+    QueryVersion                   1.15.23.19330
+    ModuleVersion                  2.1.2.4917
+
 EXAMPLES
     You can enumerate all instances - even those with errors that require a
     repair - with the following command.

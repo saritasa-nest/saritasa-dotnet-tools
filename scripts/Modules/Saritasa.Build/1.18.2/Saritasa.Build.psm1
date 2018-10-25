@@ -1,4 +1,8 @@
-﻿<#
+﻿$assemblyVersionRegex = $null
+$assemblyInfoVersionRegex = $null
+$assemblyFileVersionRegex = $null
+
+<#
 .SYNOPSIS
 Downloads latest nuget.exe to specified location.
 
@@ -66,6 +70,8 @@ function Invoke-NugetRestore
     }
     else
     {
+        Write-Warning "Install NuGet globally for faster builds:`nchoco install nuget.commandline"
+        
         Install-NugetCli -Destination $PSScriptRoot
         $nugetExePath = "$PSScriptRoot\nuget.exe"
     }
@@ -149,6 +155,55 @@ function Invoke-ProjectBuild
     }
 }
 
+function ReplaceOrAppend([regex] $ReplaceRegex, [string] $InputString, [string] $ReplaceString, [string] $AssemblyAddFormat)
+{
+    if ($ReplaceRegex.IsMatch($InputString))
+    {
+        $InputString = $ReplaceRegex.Replace($InputString, $ReplaceString)
+    }
+    else
+    {
+        $InputString += [Environment]::NewLine + [string]::Format($AssemblyAddFormat, $ReplaceString)
+    }
+
+    $InputString
+}
+
+function ProcessAssemblyInfoFile([string] $FileName, [string] $AssemblyVersionString, [string] $AssemblyInfoVersionString, [string] $AssemblyFileVersionString)
+{
+    $assemblyAddFormat = switch ((Get-Item $FileName).Extension)
+        {
+            '.cs' { '[assembly: {0}]' }
+            '.vb' { '<Assembly: {0}>' }
+            '.fs' { '[<assembly: {0}>]' }
+            default { $null }
+        }
+
+    if (!$assemblyAddFormat)
+    {
+        Write-Warning "Unknown file format: $FileName"
+    }
+
+    $content = Get-Content $FileName -Raw -Encoding UTF8
+
+    if ($AssemblyVersionString)
+    {
+        $content = ReplaceOrAppend $script:assemblyVersionRegex $content $AssemblyVersionString $assemblyAddFormat
+    }
+
+    if ($AssemblyFileVersionString)
+    {
+        $content = ReplaceOrAppend $script:assemblyFileVersionRegex $content $AssemblyFileVersionString $assemblyAddFormat
+    }
+
+    if ($AssemblyInfoVersionString)
+    {
+        $content = ReplaceOrAppend $script:assemblyInfoVersionRegex $content $AssemblyInfoVersionString $assemblyAddFormat
+    }
+
+    Set-Content -Path $FileName -Encoding UTF8 -Value $content
+}
+
 <#
 .SYNOPSIS
 Update version numbers of AssemblyInfo.cs and AssemblyInfo.vb.
@@ -157,12 +212,15 @@ Update version numbers of AssemblyInfo.cs and AssemblyInfo.vb.
 Updates version numbers in AssemblyInfo files located in current directory and all subdirectories.
 
 .EXAMPLE
-Update-AssemblyInfoFile '6.3.1.1'
+Update-AssemblyInfoFile -AssemblyVersion '6.3.0.0' -AssemblyFileVersion '6.3.1.1' -AssemblyInfoVersion '6.3.0+master.808d1733f5c701c1882816f70c3eafc6e7fce4d4'
 
 .NOTES
 Based on SetVersion script.
 http://www.luisrocha.net/2009/11/setting-assembly-version-with-windows.html
 Copyright (c) 2009 Luis Rocha
+
+Based on GitVersion code.
+https://github.com/GitTools/GitVersion
 #>
 function Update-AssemblyInfoFile
 {
@@ -171,34 +229,35 @@ function Update-AssemblyInfoFile
     (
         # Version string in major.minor.build.revision format.
         [Parameter(Mandatory = $true)]
-        [string] $Version
+        [Alias("Version")]
+        [string] $AssemblyVersion,
+        [string] $AssemblyInfoVersion,
+        [string] $AssemblyFileVersion,
+        # Path to root directory.
+        [string] $Path
     )
 
     Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
 
-    $assemblyVersionPattern = 'AssemblyVersion\("[0-9]+(\.([0-9]+|\*)){1,3}"\)'
-    $fileVersionPattern = 'AssemblyFileVersion\("[0-9]+(\.([0-9]+|\*)){1,3}"\)'
-    $assemblyVersion = 'AssemblyVersion("' + $Version + '")';
-    $fileVersion = 'AssemblyFileVersion("' + $Version + '")';
+    $script:assemblyVersionRegex = [regex] 'AssemblyVersion(Attribute)?\s*\(.*\)\s*'
+    $assemblyVersionString = if ($AssemblyVersion) { "AssemblyVersion(`"$AssemblyVersion`")" }
 
-    Get-ChildItem -r -Include AssemblyInfo.cs, AssemblyInfo.vb | ForEach-Object `
+    $script:assemblyInfoVersionRegex = [regex] 'AssemblyInformationalVersion(Attribute)?\s*\(.*\)\s*'
+    $assemblyInfoVersionString = if ($AssemblyInfoVersion) { "AssemblyInformationalVersion(`"$AssemblyInfoVersion`")" }
+
+    $script:assemblyFileVersionRegex = [regex] 'AssemblyFileVersion(Attribute)?\s*\(.*\)\s*'
+    $assemblyFileVersionString = if ($AssemblyFileVersion) { "AssemblyFileVersion(`"$AssemblyFileVersion`")" }
+
+    $rootDirectory = if ($Path) { $Path } else { Get-Location }
+
+    Get-ChildItem -Path $rootDirectory -Recurse -Include AssemblyInfo.cs, AssemblyInfo.vb, AssemblyInfo.fs | ForEach-Object `
         {
-            $filename = $_.FullName
+            $fileName = $_.FullName
 
-            # If you are using a source control that requires to check-out files before
-            # modifying them, make sure to check-out the file here.
-            # For example, TFS will require the following command:
-            # tf checkout $filename
-
-            if ($PSCmdlet.ShouldProcess($filename))
+            if ($PSCmdlet.ShouldProcess($fileName))
             {
-                (Get-Content $filename) | ForEach-Object `
-                    {
-                        ($_ -replace $assemblyVersionPattern, $assemblyVersion) `
-                            -replace $fileVersionPattern, $fileVersion
-                    } | Set-Content $filename -Encoding UTF8
-
-                Write-Information "$filename -> $Version"
+                ProcessAssemblyInfoFile $fileName $assemblyVersionString $assemblyInfoVersionString $assemblyFileVersionString
+                Write-Information "$fileName -> $AssemblyVersion"
             }
         }
 }
