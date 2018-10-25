@@ -14,11 +14,6 @@ namespace Saritasa.Tools.Common.Pagination
     public static class PagedListFactory
     {
         /// <summary>
-        /// First page index.
-        /// </summary>
-        public const int FirstPage = 1;
-
-        /// <summary>
         /// Creates paged enumerable from enumerable source.
         /// </summary>
         /// <typeparam name="T">Item type.</typeparam>
@@ -102,12 +97,12 @@ namespace Saritasa.Tools.Common.Pagination
                 throw new ArgumentNullException(nameof(items));
             }
 
-            return new PagedList<T>(items, FirstPage, items.Count, items.Count);
+            return new PagedList<T>(items, PagedList<object>.FirstPage, items.Count, items.Count);
         }
 
         internal static int GetOffset(int page, int pageSize)
         {
-            if (page < FirstPage)
+            if (page < PagedList<object>.FirstPage)
             {
                 throw new ArgumentOutOfRangeException(nameof(page));
             }

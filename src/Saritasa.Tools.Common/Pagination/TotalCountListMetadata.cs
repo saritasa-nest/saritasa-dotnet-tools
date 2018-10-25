@@ -6,7 +6,7 @@ using System;
 namespace Saritasa.Tools.Common.Pagination
 {
     /// <summary>
-    /// Enumerable with total count metadata.
+    /// Metadata class with total count of items.
     /// </summary>
 #if NET40 || NET452 || NET461 || NETSTANDARD2_0
     [Serializable]
