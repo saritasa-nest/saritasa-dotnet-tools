@@ -16,10 +16,6 @@
     <tags>uow repository domain ef6 objectcontext dbcontext</tags>
     <repository type="git" url="https://github.com/Saritasa/SaritasaTools" />
     <dependencies>
-      <group targetFramework="netstandard1.2">
-        <dependency id="System.Linq.Queryable" version="4.3.0" exclude="Build,Analyzers" />
-        <dependency id="NETStandard.Library" version="[1.6.0, )" exclude="Build,Analyzers" />
-      </group>
       <group targetFramework="netstandard1.6">
         <dependency id="System.Linq.Queryable" version="4.3.0" exclude="Build,Analyzers" />
         <dependency id="NETStandard.Library" version="[1.6.0, )" exclude="Build,Analyzers" />

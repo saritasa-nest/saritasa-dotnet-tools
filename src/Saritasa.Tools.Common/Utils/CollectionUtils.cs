@@ -1,4 +1,4 @@
-﻿// Copyright(c) 2015-2017, Saritasa.All rights reserved.
+﻿// Copyright(c) 2015-2018, Saritasa.All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -116,7 +116,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Breaks a list of items into chunks of a specific size and yeilds T items.
+        /// Breaks a list of items into chunks of a specific size and yields T items.
         /// </summary>
         /// <param name="source">Source list.</param>
         /// <param name="chunkSize">Chunk size.</param>
