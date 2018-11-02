@@ -14,7 +14,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <copyright>(c) Saritasa, 2016-2018</copyright>
     <tags>uow repository domain ef6 objectcontext dbcontext</tags>
-    <repository type="git" url="https://github.com/Saritasa/SaritasaTools" />
+    <repository type="git" url="https://github.com/Saritasa/SaritasaTools" commit="$(CommitHash)" />
     <dependencies>
       <group targetFramework="netstandard1.6">
         <dependency id="System.Linq.Queryable" version="4.3.0" exclude="Build,Analyzers" />
@@ -30,7 +30,8 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="bin\Release\**\Saritasa.Tools.Common*.dll" target="lib" />
+    <file src="bin\Release\**\Saritasa.Tools.Common.dll" target="lib" />
+    <file src="bin\Release\**\Saritasa.Tools.Common.pdb" target="lib" />
     <file src="bin\Release\**\Saritasa.Tools.Common.xml" target="lib" />
   </files>
 </package>

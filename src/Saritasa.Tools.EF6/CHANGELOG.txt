@@ -1,5 +1,6 @@
 ﻿0.5.0 [TBD]
 [-] Remove IsolationLevel parameter from IUnitOfWorkFactory.
+[+] SourceLink support.
 
 0.4.0 [2017-08-13]
 [*] Repository class update according latest domain interface.

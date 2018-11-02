@@ -14,7 +14,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <copyright>(c) Saritasa, 2016-2018</copyright>
     <tags>email emails smtp</tags>
-    <repository type="git" url="https://github.com/Saritasa/SaritasaTools" />
+    <repository type="git" url="https://github.com/Saritasa/SaritasaTools" commit="$(CommitHash)" />
     <dependencies>
       <group targetFramework="net452" />
       <group targetFramework="netstandard2.0">
@@ -23,7 +23,8 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="bin\Release\**\Saritasa.Tools.Emails*.dll" target="lib" />
+    <file src="bin\Release\**\Saritasa.Tools.Emails.dll" target="lib" />
+    <file src="bin\Release\**\Saritasa.Tools.Emails.pdb" target="lib" />
     <file src="bin\Release\**\Saritasa.Tools.Emails.xml" target="lib" />
   </files>
 </package>

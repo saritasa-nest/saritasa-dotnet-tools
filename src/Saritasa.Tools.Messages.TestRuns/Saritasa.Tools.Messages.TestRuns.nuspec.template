@@ -14,6 +14,7 @@
     <summary>Test runs for pipelines.</summary>
     <copyright>(c) Saritasa, 2017-2018</copyright>
     <tags>pipeline testrun</tags>
+    <repository type="git" url="https://github.com/Saritasa/SaritasaTools" commit="$(CommitHash)" />
     <dependencies>
       <group targetFramework="net452">
         <dependency id="Saritasa.Tools.Messages.Abstractions" version="[0.3.0, )" />
@@ -25,7 +26,8 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="bin\Release\**\Saritasa.Tools.Messages.TestRuns*.dll" target="lib" />
+    <file src="bin\Release\**\Saritasa.Tools.Messages.TestRuns.dll" target="lib" />
+    <file src="bin\Release\**\Saritasa.Tools.Messages.TestRuns.pdb" target="lib" />
     <file src="bin\Release\**\Saritasa.Tools.Messages.TestRuns.xml" target="lib" />
   </files>
 </package>

@@ -3,6 +3,7 @@
 [+] Add Exponential Backoff Normalized delay retry strategy to flow utils.
 [*] Parameter firstFastRetry now adds extra attempt.
 [-] Drop netstandard 1.2 support.
+[+] SourceLink support.
 
 0.4.8 [2018-07-12]
 [+] Add DictionaryUtils.GetValueOrDefault and DictionaryUtils.GetValuesOrDefault for NameValueCollection.

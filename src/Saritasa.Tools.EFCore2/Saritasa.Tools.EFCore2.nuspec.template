@@ -14,7 +14,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <copyright>(c) Saritasa, 2016-2018</copyright>
     <tags>uow repository domain efcore dbcontext</tags>
-    <repository type="git" url="https://github.com/Saritasa/SaritasaTools" />
+    <repository type="git" url="https://github.com/Saritasa/SaritasaTools" commit="$(CommitHash)" />
     <dependencies>
       <group targetFramework="net461">
         <dependency id="Microsoft.EntityFrameworkCore" version="[2.0.0, )" />
@@ -31,7 +31,8 @@
     </frameworkAssemblies>
   </metadata>
   <files>
-    <file src="bin\Release\**\Saritasa.Tools.EFCore2*.dll" target="lib" />
+    <file src="bin\Release\**\Saritasa.Tools.EFCore2.dll" target="lib" />
+    <file src="bin\Release\**\Saritasa.Tools.EFCore2.pdb" target="lib" />
     <file src="bin\Release\**\Saritasa.Tools.EFCore2.xml" target="lib" />
   </files>
 </package>

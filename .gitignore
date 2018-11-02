@@ -139,3 +139,4 @@ bundles
 sonar-project.properties
 *.targets
 *.bak
+*.nuspec

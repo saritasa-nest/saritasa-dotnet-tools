@@ -1,4 +1,7 @@
-﻿1.0.0 [2018-09-28]
+﻿1.0.1 [TBD]
+[+] SourceLink support.
+
+1.0.0 [2018-09-28]
 [*] Make IEmailInterceptor interface async.
 [*] Introduce cancellation token to IEmailSender.
 [*] Comments update.

@@ -43,6 +43,7 @@ Task pack -depends download-nuget, clean -description `
 {
     $revcount = &'git' @('rev-list', '--all', '--count') | Out-String | ForEach-Object { $_ -replace [Environment]::NewLine, '' }
     $hash = &'git' @('log', '--pretty=format:%h', '-n', '1') | Out-String | ForEach-Object { $_ -replace [Environment]::NewLine, '' }
+    $longHash = &'git' @('rev-parse', 'HEAD') | Out-String | ForEach-Object { $_ -replace [Environment]::NewLine, '' }
     foreach ($package in $packages)
     {
         # Format versions.
@@ -62,6 +63,11 @@ Task pack -depends download-nuget, clean -description `
         # Build.
         &dotnet restore ".\src\$package"
         &dotnet build ".\src\$package" --configuration release
+
+        # Prepare nuspec file.
+        Copy-Item ".\src\$package\$package.nuspec.template" ".\src\$package\$package.nuspec" -Force
+        Update-VariablesInFile -Path ".\src\$package\$package.nuspec" `
+            -Variables @{ CommitHash = $longHash }
 
         # Pack.
         $assemblyVersion = GetVersion($package)

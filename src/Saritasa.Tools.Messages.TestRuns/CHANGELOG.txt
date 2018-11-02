@@ -1,4 +1,7 @@
-﻿0.2.1 [2017-12-23]
+﻿0.2.2 [TBD]
+[+] SourceLink support.
+
+0.2.1 [2017-12-23]
 [+] Add fail step number to TestRunRunner.
 [+] Add TestRunResult assert method. It generates TestRunException exception in case of fail run.
 
