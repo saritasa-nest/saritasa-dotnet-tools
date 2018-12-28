@@ -19,7 +19,9 @@ namespace Saritasa.Tools.Emails
         public Task ExecuteAsync(Func<MailMessage, NameValueDict, Task> handler, MailMessage message,
             NameValueDict data, CancellationToken cancellationToken)
         {
-            return handler(message, data);
+            var task = handler(message, data);
+            task.ConfigureAwait(false);
+            return task;
         }
     }
 }

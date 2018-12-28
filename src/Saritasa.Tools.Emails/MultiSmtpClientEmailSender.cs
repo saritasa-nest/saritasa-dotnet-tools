@@ -90,7 +90,9 @@ namespace Saritasa.Tools.Emails
 
             lock (@lock)
             {
-                return GetNextClient().SendAsyncInternal(message, data);
+                var task = GetNextClient().SendAsyncInternal(message, data);
+                task.ConfigureAwait(false);
+                return task;
             }
         }
 

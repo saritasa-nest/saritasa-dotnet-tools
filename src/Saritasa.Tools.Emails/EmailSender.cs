@@ -39,7 +39,7 @@ namespace Saritasa.Tools.Emails
             // Run pre-process interceptors.
             foreach (var interceptor in interceptors)
             {
-                await interceptor.SendingAsync(message, data, ref cancel, cancellationToken);
+                await interceptor.SendingAsync(message, data, ref cancel, cancellationToken).ConfigureAwait(false);
                 if (cancel)
                 {
                     return;
@@ -47,11 +47,11 @@ namespace Saritasa.Tools.Emails
             }
 
             // Send email and run post process interceptors.
-            await ExecutionStrategy.ExecuteAsync(Process, message, data, cancellationToken);
+            await ExecutionStrategy.ExecuteAsync(Process, message, data, cancellationToken).ConfigureAwait(false);
 
             foreach (var interceptor in interceptors)
             {
-                await interceptor.SentAsync(message, data, cancellationToken);
+                await interceptor.SentAsync(message, data, cancellationToken).ConfigureAwait(false);
             }
         }
 

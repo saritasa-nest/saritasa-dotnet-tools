@@ -12,8 +12,8 @@ using System.Threading.Tasks;
 namespace Saritasa.Tools.Emails
 {
     /// <summary>
-    /// Send email using SmtpClient. The class is thread safe and allows multiple calls
-    /// of SendAsync method.
+    /// Send email using <see cref="SmtpClient" />. The class is thread safe and allows
+    /// concurrent use of SendAsync method.
     /// </summary>
     public class SmtpClientEmailSender : EmailSender, IDisposable
     {
@@ -73,6 +73,12 @@ namespace Saritasa.Tools.Emails
         /// </summary>
         public TimeSpan MinDelay { get; } = TimeSpan.Zero;
 
+        /// <summary>
+        /// Use Send method instead of SendMailAsync. When <c>true</c> the calling
+        /// thread will be blocked.
+        /// </summary>
+        public bool UseSyncMode { get; set; }
+
         private DateTime lastSendTime = DateTime.Now;
 
         /// <summary>
@@ -131,7 +137,16 @@ namespace Saritasa.Tools.Emails
             {
                 throw new EmailQueueExceededException(MaxQueueSize);
             }
-            ProcessInternal();
+
+            if (UseSyncMode)
+            {
+                ProcessInternalSync();
+            }
+            else
+            {
+                ProcessInternal();
+            }
+
             return messageTask.TaskCompletionSource.Task;
         }
 
@@ -149,10 +164,11 @@ namespace Saritasa.Tools.Emails
         {
             /*
              * Lock should be used since there possible race condition when we check isBusy field
-             * and set if to true. If another thread sends email and isBusy is true no need to
+             * and set it to true. If another thread sends email and isBusy is true then no need to
              * actually call Client.SendMailAsync() since it means that OnEmailSent will be called later and
-             * ProcessInternal will be called anyway. Because actual email sending can be delayed we return to user
-             * our own Task and sync its status with on is returned by Client.SendMailAsync() call.
+             * ProcessInternal will be called anyway. Because actual email sending can be delayed we return
+             * to user our own Task and sync its status with one that is returned by Client.SendMailAsync()
+             * call.
              * */
             lock (@lock)
             {
@@ -190,12 +206,43 @@ namespace Saritasa.Tools.Emails
                             {
                                 messageTask.TaskCompletionSource.SetResult(true);
                             }
-                        });
+                        })
+                        .ConfigureAwait(false);
                     }
                     catch (Exception)
                     {
                         isBusy = false;
                     }
+                }
+            }
+        }
+
+        private void ProcessInternalSync()
+        {
+            lock (@lock)
+            {
+                if (isBusy || ScheduleDelay())
+                {
+                    return;
+                }
+
+                if (queue.TryDequeue(out var messageTask))
+                {
+                    isBusy = true;
+                    lastSendTime = DateTime.Now;
+                    try
+                    {
+                        Client.Send(messageTask.MailMessage);
+                    }
+                    catch (Exception ex)
+                    {
+                        messageTask.TaskCompletionSource.SetException(ex);
+                    }
+                    finally
+                    {
+                        isBusy = false;
+                    }
+                    messageTask.TaskCompletionSource.SetResult(true);
                 }
             }
         }
