@@ -9,12 +9,12 @@ using Saritasa.Tools.Messages.Common;
 namespace Saritasa.Tools.Messages.Events
 {
     /// <summary>
-    /// Event pipeline builder.
+    /// Events pipeline builder.
     /// </summary>
     public class EventPipelineBuilder : BasePipelineBuilder<IEventPipeline>
     {
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="pipeline">Event pipeline.</param>
         public EventPipelineBuilder(IEventPipeline pipeline) : base(pipeline)
@@ -22,7 +22,7 @@ namespace Saritasa.Tools.Messages.Events
         }
 
         /// <summary>
-        /// Add middleware to events pipeline.
+        /// Adds middleware to events pipeline.
         /// </summary>
         /// <param name="middleware">Middleware to add.</param>
         /// <returns>Command pipeline builder.</returns>

@@ -11,14 +11,14 @@ namespace Saritasa.Tools.Messages.Common
     public interface IObjectSerializer
     {
         /// <summary>
-        /// Serialize object.
+        /// Serializes object.
         /// </summary>
         /// <param name="obj">Object.</param>
         /// <returns>Serialized to bytes object.</returns>
         byte[] Serialize(object obj);
 
         /// <summary>
-        /// Deserialized bytes to object of given type.
+        /// Deserializes bytes to object of given type.
         /// </summary>
         /// <param name="bytes">Bytes.</param>
         /// <param name="type">Type of object.</param>

@@ -14,7 +14,7 @@ using Saritasa.Tools.Messages.Internal;
 namespace Saritasa.Tools.Messages.Common.Repositories
 {
     /// <summary>
-    /// Csv file target.
+    /// The repository stores messages to CSV files.
     /// </summary>
     public class CsvFileMessageRepository : BaseFileRepository, IMessageRepository, IDisposable
     {
@@ -24,19 +24,19 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
         private const string CsvHeader = "Id,Type,CreatedAt,Status,ContentType,Content,Data,ErrorType,ErrorMessage,ErrorDetails,ExecutionDuration"; // 11
 
-        private char delimeter = ',';
+        private char delimiter = ',';
 
         private byte[] comma = Encoding.UTF8.GetBytes(new[] { ',' });
 
         /// <summary>
-        /// Fields delimeter.
+        /// Fields delimiter.
         /// </summary>
         public char Delimiter
         {
-            get => delimeter;
+            get => delimiter;
             set
             {
-                delimeter = value;
+                delimiter = value;
                 comma = Encoding.UTF8.GetBytes(new[] { value });
             }
         }
@@ -49,10 +49,10 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         public override string FileNameExtension => ".csv";
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="path">Logs path.</param>
-        /// <param name="serializer">Object serializer. By default json serializer is used.</param>
+        /// <param name="serializer">Object serializer. By default JSON serializer is used.</param>
         /// <param name="buffer">Should the output stream be buffered.</param>
         /// <param name="prefix">Files names prefix.</param>
         public CsvFileMessageRepository(

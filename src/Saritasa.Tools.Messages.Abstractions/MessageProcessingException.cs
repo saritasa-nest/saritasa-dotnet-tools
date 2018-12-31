@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -17,21 +17,21 @@ namespace Saritasa.Tools.Messages.Abstractions
     public class MessageProcessingException : Exception
     {
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         public MessageProcessingException() : base("Message processing error.")
         {
         }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         public MessageProcessingException(string message) : base(message)
         {
         }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         public MessageProcessingException(string message, Exception innerException) : base(message, innerException)
         {
@@ -39,7 +39,7 @@ namespace Saritasa.Tools.Messages.Abstractions
 
 #if NET452
         /// <summary>
-        /// .ctor for deserialization.
+        /// Constructor for deserialization.
         /// </summary>
         /// <param name="info">Stores all the data needed to serialize or deserialize an object.</param>
         /// <param name="context">Describes the source and destination of a given serialized stream,

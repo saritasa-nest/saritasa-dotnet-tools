@@ -7,12 +7,12 @@ using Saritasa.Tools.Messages.Abstractions;
 namespace Saritasa.Tools.Messages.Common
 {
     /// <summary>
-    /// Endpoint to enter messages to system.
+    /// Endpoint to send messages into system.
     /// </summary>
     public interface IMessageEndpoint
     {
         /// <summary>
-        /// Register pipelines to accept incoming messages.
+        /// Registers pipelines to accept incoming messages.
         /// </summary>
         /// <param name="container">Pipelines container.</param>
         void RegisterPipelines(IMessagePipelineContainer container);

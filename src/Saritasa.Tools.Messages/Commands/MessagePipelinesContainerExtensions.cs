@@ -9,12 +9,12 @@ using Saritasa.Tools.Messages.Abstractions.Commands;
 namespace Saritasa.Tools.Messages.Commands
 {
     /// <summary>
-    /// Message pipeline container pipeline extensions.
+    /// Message pipeline container pipeline extensions for commands.
     /// </summary>
     public static class MessagePipelinesContainerExtensions
     {
         /// <summary>
-        /// Add command pipeline feature to message context.
+        /// Adds command pipeline feature to message context.
         /// </summary>
         /// <param name="messagePipelineContainer">Message pipelines container.</param>
         /// <returns>Command pipeline builder.</returns>
@@ -22,8 +22,9 @@ namespace Saritasa.Tools.Messages.Commands
         {
             if (messagePipelineContainer.Pipelines.Any(p => p is ICommandPipeline))
             {
-                throw new InvalidOperationException("Command pipeline already exists in global context items. " +
-                    "Use RemovePipeline method to clean up existing pipeline.");
+                throw new InvalidOperationException(
+                "Command pipeline already exists in global context items. " +
+                       "Use RemovePipeline method to clean up existing pipeline.");
             }
 
             var commandPipeline = new CommandPipeline();

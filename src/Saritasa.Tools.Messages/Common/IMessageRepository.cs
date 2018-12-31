@@ -10,19 +10,19 @@ using Saritasa.Tools.Messages.Abstractions;
 namespace Saritasa.Tools.Messages.Common
 {
     /// <summary>
-    /// Message repository interface.
+    /// Message repository.
     /// </summary>
     public interface IMessageRepository
     {
         /// <summary>
-        /// Add message.
+        /// Adds message.
         /// </summary>
         /// <param name="messageRecord">Message record.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         Task AddAsync(MessageRecord messageRecord, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Get messages filtered by expression.
+        /// Gets messages filtered by expression.
         /// </summary>
         /// <param name="messageQuery">Query.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
@@ -31,9 +31,9 @@ namespace Saritasa.Tools.Messages.Common
              = default(CancellationToken));
 
         /// <summary>
-        /// Save internal state to dict. The methpd represents the ability of message repository to
-        /// to save its internal state to dictionary. Also type should define static Create
-        /// method to recreate itself from dict.
+        /// Saves internal state to dict. The method represents the ability of message repository to
+        /// to save its internal state into dictionary. The type should define static Create
+        /// method to restore itself from dictionary.
         /// </summary>
         /// <param name="parameters">Parameters dictionary.</param>
         void SaveState(IDictionary<string, string> parameters);

@@ -14,7 +14,7 @@ namespace Saritasa.Tools.Messages.Queries
     public static class MessagePipelinesContainerExtensions
     {
         /// <summary>
-        /// Add query pipeline feature to message context.
+        /// Adds query pipeline feature to message context.
         /// </summary>
         /// <param name="messagePipelineContainer">Pipeline container.</param>
         /// <returns>Query pipeline builder.</returns>
@@ -22,8 +22,9 @@ namespace Saritasa.Tools.Messages.Queries
         {
             if (messagePipelineContainer.Pipelines.Any(p => p is IQueryPipeline))
             {
-                throw new InvalidOperationException("Queries pipeline already exists in global context items. " +
-                                                    "Use RemovePipeline method to clean up existins pipeline.");
+                throw new InvalidOperationException(
+                    "Queries pipeline already exists in global context items. " +
+                           "Use RemovePipeline method to clean up existing pipeline.");
             }
 
             var queryPipeline = new QueryPipeline();

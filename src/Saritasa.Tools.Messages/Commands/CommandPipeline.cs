@@ -9,7 +9,7 @@ using Saritasa.Tools.Messages.Common;
 namespace Saritasa.Tools.Messages.Commands
 {
     /// <summary>
-    /// Commands specific pipeline.
+    /// Commands pipeline.
     /// </summary>
     public class CommandPipeline : MessagePipeline, ICommandPipeline, IMessageRecordConverter
     {

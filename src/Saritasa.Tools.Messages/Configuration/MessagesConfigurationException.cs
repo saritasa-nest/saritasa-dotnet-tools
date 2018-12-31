@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -9,7 +9,7 @@ using System.Runtime.Serialization;
 namespace Saritasa.Tools.Messages.Configuration
 {
     /// <summary>
-    /// Saritasa Tools messages configuration exception.
+    /// Saritasa Tools Messages configuration exception.
     /// </summary>
 #if NET452
     [Serializable]
@@ -17,21 +17,21 @@ namespace Saritasa.Tools.Messages.Configuration
     public class MessagesConfigurationException : Exception
     {
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         public MessagesConfigurationException()
         {
         }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         public MessagesConfigurationException(string message) : base(message)
         {
         }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         public MessagesConfigurationException(string message, Exception innerException) : base(message, innerException)
         {
@@ -39,7 +39,7 @@ namespace Saritasa.Tools.Messages.Configuration
 
 #if NET452
         /// <summary>
-        /// .ctor for deserialization.
+        /// Constructor for deserialization.
         /// </summary>
         /// <param name="info">Stores all the data needed to serialize or deserialize an object.</param>
         /// <param name="context">Describes the source and destination of a given serialized stream,

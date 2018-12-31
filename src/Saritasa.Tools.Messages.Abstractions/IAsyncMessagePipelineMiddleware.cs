@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Saritasa.Tools.Messages.Abstractions
 {
     /// <summary>
-    /// Async pipeline handler to process message. It may change message context.
+    /// Async pipeline handler to process messages. It may change message context.
     /// </summary>
     public interface IAsyncMessagePipelineMiddleware
     {

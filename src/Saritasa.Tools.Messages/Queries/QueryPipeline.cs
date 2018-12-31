@@ -84,9 +84,9 @@ namespace Saritasa.Tools.Messages.Queries
             }
 
             // Format object type name.
-            var typesplit = record.ContentType.Split(','); // type.method, assembly
-            var objectTypeName = typesplit[0].Substring(0, typesplit[0].LastIndexOf(".", StringComparison.Ordinal))
-                + "," + typesplit[1];
+            var typeSplit = record.ContentType.Split(','); // type.method, assembly
+            var objectTypeName = typeSplit[0].Substring(0, typeSplit[0].LastIndexOf(".", StringComparison.Ordinal))
+                + "," + typeSplit[1];
             var objectType = Type.GetType(objectTypeName);
 
             if (objectType == null)
@@ -95,7 +95,7 @@ namespace Saritasa.Tools.Messages.Queries
             }
             var obj = Activator.CreateInstance(objectType, nonPublic: true);
 
-            var methodName = typesplit[0].Substring(typesplit[0].LastIndexOf(".", StringComparison.Ordinal) + 1);
+            var methodName = typeSplit[0].Substring(typeSplit[0].LastIndexOf(".", StringComparison.Ordinal) + 1);
             var method = objectType.GetTypeInfo().GetMethod(methodName);
             if (method == null)
             {

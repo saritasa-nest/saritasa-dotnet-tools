@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -13,7 +13,7 @@ using Saritasa.Tools.Messages.Internal;
 namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
 {
     /// <summary>
-    /// Locates event handler.
+    /// The middleware is to locate event handler.
     /// </summary>
     public class EventHandlerLocatorMiddleware : BaseHandlerLocatorMiddleware,
         IMessagePipelineMiddleware
@@ -38,7 +38,7 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
         }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="assemblies">Assemblies to locate.</param>
         public EventHandlerLocatorMiddleware(params Assembly[] assemblies)
@@ -73,16 +73,16 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
         public void Handle(IMessageContext messageContext)
         {
             // Find handler methods.
-            var eventtype = messageContext.Content.GetType();
+            var eventType = messageContext.Content.GetType();
             if (InternalLogger.IsDebugEnabled)
             {
-                InternalLogger.Debug(string.Format(Properties.Strings.SearchEventHandler, eventtype.Name),
+                InternalLogger.Debug(string.Format(Properties.Strings.SearchEventHandler, eventType.Name),
                     nameof(EventHandlerLocatorMiddleware));
             }
-            var methods = cache.GetOrAdd(eventtype, FindOrCreateMethodHandlers);
+            var methods = cache.GetOrAdd(eventType, FindOrCreateMethodHandlers);
             if (InternalLogger.IsDebugEnabled)
             {
-                DumpFoundMethods(methods, eventtype);
+                DumpFoundMethods(methods, eventType);
             }
 
             messageContext.Items.TryGetValue(HandlerMethodsKey, out object handlersObj);

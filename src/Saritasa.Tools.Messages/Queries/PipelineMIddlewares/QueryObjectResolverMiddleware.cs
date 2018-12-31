@@ -14,7 +14,7 @@ using Saritasa.Tools.Messages.Common;
 namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
 {
     /// <summary>
-    /// Resolve and locate object handler for query.
+    /// The middleware is to resolve and locate object handler for query.
     /// </summary>
     public class QueryObjectResolverMiddleware : BaseHandlerResolverMiddleware,
         IMessagePipelineMiddleware, IAsyncMessagePipelineMiddleware, IMessagePipelinePostAction
@@ -30,7 +30,7 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
         public string Id { get; set; } = nameof(QueryObjectResolverMiddleware);
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="useInternalObjectResolver">Use internal object resolver for handlers.
         /// Otherwise <see cref="IServiceProvider" /> will be used. <c>True</c> by default.</param>
@@ -42,7 +42,7 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
         }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="assemblies">Assemblies to search query handler. Should be used for internal resolver only.</param>
         public QueryObjectResolverMiddleware(params Assembly[] assemblies) : base(useInternalObjectResolver: true)

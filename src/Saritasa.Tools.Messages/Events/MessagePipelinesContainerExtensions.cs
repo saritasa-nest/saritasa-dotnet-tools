@@ -9,12 +9,12 @@ using Saritasa.Tools.Messages.Abstractions.Events;
 namespace Saritasa.Tools.Messages.Events
 {
     /// <summary>
-    /// Event pipeline extensions.
+    /// Events pipeline extensions.
     /// </summary>
     public static class MessagePipelinesContainerExtensions
     {
         /// <summary>
-        /// Add event pipeline feature to message context.
+        /// Adds event pipeline feature to message context.
         /// </summary>
         /// <param name="pipelineContainer">Pipelines container.</param>
         /// <returns>Event pipeline builder.</returns>
@@ -22,8 +22,9 @@ namespace Saritasa.Tools.Messages.Events
         {
             if (pipelineContainer.Pipelines.Any(p => p is IEventPipeline))
             {
-                throw new InvalidOperationException("Events pipeline already exists in global context items. " +
-                                                    "Use RemovePipeline method to clean up existins pipeline.");
+                throw new InvalidOperationException(
+                    "Events pipeline already exists in global context items. " +
+                           "Use RemovePipeline method to clean up existing pipeline.");
             }
 
             var eventPipeline = new EventPipeline();

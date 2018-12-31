@@ -11,19 +11,19 @@ using Saritasa.Tools.Messages.Abstractions;
 namespace Saritasa.Tools.Messages.Common.Repositories
 {
     /// <summary>
-    /// Discards messages. Used mainly for debugging and benchmarking.
+    /// The repository discards messages. To be used for debugging and benchmarking.
     /// </summary>
     public class NullMessageRepository : IMessageRepository
     {
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         public NullMessageRepository()
         {
         }
 
         /// <summary>
-        /// Create repository from dictionary.
+        /// Creates repository from dictionary.
         /// </summary>
         /// <param name="parameters">Properties.</param>
         public NullMessageRepository(IDictionary<string, string> parameters)
@@ -32,7 +32,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
 
         #region IMessageRepository
 
-        static readonly Task<bool> completedTask = Task.FromResult(true);
+        private static readonly Task<bool> completedTask = Task.FromResult(true);
 
         /// <inheritdoc />
         public Task AddAsync(MessageRecord message, CancellationToken cancellationToken = default(CancellationToken))

@@ -14,7 +14,7 @@ using Saritasa.Tools.Messages.Common.ObjectSerializers;
 namespace Saritasa.Tools.Messages.Common.Repositories
 {
     /// <summary>
-    /// Base file repository for file, csv, json formats.
+    /// Base file repository for file, CSV, JSON formats.
     /// </summary>
     public abstract class BaseFileRepository : IMessageRepository
     {
@@ -59,14 +59,14 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         protected object SyncRoot { get; } = new object();
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         protected BaseFileRepository()
         {
         }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="parameters">Dictionary parameters.</param>
         protected BaseFileRepository(IDictionary<string, string> parameters)
@@ -107,7 +107,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <summary>
         /// Save repository state to dictionary.
         /// </summary>
-        /// <param name="parameters">Parameters dicitonary.</param>
+        /// <param name="parameters">Parameters dictionary.</param>
         public virtual void SaveState(IDictionary<string, string> parameters)
         {
             if (parameters == null)

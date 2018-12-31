@@ -8,7 +8,7 @@ using Saritasa.Tools.Messages.Common;
 namespace Saritasa.Tools.Messages.Events
 {
     /// <summary>
-    /// Event pipeline options.
+    /// Events pipeline options.
     /// </summary>
     public class EventPipelineOptions : BaseAssembliesOptions
     {

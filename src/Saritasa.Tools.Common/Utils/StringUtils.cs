@@ -98,7 +98,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Captalize the return word if the parameter is not capitalized.
+        /// Capitalize the return word if the parameter is not capitalized.
         /// For example if word is "Table", then returns "Tables".
         /// The method skips empty or null strings.
         /// </summary>

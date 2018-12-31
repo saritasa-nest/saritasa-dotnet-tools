@@ -27,7 +27,7 @@ namespace Saritasa.Tools.Messages.Queries
         private readonly IMessageContext messageContext;
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="queryPipeline">Query pipeline.</param>
         /// <param name="messageContext">Message context.</param>
@@ -40,7 +40,7 @@ namespace Saritasa.Tools.Messages.Queries
         }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="queryPipeline">Query pipeline.</param>
         /// <param name="messageContext">Message context.</param>
@@ -56,7 +56,7 @@ namespace Saritasa.Tools.Messages.Queries
         }
 
         /// <summary>
-        /// Set no query execution. The default result will be returned in the case.
+        /// Sets no query execution. The default result will be returned in the case.
         /// </summary>
         /// <returns>Query caller.</returns>
         public QueryCaller<TQuery> NoExecution()

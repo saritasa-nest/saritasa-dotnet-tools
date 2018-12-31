@@ -46,7 +46,7 @@ namespace Saritasa.Tools.Messages.Common
         }
 
         /// <summary>
-        /// Execute method. If method is awaitable method will wait for it.
+        /// Executes method. If method is awaitable it will wait for it.
         /// </summary>
         /// <param name="handler">Handler.</param>
         /// <param name="obj">The first argument.</param>
@@ -61,7 +61,7 @@ namespace Saritasa.Tools.Messages.Common
         }
 
         /// <summary>
-        /// Execute method in async mode. Handler should return <see cref="Task" /> otherwise
+        /// Executes method in async mode. Handler should return <see cref="Task" /> otherwise
         /// it will be executed in sync mode.
         /// </summary>
         /// <param name="handler">Async handler.</param>

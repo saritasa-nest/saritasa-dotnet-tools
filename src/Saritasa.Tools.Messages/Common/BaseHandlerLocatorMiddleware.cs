@@ -20,16 +20,16 @@ namespace Saritasa.Tools.Messages.Common
         protected Assembly[] Assemblies { get; set; } = new Assembly[0];
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         protected BaseHandlerLocatorMiddleware()
         {
         }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
-        /// <param name="dict">Input parameters as dict.</param>
+        /// <param name="dict">Input parameters as dictionary.</param>
         protected BaseHandlerLocatorMiddleware(IDictionary<string, string> dict)
         {
             if (dict == null)
@@ -106,7 +106,7 @@ namespace Saritasa.Tools.Messages.Common
         }
 
         /// <summary>
-        /// What method to use to search command handler class.
+        /// The method to use to search command handler class.
         /// </summary>
         public HandlerSearchMethod HandlerSearchMethod
         {

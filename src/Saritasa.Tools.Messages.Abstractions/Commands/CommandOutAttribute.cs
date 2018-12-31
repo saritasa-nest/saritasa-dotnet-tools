@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -6,10 +6,10 @@ using System;
 namespace Saritasa.Tools.Messages.Abstractions.Commands
 {
     /// <summary>
-    /// Marks property as output. Not for processing.
+    /// Marks command property as output. Not for processing.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
-    public class CommandOutAttribute : Attribute
+    public sealed class CommandOutAttribute : Attribute
     {
     }
 }

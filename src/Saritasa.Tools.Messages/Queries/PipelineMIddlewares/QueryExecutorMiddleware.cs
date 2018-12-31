@@ -13,7 +13,7 @@ using Saritasa.Tools.Messages.Common;
 namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
 {
     /// <summary>
-    /// Executes query delegate.
+    /// The middleware is to execute query delegate.
     /// </summary>
     public class QueryExecutorMiddleware : IMessagePipelineMiddleware, IAsyncMessagePipelineMiddleware,
         IMessagePipelinePostAction
@@ -37,7 +37,7 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
         private readonly bool throwExceptionOnFail;
 
         /// <summary>
-        /// Constructor
+        /// Constructor.
         /// </summary>
         /// <param name="throwExceptionOnFail">If there were exception during processing it will be rethrown. Default is <c>true</c>.</param>
         public QueryExecutorMiddleware(bool throwExceptionOnFail = true)

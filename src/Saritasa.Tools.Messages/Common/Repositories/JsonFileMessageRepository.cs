@@ -13,7 +13,8 @@ using Saritasa.Tools.Messages.Common.ObjectSerializers;
 namespace Saritasa.Tools.Messages.Common.Repositories
 {
     /// <summary>
-    /// JSON file target. Write JSON serialized messages separated by new line.
+    /// The repository stores message into JSON files. JSON serialized messages are
+    /// separated by new line.
     /// </summary>
     /// <remarks>
     /// JSON processing utilities can be used to parse files. For example jl-sql (https://github.com/avz/jl-sql), jq.
@@ -26,7 +27,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         public override string FileNameExtension => ".json";
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="path">Logs path.</param>
         /// <param name="buffer">Should the output stream be buffered.</param>
@@ -40,7 +41,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <summary>
-        /// Create repository from dictionary.
+        /// Creates repository from dictionary.
         /// </summary>
         /// <param name="parameters">Parameters dictionary.</param>
         public JsonFileMessageRepository(IDictionary<string, string> parameters) : base(parameters)
@@ -150,7 +151,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <summary>
         /// Dispose pattern implementation.
         /// </summary>
-        /// <param name="disposing">Dispose manage resorces.</param>
+        /// <param name="disposing">Dispose manage resources.</param>
         protected virtual void Dispose(bool disposing)
         {
             if (!disposed)

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -12,7 +12,7 @@ namespace Saritasa.Tools.Messages.Abstractions
     public static partial class MessagePipelineServiceExtensions
     {
         /// <summary>
-        /// Get pipeline of specified type or throw exception.
+        /// Gets pipeline of specified type or throws exception.
         /// </summary>
         /// <typeparam name="T">Type of pipeline.</typeparam>
         /// <param name="pipelineService">Pipelines service.</param>
@@ -29,12 +29,13 @@ namespace Saritasa.Tools.Messages.Abstractions
                     return pipeline;
                 }
             }
-            throw new InvalidOperationException($"Cannot find {typeof(T)} pipeline. Make sure you called correct " +
-                                                " Add{X}Pipeline extension method.");
+            throw new InvalidOperationException(
+                $"Cannot find {typeof(T)} pipeline. Make sure you called correct " +
+                        " Add{X}Pipeline extension method.");
         }
 
         /// <summary>
-        /// Remove pipeline of specified type or throw exception.
+        /// Removes pipeline of specified type or throws exception.
         /// </summary>
         /// <typeparam name="T">Pipeline type.</typeparam>
         /// <param name="pipelinesService">Pipelines service.</param>

@@ -10,15 +10,15 @@ using Saritasa.Tools.Messages.Abstractions.Commands;
 namespace Saritasa.Tools.Messages.Abstractions
 {
     /// <summary>
-    /// Command pipeline extensions.
+    /// Commands pipeline extensions.
     /// </summary>
     public static partial class MessagePipelineServiceExtensions
     {
         /// <summary>
-        /// Handle command within message context.
+        /// Handles command within message context.
         /// </summary>
         /// <param name="pipelineService">Pipelines service.</param>
-        /// <param name="command">Command to execute.</param>
+        /// <param name="command">Command to handle.</param>
         /// <returns>Message context used in execution.</returns>
         public static IMessageContext HandleCommand(this IMessagePipelineService pipelineService, object command)
         {
@@ -29,10 +29,10 @@ namespace Saritasa.Tools.Messages.Abstractions
         }
 
         /// <summary>
-        /// Handle command within message context with additional parameter.
+        /// Handles command within message context with additional parameter.
         /// </summary>
         /// <param name="pipelineService">Pipelines service.</param>
-        /// <param name="command">Command to execute.</param>
+        /// <param name="command">Command to handle.</param>
         /// <param name="param">Additional parameter to provide for middleware.</param>
         /// <returns>Message context used in execution.</returns>
         public static IMessageContext HandleCommand(this IMessagePipelineService pipelineService, object command,
@@ -49,10 +49,10 @@ namespace Saritasa.Tools.Messages.Abstractions
         }
 
         /// <summary>
-        /// Handle command within message context with additional parameter.
+        /// Handles async command within message context with additional parameter.
         /// </summary>
         /// <param name="pipelineService">Pipelines service.</param>
-        /// <param name="command">Command to execute.</param>
+        /// <param name="command">Command to handle.</param>
         /// <param name="param">Additional parameter to provide for middleware.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>Message context used in execution.</returns>
@@ -70,10 +70,10 @@ namespace Saritasa.Tools.Messages.Abstractions
         }
 
         /// <summary>
-        /// Handle command within message context.
+        /// Handles async command within message context.
         /// </summary>
         /// <param name="pipelineService">Pipelines service.</param>
-        /// <param name="command">Command to execute.</param>
+        /// <param name="command">Command to handle.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>Message context used in execution.</returns>
         public static async Task<IMessageContext> HandleCommandAsync(this IMessagePipelineService pipelineService,

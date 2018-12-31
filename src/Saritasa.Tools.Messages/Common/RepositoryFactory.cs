@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -14,10 +14,10 @@ namespace Saritasa.Tools.Messages.Common
     public static class RepositoryFactory
     {
         /// <summary>
-        /// Create repository by type name and parameters.
+        /// Creates repository by type name and parameters.
         /// </summary>
         /// <param name="typeName">Type name.</param>
-        /// <param name="parameters">Parameters dicionary.</param>
+        /// <param name="parameters">Parameters dictionary.</param>
         /// <returns>Message repository.</returns>
         public static IMessageRepository CreateFromTypeName(string typeName, IDictionary<string, string> parameters)
         {
@@ -47,7 +47,8 @@ namespace Saritasa.Tools.Messages.Common
                 : ctor.Invoke(new object[] { }) as IMessageRepository;
             if (repository == null)
             {
-                throw new InvalidOperationException($"Cannot instaniate repository {repositoryType.Name}.");
+                throw new InvalidOperationException(
+                    $"Cannot instantiate repository {repositoryType.Name}.");
             }
             return repository;
         }

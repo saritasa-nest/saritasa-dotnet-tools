@@ -12,19 +12,19 @@ namespace Saritasa.Tools.Messages.Abstractions
     public static class MessageContextConstants
     {
         /// <summary>
-        /// Specifies key to be used in items to determine what pipeline
+        /// Specifies the key to be used in items to determine what pipeline
         /// should be used to process message.
         /// </summary>
         public const string TypeKey = ".type";
 
         /// <summary>
-        /// Specifies key to be used in items to get user key/value
-        /// dictionary with additional processing data. For key/value use <see cref="string" /> type.
+        /// Specifies the key to be used in items to get user key/value
+        /// dictionary with additional processing data. For key/value <see cref="string" /> type is used.
         /// </summary>
         public const string DataKey = ".data";
 
         /// <summary>
-        /// Additional parameter provided for middleware for handling.
+        /// Additional parameter for middleware to handle.
         /// </summary>
         public const string ParamKey = ".param";
 
@@ -65,14 +65,20 @@ namespace Saritasa.Tools.Messages.Abstractions
         public const byte MessageTypeEvent = 3;
 
         /// <summary>
-        /// Dictionary that maps message type to string code.
+        /// Info type. Reserved.
+        /// </summary>
+        public const byte MessageTypeInfo = 4;
+
+        /// <summary>
+        /// Dictionary that maps message types to string codes.
         /// </summary>
         public static readonly IDictionary<byte, string> MessageTypeCodes = new Dictionary<byte, string>
         {
             [MessageTypeUnknown] = "unknown",
             [MessageTypeCommand] = "command",
             [MessageTypeQuery] = "query",
-            [MessageTypeEvent] = "event"
+            [MessageTypeEvent] = "event",
+            [MessageTypeInfo] = "info"
         };
     }
 }

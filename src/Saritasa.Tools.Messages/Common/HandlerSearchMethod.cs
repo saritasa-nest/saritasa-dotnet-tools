@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2016, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Messages.Common
@@ -9,7 +9,7 @@ namespace Saritasa.Tools.Messages.Common
     public enum HandlerSearchMethod
     {
         /// <summary>
-        /// The handlers class should be decorated with attrbite CommandHandlers, EventHandlers, etc.
+        /// The handlers class should be decorated with attribute CommandHandlers, EventHandlers, etc.
         /// </summary>
         ClassAttribute,
 

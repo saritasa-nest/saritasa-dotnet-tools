@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -36,7 +36,7 @@ namespace Saritasa.Tools.Messages.Internal
         /// <typeparam name="TValue">Dictionary value type.</typeparam>
         /// <param name="target">Target dictionary.</param>
         /// <param name="key">Key.</param>
-        /// <param name="action">Action to execure if key not exists..</param>
+        /// <param name="action">Action to execute if key is not presented.</param>
         public static TValue GetValueOrInvoke<TKey, TValue>(
             this IDictionary<TKey, TValue> target,
             TKey key,

@@ -31,7 +31,7 @@ namespace Saritasa.Tools.Messages.Common
         protected bool UseInternalObjectResolver { get; set; }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="useInternalObjectResolver">Use internal object resolver for handlers.
         /// Otherwise <see cref="IServiceProvider" /> will be used.</param>

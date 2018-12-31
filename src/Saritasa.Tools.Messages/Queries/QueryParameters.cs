@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -7,9 +7,9 @@ using System.Reflection;
 namespace Saritasa.Tools.Messages.Queries
 {
     /// <summary>
-    /// Query execution context.
+    /// Query execution context parameters.
     /// </summary>
-    public class QueryParameters
+    internal class QueryParameters
     {
         /// <summary>
         /// Execution result.
@@ -22,7 +22,7 @@ namespace Saritasa.Tools.Messages.Queries
         protected internal MethodInfo Method { get; set; }
 
         /// <summary>
-        /// Query object the delegate will be executed against.
+        /// Query object. The delegate will be executed against it.
         /// </summary>
         protected internal object QueryObject { get; set; }
 

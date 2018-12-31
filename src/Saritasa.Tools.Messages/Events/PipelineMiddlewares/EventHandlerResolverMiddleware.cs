@@ -9,7 +9,7 @@ using Saritasa.Tools.Messages.Internal;
 namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
 {
     /// <summary>
-    /// Resolve event handlers.
+    /// The middleware is to resolve event handlers.
     /// </summary>
     public class EventHandlerResolverMiddleware : BaseHandlerResolverMiddleware,
         IMessagePipelineMiddleware, IMessagePipelinePostAction

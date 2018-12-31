@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Messages.Abstractions
@@ -9,28 +9,28 @@ namespace Saritasa.Tools.Messages.Abstractions
     public enum ProcessingStatus : byte
     {
         /// <summary>
-        /// Default command state.
+        /// Initial state.
         /// </summary>
         NotInitialized,
 
         /// <summary>
-        /// The command in a processing state.
+        /// The message is being processing.
         /// </summary>
         Processing,
 
         /// <summary>
-        /// Command has been completed.
+        /// Message processing has been completed.
         /// </summary>
         Completed,
 
         /// <summary>
-        /// Command has been failed while execution. Mostly exception occurred
+        /// Message processing has been failed during execution. There is exception occurred
         /// in handler.
         /// </summary>
         Failed,
 
         /// <summary>
-        /// Command has been rejected. It may be validation error.
+        /// Message has been rejected. For example it may be validation error.
         /// </summary>
         Rejected
     }

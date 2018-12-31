@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -13,7 +13,7 @@ using Saritasa.Tools.Messages.Internal;
 namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
 {
     /// <summary>
-    /// Locate command handler.
+    /// The middleware is to locate command handler.
     /// </summary>
     public class CommandHandlerLocatorMiddleware : BaseHandlerLocatorMiddleware, IMessagePipelineMiddleware
     {
@@ -40,7 +40,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         public CommandHandlerLocatorMiddleware()
         {
@@ -49,7 +49,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="assemblies">Assemblies to locate.</param>
         public CommandHandlerLocatorMiddleware(params Assembly[] assemblies)
@@ -63,7 +63,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         }
 
         /// <summary>
-        /// Prefills command handlers. We cannot do it in runtime because there can be race conditions
+        /// Prefill command handlers. We cannot do it in runtime because there can be race conditions
         /// during initialization. Much simple just do that once on application start.
         /// </summary>
         protected override void Initialize()

@@ -38,12 +38,12 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         private readonly string accountDomain;
 
         /// <summary>
-        /// Json serializer.
+        /// JSON serializer.
         /// </summary>
         private readonly JsonObjectSerializer serializer = new JsonObjectSerializer();
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="token">Customer token.</param>
         public LogglyMessageRepository(string token)
@@ -59,7 +59,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="token">Customer token.</param>
         /// <param name="username">Customer username.</param>
@@ -101,8 +101,9 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                 if (!dict.ContainsKey(nameof(token)) || !dict.ContainsKey(nameof(username))
                     || !dict.ContainsKey(nameof(password)) || !dict.ContainsKey(nameof(accountDomain)))
                 {
-                    throw new ArgumentException($"No required parameters: {nameof(token)}," +
-                                                $"{nameof(username)}, {nameof(password)}, {nameof(accountDomain)}", nameof(dict));
+                    throw new ArgumentException(
+                        $"No required parameters: {nameof(token)}," +
+                               $"{nameof(username)}, {nameof(password)}, {nameof(accountDomain)}", nameof(dict));
                 }
                 this.token = dict[nameof(token)];
                 this.username = dict[nameof(username)];

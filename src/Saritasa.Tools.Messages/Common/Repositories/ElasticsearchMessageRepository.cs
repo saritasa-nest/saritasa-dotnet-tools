@@ -40,7 +40,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         private readonly string uri;
 
         /// <summary>
-        /// Json serializer.
+        /// JSON serializer.
         /// </summary>
         private readonly JsonObjectSerializer serializer;
 
@@ -50,7 +50,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         private HttpClient client = new HttpClient();
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="uri">Uri to Elastictsearch service.</param>
         public ElasticsearchMessageRepository(string uri)
@@ -64,7 +64,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="uri">Uri to Elastictsearch service.</param>
         /// <param name="indexName">Index name.</param>
@@ -85,7 +85,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <summary>
-        /// Create repository from dictionary.
+        /// Creates repository from dictionary.
         /// </summary>
         /// <param name="parameters">Parameters dictionary.</param>
         public ElasticsearchMessageRepository(IDictionary<string, string> parameters) :

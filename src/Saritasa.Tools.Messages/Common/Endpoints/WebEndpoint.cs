@@ -17,7 +17,7 @@ using Saritasa.Tools.Messages.Internal;
 namespace Saritasa.Tools.Messages.Common.Endpoints
 {
     /// <summary>
-    /// Web endpoint. Allows to send messages directly to application. Must be POST request.
+    /// Web endpoint that allows to send messages directly to application. There must be POST requests.
     /// Sample:
     /// POST http://localhost:26025/query/ZergRushCo.Todosya.Domain.Tasks.Queries.ProjectsQueries.GetByUser
     /// {"userId":2,"page":1,"pageSize":10}
@@ -62,7 +62,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
         private static readonly IObjectSerializer serializer = new ObjectSerializers.JsonObjectSerializer();
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// <param name="serviceProviderFactory">Service provider factory.</param>
         /// <param name="address">Address to bind, loopback by default.</param>
         /// <param name="port">TCP port. By default 26025.</param>
@@ -90,7 +90,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
         }
 
         /// <summary>
-        /// Start TCP port listening.
+        /// Starts TCP port listening.
         /// </summary>
         public virtual void Start()
         {
@@ -125,7 +125,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
         }
 
         /// <summary>
-        /// Stop listening. Need to wait for last executing message.
+        /// Stops listening. Need to wait for last executing message.
         /// <param name="wait">Wait when all handlers will be stopped.</param>
         /// </summary>
         public virtual void Stop(bool wait = false)
@@ -359,7 +359,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
             this.pipelines = container.Pipelines;
         }
 
-#region Dispose
+        #region Dispose
 
         bool disposed;
 
@@ -402,7 +402,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
             GC.SuppressFinalize(this);
         }
 
-#endregion
+        #endregion
     }
 }
 #endif

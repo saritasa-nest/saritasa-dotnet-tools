@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -52,14 +52,14 @@ namespace Saritasa.Tools.Messages.Common
         public IDictionary<object, object> Items { get; set; } = new Dictionary<object, object>();
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         public MessageContext()
         {
         }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="pipelineService">Pipeline service the context will be related to.</param>
         public MessageContext(IMessagePipelineService pipelineService)
@@ -72,7 +72,7 @@ namespace Saritasa.Tools.Messages.Common
         }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="pipelineService">Pipeline service the context will be related to.</param>
         /// <param name="content">Content to process.</param>

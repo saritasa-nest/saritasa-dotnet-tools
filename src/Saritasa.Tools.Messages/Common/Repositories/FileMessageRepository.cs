@@ -14,7 +14,7 @@ using Saritasa.Tools.Messages.Common.ObjectSerializers;
 namespace Saritasa.Tools.Messages.Common.Repositories
 {
     /// <summary>
-    /// Store messages to files.
+    /// The repository stores messages to files.
     /// </summary>
     public class FileMessageRepository : BaseFileRepository, IMessageRepository, IDisposable
     {

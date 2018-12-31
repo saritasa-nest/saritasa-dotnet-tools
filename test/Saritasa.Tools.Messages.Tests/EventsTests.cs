@@ -210,6 +210,7 @@ namespace Saritasa.Tools.Messages.Tests
 
             // Assert
             Assert.Equal(cts.Token, ev.CancellationToken);
+            cts.Dispose();
         }
 
         #endregion

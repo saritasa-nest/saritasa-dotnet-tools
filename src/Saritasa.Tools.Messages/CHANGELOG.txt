@@ -1,4 +1,4 @@
-﻿0.6.0 [TBD]
+﻿0.6.0 [2018-12-31]
 [*] Update ContentType and ErrorType compare logic for repositories.
 [*] Update message query filter logic.
 [+] New message query string constructor.
@@ -8,6 +8,7 @@
 [*] Improve query method parameters evaluation.
 [*] Other small bugfixes.
 [+] SourceLink support.
+[*] Comments update.
 
 0.5.4 [2018-06-22]
 [*] Fix WithAsync query pipeline call for GetAwaiter.

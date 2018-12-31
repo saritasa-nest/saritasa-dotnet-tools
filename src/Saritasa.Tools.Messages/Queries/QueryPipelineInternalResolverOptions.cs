@@ -18,7 +18,7 @@ namespace Saritasa.Tools.Messages.Queries
         public IList<Assembly> Assemblies { get; set; } = new List<Assembly>();
 
         /// <summary>
-        /// Set assemblies as params.
+        /// Sets assemblies.
         /// </summary>
         /// <param name="assemblies">Assemblies to set.</param>
         public void SetAssemblies(params Assembly[] assemblies)
@@ -27,7 +27,7 @@ namespace Saritasa.Tools.Messages.Queries
         }
 
         /// <summary>
-        /// Assemblies are defined.
+        /// Whether assemblies are defined.
         /// </summary>
         internal bool HasAssemblies => Assemblies != null && Assemblies.Count > 0;
     }

@@ -10,7 +10,7 @@
     <projectUrl>https://github.com/Saritasa/SaritasaTools</projectUrl>
     <iconUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>The package is a part of Saritasa Tools project. Saritasa.Tools.Messages.Abstractions contains CQRS infrastructure abstractions that includes command, queryies and events.</description>
+    <description>The package is a part of Saritasa Tools project. Saritasa.Tools.Messages.Abstractions contains CQRS infrastructure abstractions that includes command, queries and events.</description>
     <summary>CQRS infrastructure abstractions.</summary>
     <copyright>(c) Saritasa, 2016-2018</copyright>
     <tags>cqrs cqs commands queries events pipeline</tags>

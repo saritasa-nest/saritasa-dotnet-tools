@@ -29,7 +29,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         private static readonly Task<bool> completedTask = Task.FromResult(true);
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         public InMemoryMessageRepository()
         {
@@ -37,7 +37,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="parameters">Parameters dictionary.</param>
         public InMemoryMessageRepository(IDictionary<string, string> parameters) : this()
@@ -73,7 +73,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <summary>
-        /// Dump messages into string.
+        /// Dumps messages into string.
         /// </summary>
         /// <returns>String with data.</returns>
         public string Dump()
@@ -88,7 +88,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <summary>
-        /// Create repository from dictionary.
+        /// Creates repository from dictionary.
         /// </summary>
         /// <param name="dict">Properties.</param>
         /// <returns>Message repository.</returns>

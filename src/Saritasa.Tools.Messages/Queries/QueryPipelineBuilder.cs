@@ -15,7 +15,7 @@ namespace Saritasa.Tools.Messages.Queries
     public class QueryPipelineBuilder : BasePipelineBuilder<IQueryPipeline>
     {
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="pipeline">Query pipeline.</param>
         public QueryPipelineBuilder(IQueryPipeline pipeline) : base(pipeline)
@@ -23,10 +23,10 @@ namespace Saritasa.Tools.Messages.Queries
         }
 
         /// <summary>
-        /// Add middleware to events pipeline.
+        /// Adds middleware to query pipeline.
         /// </summary>
         /// <param name="middleware">Middleware to add.</param>
-        /// <returns>Command pipeline builder.</returns>
+        /// <returns>Query pipeline builder.</returns>
         public QueryPipelineBuilder AddMiddleware(IMessagePipelineMiddleware middleware)
         {
             Pipeline.AddMiddlewares(middleware);
@@ -57,7 +57,8 @@ namespace Saritasa.Tools.Messages.Queries
             }
             if (options.InternalResolver.UseHandlerParametersResolve)
             {
-                throw new InvalidOperationException("Handler method parameters resolve does not work for query pipeline.");
+                throw new InvalidOperationException(
+                    "Handler method parameters resolve does not work for query pipeline.");
             }
 
             // If assemblies were provided that means we use internal object resolver.

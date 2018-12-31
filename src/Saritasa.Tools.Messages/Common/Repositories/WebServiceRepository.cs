@@ -15,7 +15,7 @@ using Saritasa.Tools.Messages.Internal;
 namespace Saritasa.Tools.Messages.Common.Repositories
 {
     /// <summary>
-    /// Send or get messages from remote web endpoint.
+    /// The repository sends or receives messages to/from remote web endpoint.
     /// </summary>
     public class WebServiceRepository : IMessageRepository
     {
@@ -28,7 +28,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         private readonly JsonObjectSerializer serializer = new JsonObjectSerializer();
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         public WebServiceRepository()
         {
@@ -37,9 +37,9 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
-        /// <param name="uri">Uri to send messages.</param>
+        /// <param name="uri">URI to send messages.</param>
         public WebServiceRepository(string uri)
         {
             if (string.IsNullOrWhiteSpace(uri))
@@ -51,7 +51,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="parameters">Parameters dictionary.</param>
         public WebServiceRepository(IDictionary<string, string> parameters)

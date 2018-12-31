@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -44,13 +44,13 @@ namespace Saritasa.Tools.Messages.Abstractions
         Exception FailException { get; set; }
 
         /// <summary>
-        /// Current processing pipeline or null.
+        /// Current processing pipeline.
         /// </summary>
         IMessagePipeline Pipeline { get; set; }
 
         /// <summary>
         /// Local key/value collection of objects that are shared across current message scope.
-        /// Expect that dictionary implementation can not be thread safe.
+        /// Expects that dictionary implementation may not be thread safe.
         /// </summary>
         IDictionary<object, object> Items { get; set; }
     }

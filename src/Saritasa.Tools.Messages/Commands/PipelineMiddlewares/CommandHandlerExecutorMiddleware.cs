@@ -13,7 +13,7 @@ using Saritasa.Tools.Messages.Internal;
 namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
 {
     /// <summary>
-    /// Default command executor. It does not process commands with Rejected status.
+    /// Default command executor. Rejected commands are not processed.
     /// </summary>
     public class CommandHandlerExecutorMiddleware : BaseHandlerExecutorMiddleware,
         IMessagePipelineMiddleware, IAsyncMessagePipelineMiddleware
@@ -24,7 +24,7 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         public string Id { get; set; } = nameof(CommandHandlerExecutorMiddleware);
 
         /// <summary>
-        /// Include execution duration.
+        /// Include execution duration into processing result.
         /// </summary>
         public bool IncludeExecutionDuration { get; set; } = true;
 
@@ -43,8 +43,9 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             var handler = messageContext.GetItemByKeyOrDefault(BaseHandlerResolverMiddleware.HandlerObjectKey);
             if (handlerMethod == null || handler == null)
             {
-                throw new InvalidOperationException("Cannot find command handler method and/or command handler object in message context. " +
-                                                    "Please provide \"handler-method\" and \"handler-object\" in message context items.");
+                throw new InvalidOperationException(
+                    "Cannot find command handler method and/or command handler object in message context. " +
+                           "Please provide \"handler-method\" and \"handler-object\" in message context items.");
             }
 
             // Invoke method and resolve parameters if needed.
@@ -112,8 +113,9 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
             var handler = messageContext.GetItemByKeyOrDefault(BaseHandlerResolverMiddleware.HandlerObjectKey);
             if (handlerMethod == null || handler == null)
             {
-                throw new InvalidOperationException("Cannot find command handler method and/or command handler object in message context. " +
-                                                    "Please provide \"handler-method\" and \"handler-object\" in message context items.");
+                throw new InvalidOperationException(
+                    "Cannot find command handler method and/or command handler object in message context. " +
+                           "Please provide \"handler-method\" and \"handler-object\" in message context items.");
             }
 
             cancellationToken.ThrowIfCancellationRequested();

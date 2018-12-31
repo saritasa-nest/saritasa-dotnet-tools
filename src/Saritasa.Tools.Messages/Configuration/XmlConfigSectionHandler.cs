@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 #if NET452
@@ -51,8 +51,9 @@ namespace Saritasa.Tools.Messages.Configuration
                 var pipeline = Activator.CreateInstance(type) as IMessagePipeline;
                 if (pipeline == null)
                 {
-                    throw new MessagesConfigurationException($"Cannot instaniate pipeline from type {type.Name}. Make sure " +
-                                                             $"it has public parameterless ctor and implements IMessagePipeline interface.");
+                    throw new MessagesConfigurationException(
+                        $"Cannot instantiate pipeline from type {type.Name}. Make sure " +
+                               $"it has public parameterless ctor and implements IMessagePipeline interface.");
                 }
                 ParseMiddlewares(pipeline, childNode.ChildNodes);
                 pipelines.Add(pipeline);
@@ -108,7 +109,7 @@ namespace Saritasa.Tools.Messages.Configuration
                     : ctor.Invoke(new object[] { }) as IMessagePipelineMiddleware;
                 if (middleware == null)
                 {
-                    throw new MessagesConfigurationException($"Cannot instaniate pipeline middleware {type.Name}.");
+                    throw new MessagesConfigurationException($"Cannot instantiate pipeline middleware {type.Name}.");
                 }
 
                 SetIdProperty(middleware, node);

@@ -16,7 +16,7 @@ using Saritasa.Tools.Messages.Internal;
 namespace Saritasa.Tools.Messages.Common.Repositories
 {
     /// <summary>
-    /// Use ADO.NET infrastructure to store messages.
+    /// The repository uses ADO.NET infrastructure to store messages.
     /// </summary>
     public class AdoNetMessageRepository : IMessageRepository, IDisposable
     {
@@ -88,7 +88,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// </summary>
         /// <param name="factory">Database factory class to be used.</param>
         /// <param name="connectionString">Database connection string.</param>
-        /// <param name="dialect">Sql dialect to be used.</param>
+        /// <param name="dialect">SQL dialect to be used.</param>
         /// <param name="serializer">Object serializer for messages.</param>
         public AdoNetMessageRepository(DbProviderFactory factory, string connectionString, Dialect dialect = Dialect.Auto,
             IObjectSerializer serializer = null)
@@ -110,7 +110,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <summary>
-        /// Create repository from dictionary.
+        /// Creates repository from dictionary.
         /// </summary>
         /// <param name="parameters">Parameters dictionary.</param>
         public AdoNetMessageRepository(IDictionary<string, string> parameters)
@@ -149,7 +149,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                     var provider = CreateSqlProviderByFactory(factory, serializer);
                     if (provider == null)
                     {
-                        throw new NotImplementedException($"The sql provider for factory {factory} is not implemented yet.");
+                        throw new NotImplementedException($"The SQL provider for factory {factory} is not implemented yet.");
                     }
                     return provider;
                 case Dialect.MySql:
@@ -161,7 +161,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                 case Dialect.Postgres:
                     return new PostgreSqlQueryProvider(serializer);
                 default:
-                    throw new NotImplementedException($"The sql provider {dialect} is not implemented yet.");
+                    throw new NotImplementedException($"The SQL provider {dialect} is not implemented yet.");
             }
         }
 
@@ -400,7 +400,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         }
 
         /// <summary>
-        /// Dispose pattern impementation.
+        /// Dispose pattern implementation.
         /// </summary>
         /// <param name="disposing">Dispose managed resources.</param>
         protected virtual void Dispose(bool disposing)

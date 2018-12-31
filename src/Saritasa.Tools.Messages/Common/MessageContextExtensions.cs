@@ -29,12 +29,13 @@ namespace Saritasa.Tools.Messages.Common
                     return typedObj;
                 }
             }
-            throw new InvalidOperationException($"The message context items dictionary expects to have item with \"{key}\" " +
-                $"and type {typeof(T).Name}.");
+            throw new InvalidOperationException(
+                $"The message context items dictionary expects to have item with \"{key}\" " +
+                       $"and type {typeof(T).Name}.");
         }
 
         /// <summary>
-        /// Get typed object from message context items. Returns default value if not exists.
+        /// Gets typed object from message context items. Returns default value if not exists.
         /// </summary>
         /// <typeparam name="T">Object type.</typeparam>
         /// <param name="messageContext">Message context.</param>
@@ -54,7 +55,7 @@ namespace Saritasa.Tools.Messages.Common
         }
 
         /// <summary>
-        /// Get object from message context items. Returns null if not exists.
+        /// Gets object from message context items. Returns null if not exists.
         /// </summary>
         /// <param name="messageContext">Message context.</param>
         /// <param name="key">Object key.</param>

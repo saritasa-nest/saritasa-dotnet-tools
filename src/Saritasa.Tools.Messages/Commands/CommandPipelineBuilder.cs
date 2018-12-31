@@ -9,12 +9,12 @@ using Saritasa.Tools.Messages.Common;
 namespace Saritasa.Tools.Messages.Commands
 {
     /// <summary>
-    /// Command pipeline builder.
+    /// Commands pipeline builder.
     /// </summary>
     public class CommandPipelineBuilder : BasePipelineBuilder<ICommandPipeline>
     {
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="commandPipeline">Command pipeline.</param>
         public CommandPipelineBuilder(ICommandPipeline commandPipeline) : base(commandPipeline)
@@ -22,7 +22,7 @@ namespace Saritasa.Tools.Messages.Commands
         }
 
         /// <summary>
-        /// Add middleware to command pipeline.
+        /// Adds middleware to command pipeline.
         /// </summary>
         /// <param name="middleware">Middleware to add.</param>
         /// <returns>Command pipeline builder.</returns>

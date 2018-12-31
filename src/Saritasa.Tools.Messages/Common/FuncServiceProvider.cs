@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -6,14 +6,14 @@ using System;
 namespace Saritasa.Tools.Messages.Common
 {
     /// <summary>
-    /// Service provider that is based on function.
+    /// Service provider that is based on delegate.
     /// </summary>
     public class FuncServiceProvider : IServiceProvider
     {
         private readonly Func<Type, object> resolverFunc;
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="resolverFunc">Resolver function.</param>
         public FuncServiceProvider(Func<Type, object> resolverFunc)

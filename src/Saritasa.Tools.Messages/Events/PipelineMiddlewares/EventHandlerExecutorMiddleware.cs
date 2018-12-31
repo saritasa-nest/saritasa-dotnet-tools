@@ -13,7 +13,7 @@ using Saritasa.Tools.Messages.Internal;
 namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
 {
     /// <summary>
-    /// Default event executor. It does not process events with Rejected status.
+    /// Default event executor. Rejected events are not processed.
     /// </summary>
     public class EventHandlerExecutorMiddleware : BaseHandlerExecutorMiddleware,
         IMessagePipelineMiddleware, IAsyncMessagePipelineMiddleware
@@ -24,7 +24,7 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
         public string Id { get; set; } = nameof(EventHandlerExecutorMiddleware);
 
         /// <summary>
-        /// Include execution duration.
+        /// Include execution duration into result.
         /// </summary>
         public bool IncludeExecutionDuration { get; set; } = true;
 

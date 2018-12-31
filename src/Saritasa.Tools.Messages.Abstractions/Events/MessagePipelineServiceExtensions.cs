@@ -15,7 +15,7 @@ namespace Saritasa.Tools.Messages.Abstractions
     public static partial class MessagePipelineServiceExtensions
     {
         /// <summary>
-        /// Raise event.
+        /// Raises event.
         /// </summary>
         /// <param name="pipelineService">Pipeline service.</param>
         /// <param name="event">Event to process.</param>
@@ -27,7 +27,7 @@ namespace Saritasa.Tools.Messages.Abstractions
         }
 
         /// <summary>
-        /// Raise event with additional param.
+        /// Raises event with additional parameter.
         /// </summary>
         /// <param name="pipelineService">Pipeline service.</param>
         /// <param name="event">Event to process.</param>
@@ -44,7 +44,7 @@ namespace Saritasa.Tools.Messages.Abstractions
         }
 
         /// <summary>
-        /// Raise event.
+        /// Raises async event.
         /// </summary>
         /// <param name="pipelineService">Pipeline service.</param>
         /// <param name="event">Event to process.</param>
@@ -58,7 +58,7 @@ namespace Saritasa.Tools.Messages.Abstractions
         }
 
         /// <summary>
-        /// Raise event with params.
+        /// Raises async event with additional parameter.
         /// </summary>
         /// <param name="pipelineService">Pipeline service.</param>
         /// <param name="event">Event to process.</param>

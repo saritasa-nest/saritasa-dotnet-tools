@@ -10,7 +10,7 @@ using System.Runtime.Serialization;
 namespace Saritasa.Tools.Messages.Abstractions
 {
     /// <summary>
-    /// Message data transfer object used by repositories to save/load messages.
+    /// Message data transfer object that is used by repositories to save/load messages.
     /// </summary>
 #if NET452
     [Serializable]
@@ -33,7 +33,7 @@ namespace Saritasa.Tools.Messages.Abstractions
         public string ContentType { get; set; }
 
         /// <summary>
-        /// Message serialized content. May be command object, or event object.
+        /// Message serialized content. Can be command or event object.
         /// </summary>
         public object Content { get; set; }
 
@@ -59,7 +59,7 @@ namespace Saritasa.Tools.Messages.Abstractions
         public string ErrorType { get; set; }
 
         /// <summary>
-        /// When message has been created.
+        /// The date and time when message has been created.
         /// </summary>
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 

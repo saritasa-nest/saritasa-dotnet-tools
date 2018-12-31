@@ -581,6 +581,7 @@ namespace Saritasa.Tools.Messages.Tests
 
             // Assert
             Assert.Equal(cts.Token, command.CancellationToken);
+            cts.Dispose();
         }
 
         #endregion
