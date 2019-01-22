@@ -6,7 +6,7 @@
     <title>Saritasa Tools Misc</title>
     <authors>Saritasa</authors>
     <owners>Saritasa</owners>
-    <licenseUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/LICENSE</licenseUrl>
+    <license type="file">LICENSE.txt</license>
     <projectUrl>https://github.com/Saritasa/SaritasaTools</projectUrl>
     <iconUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -32,5 +32,6 @@
     <file src="bin\Release\**\Saritasa.Tools.Misc.dll" target="lib" />
     <file src="bin\Release\**\Saritasa.Tools.Misc.pdb" target="lib" />
     <file src="bin\Release\**\Saritasa.Tools.Misc.xml" target="lib" />
+    <file src="..\..\LICENSE.txt" target="LICENSE.txt" />
   </files>
 </package>

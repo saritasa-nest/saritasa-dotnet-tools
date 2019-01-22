@@ -6,13 +6,13 @@
     <title>Saritasa Tools Messages Test Runs</title>
     <authors>Saritasa</authors>
     <owners>Saritasa</owners>
-    <licenseUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/LICENSE</licenseUrl>
+    <license type="file">LICENSE.txt</license>
     <projectUrl>https://github.com/Saritasa/SaritasaTools</projectUrl>
     <iconUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>The package is a part of Saritasa Tools project. Test runs allows to use special test run infrastructure to help and automate integration testing.</description>
     <summary>Test runs for pipelines.</summary>
-    <copyright>(c) Saritasa, 2017-2018</copyright>
+    <copyright>(c) Saritasa, 2017-2019</copyright>
     <tags>pipeline testrun</tags>
     <repository type="git" url="https://github.com/Saritasa/SaritasaTools" commit="$(CommitHash)" />
     <dependencies>
@@ -29,5 +29,6 @@
     <file src="bin\Release\**\Saritasa.Tools.Messages.TestRuns.dll" target="lib" />
     <file src="bin\Release\**\Saritasa.Tools.Messages.TestRuns.pdb" target="lib" />
     <file src="bin\Release\**\Saritasa.Tools.Messages.TestRuns.xml" target="lib" />
+    <file src="..\..\LICENSE.txt" target="LICENSE.txt" />
   </files>
 </package>
