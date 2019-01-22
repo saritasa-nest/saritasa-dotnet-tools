@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Saritasa.Tools.Common.Pagination;
 using Xunit;
+using Saritasa.Tools.Common.Pagination;
 
 namespace Saritasa.Tools.Common.Tests
 {
@@ -15,7 +15,7 @@ namespace Saritasa.Tools.Common.Tests
     public class PaginationTests
     {
         [Fact]
-        public void ToPaged_ListOfInts_CorrectPagedData()
+        public void FromSource_ListOfInts_CorrectPagedData()
         {
             // Arrange
             int capacity = 250;
@@ -41,7 +41,7 @@ namespace Saritasa.Tools.Common.Tests
         }
 
         [Fact]
-        public void Create_ListOfIntsWithIntMaxPageSize_CorrectPagedData()
+        public void FromSource_ListOfIntsWithIntMaxPageSize_CorrectPagedData()
         {
             // Arrange
             var sourceData = new List<int>

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -10,7 +10,6 @@ using System.Text.RegularExpressions;
 #if NET452
 using System.Security.Cryptography;
 #endif
-using JetBrains.Annotations;
 
 namespace Saritasa.Tools.Misc.Security
 {
@@ -38,27 +37,27 @@ namespace Saritasa.Tools.Misc.Security
             /// <summary>
             /// Lower letters.
             /// </summary>
-            LowerLetters = 1,
+            LowerLetters = 1 << 0,
 
             /// <summary>
             /// Upper letters.
             /// </summary>
-            UpperLetters = 2,
+            UpperLetters = 1 << 1,
 
             /// <summary>
             /// Digits.
             /// </summary>
-            Digits = 4,
+            Digits = 1 << 2,
 
             /// <summary>
             /// Special characters except space.
             /// </summary>
-            SpecialCharacters = 8,
+            SpecialCharacters = 1 << 3,
 
             /// <summary>
             /// Space character.
             /// </summary>
-            Space = 16,
+            Space = 1 << 4,
 
             /// <summary>
             /// Combination of LowerLetters and UpperLetters.
@@ -85,22 +84,22 @@ namespace Saritasa.Tools.Misc.Security
             /// <summary>
             /// No special generation flags.
             /// </summary>
-            None = 0x0,
+            None = 1 << 0,
 
             /// <summary>
             /// Exclude conflict characters.
             /// </summary>
-            ExcludeLookAlike = 0x1,
+            ExcludeLookAlike = 1 << 1,
 
             /// <summary>
             /// Shuffle pool characters before generation.
             /// </summary>
-            ShuffleChars = 0x2,
+            ShuffleChars = 1 << 2,
 
             /// <summary>
             /// Makes secure string as read only.
             /// </summary>
-            MakeReadOnly = 0x4,
+            MakeReadOnly = 1 << 3,
         }
 
         /// <summary>
@@ -144,7 +143,7 @@ namespace Saritasa.Tools.Misc.Security
             Requirements,
 
             /// <summary>
-            /// Letterns only.
+            /// Letters only.
             /// </summary>
             LettersOnly,
 
@@ -269,7 +268,7 @@ namespace Saritasa.Tools.Misc.Security
         protected const string PoolSpace = " ";
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         public PasswordGenerator()
         {
@@ -279,7 +278,7 @@ namespace Saritasa.Tools.Misc.Security
         }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="passwordLength">Password length to generate.</param>
         /// <param name="characterClasses">What characters classes to use.</param>
@@ -297,7 +296,7 @@ namespace Saritasa.Tools.Misc.Security
         }
 
         /// <summary>
-        /// .cctor
+        /// Static constructor.
         /// </summary>
         static PasswordGenerator()
         {
@@ -393,7 +392,7 @@ namespace Saritasa.Tools.Misc.Security
         /// </remarks>
         /// <returns>Estimated score.</returns>
         public static int EstimatePasswordStrength(
-            [NotNull] string password,
+            string password,
             out IDictionary<Addition, int> additions)
         {
             if (string.IsNullOrEmpty(password))
@@ -403,16 +402,41 @@ namespace Saritasa.Tools.Misc.Security
 
             var passwordLower = password.ToLowerInvariant();
             int score;
-            int alphasUpperCount = 0, alphasLowerCount = 0, digitsCount = 0, symbolsCount = 0, middleCharsCount = 0,
-                requirements = 0, alphasOnlyCount = 0, numbersOnlyCount = 0, uniqueCharsCount = 0, repeatCharsCount = 0,
-                consequenceAlphasUpperCount = 0, consequenceAlphasLowerCount = 0, consequenceDigitsCount = 0, consequenceSymbolsCount = 0, consequenceCharsTypeCount = 0,
-                sequenceAlphasCount = 0, sequenceNumbersCount = 0, sequenceSymbolsCount = 0, sequenceCharsCount = 0, requiredCharsCount = 0;
+            int alphasUpperCount = 0,
+                alphasLowerCount = 0,
+                digitsCount = 0,
+                symbolsCount = 0,
+                middleCharsCount = 0,
+                requirements = 0,
+                alphasOnlyCount = 0,
+                numbersOnlyCount = 0,
+                uniqueCharsCount = 0,
+                repeatCharsCount = 0,
+                consequenceAlphasUpperCount = 0,
+                consequenceAlphasLowerCount = 0,
+                consequenceDigitsCount = 0,
+                consequenceSymbolsCount = 0,
+                consequenceCharsTypeCount = 0,
+                sequenceAlphasCount = 0,
+                sequenceNumbersCount = 0,
+                sequenceSymbolsCount = 0,
+                sequenceCharsCount = 0,
+                requiredCharsCount = 0;
             double repeatIncrement = 0;
-            int tempAlphaUpperIndex = -1, tempAlphaLowerIndex = -1, tempNumberIndex = -1, tempSymbolIndex = -1;
+            int tempAlphaUpperIndex = -1,
+                tempAlphaLowerIndex = -1,
+                tempNumberIndex = -1,
+                tempSymbolIndex = -1;
 
-            const int FactorMiddleChar = 2, FactorConsequenceAlphaUpper = 2, FactorConsequenceAlphaLower = 2, FactorConsequenceNumber = 2;
-            const int FactorSequenceAlpha = 3, FactorSequenceNumber = 3, FactorSequenceSymbol = 3;
-            const int FactorLength = 4, FactorNumber = 4;
+            const int FactorMiddleChar = 2,
+                FactorConsequenceAlphaUpper = 2,
+                FactorConsequenceAlphaLower = 2,
+                FactorConsequenceNumber = 2;
+            const int FactorSequenceAlpha = 3,
+                FactorSequenceNumber = 3,
+                FactorSequenceSymbol = 3;
+            const int FactorLength = 4,
+                FactorNumber = 4;
             const int FactorSymbol = 6;
             const string PoolAlphas = "abcdefghijklmnopqrstuvwxyz";
             const string PoolNumerics = "01234567890";
@@ -481,7 +505,7 @@ namespace Saritasa.Tools.Misc.Security
                     if (password[a] == password[b] && a != b)
                     {
                         charExists = true;
-                        /* Calculate icrement deduction based on proximity to identical characters
+                        /* Calculate increment deduction based on proximity to identical characters
                            Deduction is incremented each time a new match is discovered
                            Deduction amount is based on total password length divided by the
                            difference of distance between currently selected match */
@@ -630,7 +654,7 @@ namespace Saritasa.Tools.Misc.Security
             }
 
             // Determine if additional bonuses need to be applied and set image indicators accordingly.
-            additions = new Dictionary<Addition, int>(10)
+            additions = new Dictionary<Addition, int>(20)
             {
                 [Addition.MiddleNumbersOrSymbols] = middleCharsCount,
                 [Addition.Requirements] = requirements,
@@ -664,7 +688,7 @@ namespace Saritasa.Tools.Misc.Security
         /// The source code has got from http://www.passwordmeter.com .
         /// </remarks>
         /// <returns>Estimated score.</returns>
-        public static int EstimatePasswordStrength([NotNull] string password)
+        public static int EstimatePasswordStrength(string password)
         {
             IDictionary<Addition, int> additions;
             return EstimatePasswordStrength(password, out additions);
@@ -724,7 +748,7 @@ namespace Saritasa.Tools.Misc.Security
             return chars.ToArray();
         }
 
-        static void ShuffleCharsArray(char[] chars)
+        private static void ShuffleCharsArray(char[] chars)
         {
             for (int i = chars.Length - 1; i >= 1; i--)
             {
@@ -740,7 +764,7 @@ namespace Saritasa.Tools.Misc.Security
         /// </summary>
         /// <param name="maxValue">Maximum value for number.</param>
         /// <returns>The random number between zero and maxValue.</returns>
-        static int GetNextRandom(int maxValue)
+        private static int GetNextRandom(int maxValue)
         {
 #if NET452
             var bytes = new byte[4];
@@ -754,7 +778,7 @@ namespace Saritasa.Tools.Misc.Security
 #endif
         }
 
-        static string Reverse(string target)
+        private static string Reverse(string target)
         {
             return string.Join(string.Empty, target.Reverse());
         }

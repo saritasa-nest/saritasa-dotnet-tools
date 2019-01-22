@@ -1,4 +1,7 @@
-﻿0.1.1 [TBD]
+﻿0.1.2 [2019-01-22]
+[*] Fix comments.
+[*] Fix GeneratorFlag values.
+[-] Drop JetBrains.Annotations .
 [+] SourceLink support.
 
 0.1.0 [2016-11-14]
