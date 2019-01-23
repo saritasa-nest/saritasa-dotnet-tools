@@ -7,13 +7,13 @@ Emails send handling. It is built around standard class ``MailMessage``. In simp
 
         Email sender interface.
 
-        .. function:: Task SendAsync(MailMessage message);
+        .. function:: Task SendAsync(MailMessage message, CancellationToken cancellationToken);
 
             Sends the specified message.
 
     .. class:: EmailSender
 
-        .. function:: Task SendAsync(MailMessage message);
+        .. function:: Task SendAsync(MailMessage message, CancellationToken cancellationToken);
 
              Sends the specified message.
 
@@ -21,11 +21,9 @@ Example of registration with Autofac:
 
     .. code-block:: c#
 
-        // emails
+        // Emails.
         var emailSender = new Saritasa.Tools.Emails.SmtpClientEmailSender();
         builder.RegisterInstance(emailSender).AsImplementedInterfaces().SingleInstance();
-
-.. note:: For frameworks that do not support MailMessage API (.NET Standard < 2.0) there is lightweight implementation for ``MailAddress``, ``MailAddressCollection`` and ``MailMessage``.
 
 Email Senders
 -------------
@@ -34,7 +32,7 @@ Right now only ``SmtpClientEmailSender`` is available that uses ``SmtpClient`` t
 
     .. class:: SmtpClientEmailSender
 
-        Utilizes``SmtpClient`` to send emails. Unlike standard ``SmtpClient`` you can call send message method without any synchronization. It puts them to queue before sending. Thread safe.
+        Utilizes``SmtpClient`` to send emails. Unlike standard ``SmtpClient`` you can call ``SendAsync`` method without any lock. It puts messages into queue before sending. Thread safe.
 
             .. attribute:: MaxQueueSize
 
@@ -52,16 +50,20 @@ You can set additional behavior before and after emails sending by using interce
     .. code-block:: c#
 
         var emailSender = new SmtpClientEmailSender();
-        var filterInterceptor = new FilterEmailInterceptor("*@saritasa.com; *@saritasa-hosting.com");
+        var filterInterceptor = new ApprovedEmailPatternsInterceptor("*@saritasa.com; *@saritasa-hosting.com");
         emailSender.AddInterceptor(filterInterceptor);
 
 Now only emails to saritasa.com and saritasa-hosting.com domains will be accepted. The following interceptors are available:
 
-    .. class:: FilterEmailInterceptor
+    .. class:: ApprovedEmailPatternsInterceptor
 
         Filters users to whom send an email. You can ``*`` and ``?`` special characters to apply mask. The symbols ``,``, ``;`` and space can be used as separator. For example: ``*@yandex.ru;*+test@saritasa.com``.
 
-    .. class:: SaveToFileEmailInterceptor
+    .. class:: DeniedEmailPatternsInterceptor
+
+        Filters users to whom emails cannot be sent. You can ``*`` and ``?`` special characters to apply mask. The symbols ``,``, ``;`` and space can be used as separator.
+
+    .. class:: SaveToFileEmailsInterceptor
 
         Save email to disk as .eml file before or after sending.
 

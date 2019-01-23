@@ -14,7 +14,7 @@ namespace Saritasa.Tools.Emails.Interceptors
     /// <summary>
     /// Saves emails into specified folder in .eml format.
     /// </summary>
-    public class SaveToFileEmailInterceptor : IEmailInterceptor
+    public class SaveToFileEmailsInterceptor : IEmailInterceptor
     {
         /// <summary>
         /// Directory to save emails.
@@ -33,7 +33,7 @@ namespace Saritasa.Tools.Emails.Interceptors
         /// </summary>
         /// <param name="directory">Directory to save emails.</param>
         /// <param name="afterSend">Save only sent emails.</param>
-        public SaveToFileEmailInterceptor(string directory, bool afterSend = false)
+        public SaveToFileEmailsInterceptor(string directory, bool afterSend = false)
         {
             if (string.IsNullOrEmpty(directory))
             {

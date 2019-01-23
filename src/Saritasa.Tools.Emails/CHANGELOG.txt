@@ -1,4 +1,9 @@
-﻿1.1.0 [2018-12-28]
+﻿2.0.0 [2019-01-23]
+[*] Rename SaveToFileEmailInterceptor to SaveToFileEmailsInterceptor.
+[*] Change design of ApprovedEmailPatternsInterceptor.
+[+] Add DeniedEmailPatternsInterceptor and DelegateFilterInterceptor.
+
+1.1.0 [2018-12-28]
 [+] SourceLink support.
 [*] Add ConfigureAwait = false for most async calls.
 [+] Add SmtpClientEmailSender.UseSyncMode property.
