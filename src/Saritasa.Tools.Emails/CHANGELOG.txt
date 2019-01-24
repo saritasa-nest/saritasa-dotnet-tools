@@ -1,4 +1,7 @@
-﻿2.0.0 [2019-01-23]
+﻿2.0.1 [2019-01-24]
+[*] Fix SmtpClientEmailSender sync mode exceptions handle.
+
+2.0.0 [2019-01-23]
 [*] Rename SaveToFileEmailInterceptor to SaveToFileEmailsInterceptor.
 [*] Change design of ApprovedEmailPatternsInterceptor.
 [+] Add DeniedEmailPatternsInterceptor and DelegateFilterInterceptor.

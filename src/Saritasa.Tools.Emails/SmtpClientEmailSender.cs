@@ -233,6 +233,7 @@ namespace Saritasa.Tools.Emails
                     try
                     {
                         Client.Send(messageTask.MailMessage);
+                        messageTask.TaskCompletionSource.SetResult(true);
                     }
                     catch (Exception ex)
                     {
@@ -242,7 +243,6 @@ namespace Saritasa.Tools.Emails
                     {
                         isBusy = false;
                     }
-                    messageTask.TaskCompletionSource.SetResult(true);
                 }
             }
         }
