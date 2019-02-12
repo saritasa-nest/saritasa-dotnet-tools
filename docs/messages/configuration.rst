@@ -1,7 +1,10 @@
 Configuration
 =============
 
-The middlewares can be configured using configuration file. Example:
+Configuration Manager
+---------------------
+
+The middlewares can be configured using configuration file (``App.config`` or ``Web.config``). Example:
 
     .. code-block:: xml
 
@@ -75,3 +78,8 @@ To load use following code:
     .. code-block:: c#
 
         pipelineService.PipelineContainer = Saritasa.Tools.Messages.Configuration.XmlConfiguration.AppConfig;
+
+Code Configuration
+------------------
+
+Take a look at specified pipeline section to see how to setup specific pipeline.

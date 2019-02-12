@@ -13,6 +13,7 @@ The main idea is to process application business logic in general way.
     repositories
     di
     configuration
+    middleware
 
 You can setup your application to process everything thru single pipelines:
 
@@ -39,9 +40,9 @@ Overview
 
 There are certain goals we want to achieve with pipelines:
 
-- Provide ``ServiceProvider`` instance with correct scope.
-- Keep middlewares as singletons.
-- Provide execution environemnt for every request. It should be thread safe.
+- Resolve dependencies for handlers. For that we need ``ServiceProvider`` instance with correct scope.
+- Provide common way to process messages. It is done using middlewares.
+- Make your system more loose coupling.
 
 In general you should work with ``IMessagePipelineService`` class. It has two main properties:
 
@@ -62,6 +63,9 @@ In general to setup and use you should:
 Simple example:
 
     .. code-block:: c#
+
+        using Saritasa.Tools.Messages.Abstractions;
+        using Saritasa.Tools.Messages.Commands;
 
         // Setup.
         var pipelineService = new DefaultMessagePipelineService();
@@ -108,7 +112,7 @@ There are general middlewares that can be used in pipeline.
 
     .. class:: DataMiddleware
 
-        Requires action to update ``Message.Data`` dictionary. Default id is ``DataMiddleware``.
+        Contains action to update ``Message.Items`` dictionary.
 
     .. class:: PerformanceCounterMiddleware
 
@@ -131,11 +135,13 @@ There are general middlewares that can be used in pipeline.
 Object Serializers
 ------------------
 
-To store message content and error we need to serialize it to string. Not all middlerwares and repositories support all object serializers. You can create your own serializer by implementing ``IObjectSerializer``. There are following serializers built-in:
+Every message can be serialized for debug or log purposes. To store message content and error we need to serialize it to string. To do that following searialized are used:
 
 - ``JsonObjectSerializer`` - Uses ``Newtonsoft.Json`` to convert to JSON string.
 - ``XmlObjectSerializer`` - Convert to xml string. Not supported for .NET Core.
 - ``BinaryObjectSerializer`` - Convert to bytes array. Not supported for .NET Core.
+
+Not all middlerwares and repositories support all object serializers. You can create your own serializer by implementing ``IObjectSerializer``.
 
 Frameworks
 ----------

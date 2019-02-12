@@ -12,7 +12,17 @@ Things happen. Not all of them are interesting, some may be worth recording but 
 
 Here is how it can be used:
 
-1. Setup pipeline service. Also you need to register it with your DI container since it can be injected to command hanlders.
+1. Setup pipeline service. Also you need to register it with your DI container since it can be injected to events hanlders.
+
+    .. code-block:: c#
+
+        var pipelineContainer = new DefaultMessagePipelineContainer();
+        pipelineContainer.AddEventPipeline()
+            .AddStandardMiddlewares(options =>
+            {
+                options.SetAssemblies(typeof(Domain.Users.Entities.User).GetTypeInfo().Assembly);
+                options.UseExceptionDispatchInfo = true;
+            });
 
 2. Create event class:
 
@@ -45,17 +55,37 @@ Here is how it can be used:
 Middlewares
 -----------
 
-    .. class:: DomainEventLocatorMiddleware
+    .. class:: PrepareMessageContextMiddleware
 
-        Uses domain events manager to raise events.
+        The middleware prepares message context for message processing. It fills ContentId field.
+
+    .. class:: EventHandlerLocatorMiddleware
+
+        Locates event hanlders. It stores methods within context items using ``handler-methods`` item key.
+
+    .. class:: EventHandlerResolverMiddleware
+
+        The middleware is to resolve handler object, create it and resolve all dependencies if needed. The resolved object is stored in ``handler-object`` item of context items.
+
+        .. attribute:: UsePropertiesResolving
+
+            Resolve handler object public properties using service provider. False by default.
 
     .. class:: EventHandlerExecutorMiddleware
 
         Included to default pipeline. Default event executor. It does not process events with Rejected status.
 
-    .. class:: EventHandlerLocatorMiddleware
+        .. attribute:: IncludeExecutionDuration
 
-        Included to default pipeline. Locates command hanlder. See requirements above.
+            Includes execution duration into processing result. The target item key is ``.execution-duration``. Default is true.
+
+        .. attribute:: UseParametersResolve
+
+            If true the middleware will try to resolve executing method parameters. False by default.
+
+        .. attribute:: CaptureExceptionDispatchInfo
+
+            Captures original exception and stack trace within handler method using ``System.Runtime.ExceptionServices.ExceptionDispatchInfo``. False by default.
 
 Default Pipeline
 ----------------

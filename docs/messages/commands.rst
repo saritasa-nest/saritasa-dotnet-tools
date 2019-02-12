@@ -4,9 +4,33 @@ Commands
 Overview
 --------
 
-Command is something that changes the state (database insert/update/delete) of application. It utilizes Command behavioral design pattern: you should separate data for command and its handler. Here is a general usage:
+Command is something that changes the state (database insert/update/delete) of application. It uses Command behavioral design pattern: you should separate data to command and its handler. Here is a general usage:
 
-1. Setup pipeline service.
+1. Setup pipeline service. Here is a code for pipeline you can use for most projects:
+
+    .. code-block:: c#
+
+            // Setup.
+            var pipeline = pipelineService.PipelineContainer.AddCommandPipeline();
+            pipeline.AddMiddleware(new Saritasa.Tools.Messages.Common.PipelineMiddlewares.PrepareMessageContextMiddleware());
+            pipeline.AddMiddleware(new Saritasa.Tools.Messages.Commands.PipelineMiddlewares.CommandHandlerLocatorMiddleware());
+            pipeline.AddMiddleware(new Saritasa.Tools.Messages.Commands.PipelineMiddlewares.CommandHandlerResolverMiddleware());
+            pipeline.AddMiddleware(new Saritasa.Tools.Messages.Commands.PipelineMiddlewares.CommandHandlerExecutorMiddleware()
+            {
+                CaptureExceptionDispatchInfo = true
+            });
+
+    There is a simpler way to do that:
+
+    .. code-block:: c#
+
+        // Setup.
+        var pipelineService = new DefaultMessagePipelineService();
+        pipelineService.PipelineContainer
+            .AddCommandPipeline()
+                .AddStandardMiddlewares();
+
+    The ``AddStandardMiddlewares`` also accepts optional options argument.
 
 2. Create command, it should be POCO:
 
@@ -20,7 +44,7 @@ Command is something that changes the state (database insert/update/delete) of a
             public int ProjectId { get; set; }
         }
 
-3. Create command handler. To create it make new separate class, add ``CommandHandlers`` attribute to it and make a method within it where accept your command as first argument. Method name should start with ``Handle`` prefix and first argument should be command class.
+3. Create command handler. Make new separate class, add ``CommandHandlers`` attribute to it and add new method that accepts your command as first argument. Method name should start with ``Handle`` prefix and first argument should be command class.
 
     .. code-block:: c#
 
@@ -42,7 +66,7 @@ Command is something that changes the state (database insert/update/delete) of a
 
 That's it!
 
-Command contains data that needs for command execution - it is like model class in ASP.NET MVC. Try to implement command handler with all necessary dependencies it needs. Do not make "hidden" dependencies. This will make your code much clear and more testable. So think about the "black box" that has input and output.
+Command contains data that is required for command execution - it is like model class in ASP.NET MVC. Try to implement command handler with all necessary dependencies it needs. Do not make "hidden" dependencies. This will make your code much clear and more testable. So think about the "black box" that has input and output.
 
     ::
 
@@ -55,17 +79,37 @@ In general you should not return any data from command. But in most cases you ne
 Middlewares
 -----------
 
+    .. class:: PrepareMessageContextMiddleware
+
+        The middleware prepares message context for message processing. It fills ContentId field.
+
     .. class:: CommandHandlerLocatorMiddleware
 
-        Included to default pipeline. Locates for command handler class using provided assemblies. Handler class must have ``CommandHandlers`` attribute, method should begin with ``Handle`` work and first argument must be command type.
+        Included to default pipeline. Locates for command handler class using provided assemblies. Handler class must have ``CommandHandlers`` attribute, method should begin with ``Handle`` work and first argument must be command type. The resolved method is stored in ``handler-method`` item of context items.
+
+    .. class:: CommandHandlerResolverMiddleware
+
+        The middleware is to resolve handler object, create it and resolve all dependencies if needed. The resolved object is stored in ``handler-object`` item of context items.
+
+        .. attribute:: UsePropertiesResolving
+
+            Resolve handler object public properties using service provider. False by default.
 
     .. class:: CommandHandlerExecutorMiddleware
 
-        Included to default pipeline. Executes command against found command handler.
+        Executes command against found command handler.
 
-    .. class:: CommandValidationMiddleware
+        .. attribute:: IncludeExecutionDuration
 
-        Validates command against data annotation attributes. Generates ``ValidationException``.
+            Includes execution duration into processing result. The target item key is ``.execution-duration``. Default is true.
+
+        .. attribute:: UseParametersResolve
+
+            If true the middleware will try to resolve executing method parameters. False by default.
+
+        .. attribute:: CaptureExceptionDispatchInfo
+
+            Captures original exception and stack trace within handler method using ``System.Runtime.ExceptionServices.ExceptionDispatchInfo``. False by default.
 
 Default Pipeline
 ----------------

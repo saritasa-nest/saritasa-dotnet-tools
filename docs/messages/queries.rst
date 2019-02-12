@@ -8,6 +8,15 @@ Query is a reading operation. Query always returns result and does not change sy
 
 1. Setup pipeline service.
 
+    .. code-block:: c#
+
+        var pipelineContainer = new DefaultMessagePipelineContainer();
+        pipelineContainer.AddQueryPipeline()
+            .AddStandardMiddlewares(options =>
+            {
+                options.UseExceptionDispatchInfo = true;
+            });
+
 2. Prepare class with query methods, attribute ``QueryHandlers`` can be assigned (not required right now):
 
     .. code-block:: c#
@@ -15,7 +24,7 @@ Query is a reading operation. Query always returns result and does not change sy
         [QueryHandlers]
         public class TasksQueries
         {
-            readonly IAppUnitOfWork uow;
+            private readonly IAppUnitOfWork uow;
 
             private TasksQueries()
             {
@@ -35,7 +44,7 @@ Query is a reading operation. Query always returns result and does not change sy
     As you can see it is plain c# class. ``uow`` will be injected using your ``container.Resolve`` method. The reason of having private parameterless constructor is below.
 
 3. Execute query method:
-   
+
     .. code-block:: c#
 
         var task = ServicePipeline.Query<TasksQueries>().With(q => q.GetByIdDto(command.TaskId)); // #1
@@ -51,13 +60,21 @@ Query is a reading operation. Query always returns result and does not change sy
 Middlewares
 -----------
 
-    .. class:: QueryExecutorMiddleware
-
-        Executes query delegate. Included in default pipeline.
-
     .. class:: QueryObjectResolverMiddleware
 
-        Resolve object handler for query. Included in default pipeline.
+        Resolve object handler for query.
+
+        .. attribute:: UsePropertiesResolving
+
+            Resolve handler object public properties using service provider. False by default.
+
+    .. class:: QueryExecutorMiddleware
+
+        Executes query delegate. Query parameters must be in message items as ``.query-parameters`` key.
+
+        .. attribute:: IncludeExecutionDuration
+
+            Includes execution duration into processing result. The target item key is ``.execution-duration``. Default is true.
 
 Default Pipeline
 ----------------
