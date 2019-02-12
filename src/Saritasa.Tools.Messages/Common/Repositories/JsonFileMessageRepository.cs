@@ -114,6 +114,10 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                 var messageRecord = (MessageRecord)Serializer.Deserialize(Encoding.UTF8.GetBytes(line),
                     typeof(MessageRecord));
 
+                if (string.IsNullOrEmpty(messageRecord.ContentType))
+                {
+                    messageRecord.ContentType = typeof(object).FullName;
+                }
                 var contentType = Type.GetType(messageRecord.ContentType);
                 var contentBytes = Encoding.UTF8.GetBytes(messageRecord.Content.ToString());
                 messageRecord.Content = Serializer.Deserialize(contentBytes, contentType);
