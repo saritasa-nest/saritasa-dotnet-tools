@@ -260,7 +260,7 @@ namespace Saritasa.Tools.Misc.Security
         /// <summary>
         /// Special characters conflict pool.
         /// </summary>
-        protected const string PoolSpecialConflict = @"`{}!,";
+        protected const string PoolSpecialConflict = @"`{}!,|";
 
         /// <summary>
         /// Space character.
@@ -685,7 +685,7 @@ namespace Saritasa.Tools.Misc.Security
         /// </summary>
         /// <param name="password">Password to estimate.</param>
         /// <remarks>
-        /// The source code has got from http://www.passwordmeter.com .
+        /// The source code has been gotten from http://www.passwordmeter.com .
         /// </remarks>
         /// <returns>Estimated score.</returns>
         public static int EstimatePasswordStrength(string password)
