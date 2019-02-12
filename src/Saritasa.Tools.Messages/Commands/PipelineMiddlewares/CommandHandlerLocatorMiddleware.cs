@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -17,14 +17,14 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
     /// </summary>
     public class CommandHandlerLocatorMiddleware : BaseHandlerLocatorMiddleware, IMessagePipelineMiddleware
     {
+        public const string HandlerMethodKey = "handler-method";
+
         /// <summary>
         /// Middleware identifier.
         /// </summary>
         public string Id { get; set; } = nameof(CommandHandlerLocatorMiddleware);
 
         private const string HandlerPrefix = "Handle";
-
-        internal const string HandlerMethodKey = "handler-method";
 
         /// <summary>
         /// Commands methods cache. Type is for command type, MethodInfo is for actual handler.
@@ -54,7 +54,11 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
         /// <param name="assemblies">Assemblies to locate.</param>
         public CommandHandlerLocatorMiddleware(params Assembly[] assemblies)
         {
-            if (assemblies == null || assemblies.Length < 1)
+            if (assemblies == null)
+            {
+                assemblies = new[] { Assembly.GetEntryAssembly() };
+            }
+            if (assemblies.Length < 1)
             {
                 throw new ArgumentException(Properties.Strings.AssembliesNotSpecified);
             }

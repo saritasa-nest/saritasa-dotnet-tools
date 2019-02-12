@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -18,12 +18,15 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
     public class EventHandlerLocatorMiddleware : BaseHandlerLocatorMiddleware,
         IMessagePipelineMiddleware
     {
-        /// <inheritdoc />
-        public string Id { get; set; } = nameof(EventHandlerLocatorMiddleware);
+        /// <summary>
+        /// Key for array of handler methods.
+        /// </summary>
+        public const string HandlerMethodsKey = "handler-methods";
 
         private const string HandlerPrefix = "Handle";
 
-        internal const string HandlerMethodsKey = "handler-methods";
+        /// <inheritdoc />
+        public string Id { get; set; } = nameof(EventHandlerLocatorMiddleware);
 
         private readonly Assembly[] assemblies;
 
@@ -40,10 +43,23 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="assemblies">Assemblies to locate.</param>
+        public EventHandlerLocatorMiddleware()
+        {
+            this.Assemblies = new[] { Assembly.GetEntryAssembly() };
+            Initialize();
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="assemblies">Assemblies to locate. If null </param>
         public EventHandlerLocatorMiddleware(params Assembly[] assemblies)
         {
-            if (assemblies == null || assemblies.Length < 1)
+            if (assemblies == null)
+            {
+                assemblies = new[] { Assembly.GetEntryAssembly() };
+            }
+            if (assemblies.Length < 1)
             {
                 throw new ArgumentException(Properties.Strings.AssembliesNotSpecified);
             }

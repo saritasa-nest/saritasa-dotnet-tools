@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -10,7 +10,7 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
     /// The structure represents <see cref="MethodInfo" /> handler for event
     /// and resolved object to execute on.
     /// </summary>
-    internal struct EventHandlerMethodWithObject
+    public struct EventHandlerMethodWithObject
     {
         /// <summary>
         /// Method.

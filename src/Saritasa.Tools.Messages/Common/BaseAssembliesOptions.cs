@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -16,7 +16,7 @@ namespace Saritasa.Tools.Messages.Common
         /// <summary>
         /// Assemblies to search handlers.
         /// </summary>
-        public IList<Assembly> Assemblies { get; set; } = new List<Assembly>();
+        public IList<Assembly> Assemblies { get; set; }
 
         /// <summary>
         /// Set assemblies as params.
@@ -33,7 +33,7 @@ namespace Saritasa.Tools.Messages.Common
         /// <returns>Assemblies list.</returns>
         internal Assembly[] GetAssemblies()
         {
-            return Assemblies != null ? Assemblies.ToArray() : new Assembly[0];
+            return Assemblies != null ? Assemblies.ToArray() : null;
         }
 
         /// <summary>
