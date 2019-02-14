@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -62,7 +62,7 @@ namespace Saritasa.Tools.Common.Pagination
         }
 
         /// <summary>
-        /// Creates paged enumerable from source.
+        /// Creates paged enumerable from collection.
         /// </summary>
         /// <param name="items">Collection.</param>
         /// <param name="page">Current page.</param>

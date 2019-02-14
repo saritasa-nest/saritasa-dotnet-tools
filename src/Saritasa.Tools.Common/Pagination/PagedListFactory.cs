@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -99,6 +99,26 @@ namespace Saritasa.Tools.Common.Pagination
 
             return new PagedList<T>(items, PagedList<object>.FirstPage, items.Count, items.Count);
         }
+
+        /// <summary>
+        /// Returns empty paged collection.
+        /// </summary>
+        /// <typeparam name="T">Item type.</typeparam>
+        /// <returns>Empty paged list.</returns>
+        public static PagedList<T> Empty<T>()
+            => new PagedList<T>(Enumerable.Empty<T>() as ICollection<T>, page: PagedList<object>.FirstPage, pageSize: 0, totalCount: 0);
+
+        /// <summary>
+        /// Creates paged enumerable from collection. Shorthand to simplify type infer.
+        /// </summary>
+        /// <typeparam name="T">Item type.</typeparam>
+        /// <param name="items">Items.</param>
+        /// <param name="page">Current page.</param>
+        /// <param name="pageSize">Page size.</param>
+        /// <param name="totalCount">Total number of items in collection.</param>
+        /// <returns>Paged list.</returns>
+        public static PagedList<T> Create<T>(ICollection<T> items, int page, int pageSize, int totalCount)
+            => new PagedList<T>(items, page, pageSize, totalCount);
 
         internal static int GetOffset(int page, int pageSize)
         {

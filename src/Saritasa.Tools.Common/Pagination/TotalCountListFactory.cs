@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -14,7 +14,7 @@ namespace Saritasa.Tools.Common.Pagination
     public static class TotalCountListFactory
     {
         /// <summary>
-        /// Creates enumerable with total count from enumerable.
+        /// Creates list with total count from enumerable.
         /// </summary>
         /// <typeparam name="T">Item type.</typeparam>
         /// <param name="source">Enumerable.</param>
@@ -32,7 +32,7 @@ namespace Saritasa.Tools.Common.Pagination
         }
 
         /// <summary>
-        /// Creates enumerable with total count from collection or list.
+        /// Creates list with total count from collection or list.
         /// </summary>
         /// <typeparam name="T">Item type.</typeparam>
         /// <param name="source">Collection enumerable.</param>
@@ -49,7 +49,7 @@ namespace Saritasa.Tools.Common.Pagination
         }
 
         /// <summary>
-        /// Creates enumerable with total count from queryable source.
+        /// Creates list with total count from queryable source.
         /// </summary>
         /// <typeparam name="T">Item type.</typeparam>
         /// <param name="source">Queryable enumerable.</param>
@@ -65,5 +65,23 @@ namespace Saritasa.Tools.Common.Pagination
             var list = source.ToList();
             return new TotalCountList<T>(list, list.Count);
         }
+
+        /// <summary>
+        /// Returns empty list with total count.
+        /// </summary>
+        /// <typeparam name="T">Item type.</typeparam>
+        /// <returns>Empty list with total count.</returns>
+        public static TotalCountList<T> Empty<T>()
+            => new TotalCountList<T>(Enumerable.Empty<T>() as ICollection<T>, totalCount: 0);
+
+        /// <summary>
+        /// Creates list with total count property. Shorthand to simplify type infer.
+        /// </summary>
+        /// <typeparam name="T">Item type.</typeparam>
+        /// <param name="items">Collection items.</param>
+        /// <param name="totalCount">Total number of items of base collection.</param>
+        /// <returns>List with total count.</returns>
+        public static TotalCountList<T> Create<T>(ICollection<T> items, int totalCount)
+            => new TotalCountList<T>(items, totalCount);
     }
 }

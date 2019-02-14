@@ -1,4 +1,10 @@
-﻿1.0.0 [2018-11-02]
+﻿1.1.0 [TBD]
+[*] Use Count for OffsetLimitList.FromSource .
+[+] Add Empty method to pagination factories.
+[+] Add shorthand Create method to pagination factories.
+[*] Comments update.
+
+1.0.0 [2018-11-02]
 [*] Fix pagination usage when page size is int.MaxSize .
 [+] Add Exponential Backoff Normalized delay retry strategy to flow utils.
 [*] Parameter firstFastRetry now adds extra attempt.

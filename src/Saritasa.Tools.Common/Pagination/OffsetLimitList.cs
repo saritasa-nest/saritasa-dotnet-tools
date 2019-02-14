@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -8,7 +8,7 @@ using System.Linq;
 namespace Saritasa.Tools.Common.Pagination
 {
     /// <summary>
-    /// Enumerable with limit and offset feature.
+    /// List with limit and offset feature.
     /// </summary>
     public class OffsetLimitList<T> : TotalCountList<T>,
         IMetadataEnumerable<T, OffsetLimitListMetadata>
@@ -31,7 +31,7 @@ namespace Saritasa.Tools.Common.Pagination
         }
 
         /// <summary>
-        /// Creates new enumerable with limit and offset properties.
+        /// Constructor.
         /// </summary>
         /// <param name="items">Collection items.</param>
         /// <param name="offset">Number of items to skip.</param>
