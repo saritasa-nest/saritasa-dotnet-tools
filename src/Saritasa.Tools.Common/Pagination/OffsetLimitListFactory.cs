@@ -54,7 +54,7 @@ namespace Saritasa.Tools.Common.Pagination
             }
 
             var list = source.Skip(offset).Take(limit).ToList();
-            return new OffsetLimitList<T>(list, offset, limit, source.Count());
+            return new OffsetLimitList<T>(list, offset, limit, source.Count);
         }
 
         /// <summary>
