@@ -1,8 +1,9 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 #if NET40 || NET452 || NET461
 using System.Runtime.Serialization;
 #endif
@@ -15,7 +16,7 @@ namespace Saritasa.Tools.Common.Utils
     public static partial class FlowUtils
     {
         /// <summary>
-        /// Throw the exception to skip item memoization.
+        /// Throws the exception to skip item memoization.
         /// </summary>
 #if NET40 || NET452 || NET461 || NETSTANDARD2_0
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "GetObjectData is not needed")]
@@ -31,7 +32,7 @@ namespace Saritasa.Tools.Common.Utils
             public TResult Result => result;
 
             /// <summary>
-            /// .ctor
+            /// Constructor.
             /// </summary>
             /// <param name="result">Result from memoize delegate.</param>
             public SkipMemoizeException(TResult result)
@@ -41,7 +42,7 @@ namespace Saritasa.Tools.Common.Utils
 
 #if NET40 || NET452 || NET461
             /// <summary>
-            /// .ctor for deserialization.
+            /// Constructor for deserialization.
             /// </summary>
             /// <param name="info">Stores all the data needed to serialize or deserialize an object.</param>
             /// <param name="context">Describes the source and destination of a given serialized stream,
@@ -60,8 +61,8 @@ namespace Saritasa.Tools.Common.Utils
         /// <typeparam name="TResult">Cache function result type.</typeparam>
         /// <param name="key">Cache key.</param>
         /// <param name="cache">Cache storage used.</param>
-        /// <param name="notInCache">The key was not in cache.</param>
-        /// <returns>The value must be evaluated and cached again.</returns>
+        /// <param name="notInCache"><c>True</c> if key was not in cache.</param>
+        /// <returns><c>True</c> if value must be evaluated and cached again.</returns>
         public delegate bool CacheStrategy<TKey, TResult>(TKey key, IDictionary<TKey, TResult> cache, bool notInCache);
 
         /// <summary>
@@ -70,14 +71,14 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <typeparam name="TResult">Cache function result type.</typeparam>
         /// <param name="cache">Cache storage used.</param>
-        /// <param name="notInCache">The key was not in cache.</param>
-        /// <returns>The value must be evaluated and cached again.</returns>
+        /// <param name="notInCache"><c>True</c> if key was not in cache.</param>
+        /// <returns><c>True</c> if value must be evaluated and cached again.</returns>
         public delegate bool CacheStrategy<TResult>(IDictionary<int, TResult> cache, bool notInCache);
 
         #region MaxAgeCacheStrategy
 
         /// <summary>
-        /// Cache strategy based on age validation. If item exceed specific time on life it shoule be
+        /// Cache strategy based on age validation. If item exceeds specific time of life it should be
         /// invalidated.
         /// </summary>
         /// <typeparam name="TKey">Cache key type.</typeparam>
@@ -93,13 +94,13 @@ namespace Saritasa.Tools.Common.Utils
             {
                 timestampsStorage = new Dictionary<TKey, DateTime>();
             }
-            object lockobj = new object();
+            object lockObj = new object();
 
             return (key, dict, notInCache) =>
             {
                 DateTime dt;
                 bool cached;
-                lock (lockobj)
+                lock (lockObj)
                 {
                     cached = timestampsStorage.TryGetValue(key, out dt);
                     if (!cached)
@@ -107,7 +108,9 @@ namespace Saritasa.Tools.Common.Utils
                         timestampsStorage[key] = DateTime.Now;
                     }
                 }
-                return !cached || (DateTime.Now - dt) >= maxAge;
+                var isExpired = cached && (DateTime.Now - dt) >= maxAge;
+                Debug.WriteLineIf(isExpired, $"CreateMaxAgeCacheStrategy: Key {key} expired.");
+                return isExpired;
             };
         }
 
@@ -167,14 +170,12 @@ namespace Saritasa.Tools.Common.Utils
         /// <typeparam name="TResult">Cache function result type.</typeparam>
         /// <param name="maxCount">Max items to cache.</param>
         /// <param name="removeCount">How many items to remove from cache, default is 1.</param>
-        /// <param name="purge">Should whole cache be cleared. If true removeCount parameter is ignored. False by default.</param>
-        /// <param name="keysStorage">Storage for keys.</param>
+        /// <param name="purge">Should whole cache be cleared. If <c>true</c> removeCount parameter is ignored. <c>False</c> by default.</param>
         /// <returns>Cache strategy instance delegate.</returns>
         public static CacheStrategy<TKey, TResult> CreateMaxCountCacheStrategy<TKey, TResult>(
             int maxCount,
             int removeCount = 1,
-            bool purge = false,
-            IList<TKey> keysStorage = null)
+            bool purge = false)
         {
             if (maxCount < removeCount)
             {
@@ -182,52 +183,57 @@ namespace Saritasa.Tools.Common.Utils
                     string.Format(Properties.Strings.ArgumentMustBeGreaterThan, nameof(maxCount), nameof(removeCount)));
             }
 
-            if (keysStorage == null || !purge)
-            {
-                keysStorage = new List<TKey>();
-            }
-            object lockobj = new object();
+            var keysStorage = new TKey[maxCount];
+            int keysStorageIndex = 0;
+            object lockObj = new object();
 
             return (TKey key, IDictionary<TKey, TResult> dict, bool notInCache) =>
             {
-                if (notInCache && !purge)
+                lock (lockObj)
                 {
-                    lock (lockobj)
+                    if (notInCache && !purge)
                     {
-                        keysStorage.Add(key);
-                    }
-                }
-                if (dict.Count > maxCount && keysStorage.Count > 0)
-                {
-                    if (purge)
-                    {
-                        lock (lockobj)
+                        if (keysStorageIndex < keysStorage.Length)
                         {
-                            keysStorage.Clear();
+                            keysStorage[keysStorageIndex++] = key;
                         }
-                        dict.Clear();
                     }
-                    else
+                    if (dict.Count > maxCount)
                     {
-                        var toRemove = new TKey[removeCount];
-                        lock (lockobj)
+                        if (purge)
                         {
-                            for (int i = 0; i < removeCount && keysStorage.Count > 0; i++)
+                            Debug.WriteLine("CreateMaxCountCacheStrategy: Purge keys storage.");
+                            ShiftArrayItemsLeft(keysStorage, keysStorage.Length);
+                            keysStorageIndex = 0;
+                            dict.Clear();
+                        }
+                        else
+                        {
+                            // ReSharper disable once ForCanBeConvertedToForeach
+                            for (int i = 0; i < removeCount; i++)
                             {
-                                var item = keysStorage[0];
-                                keysStorage.RemoveAt(0);
-                                toRemove[i] = item;
+                                Debug.WriteLine($"CreateMaxCountCacheStrategy: Remove key {keysStorage[i]} with index {i} from keys storage.");
+                                dict.Remove(keysStorage[i]);
                             }
-                        }
-                        // ReSharper disable once ForCanBeConvertedToForeach
-                        for (int i = 0; i < toRemove.Length; i++)
-                        {
-                            dict.Remove(toRemove[i]);
+                            ShiftArrayItemsLeft(keysStorage, removeCount);
+                            keysStorageIndex -= removeCount;
                         }
                     }
                 }
                 return false;
             };
+        }
+
+        private static void ShiftArrayItemsLeft<TKey>(TKey[] array, int shift)
+        {
+            for (int i = 0; i < array.Length - shift; i++)
+            {
+                array[i] = array[i + shift];
+            }
+            for (int i = array.Length - shift; i < array.Length; i++)
+            {
+                array[i] = default(TKey);
+            }
         }
 
         /// <summary>
@@ -239,15 +245,13 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="maxCount">Max items to cache.</param>
         /// <param name="removeCount">How many items to remove from cache, default is 1.</param>
         /// <param name="purge">Should whole cache be cleared. If true removeCount parameter is ignored. False by default.</param>
-        /// <param name="keysStorage">Storage for keys.</param>
         /// <returns>Cache strategy instance delegate.</returns>
         public static CacheStrategy<int, TResult> CreateMaxCountCacheStrategy<TResult>(
             int maxCount,
             int removeCount = 1,
-            bool purge = false,
-            IList<int> keysStorage = null)
+            bool purge = false)
         {
-            return CreateMaxCountCacheStrategy<int, TResult>(maxCount, removeCount, purge, keysStorage);
+            return CreateMaxCountCacheStrategy<int, TResult>(maxCount, removeCount, purge);
         }
 
         /// <summary>
@@ -261,15 +265,13 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="maxCount">Max items to cache.</param>
         /// <param name="removeCount">How many items to remove from cache, default is 1.</param>
         /// <param name="purge">Should whole cache be cleared. If <c>true</c> removeCount parameter is ignored. <c>False</c> by default.</param>
-        /// <param name="keysStorage">Storage for keys.</param>
         /// <returns>Cache strategy instance delegate.</returns>
         public static CacheStrategy<Tuple<T1, T2>, TResult> CreateMaxCountCacheStrategy<T1, T2, TResult>(
             int maxCount,
             int removeCount = 1,
-            bool purge = false,
-            IList<Tuple<T1, T2>> keysStorage = null)
+            bool purge = false)
         {
-            return CreateMaxCountCacheStrategy<Tuple<T1, T2>, TResult>(maxCount, removeCount, purge, keysStorage);
+            return CreateMaxCountCacheStrategy<Tuple<T1, T2>, TResult>(maxCount, removeCount, purge);
         }
 
         /// <summary>
@@ -284,30 +286,27 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="maxCount">Max items to cache.</param>
         /// <param name="removeCount">How many items to remove from cache, default is 1.</param>
         /// <param name="purge">Should whole cache be cleared. If true removeCount parameter is ignored. False by default.</param>
-        /// <param name="keysStorage">Storage for keys.</param>
         /// <returns>Cache strategy instance delegate.</returns>
         public static CacheStrategy<Tuple<T1, T2, T3>, TResult> CreateMaxCountCacheStrategy<T1, T2, T3, TResult>(
             int maxCount,
             int removeCount = 1,
-            bool purge = false,
-            IList<Tuple<T1, T2, T3>> keysStorage = null)
+            bool purge = false)
         {
-            return CreateMaxCountCacheStrategy<Tuple<T1, T2, T3>, TResult>(maxCount, removeCount, purge, keysStorage);
+            return CreateMaxCountCacheStrategy<Tuple<T1, T2, T3>, TResult>(maxCount, removeCount, purge);
         }
 
         #endregion
 
         /// <summary>
         /// Returns a memoized version of a referentially transparent function. The memoized version of the
-        /// function keeps a cache of the mapping from arguments to results and, when calls with the same
-        /// arguments are repeated often, has higher performance at the expense of higher memory use.
+        /// function keeps a cache of the mapping of arguments to their results. When method is called with the same
+        /// arguments the memoized result is used. The method is thread safe.
         /// </summary>
         /// <typeparam name="TKey">First argument type.</typeparam>
         /// <typeparam name="TResult">Function result type.</typeparam>
         /// <param name="func">The function to memoize.</param>
         /// <param name="strategies">Strategies to apply. By default limitless strategy will be used.</param>
-        /// <param name="cache">Dictionary to use for caching. If not specified the standard Dictionary will be used which
-        /// is not thread safe.</param>
+        /// <param name="cache">Dictionary to use for caching. If not specified the standard Dictionary will be used.</param>
         /// <returns>Delegate the able to cache.</returns>
         public static Func<TKey, TResult> Memoize<TKey, TResult>(
             Func<TKey, TResult> func,
@@ -322,61 +321,104 @@ namespace Saritasa.Tools.Common.Utils
             {
                 strategies = (key, dict, notInCache) => false;
             }
+            var keysLocks = new System.Collections.Concurrent.ConcurrentDictionary<TKey, object>();
+            var keysLocksAsDict = (IDictionary<TKey, object>) keysLocks;
+            var collection = cache as System.Collections.ICollection;
+            var cacheLock = collection != null ? collection.SyncRoot : new object();
 
             return key =>
             {
                 TResult result;
                 bool needUpdate = false, strategiesAlreadyApplied = false;
 
-                // If result is already in cache and no need to refresh it just skip.
-                bool inCache = cache.TryGetValue(key, out result);
+                var keyLock = keysLocks.GetOrAdd(key, (k) => new object());
 
-                if (inCache)
+                lock (keyLock)
                 {
-                    // We may combine strategies.
-                    foreach (CacheStrategy<TKey, TResult> strategy in strategies.GetInvocationList())
+                    // If result is already in cache then no need to refresh it - just skip.
+                    bool inCache;
+                    lock (cacheLock)
                     {
-                        // We have to go thru whole list because some strategies may refresh cache.
-                        bool ret = strategy(key, cache, false);
-                        if (ret)
+                        inCache = cache.TryGetValue(key, out result);
+                    }
+                    Debug.WriteLine($"Memoize: Start memoize key = {key}, inCache = {inCache}, keys locks count = {keysLocks.Count}.");
+
+                    if (inCache)
+                    {
+                        // We may combine strategies.
+                        foreach (CacheStrategy<TKey, TResult> strategy in strategies.GetInvocationList())
                         {
-                            needUpdate = true;
+                            // We have to go thru whole list because some strategies may refresh cache.
+                            bool ret = DoWithinLock(cacheLock, () => strategy(key, cache, false));
+                            if (ret)
+                            {
+                                needUpdate = true;
+                                break;
+                            }
+                        }
+                        if (!needUpdate)
+                        {
+                            keysLocksAsDict.Remove(key);
+                            return result;
+                        }
+                        strategiesAlreadyApplied = true;
+                    }
+
+                    // Call user func.
+                    try
+                    {
+                        Debug.WriteLine($"Memoize: Evaluating result for key {key}.");
+                        result = func(key);
+                        Debug.WriteLine($"Memoize: Evaluated result for key {key}.");
+                    }
+                    catch (SkipMemoizeException<TResult> exc)
+                    {
+                        strategiesAlreadyApplied = true;
+                        result = exc.Result;
+                    }
+                    catch (Exception)
+                    {
+                        keysLocksAsDict.Remove(key);
+                        throw;
+                    }
+
+                    DoWithinLock(cacheLock, () => cache[key] = result);
+
+                    // If we didn't call strategies yet.
+                    if (!strategiesAlreadyApplied)
+                    {
+                        foreach (CacheStrategy<TKey, TResult> strategy in strategies.GetInvocationList())
+                        {
+                            // We have to go thru whole list because some strategies may refresh cache.
+                            bool ret = DoWithinLock(cacheLock, () => strategy(key, cache, true));
+                            if (ret)
+                            {
+                                needUpdate = true;
+                                break;
+                            }
                         }
                     }
-                    if (!needUpdate)
-                    {
-                        return result;
-                    }
-                    strategiesAlreadyApplied = true;
                 }
+                keysLocksAsDict.Remove(key);
 
-                // Call user func.
-                try
-                {
-                    result = func(key);
-                    cache[key] = result;
-                }
-                catch (SkipMemoizeException<TResult> exc)
-                {
-                    strategiesAlreadyApplied = true;
-                    result = exc.Result;
-                }
-
-                // If we didn't call strategies yet.
-                if (!strategiesAlreadyApplied)
-                {
-                    foreach (CacheStrategy<TKey, TResult> strategy in strategies.GetInvocationList())
-                    {
-                        // We have to go thru whole list because some strategies may refresh cache.
-                        bool ret = strategy(key, cache, true);
-                        if (ret)
-                        {
-                            needUpdate = true;
-                        }
-                    }
-                }
                 return result;
             };
+        }
+
+        private static void DoWithinLock(object @lock, Action action)
+        {
+            lock (@lock)
+            {
+                action();
+            }
+        }
+
+        private static TValue DoWithinLock<TValue>(object @lock, Func<TValue> action)
+        {
+            lock (@lock)
+            {
+                return action();
+            }
         }
 
         /// <summary>
