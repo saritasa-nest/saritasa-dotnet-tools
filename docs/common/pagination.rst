@@ -9,6 +9,74 @@ Simplifies pagination. The are several levels of pagination are supported:
 
     .. image:: pagination.png
 
+Factories
+---------
+
+To simplify pagination classes construction there are several factories available: ``TotalCountListFactory``, ``OffsetLimitListFactory`` and ``PagedListFactory``. There are common methods to use:
+
+.. function:: FromSource<T>(collection)
+
+    Creates specific list from collection. The collection may be evaluated during construction.
+
+.. function:: Empty()
+
+    Creates empty list.
+
+.. function:: Create()
+
+    Creates specific list from parameters. Shorthand to simplify type infer so it does not contain any additional logic.
+
+Metadata
+--------
+
+The classes are design to be easily serialized. Here is how you can make JSON for pagination:
+
+    .. code-block:: c#
+
+        var all = PagedListFactory.FromSource(products, 2, 10);
+        var all2 = all.Convert(p => new ProductWrapper(p));
+        var dto = all2.ToMetadataObject();
+
+        var serializerSettings = new Newtonsoft.Json.JsonSerializerSettings();
+        serializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver();
+        var serialized = Newtonsoft.Json.JsonConvert.SerializeObject(dto, Newtonsoft.Json.Formatting.Indented, serializerSettings);
+
+    .. code-block:: json
+
+        {
+          "metadata": {
+            "page": 2,
+            "pageSize": 10,
+            "totalPages": 2,
+            "offset": 10,
+            "limit": 10,
+            "totalCount": 17
+          },
+          "items": [
+            {
+              "name": "Radio"
+            },
+            {
+              "name": "Angular"
+            },
+            {
+              "name": "Trio"
+            },
+            {
+              "name": "Life"
+            },
+            {
+              "name": "Quake"
+            },
+            {
+              "name": "Spinner"
+            },
+            {
+              "name": ".NET"
+            }
+          ]
+        }
+
 Examples
 --------
 
