@@ -10,6 +10,11 @@ namespace Saritasa.Tools.Common.Pagination
     /// <summary>
     /// List with limit and offset feature.
     /// </summary>
+    /// <typeparam name="T">Source type.</typeparam>
+    /// <seealso cref="IEnumerable{T}" />
+#if NET40 || NET452 || NET461 || NETSTANDARD2_0
+    [Serializable]
+#endif
     public class OffsetLimitList<T> : TotalCountList<T>,
         IMetadataEnumerable<T, OffsetLimitListMetadata>
     {
@@ -55,6 +60,18 @@ namespace Saritasa.Tools.Common.Pagination
             this.Offset = offset;
             this.Limit = limit;
         }
+
+#if NET40 || NET452 || NET461 || NETSTANDARD2_0
+        /// <summary>
+        /// Constructor for deserialization.
+        /// </summary>
+        /// <param name="info">Stores all the data needed to serialize or deserialize an object.</param>
+        /// <param name="context">Describes the source and destination of a given serialized stream,
+        /// and provides an additional caller-defined context.</param>
+        protected OffsetLimitList(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
+        {
+        }
+#endif
 
         #region IMetadataEnumerable<OffsetLimitEnumerableMetadata, T>
 

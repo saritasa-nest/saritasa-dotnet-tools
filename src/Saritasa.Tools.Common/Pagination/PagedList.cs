@@ -8,9 +8,13 @@ using System.Linq;
 namespace Saritasa.Tools.Common.Pagination
 {
     /// <summary>
-    /// Paged enumerable. Also it forces evaluation with Take and Skip methods.
+    /// Paged list. Also it forces evaluation with Take and Skip methods.
     /// </summary>
     /// <typeparam name="T">Source type.</typeparam>
+    /// <seealso cref="IEnumerable{T}" />
+#if NET40 || NET452 || NET461 || NETSTANDARD2_0
+    [Serializable]
+#endif
     public class PagedList<T> : OffsetLimitList<T>,
         IMetadataEnumerable<T, PagedListMetadata>
     {
@@ -60,6 +64,18 @@ namespace Saritasa.Tools.Common.Pagination
         protected PagedList()
         {
         }
+
+#if NET40 || NET452 || NET461 || NETSTANDARD2_0
+        /// <summary>
+        /// Constructor for deserialization.
+        /// </summary>
+        /// <param name="info">Stores all the data needed to serialize or deserialize an object.</param>
+        /// <param name="context">Describes the source and destination of a given serialized stream,
+        /// and provides an additional caller-defined context.</param>
+        protected PagedList(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
+        {
+        }
+#endif
 
         /// <summary>
         /// Creates paged enumerable from collection.

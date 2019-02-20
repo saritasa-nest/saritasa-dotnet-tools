@@ -36,6 +36,18 @@ namespace Saritasa.Tools.Common.Pagination
             Metadata = metadata;
         }
 
+#if NET40 || NET452 || NET461 || NETSTANDARD2_0
+        /// <summary>
+        /// Constructor for deserialization.
+        /// </summary>
+        /// <param name="info">Stores all the data needed to serialize or deserialize an object.</param>
+        /// <param name="context">Describes the source and destination of a given serialized stream,
+        /// and provides an additional caller-defined context.</param>
+        protected MetadataDto(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
+        {
+        }
+#endif
+
         /// <summary>
         /// Metadata.
         /// </summary>

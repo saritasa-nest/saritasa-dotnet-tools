@@ -13,6 +13,9 @@ namespace Saritasa.Tools.Common.Pagination
     /// collection.
     /// </summary>
     /// <seealso cref="IEnumerable{T}" />
+#if NET40 || NET452 || NET461 || NETSTANDARD2_0
+    [Serializable]
+#endif
     public class TotalCountList<T> :
         IMetadataEnumerable<T, TotalCountListMetadata>
     {
@@ -38,6 +41,18 @@ namespace Saritasa.Tools.Common.Pagination
         protected TotalCountList()
         {
         }
+
+#if NET40 || NET452 || NET461 || NETSTANDARD2_0
+        /// <summary>
+        /// Constructor for deserialization.
+        /// </summary>
+        /// <param name="info">Stores all the data needed to serialize or deserialize an object.</param>
+        /// <param name="context">Describes the source and destination of a given serialized stream,
+        /// and provides an additional caller-defined context.</param>
+        protected TotalCountList(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
+        {
+        }
+#endif
 
         /// <summary>
         /// Constructor.
