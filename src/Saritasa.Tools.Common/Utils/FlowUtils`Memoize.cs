@@ -2,8 +2,10 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 #if NET40 || NET452 || NET461
 using System.Runtime.Serialization;
 #endif
@@ -16,7 +18,7 @@ namespace Saritasa.Tools.Common.Utils
     public static partial class FlowUtils
     {
         /// <summary>
-        /// Throws the exception to skip item memoization.
+        /// Consumer code can throw the exception to skip item memoization.
         /// </summary>
 #if NET40 || NET452 || NET461 || NETSTANDARD2_0
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "GetObjectData is not needed")]
@@ -164,13 +166,14 @@ namespace Saritasa.Tools.Common.Utils
 
         /// <summary>
         /// Cache strategy invalidation based on max count if items cached. If it exceeds maxCount the
-        /// removeCount last items will be removed. If purge is true then whole cached will be cleared.
+        /// removeCount last items will be removed. If purge is <c>true</c> then whole cache will be cleared.
         /// </summary>
         /// <typeparam name="TKey">Key type.</typeparam>
         /// <typeparam name="TResult">Cache function result type.</typeparam>
         /// <param name="maxCount">Max items to cache.</param>
         /// <param name="removeCount">How many items to remove from cache, default is 1.</param>
-        /// <param name="purge">Should whole cache be cleared. If <c>true</c> removeCount parameter is ignored. <c>False</c> by default.</param>
+        /// <param name="purge">Should whole cache be cleared. If <c>true</c> the removeCount parameter is ignored. Once maxCount size exceed
+        /// we clear all cached keys and start memoization from scratch. <c>False</c> by default.</param>
         /// <returns>Cache strategy instance delegate.</returns>
         public static CacheStrategy<TKey, TResult> CreateMaxCountCacheStrategy<TKey, TResult>(
             int maxCount,
@@ -226,10 +229,7 @@ namespace Saritasa.Tools.Common.Utils
 
         private static void ShiftArrayItemsLeft<TKey>(TKey[] array, int shift)
         {
-            for (int i = 0; i < array.Length - shift; i++)
-            {
-                array[i] = array[i + shift];
-            }
+            Array.Copy(array, shift - 1, array, 0, array.Length - shift);
             for (int i = array.Length - shift; i < array.Length; i++)
             {
                 array[i] = default(TKey);
@@ -244,7 +244,8 @@ namespace Saritasa.Tools.Common.Utils
         /// <typeparam name="TResult">Cache function result type.</typeparam>
         /// <param name="maxCount">Max items to cache.</param>
         /// <param name="removeCount">How many items to remove from cache, default is 1.</param>
-        /// <param name="purge">Should whole cache be cleared. If true removeCount parameter is ignored. False by default.</param>
+        /// <param name="purge">Should whole cache be cleared. If <c>true</c> the removeCount parameter is ignored. Once maxCount size exceed
+        /// we clear all cached keys and start memoization from scratch. <c>False</c> by default.</param>
         /// <returns>Cache strategy instance delegate.</returns>
         public static CacheStrategy<int, TResult> CreateMaxCountCacheStrategy<TResult>(
             int maxCount,
@@ -264,7 +265,8 @@ namespace Saritasa.Tools.Common.Utils
         /// <typeparam name="TResult">Cache function result type.</typeparam>
         /// <param name="maxCount">Max items to cache.</param>
         /// <param name="removeCount">How many items to remove from cache, default is 1.</param>
-        /// <param name="purge">Should whole cache be cleared. If <c>true</c> removeCount parameter is ignored. <c>False</c> by default.</param>
+        /// <param name="purge">Should whole cache be cleared. If <c>true</c> the removeCount parameter is ignored. Once maxCount size exceed
+        /// we clear all cached keys and start memoization from scratch. <c>False</c> by default.</param>
         /// <returns>Cache strategy instance delegate.</returns>
         public static CacheStrategy<Tuple<T1, T2>, TResult> CreateMaxCountCacheStrategy<T1, T2, TResult>(
             int maxCount,
@@ -285,7 +287,8 @@ namespace Saritasa.Tools.Common.Utils
         /// <typeparam name="TResult">Cache function result type.</typeparam>
         /// <param name="maxCount">Max items to cache.</param>
         /// <param name="removeCount">How many items to remove from cache, default is 1.</param>
-        /// <param name="purge">Should whole cache be cleared. If true removeCount parameter is ignored. False by default.</param>
+        /// <param name="purge">Should whole cache be cleared. If <c>true</c> the removeCount parameter is ignored. Once maxCount size exceed
+        /// we clear all cached keys and start memoization from scratch. <c>False</c> by default.</param>
         /// <returns>Cache strategy instance delegate.</returns>
         public static CacheStrategy<Tuple<T1, T2, T3>, TResult> CreateMaxCountCacheStrategy<T1, T2, T3, TResult>(
             int maxCount,
@@ -307,7 +310,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="func">The function to memoize.</param>
         /// <param name="strategies">Strategies to apply. By default limitless strategy will be used.</param>
         /// <param name="cache">Dictionary to use for caching. If not specified the standard Dictionary will be used.</param>
-        /// <returns>Delegate the able to cache.</returns>
+        /// <returns>Delegate with memoize.</returns>
         public static Func<TKey, TResult> Memoize<TKey, TResult>(
             Func<TKey, TResult> func,
             CacheStrategy<TKey, TResult> strategies = null,
@@ -321,27 +324,19 @@ namespace Saritasa.Tools.Common.Utils
             {
                 strategies = (key, dict, notInCache) => false;
             }
-            var keysLocks = new System.Collections.Concurrent.ConcurrentDictionary<TKey, object>();
-            var keysLocksAsDict = (IDictionary<TKey, object>) keysLocks;
-            var collection = cache as System.Collections.ICollection;
-            var cacheLock = collection != null ? collection.SyncRoot : new object();
+            var cacheLock = new System.Threading.ReaderWriterLockSlim();
 
             return key =>
             {
-                TResult result;
                 bool needUpdate = false, strategiesAlreadyApplied = false;
 
-                var keyLock = keysLocks.GetOrAdd(key, (k) => new object());
+                cacheLock.EnterUpgradeableReadLock();
 
-                lock (keyLock)
+                try
                 {
                     // If result is already in cache then no need to refresh it - just skip.
-                    bool inCache;
-                    lock (cacheLock)
-                    {
-                        inCache = cache.TryGetValue(key, out result);
-                    }
-                    Debug.WriteLine($"Memoize: Start memoize key = {key}, inCache = {inCache}, keys locks count = {keysLocks.Count}.");
+                    bool inCache = cache.TryGetValue(key, out TResult result);
+                    Debug.WriteLine($"Memoize: Start memoize key = {key}, inCache = {inCache}.");
 
                     if (inCache)
                     {
@@ -349,7 +344,7 @@ namespace Saritasa.Tools.Common.Utils
                         foreach (CacheStrategy<TKey, TResult> strategy in strategies.GetInvocationList())
                         {
                             // We have to go thru whole list because some strategies may refresh cache.
-                            bool ret = DoWithinLock(cacheLock, () => strategy(key, cache, false));
+                            bool ret = strategy(key, cache, false);
                             if (ret)
                             {
                                 needUpdate = true;
@@ -358,7 +353,6 @@ namespace Saritasa.Tools.Common.Utils
                         }
                         if (!needUpdate)
                         {
-                            keysLocksAsDict.Remove(key);
                             return result;
                         }
                         strategiesAlreadyApplied = true;
@@ -368,6 +362,7 @@ namespace Saritasa.Tools.Common.Utils
                     try
                     {
                         Debug.WriteLine($"Memoize: Evaluating result for key {key}.");
+                        cacheLock.EnterWriteLock();
                         result = func(key);
                         Debug.WriteLine($"Memoize: Evaluated result for key {key}.");
                     }
@@ -376,13 +371,11 @@ namespace Saritasa.Tools.Common.Utils
                         strategiesAlreadyApplied = true;
                         result = exc.Result;
                     }
-                    catch (Exception)
+                    finally
                     {
-                        keysLocksAsDict.Remove(key);
-                        throw;
+                        cacheLock.ExitWriteLock();
                     }
-
-                    DoWithinLock(cacheLock, () => cache[key] = result);
+                    cache[key] = result;
 
                     // If we didn't call strategies yet.
                     if (!strategiesAlreadyApplied)
@@ -390,7 +383,7 @@ namespace Saritasa.Tools.Common.Utils
                         foreach (CacheStrategy<TKey, TResult> strategy in strategies.GetInvocationList())
                         {
                             // We have to go thru whole list because some strategies may refresh cache.
-                            bool ret = DoWithinLock(cacheLock, () => strategy(key, cache, true));
+                            bool ret = strategy(key, cache, true);
                             if (ret)
                             {
                                 needUpdate = true;
@@ -398,19 +391,14 @@ namespace Saritasa.Tools.Common.Utils
                             }
                         }
                     }
+
+                    return result;
                 }
-                keysLocksAsDict.Remove(key);
-
-                return result;
+                finally
+                {
+                    cacheLock.ExitUpgradeableReadLock();
+                }
             };
-        }
-
-        private static void DoWithinLock(object @lock, Action action)
-        {
-            lock (@lock)
-            {
-                action();
-            }
         }
 
         private static TValue DoWithinLock<TValue>(object @lock, Func<TValue> action)
