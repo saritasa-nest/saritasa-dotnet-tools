@@ -401,14 +401,6 @@ namespace Saritasa.Tools.Common.Utils
             };
         }
 
-        private static TValue DoWithinLock<TValue>(object @lock, Func<TValue> action)
-        {
-            lock (@lock)
-            {
-                return action();
-            }
-        }
-
         /// <summary>
         /// Returns a memoized version of a referentially transparent function. The memoized version of the
         /// function keeps a cache of the mapping from arguments to results and, when calls with the same

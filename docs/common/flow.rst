@@ -134,7 +134,7 @@ Methods that affect application execution flow.
 
     The following cache strategies can be used:
 
-    .. function:: CacheStrategy<TKey, TResult> CreateMaxCountCacheStrategy<TKey, TResult>(int maxCount, int removeCount, bool purge, IList<TKey> keysStorage)
+    .. function:: CacheStrategy<TKey, TResult> CreateMaxCountCacheStrategy<TKey, TResult>(int maxCount, int removeCount, bool purge)
 
     .. function:: CacheStrategy<TKey, TResult> CreateMaxAgeCacheStrategy<TKey, TResult>(TimeSpan maxAge, IDictionary<TKey, DateTime> timestampsStorage)
 
@@ -149,6 +149,19 @@ Methods that affect application execution flow.
                     }),
                     FlowUtils.CreateMaxCountCacheStrategy<int, int>(maxCount: 3, removeCount: 2)
                 );
+
+            .. code-block:: c#
+
+                private static int SumInts(int a, int b) => a + b;
+
+                var memoizedSumInts = Saritasa.Tools.Common.Utils.FlowUtils.Memoize(
+                    new Func<int, int, int>(SumInts),
+                    Saritasa.Tools.Common.Utils.FlowUtils.CreateMaxCountCacheStrategy<int, int, int>(maxCount: 30, removeCount: 5, purge: true)
+                );
+
+                Console.WriteLine(memoizedSumInts(2, 2));
+
+
 
 .. function:: void RaiseAll<TEventArgs>(object sender, TEventArgs e, ref EventHandler<TEventArgs> eventDelegate)
 
