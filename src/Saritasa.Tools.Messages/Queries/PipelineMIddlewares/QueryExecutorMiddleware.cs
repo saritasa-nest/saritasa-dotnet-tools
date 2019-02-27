@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -72,6 +72,11 @@ namespace Saritasa.Tools.Messages.Queries.PipelineMiddlewares
                 if (innerException != null)
                 {
                     messageContext.FailException = innerException;
+                    if (CaptureExceptionDispatchInfo)
+                    {
+                        messageContext.Items[MessageContextConstants.ExceptionDispatchInfoKey] =
+                            ExceptionDispatchInfo.Capture(messageContext.FailException);
+                    }
                 }
             }
             finally

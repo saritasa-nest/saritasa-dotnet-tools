@@ -68,6 +68,7 @@ namespace SandBox
             CommandPipeline = new CommandPipeline();
             CommandPipeline.AddMiddlewares(
                 new CommandHandlerLocatorMiddleware(Assembly.GetEntryAssembly()),
+                new CommandHandlerResolverMiddleware(),
                 new CommandHandlerExecutorMiddleware(),
                 new RepositoryMiddleware(inMemoryMessageRepository)
             );
@@ -76,7 +77,10 @@ namespace SandBox
             QueryPipeline = new QueryPipeline();
             QueryPipeline.AddMiddlewares(
                 new QueryObjectResolverMiddleware(),
-                new QueryExecutorMiddleware(),
+                new QueryExecutorMiddleware
+                {
+                    CaptureExceptionDispatchInfo = true
+                },
                 new RepositoryMiddleware(inMemoryMessageRepository)
             );
 
