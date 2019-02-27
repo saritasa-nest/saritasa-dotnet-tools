@@ -16,6 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Saritasa.Tools.Common\Saritasa.Tools.Common.csproj" />
     <ProjectReference Include="..\Saritasa.Tools.Domain\Saritasa.Tools.Domain.csproj" />
   </ItemGroup>
 
