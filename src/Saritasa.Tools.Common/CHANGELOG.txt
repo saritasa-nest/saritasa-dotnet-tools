@@ -1,8 +1,10 @@
-﻿1.1.0 [TBD]
+﻿2.0.0 [2019-02-27]
 [*] Use Count for OffsetLimitList.FromSource .
 [+] Add Empty method to pagination factories.
 [+] Add shorthand Create method to pagination factories.
 [*] Comments update.
+[+] Memoize is thread safe now.
+[-] Remove SkipMemoizeException.
 
 1.0.0 [2018-11-02]
 [*] Fix pagination usage when page size is int.MaxSize .

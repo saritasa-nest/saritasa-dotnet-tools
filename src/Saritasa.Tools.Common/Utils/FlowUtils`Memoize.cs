@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 #if NET40 || NET452 || NET461
 using System.Runtime.Serialization;
 #endif
@@ -16,45 +15,6 @@ namespace Saritasa.Tools.Common.Utils
     /// </summary>
     public static partial class FlowUtils
     {
-        /// <summary>
-        /// Consumer code can throw the exception to skip item memoization.
-        /// </summary>
-#if NET40 || NET452 || NET461 || NETSTANDARD2_0
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "GetObjectData is not needed")]
-        [Serializable]
-#endif
-        public sealed class SkipMemoizeException<TResult> : Exception
-        {
-            private readonly TResult result;
-
-            /// <summary>
-            /// Returned result.
-            /// </summary>
-            public TResult Result => result;
-
-            /// <summary>
-            /// Constructor.
-            /// </summary>
-            /// <param name="result">Result from memoize delegate.</param>
-            public SkipMemoizeException(TResult result)
-            {
-                this.result = result;
-            }
-
-#if NET40 || NET452 || NET461
-            /// <summary>
-            /// Constructor for deserialization.
-            /// </summary>
-            /// <param name="info">Stores all the data needed to serialize or deserialize an object.</param>
-            /// <param name="context">Describes the source and destination of a given serialized stream,
-            /// and provides an additional caller-defined context.</param>
-            private SkipMemoizeException(SerializationInfo info, StreamingContext context)
-                : base(info, context)
-            {
-            }
-#endif
-        }
-
         /// <summary>
         /// Cache strategy delegate determines when value must be invalidated.
         /// </summary>
@@ -95,21 +55,15 @@ namespace Saritasa.Tools.Common.Utils
             {
                 timestampsStorage = new Dictionary<TKey, DateTime>();
             }
-            object lockObj = new object();
 
             return (key, dict, notInCache) =>
             {
-                DateTime dt;
-                bool cached;
-                lock (lockObj)
+                bool cached = timestampsStorage.TryGetValue(key, out DateTime dt);
+                if (!cached)
                 {
-                    cached = timestampsStorage.TryGetValue(key, out dt);
-                    if (!cached)
-                    {
-                        timestampsStorage[key] = DateTime.Now;
-                    }
+                    timestampsStorage[key] = DateTime.Now;
                 }
-                var isExpired = cached && (DateTime.Now - dt) >= maxAge;
+                var isExpired = cached && DateTime.Now - dt >= maxAge;
                 Debug.WriteLineIf(isExpired, $"CreateMaxAgeCacheStrategy: Key {key} expired.");
                 return isExpired;
             };
@@ -179,39 +133,47 @@ namespace Saritasa.Tools.Common.Utils
 
             var keysStorage = new TKey[maxCount];
             var keysStorageIndex = 0;
-            object lockObj = new object();
 
-            return (TKey key, IDictionary<TKey, TResult> dict, bool notInCache) =>
+            return (TKey key, IDictionary<TKey, TResult> cache, bool notInCache) =>
             {
-                lock (lockObj)
+                if (notInCache && !purge)
                 {
-                    if (notInCache && !purge)
+                    if (keysStorageIndex < keysStorage.Length)
                     {
-                        if (keysStorageIndex < keysStorage.Length)
+                        keysStorage[keysStorageIndex++] = key;
+                    }
+                }
+                if (cache.Count > maxCount)
+                {
+                    if (purge)
+                    {
+                        Debug.WriteLine("CreateMaxCountCacheStrategy: Purge keys storage.");
+                        Array.Clear(keysStorage, 0, keysStorage.Length);
+                        keysStorageIndex = 0;
+                        cache.Clear();
+                    }
+                    else
+                    {
+                        var reAddKey = false;
+                        // ReSharper disable once ForCanBeConvertedToForeach
+                        for (int i = 0; i < removeCount; i++)
+                        {
+                            Debug.WriteLine($"CreateMaxCountCacheStrategy: Remove key {keysStorage[i]} with index {i} from keys storage.");
+                            var keyToRemove = keysStorage[i];
+                            cache.Remove(keyToRemove);
+                            if (!reAddKey && EqualityComparer<TKey>.Default.Equals(keyToRemove, key))
+                            {
+                                reAddKey = true;
+                            }
+                        }
+
+                        keysStorageIndex -= removeCount;
+                        Array.Copy(keysStorage, removeCount, keysStorage, 0, keysStorage.Length - removeCount);
+                        Array.Clear(keysStorage, keysStorage.Length - removeCount, removeCount);
+                        if (reAddKey)
                         {
                             keysStorage[keysStorageIndex++] = key;
-                        }
-                    }
-                    if (dict.Count > maxCount)
-                    {
-                        if (purge)
-                        {
-                            Debug.WriteLine("CreateMaxCountCacheStrategy: Purge keys storage.");
-                            Array.Clear(keysStorage, 0, keysStorage.Length);
-                            keysStorageIndex = 0;
-                            dict.Clear();
-                        }
-                        else
-                        {
-                            // ReSharper disable once ForCanBeConvertedToForeach
-                            for (int i = 0; i < removeCount; i++)
-                            {
-                                Debug.WriteLine($"CreateMaxCountCacheStrategy: Remove key {keysStorage[i]} with index {i} from keys storage.");
-                                dict.Remove(keysStorage[i]);
-                            }
-                            Array.Copy(keysStorage, removeCount, keysStorage, 0, keysStorage.Length - removeCount);
-                            Array.Clear(keysStorage, keysStorage.Length - removeCount, removeCount);
-                            keysStorageIndex -= removeCount;
+                            return true;
                         }
                     }
                 }
@@ -324,55 +286,50 @@ namespace Saritasa.Tools.Common.Utils
         {
             bool ExecuteStrategiesReturnIfCacheUpdateRequired(bool notInCache)
             {
-                foreach (CacheStrategy<TKey, TResult> strategy in strategies.GetInvocationList())
+                cacheLock.EnterWriteLock();
+                try
                 {
-                    // We have to go thru whole list because some strategies may refresh cache.
-                    bool cacheUpdateRequired = strategy(key, cache, notInCache: false);
-                    if (cacheUpdateRequired)
+                    foreach (CacheStrategy<TKey, TResult> strategy in strategies.GetInvocationList())
                     {
-                        return true;
+                        // We have to go thru whole list because some strategies may refresh cache.
+                        bool cacheUpdateRequired = strategy(key, cache, notInCache);
+                        if (cacheUpdateRequired)
+                        {
+                            return true;
+                        }
                     }
+                }
+                finally
+                {
+                    cacheLock.ExitWriteLock();
                 }
                 return false;
             }
 
             // If result is already in cache then no need to refresh it - just skip.
-            bool inCache = cache.TryGetValue(key, out TResult result), needResultUpdate = false, strategiesAlreadyApplied = false;
+            bool inCache = cache.TryGetValue(key, out TResult result), needResultUpdate = false;
             Debug.WriteLine($"Memoize: Start memoize with key = {key}, inCache = {inCache}.");
 
-            if (inCache)
+            needResultUpdate = ExecuteStrategiesReturnIfCacheUpdateRequired(notInCache: !inCache);
+            if (inCache && !needResultUpdate)
             {
-                needResultUpdate = ExecuteStrategiesReturnIfCacheUpdateRequired(notInCache: false);
-                if (!needResultUpdate)
-                {
-                    return result;
-                }
-                strategiesAlreadyApplied = true;
+                return result;
             }
 
             // Call user func.
+            Debug.WriteLine($"Memoize: Evaluating result for key {key}.");
+            result = func(key);
+            Debug.WriteLine($"Memoize: Evaluated result for key {key}.");
+
+            // Write to cache.
             cacheLock.EnterWriteLock();
             try
             {
-                Debug.WriteLine($"Memoize: Evaluating result for key {key}.");
-                result = func(key);
                 cache[key] = result;
-                Debug.WriteLine($"Memoize: Evaluated result for key {key}.");
-            }
-            catch (SkipMemoizeException<TResult> exc)
-            {
-                strategiesAlreadyApplied = true;
-                result = exc.Result;
             }
             finally
             {
                 cacheLock.ExitWriteLock();
-            }
-
-            // If we didn't call strategies yet.
-            if (!strategiesAlreadyApplied)
-            {
-                needResultUpdate = ExecuteStrategiesReturnIfCacheUpdateRequired(notInCache: true);
             }
 
             return result;
