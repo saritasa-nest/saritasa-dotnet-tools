@@ -36,8 +36,7 @@ namespace SandBox
         {
             var memoizedGetInts = Saritasa.Tools.Common.Utils.FlowUtils.Memoize(
                 new Func<int, int, int>(GetInts),
-                Saritasa.Tools.Common.Utils.FlowUtils.CreateMaxCountCacheStrategy<int, int, int>(maxCount: 30, removeCount: 5, purge: true)
-                //Saritasa.Tools.Common.Utils.FlowUtils.CreateMaxAgeCacheStrategy<int, int, int>(maxAge: TimeSpan.FromSeconds(10))
+                Saritasa.Tools.Common.Utils.FlowUtils.CreateMaxCountCacheStrategy<int, int, int>(maxCount: 30, removeCount: 5, purge: false)
             );
 
             var stopwatch = new Stopwatch();

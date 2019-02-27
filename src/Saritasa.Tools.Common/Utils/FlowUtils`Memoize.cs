@@ -2,7 +2,6 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -125,11 +124,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="timestampsStorage"></param>
         /// <returns>Cache strategy instance delegate.</returns>
         public static CacheStrategy<int, TResult> CreateMaxAgeCacheStrategy<TResult>(
-            TimeSpan maxAge,
-            IDictionary<int, DateTime> timestampsStorage = null)
-        {
-            return CreateMaxAgeCacheStrategy<int, TResult>(maxAge, timestampsStorage);
-        }
+            TimeSpan maxAge, IDictionary<int, DateTime> timestampsStorage = null) => CreateMaxAgeCacheStrategy<int, TResult>(maxAge, timestampsStorage);
 
         /// <summary>
         /// Cache strategy based on age validation. If item exceed specific time on life it shoule be
@@ -141,9 +136,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="maxAge">Maximum age to live.</param>
         /// <returns>Cache strategy instance delegate.</returns>
         public static CacheStrategy<Tuple<T1, T2>, TResult> CreateMaxAgeCacheStrategy<T1, T2, TResult>(TimeSpan maxAge)
-        {
-            return CreateMaxAgeCacheStrategy<Tuple<T1, T2>, TResult>(maxAge);
-        }
+            => CreateMaxAgeCacheStrategy<Tuple<T1, T2>, TResult>(maxAge);
 
         /// <summary>
         /// Cache strategy based on age validation. If item exceed specific time on life it shoule be
@@ -156,9 +149,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="maxAge">Maximum age to live.</param>
         /// <returns>Cache strategy instance delegate.</returns>
         public static CacheStrategy<Tuple<T1, T2, T3>, TResult> CreateMaxAgeCacheStrategy<T1, T2, T3, TResult>(TimeSpan maxAge)
-        {
-            return CreateMaxAgeCacheStrategy<Tuple<T1, T2, T3>, TResult>(maxAge);
-        }
+            => CreateMaxAgeCacheStrategy<Tuple<T1, T2, T3>, TResult>(maxAge);
 
         #endregion
 
@@ -187,7 +178,7 @@ namespace Saritasa.Tools.Common.Utils
             }
 
             var keysStorage = new TKey[maxCount];
-            int keysStorageIndex = 0;
+            var keysStorageIndex = 0;
             object lockObj = new object();
 
             return (TKey key, IDictionary<TKey, TResult> dict, bool notInCache) =>
@@ -206,7 +197,7 @@ namespace Saritasa.Tools.Common.Utils
                         if (purge)
                         {
                             Debug.WriteLine("CreateMaxCountCacheStrategy: Purge keys storage.");
-                            ShiftArrayItemsLeft(keysStorage, keysStorage.Length);
+                            Array.Clear(keysStorage, 0, keysStorage.Length);
                             keysStorageIndex = 0;
                             dict.Clear();
                         }
@@ -218,22 +209,14 @@ namespace Saritasa.Tools.Common.Utils
                                 Debug.WriteLine($"CreateMaxCountCacheStrategy: Remove key {keysStorage[i]} with index {i} from keys storage.");
                                 dict.Remove(keysStorage[i]);
                             }
-                            ShiftArrayItemsLeft(keysStorage, removeCount);
+                            Array.Copy(keysStorage, removeCount, keysStorage, 0, keysStorage.Length - removeCount);
+                            Array.Clear(keysStorage, keysStorage.Length - removeCount, removeCount);
                             keysStorageIndex -= removeCount;
                         }
                     }
                 }
                 return false;
             };
-        }
-
-        private static void ShiftArrayItemsLeft<TKey>(TKey[] array, int shift)
-        {
-            Array.Copy(array, shift - 1, array, 0, array.Length - shift);
-            for (int i = array.Length - shift; i < array.Length; i++)
-            {
-                array[i] = default(TKey);
-            }
         }
 
         /// <summary>
@@ -250,10 +233,7 @@ namespace Saritasa.Tools.Common.Utils
         public static CacheStrategy<int, TResult> CreateMaxCountCacheStrategy<TResult>(
             int maxCount,
             int removeCount = 1,
-            bool purge = false)
-        {
-            return CreateMaxCountCacheStrategy<int, TResult>(maxCount, removeCount, purge);
-        }
+            bool purge = false) => CreateMaxCountCacheStrategy<int, TResult>(maxCount, removeCount, purge);
 
         /// <summary>
         /// Cache strategy invalidation based on max count if items cached. If it exceeds maxCount the
@@ -271,10 +251,7 @@ namespace Saritasa.Tools.Common.Utils
         public static CacheStrategy<Tuple<T1, T2>, TResult> CreateMaxCountCacheStrategy<T1, T2, TResult>(
             int maxCount,
             int removeCount = 1,
-            bool purge = false)
-        {
-            return CreateMaxCountCacheStrategy<Tuple<T1, T2>, TResult>(maxCount, removeCount, purge);
-        }
+            bool purge = false) => CreateMaxCountCacheStrategy<Tuple<T1, T2>, TResult>(maxCount, removeCount, purge);
 
         /// <summary>
         /// Cache strategy invalidation based on max count if items cached. If it exceeds maxCount the
@@ -293,10 +270,7 @@ namespace Saritasa.Tools.Common.Utils
         public static CacheStrategy<Tuple<T1, T2, T3>, TResult> CreateMaxCountCacheStrategy<T1, T2, T3, TResult>(
             int maxCount,
             int removeCount = 1,
-            bool purge = false)
-        {
-            return CreateMaxCountCacheStrategy<Tuple<T1, T2, T3>, TResult>(maxCount, removeCount, purge);
-        }
+            bool purge = false) => CreateMaxCountCacheStrategy<Tuple<T1, T2, T3>, TResult>(maxCount, removeCount, purge);
 
         #endregion
 
@@ -328,77 +302,80 @@ namespace Saritasa.Tools.Common.Utils
 
             return key =>
             {
-                bool needUpdate = false, strategiesAlreadyApplied = false;
-
                 cacheLock.EnterUpgradeableReadLock();
 
                 try
                 {
-                    // If result is already in cache then no need to refresh it - just skip.
-                    bool inCache = cache.TryGetValue(key, out TResult result);
-                    Debug.WriteLine($"Memoize: Start memoize key = {key}, inCache = {inCache}.");
-
-                    if (inCache)
-                    {
-                        // We may combine strategies.
-                        foreach (CacheStrategy<TKey, TResult> strategy in strategies.GetInvocationList())
-                        {
-                            // We have to go thru whole list because some strategies may refresh cache.
-                            bool ret = strategy(key, cache, false);
-                            if (ret)
-                            {
-                                needUpdate = true;
-                                break;
-                            }
-                        }
-                        if (!needUpdate)
-                        {
-                            return result;
-                        }
-                        strategiesAlreadyApplied = true;
-                    }
-
-                    // Call user func.
-                    try
-                    {
-                        Debug.WriteLine($"Memoize: Evaluating result for key {key}.");
-                        cacheLock.EnterWriteLock();
-                        result = func(key);
-                        Debug.WriteLine($"Memoize: Evaluated result for key {key}.");
-                    }
-                    catch (SkipMemoizeException<TResult> exc)
-                    {
-                        strategiesAlreadyApplied = true;
-                        result = exc.Result;
-                    }
-                    finally
-                    {
-                        cacheLock.ExitWriteLock();
-                    }
-                    cache[key] = result;
-
-                    // If we didn't call strategies yet.
-                    if (!strategiesAlreadyApplied)
-                    {
-                        foreach (CacheStrategy<TKey, TResult> strategy in strategies.GetInvocationList())
-                        {
-                            // We have to go thru whole list because some strategies may refresh cache.
-                            bool ret = strategy(key, cache, true);
-                            if (ret)
-                            {
-                                needUpdate = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    return result;
+                    return MemoizeInternal(key, cacheLock, func, strategies, cache);
                 }
                 finally
                 {
                     cacheLock.ExitUpgradeableReadLock();
                 }
             };
+        }
+
+        private static TResult MemoizeInternal<TKey, TResult>(
+            TKey key,
+            System.Threading.ReaderWriterLockSlim cacheLock,
+            Func<TKey, TResult> func,
+            CacheStrategy<TKey, TResult> strategies,
+            IDictionary<TKey, TResult> cache)
+        {
+            bool ExecuteStrategiesReturnIfCacheUpdateRequired(bool notInCache)
+            {
+                foreach (CacheStrategy<TKey, TResult> strategy in strategies.GetInvocationList())
+                {
+                    // We have to go thru whole list because some strategies may refresh cache.
+                    bool cacheUpdateRequired = strategy(key, cache, notInCache: false);
+                    if (cacheUpdateRequired)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            // If result is already in cache then no need to refresh it - just skip.
+            bool inCache = cache.TryGetValue(key, out TResult result), needResultUpdate = false, strategiesAlreadyApplied = false;
+            Debug.WriteLine($"Memoize: Start memoize with key = {key}, inCache = {inCache}.");
+
+            if (inCache)
+            {
+                needResultUpdate = ExecuteStrategiesReturnIfCacheUpdateRequired(notInCache: false);
+                if (!needResultUpdate)
+                {
+                    return result;
+                }
+                strategiesAlreadyApplied = true;
+            }
+
+            // Call user func.
+            cacheLock.EnterWriteLock();
+            try
+            {
+                Debug.WriteLine($"Memoize: Evaluating result for key {key}.");
+                result = func(key);
+                cache[key] = result;
+                Debug.WriteLine($"Memoize: Evaluated result for key {key}.");
+            }
+            catch (SkipMemoizeException<TResult> exc)
+            {
+                strategiesAlreadyApplied = true;
+                result = exc.Result;
+            }
+            finally
+            {
+                cacheLock.ExitWriteLock();
+            }
+
+            // If we didn't call strategies yet.
+            if (!strategiesAlreadyApplied)
+            {
+                needResultUpdate = ExecuteStrategiesReturnIfCacheUpdateRequired(notInCache: true);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -413,7 +390,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="cache">Dictionary to use for caching. If not specified the standard Dictionary will be used which
         /// is not thread safe.</param>
         /// <returns>Delegate the able to cache.</returns>
-        public static Func<TResult> Memoize<TResult>(
+            public static Func<TResult> Memoize<TResult>(
             Func<TResult> func,
             CacheStrategy<int, TResult> strategies = null,
             IDictionary<int, TResult> cache = null)
