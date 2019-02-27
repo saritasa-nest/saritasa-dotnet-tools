@@ -2,6 +2,9 @@
 [*] For commands and events pipeline use entry assembly to search handlers by default.
 [*] Make EventHandlerMethodWithObject public.
 [*] Correctly handle null ContentType for JsonFileMessageRepository.
+[*] Fix JsonFileMessageRepository.GetAsync only one record return problem. #66
+[*] Return empty MessageQuery if CreateFromString is called with empty string.
+[*] All files-based repositores use FileShare.Read instead of FileShare.ReadWrite sharing.
 
 0.6.0 [2018-12-31]
 [*] Update ContentType and ErrorType compare logic for repositories.

@@ -105,7 +105,7 @@ namespace Saritasa.Tools.Messages.Common
         /// <returns>Message query.</returns>
         public static MessageQuery CreateFromString(string queryString)
         {
-            if (string.IsNullOrEmpty(queryString))
+            if (queryString == null)
             {
                 throw new ArgumentNullException(nameof(queryString));
             }

@@ -187,7 +187,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
                     try
                     {
                         stream = new FileStream(System.IO.Path.Combine(Path, fileName), FileMode.Open, FileAccess.Read,
-                            FileShare.ReadWrite);
+                            FileShare.Read);
                         var messages = ReadMessagesFromStream(stream, messageQuery);
                         foreach (MessageRecord messageRecord in messages)
                         {
