@@ -110,26 +110,29 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         {
             using (var streamReader = new StreamReader(stream))
             {
-                var line = streamReader.ReadLine();
-                var messageRecord = (MessageRecord)Serializer.Deserialize(Encoding.UTF8.GetBytes(line),
-                    typeof(MessageRecord));
-
-                if (string.IsNullOrEmpty(messageRecord.ContentType))
+                string line;
+                while ((line = streamReader.ReadLine()) != null)
                 {
-                    messageRecord.ContentType = typeof(object).FullName;
-                }
-                var contentType = Type.GetType(messageRecord.ContentType);
-                var contentBytes = Encoding.UTF8.GetBytes(messageRecord.Content.ToString());
-                messageRecord.Content = Serializer.Deserialize(contentBytes, contentType);
+                    var messageRecord = (MessageRecord)Serializer.Deserialize(Encoding.UTF8.GetBytes(line),
+                        typeof(MessageRecord));
 
-                if (messageRecord.Error != null)
-                {
-                    var errorType = Type.GetType(messageRecord.ErrorType);
-                    var errorBytes = Encoding.UTF8.GetBytes(messageRecord.Error.ToString());
-                    messageRecord.Error = Serializer.Deserialize(errorBytes, errorType) as Exception;
-                }
+                    if (string.IsNullOrEmpty(messageRecord.ContentType))
+                    {
+                        messageRecord.ContentType = typeof(object).FullName;
+                    }
+                    var contentType = Type.GetType(messageRecord.ContentType);
+                    var contentBytes = Encoding.UTF8.GetBytes(messageRecord.Content.ToString());
+                    messageRecord.Content = Serializer.Deserialize(contentBytes, contentType);
 
-                yield return messageRecord;
+                    if (messageRecord.Error != null)
+                    {
+                        var errorType = Type.GetType(messageRecord.ErrorType);
+                        var errorBytes = Encoding.UTF8.GetBytes(messageRecord.Error.ToString());
+                        messageRecord.Error = Serializer.Deserialize(errorBytes, errorType) as Exception;
+                    }
+
+                    yield return messageRecord;
+                }
             }
         }
 
