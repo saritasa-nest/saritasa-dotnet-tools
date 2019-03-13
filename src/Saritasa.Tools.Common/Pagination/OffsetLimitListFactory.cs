@@ -88,7 +88,7 @@ namespace Saritasa.Tools.Common.Pagination
         /// <typeparam name="T">Item type.</typeparam>
         /// <returns>Empty list with offset and limit.</returns>
         public static OffsetLimitList<T> Empty<T>()
-            => new OffsetLimitList<T>(Enumerable.Empty<T>() as ICollection<T>, offset: 0, limit: 0, totalCount: 0);
+            => new OffsetLimitList<T>(Enumerable.Empty<T>() as ICollection<T>, offset: 0, limit: 1, totalCount: 0);
 
         /// <summary>
         /// Creates new list with limit and offset properties. Shorthand to simplify type infer.

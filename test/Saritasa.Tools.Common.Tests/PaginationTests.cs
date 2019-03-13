@@ -62,5 +62,39 @@ namespace Saritasa.Tools.Common.Tests
             Assert.Equal(1, pagedResult.Page);
             Assert.Equal(int.MaxValue, pagedResult.PageSize);
         }
+
+        [Fact]
+        public void PagedListEmpty_NoInput_EmptyPagedList()
+        {
+            // Arrange & Act
+            var pagedResult = PagedListFactory.Empty<object>();
+
+            // Assert
+            Assert.Equal(0, pagedResult.TotalCount);
+            Assert.Equal(0, pagedResult.TotalPages);
+            Assert.False(pagedResult.Any());
+        }
+
+        [Fact]
+        public void OffsetLimitEmpty_NoInput_EmptyOffsetLimitList()
+        {
+            // Arrange & Act
+            var offsetLimitResult = OffsetLimitListFactory.Empty<object>();
+
+            // Assert
+            Assert.Equal(0, offsetLimitResult.TotalCount);
+            Assert.False(offsetLimitResult.Any());
+        }
+
+        [Fact]
+        public void TotalCountEmpty_NoInput_EmptyTotalCountList()
+        {
+            // Arrange & Act
+            var totalCountResult = TotalCountListFactory.Empty<object>();
+
+            // Assert
+            Assert.Equal(0, totalCountResult.TotalCount);
+            Assert.False(totalCountResult.Any());
+        }
     }
 }

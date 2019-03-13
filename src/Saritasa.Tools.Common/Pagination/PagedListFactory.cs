@@ -106,7 +106,7 @@ namespace Saritasa.Tools.Common.Pagination
         /// <typeparam name="T">Item type.</typeparam>
         /// <returns>Empty paged list.</returns>
         public static PagedList<T> Empty<T>()
-            => new PagedList<T>(Enumerable.Empty<T>() as ICollection<T>, page: PagedList<object>.FirstPage, pageSize: 0, totalCount: 0);
+            => new PagedList<T>(Enumerable.Empty<T>() as ICollection<T>, page: PagedList<object>.FirstPage, pageSize: 1, totalCount: 0);
 
         /// <summary>
         /// Creates paged enumerable from collection. Shorthand to simplify type infer.
