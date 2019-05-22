@@ -1,5 +1,7 @@
-﻿0.5.2 [TBD]
+﻿0.5.4 [TBD]
 [+] SourceLink support.
+[+] Add code field to DomainException and related exceptions.
+[*] Fix ValidationException binary serialization.
 
 0.5.1 [2018-05-07]
 [+] Add custom message formatter for ValidationException.

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -63,31 +63,82 @@ namespace Saritasa.Tools.Domain.Exceptions
         public IEnumerable<string> SummaryErrors => errors.ContainsKey(SummaryKey) ? errors[SummaryKey] : new string[0];
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         public ValidationException() : base(DomainErrorDescriber.Default.ValidationErrors())
         {
         }
 
         /// <summary>
-        /// .ctor with message.
-        /// <param name="message">Exception message.</param>
+        /// Constructor.
         /// </summary>
+        /// <param name="code">Optional description code for this exception.</param>
+        public ValidationException(int code) : base(DomainErrorDescriber.Default.ValidationErrors(), code)
+        {
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="message">The message that describes the error.</param>
         public ValidationException(string message) : base(message)
         {
         }
 
         /// <summary>
-        /// .ctor with message and inner exception.
-        /// <param name="message">Exception message.</param>
-        /// <param name="innerException">Inner exception.</param>
+        /// Constructor.
         /// </summary>
+        /// <param name="message">The message that describes the error.</param>
+        /// <param name="code">Optional description code for this exception.</param>
+        public ValidationException(string message, int code) : base(message, code)
+        {
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="message">The message that describes the error.</param>
+        /// <param name="code">Optional description code for this exception.</param>
+        public ValidationException(string message, string code) : base(message, code)
+        {
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="message">The message that describes the error.</param>
+        /// <param name="innerException">The exception that is the cause of the current exception, or a
+        /// null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
         public ValidationException(string message, Exception innerException) : base(message, innerException)
         {
         }
 
         /// <summary>
-        /// .ctor with dictionary contain member field as key and error message as value.
+        /// Constructor.
+        /// </summary>
+        /// <param name="message">The message that describes the error.</param>
+        /// <param name="innerException">The exception that is the cause of the current exception, or a
+        /// null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
+        /// <param name="code">Optional description code for this exception.</param>
+        public ValidationException(string message, Exception innerException, int code) :
+            base(message, innerException, code)
+        {
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="message">The message that describes the error.</param>
+        /// <param name="innerException">The exception that is the cause of the current exception, or a
+        /// null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
+        /// <param name="code">Optional description code for this exception.</param>
+        public ValidationException(string message, Exception innerException, string code) :
+            base(message, innerException, code)
+        {
+        }
+
+        /// <summary>
+        /// Constructor with dictionary contain member field as key and error message as value.
         /// </summary>
         /// <param name="errors">Member error dictionary.</param>
         public ValidationException(IDictionary<string, string> errors) :
@@ -105,7 +156,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         }
 
         /// <summary>
-        /// .ctor with dictionary contain member field as key and error messages as value.
+        /// Constructor with dictionary contain member field as key and error messages as value.
         /// </summary>
         /// <param name="errors">Member errors dictionary.</param>
         public ValidationException(IDictionary<string, IEnumerable<string>> errors) :
@@ -121,7 +172,7 @@ namespace Saritasa.Tools.Domain.Exceptions
 
 #if NET40
         /// <summary>
-        /// .ctor for deserialization.
+        /// Constructor for deserialization.
         /// </summary>
         /// <param name="info">Stores all the data needed to serialize or deserialize an object.</param>
         /// <param name="context">Describes the source and destination of a given serialized stream,
@@ -129,6 +180,35 @@ namespace Saritasa.Tools.Domain.Exceptions
         protected ValidationException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
+            var xml = info.GetString("errors");
+            if (!string.IsNullOrEmpty(xml))
+            {
+                var xelement = System.Xml.Linq.XElement.Parse(xml);
+                var errorsElements = xelement.Descendants("error").ToDictionary(
+                    x => (string) x.Attribute("id"),
+                    x => x.Elements("msg").Select(e => e.Value).ToList()
+                );
+                foreach (var error in errorsElements)
+                {
+                    errors.Add(error.Key, error.Value);
+                }
+            }
+        }
+
+        /// <inheritdoc />
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+            if (Errors.Count > 0)
+            {
+                var xelement = new System.Xml.Linq.XElement(
+                    "errors",
+                    errors.Select(x => new System.Xml.Linq.XElement("error",
+                        new System.Xml.Linq.XAttribute("id", x.Key),
+                        x.Value.Select(e => new System.Xml.Linq.XElement("msg", e))))
+                );
+                info.AddValue("errors", xelement.ToString(System.Xml.Linq.SaveOptions.DisableFormatting));
+            }
         }
 #endif
 

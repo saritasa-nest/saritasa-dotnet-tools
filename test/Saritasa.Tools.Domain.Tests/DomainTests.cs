@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -21,10 +21,10 @@ namespace Saritasa.Tools.Domain.Tests
     {
 #if NET452
         [Fact]
-        public void Domain_exception_should_serialize_deserialize_correctly()
+        public void BinaryFormatterSerialize_DomainExceptionWithMessageAndCode_PersistAfterDeserialize()
         {
             // Arrange
-            var domainException = new DomainException("Test");
+            var domainException = new DomainException("Test", 10);
             var formatter = new BinaryFormatter();
             DomainException deserializedDomainException = null;
 
@@ -38,6 +38,34 @@ namespace Saritasa.Tools.Domain.Tests
 
             // Assert
             Assert.Equal(domainException.Message, deserializedDomainException.Message);
+            Assert.Equal(domainException.Code, deserializedDomainException.Code);
+        }
+
+        [Fact]
+        public void BinaryFormatterSerialize_ValidationExceptionWithErrors_PersistAfterDeserialize()
+        {
+            // Arrange
+            var validationException = new Saritasa.Tools.Domain.Exceptions.ValidationException(new Dictionary<string, IEnumerable<string>>()
+            {
+                ["Name"] = new List<string> { "Required." },
+                ["Dob"] = new List<string> { "Out of range." },
+                ["SSN"] = new List<string> { "Incorrect length.", "Should not contain characters." }
+            });
+            var formatter = new BinaryFormatter();
+            Saritasa.Tools.Domain.Exceptions.ValidationException deserializedValidationException = null;
+
+            // Act
+            using (var memoryStream = new MemoryStream())
+            {
+                formatter.Serialize(memoryStream, validationException);
+                memoryStream.Seek(0, SeekOrigin.Begin);
+                deserializedValidationException = (Saritasa.Tools.Domain.Exceptions.ValidationException)formatter.Deserialize(memoryStream);
+            }
+
+            // Assert
+            Assert.Equal(validationException.Errors.Count, deserializedValidationException.Errors.Count);
+            Assert.Equal(validationException.Errors["Dob"].ElementAt(0), deserializedValidationException.Errors["Dob"].ElementAt(0));
+            Assert.Equal(validationException.Errors["SSN"].Count(), deserializedValidationException.Errors["SSN"].Count());
         }
 #endif
 
@@ -65,7 +93,7 @@ namespace Saritasa.Tools.Domain.Tests
         }
 
         [Fact]
-        public void Domain_validation_exception_should_take_into_account_IValidatableObject()
+        public void ThrowFromObjectValidation_ValidationExceptionThrow_CorrectValidationException()
         {
             // Arrange
             var obj = new User();
@@ -88,7 +116,7 @@ namespace Saritasa.Tools.Domain.Tests
         }
 
         [Fact]
-        public void Domain_validation_exception_should_not_throw_on_valid_object()
+        public void ThrowFromObjectValidation_ValidProduct_NoException()
         {
             // Arrange
             var obj = new Product();
@@ -99,7 +127,7 @@ namespace Saritasa.Tools.Domain.Tests
         }
 
         [Fact]
-        public void Domain_validation_exception_should_throw_on_not_valid_object()
+        public void ThrowFromObjectValidation_InvalidProduct_ThrowException()
         {
             // Arrange
             var obj = new Product();
@@ -142,7 +170,7 @@ namespace Saritasa.Tools.Domain.Tests
         }
 
         [Fact]
-        public void Domain_validation_should_work_on_MetadataType_attribute()
+        public void ThrowFromObjectValidation_JobAndUseMetadataType_MetadataTypeUsedInValidation()
         {
             // Arrange
             var obj = new Job();
@@ -168,7 +196,7 @@ namespace Saritasa.Tools.Domain.Tests
 #endif
 
         [Fact]
-        public void Domain_validation_should_keep_message_from_ctor()
+        public void ValidationException_WithMessage_MessageRemains()
         {
             // Arrange & act
             var ex = new Exceptions.ValidationException("The custom message");
