@@ -135,6 +135,9 @@
   <data name="NotFoundEntity" xml:space="preserve">
     <value>The specified {0} not found.</value>
   </data>
+  <data name="ServerError" xml:space="preserve">
+    <value>A server error has occured. Please try again later.</value>
+  </data>
   <data name="Unauthorized" xml:space="preserve">
     <value>Unauthorized access.</value>
   </data>

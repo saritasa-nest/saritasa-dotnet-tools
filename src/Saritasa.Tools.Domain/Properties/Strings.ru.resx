@@ -135,6 +135,9 @@
   <data name="NotFoundEntity" xml:space="preserve">
     <value>Элемент {0} не найден.</value>
   </data>
+  <data name="ServerError" xml:space="preserve">
+    <value>На сервер произошла ошибка. Пожалуйста, повторите попытку позже.</value>
+  </data>
   <data name="Unauthorized" xml:space="preserve">
     <value>Не авторизованный доступ.</value>
   </data>

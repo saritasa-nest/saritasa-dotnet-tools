@@ -2,6 +2,7 @@
 [+] SourceLink support.
 [+] Add code field to DomainException and related exceptions.
 [*] Fix ValidationException binary serialization.
+[+] Add InfrastructureException.
 
 0.5.1 [2018-05-07]
 [+] Add custom message formatter for ValidationException.
