@@ -2,14 +2,17 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net47</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
+    <CodeAnalysisRuleSet>../../tools/Saritasa.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.11.5" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Saritasa.Tools.Common\Saritasa.Tools.Common.csproj" />
     <ProjectReference Include="..\..\src\Saritasa.Tools.Messages.Abstractions\Saritasa.Tools.Messages.Abstractions.csproj" />
     <ProjectReference Include="..\..\src\Saritasa.Tools.Messages\Saritasa.Tools.Messages.csproj" />
   </ItemGroup>

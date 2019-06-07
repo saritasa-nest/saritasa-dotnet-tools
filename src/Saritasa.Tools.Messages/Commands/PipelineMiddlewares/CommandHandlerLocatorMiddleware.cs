@@ -17,6 +17,9 @@ namespace Saritasa.Tools.Messages.Commands.PipelineMiddlewares
     /// </summary>
     public class CommandHandlerLocatorMiddleware : BaseHandlerLocatorMiddleware, IMessagePipelineMiddleware
     {
+        /// <summary>
+        /// String key to lookup found <see cref="MethodInfo" />.
+        /// </summary>
         public const string HandlerMethodKey = "handler-method";
 
         /// <summary>

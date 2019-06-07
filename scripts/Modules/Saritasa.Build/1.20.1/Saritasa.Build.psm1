@@ -71,7 +71,7 @@ function Invoke-NugetRestore
     else
     {
         Write-Warning "Install NuGet globally for faster builds:`nchoco install nuget.commandline"
-        
+
         Install-NugetCli -Destination $PSScriptRoot
         $nugetExePath = "$PSScriptRoot\nuget.exe"
     }
@@ -394,7 +394,8 @@ function Update-VariablesInFile
     foreach ($key in $Variables.Keys)
     {
         $escapedValue = $Variables[$key] -replace '\$', '$$$$'
-        $content = $content -ireplace"\`$\($key\)", $escapedValue
+        $content = $content -ireplace "\`$\($key\)", $escapedValue
+        $content = $content -ireplace "%$key%", $escapedValue
     }
 
     $content | Set-Content $Path
@@ -411,22 +412,38 @@ function Initialize-MSBuild
 
     Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
 
-    $vsPath = (@((Get-VSSetupInstance | Select-VSSetupInstance -Version 15.0 -Require Microsoft.Component.MSBuild).InstallationPath,
-        (Get-VSSetupInstance | Select-VSSetupInstance -Version 15.0 -Product Microsoft.VisualStudio.Product.BuildTools).InstallationPath) -ne $null)[0]
+    $vsDefinitions = `
+    @(
+        @{ Version = '16.0'; Product = 'Microsoft.Component.MSBuild'; MSBuildVersion = 'Current' }
+        @{ Version = '16.0'; Product = 'Microsoft.VisualStudio.Product.BuildTools'; MSBuildVersion = 'Current' }
+        @{ Version = '15.0'; Product = 'Microsoft.Component.MSBuild'; MSBuildVersion = '15.0' }
+        @{ Version = '15.0'; Product = 'Microsoft.VisualStudio.Product.BuildTools'; MSBuildVersion = '15.0' }
+    )
+
+    foreach ($vsDefinition in $vsDefinitions)
+    {
+        $vsPath = (Get-VSSetupInstance | Select-VSSetupInstance -Version $vsDefinition.Version -Require $vsDefinition.Product).InstallationPath
+
+        if ($vsPath)
+        {
+            $msBuildVersion = $vsDefinition.MSBuildVersion
+            break
+        }
+    }
 
     if (!$vsPath)
     {
-        Write-Information 'VS 2017 not found.'
+        Write-Information 'VS 2017 or 2019 not found.'
         return
     }
 
     if ([System.IntPtr]::Size -eq 8)
     {
-        $msbuildPath = Join-Path $vsPath 'MSBuild\15.0\Bin\amd64'
+        $msbuildPath = Join-Path $vsPath "MSBuild\$msBuildVersion\Bin\amd64"
     }
     else
     {
-        $msbuildPath = Join-Path $vsPath 'MSBuild\15.0\Bin'
+        $msbuildPath = Join-Path $vsPath "MSBuild\$msBuildVersion\Bin"
     }
 
     $env:Path = "$msbuildPath;$env:Path"
