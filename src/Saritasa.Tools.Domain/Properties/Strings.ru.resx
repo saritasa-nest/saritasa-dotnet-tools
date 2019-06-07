@@ -136,10 +136,10 @@
     <value>Элемент {0} не найден.</value>
   </data>
   <data name="ServerError" xml:space="preserve">
-    <value>На сервер произошла ошибка. Пожалуйста, повторите попытку позже.</value>
+    <value>На сервере произошла ошибка. Пожалуйста, повторите попытку позже.</value>
   </data>
   <data name="Unauthorized" xml:space="preserve">
-    <value>Не авторизованный доступ.</value>
+    <value>Неавторизованный доступ.</value>
   </data>
   <data name="ValidationErrorIsEmpty" xml:space="preserve">
     <value>Укажите текст ошибки.</value>

@@ -127,7 +127,7 @@
     <value>An error has occurred.</value>
   </data>
   <data name="Forbidden" xml:space="preserve">
-    <value>Action forbidden.</value>
+    <value>Action is forbidden.</value>
   </data>
   <data name="NotFound" xml:space="preserve">
     <value>The specified item not found.</value>
@@ -136,13 +136,13 @@
     <value>The specified {0} not found.</value>
   </data>
   <data name="ServerError" xml:space="preserve">
-    <value>A server error has occured. Please try again later.</value>
+    <value>A server error has occurred. Please try again later.</value>
   </data>
   <data name="Unauthorized" xml:space="preserve">
     <value>Unauthorized access.</value>
   </data>
   <data name="ValidationErrorIsEmpty" xml:space="preserve">
-    <value>Please specify error message.</value>
+    <value>Please specify an error message.</value>
   </data>
   <data name="ValidationErrors" xml:space="preserve">
     <value>Validation errors.</value>

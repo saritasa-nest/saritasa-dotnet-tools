@@ -13,12 +13,7 @@ namespace Saritasa.Tools.Domain.Exceptions
     /// or works incorrect so that system cannot process request. The client must provide source exception.
     /// Can be mapped to 500 HTTP status code.
     /// </summary>
-    public class InfrastructureException :
-#if NET40
-        SystemException
-#else
-        Exception
-#endif
+    public class InfrastructureException : Exception
     {
         /// <summary>
         /// Optional description code for this exception.

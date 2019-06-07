@@ -12,7 +12,6 @@ namespace Saritasa.Tools.Domain.Properties {
     using System;
     using System.Reflection;
 
-
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -89,7 +88,7 @@ namespace Saritasa.Tools.Domain.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Action forbidden..
+        ///   Looks up a localized string similar to Action is forbidden..
         /// </summary>
         internal static string Forbidden {
             get {
@@ -116,7 +115,7 @@ namespace Saritasa.Tools.Domain.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A server error has occured. Please try again later..
+        ///   Looks up a localized string similar to A server error has occurred. Please try again later..
         /// </summary>
         internal static string ServerError {
             get {
@@ -134,7 +133,7 @@ namespace Saritasa.Tools.Domain.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Please specify error message..
+        ///   Looks up a localized string similar to Please specify an error message..
         /// </summary>
         internal static string ValidationErrorIsEmpty {
             get {
