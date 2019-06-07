@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 #if !NET40
@@ -21,7 +21,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
     /// issue API token at Source Setup -> Customer Tokens section of website.
     /// </summary>
     /// <remarks>
-    /// Information about HTTP endpoint: https://www.loggly.com/docs/http-endpoint/
+    /// Information about HTTP endpoint: https://www.loggly.com/docs/http-endpoint/ .
     /// </remarks>
     public class LogglyMessageRepository : IMessageRepository, IDisposable
     {
@@ -144,7 +144,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         /// <param name="messageQuery">Message query.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <remarks>
-        /// Source: https://www.loggly.com/docs/search-query-language/
+        /// See also https://www.loggly.com/docs/search-query-language/ .
         /// </remarks>
         /// <returns>Enumerable of found messages.</returns>
         public async Task<IEnumerable<MessageRecord>> GetAsync(MessageQuery messageQuery,

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2017-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -50,7 +50,7 @@ namespace Saritasa.Tools.Messages.TestRuns.Steps
         }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         public BasicInformationStep()
         {
@@ -58,7 +58,7 @@ namespace Saritasa.Tools.Messages.TestRuns.Steps
         }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="body">Deserialize from json.</param>
         public BasicInformationStep(JObject body)

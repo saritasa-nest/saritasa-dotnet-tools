@@ -8,7 +8,6 @@
     <RuntimeFrameworkVersion Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">2.0.0</RuntimeFrameworkVersion>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <CodeAnalysisRuleSet>../../tools/Saritasa.ruleset</CodeAnalysisRuleSet>
-    <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile Condition="'$(OS)' == 'Windows_NT'">../../tools/SaritasaTools.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 

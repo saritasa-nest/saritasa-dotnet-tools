@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2017-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -18,7 +18,7 @@ namespace Saritasa.Tools.Messages.TestRuns.Loaders
         public string[] Files { get; }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="files">Set of files.</param>
         public FilesLoader(params string[] files)

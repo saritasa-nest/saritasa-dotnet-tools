@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -99,7 +99,7 @@ namespace Saritasa.Tools.Messages.Common
         }
 
         /// <summary>
-        /// Prepares expression: NEW UserHandlers((IInterface1)sp.GetService(typeof(IInterface1)));
+        /// Prepares expression: NEW UserHandlers((IInterface1)sp.GetService(typeof(IInterface1))) .
         /// </summary>
         /// <param name="ctor">Constructor descriptor.</param>
         /// <param name="serviceProviderParam">Parameter of type <see cref="IServiceProvider" />.</param>
@@ -126,7 +126,7 @@ namespace Saritasa.Tools.Messages.Common
 
         /// <summary>
         /// Prepares expression for every public property:
-        /// IF (obj.Prop1 == null) { (obj.Prop1.GetType()) sp.GetService(obj.Prop1.GetType()); }
+        /// IF (obj.Prop1 == null) { (obj.Prop1.GetType()) sp.GetService(obj.Prop1.GetType()); }.
         /// </summary>
         /// <param name="type">Handler type.</param>
         /// <param name="handlerParam">Handler parameter expression.</param>

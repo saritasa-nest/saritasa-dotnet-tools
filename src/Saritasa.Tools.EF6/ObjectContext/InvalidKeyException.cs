@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -12,14 +12,14 @@ namespace Saritasa.Tools.EF.ObjectContext
     public class InvalidKeyException : Exception
     {
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         public InvalidKeyException()
         {
         }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="message">Exception message.</param>
         public InvalidKeyException(string message) : base(message)
@@ -27,7 +27,7 @@ namespace Saritasa.Tools.EF.ObjectContext
         }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="message">Exception message.</param>
         /// <param name="innerException">Inner exception.</param>

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2017-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
@@ -16,7 +16,7 @@ namespace Saritasa.Tools.Messages.TestRuns.Internal
         public IMessagePipeline[] Pipelines { get; set; }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="pipelines">Pipelines.</param>
         public TestRunMessagePipelineContainer(IEnumerable<IMessagePipeline> pipelines)

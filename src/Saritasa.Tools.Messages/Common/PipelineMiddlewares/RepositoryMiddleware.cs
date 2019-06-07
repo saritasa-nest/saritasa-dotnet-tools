@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -42,7 +42,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         private readonly RepositoryMessagesFilter filter;
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="parameters">Parameters dictionary.</param>
         public RepositoryMiddleware(IDictionary<string, string> parameters)
@@ -72,7 +72,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="repository">Repository implementation.</param>
         public RepositoryMiddleware(IMessageRepository repository)
@@ -86,7 +86,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="repository">Repository implementation.</param>
         /// <param name="filter">Filter incoming messages.</param>

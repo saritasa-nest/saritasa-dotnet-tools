@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -76,8 +76,11 @@ namespace Saritasa.Tools.Common.Tests
         public void Convert_BytesToString_should_match_StringToBytes()
         {
             // Arrange
-            var bytes = new byte[] { 0x12, 0x64, 0x12, 0x05, 0x64, 0x53, 0x34, 0x77, 0x66, 0x33, 0x12, 0x64, 0x12, 0x05, 0x64,
-                0x53, 0x34, 0x77, 0x66, 0x33 };
+            var bytes = new byte[]
+            {
+                0x12, 0x64, 0x12, 0x05, 0x64, 0x53, 0x34, 0x77, 0x66, 0x33, 0x12, 0x64, 0x12, 0x05, 0x64,
+                0x53, 0x34, 0x77, 0x66, 0x33
+            };
 
             // Act
             var str1 = SecurityUtils.ConvertBytesToString(bytes);

@@ -347,7 +347,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="cache">Dictionary to use for caching. If not specified the standard Dictionary will be used which
         /// is not thread safe.</param>
         /// <returns>Delegate the able to cache.</returns>
-            public static Func<TResult> Memoize<TResult>(
+        public static Func<TResult> Memoize<TResult>(
             Func<TResult> func,
             CacheStrategy<int, TResult> strategies = null,
             IDictionary<int, TResult> cache = null)

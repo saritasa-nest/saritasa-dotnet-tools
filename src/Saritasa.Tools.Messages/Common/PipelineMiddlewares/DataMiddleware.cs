@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019 Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -19,7 +19,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         private readonly Action<IDictionary<string, string>> action;
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="action">The action to be executed.</param>
         public DataMiddleware(Action<IDictionary<string, string>> action)

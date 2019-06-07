@@ -69,7 +69,7 @@ namespace Saritasa.Tools.Emails.Interceptors
         /// Convert string with emails to array.
         /// </summary>
         /// <param name="emails">String with emails, for example "ivan@saritasa.com,test@example.com".</param>
-        /// <returns>Array of emails</returns>
+        /// <returns>Array of emails.</returns>
         internal static string[] SplitAndCleanEmails(string emails) => emails
             .Split(new[] { ',', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries)
             .Select(e => e.ToLowerInvariant().Trim())

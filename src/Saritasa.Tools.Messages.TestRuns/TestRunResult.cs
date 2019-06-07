@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2017-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -40,14 +40,14 @@ namespace Saritasa.Tools.Messages.TestRuns
         public IEnumerable<TestRunStepResult> Steps => steps;
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         public TestRunResult()
         {
         }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="name">Test run name.</param>
         public TestRunResult(string name)
@@ -73,6 +73,7 @@ namespace Saritasa.Tools.Messages.TestRuns
         /// <param name="logger">Logger to be used.</param>
         public void Dump(ITestRunLogger logger)
         {
+#pragma warning disable SA1001 // Commas should be spaced correctly
             logger.Log(new string('-', 96));
             logger.Log($"{TruncateString(Name, 90), -90}{GetSuccessString(IsSuccess), 6}");
             foreach (TestRunStepResult step in Steps)
@@ -81,6 +82,7 @@ namespace Saritasa.Tools.Messages.TestRuns
                     $"{"#" + step.StepNum, -4}{TruncateString(step.Name, 86), -86}{GetSuccessString(step.IsSuccess), 6}");
             }
             logger.Log(new string('-', 96));
+#pragma warning restore SA1001 // Commas should be spaced correctly
         }
 
         /// <summary>

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2017-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -15,7 +15,7 @@ namespace Saritasa.Tools.Messages.TestRuns.Loaders
         private readonly string directory;
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="directory">Directory to search files.</param>
         public DirectoryFilesLoader(string directory)

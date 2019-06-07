@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -9,19 +9,19 @@ namespace Saritasa.Tools.Messages.TestRuns
     /// Exception occurs when assert fails during test run.
     /// </summary>
 #if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_6
-        [Serializable]
+    [Serializable]
 #endif
     public class TestRunAssertException : TestRunException
     {
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         public TestRunAssertException()
         {
         }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="message">Exception message.</param>
         public TestRunAssertException(string message) : base(message)
@@ -29,7 +29,7 @@ namespace Saritasa.Tools.Messages.TestRuns
         }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="message">Exception message.</param>
         /// <param name="innerException">Inner exception.</param>

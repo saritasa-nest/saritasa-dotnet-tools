@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -15,7 +15,7 @@ namespace Saritasa.Tools.Messages.Tests
     public class QueryProviderTests
     {
         [Fact]
-        public void Sql_server_query_provider_get_filter_by_id_test()
+        public void GetFilterScript_SqlServerQueryProvider_GetFilterByIdSql()
         {
             // Arrange
             var guid = Guid.NewGuid();
@@ -27,14 +27,14 @@ namespace Saritasa.Tools.Messages.Tests
             var result = provider.GetFilterScript(query);
 
             // Assert
-            var expectedResult = 
+            var expectedResult =
 $@"SELECT TOP 1000 * FROM [SaritasaMessages]
 WHERE ([ContentId] = '{guid}')";
             Assert.Equal(expectedResult, result);
         }
 
         [Fact]
-        public void Sql_server_query_provider_get_filter_by_date_test()
+        public void GetFilterScript_SqlServerQueryProvider_GetFilterByDateSql()
         {
             // Arrange
             var startDate = new DateTime(2016, 1, 1);
@@ -56,7 +56,7 @@ WHERE ([CreatedAt] >= '{startDate:yyyy-MM-dd hh:mm:ss}') AND ([CreatedAt] <= '{e
         }
 
         [Fact]
-        public void Sql_server_query_provider_get_filter_range_test()
+        public void GetFilterScript_SqlServerQueryProvider_GetFilterRangeSql()
         {
             // Arrange
             var ser = new JsonObjectSerializer();
@@ -76,7 +76,7 @@ FETCH NEXT 10 ROWS ONLY";
         }
 
         [Fact]
-        public void Mysql_query_provider_get_filter_by_id_test()
+        public void GetFilterScript_MySqlQueryProvider_GetFilterByIdSql()
         {
             // Arrange
             var guid = Guid.NewGuid();
@@ -88,7 +88,7 @@ FETCH NEXT 10 ROWS ONLY";
             var result = provider.GetFilterScript(query);
 
             // Assert
-            var expectedResult = 
+            var expectedResult =
 $@"SELECT * FROM `saritasa_messages`
 WHERE (`content_id` = '{guid}')
 LIMIT 1000";
@@ -96,7 +96,7 @@ LIMIT 1000";
         }
 
         [Fact]
-        public void Mysql_query_provider_get_filter_by_date_test()
+        public void GetFilterScript_MySqlQueryProvider_GetFilterByDateSql()
         {
             // Arrange
             var startDate = new DateTime(2016, 1, 1);
@@ -119,7 +119,7 @@ LIMIT 1000";
         }
 
         [Fact]
-        public void Mysql_query_provider_get_filter_range_test()
+        public void GetFilterScript_MySqlQueryProvider_GetFilterRangeSql()
         {
             // Arrange
             var ser = new JsonObjectSerializer();
@@ -137,7 +137,7 @@ LIMIT 20, 10";
         }
 
         [Fact]
-        public void Sqlite_query_provider_get_filter_by_id_test()
+        public void GetFilterScript_SqliteQueryProvider_GetFilterByIdSql()
         {
             // Arrange
             var guid = Guid.NewGuid();
@@ -149,7 +149,7 @@ LIMIT 20, 10";
             var result = provider.GetFilterScript(query);
 
             // Assert
-            var expectedResult = 
+            var expectedResult =
 $@"SELECT * FROM saritasa_messages
 WHERE (content_id = '{guid}')
 LIMIT 1000";
@@ -180,7 +180,7 @@ LIMIT 1000";
         }
 
         [Fact]
-        public void Sqlite_query_provider_get_filter_range_test()
+        public void GetFilterScript_SqliteQueryProvider_GetFilterRangeSql()
         {
             // Arrange
             var ser = new JsonObjectSerializer();

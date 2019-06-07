@@ -52,7 +52,7 @@ namespace Saritasa.Tools.Messages.Events.PipelineMiddlewares
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="assemblies">Assemblies to locate. If null </param>
+        /// <param name="assemblies">Assemblies to locate. If null the entry assembly will be used.</param>
         public EventHandlerLocatorMiddleware(params Assembly[] assemblies)
         {
             if (assemblies == null)

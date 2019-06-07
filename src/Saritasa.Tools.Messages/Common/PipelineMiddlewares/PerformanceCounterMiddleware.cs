@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 #if NET452
@@ -47,7 +47,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         private PerformanceCounter performanceCounterAvgBase;
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="dict">Parameters.</param>
         public PerformanceCounterMiddleware(IDictionary<string, string> dict)
@@ -67,7 +67,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="category">Performance counter category.</param>
         public PerformanceCounterMiddleware(string category = "Saritasa Tools Messages")

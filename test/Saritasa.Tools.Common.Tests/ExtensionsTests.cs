@@ -106,7 +106,9 @@ namespace Saritasa.Tools.Common.Tests
 
         private const string OverriddenDescriptionName = "Description Override";
 
-        public class TestAttribute : Attribute { }
+        public class TestAttribute : Attribute
+        {
+        }
 
         public enum TestEnum
         {

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -90,7 +90,7 @@ namespace Saritasa.Tools.Messages.Common
 
         /// <summary>
         /// Constructs the expression like this:
-        /// handler.Method(obj, (IInterface)sp.Resolve(typeof(IInterface)));
+        /// handler.Method(obj, (IInterface)sp.Resolve(typeof(IInterface))) .
         /// </summary>
         /// <param name="handler">Handler object.</param>
         /// <param name="obj">Command object.</param>

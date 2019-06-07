@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -38,7 +38,7 @@ namespace Saritasa.Tools.Messages.Common.Repositories
         public override string FileNameExtension => compress ? ".bin.zip" : ".bin";
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="path">Logs path.</param>
         /// <param name="serializer">Object serializer. By default json serializer is used.</param>

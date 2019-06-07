@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -291,14 +291,14 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Castagnoli's polynomial, used in iSCSI. Has better error detection characteristics than IEEE.
         /// </summary>
-        /// <remarks>http://dx.doi.org/10.1109/26.231911</remarks>
+        /// <remarks>For reference look http://dx.doi.org/10.1109/26.231911 .</remarks>
         [CLSCompliant(false)]
         public const uint Crc32Castagnoli = 0x82f63b78;
 
         /// <summary>
         /// Koopman's polynomial. Also has better error detection characteristics than IEEE.
         /// </summary>
-        /// <remarks>http://dx.doi.org/10.1109/DSN.2002.1028931</remarks>
+        /// <remarks>For reference look http://dx.doi.org/10.1109/DSN.2002.1028931 .</remarks>
         [CLSCompliant(false)]
         public const uint Crc32Koopman = 0xeb31d82e;
 

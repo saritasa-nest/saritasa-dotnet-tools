@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -23,7 +23,9 @@ namespace Saritasa.Tools.Messages.Tests
 
         #region Shared interfaces
 
+#pragma warning disable SA1302 // Interface names should begin with I
         public interface Ns01_IInterfaceA
+#pragma warning restore SA1302 // Interface names should begin with I
         {
             string GetTestValue();
         }
@@ -33,7 +35,9 @@ namespace Saritasa.Tools.Messages.Tests
             public string GetTestValue() => "A";
         }
 
+#pragma warning disable SA1302 // Interface names should begin with I
         public interface Ns01_IInterfaceB
+#pragma warning restore SA1302 // Interface names should begin with I
         {
             string GetTestValue();
         }

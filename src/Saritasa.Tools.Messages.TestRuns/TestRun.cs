@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2017-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -20,17 +20,17 @@ namespace Saritasa.Tools.Messages.TestRuns
     public class TestRun
     {
         /// <summary>
-        /// Json field name for step number.
+        /// JSON field name for step number.
         /// </summary>
         public const string NumberKey = "number";
 
         /// <summary>
-        /// Json field name for type.
+        /// JSON field name for type.
         /// </summary>
         public const string TypeKey = "type";
 
         /// <summary>
-        /// Json field name for content.
+        /// JSON field name for content.
         /// </summary>
         public const string ContentKey = "content";
 
@@ -40,16 +40,16 @@ namespace Saritasa.Tools.Messages.TestRuns
         public IList<ITestRunStep> Steps { get; protected set; } = new List<ITestRunStep>();
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         internal TestRun()
         {
         }
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
-        /// <param name="name">Test name</param>
+        /// <param name="name">Test name.</param>
         public TestRun(string name)
         {
             Steps.Add(new BasicInformationStep

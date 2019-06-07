@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -19,7 +19,7 @@ namespace Saritasa.Tools.Common.Utils
         /// Retry strategy delegate determines wait delay and when to break attempts to execute.
         /// </summary>
         /// <param name="attemptCount">Current attempt number.</param>
-        /// <param name="lastException">Last exception</param>
+        /// <param name="lastException">Last exception.</param>
         /// <param name="neededDelay">Out argument determines how much time to delay.</param>
         /// <returns>Return true if need to break flow.</returns>
         public delegate bool RetryStrategy(int attemptCount, Exception lastException, out TimeSpan neededDelay);
@@ -473,7 +473,8 @@ namespace Saritasa.Tools.Common.Utils
         /// deltaBackoff * 1.2 . True by default.</param>
         /// <returns>Retry strategy delegate.</returns>
         /// <remarks>
-        /// https://github.com/MicrosoftArchive/transient-fault-handling-application-block/blob/master/source/Source/TransientFaultHandling/ExponentialBackoff.cs#L78
+        /// See also
+        /// https://github.com/MicrosoftArchive/transient-fault-handling-application-block/blob/master/source/Source/TransientFaultHandling/ExponentialBackoff.cs#L78 .
         /// </remarks>
         public static RetryStrategy CreateExponentialBackoffDelayRetryStrategy(
             int numberOfTries = 3,

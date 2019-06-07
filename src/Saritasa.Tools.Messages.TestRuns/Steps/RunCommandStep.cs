@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2017-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -44,7 +44,7 @@ namespace Saritasa.Tools.Messages.TestRuns.Steps
         public string CommandType => commandType;
 
         /// <summary>
-        /// .ctor
+        /// Constructor.
         /// </summary>
         /// <param name="id">Command id.</param>
         /// <param name="command">Command object.</param>
@@ -56,7 +56,7 @@ namespace Saritasa.Tools.Messages.TestRuns.Steps
         }
 
         /// <summary>
-        /// .ctor to create from <see cref="IMessageContext" />.
+        /// Constructor to create from <see cref="IMessageContext" />.
         /// </summary>
         /// <param name="messageRecord">Message record.</param>
         public RunCommandStep(MessageRecord messageRecord)
@@ -72,7 +72,7 @@ namespace Saritasa.Tools.Messages.TestRuns.Steps
         }
 
         /// <summary>
-        /// .ctor to create from string line.
+        /// Constructor to create from string line.
         /// </summary>
         /// <param name="body">JSON.</param>
         public RunCommandStep(JObject body)

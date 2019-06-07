@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2017-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 namespace Saritasa.Tools.Messages.TestRuns.Steps
 {
     /// <summary>
-    /// The step is to provide comment text within steps list
+    /// The step is to provide comment text within steps list.
     /// </summary>
     public class CommentStep : ITestRunStep
     {

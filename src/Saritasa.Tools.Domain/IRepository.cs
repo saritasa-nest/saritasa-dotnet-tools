@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -40,7 +40,7 @@ namespace Saritasa.Tools.Domain
         /// Finds for range of entities based on predicate.
         /// </summary>
         /// <param name="predicate">Filter predicate.</param>
-        /// <param name="includes">Relations to include</param>
+        /// <param name="includes">Relations to include.</param>
         /// <returns>Enumerable of enitites.</returns>
         IEnumerable<TEntity> Find(
             Expression<Func<TEntity, bool>> predicate,
@@ -102,7 +102,7 @@ namespace Saritasa.Tools.Domain
         /// Finds for range of entities based on predicate.
         /// </summary>
         /// <param name="predicate">Filter predicate.</param>
-        /// <param name="includes">Relations to include</param>
+        /// <param name="includes">Relations to include.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>Task with result of enumerable of enitites.</returns>
         Task<IEnumerable<TEntity>> FindAsync(

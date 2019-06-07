@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -13,8 +13,8 @@ namespace Saritasa.Tools.Common.Utils
     /// </summary>
     /// <remarks>
     /// Used sources:
-    /// https://github.com/itmasterspro/PluralizeService.Core/blob/master/PluralizeService.Core/English/Adapters/EnglishMetaDataAdapter.cs
-    /// https://github.com/Microsoft/referencesource/blob/master/System.Data.Entity.Design/System/Data/Entity/Design/PluralizationService/EnglishPluralizationService.cs
+    /// https://github.com/itmasterspro/PluralizeService.Core/blob/master/PluralizeService.Core/English/Adapters/EnglishMetaDataAdapter.cs ,
+    /// https://github.com/Microsoft/referencesource/blob/master/System.Data.Entity.Design/System/Data/Entity/Design/PluralizationService/EnglishPluralizationService.cs .
     /// </remarks>
     public static class EnglishUtils
     {
@@ -563,7 +563,7 @@ namespace Saritasa.Tools.Common.Utils
         };
 
         /// <summary>
-        /// .cctor
+        /// Static constructor.
         /// </summary>
         static EnglishUtils()
         {

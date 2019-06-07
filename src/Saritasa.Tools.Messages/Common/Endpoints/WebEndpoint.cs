@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 #if NET452
@@ -20,7 +20,7 @@ namespace Saritasa.Tools.Messages.Common.Endpoints
     /// Web endpoint that allows to send messages directly to application. There must be POST requests.
     /// Sample:
     /// POST http://localhost:26025/query/ZergRushCo.Todosya.Domain.Tasks.Queries.ProjectsQueries.GetByUser
-    /// {"userId":2,"page":1,"pageSize":10}
+    /// {"userId":2,"page":1,"pageSize":10}.
     /// </summary>
     public class WebEndpoint : IMessageEndpoint, IDisposable
     {
