@@ -1,5 +1,7 @@
-﻿0.5.1 [TBD]
+﻿0.6.0 [2019-06-07]
 [+] SourceLink support.
+[+] Add EF related EfPagedListFactory, TotalCountListFactory and OffsetLimitListFactory.
+[+] Add Saritasa.Tools.Common dependency.
 
 0.5.0 [2018-04-24]
 [+] Initial release.

@@ -42,7 +42,7 @@ namespace Saritasa.Tools.Common.Pagination
                 await source.Skip(offset).Take(pageSize).ToListAsync(cancellationToken),
                 page,
                 pageSize,
-                await source.CountAsync());
+                await source.CountAsync(cancellationToken));
         }
 
         internal static int GetOffset(int page, int pageSize)
