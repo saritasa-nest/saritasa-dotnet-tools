@@ -1,4 +1,9 @@
-﻿0.6.0 [2019-06-07]
+﻿0.6.1 [2019-06-11]
+[*] Fix EfPagedListFactory, TotalCountListFactory and OffsetLimitListFactory namespace.
+[*] Rename TotalCountListFactory to EFTotalCountListFactory, OffsetLimitListFactory to EFOffsetLimitListFactory.
+[*] Rename EfPagedListFactory to EFPagedListFactory.
+
+0.6.0 [2019-06-07]
 [+] SourceLink support.
 [+] Add EF related EfPagedListFactory, TotalCountListFactory and OffsetLimitListFactory.
 [+] Add Saritasa.Tools.Common dependency.

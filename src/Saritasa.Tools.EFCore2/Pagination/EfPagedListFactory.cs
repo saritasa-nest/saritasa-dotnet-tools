@@ -6,15 +6,15 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Saritasa.Tools.Common.Pagination;
 
-// ReSharper disable once CheckNamespace
-namespace Saritasa.Tools.Common.Pagination
+namespace Saritasa.Tools.EFCore.Pagination
 {
     /// <summary>
     /// Class contains Entity Framework related static methods for
     /// <see cref="PagedList{T}" /> and is intended to simplify instantiation and better API.
     /// </summary>
-    public static class EfPagedListFactory
+    public static class EFPagedListFactory
     {
         /// <summary>
         /// Creates paged list from queryable source and query source by page and page size.
