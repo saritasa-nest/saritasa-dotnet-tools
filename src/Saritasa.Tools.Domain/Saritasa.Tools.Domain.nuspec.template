@@ -4,7 +4,7 @@
     <id>Saritasa.Tools.Domain</id>
     <title>Saritasa Tools Domain</title>
     <version>0.0.0</version>
-    <description>The package is a part of Saritasa Tools project. Saritasa.Tools.Domain contains abstractions for unit of work, repository, domain events. Also there are domain exceptions (not found, validation, security). The implementation can be found in Saritasa.Tools.EFCore1, Saritasa.Tools.EF6 packages.</description>
+    <description>The package is a part of Saritasa Tools project. Saritasa.Tools.Domain contains abstractions for unit of work, repository, domain events. Also there are domain exceptions (not found, validation, security). The implementation can be found in Saritasa.Tools.EFCore2, Saritasa.Tools.EF6 packages.</description>
     <summary>Domain Driven Design related abstractions.</summary>
     <authors>Saritasa</authors>
     <owners>Saritasa</owners>
