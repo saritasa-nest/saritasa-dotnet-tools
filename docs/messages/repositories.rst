@@ -85,7 +85,27 @@ There are built in repositories.
 
     .. class:: CsvFileMessageRepository
 
-        Store messages in csv files. File name format is ``{prefix}-yyyyMMdd-XXX.csv`` (for example ``backend-20170101-001.csv``).
+        Store messages in CSV files. File name format is ``{prefix}-yyyyMMdd-XXX.csv`` (for example ``backend-20170101-001.csv``).
+
+            .. attribute:: string logsPath
+
+                Directory to store files.
+
+            .. attribute:: IObjectSerializer serializer
+
+                Serializer to be used to serialize message and error contents. JSON by default.
+
+            .. attribute:: string prefix
+
+                File name prefix.
+
+            .. attribute:: bool buffer = true
+
+                Should the output stream be buffered. The message will be stored to buffer before writing to disk.
+
+    .. class:: JsonFileMessageRepository
+
+        Store messages in JSON files. File name format is ``{prefix}-yyyyMMdd-XXX.json`` (for example ``backend-20170101-001.json``).
 
             .. attribute:: string logsPath
 
