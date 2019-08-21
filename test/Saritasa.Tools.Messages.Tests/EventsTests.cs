@@ -101,10 +101,10 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Events should be fired withing all classes
+        #region RaiseEvent_ThreeEventHandlers_ThreeEventHandlersCalled
 
         [Fact]
-        public void Events_should_be_fired_withing_all_classes()
+        public void RaiseEvent_ThreeEventHandlers_ThreeEventHandlersCalled()
         {
             // Arrange
             pipelinesService.ServiceProvider = new FuncServiceProvider(Ns01_InterfacesResolver);
@@ -135,7 +135,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Can run default simple generic command
+        #region RaiseEvent_DefaultEventPipelineWithGenericEvent_EventHandlersCalled
 
         public class Ns04_SimpleGenericEvent<T>
         {
@@ -159,7 +159,7 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [Fact]
-        public void Can_run_default_simple_generic_command()
+        public void RaiseEvent_DefaultEventPipelineWithGenericEvent_EventHandlersCalled()
         {
             // Arrange
             SetupEventPipeline(pipelinesService.PipelineContainer.AddEventPipeline());
@@ -178,7 +178,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Async event should bypass cancellation token
+        #region RaiseEventAsync_RaiseWithCancellationToken_CancellationTokenPassedToHandler
 
         public class Ns05_AsyncEvent
         {
@@ -196,7 +196,7 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [Fact]
-        public async void Async_event_should_bypass_cancellation_token()
+        public async void RaiseEventAsync_RaiseWithCancellationToken_CancellationTokenPassedToHandler()
         {
             // Arrange
             pipelinesService.PipelineContainer.AddEventPipeline().AddStandardMiddlewares(options =>
@@ -217,7 +217,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Event with no handlers should do nothing
+        #region RaiseEvent_NoHandlersForEvent_NoExceptionsAndNoAction
 
         public class Ns06_NoHandlerEvent
         {
@@ -225,7 +225,7 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [Fact]
-        public void Event_with_no_handlers_should_do_nothing()
+        public void RaiseEvent_NoHandlersForEvent_NoExceptionsAndNoAction()
         {
             // Arrange
             pipelinesService.PipelineContainer.AddEventPipeline().AddStandardMiddlewares(options =>

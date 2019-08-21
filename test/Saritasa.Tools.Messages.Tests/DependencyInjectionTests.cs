@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -41,10 +41,10 @@ namespace Saritasa.Tools.Messages.Tests
             }
         }
 
-        #region Should dispose command handlers after instaniate if use internal object resolver
+        #region HandleCommand_CommandHandlerIsDisposableAndInternalObjectResolvedUsed_DisposeMethodIsCalled
 
         [Fact]
-        public void Should_dispose_command_handlers_after_instaniate_if_use_internal_object_resolver()
+        public void HandleCommand_CommandHandlerIsDisposableAndInternalObjectResolvedUsed_DisposeMethodIsCalled()
         {
             // Arrange
             pipelineService.PipelineContainer.AddCommandPipeline()
@@ -87,7 +87,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Should dispose query handlers after instaniate if use internal object resolver
+        #region QueryWith_QueryIsDisposable_DisposeMethodIsCalled
 
         [QueryHandlers]
         public class QueryClass : IDisposable
@@ -103,7 +103,7 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [Fact]
-        public void Should_dispose_query_handlers_after_instaniate_if_use_internal_object_resolver()
+        public void QueryWith_QueryIsDisposable_DisposeMethodIsCalled()
         {
             // Arrange
             pipelineService.PipelineContainer.AddQueryPipeline()
@@ -119,7 +119,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Should not dispose query handlers after instaniate if not use internal object resolver
+        #region QueryWith_QueryIsDisposableButInternalObjectResolverIsNotUsed_DisposeMethodIsNotCalled
 
         [QueryHandlers]
         public class QueryClass2 : IDisposable
@@ -135,7 +135,7 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [Fact]
-        public void Should_not_dispose_query_handlers_after_instaniate_if_not_use_internal_object_resolver()
+        public void QueryWith_QueryIsDisposableButInternalObjectResolverIsNotUsed_DisposeMethodIsNotCalled()
         {
             // Arrange
             pipelineService.PipelineContainer.AddQueryPipeline()
@@ -152,10 +152,10 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Should not dispose command handlers after instaniate if not use internal object resolver
+        #region HandleCommand_CommandHandlerIsDisposableButInternalObjectResolverIsNotUsed_DisposeMethodIsNotCalled
 
         [Fact]
-        public void Should_not_dispose_command_handlers_after_instaniate_if_not_use_internal_object_resolver()
+        public void HandleCommand_CommandHandlerIsDisposableButInternalObjectResolverIsNotUsed_DisposeMethodIsNotCalled()
         {
             // Arrange
             pipelineService.PipelineContainer.AddCommandPipeline()

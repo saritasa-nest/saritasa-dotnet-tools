@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -13,7 +13,7 @@ namespace Saritasa.Tools.Messages.Tests
     public class SelectStringBuilderTests
     {
         [Fact]
-        public void Test_sql_server_select_string_builder()
+        public void Build_SqlWithColumn1Column2Value_MatchSqlServerSelectString()
         {
             // Arrange
             var ssb = new SqlServerSelectStringBuilder();
@@ -32,7 +32,7 @@ WHERE ([Column1] = 1) AND ([Column2] LIKE 'value')";
         }
 
         [Fact]
-        public void Test_mysql_select_string_builder()
+        public void Build_SqlWithColumn1Column2Value_MatchMySqlSelectString()
         {
             // Arrange
             var ssb = new MySqlSelectStringBuilder();
@@ -51,7 +51,7 @@ WHERE (`Column1` = 1) AND (`Column2` LIKE 'value')";
         }
 
         [Fact]
-        public void Test_sqlite_select_string_builder()
+        public void Build_SqlWithColumn1Column2Value_MatchSQLiteSelectString()
         {
             // Arrange
             var ssb = new SqLiteSelectStringBuilder();

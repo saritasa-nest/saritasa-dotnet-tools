@@ -71,10 +71,10 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region If_command_is_null_should_raise_invalid_operation_exception
+        #region HandleCommand_CommandIsNull_ShouldRaiseInvalidOperationException
 
         [Fact]
-        public void If_command_is_null_should_raise_invalid_operation_exception()
+        public void HandleCommand_CommandIsNull_ShouldRaiseInvalidOperationException()
         {
             // Arrange
             var builder = pipelineService.PipelineContainer.AddCommandPipeline()
@@ -90,7 +90,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Can_run_default_simple_pipeline
+        #region HandleCommand_DefaultSimplePipeline_ResultReturned
 
         public class Ns02_SimpleTestCommand
         {
@@ -109,7 +109,7 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [Fact]
-        public void Can_run_default_simple_pipeline()
+        public void HandleCommand_DefaultSimplePipeline_ResultReturned()
         {
             // Arrange
             var builder = pipelineService.PipelineContainer.AddCommandPipeline();
@@ -125,7 +125,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Can_run_default_simple_generic_command
+        #region HandleCommand_GenericInputCommandWithOneTypedParam_ResultReturned
 
         public class Ns03_SimpleTestGenericCommand<T>
         {
@@ -144,7 +144,7 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [Fact]
-        public void Can_run_default_simple_generic_command()
+        public void HandleCommand_GenericInputCommandWithOneTypedParam_ResultReturned()
         {
             // Arrange
             var builder = pipelineService.PipelineContainer.AddCommandPipeline();
@@ -161,7 +161,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Can_run_default_simple_generic_command_with_two_typed_params
+        #region HandleCommand_DefaultSimpleGenericCommandWithTwoTypedParams_ResultReturned
 
         public class Ns12_SimpleTestGenericCommand<T1, T2>
         {
@@ -182,7 +182,7 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [Fact]
-        public void Can_run_default_simple_generic_command_with_two_typed_params()
+        public void HandleCommand_DefaultSimpleGenericCommandWithTwoTypedParams_ResultReturned()
         {
             // Arrange
             var builder = pipelineService.PipelineContainer.AddCommandPipeline();
@@ -200,7 +200,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Command_with_handle_in_it_should_run
+        #region HandleCommand_CommandWithHandleMethonInIt_ResultReturned
 
         public class Ns04_SimpleTestCommandWithHandler
         {
@@ -213,7 +213,7 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [Fact]
-        public void Command_with_handle_in_it_should_run()
+        public void HandleCommand_CommandWithHandleMethonInIt_ResultReturned()
         {
             // Arrange
             var builder = pipelineService.PipelineContainer.AddCommandPipeline();
@@ -229,7 +229,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Command_with_handle_in_it_and_deps_should_run
+        #region HandleCommand_CommandWithHandleMethonInItAndDependencies_ResultReturned
 
         public class Ns05_TestCommandWithHandlerAndDeps
         {
@@ -242,7 +242,7 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [Fact]
-        public void Command_with_handle_in_it_and_deps_should_run()
+        public void HandleCommand_CommandWithHandleMethonInItAndDependencies_ResultReturned()
         {
             // Arrange
             pipelineService.ServiceProvider = new FuncServiceProvider(Ns01_InterfacesResolver);
@@ -259,7 +259,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Can_run_command_handler_with_public_properties_resolve
+        #region HandleCommand_CommandHandlerHasPublicPropertiesToResolve_PropertiesResolvedCorrectly
 
         public class Ns06_TestCommand
         {
@@ -279,12 +279,12 @@ namespace Saritasa.Tools.Messages.Tests
             {
                 command.Param = DependencyA.GetTestValue() == "A"
                     && DependencyB == null
-                    && DependencyC != null ? 1 : 0;
+                    && DependencyC != null ? 1 : 0; // 1 means resolved properly
             }
         }
 
         [Fact]
-        public void Can_run_command_handler_with_public_properties_resolve()
+        public void HandleCommand_CommandHandlerHasPublicPropertiesToResolve_PropertiesResolvedCorrectly()
         {
             // Arrange
             pipelineService.ServiceProvider = new FuncServiceProvider(Ns01_InterfacesResolver);
@@ -311,7 +311,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Can_run_command_handler_with_ctor_resolve
+        #region HandleCommand_CommandHandlerHasCtorParamsToResolve_ParamsResolvedCorrectly
 
         public class Ns07_TestCommand
         {
@@ -335,7 +335,7 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [Fact]
-        public void Can_run_command_handler_with_ctor_resolve()
+        public void HandleCommand_CommandHandlerHasCtorParamsToResolve_ParamsResolvedCorrectly()
         {
             // Arrange
             pipelineService.ServiceProvider = new FuncServiceProvider(Ns01_InterfacesResolver);
@@ -352,14 +352,14 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region If_command_handler_not_found_generate_exception
+        #region HandleCommand_CommandHandlerDoesNotExist_ShouldRaiseCommandHandlerNotFoundException
 
         private class Ns09_CommandWithNoHandler
         {
         }
 
         [Fact]
-        public void If_command_handler_not_found_generate_exception()
+        public void HandleCommand_CommandHandlerDoesNotExist_ShouldRaiseCommandHandlerNotFoundException()
         {
             // Arrange
             var builder = pipelineService.PipelineContainer.AddCommandPipeline();
@@ -374,7 +374,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Can_find_command_handler_by_class_name
+        #region HandleCommand_CommandHandlerHasClassSuffixSearchMethod_CommandHandlerIsFound
 
         public class Ns10_SimpleTestCommand
         {
@@ -392,7 +392,7 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [Fact]
-        public void Can_find_handler_with_ClassSuffix_search_method()
+        public void HandleCommand_CommandHandlerHasClassSuffixSearchMethod_CommandHandlerIsFound()
         {
             // Arrange
             pipelineService.PipelineContainer.AddCommandPipeline()
@@ -417,7 +417,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Should_generate_in_pipeline_exception_on_fail
+        #region HandleCommand_HandlerMethodWithException_ShouldRaiseMessageProcessingException
 
         private class Ns11_CommandWithFail
         {
@@ -428,7 +428,7 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [Fact]
-        public void Should_generate_in_pipeline_exception_on_fail()
+        public void HandleCommand_HandlerMethodWithException_ShouldRaiseMessageProcessingException()
         {
             // Arrange
             var builder = pipelineService.PipelineContainer.AddCommandPipeline();
@@ -443,7 +443,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Should_not_resolve_if_service_provider_not_defined
+        #region HandleCommand_ServiceProvideNotSet_DependenciesShouldNotBeResolved
 
         public class Ns13_Command
         {
@@ -466,7 +466,7 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [Fact]
-        public void Should_not_resolve_if_service_provider_not_defined()
+        public void HandleCommand_ServiceProvideNotSet_DependenciesShouldNotBeResolved()
         {
             // Arrange
             var builder = pipelineService.PipelineContainer.AddCommandPipeline();
@@ -478,7 +478,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Should_throw_original_exception_if_option_set
+        #region HandleCommand_CommandPipelineWithUseExceptionDispatchInfo_ShouldRaiseOriginalException
 
         public class Ns14_Exception : Exception
         {
@@ -493,7 +493,7 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [Fact]
-        public void Should_throw_original_exception_if_option_set()
+        public void HandleCommand_CommandPipelineWithUseExceptionDispatchInfo_ShouldRaiseOriginalException()
         {
             // Arrange
             var builder = pipelineService.PipelineContainer.AddCommandPipeline()
@@ -513,7 +513,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Should_pass_additional_param_to_middleware
+        #region HandleCommandAsync_HandleCommandWithAdditionalParam_ParamInMessageContextItems
 
         private class Ns15_TestParamMiddleware : IMessagePipelineMiddleware
         {
@@ -535,7 +535,7 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [Fact]
-        public async void Should_pass_additional_param_to_middleware()
+        public async void HandleCommandAsync_HandleCommandWithAdditionalParam_ParamInMessageContextItems()
         {
             // Arrange
             var testParamMiddleware = new Ns15_TestParamMiddleware();
@@ -554,7 +554,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region Cancellation_token_should_be_passed_to_command_handler
+        #region HandleCommandAsync_HandleCommandWithCancellationToken_CancellationTokenIsPassedToHandler
 
         private class Ns16_EmptyCommand
         {
@@ -568,7 +568,7 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [Fact]
-        public async void Cancellation_token_should_be_passed_to_command_handler()
+        public async void HandleCommandAsync_HandleCommandWithCancellationToken_CancellationTokenIsPassedToHandler()
         {
             // Arrange
             var builder = pipelineService.PipelineContainer.AddCommandPipeline()
@@ -590,7 +590,7 @@ namespace Saritasa.Tools.Messages.Tests
 
         #endregion
 
-        #region HandleAsync_CommandWithException_ShouldThrow
+        #region HandleCommandAsync_CommandWithException_ShouldRaiseOriginalException
 
         private class Ns17_ExceptionCommand
         {
@@ -605,7 +605,7 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [Fact]
-        public async Task HandleAsync_CommandWithException_ShouldThrow()
+        public async Task HandleCommandAsync_CommandWithException_ShouldRaiseOriginalException()
         {
             // Arrange
             var builder = pipelineService.PipelineContainer.AddCommandPipeline()

@@ -1,11 +1,10 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Text.RegularExpressions;
 using Xunit;
 using Saritasa.Tools.Messages.Abstractions;
-using Saritasa.Tools.Messages.Common;
 using Saritasa.Tools.Messages.Common.PipelineMiddlewares;
 
 namespace Saritasa.Tools.Messages.Tests
@@ -16,7 +15,7 @@ namespace Saritasa.Tools.Messages.Tests
     public class MessagesRepositoryFilterTests
     {
         [Fact]
-        public void Repository_should_filter_by_status()
+        public void IsMatch_RepositoryMessagesFilter_ShouldFilterByStatus()
         {
             // Arrange
             var filter = RepositoryMessagesFilter.Create().WithStatus(ProcessingStatus.Completed);
@@ -37,7 +36,7 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [Fact]
-        public void Repository_should_filter_by_execution_duration()
+        public void IsMatch_RepositoryMessagesFilter_ShouldFilterByExecutionDurationAbove()
         {
             var filter = RepositoryMessagesFilter.Create().WithExecutionDurationAbove(100);
             var msg = new MessageRecord
@@ -50,7 +49,7 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [Fact]
-        public void Repository_should_filter_by_content_type()
+        public void IsMatch_RepositoryMessagesFilter_ShouldFilterByContentType()
         {
             var filter = RepositoryMessagesFilter.Create()
                 .WithIncludeContentType(new Regex(@".(C|c)orrectCommand$"))
@@ -69,7 +68,7 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [Fact]
-        public void Repository_should_filter_by_type()
+        public void IsMatch_RepositoryMessagesFilter_ShouldFilterByType()
         {
             var filter = RepositoryMessagesFilter.Create().WithType(MessageContextConstants.MessageTypeCommand);
             var msgquery = new MessageRecord
