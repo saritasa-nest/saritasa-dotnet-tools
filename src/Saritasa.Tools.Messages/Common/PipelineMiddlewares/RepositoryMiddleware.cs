@@ -18,6 +18,7 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         private const string KeyRepositoryType = "repositorytype";
         private const string KeyActive = "active";
         private const string KeyRethrowExceptions = "rethrowexceptions";
+        private const string KeyAddNestedMessages = "addnestedmessages";
 
         /// <inheritdoc />
         public string Id { get; set; }
@@ -36,6 +37,11 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         /// Rethrow exceptions from repositories. <c>True</c> by default.
         /// </summary>
         public bool RethrowExceptions { get; set; } = true;
+
+        /// <summary>
+        /// Record nested messages. <c>True</c> by default.
+        /// </summary>
+        public bool AddNestedMessages { get; set; } = true;
 
         private readonly IMessageRepository repository;
 
@@ -66,6 +72,10 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
             if (parameters.ContainsKey(KeyRethrowExceptions))
             {
                 RethrowExceptions = Boolean.Parse(parameters[KeyRethrowExceptions]);
+            }
+            if (parameters.ContainsKey(KeyAddNestedMessages))
+            {
+                AddNestedMessages = Boolean.Parse(parameters[KeyAddNestedMessages]);
             }
 
             this.repository = RepositoryFactory.CreateFromTypeName(parameters[KeyRepositoryType], parameters);
