@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -53,5 +53,10 @@ namespace Saritasa.Tools.Messages.Abstractions
         /// Expects that dictionary implementation may not be thread safe.
         /// </summary>
         IDictionary<object, object> Items { get; set; }
+
+        /// <summary>
+        /// Parent message context.
+        /// </summary>
+        IMessageContext Parent { get; }
     }
 }

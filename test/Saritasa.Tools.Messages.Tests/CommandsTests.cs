@@ -640,27 +640,25 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [CommandHandlers]
-        private class Ns18_ParentCommandHandlers
+        private class Ns18_ParentNesterCommandHandlers
         {
             public async Task HandleTestCommand(Ns18_ParentCommand command)
             {
+                await Task.Delay(100);
                 var nestedCommand = new Ns18_NestedCommand { NestedProperty = "Nested" };
                 await command.PipelineService.HandleCommandAsync(nestedCommand);
             }
-        }
 
-        [CommandHandlers]
-        private class Ns18_NestedCommandHandlers
-        {
-            public void HandleTestCommand(Ns18_NestedCommand command)
+            public async Task HandleTestCommand(Ns18_NestedCommand command)
             {
+                await Task.Delay(100);
             }
         }
 
         [Fact]
-        private async Task HandleCommandAsync_HandleNestedCommands_ShouldLogOnlyParentCommand()
+        public async Task HandleCommandAsync_HandleNestedCommands_ShouldLogOnlyParentCommand()
         {
-            // Arrange.
+            // Arrange
             var inMemoryMessageRepository = new InMemoryMessageRepository();
             var repositoryMiddleware = new RepositoryMiddleware(inMemoryMessageRepository) { AddNestedMessages = false };
             var builder = pipelineService.PipelineContainer.AddCommandPipeline();
@@ -668,11 +666,12 @@ namespace Saritasa.Tools.Messages.Tests
             builder.AddMiddleware(repositoryMiddleware);
             var command = new Ns18_ParentCommand { ParentProperty = "Parent", PipelineService = pipelineService };
 
-            // Act.
+            // Act
             await pipelineService.HandleCommandAsync(command);
 
-            // Assert.
+            // Assert
             Assert.Equal(1, inMemoryMessageRepository.Messages.Count);
+            Assert.Equal(command, inMemoryMessageRepository.Messages[0].Content);
         }
 
         #endregion
@@ -692,27 +691,23 @@ namespace Saritasa.Tools.Messages.Tests
         }
 
         [CommandHandlers]
-        private class Ns19_ParentCommandHandlers
+        private class Ns19_ParentNesterCommandHandlers
         {
             public void HandleTestCommand(Ns19_ParentCommand command)
             {
                 var nestedCommand = new Ns19_NestedCommand { NestedProperty = "Nested" };
                 command.PipelineService.HandleCommand(nestedCommand);
             }
-        }
 
-        [CommandHandlers]
-        private class Ns19_NestedCommandHandlers
-        {
             public void HandleTestCommand(Ns19_NestedCommand command)
             {
             }
         }
 
         [Fact]
-        private void HandleCommand_HandleNestedCommands_ShouldLogOnlyParentCommand()
+        public void HandleCommand_HandleNestedCommands_ShouldLogOnlyParentCommand()
         {
-            // Arrange.
+            // Arrange
             var inMemoryMessageRepository = new InMemoryMessageRepository();
             var repositoryMiddleware = new RepositoryMiddleware(inMemoryMessageRepository) { AddNestedMessages = false };
             var builder = pipelineService.PipelineContainer.AddCommandPipeline();
@@ -720,11 +715,12 @@ namespace Saritasa.Tools.Messages.Tests
             builder.AddMiddleware(repositoryMiddleware);
             var command = new Ns19_ParentCommand { ParentProperty = "Parent", PipelineService = pipelineService };
 
-            // Act.
+            // Act
             pipelineService.HandleCommand(command);
 
-            // Assert.
+            // Assert
             Assert.Equal(1, inMemoryMessageRepository.Messages.Count);
+            Assert.Equal(command, inMemoryMessageRepository.Messages[0].Content);
         }
 
         #endregion

@@ -117,6 +117,11 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
                 return;
             }
 
+            if (!AddNestedMessages && messageContext.Parent != null)
+            {
+                return;
+            }
+
             MessageRecord messageRecord = null;
             var convertPipeline = messageContext.Pipeline as IMessageRecordConverter;
             if (convertPipeline != null)
@@ -150,6 +155,11 @@ namespace Saritasa.Tools.Messages.Common.PipelineMiddlewares
         public virtual async Task HandleAsync(IMessageContext messageContext, CancellationToken cancellationToken)
         {
             if (!Active)
+            {
+                return;
+            }
+
+            if (!AddNestedMessages && messageContext.Parent != null)
             {
                 return;
             }

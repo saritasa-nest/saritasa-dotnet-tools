@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -51,18 +51,23 @@ namespace Saritasa.Tools.Messages.Common
         /// <inheritdoc />
         public IDictionary<object, object> Items { get; set; } = new Dictionary<object, object>();
 
+        /// <inheritdoc />
+        public IMessageContext Parent { get; }
+
         /// <summary>
         /// Constructor.
         /// </summary>
         public MessageContext()
         {
+            this.Parent = Internal.LocalStorage<IMessageContext>.Current;
+            Internal.LocalStorage<IMessageContext>.Current = this;
         }
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="pipelineService">Pipeline service the context will be related to.</param>
-        public MessageContext(IMessagePipelineService pipelineService)
+        public MessageContext(IMessagePipelineService pipelineService) : this()
         {
             if (pipelineService == null)
             {
