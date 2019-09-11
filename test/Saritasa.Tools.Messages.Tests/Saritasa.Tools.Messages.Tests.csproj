@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <AssemblyTitle>Saritasa Tools Messages Tests</AssemblyTitle>
-    <TargetFrameworks>netcoreapp2.0;net452</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.0;net461</TargetFrameworks>
     <AssemblyName>Saritasa.Tools.Messages.Tests</AssemblyName>
     <AssemblyOriginatorKeyFile>../../tools/SaritasaTools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
@@ -32,7 +32,7 @@
     <PackageReference Include="System.Data.Common" Version="4.3.0" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
