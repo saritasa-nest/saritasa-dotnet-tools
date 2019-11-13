@@ -1,4 +1,7 @@
-﻿0.5.4 [2019-06-28]
+﻿0.6.0 [TBD]
+[-] Update support netstandard from 1.2 to 2.0 .
+
+0.5.4 [2019-06-28]
 [+] SourceLink support.
 [+] Add code field to DomainException and related exceptions.
 [*] Fix ValidationException binary serialization.
