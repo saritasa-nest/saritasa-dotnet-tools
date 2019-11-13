@@ -1,4 +1,7 @@
-﻿2.0.1 [2019-01-24]
+﻿2.1.0 [TBD]
+[-] Drop support for net452.
+
+2.0.1 [2019-01-24]
 [*] Fix SmtpClientEmailSender sync mode exceptions handle.
 
 2.0.0 [2019-01-23]
