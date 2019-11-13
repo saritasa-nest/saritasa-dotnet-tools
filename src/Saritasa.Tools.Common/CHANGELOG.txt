@@ -1,4 +1,7 @@
-﻿2.0.1 [2019-03-13]
+﻿2.1.0 [TBD]
+[-] Drop support for net452 and net461.
+
+2.0.1 [2019-03-13]
 [*] Fix PagedListFactory.Empty and OffsetLimitListFactory.Empty exception.
 
 2.0.0 [2019-02-27]
