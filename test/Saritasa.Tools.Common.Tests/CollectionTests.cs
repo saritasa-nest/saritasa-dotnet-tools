@@ -1,0 +1,234 @@
+// Copyright (c) 2015-2019, Saritasa. All rights reserved.
+// Licensed under the BSD license. See LICENSE file in the project root for full license information.
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq;
+using Xunit;
+using Saritasa.Tools.Common.Utils;
+
+namespace Saritasa.Tools.Common.Tests
+{
+    /// <summary>
+    /// Collection utils.
+    /// </summary>
+    public class CollectionTests
+    {
+        [DebuggerDisplay("{Id}, {Name}")]
+        private sealed class User
+        {
+            public int Id { get; }
+
+            public string Name { get; internal set; }
+
+            public User(int id, string name)
+            {
+                this.Id = id;
+                this.Name = name;
+            }
+        }
+
+        private class UserEqualityComparer : IEqualityComparer<User>
+        {
+            public bool Equals(User x, User y) => y != null && x != null && x.Id == y.Id && x.Name == y.Name;
+
+            public int GetHashCode(User obj) => obj.Id.GetHashCode() ^ obj.Name.GetHashCode();
+        }
+
+        [Fact]
+        public void Diff_TargetCollectionWithNewElements_NewElementsAreAdded()
+        {
+            // Arrange
+            var source = new[] { 1, 2, 3 };
+            var target = new[] { 1, 2, 4 };
+
+            // Act
+            var actions = CollectionUtils.Diff(source, target);
+
+            // Assert
+            Assert.Equal(new[] { 4 }, actions.Added);
+        }
+
+        [Fact]
+        public void Diff_TargetCollectionWithoutOldElements_OldElementsAreRemoved()
+        {
+            // Arrange
+            var source = new[] { 1, 2, 3 };
+            var target = new[] { 1, 4 };
+
+            // Act
+            var actions = CollectionUtils.Diff(source, target);
+
+            // Assert
+            Assert.Equal(new[] { 2, 3 }, actions.Removed);
+        }
+
+        [Fact]
+        public void Diff_TargetCollectionWithExistingElements_ExistingElementsAreUpdated()
+        {
+            // Arrange
+            var source = new[] { 1, 2, 3 };
+            var target = new[] { 1, 2, 4 };
+
+            // Act
+            var actions = CollectionUtils.Diff(source, target);
+
+            // Assert
+            Assert.Equal(new[] { (1, 1), (2, 2) }, actions.Updated);
+        }
+
+        [Fact]
+        public void Diff_TargetCollectionWithElements_ElementsWereAddedRemovedUpdated()
+        {
+            // Arrange
+            var source = new List<User>
+            {
+                new User(1, "Ivan"),
+                new User(2, "Roma"),
+                new User(3, "Vlad"),
+                new User(4, "Denis"),
+                new User(5, "Nastya"),
+                new User(6, "Marina"),
+                new User(7, "Varvara"),
+            };
+            var target = new List<User>
+            {
+                new User(1, "Ivan"),
+                new User(2, "Roman"),
+                new User(5, "Anastasya"),
+                new User(6, "Marina"),
+                new User(7, "Varvara"),
+                new User(0, "Tamara"),
+                new User(0, "Pavel"),
+            };
+
+            // Act
+            var diff = CollectionUtils.Diff(source, target, (u1, u2) => u1.Id == u2.Id);
+
+            // Assert
+            Assert.Equal(2, diff.Added.Count);
+            Assert.Equal(5, diff.Updated.Count);
+            Assert.Equal(2, diff.Removed.Count);
+        }
+
+        [Fact]
+        public void ApplyDiff_TargetCollectionWithElements_AfterApplyCollectionsAreEqual()
+        {
+            // Arrange
+            var initialCollection = new List<User>
+            {
+                new User(1, "Ivan"),
+                new User(2, "Roma"),
+                new User(3, "Vlad"),
+                new User(4, "Denis"),
+                new User(5, "Nastya"),
+                new User(6, "Marina"),
+                new User(7, "Varvara"),
+            };
+            var newCollection = new List<User>
+            {
+                new User(1, "Ivan"),
+                new User(2, "Roman"),
+                new User(5, "Anastasya"),
+                new User(6, "Marina"),
+                new User(7, "Varvara"),
+                new User(0, "Tamara"),
+                new User(0, "Pavel"),
+            };
+
+            // Act
+            var diff = CollectionUtils.Diff(initialCollection, newCollection, (u1, u2) => u1.Id == u2.Id);
+            CollectionUtils.ApplyDiff(initialCollection, diff, (source, target) =>
+            {
+                source.Name = target.Name;
+            });
+
+            // Assert
+            Assert.Equal(newCollection.OrderBy(u => u.Id), initialCollection.OrderBy(u => u.Id), new UserEqualityComparer());
+        }
+
+        [Fact]
+        public void OrderParsingDelegates_QueryString_CollectionOfSortEntries()
+        {
+            // Arrange
+            var query = "id:asc,name:desc;year salary;year:desc";
+
+            // Act
+            var sortingEntries = OrderParsingDelegates.ParseSeparated(query);
+
+            // Assert
+            var expected = new[]
+            {
+                new OrderingEntry("id", ListSortDirection.Ascending),
+                new OrderingEntry("name", ListSortDirection.Descending),
+                new OrderingEntry("year salary", ListSortDirection.Ascending),
+                new OrderingEntry("year", ListSortDirection.Descending)
+            };
+            Assert.Equal(expected, sortingEntries);
+        }
+
+        [Fact]
+        public void OrderMultiple_NotOrderedQueryableCollectionOfUsers_OrderedCollection()
+        {
+            // Arrange
+            var source = new List<User>
+            {
+                new User(1, "A"),
+                new User(4, "B"),
+                new User(4, "Z"),
+                new User(2, "D")
+            };
+
+            // Act
+            var target = CollectionUtils.OrderMultiple(
+                source.AsQueryable(),
+                OrderParsingDelegates.ParseSeparated("id:asc;name:desc"),
+                ("id", u => u.Id),
+                ("name", u => u.Name)
+            );
+
+            // Assert
+            var expected = new List<User>
+            {
+                new User(1, "A"),
+                new User(2, "D"),
+                new User(4, "Z"),
+                new User(4, "B")
+            };
+            Assert.Equal(expected, target, new UserEqualityComparer());
+        }
+
+        [Fact]
+        public void OrderMultiple_NotOrderedListOfUsers_OrderedCollection()
+        {
+            // Arrange
+            var source = new List<User>
+            {
+                new User(1, "A"),
+                new User(4, "B"),
+                new User(4, "Z"),
+                new User(2, "D")
+            };
+
+            // Act
+            var target = CollectionUtils.OrderMultiple(
+                source,
+                OrderParsingDelegates.ParseSeparated("id:asc;name:desc"),
+                ("id", u => u.Id),
+                ("name", u => u.Name)
+            );
+
+            // Assert
+            var expected = new List<User>
+            {
+                new User(1, "A"),
+                new User(2, "D"),
+                new User(4, "Z"),
+                new User(4, "B")
+            };
+            Assert.Equal(expected, target, new UserEqualityComparer());
+        }
+    }
+}

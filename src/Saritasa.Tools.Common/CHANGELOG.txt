@@ -1,5 +1,7 @@
 ﻿2.1.0 [TBD]
 [-] Drop support for net452 and net461.
+[+] Add method to diff collections CollectionUtils.Diff and CollectionUtils.ApplyDiff .
+[+] Add method to apply collection sorting with one call CollectionUtils.OrderMultiple .
 
 2.0.1 [2019-03-13]
 [*] Fix PagedListFactory.Empty and OffsetLimitListFactory.Empty exception.

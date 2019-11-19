@@ -1,7 +1,8 @@
-﻿// Copyright(c) 2015-2018, Saritasa.All rights reserved.
+﻿// Copyright(c) 2015-2019, Saritasa.All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -34,7 +35,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Sorts the elements of a sequence in ascending or descending order by using a specified comparer.
+        /// Sorts the elements of a sequence in ascending or descending order by using a specified identityComparer.
         /// </summary>
         /// <typeparam name="TSource">The type of the elements of source.</typeparam>
         /// <typeparam name="TKey">The type of the key returned by keySelector.</typeparam>
@@ -50,6 +51,64 @@ namespace Saritasa.Tools.Common.Utils
             ListSortDirection sortOrder)
         {
             return sortOrder == ListSortDirection.Ascending ? source.OrderBy(keySelector, comparer) : source.OrderByDescending(keySelector, comparer);
+        }
+
+        /// <summary>
+        /// Applies ordering to collection according to sorting entries and selectors. Allows to
+        /// make ordering in one method call.
+        /// </summary>
+        /// <typeparam name="TSource">Type of data in the data source.</typeparam>
+        /// <param name="source">Data source to order.</param>
+        /// <param name="keySelectors">Contains mapping between sorting field name and the way to get this field from the object.</param>
+        /// <param name="sortingEntries">List of fields to sort by.</param>
+        /// <returns>Reordered data.</returns>
+        public static IOrderedEnumerable<TSource> OrderMultiple<TSource>(
+            IEnumerable<TSource> source,
+            ICollection<OrderingEntry> sortingEntries,
+            params (string fieldName, Func<TSource, object> selector)[] keySelectors)
+        {
+            Func<TSource, object> GetKeySelector(string fieldName)
+            {
+                for (int i = 0; i < keySelectors.Length; i++)
+                {
+                    if (keySelectors[i].fieldName == fieldName)
+                    {
+                        return keySelectors[i].selector;
+                    }
+                }
+                throw new InvalidOperationException($"Sorting by field \"{fieldName}\" is not supported.");
+            }
+
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+            if (sortingEntries == null || !sortingEntries.Any())
+            {
+                throw new ArgumentNullException(nameof(sortingEntries));
+            }
+            if (keySelectors == null)
+            {
+                throw new ArgumentNullException(nameof(keySelectors));
+            }
+
+            // Need to sort by first field to get IOrderedQuery object instance.
+            var firstSortingEntry = sortingEntries.First();
+            var keySelector = GetKeySelector(firstSortingEntry.FieldName);
+            var sortedQuery = firstSortingEntry.SortDirection == ListSortDirection.Ascending
+                ? source.OrderBy(keySelector)
+                : source.OrderByDescending(keySelector);
+
+            // Sort for remaining fields.
+            foreach (var sortingEntry in sortingEntries.Skip(1))
+            {
+                keySelector = GetKeySelector(sortingEntry.FieldName);
+                sortedQuery = sortingEntry.SortDirection == ListSortDirection.Ascending
+                    ? sortedQuery.ThenBy(keySelector)
+                    : sortedQuery.ThenByDescending(keySelector);
+            }
+
+            return sortedQuery;
         }
 
 #if NET40 || NET452 || NET461 || NETSTANDARD1_2 || NETSTANDARD1_6 || NETSTANDARD2_0
@@ -68,6 +127,64 @@ namespace Saritasa.Tools.Common.Utils
             ListSortDirection sortOrder)
         {
             return sortOrder == ListSortDirection.Ascending ? source.OrderBy(keySelector) : source.OrderByDescending(keySelector);
+        }
+
+        /// <summary>
+        /// Applies ordering to collection according to sorting entries and selectors. Allows to
+        /// make ordering in one method call.
+        /// </summary>
+        /// <typeparam name="TSource">Type of data in the data source.</typeparam>
+        /// <param name="source">Data source to order.</param>
+        /// <param name="keySelectors">Contains mapping between sorting field name and the way to get this field from the object.</param>
+        /// <param name="sortingEntries">List of fields to sort by.</param>
+        /// <returns>Reordered data.</returns>
+        public static IOrderedQueryable<TSource> OrderMultiple<TSource>(
+            IQueryable<TSource> source,
+            ICollection<OrderingEntry> sortingEntries,
+            params (string fieldName, Expression<Func<TSource, object>> selector)[] keySelectors)
+        {
+            Expression<Func<TSource, object>> GetKeySelector(string fieldName)
+            {
+                for (int i = 0; i < keySelectors.Length; i++)
+                {
+                    if (keySelectors[i].fieldName == fieldName)
+                    {
+                        return keySelectors[i].selector;
+                    }
+                }
+                throw new InvalidOperationException($"Sorting by field \"{fieldName}\" is not supported.");
+            }
+
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+            if (sortingEntries == null || !sortingEntries.Any())
+            {
+                throw new ArgumentNullException(nameof(sortingEntries));
+            }
+            if (keySelectors == null)
+            {
+                throw new ArgumentNullException(nameof(keySelectors));
+            }
+
+            // Need to sort by first field to get IOrderedQuery object instance.
+            var firstSortingEntry = sortingEntries.First();
+            var keySelector = GetKeySelector(firstSortingEntry.FieldName);
+            var sortedQuery = firstSortingEntry.SortDirection == ListSortDirection.Ascending
+                ? source.OrderBy(keySelector)
+                : source.OrderByDescending(keySelector);
+
+            // Sort for remaining fields.
+            foreach (var sortingEntry in sortingEntries.Skip(1))
+            {
+                keySelector = GetKeySelector(sortingEntry.FieldName);
+                sortedQuery = sortingEntry.SortDirection == ListSortDirection.Ascending
+                    ? sortedQuery.ThenBy(keySelector)
+                    : sortedQuery.ThenByDescending(keySelector);
+            }
+
+            return sortedQuery;
         }
 
         /// <summary>
@@ -91,7 +208,6 @@ namespace Saritasa.Tools.Common.Utils
                 currentPosition += chunkSize;
             }
         }
-
 #endif
 
         /// <summary>
@@ -152,7 +268,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <typeparam name="TKey">Type of the projected element.</typeparam>
         /// <param name="source">The sequence to remove duplicate elements from.</param>
         /// <param name="keySelector">Projection for determining "distinctness".</param>
-        /// <param name="comparer">The equality comparer to compare key values. If null default comparer will be used.</param>
+        /// <param name="comparer">The equality identityComparer to compare key values. If null default identityComparer will be used.</param>
         /// <returns>A collection that contains distinct elements from the source sequence.</returns>
         public static IEnumerable<TSource> DistinctBy<TSource, TKey>(
             IEnumerable<TSource> source,
@@ -181,6 +297,124 @@ namespace Saritasa.Tools.Common.Utils
             }
 
             return DistinctByImpl();
+        }
+
+        /// <summary>
+        /// Compares two collections and creates a list with items to add, remove and update based
+        /// on identity equality.
+        /// </summary>
+        /// <param name="source">Source collection.</param>
+        /// <param name="target">Target collection (new).</param>
+        /// <param name="identityComparer">Comparer elements by identity. This means that elements may be
+        /// identity equal but target collection has its newer version. If null the default comparer will be used.</param>
+        /// <typeparam name="T">Item type.</typeparam>
+        /// <returns>Items to add, remove and update.</returns>
+        public static DiffResult<T> Diff<T>(
+            IEnumerable<T> source,
+            IEnumerable<T> target,
+            Func<T, T, bool> identityComparer = null)
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+            if (target == null)
+            {
+                throw new ArgumentNullException(nameof(target));
+            }
+            if (identityComparer == null)
+            {
+                identityComparer = (obj1, obj2) => Comparer<T>.Default.Compare(obj1, obj2) == 0;
+            }
+
+            var sourceArr = source.ToArray();
+            var targetArr = target.ToArray();
+            var added = new List<T>(sourceArr.Length / 2);
+            var updated = new List<(T source, T target)>(sourceArr.Length);
+            var removed = new List<T>(sourceArr.Length / 2);
+            var targetBits = new BitArray(targetArr.Length);
+
+            // Determine updated and removed elements.
+            for (int i = 0; i < sourceArr.Length; i++)
+            {
+                bool isRemoved = true;
+                for (int j = 0; j < targetArr.Length; j++)
+                {
+                    if (targetBits[j])
+                    {
+                        continue;
+                    }
+
+                    // Elements are identity equal.
+                    if (identityComparer(sourceArr[i], targetArr[j]))
+                    {
+                        updated.Add((sourceArr[i], targetArr[j]));
+                        targetBits[j] = true;
+                        isRemoved = false;
+                        break;
+                    }
+                }
+
+                if (isRemoved)
+                {
+                    removed.Add(sourceArr[i]);
+                }
+            }
+
+            // Determine new elements.
+            for (int i = 0; i < targetArr.Length; i++)
+            {
+                if (targetBits[i])
+                {
+                    continue;
+                }
+                added.Add(targetArr[i]);
+            }
+
+            // Format result.
+            var dto = new DiffResult<T>
+            {
+                Added = added,
+                Removed = removed,
+                Updated = updated
+            };
+            return dto;
+        }
+
+        /// <summary>
+        /// Apply collections compare diff to another collection.
+        /// </summary>
+        /// <param name="source">The collection to compare to.</param>
+        /// <param name="diff">Diff.</param>
+        /// <param name="update">Updater delegate to change state of object 1 according to object 2.</param>
+        /// <typeparam name="T">Collection source type.</typeparam>
+        public static void ApplyDiff<T>(ICollection<T> source, DiffResult<T> diff, Action<T, T> update)
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+            if (diff == null)
+            {
+                throw new ArgumentNullException(nameof(diff));
+            }
+            if (update == null)
+            {
+                throw new ArgumentNullException(nameof(update));
+            }
+
+            foreach (T removedItem in diff.Removed)
+            {
+                source.Remove(removedItem);
+            }
+            foreach (T addedItem in diff.Added)
+            {
+                source.Add(addedItem);
+            }
+            foreach ((T sourceItem, T targetItem) in diff.Updated)
+            {
+                update(sourceItem, targetItem);
+            }
         }
     }
 }
