@@ -15,8 +15,7 @@ namespace Saritasa.Tools.Common.Pagination
 #if NET40 || NET452 || NET461 || NETSTANDARD2_0
     [Serializable]
 #endif
-    public class PagedList<T> : OffsetLimitList<T>,
-        IMetadataEnumerable<T, PagedListMetadata>
+    public class PagedList<T> : OffsetLimitList<T>
     {
         /// <summary>
         /// First page index.
@@ -122,12 +121,20 @@ namespace Saritasa.Tools.Common.Pagination
             };
         }
 
-        /// <inheritdoc />
-        public new MetadataDto<T, PagedListMetadata> ToMetadataObject()
-            => new MetadataDto<T, PagedListMetadata>(Items, this.GetMetadata());
+        /// <summary>
+        /// Create items object with metadata.
+        /// </summary>
+        /// <returns>List metadata.</returns>
+        public PagedListMetadataDto<T> ToMetadataObject()
+            => new PagedListMetadataDto<T>(Items, this.GetMetadata());
 
-        /// <inheritdoc />
-        public new IMetadataEnumerable<TNew, PagedListMetadata> Convert<TNew>(Func<T, TNew> converter)
+        /// <summary>
+        /// Convert items into another type.
+        /// </summary>
+        /// <param name="converter">Converter function.</param>
+        /// <typeparam name="TNew">New type.</typeparam>
+        /// <returns>New list.</returns>
+        public new PagedList<TNew> Convert<TNew>(Func<T, TNew> converter)
             => new PagedList<TNew>
             {
                 Items = Items.Select(converter).ToList(),

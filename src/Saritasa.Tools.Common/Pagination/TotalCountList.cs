@@ -16,8 +16,7 @@ namespace Saritasa.Tools.Common.Pagination
 #if NET40 || NET452 || NET461 || NETSTANDARD2_0
     [Serializable]
 #endif
-    public class TotalCountList<T> :
-        IMetadataEnumerable<T, TotalCountListMetadata>
+    public class TotalCountList<T> : IEnumerable<T>
     {
         /// <summary>
         /// Source collection.
@@ -88,12 +87,20 @@ namespace Saritasa.Tools.Common.Pagination
             };
         }
 
-        /// <inheritdoc />
-        public MetadataDto<T, TotalCountListMetadata> ToMetadataObject()
-            => new MetadataDto<T, TotalCountListMetadata>(Items, GetMetadata());
+        /// <summary>
+        /// Create items object with metadata.
+        /// </summary>
+        /// <returns>List metadata.</returns>
+        public TotalCountListMetadataDto<T> ToMetadataObject()
+            => new TotalCountListMetadataDto<T>(Items, GetMetadata());
 
-        /// <inheritdoc />
-        public IMetadataEnumerable<TNew, TotalCountListMetadata> Convert<TNew>(Func<T, TNew> converter)
+        /// <summary>
+        /// Convert items into another type.
+        /// </summary>
+        /// <param name="converter">Converter function.</param>
+        /// <typeparam name="TNew">New type.</typeparam>
+        /// <returns>New list.</returns>
+        public TotalCountList<TNew> Convert<TNew>(Func<T, TNew> converter)
             => new TotalCountList<TNew>
             {
                 Items = Items.Select(converter).ToList(),

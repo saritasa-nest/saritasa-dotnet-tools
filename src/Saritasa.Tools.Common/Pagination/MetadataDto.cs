@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -14,7 +14,7 @@ namespace Saritasa.Tools.Common.Pagination
 #if NET40 || NET452 || NET461 || NETSTANDARD2_0
     [Serializable]
 #endif
-    public class MetadataDto<TItem, TMetadata>
+    public class MetadataDto<TItem, TMetadata> : IMetadataDto<TItem, TMetadata>
     {
         /// <summary>
         /// Constructor.
@@ -48,14 +48,10 @@ namespace Saritasa.Tools.Common.Pagination
         }
 #endif
 
-        /// <summary>
-        /// Metadata.
-        /// </summary>
+        /// <inheritdoc />
         public TMetadata Metadata { get; protected set; }
 
-        /// <summary>
-        /// Enumerable items.
-        /// </summary>
+        /// <inheritdoc />
         public IEnumerable<TItem> Items { get; protected set; }
     }
 }

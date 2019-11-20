@@ -7,20 +7,20 @@ using System.Collections.Generic;
 namespace Saritasa.Tools.Common.Pagination
 {
     /// <summary>
-    /// Metadata data transfer object for paged list. Combines metadata and enumerable items.
+    /// Metadata data transfer object for total count list. Combines metadata and enumerable items.
     /// </summary>
     /// <typeparam name="TItem">Metadata items type.</typeparam>
 #if NET40 || NET452 || NET461 || NETSTANDARD2_0 || NETSTANDARD2_1
     [Serializable]
 #endif
-    public class PagedListMetadataDto<TItem> : MetadataDto<TItem, PagedListMetadata>
+    public class TotalCountListMetadataDto<TItem> : MetadataDto<TItem, TotalCountListMetadata>
     {
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="items">Metadata items.</param>
         /// <param name="metadata">Metadata object.</param>
-        public PagedListMetadataDto(IEnumerable<TItem> items, PagedListMetadata metadata) : base(items, metadata)
+        public TotalCountListMetadataDto(IEnumerable<TItem> items, TotalCountListMetadata metadata) : base(items, metadata)
         {
         }
 
@@ -31,7 +31,7 @@ namespace Saritasa.Tools.Common.Pagination
         /// <param name="info">Stores all the data needed to serialize or deserialize an object.</param>
         /// <param name="context">Describes the source and destination of a given serialized stream,
         /// and provides an additional caller-defined context.</param>
-        protected PagedListMetadataDto(
+        protected TotalCountListMetadataDto(
             System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) :
             base(info, context)
         {

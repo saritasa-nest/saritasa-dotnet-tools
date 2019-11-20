@@ -15,8 +15,7 @@ namespace Saritasa.Tools.Common.Pagination
 #if NET40 || NET452 || NET461 || NETSTANDARD2_0
     [Serializable]
 #endif
-    public class OffsetLimitList<T> : TotalCountList<T>,
-        IMetadataEnumerable<T, OffsetLimitListMetadata>
+    public class OffsetLimitList<T> : TotalCountList<T>
     {
         /// <summary>
         /// Number of items to skip.
@@ -89,12 +88,20 @@ namespace Saritasa.Tools.Common.Pagination
             };
         }
 
-        /// <inheritdoc />
-        public new MetadataDto<T, OffsetLimitListMetadata> ToMetadataObject()
-            => new MetadataDto<T, OffsetLimitListMetadata>(Items, GetMetadata());
+        /// <summary>
+        /// Create items object with metadata.
+        /// </summary>
+        /// <returns>List metadata.</returns>
+        public new OffsetLimitMetadataDto<T> ToMetadataObject()
+            => new OffsetLimitMetadataDto<T>(Items, GetMetadata());
 
-        /// <inheritdoc />
-        public new IMetadataEnumerable<TNew, OffsetLimitListMetadata> Convert<TNew>(Func<T, TNew> converter)
+        /// <summary>
+        /// Convert items into another type.
+        /// </summary>
+        /// <param name="converter">Converter function.</param>
+        /// <typeparam name="TNew">New type.</typeparam>
+        /// <returns>New list.</returns>
+        public new OffsetLimitList<TNew> Convert<TNew>(Func<T, TNew> converter)
             => new OffsetLimitList<TNew>
             {
                 Items = Items.Select(converter).ToList(),
