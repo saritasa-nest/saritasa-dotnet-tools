@@ -4,6 +4,7 @@
 [+] Add method to apply collection sorting with one call CollectionUtils.OrderMultiple .
 [+] Make covariant IMetadataDto and IMetadataEnumerable generic type parameters.
 [+] Simplify metadata generation by introducing TotalCountListMetadataDto, OffsetLimitMetadataDto, PagedListMetadataDto.
+[*] Remove not needed dependencies.
 
 2.0.1 [2019-03-13]
 [*] Fix PagedListFactory.Empty and OffsetLimitListFactory.Empty exception.
