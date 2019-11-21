@@ -60,11 +60,11 @@ namespace Saritasa.Tools.Common.Utils
         /// <typeparam name="TSource">Type of data in the data source.</typeparam>
         /// <param name="source">Data source to order.</param>
         /// <param name="keySelectors">Contains mapping between sorting field name and the way to get this field from the object.</param>
-        /// <param name="sortingEntries">List of fields to sort by.</param>
+        /// <param name="orderEntries">List of fields to sort by.</param>
         /// <returns>Reordered data.</returns>
         public static IOrderedEnumerable<TSource> OrderMultiple<TSource>(
             IEnumerable<TSource> source,
-            ICollection<OrderingEntry> sortingEntries,
+            ICollection<(string FieldName, ListSortDirection Order)> orderEntries,
             params (string fieldName, Func<TSource, object> selector)[] keySelectors)
         {
             Func<TSource, object> GetKeySelector(string fieldName)
@@ -76,16 +76,16 @@ namespace Saritasa.Tools.Common.Utils
                         return keySelectors[i].selector;
                     }
                 }
-                throw new InvalidOperationException($"Sorting by field \"{fieldName}\" is not supported.");
+                throw new InvalidOperationException(string.Format(Properties.Strings.OrderByFieldIsNotSupported, fieldName));
             }
 
             if (source == null)
             {
                 throw new ArgumentNullException(nameof(source));
             }
-            if (sortingEntries == null || !sortingEntries.Any())
+            if (orderEntries == null || !orderEntries.Any())
             {
-                throw new ArgumentNullException(nameof(sortingEntries));
+                throw new ArgumentNullException(nameof(orderEntries));
             }
             if (keySelectors == null)
             {
@@ -93,17 +93,17 @@ namespace Saritasa.Tools.Common.Utils
             }
 
             // Need to sort by first field to get IOrderedQuery object instance.
-            var firstSortingEntry = sortingEntries.First();
+            var firstSortingEntry = orderEntries.First();
             var keySelector = GetKeySelector(firstSortingEntry.FieldName);
-            var sortedQuery = firstSortingEntry.SortDirection == ListSortDirection.Ascending
+            var sortedQuery = firstSortingEntry.Order == ListSortDirection.Ascending
                 ? source.OrderBy(keySelector)
                 : source.OrderByDescending(keySelector);
 
             // Sort for remaining fields.
-            foreach (var sortingEntry in sortingEntries.Skip(1))
+            foreach (var sortingEntry in orderEntries.Skip(1))
             {
                 keySelector = GetKeySelector(sortingEntry.FieldName);
-                sortedQuery = sortingEntry.SortDirection == ListSortDirection.Ascending
+                sortedQuery = sortingEntry.Order == ListSortDirection.Ascending
                     ? sortedQuery.ThenBy(keySelector)
                     : sortedQuery.ThenByDescending(keySelector);
             }
@@ -136,11 +136,11 @@ namespace Saritasa.Tools.Common.Utils
         /// <typeparam name="TSource">Type of data in the data source.</typeparam>
         /// <param name="source">Data source to order.</param>
         /// <param name="keySelectors">Contains mapping between sorting field name and the way to get this field from the object.</param>
-        /// <param name="sortingEntries">List of fields to sort by.</param>
+        /// <param name="orderEntries">List of fields to sort by.</param>
         /// <returns>Reordered data.</returns>
         public static IOrderedQueryable<TSource> OrderMultiple<TSource>(
             IQueryable<TSource> source,
-            ICollection<OrderingEntry> sortingEntries,
+            ICollection<(string FieldName, ListSortDirection Order)> orderEntries,
             params (string fieldName, Expression<Func<TSource, object>> selector)[] keySelectors)
         {
             Expression<Func<TSource, object>> GetKeySelector(string fieldName)
@@ -152,16 +152,16 @@ namespace Saritasa.Tools.Common.Utils
                         return keySelectors[i].selector;
                     }
                 }
-                throw new InvalidOperationException($"Sorting by field \"{fieldName}\" is not supported.");
+                throw new InvalidOperationException(string.Format(Properties.Strings.OrderByFieldIsNotSupported, fieldName));
             }
 
             if (source == null)
             {
                 throw new ArgumentNullException(nameof(source));
             }
-            if (sortingEntries == null || !sortingEntries.Any())
+            if (orderEntries == null || !orderEntries.Any())
             {
-                throw new ArgumentNullException(nameof(sortingEntries));
+                throw new ArgumentNullException(nameof(orderEntries));
             }
             if (keySelectors == null)
             {
@@ -169,17 +169,17 @@ namespace Saritasa.Tools.Common.Utils
             }
 
             // Need to sort by first field to get IOrderedQuery object instance.
-            var firstSortingEntry = sortingEntries.First();
+            var firstSortingEntry = orderEntries.First();
             var keySelector = GetKeySelector(firstSortingEntry.FieldName);
-            var sortedQuery = firstSortingEntry.SortDirection == ListSortDirection.Ascending
+            var sortedQuery = firstSortingEntry.Order == ListSortDirection.Ascending
                 ? source.OrderBy(keySelector)
                 : source.OrderByDescending(keySelector);
 
             // Sort for remaining fields.
-            foreach (var sortingEntry in sortingEntries.Skip(1))
+            foreach (var sortingEntry in orderEntries.Skip(1))
             {
                 keySelector = GetKeySelector(sortingEntry.FieldName);
-                sortedQuery = sortingEntry.SortDirection == ListSortDirection.Ascending
+                sortedQuery = sortingEntry.Order == ListSortDirection.Ascending
                     ? sortedQuery.ThenBy(keySelector)
                     : sortedQuery.ThenByDescending(keySelector);
             }

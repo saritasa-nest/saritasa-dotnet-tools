@@ -7,7 +7,7 @@ using System.ComponentModel;
 namespace Saritasa.Tools.Common.Utils
 {
     /// <summary>
-    /// Order parsing strategies to get array of <see cref="OrderingEntry" />.
+    /// Order entries parsing strategies to get array of (fieldName, order) tuples.
     /// </summary>
     public static class OrderParsingDelegates
     {
@@ -16,7 +16,7 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="orderQuery">Order query string.</param>
         /// <returns>Ordering entries.</returns>
-        public static OrderingEntry[] ParseSeparated(string orderQuery)
+        public static (string FieldName, ListSortDirection Order)[] ParseSeparated(string orderQuery)
         {
             if (string.IsNullOrEmpty(orderQuery))
             {
@@ -37,18 +37,17 @@ namespace Saritasa.Tools.Common.Utils
             }
 
             var sortingRecordsStrings = orderQuery.Split(new[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries);
-            var arr = new OrderingEntry[sortingRecordsStrings.Length];
+            var arr = new (string FieldName, ListSortDirection Order)[sortingRecordsStrings.Length];
             for (int i = 0; i < sortingRecordsStrings.Length; i++)
             {
                 var ind = sortingRecordsStrings[i].IndexOf(':');
                 if (ind > -1)
                 {
-                    arr[i] = new OrderingEntry(sortingRecordsStrings[i].Substring(0, ind),
-                        ParseOrder(sortingRecordsStrings[i].Substring(ind + 1)));
+                    arr[i] = (sortingRecordsStrings[i].Substring(0, ind), ParseOrder(sortingRecordsStrings[i].Substring(ind + 1)));
                 }
                 else
                 {
-                    arr[i] = new OrderingEntry(sortingRecordsStrings[i]);
+                    arr[i] = (sortingRecordsStrings[i], ListSortDirection.Ascending);
                 }
             }
             return arr;

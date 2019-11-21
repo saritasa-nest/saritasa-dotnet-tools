@@ -125,7 +125,7 @@ namespace Saritasa.Tools.Common.Pagination
         /// Create items object with metadata.
         /// </summary>
         /// <returns>List metadata.</returns>
-        public PagedListMetadataDto<T> ToMetadataObject()
+        public new PagedListMetadataDto<T> ToMetadataObject()
             => new PagedListMetadataDto<T>(Items, this.GetMetadata());
 
         /// <summary>

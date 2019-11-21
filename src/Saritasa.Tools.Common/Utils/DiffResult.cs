@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Saritasa.Tools.Common.Utils
 {
@@ -13,17 +14,18 @@ namespace Saritasa.Tools.Common.Utils
 #if NET40 || NET452 || NET461 || NETSTANDARD2_0 || NETSTANDARD2_1
     [Serializable]
 #endif
+    [DebuggerDisplay("Added: {Added.Count}, removed: {Removed.Count}, updated: {Updated.Count}")]
     public class DiffResult<T>
     {
-        /// <summary>
-        /// Items to remove.
-        /// </summary>
-        public ICollection<T> Removed { get; internal set; }
-
         /// <summary>
         /// New items to add.
         /// </summary>
         public ICollection<T> Added { get; internal set; }
+
+        /// <summary>
+        /// Items to remove.
+        /// </summary>
+        public ICollection<T> Removed { get; internal set; }
 
         /// <summary>
         /// Items to update. This is the collection of tuples where first item is

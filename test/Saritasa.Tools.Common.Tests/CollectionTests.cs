@@ -161,10 +161,10 @@ namespace Saritasa.Tools.Common.Tests
             // Assert
             var expected = new[]
             {
-                new OrderingEntry("id", ListSortDirection.Ascending),
-                new OrderingEntry("name", ListSortDirection.Descending),
-                new OrderingEntry("year salary", ListSortDirection.Ascending),
-                new OrderingEntry("year", ListSortDirection.Descending)
+                ("id", ListSortDirection.Ascending),
+                ("name", ListSortDirection.Descending),
+                ("year salary", ListSortDirection.Ascending),
+                ("year", ListSortDirection.Descending)
             };
             Assert.Equal(expected, sortingEntries);
         }

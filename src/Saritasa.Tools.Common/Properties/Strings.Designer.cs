@@ -21,7 +21,7 @@ namespace Saritasa.Tools.Common.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Strings {
@@ -117,7 +117,7 @@ namespace Saritasa.Tools.Common.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Argument must be enum..
+        ///   Looks up a localized string similar to Argument must be enumeration..
         /// </summary>
         internal static string ArgumentMustBeEnum {
             get {
@@ -176,6 +176,15 @@ namespace Saritasa.Tools.Common.Properties {
         internal static string NoHashMethod {
             get {
                 return ResourceManager.GetString("NoHashMethod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ordering by field {0} is not supported..
+        /// </summary>
+        internal static string OrderByFieldIsNotSupported {
+            get {
+                return ResourceManager.GetString("OrderByFieldIsNotSupported", resourceCulture);
             }
         }
         
