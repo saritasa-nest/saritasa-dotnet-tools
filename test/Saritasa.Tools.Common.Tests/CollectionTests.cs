@@ -30,7 +30,13 @@ namespace Saritasa.Tools.Common.Tests
             }
         }
 
-        private class UserEqualityComparer : IEqualityComparer<User>
+        private sealed class UsersComparer : IComparer<User>
+        {
+            public int Compare(User x, User y) =>
+                y != null && (x != null && (x.Id == y.Id && x.Name == y.Name)) ? 0 : -1;
+        }
+
+        private sealed class UserEqualityComparer : IEqualityComparer<User>
         {
             public bool Equals(User x, User y) => y != null && x != null && x.Id == y.Id && x.Name == y.Name;
 
@@ -69,14 +75,45 @@ namespace Saritasa.Tools.Common.Tests
         public void Diff_TargetCollectionWithExistingElements_ExistingElementsAreUpdated()
         {
             // Arrange
-            var source = new[] { 1, 2, 3 };
-            var target = new[] { 1, 2, 4 };
+            var doug = new User(1, "Doug");
+            var source = new[]
+            {
+                doug,
+                new User(2, "Pasha")
+            };
+            var target = new[]
+            {
+                doug,
+                new User(2, "Pavel")
+            };
 
             // Act
-            var actions = CollectionUtils.Diff(source, target);
+            var diff = CollectionUtils.Diff(source, target, (u1, u2) => u1.Id == u2.Id);
 
             // Assert
-            Assert.Equal(new[] { (1, 1), (2, 2) }, actions.Updated);
+            Assert.Equal(new[] { (source[1], target[1]) }, diff.Updated);
+        }
+
+        [Fact]
+        public void Diff_TargetCollectionWithUpdatedElementsAndComparer_NotUpdatedElementsSkipped()
+        {
+            // Arrange
+            var source = new[]
+            {
+                new User(1, "Doug"),
+                new User(2, "Pasha")
+            };
+            var target = new[]
+            {
+                new User(1, "Doug"),
+                new User(2, "Pavel")
+            };
+
+            // Act
+            var diff = CollectionUtils.Diff(source, target, (u1, u2) => u1.Id == u2.Id, new UsersComparer());
+
+            // Assert
+            Assert.Equal(new[] { (source[1], target[1]) }, diff.Updated);
         }
 
         [Fact]

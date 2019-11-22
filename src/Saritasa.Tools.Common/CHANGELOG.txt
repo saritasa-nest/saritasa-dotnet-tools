@@ -2,7 +2,7 @@
 [-] Drop support for net452 and net461.
 [+] Add method to diff collections CollectionUtils.Diff and CollectionUtils.ApplyDiff .
 [+] Add method to apply collection sorting with one call CollectionUtils.OrderMultiple .
-[+] Make covariant IMetadataDto and IMetadataEnumerable generic type parameters.
+[+] Make covariant IMetadataDto generic type parameters.
 [+] Simplify metadata generation by introducing TotalCountListMetadataDto, OffsetLimitMetadataDto, PagedListMetadataDto.
 [*] Remove not needed dependencies.
 

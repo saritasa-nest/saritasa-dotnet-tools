@@ -302,17 +302,23 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Compares two collections and creates a list with items to add, remove and update based
         /// on identity equality.
+        ///
+        /// The updated items are formatted using comparer argument. If defined, it is used to determine whether
+        /// to add items to "updated" collection. If not the method tries to use <see cref="IComparable{T}" /> interface.
+        /// Otherwise every item in target collection considered as updated.
         /// </summary>
         /// <param name="source">Source collection.</param>
         /// <param name="target">Target collection (new).</param>
         /// <param name="identityComparer">Comparer elements by identity. This means that elements may be
-        /// identity equal but target collection has its newer version. If null the default comparer will be used.</param>
+        /// identity equal but target collection has its newer version. If null the Equals method will be used.</param>
+        /// <param name="comparer">Comparer for full objects compare. If not defined every object considered as updated.</param>
         /// <typeparam name="T">Item type.</typeparam>
         /// <returns>Items to add, remove and update.</returns>
         public static DiffResult<T> Diff<T>(
             IEnumerable<T> source,
             IEnumerable<T> target,
-            Func<T, T, bool> identityComparer = null)
+            Func<T, T, bool> identityComparer = null,
+            IComparer<T> comparer = null)
         {
             if (source == null)
             {
@@ -324,7 +330,7 @@ namespace Saritasa.Tools.Common.Utils
             }
             if (identityComparer == null)
             {
-                identityComparer = (obj1, obj2) => Comparer<T>.Default.Compare(obj1, obj2) == 0;
+                identityComparer = (obj1, obj2) => obj1.Equals(obj2);
             }
 
             var sourceArr = source.ToArray();
@@ -335,6 +341,12 @@ namespace Saritasa.Tools.Common.Utils
             var targetBits = new BitArray(targetArr.Length);
 
             // Determine updated and removed elements.
+            Func<T, T, bool> comparerFunc =
+                (o1, o2) => o1.Equals(o2) || o1 is IComparable<T> comparable && comparable.CompareTo(o2) == 0;
+            if (comparer != null)
+            {
+                comparerFunc = (o1, o2) => comparer.Compare(o1, o2) == 0;
+            }
             for (int i = 0; i < sourceArr.Length; i++)
             {
                 bool isRemoved = true;
@@ -348,7 +360,10 @@ namespace Saritasa.Tools.Common.Utils
                     // Elements are identity equal.
                     if (identityComparer(sourceArr[i], targetArr[j]))
                     {
-                        updated.Add((sourceArr[i], targetArr[j]));
+                        if (!comparerFunc(sourceArr[i], targetArr[j]))
+                        {
+                            updated.Add((sourceArr[i], targetArr[j]));
+                        }
                         targetBits[j] = true;
                         isRemoved = false;
                         break;
