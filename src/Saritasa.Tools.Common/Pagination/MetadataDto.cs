@@ -11,7 +11,7 @@ namespace Saritasa.Tools.Common.Pagination
     /// </summary>
     /// <typeparam name="TItem">Metadata items type.</typeparam>
     /// <typeparam name="TMetadata">Metadata type.</typeparam>
-#if NET40 || NET452 || NET461 || NETSTANDARD2_0
+#if NET40 || NETSTANDARD2_0
     [Serializable]
 #endif
     public class MetadataDto<TItem, TMetadata> : IMetadataDto<TItem, TMetadata>
@@ -36,7 +36,7 @@ namespace Saritasa.Tools.Common.Pagination
             Metadata = metadata;
         }
 
-#if NET40 || NET452 || NET461 || NETSTANDARD2_0
+#if NET40 || NETSTANDARD2_0
         /// <summary>
         /// Constructor for deserialization.
         /// </summary>

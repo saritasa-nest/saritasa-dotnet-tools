@@ -1,9 +1,9 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
-#if NET40 || NET452 || NET461 || NETSTANDARD2_0
+#if NET40 || NETSTANDARD2_0
 using System.Collections.Specialized;
 #endif
 
@@ -34,12 +34,12 @@ namespace Saritasa.Tools.Common.Utils
             return success ? value : defaultValue;
         }
 
-#if NET40 || NET452 || NET461 || NETSTANDARD2_0
+#if NET40 || NETSTANDARD2_0
         /// <summary>
         /// Tries to get the value in <see cref="NameValueCollection" />. If value with specified
         /// key does not exist it will return default value.
         /// </summary>
-        /// <param name="target">Target name value colleciton.</param>
+        /// <param name="target">Target name value collection.</param>
         /// <param name="key">Key.</param>
         /// <param name="defaultValues">Default value.</param>
         /// <returns>Values by key or default values.</returns>
@@ -56,7 +56,7 @@ namespace Saritasa.Tools.Common.Utils
         /// Tries to get the values in <see cref="NameValueCollection" />. If value with specified
         /// key does not exist it will return default values.
         /// </summary>
-        /// <param name="target">Target name value colleciton.</param>
+        /// <param name="target">Target name value collection.</param>
         /// <param name="key">Key.</param>
         /// <param name="defaultValues">Default value.</param>
         /// <returns>Values by key or default values.</returns>

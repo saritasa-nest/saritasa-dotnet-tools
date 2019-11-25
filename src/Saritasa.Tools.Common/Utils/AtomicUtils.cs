@@ -1,8 +1,8 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-#if NET452 || NET461 || NETSTANDARD1_2 || NETSTANDARD1_6 || NETSTANDARD2_0
+#if NETSTANDARD1_6 || NETSTANDARD2_0
 using System.Runtime.CompilerServices;
 #endif
 using System.Threading;
@@ -20,7 +20,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <typeparam name="T"></typeparam>
         /// <param name="item1">Variable 1.</param>
         /// <param name="item2">Variable 2.</param>
-#if NET452 || NET461 || NETSTANDARD1_2 || NETSTANDARD1_6 || NETSTANDARD2_0
+#if NETSTANDARD1_6 || NETSTANDARD2_0
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
         public static void Swap<T>(ref T item1, ref T item2)
@@ -36,7 +36,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <typeparam name="T">Variables type.</typeparam>
         /// <param name="item1">Variable 1.</param>
         /// <param name="item2">Variable 2.</param>
-#if NET452 || NET461 || NETSTANDARD1_2 || NETSTANDARD1_6 || NETSTANDARD2_0
+#if NETSTANDARD1_6 || NETSTANDARD2_0
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
         public static void SafeSwap<T>(ref T item1, ref T item2)

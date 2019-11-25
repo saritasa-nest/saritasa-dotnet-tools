@@ -11,7 +11,7 @@ namespace Saritasa.Tools.Common.Utils
     /// The result of collections comparision.
     /// </summary>
     /// <typeparam name="T">Collections source type.</typeparam>
-#if NET40 || NET452 || NET461 || NETSTANDARD2_0 || NETSTANDARD2_1
+#if NET40 || NETSTANDARD2_0
     [Serializable]
 #endif
     [DebuggerDisplay("Added: {Added.Count}, removed: {Removed.Count}, updated: {Updated.Count}")]

@@ -15,8 +15,7 @@ namespace Saritasa.Tools.Common.Utils
     /// </summary>
     public static class SecurityUtils
     {
-#if NET40 || NET452 || NET461 || NETSTANDARD1_6 || NETSTANDARD2_0
-        const char PasswordMethodHashSeparator = '$';
+        private const char PasswordMethodHashSeparator = '$';
 
         /// <summary>
         /// Returns string's MD5 hash.
@@ -242,7 +241,6 @@ namespace Saritasa.Tools.Common.Utils
 
             return Hash(target, method) == hashedStringToCheck;
         }
-#endif
 
         /// <summary>
         /// Convert array of bytes to string representation. Replace dashes by empty strings.

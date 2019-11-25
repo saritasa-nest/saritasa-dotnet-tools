@@ -111,7 +111,6 @@ namespace Saritasa.Tools.Common.Utils
             return sortedQuery;
         }
 
-#if NET40 || NET452 || NET461 || NETSTANDARD1_2 || NETSTANDARD1_6 || NETSTANDARD2_0
         /// <summary>
         /// Sorts the elements of a sequence in ascending or descending order.
         /// </summary>
@@ -208,7 +207,6 @@ namespace Saritasa.Tools.Common.Utils
                 currentPosition += chunkSize;
             }
         }
-#endif
 
         /// <summary>
         /// Breaks a list of items into chunks of a specific size.

@@ -13,7 +13,7 @@ namespace Saritasa.Tools.Common.Pagination
     /// collection.
     /// </summary>
     /// <seealso cref="IEnumerable{T}" />
-#if NET40 || NET452 || NET461 || NETSTANDARD2_0
+#if NET40 || NETSTANDARD2_0
     [Serializable]
 #endif
     public class TotalCountList<T> : IEnumerable<T>

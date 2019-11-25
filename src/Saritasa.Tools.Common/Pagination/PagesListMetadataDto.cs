@@ -10,7 +10,7 @@ namespace Saritasa.Tools.Common.Pagination
     /// Metadata data transfer object for paged list. Combines metadata and enumerable items.
     /// </summary>
     /// <typeparam name="TItem">Metadata items type.</typeparam>
-#if NET40 || NET452 || NET461 || NETSTANDARD2_0 || NETSTANDARD2_1
+#if NET40 || NETSTANDARD2_0
     [Serializable]
 #endif
     public class PagedListMetadataDto<TItem> : MetadataDto<TItem, PagedListMetadata>
@@ -24,7 +24,7 @@ namespace Saritasa.Tools.Common.Pagination
         {
         }
 
-#if NET40 || NET452 || NET461 || NETSTANDARD2_0 || NETSTANDARD2_1
+#if NET40 || NETSTANDARD2_0
         /// <summary>
         /// Constructor for deserialization.
         /// </summary>

@@ -4,9 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-#if NET40 || NET452 || NET461
-using System.Runtime.Serialization;
-#endif
 
 namespace Saritasa.Tools.Common.Utils
 {
