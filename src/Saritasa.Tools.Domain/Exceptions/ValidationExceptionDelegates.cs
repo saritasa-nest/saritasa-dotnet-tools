@@ -85,7 +85,7 @@ namespace Saritasa.Tools.Domain.Exceptions
             if (validationException.Errors.Any())
             {
                 var sb = new StringBuilder(validationException.Errors.Count * 55);
-                foreach (KeyValuePair<string, IEnumerable<string>> errorMember in validationException.Errors.OrderBy(e => e.Key))
+                foreach (KeyValuePair<string, ICollection<string>> errorMember in validationException.Errors.OrderBy(e => e.Key))
                 {
                     if (errorMember.Key.Equals(ValidationException.SummaryKey))
                     {
@@ -123,9 +123,8 @@ namespace Saritasa.Tools.Domain.Exceptions
 
             if (validationException.Errors.Any())
             {
-                var errorMembers = validationException.GetErrorMembersDictionary();
                 var sb = new StringBuilder(validationException.Errors.Count * 55);
-                foreach (KeyValuePair<string, IEnumerable<string>> errorMember in errorMembers)
+                foreach (KeyValuePair<string, ICollection<string>> errorMember in validationException.Errors)
                 {
                     sb.AppendLine(errorMember.Key);
                 }

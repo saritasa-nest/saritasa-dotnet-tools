@@ -45,7 +45,7 @@ namespace Saritasa.Tools.Domain.Tests
         public void BinaryFormatterSerialize_ValidationExceptionWithErrors_PersistAfterDeserialize()
         {
             // Arrange
-            var validationException = new Saritasa.Tools.Domain.Exceptions.ValidationException(new Dictionary<string, IEnumerable<string>>()
+            var validationException = new Saritasa.Tools.Domain.Exceptions.ValidationException(new Dictionary<string, ICollection<string>>()
             {
                 ["Name"] = new List<string> { "Required." },
                 ["Dob"] = new List<string> { "Out of range." },

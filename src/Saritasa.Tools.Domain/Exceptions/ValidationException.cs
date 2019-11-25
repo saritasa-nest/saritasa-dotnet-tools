@@ -49,10 +49,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         /// - Name: Field is required.
         /// - ConfirmPassword: Field is required, Should equal to Password field.
         /// </summary>
-        public virtual IDictionary<string, IEnumerable<string>> Errors => errors;
-
-        private readonly IDictionary<string, IEnumerable<string>> errors
-            = new Dictionary<string, IEnumerable<string>>();
+        public ValidationErrors Errors { get; } = new ValidationErrors();
 
         /// <inheritdoc />
         public override string Message => MessageFormatter(base.Message, this);
@@ -60,7 +57,8 @@ namespace Saritasa.Tools.Domain.Exceptions
         /// <summary>
         /// Summary errors. Returns zero array if not defined.
         /// </summary>
-        public IEnumerable<string> SummaryErrors => errors.ContainsKey(SummaryKey) ? errors[SummaryKey] : new string[0];
+        public IEnumerable<string> SummaryErrors => Errors.ContainsKey(SummaryKey) ?
+            Errors[SummaryKey] : Enumerable.Empty<string>();
 
         /// <summary>
         /// Constructor.
@@ -151,7 +149,7 @@ namespace Saritasa.Tools.Domain.Exceptions
 
             foreach (var error in errors)
             {
-                this.errors[error.Key] = new[] { error.Value };
+                this.Errors[error.Key] = new[] { error.Value };
             }
         }
 
@@ -159,7 +157,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         /// Constructor with dictionary contain member field as key and error messages as value.
         /// </summary>
         /// <param name="errors">Member errors dictionary.</param>
-        public ValidationException(IDictionary<string, IEnumerable<string>> errors) :
+        public ValidationException(IDictionary<string, ICollection<string>> errors) :
             base(DomainErrorDescriber.Default.ValidationErrors())
         {
             if (errors == null)
@@ -167,7 +165,7 @@ namespace Saritasa.Tools.Domain.Exceptions
                 throw new ArgumentNullException(nameof(errors));
             }
 
-            this.errors = errors;
+            this.Errors.Merge(errors);
         }
 
 #if NET40
@@ -190,7 +188,7 @@ namespace Saritasa.Tools.Domain.Exceptions
                 );
                 foreach (var error in errorsElements)
                 {
-                    errors.Add(error.Key, error.Value);
+                    Errors.Add(error.Key, error.Value);
                 }
             }
         }
@@ -203,85 +201,14 @@ namespace Saritasa.Tools.Domain.Exceptions
             {
                 var xelement = new System.Xml.Linq.XElement(
                     "errors",
-                    errors.Select(x => new System.Xml.Linq.XElement("error",
+                    Errors.Select(x => new System.Xml.Linq.XElement("error",
                         new System.Xml.Linq.XAttribute("id", x.Key),
                         x.Value.Select(e => new System.Xml.Linq.XElement("msg", e))))
                 );
                 info.AddValue("errors", xelement.ToString(System.Xml.Linq.SaveOptions.DisableFormatting));
             }
         }
-#endif
 
-        /// <summary>
-        /// Add error to errors list for specific member.
-        /// </summary>
-        /// <param name="member">Member of field name. Can be empty.</param>
-        /// <param name="error">Error message.</param>
-        public void AddError(string member, string error)
-        {
-            if (string.IsNullOrEmpty(error))
-            {
-                throw new ArgumentException(DomainErrorDescriber.Default.ValidationErrorIsEmpty(), nameof(error));
-            }
-
-            if (errors.TryGetValue(member, out var list))
-            {
-                ((IList<string>)list).Add(error);
-            }
-            else
-            {
-                list = new List<string>();
-                ((IList<string>)list).Add(error);
-                errors.Add(member, list);
-            }
-        }
-
-        /// <summary>
-        /// Add summary error.
-        /// </summary>
-        /// <param name="error">Error message.</param>
-        public void AddError(string error)
-        {
-            AddError(SummaryKey, error);
-        }
-
-        /// <summary>
-        /// Returns opposite dictionary where key is error message and value is an
-        /// enumerable with member names related to the error.
-        /// </summary>
-        /// <returns>Error members dictionary.</returns>
-        public IDictionary<string, IEnumerable<string>> GetErrorMembersDictionary()
-        {
-            var dict = new Dictionary<string, IEnumerable<string>>();
-            foreach (KeyValuePair<string, IEnumerable<string>> member in errors)
-            {
-                foreach (string error in member.Value)
-                {
-                    if (dict.TryGetValue(error, out var list))
-                    {
-                        ((IList<string>)list).Add(member.Key);
-                    }
-                    else
-                    {
-                        list = new List<string>();
-                        ((IList<string>)list).Add(member.Key);
-                        dict.Add(error, list);
-                    }
-                }
-            }
-            return dict;
-        }
-
-        /// <summary>
-        /// Returns dictionary that contains only one first error message per member name.
-        /// </summary>
-        /// <returns>Member error dictionary.</returns>
-        public IDictionary<string, string> GetOneErrorDictionary()
-        {
-            return errors.ToDictionary(k => k.Key, v => v.Value.FirstOrDefault() ?? string.Empty);
-        }
-
-#if NET40
         /// <summary>
         /// If object contains validation errors throws instance of <see cref="ValidationException" />.
         /// </summary>
@@ -317,12 +244,12 @@ namespace Saritasa.Tools.Domain.Exceptions
                     {
                         foreach (var memberName in validationResult.MemberNames)
                         {
-                            ex.AddError(memberName, validationResult.ErrorMessage);
+                            ex.Errors.AddError(memberName, validationResult.ErrorMessage);
                         }
                     }
                     else
                     {
-                        ex.AddError(validationResult.ErrorMessage);
+                        ex.Errors.AddError(validationResult.ErrorMessage);
                     }
                 }
                 throw ex;
@@ -339,8 +266,8 @@ namespace Saritasa.Tools.Domain.Exceptions
             new ConcurrentDictionary<Type, bool>();
 
         /// <summary>
-        /// For some reason if type hase <see cref="MetadataTypeAttribute" /> type that contains
-        /// validation attributes they will not be taked into account. This is workaround that
+        /// For some reason if type base <see cref="MetadataTypeAttribute" /> type that contains
+        /// validation attributes they will not be taken into account. This is workaround that
         /// registers them explicitly.
         /// </summary>
         /// <param name="t">Type to register.</param>
@@ -388,51 +315,17 @@ namespace Saritasa.Tools.Domain.Exceptions
                     {
                         foreach (var memberName in validationResult.MemberNames)
                         {
-                            ex.AddError(memberName, validationResult.ErrorMessage);
+                            ex.Errors.AddError(memberName, validationResult.ErrorMessage);
                         }
                     }
                     else
                     {
-                        ex.AddError(validationResult.ErrorMessage);
+                        ex.Errors.AddError(validationResult.ErrorMessage);
                     }
                 }
                 throw ex;
             }
         }
 #endif
-
-        /// <summary>
-        /// Throws <see cref="ValidationException" /> by provided dictionary of errors.
-        /// If dictionary is empty it does nothing.
-        /// </summary>
-        /// <param name="errors">Errors.</param>
-        public static void ThrowFromDictionary(IDictionary<string, string> errors)
-        {
-            if (errors == null)
-            {
-                throw new ArgumentNullException(nameof(errors));
-            }
-            if (errors.Count > 0)
-            {
-                throw new ValidationException(errors);
-            }
-        }
-
-        /// <summary>
-        /// Throws <see cref="ValidationException" /> by provided dictionary of errors.
-        /// If dictionary is empty it does nothing.
-        /// </summary>
-        /// <param name="errors">Errors.</param>
-        public static void ThrowFromDictionary(IDictionary<string, IEnumerable<string>> errors)
-        {
-            if (errors == null)
-            {
-                throw new ArgumentNullException(nameof(errors));
-            }
-            if (errors.Count > 0)
-            {
-                throw new ValidationException(errors);
-            }
-        }
     }
 }
