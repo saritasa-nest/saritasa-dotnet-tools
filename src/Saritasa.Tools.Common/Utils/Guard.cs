@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -13,11 +13,7 @@ namespace Saritasa.Tools.Common.Utils
     /// </summary>
     public static class Guard
     {
-#if NETSTANDARD1_2 || NETSTANDARD1_6 || NETSTANDARD2_0
-        internal const RegexOptions Options = RegexOptions.Singleline;
-#else
         internal const RegexOptions Options = RegexOptions.Singleline | RegexOptions.Compiled;
-#endif
 
         /// <summary>
         /// Email check regular expression.
@@ -44,7 +40,7 @@ namespace Saritasa.Tools.Common.Utils
         {
             if (argument == Guid.Empty)
             {
-                throw new ArgumentException(Properties.Strings.ArgumentCannotBeEmptyGuid.FormatWith(argumentName),
+                throw new ArgumentException(string.Format(Properties.Strings.ArgumentCannotBeEmptyGuid, argumentName),
                     argumentName);
             }
         }
@@ -59,7 +55,7 @@ namespace Saritasa.Tools.Common.Utils
         {
             if (string.IsNullOrEmpty(argument))
             {
-                throw new ArgumentException(Properties.Strings.ArgumentCannotBeEmptyString.FormatWith(argumentName),
+                throw new ArgumentException(string.Format(Properties.Strings.ArgumentCannotBeEmptyString, argumentName),
                     argumentName);
             }
         }
@@ -74,7 +70,7 @@ namespace Saritasa.Tools.Common.Utils
         {
             if (string.IsNullOrWhiteSpace(argument))
             {
-                throw new ArgumentException(Properties.Strings.ArgumentCannotBeEmptyString.FormatWith(argumentName),
+                throw new ArgumentException(string.Format(Properties.Strings.ArgumentCannotBeEmptyString, argumentName),
                     argumentName);
             }
         }
@@ -91,7 +87,8 @@ namespace Saritasa.Tools.Common.Utils
             if (argument.Length > length)
             {
                 throw new ArgumentException(
-                    Properties.Strings.ArgumentCannotBeMoreThanChars.FormatWith(argumentName, length.ToString()), argumentName);
+                    string.Format(Properties.Strings.ArgumentCannotBeMoreThanChars, argumentName, length.ToString()),
+                    argumentName);
             }
         }
 
@@ -338,7 +335,7 @@ namespace Saritasa.Tools.Common.Utils
             if (argument < min || argument > max)
             {
                 throw new ArgumentOutOfRangeException(argumentName,
-                    Properties.Strings.ArgumentMustBeBetween.FormatWith(argumentName, min.ToString(), max.ToString()));
+                    string.Format(Properties.Strings.ArgumentMustBeBetween, argumentName, min.ToString(), max.ToString()));
             }
         }
 
@@ -355,7 +352,8 @@ namespace Saritasa.Tools.Common.Utils
 
             if (!EmailExpression.IsMatch(argument))
             {
-                throw new ArgumentException(Properties.Strings.ArgumentNotValidEmail.FormatWith(argumentName), argumentName);
+                throw new ArgumentException(string.Format(Properties.Strings.ArgumentNotValidEmail, argumentName),
+                    argumentName);
             }
         }
     }

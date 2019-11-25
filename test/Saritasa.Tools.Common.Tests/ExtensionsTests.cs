@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 using Saritasa.Tools.Common.Extensions;
-using Saritasa.Tools.Common.Utils;
-using System.ComponentModel;
 
 namespace Saritasa.Tools.Common.Tests
 {
@@ -17,17 +15,7 @@ namespace Saritasa.Tools.Common.Tests
     public class ExtensionsTests
     {
         [Fact]
-        public void String_format_should_format()
-        {
-            // Arrange & act
-            var result = "{0} + {1} = {2}".FormatWith(2, 2, 4);
-
-            // Assert
-            Assert.Equal("2 + 2 = 4", result);
-        }
-
-        [Fact]
-        public void Dictionary_get_default_value_should_get_default()
+        public void AddOrUpdate_Dictionary_GetDefaultValueShouldGetDefault()
         {
             // Arrange
             IDictionary<int, string> dict = new Dictionary<int, string>();
@@ -40,7 +28,7 @@ namespace Saritasa.Tools.Common.Tests
         }
 
         [Fact]
-        public void Dictionary_add_or_update_should_return_new_value()
+        public void AddOrUpdate_Dictionary_AddOrUpdateShouldReturnNewValue()
         {
             // Arrange
             IDictionary<int, int> dict = new Dictionary<int, int>();
@@ -55,9 +43,8 @@ namespace Saritasa.Tools.Common.Tests
             Assert.Equal(11, dict[1]);
         }
 
-#if NET40 || NET452 || NET461
         [Fact]
-        public void Chunk_select_range_should_return_subsets()
+        public void ChunkSelectRange_ListWithItems_ShouldIterateWholeList()
         {
             // Arrange
             int capacity = 250;
@@ -80,10 +67,9 @@ namespace Saritasa.Tools.Common.Tests
             // Assert
             Assert.Equal(31125, sum);
         }
-#endif
 
         [Fact]
-        public void Chunk_select_should_return_subsets()
+        public void ChunkSelect_ListWithItems_ShouldIterateWholeList()
         {
             // Arrange
             int capacity = 250;

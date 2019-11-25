@@ -5,6 +5,7 @@
 [+] Make covariant IMetadataDto generic type parameters.
 [+] Simplify metadata generation by introducing TotalCountListMetadataDto, OffsetLimitMetadataDto, PagedListMetadataDto.
 [+] Add enum utils GetNamesWithDescriptions, GetValuesWithDescriptions.
+[-] Remove string extensions methods.
 [*] Remove not needed dependencies.
 
 2.0.1 [2019-03-13]
