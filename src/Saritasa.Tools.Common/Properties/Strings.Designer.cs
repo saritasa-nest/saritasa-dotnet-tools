@@ -8,12 +8,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-using System.Reflection;
-
 namespace Saritasa.Tools.Common.Properties {
     using System;
-    
-    
+    using System.Reflection;
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -113,15 +111,6 @@ namespace Saritasa.Tools.Common.Properties {
         internal static string ArgumentMustBeBetween {
             get {
                 return ResourceManager.GetString("ArgumentMustBeBetween", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Argument must be enumeration..
-        /// </summary>
-        internal static string ArgumentMustBeEnum {
-            get {
-                return ResourceManager.GetString("ArgumentMustBeEnum", resourceCulture);
             }
         }
         

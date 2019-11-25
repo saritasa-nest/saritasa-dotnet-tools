@@ -1,8 +1,8 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-#if NET40 || NET452 || NET461 || NETSTANDARD2_0
+#if NET40 || NET452 || NET461 || NETSTANDARD1_6 || NETSTANDARD2_0
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
@@ -17,13 +17,13 @@ namespace Saritasa.Tools.Common.Utils
     /// </summary>
     public static class EnumUtils
     {
-#if NET40 || NET452 || NET461 || NETSTANDARD2_0
-
+#if NET40 || NETSTANDARD2_0
         /// <summary>
         /// Splits intercapped string.
         /// </summary>
         /// <example>TestDBConnection will be parsed into "Test", "DB", "Connection" parts.</example>
-        private static readonly Regex intercappedStringSplitRegex = new Regex(@"((?<=[a-z])([A-Z])|(?<=[A-Z])([A-Z][a-z]))", RegexOptions.Compiled);
+        private static readonly Regex intercappedStringSplitRegex =
+            new Regex(@"((?<=[a-z])([A-Z])|(?<=[A-Z])([A-Z][a-z]))", RegexOptions.Compiled);
 
         /// <summary>
         /// Gets a description of enum value. If <see cref="DescriptionAttribute" /> is specified for it, its value will be returned.
@@ -33,6 +33,11 @@ namespace Saritasa.Tools.Common.Utils
         /// <returns>Description of the value.</returns>
         public static string GetDescription(Enum target)
         {
+            if (target == null)
+            {
+                throw new ArgumentNullException(nameof(target));
+            }
+
             var descAttribute = GetAttribute<DescriptionAttribute>(target);
             if (descAttribute != null)
             {
@@ -55,14 +60,12 @@ namespace Saritasa.Tools.Common.Utils
         public static TAttribute GetAttribute<TAttribute>(Enum target)
             where TAttribute : Attribute
         {
-#if NET40 || NET452 || NET461
-            if (!target.GetType().IsEnum)
+            if (target == null)
             {
-                throw new ArgumentOutOfRangeException(nameof(target), Properties.Strings.ArgumentMustBeEnum);
+                throw new ArgumentNullException(nameof(target));
             }
-#endif
 
-#if NET40 || NET452 || NET461
+#if NET40
             FieldInfo fieldInfo = target.GetType().GetField(target.ToString());
 #else
             FieldInfo fieldInfo = target.GetType().GetTypeInfo().GetDeclaredField(target.ToString());
@@ -72,7 +75,7 @@ namespace Saritasa.Tools.Common.Utils
                 return null;
             }
 
-#if NETSTANDARD1_2 || NETSTANDARD1_6 || NETSTANDARD2_0
+#if NETSTANDARD1_6 || NETSTANDARD2_0
             var attributes = fieldInfo.GetCustomAttributes<TAttribute>(false);
 #else
             var attributes =
@@ -80,5 +83,34 @@ namespace Saritasa.Tools.Common.Utils
 #endif
             return attributes.FirstOrDefault();
         }
+
+        /// <summary>
+        /// Get enumerable values.
+        /// </summary>
+        /// <typeparam name="T">Enum type.</typeparam>
+        /// <returns>Enumerable values.</returns>
+        public static T[] GetValues<T>() where T : Enum => Enum.GetValues(typeof(T)).Cast<T>().ToArray();
+
+#if NET40 || NETSTANDARD2_0
+        /// <summary>
+        /// Get the enumerable of key value pairs of enum name and enum description.
+        /// </summary>
+        /// <typeparam name="T">Enum type.</typeparam>
+        /// <returns>Key value pairs of enum name and its description.</returns>
+        public static IEnumerable<KeyValuePair<string, string>> GetNamesWithDescriptions<T>() where T : Enum
+        {
+            return GetValues<T>().Select(e => new KeyValuePair<string, string>(e.ToString(), GetDescription(e)));
+        }
+
+        /// <summary>
+        /// Get the enumerable of key value pairs of enum name and enum description.
+        /// </summary>
+        /// <typeparam name="T">Enum type.</typeparam>
+        /// <returns>Key value pairs of enum name and its description.</returns>
+        public static IEnumerable<KeyValuePair<string, string>> GetValuesWithDescriptions<T>() where T : Enum
+        {
+            return GetValues<T>().Select(e => new KeyValuePair<string, string>(e.ToString("d"), GetDescription(e)));
+        }
+#endif
     }
 }
