@@ -65,15 +65,15 @@ namespace Saritasa.Tools.Common.Utils
         public static IOrderedEnumerable<TSource> OrderMultiple<TSource>(
             IEnumerable<TSource> source,
             ICollection<(string FieldName, ListSortDirection Order)> orderEntries,
-            params (string fieldName, Func<TSource, object> selector)[] keySelectors)
+            params (string FieldName, Func<TSource, object> Selector)[] keySelectors)
         {
             Func<TSource, object> GetKeySelector(string fieldName)
             {
                 for (int i = 0; i < keySelectors.Length; i++)
                 {
-                    if (keySelectors[i].fieldName == fieldName)
+                    if (keySelectors[i].FieldName == fieldName)
                     {
-                        return keySelectors[i].selector;
+                        return keySelectors[i].Selector;
                     }
                 }
                 throw new InvalidOperationException(string.Format(Properties.Strings.OrderByFieldIsNotSupported, fieldName));
@@ -140,15 +140,15 @@ namespace Saritasa.Tools.Common.Utils
         public static IOrderedQueryable<TSource> OrderMultiple<TSource>(
             IQueryable<TSource> source,
             ICollection<(string FieldName, ListSortDirection Order)> orderEntries,
-            params (string fieldName, Expression<Func<TSource, object>> selector)[] keySelectors)
+            params (string FieldName, Expression<Func<TSource, object>> Selector)[] keySelectors)
         {
             Expression<Func<TSource, object>> GetKeySelector(string fieldName)
             {
                 for (int i = 0; i < keySelectors.Length; i++)
                 {
-                    if (keySelectors[i].fieldName == fieldName)
+                    if (keySelectors[i].FieldName == fieldName)
                     {
-                        return keySelectors[i].selector;
+                        return keySelectors[i].Selector;
                     }
                 }
                 throw new InvalidOperationException(string.Format(Properties.Strings.OrderByFieldIsNotSupported, fieldName));
@@ -399,9 +399,10 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="source">The collection to compare to.</param>
         /// <param name="diff">Diff.</param>
-        /// <param name="update">Updater delegate to change state of object 1 according to object 2.</param>
+        /// <param name="update">Updater delegate to change state of object 1 according to object 2 and return
+        /// destination object. The new object is not used and this overload is only for AutoMapper compatibility.</param>
         /// <typeparam name="T">Collection source type.</typeparam>
-        public static void ApplyDiff<T>(ICollection<T> source, DiffResult<T> diff, Action<T, T> update)
+        public static void ApplyDiff<T>(ICollection<T> source, DiffResult<T> diff, Func<T, T, T> update)
         {
             if (source == null)
             {
@@ -424,10 +425,27 @@ namespace Saritasa.Tools.Common.Utils
             {
                 source.Add(addedItem);
             }
+
             foreach ((T sourceItem, T targetItem) in diff.Updated)
             {
                 update(sourceItem, targetItem);
             }
+        }
+
+        /// <summary>
+        /// Apply collections compare diff to another collection.
+        /// </summary>
+        /// <param name="source">The collection to compare to.</param>
+        /// <param name="diff">Diff.</param>
+        /// <param name="update">Updater delegate to change state of object 1 according to object 2.</param>
+        /// <typeparam name="T">Collection source type.</typeparam>
+        public static void ApplyDiff<T>(ICollection<T> source, DiffResult<T> diff, Action<T, T> update)
+        {
+            ApplyDiff(source, diff, (obj1, obj2) =>
+            {
+                update(obj1, obj2);
+                return obj2;
+            });
         }
     }
 }

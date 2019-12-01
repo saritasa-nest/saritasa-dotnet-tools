@@ -18,19 +18,24 @@ namespace Saritasa.Tools.Common.Utils
     public class DiffResult<T>
     {
         /// <summary>
-        /// New items to add.
+        /// Are there ane differences in the diff.
+        /// </summary>
+        public bool HasDifferences => Added.Count > 0 || Removed.Count > 0 || Updated.Count > 0;
+
+        /// <summary>
+        /// New items.
         /// </summary>
         public ICollection<T> Added { get; internal set; }
 
         /// <summary>
-        /// Items to remove.
+        /// Removed items.
         /// </summary>
         public ICollection<T> Removed { get; internal set; }
 
         /// <summary>
-        /// Items to update. This is the collection of tuples where first item is
+        /// Updated items. This is the collection of tuples where first item is
         /// from source collection and second one is from target.
         /// </summary>
-        public ICollection<(T source, T target)> Updated { get; internal set; }
+        public ICollection<(T Source, T Target)> Updated { get; internal set; }
     }
 }

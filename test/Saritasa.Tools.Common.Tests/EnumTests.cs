@@ -23,7 +23,7 @@ namespace Saritasa.Tools.Common.Tests
 
         public enum TestEnum
         {
-            [TestAttribute]
+            [Test]
             [Description(OverriddenDescriptionName)]
             A,
 
