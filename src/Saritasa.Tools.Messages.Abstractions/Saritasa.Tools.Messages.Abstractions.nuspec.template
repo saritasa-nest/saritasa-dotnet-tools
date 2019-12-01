@@ -8,7 +8,7 @@
     <owners>Saritasa</owners>
     <license type="file">LICENSE.txt</license>
     <projectUrl>https://github.com/Saritasa/SaritasaTools</projectUrl>
-    <iconUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png</iconUrl>
+    <icon>icon.png</icon>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>The package is a part of Saritasa Tools project. Saritasa.Tools.Messages.Abstractions contains CQRS infrastructure abstractions that includes command, queries and events.</description>
     <summary>CQRS infrastructure abstractions.</summary>
@@ -27,5 +27,6 @@
     <file src="bin\Release\**\Saritasa.Tools.Messages.Abstractions.pdb" target="lib" />
     <file src="bin\Release\**\Saritasa.Tools.Messages.Abstractions.xml" target="lib" />
     <file src="..\..\LICENSE.txt" target="LICENSE.txt" />
+    <file src="..\..\icon.png" target="icon.png" />
   </files>
 </package>

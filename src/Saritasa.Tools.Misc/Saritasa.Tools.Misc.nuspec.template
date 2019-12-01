@@ -8,7 +8,7 @@
     <owners>Saritasa</owners>
     <license type="file">LICENSE.txt</license>
     <projectUrl>https://github.com/Saritasa/SaritasaTools</projectUrl>
-    <iconUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png</iconUrl>
+    <icon>icon.png</icon>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>The package is a part of Saritasa Tools project. Saritasa.Tools.Misc contains miscellaneous items: passwords generation, passwords strength estimate.</description>
     <summary>Miscellaneous items.</summary>
@@ -33,5 +33,6 @@
     <file src="bin\Release\**\Saritasa.Tools.Misc.pdb" target="lib" />
     <file src="bin\Release\**\Saritasa.Tools.Misc.xml" target="lib" />
     <file src="..\..\LICENSE.txt" target="LICENSE.txt" />
+    <file src="..\..\icon.png" target="icon.png" />
   </files>
 </package>

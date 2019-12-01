@@ -8,7 +8,7 @@
     <owners>Saritasa</owners>
     <license type="file">LICENSE.txt</license>
     <projectUrl>https://github.com/Saritasa/SaritasaTools</projectUrl>
-    <iconUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png</iconUrl>
+    <icon>icon.png</icon>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>The package is a part of Saritasa Tools project. Test runs allows to use special test run infrastructure to help and automate integration testing.</description>
     <summary>Test runs for pipelines.</summary>
@@ -30,5 +30,6 @@
     <file src="bin\Release\**\Saritasa.Tools.Messages.TestRuns.pdb" target="lib" />
     <file src="bin\Release\**\Saritasa.Tools.Messages.TestRuns.xml" target="lib" />
     <file src="..\..\LICENSE.txt" target="LICENSE.txt" />
+    <file src="..\..\icon.png" target="icon.png" />
   </files>
 </package>

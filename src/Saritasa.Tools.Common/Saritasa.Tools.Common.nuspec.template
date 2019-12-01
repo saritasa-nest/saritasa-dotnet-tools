@@ -10,10 +10,10 @@
     <owners>Saritasa</owners>
     <license type="file">LICENSE.txt</license>
     <projectUrl>https://github.com/saritasa/saritasatools</projectUrl>
-    <iconUrl>https://raw.githubusercontent.com/Saritasa/SaritasaTools/master/icon.png</iconUrl>
+    <icon>icon.png</icon>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <copyright>(c) Saritasa, 2016-2019</copyright>
-    <tags>uow repository domain ef6 objectcontext dbcontext</tags>
+    <tags>strings utils atomic pagination datetime security collections diff</tags>
     <repository type="git" url="https://github.com/Saritasa/SaritasaTools" commit="$(CommitHash)" />
     <dependencies>
       <group targetFramework="netstandard1.6">
@@ -28,5 +28,6 @@
     <file src="bin\Release\**\Saritasa.Tools.Common.pdb" target="lib" />
     <file src="bin\Release\**\Saritasa.Tools.Common.xml" target="lib" />
     <file src="..\..\LICENSE.txt" target="LICENSE.txt" />
+    <file src="..\..\icon.png" target="icon.png" />
   </files>
 </package>
