@@ -33,7 +33,7 @@ namespace Saritasa.Tools.Common.Utils
                 {
                     return ListSortDirection.Descending;
                 }
-                throw new InvalidOperationException($"Cannot recognize sort direction \"{order}\".");
+                throw new InvalidOperationException(string.Format(Properties.Strings.InvalidOrderDirection, order));
             }
 
             var sortingRecordsStrings = orderQuery.Split(new[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries);

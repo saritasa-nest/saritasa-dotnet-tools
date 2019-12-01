@@ -8,10 +8,12 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System.Reflection;
+
 namespace Saritasa.Tools.Common.Properties {
     using System;
-    using System.Reflection;
-
+    
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -156,6 +158,15 @@ namespace Saritasa.Tools.Common.Properties {
         internal static string HashMethodCannotRecognize {
             get {
                 return ResourceManager.GetString("HashMethodCannotRecognize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot recognize sort direction {0}..
+        /// </summary>
+        internal static string InvalidOrderDirection {
+            get {
+                return ResourceManager.GetString("InvalidOrderDirection", resourceCulture);
             }
         }
         

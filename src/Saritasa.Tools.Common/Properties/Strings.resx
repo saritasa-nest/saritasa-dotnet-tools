@@ -150,6 +150,9 @@
   <data name="HashMethodCannotRecognize" xml:space="preserve">
     <value>{0} contains method that is not possible to recognize.</value>
   </data>
+  <data name="InvalidOrderDirection" xml:space="preserve">
+    <value>Cannot recognize sort direction {0}.</value>
+  </data>
   <data name="NoHashMethod" xml:space="preserve">
     <value>{0} does not contain hash method.</value>
   </data>
