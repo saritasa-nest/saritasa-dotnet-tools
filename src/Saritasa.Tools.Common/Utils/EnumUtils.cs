@@ -2,7 +2,7 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-#if NET40 || NET452 || NET461 || NETSTANDARD1_6 || NETSTANDARD2_0
+#if NET40 || NETSTANDARD1_6 || NETSTANDARD2_0
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
@@ -93,13 +93,13 @@ namespace Saritasa.Tools.Common.Utils
 
 #if NET40 || NETSTANDARD2_0
         /// <summary>
-        /// Get the enumerable of key value pairs of enum name and enum description.
+        /// Get the dictionary of enum name and enum description.
         /// </summary>
         /// <typeparam name="T">Enum type.</typeparam>
         /// <returns>Key value pairs of enum name and its description.</returns>
-        public static IEnumerable<KeyValuePair<string, string>> GetNamesWithDescriptions<T>() where T : Enum
+        public static IDictionary<string, string> GetNamesWithDescriptions<T>() where T : Enum
         {
-            return GetValues<T>().Select(e => new KeyValuePair<string, string>(e.ToString(), GetDescription(e)));
+            return GetValues<T>().ToDictionary(e => e.ToString(), e => GetDescription(e));
         }
 
         /// <summary>
@@ -107,9 +107,9 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <typeparam name="T">Enum type.</typeparam>
         /// <returns>Key value pairs of enum name and its description.</returns>
-        public static IEnumerable<KeyValuePair<string, string>> GetValuesWithDescriptions<T>() where T : Enum
+        public static IDictionary<string, string> GetValuesWithDescriptions<T>() where T : Enum
         {
-            return GetValues<T>().Select(e => new KeyValuePair<string, string>(e.ToString("d"), GetDescription(e)));
+            return GetValues<T>().ToDictionary(e => e.ToString("d"), e => GetDescription(e));
         }
 #endif
     }

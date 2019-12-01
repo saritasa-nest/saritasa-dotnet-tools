@@ -1,4 +1,4 @@
-﻿3.0.0 [TBD]
+﻿3.0.0 [2019-12-01]
 [-] Drop support for net452 and net461.
 [+] Add method to diff collections CollectionUtils.Diff and CollectionUtils.ApplyDiff .
 [+] Add method to apply collection sorting with one call CollectionUtils.OrderMultiple .
