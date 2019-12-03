@@ -17,12 +17,10 @@
     <repository type="git" url="https://github.com/Saritasa/SaritasaTools" commit="$(CommitHash)" />
     <dependencies>
       <group targetFramework="netstandard1.6">
-        <dependency id="System.Linq.Queryable" version="4.3.0" exclude="Build,Analyzers" />
-        <dependency id="System.ValueTuple" version="4.5.0" exclude="Build,Analyzers" />
+        <dependency id="System.Linq.Queryable" version="[4.3.0, )" exclude="Build,Analyzers" />
+        <dependency id="System.ValueTuple" version="[4.5.0, )" exclude="Build,Analyzers" />
       </group>
-      <group targetFramework="netstandard2.0">
-        <dependency id="System.ValueTuple" version="4.5.0" exclude="Build,Analyzers" />
-      </group>
+      <group targetFramework="netstandard2.0" />
       <group targetFramework="net40" /> 
     </dependencies>
   </metadata>
