@@ -35,6 +35,12 @@ namespace Saritasa.Tools.Common.Pagination
         public T this[int index] => ((IList<T>)Items)[index];
 
         /// <summary>
+        /// Empty total count list.
+        /// </summary>
+        public static TotalCountList<T> Empty { get; } =
+            new TotalCountList<T>(new List<T>(), totalCount: 0);
+
+        /// <summary>
         /// Parameterless constructor.
         /// </summary>
         protected TotalCountList()

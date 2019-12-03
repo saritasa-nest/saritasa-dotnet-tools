@@ -1,8 +1,9 @@
-﻿3.1.0 [TBD]
+﻿3.1.0 [2019-12-03]
 [*] Use DiffResultUpdatedItems{T} for Diff{T} instead of tuples.
 [-] Remove CollectionUtils.OrderMultiple support for net40.
 [*] Fix net40 support.
 [+] Add deconstruct for Diff{T}.
+[*] Fix pagination Empty result.
 
 3.0.0 [2019-12-01]
 [-] Drop support for net452 and net461.

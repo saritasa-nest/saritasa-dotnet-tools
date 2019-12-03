@@ -71,8 +71,7 @@ namespace Saritasa.Tools.Common.Pagination
         /// </summary>
         /// <typeparam name="T">Item type.</typeparam>
         /// <returns>Empty list with total count.</returns>
-        public static TotalCountList<T> Empty<T>()
-            => new TotalCountList<T>(Enumerable.Empty<T>() as ICollection<T>, totalCount: 0);
+        public static TotalCountList<T> Empty<T>() => TotalCountList<T>.Empty;
 
         /// <summary>
         /// Creates list with total count property. Shorthand to simplify type infer.

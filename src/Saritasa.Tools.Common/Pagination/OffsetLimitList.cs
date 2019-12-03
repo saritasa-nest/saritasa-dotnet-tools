@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace Saritasa.Tools.Common.Pagination
@@ -26,6 +27,12 @@ namespace Saritasa.Tools.Common.Pagination
         /// Maximum number of items to take.
         /// </summary>
         public int Limit { get; protected internal set; }
+
+        /// <summary>
+        /// Empty offset limit list.
+        /// </summary>
+        public static new OffsetLimitList<T> Empty { get; } =
+            new OffsetLimitList<T>(new List<T>(), offset: 0, limit: 1, totalCount: 0);
 
         /// <summary>
         /// Parameterless constructor.

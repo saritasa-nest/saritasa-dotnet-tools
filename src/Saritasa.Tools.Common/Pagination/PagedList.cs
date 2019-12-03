@@ -33,6 +33,12 @@ namespace Saritasa.Tools.Common.Pagination
         public int PageSize { get; protected internal set; }
 
         /// <summary>
+        /// Empty offset limit list.
+        /// </summary>
+        public static new PagedList<T> Empty { get; } =
+            new PagedList<T>(new List<T>(), page: 1, pageSize: 1, totalCount: 0);
+
+        /// <summary>
         /// Total pages.
         /// </summary>
         public int TotalPages
