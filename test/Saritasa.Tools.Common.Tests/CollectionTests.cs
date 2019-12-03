@@ -91,7 +91,7 @@ namespace Saritasa.Tools.Common.Tests
             var diff = CollectionUtils.Diff(source, target, (u1, u2) => u1.Id == u2.Id);
 
             // Assert
-            Assert.Equal(new[] { (source[1], target[1]) }, diff.Updated);
+            Assert.Equal(new[] { new DiffResultUpdatedItems<User>(source[1], target[1]) }, diff.Updated);
         }
 
         [Fact]
@@ -113,7 +113,7 @@ namespace Saritasa.Tools.Common.Tests
             var diff = CollectionUtils.Diff(source, target, (u1, u2) => u1.Id == u2.Id, new UsersComparer());
 
             // Assert
-            Assert.Equal(new[] { (source[1], target[1]) }, diff.Updated);
+            Assert.Equal(new[] { new DiffResultUpdatedItems<User>(source[1], target[1]) }, diff.Updated);
         }
 
         [Fact]

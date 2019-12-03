@@ -25,17 +25,31 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// New items.
         /// </summary>
-        public ICollection<T> Added { get; internal set; }
+        public ICollection<T> Added { get; protected internal set; }
 
         /// <summary>
         /// Removed items.
         /// </summary>
-        public ICollection<T> Removed { get; internal set; }
+        public ICollection<T> Removed { get; protected internal set; }
 
         /// <summary>
         /// Updated items. This is the collection of tuples where first item is
         /// from source collection and second one is from target.
         /// </summary>
-        public ICollection<(T Source, T Target)> Updated { get; internal set; }
+        public ICollection<DiffResultUpdatedItems<T>> Updated { get; protected internal set; }
+
+        /// <summary>
+        /// Deconstruction method used for tuples.
+        /// </summary>
+        /// <param name="added">Added items.</param>
+        /// <param name="removed">Removed items.</param>
+        /// <param name="updated">Updated items.</param>
+        public void Deconstruct(out ICollection<T> added, out ICollection<T> removed,
+            out ICollection<DiffResultUpdatedItems<T>> updated)
+        {
+            added = Added;
+            removed = Removed;
+            updated = Updated;
+        }
     }
 }

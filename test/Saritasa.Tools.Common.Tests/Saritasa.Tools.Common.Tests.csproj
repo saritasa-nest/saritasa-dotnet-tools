@@ -2,13 +2,13 @@
 
   <PropertyGroup>
     <AssemblyTitle>Saritasa Tools Utils and Extensions Tests</AssemblyTitle>
-    <TargetFrameworks>net452;netcoreapp2.0</TargetFrameworks>
     <AssemblyName>Saritasa.Tools.Common.Tests</AssemblyName>
     <PackageId>Saritasa.Tools.Common.Tests</PackageId>
-    <RuntimeFrameworkVersion Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">2.0.0</RuntimeFrameworkVersion>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <CodeAnalysisRuleSet>../../tools/Saritasa.ruleset</CodeAnalysisRuleSet>
     <AssemblyOriginatorKeyFile Condition="'$(OS)' == 'Windows_NT'">../../tools/SaritasaTools.snk</AssemblyOriginatorKeyFile>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <LangVersion>default</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,11 +23,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="xunit" Version="2.4.1" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
   <ItemGroup>

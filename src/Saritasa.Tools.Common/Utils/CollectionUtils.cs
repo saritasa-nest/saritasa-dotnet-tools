@@ -54,6 +54,24 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
+        /// Sorts the elements of a sequence in ascending or descending order.
+        /// </summary>
+        /// <typeparam name="TSource">The type of the elements of source.</typeparam>
+        /// <typeparam name="TKey">The type of the key returned by keySelector.</typeparam>
+        /// <param name="source">A sequence of values to order.</param>
+        /// <param name="keySelector">A function to extract a key from an element.</param>
+        /// <param name="sortOrder">Sort order.</param>
+        /// <returns>An <see cref="System.Linq.IOrderedQueryable{T}" /> whose elements are sorted according to a key.</returns>
+        public static IOrderedQueryable<TSource> Order<TSource, TKey>(
+            IQueryable<TSource> source,
+            Expression<Func<TSource, TKey>> keySelector,
+            ListSortDirection sortOrder)
+        {
+            return sortOrder == ListSortDirection.Ascending ? source.OrderBy(keySelector) : source.OrderByDescending(keySelector);
+        }
+
+#if NETSTANDARD1_6 || NETSTANDARD2_0
+        /// <summary>
         /// Applies ordering to collection according to sorting entries and selectors. Allows to
         /// make ordering in one method call.
         /// </summary>
@@ -109,23 +127,6 @@ namespace Saritasa.Tools.Common.Utils
             }
 
             return sortedQuery;
-        }
-
-        /// <summary>
-        /// Sorts the elements of a sequence in ascending or descending order.
-        /// </summary>
-        /// <typeparam name="TSource">The type of the elements of source.</typeparam>
-        /// <typeparam name="TKey">The type of the key returned by keySelector.</typeparam>
-        /// <param name="source">A sequence of values to order.</param>
-        /// <param name="keySelector">A function to extract a key from an element.</param>
-        /// <param name="sortOrder">Sort order.</param>
-        /// <returns>An <see cref="System.Linq.IOrderedQueryable{T}" /> whose elements are sorted according to a key.</returns>
-        public static IOrderedQueryable<TSource> Order<TSource, TKey>(
-            IQueryable<TSource> source,
-            Expression<Func<TSource, TKey>> keySelector,
-            ListSortDirection sortOrder)
-        {
-            return sortOrder == ListSortDirection.Ascending ? source.OrderBy(keySelector) : source.OrderByDescending(keySelector);
         }
 
         /// <summary>
@@ -185,6 +186,7 @@ namespace Saritasa.Tools.Common.Utils
 
             return sortedQuery;
         }
+#endif
 
         /// <summary>
         /// Breaks a list of items into chunks of a specific size. Be aware that this method generates one additional
@@ -334,7 +336,7 @@ namespace Saritasa.Tools.Common.Utils
             var sourceArr = source.ToArray();
             var targetArr = target.ToArray();
             var added = new List<T>(sourceArr.Length / 2);
-            var updated = new List<(T source, T target)>(sourceArr.Length);
+            var updated = new List<DiffResultUpdatedItems<T>>(sourceArr.Length);
             var removed = new List<T>(sourceArr.Length / 2);
             var targetBits = new BitArray(targetArr.Length);
 
@@ -360,7 +362,7 @@ namespace Saritasa.Tools.Common.Utils
                     {
                         if (!comparerFunc(sourceArr[i], targetArr[j]))
                         {
-                            updated.Add((sourceArr[i], targetArr[j]));
+                            updated.Add(new DiffResultUpdatedItems<T>(sourceArr[i], targetArr[j]));
                         }
                         targetBits[j] = true;
                         isRemoved = false;

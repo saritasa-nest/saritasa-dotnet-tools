@@ -6,6 +6,7 @@ using System.ComponentModel;
 
 namespace Saritasa.Tools.Common.Utils
 {
+#if NETSTANDARD1_6 || NETSTANDARD2_0
     /// <summary>
     /// Order entries parsing strategies to get array of (fieldName, order) tuples.
     /// </summary>
@@ -53,4 +54,5 @@ namespace Saritasa.Tools.Common.Utils
             return arr;
         }
     }
+#endif
 }
