@@ -101,13 +101,19 @@ namespace Saritasa.Tools.Common.Utils
             {
                 throw new ArgumentNullException(nameof(source));
             }
-            if (orderEntries == null || !orderEntries.Any())
+            if (orderEntries == null)
             {
                 throw new ArgumentNullException(nameof(orderEntries));
             }
             if (keySelectors == null)
             {
                 throw new ArgumentNullException(nameof(keySelectors));
+            }
+
+            // Noop ordering.
+            if (!orderEntries.Any())
+            {
+                return source.OrderBy(s => 1);
             }
 
             // Need to sort by first field to get IOrderedQuery object instance.
@@ -159,13 +165,19 @@ namespace Saritasa.Tools.Common.Utils
             {
                 throw new ArgumentNullException(nameof(source));
             }
-            if (orderEntries == null || !orderEntries.Any())
+            if (orderEntries == null)
             {
                 throw new ArgumentNullException(nameof(orderEntries));
             }
             if (keySelectors == null)
             {
                 throw new ArgumentNullException(nameof(keySelectors));
+            }
+
+            // Noop ordering.
+            if (!orderEntries.Any())
+            {
+                return source.OrderBy(s => 1);
             }
 
             // Need to sort by first field to get IOrderedQuery object instance.

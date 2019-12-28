@@ -19,7 +19,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <returns>Ordering entries.</returns>
         public static (string FieldName, ListSortDirection Order)[] ParseSeparated(string orderQuery)
         {
-            if (string.IsNullOrEmpty(orderQuery))
+            if (orderQuery == null)
             {
                 throw new ArgumentNullException(nameof(orderQuery));
             }
@@ -35,6 +35,11 @@ namespace Saritasa.Tools.Common.Utils
                     return ListSortDirection.Descending;
                 }
                 throw new InvalidOperationException(string.Format(Properties.Strings.InvalidOrderDirection, order));
+            }
+
+            if (string.IsNullOrWhiteSpace(orderQuery))
+            {
+                return Array.Empty<(string FieldName, ListSortDirection Order)>();
             }
 
             var sortingRecordsStrings = orderQuery.Split(new[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries);

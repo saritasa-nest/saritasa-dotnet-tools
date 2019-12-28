@@ -267,5 +267,31 @@ namespace Saritasa.Tools.Common.Tests
             };
             Assert.Equal(expected, target, new UserEqualityComparer());
         }
+
+        [Fact]
+        public void OrderMultiple_EmptyOrderList_ReturnsSourceCollection()
+        {
+            // Arrange
+            var source = new List<User>
+            {
+                new User(2, "B"),
+                new User(1, "A")
+            };
+
+            // Act
+            var target = CollectionUtils.OrderMultiple(
+                source,
+                OrderParsingDelegates.ParseSeparated(string.Empty),
+                ("id", u => u.Id)
+            );
+
+            // Assert
+            var expected = new List<User>
+            {
+                new User(2, "B"),
+                new User(1, "A")
+            };
+            Assert.Equal(expected, target, new UserEqualityComparer());
+        }
     }
 }
