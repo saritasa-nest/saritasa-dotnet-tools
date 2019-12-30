@@ -1,6 +1,7 @@
 ﻿0.7.0 [TBD]
 [-] Drop IUnitOfWork support.
 [+] SourceLink support.
+[+] Add EF related EfPagedListFactory, TotalCountListFactory and OffsetLimitListFactory.
 
 0.4.0 [2017-08-13]
 [*] Repository class update according latest domain interface.

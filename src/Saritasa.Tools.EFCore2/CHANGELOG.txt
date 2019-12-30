@@ -1,5 +1,6 @@
 ﻿0.7.0 [TBD]
 [-] Drop IUnitOfWork support.
+[+] Add DbSetExtensions.GetAsync and QueryableExtensions.GetAsync .
 
 0.6.1 [2019-06-11]
 [*] Fix EfPagedListFactory, TotalCountListFactory and OffsetLimitListFactory namespace.
