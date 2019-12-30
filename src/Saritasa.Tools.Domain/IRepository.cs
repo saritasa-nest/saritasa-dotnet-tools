@@ -84,9 +84,7 @@ namespace Saritasa.Tools.Domain
         /// <param name="keyValues">Entity identifications.</param>
         /// <exception cref="Saritasa.Tools.Domain.Exceptions.NotFoundException">Is generated when entity is not found.</exception>
         /// <returns>Task with result of entity instance.</returns>
-        Task<TEntity> GetAsync(
-            CancellationToken cancellationToken = default(CancellationToken),
-            params object[] keyValues);
+        Task<TEntity> GetAsync(CancellationToken cancellationToken = default, params object[] keyValues);
 
         /// <summary>
         /// Get all entities of specified type.
@@ -94,9 +92,7 @@ namespace Saritasa.Tools.Domain
         /// <param name="includes">Relations to include.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>Task with result of enumerable of entities.</returns>
-        Task<IEnumerable<TEntity>> GetAllAsync(
-            CancellationToken cancellationToken = default(CancellationToken),
-            params Expression<Func<TEntity, object>>[] includes);
+        Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default, params Expression<Func<TEntity, object>>[] includes);
 
         /// <summary>
         /// Finds for range of entities based on predicate.
@@ -107,7 +103,7 @@ namespace Saritasa.Tools.Domain
         /// <returns>Task with result of enumerable of enitites.</returns>
         Task<IEnumerable<TEntity>> FindAsync(
             Expression<Func<TEntity, bool>> predicate,
-            CancellationToken cancellationToken = default(CancellationToken),
+            CancellationToken cancellationToken = default,
             params Expression<Func<TEntity, object>>[] includes);
 
         /// <summary>
@@ -116,7 +112,7 @@ namespace Saritasa.Tools.Domain
         /// <param name="entity">Entity instance.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
-        Task RemoveAsync(TEntity entity, CancellationToken cancellationToken = default(CancellationToken));
+        Task RemoveAsync(TEntity entity, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Add entity.
@@ -124,7 +120,7 @@ namespace Saritasa.Tools.Domain
         /// <param name="entity">Entity instance.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
-        Task AddAsync(TEntity entity, CancellationToken cancellationToken = default(CancellationToken));
+        Task AddAsync(TEntity entity, CancellationToken cancellationToken = default);
 
         #endregion
     }
