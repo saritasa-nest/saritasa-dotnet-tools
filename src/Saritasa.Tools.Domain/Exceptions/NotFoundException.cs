@@ -2,7 +2,7 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-#if NET40
+#if NET40 || NET452
 using System.Runtime.Serialization;
 #endif
 
@@ -12,7 +12,7 @@ namespace Saritasa.Tools.Domain.Exceptions
     /// Exception occurs in domain part of application if entity is not found by key.
     /// Can be mapped to 404 HTTP status code.
     /// </summary>
-#if NET40
+#if NET40 || NET452
     [Serializable]
 #endif
     public class NotFoundException : DomainException
@@ -92,7 +92,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         {
         }
 
-#if NET40
+#if NET40 || NET452
         /// <summary>
         /// Constructor for deserialization.
         /// </summary>

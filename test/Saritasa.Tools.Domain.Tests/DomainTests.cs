@@ -6,9 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
-#if NET452
 using System.Runtime.Serialization.Formatters.Binary;
-#endif
 using Xunit;
 using Saritasa.Tools.Domain.Exceptions;
 
@@ -19,7 +17,6 @@ namespace Saritasa.Tools.Domain.Tests
     /// </summary>
     public class DomainTests
     {
-#if NET452
         [Fact]
         public void BinaryFormatterSerialize_DomainExceptionWithMessageAndCode_PersistAfterDeserialize()
         {
@@ -67,7 +64,6 @@ namespace Saritasa.Tools.Domain.Tests
             Assert.Equal(validationException.Errors["Dob"].ElementAt(0), deserializedValidationException.Errors["Dob"].ElementAt(0));
             Assert.Equal(validationException.Errors["SSN"].Count(), deserializedValidationException.Errors["SSN"].Count());
         }
-#endif
 
         private class User : IValidatableObject
         {
@@ -149,8 +145,7 @@ namespace Saritasa.Tools.Domain.Tests
             Assert.Single(validationException.Errors);
         }
 
-#if NET452
-
+#if NET48
         [MetadataType(typeof(JobMetadata))]
         private class Job
         {
@@ -192,7 +187,6 @@ namespace Saritasa.Tools.Domain.Tests
             Assert.Empty(validationException.SummaryErrors);
             Assert.Equal(2, validationException.Errors.Count);
         }
-
 #endif
 
         [Fact]

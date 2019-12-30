@@ -2,12 +2,9 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.ComponentModel.DataAnnotations;
-#if NET40
+#if NET40 || NET452
 using System.Runtime.Serialization;
 #endif
 
@@ -16,7 +13,7 @@ namespace Saritasa.Tools.Domain.Exceptions
     /// <summary>
     /// Validation exception. Can be mapped to 400 HTTP status code.
     /// </summary>
-#if NET40
+#if NET40 || NET452
     [Serializable]
 #endif
     public class ValidationException : DomainException
@@ -168,7 +165,22 @@ namespace Saritasa.Tools.Domain.Exceptions
             this.Errors.Merge(errors);
         }
 
-#if NET40
+        /// <summary>
+        /// Constructor with dictionary contain member field as key and error messages as value.
+        /// </summary>
+        /// <param name="errors">Member errors dictionary.</param>
+        public ValidationException(IDictionary<string, IEnumerable<string>> errors) :
+            base(DomainErrorDescriber.Default.ValidationErrors())
+        {
+            if (errors == null)
+            {
+                throw new ArgumentNullException(nameof(errors));
+            }
+
+            this.Errors.Merge(errors.ToDictionary(k => k.Key, v => (ICollection<string>)v.Value));
+        }
+
+#if NET40 || NET452
         /// <summary>
         /// Constructor for deserialization.
         /// </summary>
@@ -208,124 +220,26 @@ namespace Saritasa.Tools.Domain.Exceptions
                 info.AddValue("errors", xelement.ToString(System.Xml.Linq.SaveOptions.DisableFormatting));
             }
         }
+#endif
 
         /// <summary>
         /// If object contains validation errors throws instance of <see cref="ValidationException" />.
         /// </summary>
         /// <param name="obj">The object to validate.</param>
-        /// <param name="serviceProvider">The object that implements the <see cref="IServiceProvider" /> interface.
-        /// This parameter is optional.</param>
         /// <param name="items">A dictionary of key/value pairs to make available to the service consumers.
         /// This parameter is optional.</param>
+        /// <param name="serviceProvider">The object that implements the <see cref="IServiceProvider" /> interface.
+        /// This parameter is optional and is not used for netstandard 2.0 .</param>
         public static void ThrowFromObjectValidation(
             object obj,
             IServiceProvider serviceProvider = null,
             IDictionary<object, object> items = null)
         {
-            if (obj == null)
+            var validationErrors = ValidationErrors.CreateFromObjectValidation(obj, items, serviceProvider);
+            if (validationErrors.HasErrors)
             {
-                throw new ArgumentNullException(nameof(obj));
-            }
-
-            if (UseMetadataType)
-            {
-                RegisterMetadataType(obj.GetType());
-            }
-
-            var validationResults = new List<ValidationResult>();
-            var result = Validator.TryValidateObject(obj, new ValidationContext(obj, serviceProvider, items),
-                validationResults, true);
-            if (!result)
-            {
-                var ex = new ValidationException();
-                foreach (ValidationResult validationResult in validationResults)
-                {
-                    if (validationResult.MemberNames != null && validationResult.MemberNames.Any())
-                    {
-                        foreach (var memberName in validationResult.MemberNames)
-                        {
-                            ex.Errors.AddError(memberName, validationResult.ErrorMessage);
-                        }
-                    }
-                    else
-                    {
-                        ex.Errors.AddError(validationResult.ErrorMessage);
-                    }
-                }
-                throw ex;
+                throw new ValidationException(validationErrors);
             }
         }
-
-        /// <summary>
-        /// If <c>true</c> there will be additional check for <see cref="MetadataTypeAttribute" />
-        /// and metadata type registration. <c>False</c> by default.
-        /// </summary>
-        public static bool UseMetadataType { get; set; } = false;
-
-        private static readonly ConcurrentDictionary<Type, bool> registeredMetadataType =
-            new ConcurrentDictionary<Type, bool>();
-
-        /// <summary>
-        /// For some reason if type base <see cref="MetadataTypeAttribute" /> type that contains
-        /// validation attributes they will not be taken into account. This is workaround that
-        /// registers them explicitly.
-        /// </summary>
-        /// <param name="t">Type to register.</param>
-        private static void RegisterMetadataType(Type t)
-        {
-            var attributes = t.GetCustomAttributes(typeof(MetadataTypeAttribute), true);
-            if (attributes.Length > 0)
-            {
-                registeredMetadataType.GetOrAdd(t, type =>
-                {
-                    foreach (MetadataTypeAttribute attribute in attributes)
-                    {
-                        TypeDescriptor.AddProviderTransparent(
-                            new AssociatedMetadataTypeTypeDescriptionProvider(type, attribute.MetadataClassType), type);
-                    }
-                    return true;
-                });
-            }
-        }
-#else
-        /// <summary>
-        /// If object contains validation errors throws instance of <see cref="ValidationException" />.
-        /// </summary>
-        /// <param name="obj">The object to validate.</param>
-        /// <param name="items">A dictionary of key/value pairs to make available to the service consumers.
-        /// This parameter is optional.</param>
-        public static void ThrowFromObjectValidation(
-            object obj,
-            IDictionary<object, object> items = null)
-        {
-            if (obj == null)
-            {
-                throw new ArgumentNullException(nameof(obj));
-            }
-
-            var validationResults = new List<ValidationResult>();
-            var result = Validator.TryValidateObject(obj, new ValidationContext(obj, items),
-                validationResults, true);
-            if (!result)
-            {
-                var ex = new ValidationException();
-                foreach (ValidationResult validationResult in validationResults)
-                {
-                    if (validationResult.MemberNames != null && validationResult.MemberNames.Any())
-                    {
-                        foreach (var memberName in validationResult.MemberNames)
-                        {
-                            ex.Errors.AddError(memberName, validationResult.ErrorMessage);
-                        }
-                    }
-                    else
-                    {
-                        ex.Errors.AddError(validationResult.ErrorMessage);
-                    }
-                }
-                throw ex;
-            }
-        }
-#endif
     }
 }

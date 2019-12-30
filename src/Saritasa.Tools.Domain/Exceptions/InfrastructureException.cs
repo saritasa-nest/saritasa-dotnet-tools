@@ -2,7 +2,7 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-#if NET40
+#if NET40 || NET452
 using System.Runtime.Serialization;
 #endif
 
@@ -60,6 +60,17 @@ namespace Saritasa.Tools.Domain.Exceptions
         /// <param name="message">The message that describes the error.</param>
         /// <param name="innerException">The exception that is the cause of the current exception, or a
         /// null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
+        public InfrastructureException(string message, Exception innerException) :
+            base(message, innerException)
+        {
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="message">The message that describes the error.</param>
+        /// <param name="innerException">The exception that is the cause of the current exception, or a
+        /// null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
         /// <param name="code">Optional description code for this exception.</param>
         public InfrastructureException(string message, Exception innerException, int code) :
             base(message, innerException)
@@ -80,7 +91,7 @@ namespace Saritasa.Tools.Domain.Exceptions
             this.Code = code;
         }
 
-#if NET40
+#if NET40 || NET452
         /// <summary>
         /// Constructor for deserialization.
         /// </summary>
