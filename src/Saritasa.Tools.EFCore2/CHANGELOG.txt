@@ -1,4 +1,4 @@
-﻿0.7.0 [TBD]
+﻿0.7.0 [2019-12-30]
 [-] Drop IUnitOfWork support.
 [+] Add DbSetExtensions.GetAsync and QueryableExtensions.GetAsync .
 

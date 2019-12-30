@@ -4,11 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.Data.Entity.Core.Objects;
+using System.Data.Entity.Core;
+using System.Data.Entity.Core.Objects.DataClasses;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Data.Entity.Core.Objects.DataClasses;
-using System.Data.Entity.Core;
 using System.Threading;
 using System.Threading.Tasks;
 using Saritasa.Tools.Domain;
@@ -33,7 +32,7 @@ namespace Saritasa.Tools.EF.ObjectContext
         /// <summary>
         /// Entity set.
         /// </summary>
-        public ObjectSet<TEntity> Set { get; }
+        public System.Data.Entity.Core.Objects.ObjectSet<TEntity> Set { get; }
 
         /// <summary>
         /// Constructor.

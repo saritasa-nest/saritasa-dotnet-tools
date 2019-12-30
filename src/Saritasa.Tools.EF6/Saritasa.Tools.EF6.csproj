@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net462</TargetFrameworks>
+    <TargetFrameworks>net452</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Saritasa.Tools.EF6</AssemblyName>
     <AssemblyOriginatorKeyFile>../../tools/SaritasaTools.snk</AssemblyOriginatorKeyFile>
@@ -21,7 +21,7 @@
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="All" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-19270-01" PrivateAssets="All" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
     <PackageReference Include="EntityFramework" Version="6.2.0" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
