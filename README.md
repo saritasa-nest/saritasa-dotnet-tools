@@ -13,7 +13,7 @@ Overview
 1. [Saritasa.Tools.Messages.Abstractions](https://www.nuget.org/packages/Saritasa.Tools.Messages.Abstractions) - _contains interfaces and base classes for package above with minimum dependencies;_
 1. [Saritasa.Tools.Misc](https://www.nuget.org/packages/Saritasa.Tools.Misc) - _miscellaneous: password generation;_
 1. [Saritasa.Tools.EF6](https://www.nuget.org/packages/Saritasa.Tools.EF6) - _unit of work and repository implementation for Entity Framework 6;_
-1. [Saritasa.Tools.EFCore2](https://www.nuget.org/packages/Saritasa.Tools.EFCore2) - _unit of work and repository implementation for Entity Framework Core 2;_
+1. [Saritasa.Tools.EFCore3](https://www.nuget.org/packages/Saritasa.Tools.EFCore3) - _unit of work and repository implementation for Entity Framework Core 3;_
 
 Goals
 -----
