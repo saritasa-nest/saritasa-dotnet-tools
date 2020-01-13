@@ -130,7 +130,7 @@ namespace SandBox
         private static void EmailsSend()
         {
             var emailSender = new Saritasa.Tools.Emails.SmtpClientEmailSender(new SmtpClient(), TimeSpan.FromSeconds(10));
-            emailSender.AddInterceptor(new Saritasa.Tools.Emails.Interceptors.SaveToFileEmailInterceptor(@"D:\temp"));
+            emailSender.AddInterceptor(new Saritasa.Tools.Emails.Interceptors.SaveToFileEmailsInterceptor(@"D:\temp"));
             emailSender.AddInterceptor(new Saritasa.Tools.Emails.Interceptors.CountEmailsInterceptor());
             for (int i = 0; i < 12; i++)
             {
