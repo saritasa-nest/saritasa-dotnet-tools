@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -13,6 +13,7 @@ namespace Saritasa.Tools.Domain
     /// Repository abstraction.
     /// </summary>
     /// <typeparam name="TEntity">The entity that repository wraps.</typeparam>
+    [Obsolete("Prefer using DbSet or custom repository instead of generic repository.")]
     public interface IRepository<TEntity> where TEntity : class
     {
         #region Sync methods
