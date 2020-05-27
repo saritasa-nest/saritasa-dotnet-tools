@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -19,25 +19,10 @@ namespace Saritasa.Tools.Domain.Exceptions
     public class ValidationException : DomainException
     {
         /// <summary>
-        /// Default summary validation key. Should contain overall message.
+        /// Validation message formatter. <see cref="ValidationErrorsFormatter.SummaryOrDefaultMessageFormatter" /> by default.
         /// </summary>
-        internal const string SummaryKey = "";
-
-        /// <summary>
-        /// Validation message formatter delegate used for Message property output.
-        /// </summary>
-        /// <param name="defaultMessage">Default message.</param>
-        /// <param name="validationException">Validation exception.</param>
-        /// <returns>Validation message.</returns>
-        /// <remarks>
-        /// Do not use validationException.Message property because it leads to recursion.
-        /// </remarks>
-        public delegate string ValidationMessageFormatter(string defaultMessage, ValidationException validationException);
-
-        /// <summary>
-        /// Validation message formatter. <see cref="ValidationExceptionDelegates.SummaryOrDefaultMessageFormatter" /> by default.
-        /// </summary>
-        public static ValidationMessageFormatter MessageFormatter { get; set; } = ValidationExceptionDelegates.SummaryOrDefaultMessageFormatter;
+        public static ValidationErrorsFormatter.ValidationErrorsMessageFormatter MessageFormatter { get; set; } =
+            ValidationErrorsFormatter.SummaryOrDefaultMessageFormatter;
 
         /// <summary>
         /// Errors dictionary. Key is a member name, value is an enumerable of error
@@ -49,13 +34,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         public ValidationErrors Errors { get; } = new ValidationErrors();
 
         /// <inheritdoc />
-        public override string Message => MessageFormatter(base.Message, this);
-
-        /// <summary>
-        /// Summary errors. Returns zero array if not defined.
-        /// </summary>
-        public IEnumerable<string> SummaryErrors => Errors.ContainsKey(SummaryKey) ?
-            Errors[SummaryKey] : Enumerable.Empty<string>();
+        public override string Message => MessageFormatter(base.Message, this.Errors);
 
         /// <summary>
         /// Constructor.

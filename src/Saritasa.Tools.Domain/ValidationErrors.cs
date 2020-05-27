@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2019, Saritasa. All rights reserved.
+// Copyright (c) 2015-2020, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -6,7 +6,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Saritasa.Tools.Domain.Exceptions;
 
 namespace Saritasa.Tools.Domain
 {
@@ -17,6 +16,11 @@ namespace Saritasa.Tools.Domain
     [DebuggerDisplay("{Count} errors: {ErrorsKeys}")]
     public class ValidationErrors : Dictionary<string, ICollection<string>>
     {
+        /// <summary>
+        /// Default summary validation key. Should contain overall message.
+        /// </summary>
+        public const string SummaryKey = "";
+
         /// <summary>
         /// Returns <c>true</c> if there were any errors added.
         /// </summary>
@@ -162,7 +166,7 @@ namespace Saritasa.Tools.Domain
         /// <param name="error">Error message.</param>
         public void AddError(string error)
         {
-            AddError(ValidationException.SummaryKey, error);
+            AddError(SummaryKey, error);
         }
 
         /// <summary>
@@ -189,7 +193,13 @@ namespace Saritasa.Tools.Domain
             }
         }
 
+        /// <summary>
+        /// Summary errors. Returns zero enumerable if not defined.
+        /// </summary>
+        public IEnumerable<string> SummaryErrors => this.ContainsKey(SummaryKey) ?
+            this[SummaryKey] : Enumerable.Empty<string>();
+
         private string ErrorsKeys => string.Join(", ",
-            this.Keys.Select(k => k != ValidationException.SummaryKey ? k : "<summary>"));
+            this.Keys.Select(k => k != SummaryKey ? k : "<summary>"));
     }
 }

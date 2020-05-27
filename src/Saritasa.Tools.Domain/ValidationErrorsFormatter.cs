@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -6,33 +6,41 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Saritasa.Tools.Domain.Exceptions
+namespace Saritasa.Tools.Domain
 {
     /// <summary>
     /// Validation message delegates.
     /// </summary>
-    public static class ValidationExceptionDelegates
+    public static class ValidationErrorsFormatter
     {
+        /// <summary>
+        /// Validation message formatter delegate used for errors text formatting.
+        /// </summary>
+        /// <param name="defaultMessage">Default message.</param>
+        /// <param name="validationErrors">Validation errors.</param>
+        /// <returns>Validation message.</returns>
+        public delegate string ValidationErrorsMessageFormatter(string defaultMessage, ValidationErrors validationErrors);
+
         /// <summary>
         /// Returns summary message if specific key exists or default one.
         /// </summary>
         /// <param name="defaultMessage">Default message.</param>
-        /// <param name="validationException">Validation exception.</param>
+        /// <param name="validationErrors">Validation errors.</param>
         /// <returns>Validation message.</returns>
-        public static string SummaryOrDefaultMessageFormatter(string defaultMessage, ValidationException validationException)
+        public static string SummaryOrDefaultMessageFormatter(string defaultMessage, ValidationErrors validationErrors)
         {
             if (string.IsNullOrEmpty(defaultMessage))
             {
                 throw new ArgumentNullException(nameof(defaultMessage));
             }
-            if (validationException == null)
+            if (validationErrors == null)
             {
-                throw new ArgumentNullException(nameof(validationException));
+                throw new ArgumentNullException(nameof(validationErrors));
             }
 
-            if (validationException.Errors.ContainsKey(ValidationException.SummaryKey))
+            if (validationErrors.ContainsKey(ValidationErrors.SummaryKey))
             {
-                return validationException.Errors[ValidationException.SummaryKey].First();
+                return validationErrors[ValidationErrors.SummaryKey].First();
             }
             return defaultMessage;
         }
@@ -41,22 +49,22 @@ namespace Saritasa.Tools.Domain.Exceptions
         /// Returns first available validation error. If no errors exist just return default message.
         /// </summary>
         /// <param name="defaultMessage">Default message.</param>
-        /// <param name="validationException">Validation exception.</param>
+        /// <param name="validationErrors">Validation errors.</param>
         /// <returns>Validation message.</returns>
-        public static string FirstErrorOrDefaultMessageFormatter(string defaultMessage, ValidationException validationException)
+        public static string FirstErrorOrDefaultMessageFormatter(string defaultMessage, ValidationErrors validationErrors)
         {
             if (string.IsNullOrEmpty(defaultMessage))
             {
                 throw new ArgumentNullException(nameof(defaultMessage));
             }
-            if (validationException == null)
+            if (validationErrors == null)
             {
-                throw new ArgumentNullException(nameof(validationException));
+                throw new ArgumentNullException(nameof(validationErrors));
             }
 
-            if (validationException.Errors.Any())
+            if (validationErrors.Any())
             {
-                return validationException.Errors.First().Value.First();
+                return validationErrors.First().Value.First();
             }
             return defaultMessage;
         }
@@ -68,26 +76,26 @@ namespace Saritasa.Tools.Domain.Exceptions
         /// - Field2: Validation message.
         /// </summary>
         /// <param name="defaultMessage">Default message.</param>
-        /// <param name="validationException">Validation exception.</param>
+        /// <param name="validationErrors">Validation errors.</param>
         /// <returns>Validation message.</returns>
-        public static string GroupErrorsOrDefaultMessageFormatter(string defaultMessage, ValidationException validationException)
+        public static string GroupErrorsOrDefaultMessageFormatter(string defaultMessage, ValidationErrors validationErrors)
         {
             if (string.IsNullOrEmpty(defaultMessage))
             {
                 throw new ArgumentNullException(nameof(defaultMessage));
             }
-            if (validationException == null)
+            if (validationErrors == null)
             {
-                throw new ArgumentNullException(nameof(validationException));
+                throw new ArgumentNullException(nameof(validationErrors));
             }
 
             const string separator = " ";
-            if (validationException.Errors.Any())
+            if (validationErrors.Any())
             {
-                var sb = new StringBuilder(validationException.Errors.Count * 55);
-                foreach (KeyValuePair<string, ICollection<string>> errorMember in validationException.Errors.OrderBy(e => e.Key))
+                var sb = new StringBuilder(validationErrors.Count * 55);
+                foreach (KeyValuePair<string, ICollection<string>> errorMember in validationErrors.OrderBy(e => e.Key))
                 {
-                    if (errorMember.Key.Equals(ValidationException.SummaryKey))
+                    if (errorMember.Key.Equals(ValidationErrors.SummaryKey))
                     {
                         sb.AppendLine(string.Join(separator, errorMember.Value));
                     }
@@ -108,23 +116,23 @@ namespace Saritasa.Tools.Domain.Exceptions
         /// Validation message 2.
         /// </summary>
         /// <param name="defaultMessage">Default message.</param>
-        /// <param name="validationException">Validation exception.</param>
+        /// <param name="validationErrors">Validation errors.</param>
         /// <returns>Validation message.</returns>
-        public static string ListErrorsOrDefaultMessageFormatter(string defaultMessage, ValidationException validationException)
+        public static string ListErrorsOrDefaultMessageFormatter(string defaultMessage, ValidationErrors validationErrors)
         {
             if (string.IsNullOrEmpty(defaultMessage))
             {
                 throw new ArgumentNullException(nameof(defaultMessage));
             }
-            if (validationException == null)
+            if (validationErrors == null)
             {
-                throw new ArgumentNullException(nameof(validationException));
+                throw new ArgumentNullException(nameof(validationErrors));
             }
 
-            if (validationException.Errors.Any())
+            if (validationErrors.Any())
             {
-                var sb = new StringBuilder(validationException.Errors.Count * 55);
-                foreach (KeyValuePair<string, ICollection<string>> errorMember in validationException.Errors)
+                var sb = new StringBuilder(validationErrors.Count * 55);
+                foreach (KeyValuePair<string, ICollection<string>> errorMember in validationErrors)
                 {
                     sb.AppendLine(errorMember.Key);
                 }
