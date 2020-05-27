@@ -12,10 +12,11 @@
     <projectUrl>https://github.com/saritasa/saritasatools</projectUrl>
     <icon>icon.png</icon>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <copyright>(c) Saritasa, 2016-2019</copyright>
+    <copyright>(c) Saritasa, 2016-2020</copyright>
     <tags>uow repository domain</tags>
     <repository type="git" url="https://github.com/Saritasa/SaritasaTools"  commit="$(CommitHash)" />
     <dependencies>
+      <group targetFramework="netstandard2.1" />
       <group targetFramework="netstandard2.0" />
       <group targetFramework="net452" />
       <group targetFramework="net40" />

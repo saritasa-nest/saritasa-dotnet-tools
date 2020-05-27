@@ -52,8 +52,8 @@ namespace Saritasa.Tools.Domain
         /// <returns><see cref="ValidationErrors" /> instance.</returns>
         public static ValidationErrors CreateFromObjectValidation(
             object obj,
-            IDictionary<object, object> items = null,
-            IServiceProvider serviceProvider = null)
+            IDictionary<object, object>? items = null,
+            IServiceProvider? serviceProvider = null)
         {
             if (obj == null)
             {

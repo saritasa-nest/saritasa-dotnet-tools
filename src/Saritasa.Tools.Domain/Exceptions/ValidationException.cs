@@ -205,8 +205,8 @@ namespace Saritasa.Tools.Domain.Exceptions
         /// This parameter is optional and is not used for netstandard 2.0 .</param>
         public static void ThrowFromObjectValidation(
             object obj,
-            IServiceProvider serviceProvider = null,
-            IDictionary<object, object> items = null)
+            IServiceProvider? serviceProvider = null,
+            IDictionary<object, object>? items = null)
         {
             var validationErrors = ValidationErrors.CreateFromObjectValidation(obj, items, serviceProvider);
             if (validationErrors.HasErrors)

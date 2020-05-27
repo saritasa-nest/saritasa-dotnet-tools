@@ -1,5 +1,8 @@
 ﻿0.7.2 [TBD]
 [*] Make errors formatters to use ValidationErrors instead of ValidationException.
+[*] Fix exceptions serialization for netstandard 2.0 .
+[+] Add support netstandard 2.1 .
+[+] Tha package is built with nullable reference type annotations.
 
 0.7.0 [2019-12-30]
 [-] Update support netstandard from 1.2 to 2.0 .
