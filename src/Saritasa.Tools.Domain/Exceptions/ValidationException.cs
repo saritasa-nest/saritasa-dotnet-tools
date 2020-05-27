@@ -4,18 +4,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-#if NET40 || NET452
 using System.Runtime.Serialization;
-#endif
 
 namespace Saritasa.Tools.Domain.Exceptions
 {
     /// <summary>
     /// Validation exception. Can be mapped to 400 HTTP status code.
     /// </summary>
-#if NET40 || NET452
     [Serializable]
-#endif
     public class ValidationException : DomainException
     {
         /// <summary>
@@ -159,7 +155,6 @@ namespace Saritasa.Tools.Domain.Exceptions
             this.Errors.Merge(errors.ToDictionary(k => k.Key, v => (ICollection<string>)v.Value));
         }
 
-#if NET40 || NET452
         /// <summary>
         /// Constructor for deserialization.
         /// </summary>
@@ -199,7 +194,6 @@ namespace Saritasa.Tools.Domain.Exceptions
                 info.AddValue("errors", xelement.ToString(System.Xml.Linq.SaveOptions.DisableFormatting));
             }
         }
-#endif
 
         /// <summary>
         /// If object contains validation errors throws instance of <see cref="ValidationException" />.

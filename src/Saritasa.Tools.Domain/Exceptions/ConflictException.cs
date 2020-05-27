@@ -1,10 +1,8 @@
-﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-#if NET40 || NET452
 using System.Runtime.Serialization;
-#endif
 
 namespace Saritasa.Tools.Domain.Exceptions
 {
@@ -13,9 +11,7 @@ namespace Saritasa.Tools.Domain.Exceptions
     /// processed because of conflict in the request, such as an edit conflict between multiple simultaneous updates.
     /// Can be mapped to 409 HTTP status code.
     /// </summary>
-#if NET40 || NET452
     [Serializable]
-#endif
     public class ConflictException : DomainException
     {
         /// <summary>
@@ -93,7 +89,6 @@ namespace Saritasa.Tools.Domain.Exceptions
         {
         }
 
-#if NET40 || NET452
         /// <summary>
         /// Constructor for deserialization.
         /// </summary>
@@ -104,6 +99,5 @@ namespace Saritasa.Tools.Domain.Exceptions
             : base(info, context)
         {
         }
-#endif
     }
 }

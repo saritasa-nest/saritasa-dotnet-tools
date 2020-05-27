@@ -1,10 +1,8 @@
-﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-#if NET40 || NET452
 using System.Runtime.Serialization;
-#endif
 
 namespace Saritasa.Tools.Domain.Exceptions
 {
@@ -12,9 +10,7 @@ namespace Saritasa.Tools.Domain.Exceptions
     /// Exception occurs in domain part of application. It can be business logic or validation exception.
     /// The message can be used as display messages to end user. InnerException should contain actual system exception.
     /// </summary>
-#if NET40 || NET452
     [Serializable]
-#endif
     public class DomainException : Exception
     {
         /// <summary>
@@ -103,7 +99,6 @@ namespace Saritasa.Tools.Domain.Exceptions
             this.Code = code;
         }
 
-#if NET40 || NET452
         /// <summary>
         /// Constructor for deserialization.
         /// </summary>
@@ -122,6 +117,5 @@ namespace Saritasa.Tools.Domain.Exceptions
             base.GetObjectData(info, context);
             info.AddValue("code", Code);
         }
-#endif
     }
 }
