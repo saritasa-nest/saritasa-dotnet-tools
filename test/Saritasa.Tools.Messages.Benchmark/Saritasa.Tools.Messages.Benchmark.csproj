@@ -12,7 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Saritasa.Tools.Common\Saritasa.Tools.Common.csproj" />
     <ProjectReference Include="..\..\src\Saritasa.Tools.Messages.Abstractions\Saritasa.Tools.Messages.Abstractions.csproj" />
     <ProjectReference Include="..\..\src\Saritasa.Tools.Messages\Saritasa.Tools.Messages.csproj" />
   </ItemGroup>

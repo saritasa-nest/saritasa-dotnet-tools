@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -107,7 +107,7 @@ namespace Saritasa.Tools.Domain.Tests
 
             // Assert
             Assert.NotNull(validationException);
-            Assert.Single(validationException.SummaryErrors);
+            Assert.Single(validationException.Errors.SummaryErrors);
             Assert.Equal(2, validationException.Errors.Count);
         }
 
@@ -141,7 +141,7 @@ namespace Saritasa.Tools.Domain.Tests
 
             // Assert
             Assert.NotNull(validationException);
-            Assert.Empty(validationException.SummaryErrors);
+            Assert.Empty(validationException.Errors.SummaryErrors);
             Assert.Single(validationException.Errors);
         }
 
