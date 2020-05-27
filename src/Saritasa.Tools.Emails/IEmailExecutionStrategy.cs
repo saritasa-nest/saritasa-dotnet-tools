@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -11,7 +11,7 @@ using NameValueDict = System.Collections.Generic.IDictionary<string, object>;
 namespace Saritasa.Tools.Emails
 {
     /// <summary>
-    /// Email execution strategies.
+    /// Email execution strategy.
     /// </summary>
     public interface IEmailExecutionStrategy
     {
@@ -24,9 +24,9 @@ namespace Saritasa.Tools.Emails
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>Task.</returns>
         Task ExecuteAsync(
-            Func<MailMessage, NameValueDict, Task> handler,
+            Func<MailMessage, NameValueDict?, Task> handler,
             MailMessage message,
-            NameValueDict data,
-            CancellationToken cancellationToken);
+            NameValueDict? data,
+            CancellationToken cancellationToken = default);
     }
 }

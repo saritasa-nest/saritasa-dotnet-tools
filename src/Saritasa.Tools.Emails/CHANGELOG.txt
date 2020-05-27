@@ -1,5 +1,8 @@
 ﻿2.1.0 [TBD]
 [-] Drop support for net452.
+[+] Add netstandard 2.1 support.
+[+] Tha package is built with nullable reference type annotations.
+[*] Code cleanup.
 
 2.0.1 [2019-01-24]
 [*] Fix SmtpClientEmailSender sync mode exceptions handle.

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -21,7 +21,7 @@ namespace Saritasa.Tools.Emails
         /// We provide another task to client since actual email sending can be delayed
         /// (enqueued).
         /// </summary>
-        private struct MailMessageWithTaskSource
+        private readonly struct MailMessageWithTaskSource
         {
             /// <summary>
             /// Completion source for task.
@@ -124,7 +124,7 @@ namespace Saritasa.Tools.Emails
         }
 
         /// <inheritdoc />
-        protected override Task Process(MailMessage message, IDictionary<string, object> data)
+        protected override Task Process(MailMessage message, IDictionary<string, object>? data)
         {
             if (disposed)
             {
@@ -156,7 +156,7 @@ namespace Saritasa.Tools.Emails
         /// <param name="message">Mail message.</param>
         /// <param name="data">Additional data.</param>
         /// <returns>Async task operation.</returns>
-        internal Task SendAsyncInternal(MailMessage message, IDictionary<string, object> data) => Process(message, data);
+        internal Task SendAsyncInternal(MailMessage message, IDictionary<string, object>? data) => Process(message, data);
 
         private bool isDelayScheduled;
 
@@ -269,7 +269,7 @@ namespace Saritasa.Tools.Emails
                     .ContinueWith(t =>
                     {
                         isDelayScheduled = false;
-                        OnEmailSent(this, null);
+                        OnEmailSent(this, null!);
                     }, CancellationToken.None)
                     .ConfigureAwait(false);
                 return true;
@@ -300,7 +300,6 @@ namespace Saritasa.Tools.Emails
                 {
                     Client.SendCompleted -= OnEmailSent;
                     Client.Dispose();
-                    Client = null;
                 }
                 disposed = true;
             }

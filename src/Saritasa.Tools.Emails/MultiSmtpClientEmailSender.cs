@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -13,7 +13,7 @@ namespace Saritasa.Tools.Emails
     /// </summary>
     public class MultiSmtpClientEmailSender : EmailSender, IDisposable
     {
-        private SmtpClientEmailSender[] clientInstances;
+        private readonly SmtpClientEmailSender[] clientInstances;
 
         private readonly object @lock = new object();
 
@@ -25,7 +25,7 @@ namespace Saritasa.Tools.Emails
         /// <param name="smtpClientInstancesCount">Max number of instances. 2 by default.</param>
         /// <param name="smtpClient">SMTP client to be used as reference object. If null default settings
         /// from configuration will be used.</param>
-        public MultiSmtpClientEmailSender(int smtpClientInstancesCount = 2, SmtpClient smtpClient = null)
+        public MultiSmtpClientEmailSender(int smtpClientInstancesCount = 2, SmtpClient? smtpClient = null)
         {
             if (smtpClientInstancesCount <= 0)
             {
@@ -42,11 +42,11 @@ namespace Saritasa.Tools.Emails
         }
 
         /// <summary>
-        /// Clones <see cref="SmtpClient" /> instance to new one. If null just creates it.
+        /// Clones <see cref="SmtpClient" /> instance to new one. If null - just creates it.
         /// </summary>
         /// <param name="client">Original SMTP client instance.</param>
         /// <returns>Cloned SMTP client instance.</returns>
-        private static SmtpClient CloneSmtpClient(SmtpClient client)
+        private static SmtpClient CloneSmtpClient(SmtpClient? client)
         {
             if (client == null)
             {
@@ -81,7 +81,7 @@ namespace Saritasa.Tools.Emails
         }
 
         /// <inheritdoc />
-        protected override Task Process(MailMessage message, IDictionary<string, object> data)
+        protected override Task Process(MailMessage message, IDictionary<string, object>? data)
         {
             if (disposed)
             {
@@ -121,7 +121,6 @@ namespace Saritasa.Tools.Emails
                     {
                         client.Dispose();
                     }
-                    clientInstances = null;
                 }
                 disposed = true;
             }

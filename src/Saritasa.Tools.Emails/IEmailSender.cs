@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -19,7 +19,6 @@ namespace Saritasa.Tools.Emails
         /// <param name="mailMessage">The mail message.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>Task with email sending operation.</returns>
-        Task SendAsync(MailMessage mailMessage, CancellationToken cancellationToken =
-            default(CancellationToken));
+        Task SendAsync(MailMessage mailMessage, CancellationToken cancellationToken = default);
     }
 }

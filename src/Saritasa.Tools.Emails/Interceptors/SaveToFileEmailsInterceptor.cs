@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -67,7 +67,7 @@ namespace Saritasa.Tools.Emails.Interceptors
             {
                 Save(mailMessage);
             }
-            return Internals.TaskHelpers.CompletedTask;
+            return Task.CompletedTask;
         }
 
         /// <inheritdoc />
@@ -78,7 +78,7 @@ namespace Saritasa.Tools.Emails.Interceptors
             {
                 Save(mailMessage);
             }
-            return Internals.TaskHelpers.CompletedTask;
+            return Task.CompletedTask;
         }
 
         #endregion

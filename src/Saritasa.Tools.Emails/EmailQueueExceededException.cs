@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -9,9 +9,7 @@ namespace Saritasa.Tools.Emails
     /// <summary>
     /// Exception occurs when email sending queue is overloaded.
     /// </summary>
-#if NET452
     [Serializable]
-#endif
     public class EmailQueueExceededException : Exception
     {
         /// <summary>
@@ -23,7 +21,6 @@ namespace Saritasa.Tools.Emails
         {
         }
 
-#if NET452
         /// <summary>
         /// Constructor for deserialization.
         /// </summary>
@@ -34,6 +31,5 @@ namespace Saritasa.Tools.Emails
             : base(info, context)
         {
         }
-#endif
     }
 }

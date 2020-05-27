@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -12,7 +12,7 @@ using NameValueDict = System.Collections.Generic.IDictionary<string, object>;
 namespace Saritasa.Tools.Emails
 {
     /// <summary>
-    /// Abstract email sender implementation with interceptors support.
+    /// Abstract email-sender implementation with interceptors' support.
     /// </summary>
     public abstract class EmailSender : IEmailSender
     {
@@ -21,17 +21,16 @@ namespace Saritasa.Tools.Emails
         /// <summary>
         /// Send message.
         /// </summary>
-        protected abstract Task Process(MailMessage message, NameValueDict data);
+        protected abstract Task Process(MailMessage message, NameValueDict? data);
 
         /// <summary>
         /// Execution strategy. <see cref="DefaultEmailExecutionStrategy" /> used by default. Determines the way how we should proceed
-        /// actual email sending.
+        /// with actual email sending.
         /// </summary>
         protected IEmailExecutionStrategy ExecutionStrategy { get; } = new DefaultEmailExecutionStrategy();
 
         /// <inheritdoc />
-        public async Task SendAsync(MailMessage message,
-            CancellationToken cancellationToken = default(CancellationToken))
+        public async Task SendAsync(MailMessage message, CancellationToken cancellationToken = default)
         {
             var data = new Dictionary<string, object>();
             bool cancel = false;
