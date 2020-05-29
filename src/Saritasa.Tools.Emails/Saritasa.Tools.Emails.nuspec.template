@@ -5,7 +5,7 @@
     <title>Saritasa Tools Emails</title>
     <version>0.0.0</version>
     <description>The package is a part of Saritasa Tools project. Saritasa.Tools.Emails contains emails sending pipeline and interceptors.</description>
-    <summary>Emails abstractions.</summary>
+    <summary>Emails sending helpful wrappers.</summary>
     <authors>Saritasa</authors>
     <owners>Saritasa</owners>
     <license type="file">LICENSE.txt</license>
@@ -19,6 +19,7 @@
       <group targetFramework="netstandard2.0" />
       <group targetFramework="netstandard2.1" />
     </dependencies>
+    <releaseNotes>Release notes are at https://github.com/Saritasa/SaritasaTools/blob/master/src/Saritasa.Tools.Emails/CHANGELOG.txt</releaseNotes>
   </metadata>
   <files>
     <file src="bin\Release\**\Saritasa.Tools.Emails.dll" target="lib" />

@@ -1,4 +1,4 @@
-﻿2.1.0 [TBD]
+﻿2.1.0 [2020-05-29]
 [-] Drop support for net452.
 [+] Add netstandard 2.1 support.
 [+] Tha package is built with nullable reference type annotations.
