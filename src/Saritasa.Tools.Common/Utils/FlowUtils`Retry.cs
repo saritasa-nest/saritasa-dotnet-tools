@@ -1,10 +1,10 @@
-﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-#if NETSTANDARD1_6 || NETSTANDARD2_0
+#if NETSTANDARD1_6 || NETSTANDARD2_0 || NETSTANDARD2_1
 using System.Reflection;
 #endif
 
@@ -71,7 +71,7 @@ namespace Saritasa.Tools.Common.Utils
                     }
                     if (delay.TotalMilliseconds > 0)
                     {
-#if NETSTANDARD1_6 || NETSTANDARD2_0
+#if NETSTANDARD1_6 || NETSTANDARD2_0 || NETSTANDARD2_1
                         System.Threading.Tasks.Task.Delay(delay).Wait();
 #else
                         Thread.Sleep((int)delay.TotalMilliseconds);
@@ -117,7 +117,7 @@ namespace Saritasa.Tools.Common.Utils
         public static Task<T> RetryAsync<T>(
             Func<Task<T>> action,
             RetryStrategy retryStrategy,
-            CancellationToken cancellationToken = default(CancellationToken),
+            CancellationToken cancellationToken = default,
             params Type[] transientExceptions)
         {
             Guard.IsNotNull(action, nameof(action));
@@ -129,7 +129,7 @@ namespace Saritasa.Tools.Common.Utils
             Func<Task<T>> action,
             int attemptCount,
             RetryStrategy retryStrategy,
-            CancellationToken cancellationToken = default(CancellationToken),
+            CancellationToken cancellationToken = default,
             params Type[] transientExceptions)
         {
             // Based on TPL police we should check whether action already cancelled.
@@ -140,7 +140,7 @@ namespace Saritasa.Tools.Common.Utils
                 return tcs1.Task;
             }
 
-            Task<T> task = null;
+            Task<T>? task = null;
             try
             {
                 task = action();
@@ -185,10 +185,9 @@ namespace Saritasa.Tools.Common.Utils
                         return runningTask;
                     }
 
-                    Exception executedException = runningTask.Exception?.InnerException;
-                    TimeSpan delay;
+                    Exception? executedException = runningTask.Exception?.InnerException;
                     bool isTransient = IsSubtypeOf(executedException, transientExceptions);
-                    bool shouldStop = retryStrategy(attemptCount, executedException, out delay);
+                    bool shouldStop = retryStrategy(attemptCount, executedException, out TimeSpan delay);
                     if (isTransient == false || shouldStop)
                     {
                         var tcs1 = new TaskCompletionSource<T>();
@@ -205,7 +204,7 @@ namespace Saritasa.Tools.Common.Utils
 
                     if (delay.TotalMilliseconds > 0)
                     {
-#if NETSTANDARD1_6 || NETSTANDARD2_0
+#if NETSTANDARD1_6 || NETSTANDARD2_0 || NETSTANDARD2_1
                         System.Threading.Tasks.Task.Delay((int)delay.TotalMilliseconds).Wait();
 #else
                         Thread.Sleep((int)delay.TotalMilliseconds);
@@ -233,7 +232,7 @@ namespace Saritasa.Tools.Common.Utils
         public static Task RetryAsync(
             Func<Task> action,
             RetryStrategy retryStrategy,
-            CancellationToken cancellationToken = default(CancellationToken),
+            CancellationToken cancellationToken = default,
             params Type[] transientExceptions)
         {
             Guard.IsNotNull(action, nameof(action));
@@ -264,7 +263,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 #endif
 
-#if NETSTANDARD1_6 || NETSTANDARD2_0
+#if NETSTANDARD1_6 || NETSTANDARD2_0 || NETSTANDARD2_1
         /// <summary>
         /// Provides the async implementation of the retry mechanism for unreliable actions and transient conditions.
         /// </summary>
@@ -277,7 +276,7 @@ namespace Saritasa.Tools.Common.Utils
         public static async Task<T> RetryAsync<T>(
             Func<Task<T>> action,
             RetryStrategy retryStrategy,
-            CancellationToken cancellationToken = default(CancellationToken),
+            CancellationToken cancellationToken = default,
             params Type[] transientExceptions)
         {
             Guard.IsNotNull(action, nameof(action));
@@ -286,7 +285,7 @@ namespace Saritasa.Tools.Common.Utils
             // Based on TPL police we should check whether action already cancelled.
             if (cancellationToken.IsCancellationRequested)
             {
-#if NETSTANDARD1_6 || NETSTANDARD2_0
+#if NETSTANDARD1_6 || NETSTANDARD2_0 || NETSTANDARD2_1
                 return await Task.FromCanceled<T>(cancellationToken);
 #else
                 var tcs = new TaskCompletionSource<T>();
@@ -336,7 +335,7 @@ namespace Saritasa.Tools.Common.Utils
         public static async Task RetryAsync(
             Func<Task> action,
             RetryStrategy retryStrategy,
-            CancellationToken cancellationToken = default(CancellationToken),
+            CancellationToken cancellationToken = default,
             params Type[] transientExceptions)
         {
             await RetryAsync<int>(async () =>
@@ -363,7 +362,7 @@ namespace Saritasa.Tools.Common.Utils
             Type executedExceptionType = executedException.GetType();
             foreach (var exceptionType in exceptionsTypes)
             {
-#if NETSTANDARD1_6 || NETSTANDARD2_0
+#if NETSTANDARD1_6 || NETSTANDARD2_0 || NETSTANDARD2_1
                 if (executedExceptionType == exceptionType || executedExceptionType.GetTypeInfo().IsSubclassOf(exceptionType))
 #else
                 if (executedExceptionType == exceptionType || executedExceptionType.IsSubclassOf(exceptionType))

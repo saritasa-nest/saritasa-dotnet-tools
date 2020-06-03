@@ -1,9 +1,9 @@
-﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
-#if NET40 || NETSTANDARD2_0
+#if NET40 || NETSTANDARD2_0 || NETSTANDARD2_1
 using System.Collections.Specialized;
 #endif
 
@@ -27,14 +27,13 @@ namespace Saritasa.Tools.Common.Utils
         public static TValue GetValueOrDefault<TKey, TValue>(
             IDictionary<TKey, TValue> target,
             TKey key,
-            TValue defaultValue = default(TValue))
+            TValue defaultValue = default)
         {
-            TValue value;
-            bool success = target.TryGetValue(key, out value);
+            bool success = target.TryGetValue(key, out TValue value);
             return success ? value : defaultValue;
         }
 
-#if NET40 || NETSTANDARD2_0
+#if NET40 || NETSTANDARD2_0 || NETSTANDARD2_1
         /// <summary>
         /// Tries to get the value in <see cref="NameValueCollection" />. If value with specified
         /// key does not exist it will return default value.
@@ -43,13 +42,13 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="key">Key.</param>
         /// <param name="defaultValues">Default value.</param>
         /// <returns>Values by key or default values.</returns>
-        public static string GetValueOrDefault(
+        public static string? GetValueOrDefault(
             NameValueCollection target,
             string key,
-            string defaultValues = default(string))
+            string? defaultValues = default)
         {
             var values = target.Get(key);
-            return values != null ? values : defaultValues;
+            return values ?? defaultValues;
         }
 
         /// <summary>
@@ -60,13 +59,13 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="key">Key.</param>
         /// <param name="defaultValues">Default value.</param>
         /// <returns>Values by key or default values.</returns>
-        public static string[] GetValuesOrDefault(
+        public static string[]? GetValuesOrDefault(
             NameValueCollection target,
             string key,
-            string[] defaultValues = default(string[]))
+            string[]? defaultValues = default)
         {
             var values = target.GetValues(key);
-            return values != null ? values : defaultValues;
+            return values ?? defaultValues;
         }
 #endif
 
@@ -87,7 +86,7 @@ namespace Saritasa.Tools.Common.Utils
             IDictionary<TKey, TValue> target,
             TKey key,
             Func<TKey, TValue, TValue> updateFunc,
-            TValue defaultValue = default(TValue))
+            TValue defaultValue = default)
         {
             var keyExists = target.TryGetValue(key, out TValue value);
             if (keyExists)

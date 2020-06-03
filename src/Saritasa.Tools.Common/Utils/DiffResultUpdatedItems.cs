@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2019, Saritasa. All rights reserved.
+// Copyright (c) 2015-2020, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -29,8 +29,8 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="target">Target item.</param>
         public DiffResultUpdatedItems(T source, T target)
         {
-            this.Source = source;
-            this.Target = target;
+            this.Source = source ?? throw new ArgumentNullException(nameof(source));
+            this.Target = target ?? throw new ArgumentNullException(nameof(target));
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace Saritasa.Tools.Common.Utils
             target = this.Target;
         }
 
-#if NETSTANDARD1_6 || NETSTANDARD2_0
+#if NETSTANDARD1_6 || NETSTANDARD2_0 || NETSTANDARD2_1
         /// <summary>
         /// Allows to implicitly convert to the type from tuple.
         /// </summary>
@@ -67,14 +67,13 @@ namespace Saritasa.Tools.Common.Utils
             }
 
             var diffObj = (DiffResultUpdatedItems<T>)obj;
-            return this.Source.Equals(diffObj.Source) && this.Target.Equals(diffObj.Target);
+            T source = this.Source;
+            T target = this.Target;
+            return target != null && source != null && source.Equals(diffObj.Source) && target.Equals(diffObj.Target);
         }
 
         /// <inheritdoc />
-        public override int GetHashCode()
-        {
-            return this.Source.GetHashCode() ^ this.Target.GetHashCode();
-        }
+        public override int GetHashCode() => this.Source.GetHashCode() ^ this.Target.GetHashCode();
 
         /// <inheritdoc />
         public override string ToString() => this.Source + "; " + this.Target;

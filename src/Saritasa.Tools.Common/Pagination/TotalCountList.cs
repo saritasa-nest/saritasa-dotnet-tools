@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -13,7 +13,7 @@ namespace Saritasa.Tools.Common.Pagination
     /// collection.
     /// </summary>
     /// <seealso cref="IEnumerable{T}" />
-#if NET40 || NETSTANDARD2_0
+#if NET40 || NETSTANDARD2_0 || NETSTANDARD2_1
     [Serializable]
 #endif
     public class TotalCountList<T> : IEnumerable<T>
@@ -47,7 +47,7 @@ namespace Saritasa.Tools.Common.Pagination
         {
         }
 
-#if NET40 || NET452 || NET461 || NETSTANDARD2_0
+#if NET40 || NETSTANDARD2_0 || NETSTANDARD2_1
         /// <summary>
         /// Constructor for deserialization.
         /// </summary>
@@ -66,16 +66,12 @@ namespace Saritasa.Tools.Common.Pagination
         /// <param name="totalCount">Total number of items of base collection.</param>
         public TotalCountList(ICollection<T> items, int totalCount)
         {
-            if (items == null)
-            {
-                throw new ArgumentNullException(nameof(items));
-            }
             if (totalCount < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(totalCount));
             }
 
-            this.Items = items;
+            this.Items = items ?? throw new ArgumentNullException(nameof(items));
             this.TotalCount = totalCount;
         }
 

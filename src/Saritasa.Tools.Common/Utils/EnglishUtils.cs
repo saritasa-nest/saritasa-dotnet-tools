@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -621,7 +621,7 @@ namespace Saritasa.Tools.Common.Utils
             if (TryInflectOnSuffixInWord(suffixWord, new[]
             {
                 "man"
-            }, s => string.Concat(s.Remove(s.Length - 2, 2), "en"), out string str1))
+            }, s => string.Concat(s.Remove(s.Length - 2, 2), "en"), out string? str1))
             {
                 return string.Concat(str, str1);
             }
@@ -851,7 +851,7 @@ namespace Saritasa.Tools.Common.Utils
             string word,
             string[] suffixes,
             Func<string, string> operationOnWord,
-            out string newWord
+            out string? newWord
         )
         {
             newWord = null;
@@ -874,7 +874,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="singular">Singular form of word.</param>
         /// <param name="plural">Pluaral form of word. If not specified it will be detected automatically.</param>
         /// <returns>The plural form of the specified word.</returns>
-        public static string PluralizeWithNumber(int number, string singular, string plural = null)
+        public static string PluralizeWithNumber(int number, string singular, string? plural = null)
         {
             if (number > 1)
             {

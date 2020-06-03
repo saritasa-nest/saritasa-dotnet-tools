@@ -46,7 +46,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <returns>Cache strategy instance delegate.</returns>
         public static CacheStrategy<TKey, TResult> CreateMaxAgeCacheStrategy<TKey, TResult>(
             TimeSpan maxAge,
-            IDictionary<TKey, DateTime> timestampsStorage = null)
+            IDictionary<TKey, DateTime>? timestampsStorage = null)
         {
             if (timestampsStorage == null)
             {
@@ -75,7 +75,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="timestampsStorage"></param>
         /// <returns>Cache strategy instance delegate.</returns>
         public static CacheStrategy<int, TResult> CreateMaxAgeCacheStrategy<TResult>(
-            TimeSpan maxAge, IDictionary<int, DateTime> timestampsStorage = null) => CreateMaxAgeCacheStrategy<int, TResult>(maxAge, timestampsStorage);
+            TimeSpan maxAge, IDictionary<int, DateTime>? timestampsStorage = null) => CreateMaxAgeCacheStrategy<int, TResult>(maxAge, timestampsStorage);
 
         /// <summary>
         /// Cache strategy based on age validation. If item exceed specific time on life it shoule be
@@ -246,8 +246,8 @@ namespace Saritasa.Tools.Common.Utils
         /// <returns>Delegate with memoize.</returns>
         public static Func<TKey, TResult> Memoize<TKey, TResult>(
             Func<TKey, TResult> func,
-            CacheStrategy<TKey, TResult> strategies = null,
-            IDictionary<TKey, TResult> cache = null)
+            CacheStrategy<TKey, TResult>? strategies = null,
+            IDictionary<TKey, TResult>? cache = null)
         {
             if (cache == null)
             {
@@ -346,8 +346,8 @@ namespace Saritasa.Tools.Common.Utils
         /// <returns>Delegate the able to cache.</returns>
         public static Func<TResult> Memoize<TResult>(
             Func<TResult> func,
-            CacheStrategy<int, TResult> strategies = null,
-            IDictionary<int, TResult> cache = null)
+            CacheStrategy<int, TResult>? strategies = null,
+            IDictionary<int, TResult>? cache = null)
         {
             var func2 = new Func<int, TResult>(arg => func());
             var memoized = Memoize(func2, strategies, cache);
@@ -370,8 +370,8 @@ namespace Saritasa.Tools.Common.Utils
         /// <returns>Delegate the able to cache.</returns>
         public static Func<T1, T2, TResult> Memoize<T1, T2, TResult>(
             Func<T1, T2, TResult> func,
-            CacheStrategy<Tuple<T1, T2>, TResult> strategies = null,
-            IDictionary<Tuple<T1, T2>, TResult> cache = null)
+            CacheStrategy<Tuple<T1, T2>, TResult>? strategies = null,
+            IDictionary<Tuple<T1, T2>, TResult>? cache = null)
         {
             var func2 = new Func<Tuple<T1, T2>, TResult>(arg => func(arg.Item1, arg.Item2));
             var memoized = Memoize(func2, strategies, cache);
@@ -395,8 +395,8 @@ namespace Saritasa.Tools.Common.Utils
         /// <returns>Delegate the able to cache.</returns>
         public static Func<T1, T2, T3, TResult> Memoize<T1, T2, T3, TResult>(
             Func<T1, T2, T3, TResult> func,
-            CacheStrategy<Tuple<T1, T2, T3>, TResult> strategies = null,
-            IDictionary<Tuple<T1, T2, T3>, TResult> cache = null)
+            CacheStrategy<Tuple<T1, T2, T3>, TResult>? strategies = null,
+            IDictionary<Tuple<T1, T2, T3>, TResult>? cache = null)
         {
             var func2 = new Func<Tuple<T1, T2, T3>, TResult>(arg => func(arg.Item1, arg.Item2, arg.Item3));
             var memoized = Memoize(func2, strategies, cache);

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -21,9 +21,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="toDate">To date.</param>
         /// <returns>Dates range.</returns>
         public static IEnumerable<DateTime> GetRange(DateTime fromDate, DateTime toDate)
-        {
-            return Enumerable.Range(0, toDate.Subtract(fromDate).Days + 1).Select(d => fromDate.AddDays(d));
-        }
+            => Enumerable.Range(0, toDate.Subtract(fromDate).Days + 1).Select(d => fromDate.AddDays(d));
 
         /// <summary>
         /// Combines date part from first date and time from another. Kind is taken from time part.
@@ -49,10 +47,8 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="period">Period type.</param>
         /// <param name="cultureInfo">Specific culture to use. If null current culture is used.</param>
         /// <returns>Start of period date.</returns>
-        public static DateTime GetStartOfPeriod(DateTime target, DateTimePeriod period, CultureInfo cultureInfo = null)
-        {
-            return target.Truncate(period, cultureInfo);
-        }
+        public static DateTime GetStartOfPeriod(DateTime target, DateTimePeriod period, CultureInfo? cultureInfo = null)
+            => target.Truncate(period, cultureInfo);
 
         /// <summary>
         /// Returns end <see cref="System.DateTime" /> of period.
@@ -61,9 +57,9 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="period">Period type.</param>
         /// <param name="cultureInfo">Specific culture to use. If null current culture is used.</param>
         /// <returns>End of period date.</returns>
-        public static DateTime GetEndOfPeriod(DateTime target, DateTimePeriod period, CultureInfo cultureInfo = null)
+        public static DateTime GetEndOfPeriod(DateTime target, DateTimePeriod period, CultureInfo? cultureInfo = null)
         {
-            var result = target.Truncate(period);
+            var result = target.Truncate(period, cultureInfo);
             switch (period)
             {
                 case DateTimePeriod.Millisecond:
@@ -157,7 +153,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="period">Type of truncation.</param>
         /// <param name="cultureInfo">Specific culture to use. If null current culture is used.</param>
         /// <returns>Truncated date.</returns>
-        public static DateTime Truncate(DateTime target, DateTimePeriod period, CultureInfo cultureInfo = null)
+        public static DateTime Truncate(DateTime target, DateTimePeriod period, CultureInfo? cultureInfo = null)
         {
             // For reference https://www.postgresql.org/docs/10/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
             switch (period)
@@ -201,9 +197,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="period">Type of truncation.</param>
         /// <returns>A signed number indicating the relative values of this instance and the value parameter.</returns>
         public static int CompareTo(DateTime target, DateTime value, DateTimePeriod period)
-        {
-            return Truncate(target, period).CompareTo(value.Truncate(period));
-        }
+            => Truncate(target, period).CompareTo(value.Truncate(period));
 
         #region Unix
 

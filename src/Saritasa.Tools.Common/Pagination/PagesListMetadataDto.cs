@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -10,7 +10,7 @@ namespace Saritasa.Tools.Common.Pagination
     /// Metadata data transfer object for paged list. Combines metadata and enumerable items.
     /// </summary>
     /// <typeparam name="TItem">Metadata items type.</typeparam>
-#if NET40 || NETSTANDARD2_0
+#if NET40 || NETSTANDARD2_0 || NETSTANDARD2_1
     [Serializable]
 #endif
     public class PagedListMetadataDto<TItem> : MetadataDto<TItem, PagedListMetadata>
@@ -24,7 +24,7 @@ namespace Saritasa.Tools.Common.Pagination
         {
         }
 
-#if NET40 || NETSTANDARD2_0
+#if NET40 || NETSTANDARD2_0 || NETSTANDARD2_1
         /// <summary>
         /// Constructor for deserialization.
         /// </summary>

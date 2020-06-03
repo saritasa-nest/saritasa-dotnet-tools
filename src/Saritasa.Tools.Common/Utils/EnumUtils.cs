@@ -1,8 +1,8 @@
-﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-#if NET40 || NETSTANDARD1_6 || NETSTANDARD2_0
+#if NET40 || NETSTANDARD1_6 || NETSTANDARD2_0 || NETSTANDARD2_1
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
@@ -17,7 +17,7 @@ namespace Saritasa.Tools.Common.Utils
     /// </summary>
     public static class EnumUtils
     {
-#if NET40 || NETSTANDARD2_0
+#if NET40 || NETSTANDARD2_0 || NETSTANDARD2_1
         /// <summary>
         /// Splits intercapped string.
         /// </summary>
@@ -57,7 +57,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="target">Enum.</param>
         /// <typeparam name="TAttribute">Attribute type.</typeparam>
         /// <returns>Attribute or null if not found.</returns>
-        public static TAttribute GetAttribute<TAttribute>(Enum target)
+        public static TAttribute? GetAttribute<TAttribute>(Enum target)
             where TAttribute : Attribute
         {
             if (target == null)
@@ -75,7 +75,7 @@ namespace Saritasa.Tools.Common.Utils
                 return null;
             }
 
-#if NETSTANDARD1_6 || NETSTANDARD2_0
+#if NETSTANDARD1_6 || NETSTANDARD2_0 || NETSTANDARD2_1
             var attributes = fieldInfo.GetCustomAttributes<TAttribute>(false);
 #else
             var attributes =
@@ -91,16 +91,14 @@ namespace Saritasa.Tools.Common.Utils
         /// <returns>Enumerable values.</returns>
         public static T[] GetValues<T>() where T : Enum => Enum.GetValues(typeof(T)).Cast<T>().ToArray();
 
-#if NET40 || NETSTANDARD2_0
+#if NET40 || NETSTANDARD2_0 || NETSTANDARD2_1
         /// <summary>
         /// Get the dictionary of enum name and enum description.
         /// </summary>
         /// <typeparam name="T">Enum type.</typeparam>
         /// <returns>Key value pairs of enum name and its description.</returns>
         public static IDictionary<string, string> GetNamesWithDescriptions<T>() where T : Enum
-        {
-            return GetValues<T>().ToDictionary(e => e.ToString(), e => GetDescription(e));
-        }
+            => GetValues<T>().ToDictionary(e => e.ToString(), e => GetDescription(e));
 
         /// <summary>
         /// Get the enumerable of key value pairs of enum name and enum description.
@@ -108,9 +106,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <typeparam name="T">Enum type.</typeparam>
         /// <returns>Key value pairs of enum name and its description.</returns>
         public static IDictionary<string, string> GetValuesWithDescriptions<T>() where T : Enum
-        {
-            return GetValues<T>().ToDictionary(e => e.ToString("d"), e => GetDescription(e));
-        }
+            => GetValues<T>().ToDictionary(e => e.ToString("d"), e => GetDescription(e));
 #endif
     }
 }

@@ -1,8 +1,8 @@
-﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-#if NETSTANDARD1_6 || NETSTANDARD2_0
+#if NETSTANDARD1_6 || NETSTANDARD2_0 || NETSTANDARD2_1
 using System.Runtime.CompilerServices;
 #endif
 using System.Threading;
@@ -15,12 +15,12 @@ namespace Saritasa.Tools.Common.Utils
     public static class AtomicUtils
     {
         /// <summary>
-        /// Swaps values of two variables.
+        /// Swaps values of two variables. Not thread-safe.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T">Variable type.</typeparam>
         /// <param name="item1">Variable 1.</param>
         /// <param name="item2">Variable 2.</param>
-#if NETSTANDARD1_6 || NETSTANDARD2_0
+#if NETSTANDARD1_6 || NETSTANDARD2_0 || NETSTANDARD2_1
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
         public static void Swap<T>(ref T item1, ref T item2)
@@ -28,26 +28,6 @@ namespace Saritasa.Tools.Common.Utils
             T tmp = item1;
             item1 = item2;
             item2 = tmp;
-        }
-
-        /// <summary>
-        /// Swaps values of two variables. Thread safe implementation.
-        /// </summary>
-        /// <typeparam name="T">Variables type.</typeparam>
-        /// <param name="item1">Variable 1.</param>
-        /// <param name="item2">Variable 2.</param>
-#if NETSTANDARD1_6 || NETSTANDARD2_0
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
-        public static void SafeSwap<T>(ref T item1, ref T item2)
-        {
-            var lockObject = new object();
-            T tmp = item1;
-            lock (lockObject)
-            {
-                item1 = item2;
-                item2 = tmp;
-            }
         }
 
         #region CAS

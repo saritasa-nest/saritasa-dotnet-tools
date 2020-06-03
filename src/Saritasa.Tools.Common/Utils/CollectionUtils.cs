@@ -1,4 +1,4 @@
-﻿// Copyright(c) 2015-2019, Saritasa.All rights reserved.
+﻿// Copyright(c) 2015-2020, Saritasa.All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -70,7 +70,7 @@ namespace Saritasa.Tools.Common.Utils
             return sortOrder == ListSortDirection.Ascending ? source.OrderBy(keySelector) : source.OrderByDescending(keySelector);
         }
 
-#if NETSTANDARD1_6 || NETSTANDARD2_0
+#if NETSTANDARD1_6 || NETSTANDARD2_0 || NETSTANDARD2_1
         /// <summary>
         /// Applies ordering to collection according to sorting entries and selectors. Allows to
         /// make ordering in one method call.
@@ -232,7 +232,7 @@ namespace Saritasa.Tools.Common.Utils
             IEnumerable<T> source,
             int chunkSize = DefaultChunkSize)
         {
-            long totalNumberOfElements = source.LongCount();
+            long totalNumberOfElements = source.Count();
             int currentPosition = 0;
             var originalSource = source;
             while (totalNumberOfElements > currentPosition)
@@ -285,7 +285,7 @@ namespace Saritasa.Tools.Common.Utils
         public static IEnumerable<TSource> DistinctBy<TSource, TKey>(
             IEnumerable<TSource> source,
             Func<TSource, TKey> keySelector,
-            IEqualityComparer<TKey> comparer = null)
+            IEqualityComparer<TKey>? comparer = null)
         {
             if (source == null)
             {
@@ -329,8 +329,8 @@ namespace Saritasa.Tools.Common.Utils
         public static DiffResult<T> Diff<T>(
             IEnumerable<T> source,
             IEnumerable<T> target,
-            Func<T, T, bool> identityComparer = null,
-            IComparer<T> comparer = null)
+            Func<T, T, bool>? identityComparer = null,
+            IComparer<T>? comparer = null)
         {
             if (source == null)
             {
@@ -340,10 +340,7 @@ namespace Saritasa.Tools.Common.Utils
             {
                 throw new ArgumentNullException(nameof(target));
             }
-            if (identityComparer == null)
-            {
-                identityComparer = (obj1, obj2) => obj1.Equals(obj2);
-            }
+            identityComparer ??= (obj1, obj2) => obj1 != null && obj1.Equals(obj2);
 
             var sourceArr = source.ToArray();
             var targetArr = target.ToArray();
@@ -354,7 +351,7 @@ namespace Saritasa.Tools.Common.Utils
 
             // Determine updated and removed elements.
             Func<T, T, bool> comparerFunc =
-                (o1, o2) => o1.Equals(o2) || o1 is IComparable<T> comparable && comparable.CompareTo(o2) == 0;
+                (o1, o2) => o1 != null && (o1.Equals(o2) || o1 is IComparable<T> comparable && comparable.CompareTo(o2) == 0);
             if (comparer != null)
             {
                 comparerFunc = (o1, o2) => comparer.Compare(o1, o2) == 0;
@@ -399,12 +396,7 @@ namespace Saritasa.Tools.Common.Utils
             }
 
             // Format result.
-            var dto = new DiffResult<T>
-            {
-                Added = added,
-                Removed = removed,
-                Updated = updated
-            };
+            var dto = new DiffResult<T>(added, removed, updated);
             return dto;
         }
 
