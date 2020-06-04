@@ -94,7 +94,7 @@ namespace Saritasa.Tools.Common.Utils
                         return keySelectors[i].Selector;
                     }
                 }
-                throw new InvalidOperationException(string.Format(Properties.Strings.OrderByFieldIsNotSupported, fieldName));
+                throw new InvalidOrderFieldException(fieldName);
             }
 
             if (source == null)
