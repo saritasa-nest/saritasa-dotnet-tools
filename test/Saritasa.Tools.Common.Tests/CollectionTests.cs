@@ -220,7 +220,7 @@ namespace Saritasa.Tools.Common.Tests
 
             // Act
             var target = CollectionUtils.OrderMultiple(
-                source.AsQueryable(),
+                source.OrderBy(x => 1).AsQueryable(),
                 OrderParsingDelegates.ParseSeparated("id:asc;name:desc"),
                 ("id", u => u.Id),
                 ("name", u => u.Name)
@@ -292,6 +292,56 @@ namespace Saritasa.Tools.Common.Tests
                 new User(1, "A")
             };
             Assert.Equal(expected, target, new UserEqualityComparer());
+        }
+
+        [Fact]
+        public void OrderMultiple_SelectorWithDoubleKey_OrderWithOrderThen()
+        {
+            // Arrange
+            var source = new List<User>
+            {
+                new User(1, "B"),
+                new User(1, "A"),
+                new User(2, "C"),
+            };
+
+            // Act
+            var target = CollectionUtils.OrderMultiple(
+                source,
+                OrderParsingDelegates.ParseSeparated("key:asc"),
+                ("key", u => u.Id),
+                ("key", u => u.Name)
+            );
+
+            // Assert
+            var expected = new List<User>
+            {
+                new User(1, "A"),
+                new User(1, "B"),
+                new User(2, "C"),
+            };
+            Assert.Equal(expected, target, new UserEqualityComparer());
+        }
+
+        [Fact]
+        public void OrderMultiple_OrderByNotExistingKey_InvalidOrderFieldException()
+        {
+            // Arrange
+            var source = new List<User>
+            {
+                new User(1, "B"),
+            };
+
+            // Assert
+            Assert.Throws<InvalidOrderFieldException>(() =>
+            {
+                var target = CollectionUtils.OrderMultiple(
+                    source,
+                    OrderParsingDelegates.ParseSeparated("date:asc"),
+                    ("id", u => u.Id),
+                    ("name", u => u.Name)
+                );
+            });
         }
     }
 }

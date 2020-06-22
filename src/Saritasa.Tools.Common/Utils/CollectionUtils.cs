@@ -85,16 +85,44 @@ namespace Saritasa.Tools.Common.Utils
             ICollection<(string FieldName, ListSortDirection Order)> orderEntries,
             params (string FieldName, Func<TSource, object> Selector)[] keySelectors)
         {
-            Func<TSource, object> GetKeySelector(string fieldName)
+            IEnumerable<Func<TSource, object>> GetKeySelectors(string fieldName)
             {
+                var count = 0;
                 for (int i = 0; i < keySelectors.Length; i++)
                 {
                     if (keySelectors[i].FieldName == fieldName)
                     {
-                        return keySelectors[i].Selector;
+                        count++;
+                        yield return keySelectors[i].Selector;
                     }
                 }
-                throw new InvalidOrderFieldException(fieldName);
+                if (count == 0)
+                {
+                    throw new InvalidOrderFieldException(fieldName);
+                }
+            }
+
+            IOrderedEnumerable<TSource> OrderByField(IEnumerable<Func<TSource, object>> selectors,
+                ListSortDirection direction,
+                IEnumerable<TSource> target)
+            {
+                var orderedTarget = target as IOrderedEnumerable<TSource>;
+                if (orderedTarget == null)
+                {
+                    var firstSelector = selectors.FirstOrDefault();
+                    orderedTarget = direction == ListSortDirection.Ascending ?
+                        target.OrderBy(firstSelector) :
+                        target.OrderByDescending(firstSelector);
+                    selectors = selectors.Skip(1);
+                }
+
+                foreach (var selector in selectors)
+                {
+                    orderedTarget = direction == ListSortDirection.Ascending ?
+                        orderedTarget.ThenBy(selector) :
+                        orderedTarget.ThenByDescending(selector);
+                }
+                return orderedTarget;
             }
 
             if (source == null)
@@ -110,29 +138,17 @@ namespace Saritasa.Tools.Common.Utils
                 throw new ArgumentNullException(nameof(keySelectors));
             }
 
-            // Noop ordering.
-            if (!orderEntries.Any())
-            {
-                return source.OrderBy(s => 1);
-            }
-
-            // Need to sort by first field to get IOrderedQuery object instance.
-            var firstSortingEntry = orderEntries.First();
-            var keySelector = GetKeySelector(firstSortingEntry.FieldName);
-            var sortedQuery = firstSortingEntry.Order == ListSortDirection.Ascending
-                ? source.OrderBy(keySelector)
-                : source.OrderByDescending(keySelector);
-
             // Sort for remaining fields.
-            foreach (var sortingEntry in orderEntries.Skip(1))
+            IEnumerable<TSource> ordered = source;
+            foreach (var sortingEntry in orderEntries)
             {
-                keySelector = GetKeySelector(sortingEntry.FieldName);
-                sortedQuery = sortingEntry.Order == ListSortDirection.Ascending
-                    ? sortedQuery.ThenBy(keySelector)
-                    : sortedQuery.ThenByDescending(keySelector);
+                ordered = OrderByField(
+                    GetKeySelectors(sortingEntry.FieldName),
+                    sortingEntry.Order,
+                    ordered);
             }
 
-            return sortedQuery;
+            return ordered is IOrderedEnumerable<TSource> orderedResult ? orderedResult : ordered.OrderBy(s => 1);
         }
 
         /// <summary>
@@ -149,16 +165,44 @@ namespace Saritasa.Tools.Common.Utils
             ICollection<(string FieldName, ListSortDirection Order)> orderEntries,
             params (string FieldName, Expression<Func<TSource, object>> Selector)[] keySelectors)
         {
-            Expression<Func<TSource, object>> GetKeySelector(string fieldName)
+            IEnumerable<Expression<Func<TSource, object>>> GetKeySelectors(string fieldName)
             {
+                var count = 0;
                 for (int i = 0; i < keySelectors.Length; i++)
                 {
                     if (keySelectors[i].FieldName == fieldName)
                     {
-                        return keySelectors[i].Selector;
+                        count++;
+                        yield return keySelectors[i].Selector;
                     }
                 }
-                throw new InvalidOperationException(string.Format(Properties.Strings.OrderByFieldIsNotSupported, fieldName));
+                if (count == 0)
+                {
+                    throw new InvalidOrderFieldException(fieldName);
+                }
+            }
+
+            IOrderedQueryable<TSource> OrderByField(IEnumerable<Expression<Func<TSource, object>>> selectors,
+                ListSortDirection direction,
+                IQueryable<TSource> target)
+            {
+                var orderedTarget = target as IOrderedQueryable<TSource>;
+                if (orderedTarget == null)
+                {
+                    var firstSelector = selectors.FirstOrDefault();
+                    orderedTarget = direction == ListSortDirection.Ascending ?
+                        target.OrderBy(firstSelector) :
+                        target.OrderByDescending(firstSelector);
+                    selectors = selectors.Skip(1);
+                }
+
+                foreach (var selector in selectors)
+                {
+                    orderedTarget = direction == ListSortDirection.Ascending ?
+                        orderedTarget.ThenBy(selector) :
+                        orderedTarget.ThenByDescending(selector);
+                }
+                return orderedTarget;
             }
 
             if (source == null)
@@ -174,29 +218,17 @@ namespace Saritasa.Tools.Common.Utils
                 throw new ArgumentNullException(nameof(keySelectors));
             }
 
-            // Noop ordering.
-            if (!orderEntries.Any())
-            {
-                return source.OrderBy(s => 1);
-            }
-
-            // Need to sort by first field to get IOrderedQuery object instance.
-            var firstSortingEntry = orderEntries.First();
-            var keySelector = GetKeySelector(firstSortingEntry.FieldName);
-            var sortedQuery = firstSortingEntry.Order == ListSortDirection.Ascending
-                ? source.OrderBy(keySelector)
-                : source.OrderByDescending(keySelector);
-
             // Sort for remaining fields.
-            foreach (var sortingEntry in orderEntries.Skip(1))
+            IQueryable<TSource> ordered = source;
+            foreach (var sortingEntry in orderEntries)
             {
-                keySelector = GetKeySelector(sortingEntry.FieldName);
-                sortedQuery = sortingEntry.Order == ListSortDirection.Ascending
-                    ? sortedQuery.ThenBy(keySelector)
-                    : sortedQuery.ThenByDescending(keySelector);
+                ordered = OrderByField(
+                    GetKeySelectors(sortingEntry.FieldName),
+                    sortingEntry.Order,
+                    ordered);
             }
 
-            return sortedQuery;
+            return ordered is IOrderedQueryable<TSource> orderedResult ? orderedResult : ordered.OrderBy(s => 1);
         }
 #endif
 
@@ -211,7 +243,7 @@ namespace Saritasa.Tools.Common.Utils
             IQueryable<T> source,
             int chunkSize = DefaultChunkSize)
         {
-            long totalNumberOfElements = source.LongCount();
+            var totalNumberOfElements = source.Count();
             int currentPosition = 0;
             var originalSource = source;
             while (totalNumberOfElements > currentPosition)
