@@ -4,8 +4,9 @@
 [-] Remove AtomicUtils.SafeSwap .
 [*] Use Count() call for enumerable ChunkSelectRange because it has much more effective implementation.
 [+] Add constructor to DiffResult.
-[*] Overall code clean up.
 [*] CollectionUtils.OrderMultiple generates InvalidOrderFieldException instead of InvalidOperationException.
+[*] CollectionUtils.OrderMultiple allows duplicating selector keys.
+[*] Overall code clean up.
 
 3.1.1 [2019-12-28]
 [*] OrderParsingDelegates.ParseSeparated returns empty collection if string is empty.

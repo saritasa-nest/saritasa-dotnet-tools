@@ -83,7 +83,8 @@ namespace Saritasa.Tools.Common.Pagination
 #endif
 
         /// <summary>
-        /// Creates paged enumerable from collection.
+        /// Creates paged enumerable from collection. Page starts from 1. Page size must be must be
+        /// greater than zero.
         /// </summary>
         /// <param name="items">Collection.</param>
         /// <param name="page">Current page.</param>

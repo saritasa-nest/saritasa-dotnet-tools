@@ -1,9 +1,11 @@
-﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using Xunit;
 using Saritasa.Tools.Common.Pagination;
 
@@ -95,6 +97,28 @@ namespace Saritasa.Tools.Common.Tests
             // Assert
             Assert.Equal(0, totalCountResult.TotalCount);
             Assert.False(totalCountResult.Any());
+        }
+
+        [Fact]
+        public void BinaryFormatterSerialize_PagedListWithDate_PersistAfterDeserialize()
+        {
+            // Arrange
+            var pagedList = new PagedList<int>(new[] { 10 }, 1, 10, 1);
+            var formatter = new BinaryFormatter();
+            PagedList<int> deserializedPagedList = null;
+
+            // Act
+            using var memoryStream = new MemoryStream();
+            formatter.Serialize(memoryStream, pagedList);
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            deserializedPagedList = (PagedList<int>)formatter.Deserialize(memoryStream);
+
+            // Assert
+            Assert.Equal(pagedList.Page, deserializedPagedList.Page);
+            Assert.Equal(pagedList.PageSize, deserializedPagedList.PageSize);
+            Assert.Equal(pagedList.TotalCount, deserializedPagedList.TotalCount);
+            Assert.Equal(pagedList.Count(), deserializedPagedList.Count());
+            Assert.Equal(pagedList.Page, deserializedPagedList.Page);
         }
     }
 }

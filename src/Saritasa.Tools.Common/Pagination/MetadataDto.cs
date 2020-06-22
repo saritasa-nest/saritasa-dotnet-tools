@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Runtime.CompilerServices;
 
 namespace Saritasa.Tools.Common.Pagination
 {
@@ -39,6 +41,7 @@ namespace Saritasa.Tools.Common.Pagination
         }
 #endif
 
+        [Required]
         /// <inheritdoc />
         public TMetadata Metadata { get; protected set; }
 
