@@ -3,8 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+#if NETSTANDARD1_6 || NETSTANDARD2_0 || NETSTANDARD2_1
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.CompilerServices;
+#endif
 
 namespace Saritasa.Tools.Common.Pagination
 {
@@ -41,11 +42,16 @@ namespace Saritasa.Tools.Common.Pagination
         }
 #endif
 
-        [Required]
         /// <inheritdoc />
+#if NETSTANDARD1_6 || NETSTANDARD2_0 || NETSTANDARD2_1
+        [Required]
+#endif
         public TMetadata Metadata { get; protected set; }
 
         /// <inheritdoc />
+#if NETSTANDARD1_6 || NETSTANDARD2_0 || NETSTANDARD2_1
+        [Required]
+#endif
         public IEnumerable<TItem> Items { get; protected set; }
     }
 }
