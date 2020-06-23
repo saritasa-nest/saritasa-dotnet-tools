@@ -37,7 +37,9 @@ namespace Saritasa.Tools.Common.Pagination
         /// <param name="info">Stores all the data needed to serialize or deserialize an object.</param>
         /// <param name="context">Describes the source and destination of a given serialized stream,
         /// and provides an additional caller-defined context.</param>
+#pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         protected MetadataDto(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
+#pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         {
         }
 #endif

@@ -24,6 +24,7 @@
       <group targetFramework="netstandard2.1" />
       <group targetFramework="net40" /> 
     </dependencies>
+    <releaseNotes>Release notes are at https://github.com/Saritasa/SaritasaTools/blob/master/src/Saritasa.Tools.Common/CHANGELOG.txt</releaseNotes>
   </metadata>
   <files>
     <file src="bin\Release\**\Saritasa.Tools.Common.dll" target="lib" />

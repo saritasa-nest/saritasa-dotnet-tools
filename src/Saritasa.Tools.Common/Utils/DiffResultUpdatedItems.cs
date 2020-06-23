@@ -9,24 +9,27 @@ namespace Saritasa.Tools.Common.Utils
     /// The struct represents the pair of source item in collection and the same (by identity)
     /// item in target collection.
     /// </summary>
-    /// <typeparam name="T">Source type.</typeparam>
+    /// <typeparam name="T">The source type.</typeparam>
+#if NET40 || NETSTANDARD2_0 || NETSTANDARD2_1
+    [Serializable]
+#endif
     public struct DiffResultUpdatedItems<T>
     {
         /// <summary>
-        /// Source item.
+        /// The source item.
         /// </summary>
         public T Source { get; }
 
         /// <summary>
-        /// Target item.
+        /// The target item.
         /// </summary>
         public T Target { get; }
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="source">Source item.</param>
-        /// <param name="target">Target item.</param>
+        /// <param name="source">The source item.</param>
+        /// <param name="target">The target item.</param>
         public DiffResultUpdatedItems(T source, T target)
         {
             this.Source = source ?? throw new ArgumentNullException(nameof(source));
@@ -36,8 +39,8 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Deconstruction method used for tuples.
         /// </summary>
-        /// <param name="source">Source item.</param>
-        /// <param name="target">Target item.</param>
+        /// <param name="source">The source item.</param>
+        /// <param name="target">The target item.</param>
         public void Deconstruct(out T source, out T target)
         {
             source = this.Source;
@@ -73,7 +76,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <inheritdoc />
-        public override int GetHashCode() => this.Source.GetHashCode() ^ this.Target.GetHashCode();
+        public override int GetHashCode() => this.Source?.GetHashCode() ^ this.Target?.GetHashCode() ?? 0;
 
         /// <inheritdoc />
         public override string ToString() => this.Source + "; " + this.Target;

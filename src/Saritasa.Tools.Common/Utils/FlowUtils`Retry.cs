@@ -180,12 +180,12 @@ namespace Saritasa.Tools.Common.Utils
                 new Func<Task<T>, Task<T>>((Task<T> runningTask) =>
                 {
                     // Success case.
-                    if (!runningTask.IsFaulted || cancellationToken.IsCancellationRequested)
+                    if (!runningTask.IsFaulted || cancellationToken.IsCancellationRequested || runningTask.Exception == null)
                     {
                         return runningTask;
                     }
 
-                    Exception? executedException = runningTask.Exception?.InnerException;
+                    Exception? executedException = runningTask.Exception.InnerException;
                     bool isTransient = IsSubtypeOf(executedException, transientExceptions);
                     bool shouldStop = retryStrategy(attemptCount, executedException, out TimeSpan delay);
                     if (isTransient == false || shouldStop)
@@ -351,7 +351,7 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="executedException">Exception to check.</param>
         /// <param name="exceptionsTypes">Exceptions of check.</param>
-        internal static bool IsSubtypeOf(Exception executedException, Type[] exceptionsTypes)
+        internal static bool IsSubtypeOf(Exception executedException, Type[]? exceptionsTypes)
         {
             if (exceptionsTypes == null || exceptionsTypes.Length < 1)
             {
