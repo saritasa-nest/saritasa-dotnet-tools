@@ -8,12 +8,11 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-using System.Reflection;
-
 namespace Saritasa.Tools.Common.Properties {
     using System;
-    
-    
+    using System.Reflection;
+
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -144,6 +143,15 @@ namespace Saritasa.Tools.Common.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Class {0} must contain method {1}..
+        /// </summary>
+        internal static string ClassMustContainMethod {
+            get {
+                return ResourceManager.GetString("ClassMustContainMethod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Collection cannot be empty..
         /// </summary>
         internal static string CollectionCannotEmpty {
@@ -176,6 +184,15 @@ namespace Saritasa.Tools.Common.Properties {
         internal static string NoHashMethod {
             get {
                 return ResourceManager.GetString("NoHashMethod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The class {0} does not have public constructor..
+        /// </summary>
+        internal static string NoSuitableConstructor {
+            get {
+                return ResourceManager.GetString("NoSuitableConstructor", resourceCulture);
             }
         }
         
