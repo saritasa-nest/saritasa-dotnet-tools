@@ -307,7 +307,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Is not empty check for collection of arguments. Generates <see cref="ArgumentException" />.
+        /// Is not an empty check for the collection of arguments. Generates <see cref="ArgumentException" />.
         /// </summary>
         /// <param name="argument">Collection of arguments.</param>
         /// <param name="argumentName">Argument name.</param>

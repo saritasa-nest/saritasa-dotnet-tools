@@ -11,14 +11,14 @@ using Saritasa.Tools.Common.Pagination;
 namespace Saritasa.Tools.EFCore.Pagination
 {
     /// <summary>
-    /// Class contains Entity Framework related static methods for
+    /// The class contains Entity Framework related static methods for
     /// <see cref="PagedList{T}" /> and is intended to simplify instantiation and better API.
     /// </summary>
     public static class EFPagedListFactory
     {
         /// <summary>
-        /// Creates paged list from queryable source and query source by page and page size.
-        /// The calling will evaluate query automatically.
+        /// Creates a paged list from queryable source and query source by page and page size.
+        /// The calling will evaluate the query automatically.
         /// </summary>
         /// <typeparam name="T">Item type.</typeparam>
         /// <param name="source">Queryable enumerable.</param>

@@ -13,7 +13,7 @@ namespace Saritasa.Tools.Common.Extensions
     public static class DateTimeExtensions
     {
         /// <summary>
-        /// Truncates date. Begin of period.
+        /// Truncates date. Begin of the period.
         /// </summary>
         /// <param name="target">Target date.</param>
         /// <param name="period">Type of truncation.</param>

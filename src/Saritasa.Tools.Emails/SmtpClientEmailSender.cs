@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace Saritasa.Tools.Emails
 {
     /// <summary>
-    /// Send email using <see cref="SmtpClient" />. The class is thread safe and allows
+    /// Send email using <see cref="SmtpClient" />. The class is thread-safe and allows
     /// concurrent use of SendAsync method.
     /// </summary>
     public class SmtpClientEmailSender : EmailSender, IDisposable

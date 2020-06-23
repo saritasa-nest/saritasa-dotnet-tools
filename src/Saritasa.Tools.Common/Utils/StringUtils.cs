@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -53,9 +53,9 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Retrieves a substring from this instance. If start index has negative value it will be replaced
-        /// to 0. If substring exceed length of target string the end of string will be returned. <c>null</c> will
-        /// be converted to empty string.
+        /// Retrieves a substring from this instance. If the start index has negative value it will be replaced
+        /// to 0. If substring exceeds the length of the target string the end of the string will be returned. <c>null</c> will
+        /// be converted to the empty string.
         /// </summary>
         /// <param name="target">Target string.</param>
         /// <param name="startIndex">The zero-based starting character position of a substring in this instance.</param>
@@ -123,7 +123,7 @@ namespace Saritasa.Tools.Common.Utils
         #region Parse with default
 
         /// <summary>
-        /// Tries to convert target string to Boolean. If fails returns default value.
+        /// Tries to convert the target string to Boolean. If fails return the default value.
         /// </summary>
         public static Boolean ParseOrDefault(string target, Boolean defaultValue)
         {
@@ -136,7 +136,7 @@ namespace Saritasa.Tools.Common.Utils
         private static readonly string[] falseValues = { "no", "off", "n", "f", "0" };
 
         /// <summary>
-        /// Tries to convert target string to Boolean. If fails returns default value.
+        /// Tries to convert the target string to Boolean. If fails return the default value.
         /// SetPart extended parameter to true to be able to parse from values "0", "1", "Yes", "No".
         /// </summary>
         public static Boolean ParseOrDefault(string target, Boolean defaultValue, Boolean extended)
@@ -161,7 +161,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Tries to convert target string to Byte. If fails returns default value.
+        /// Tries to convert the target string to Byte. If fails return the default value.
         /// </summary>
         public static Byte ParseOrDefault(string target, Byte defaultValue)
         {
@@ -171,7 +171,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Tries to convert target string to Byte. If fails returns default value.
+        /// Tries to convert the target string to Byte. If fails return the default value.
         /// </summary>
         public static Byte ParseOrDefault(string target, NumberStyles style, IFormatProvider provider, Byte defaultValue)
         {
@@ -181,7 +181,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Tries to convert target string to Char. If fails returns default value.
+        /// Tries to convert the target string to Char. If fails return the default value.
         /// </summary>
         public static Char ParseOrDefault(string target, Char defaultValue)
         {
@@ -191,7 +191,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Tries to convert target string to DateTime. If fails returns default value.
+        /// Tries to convert the target string to DateTime. If fails return the default value.
         /// </summary>
         public static DateTime ParseOrDefault(string target, DateTime defaultValue)
         {
@@ -201,7 +201,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Tries to convert target string to DateTime. If fails returns default value.
+        /// Tries to convert the target string to DateTime. If fails return the default value.
         /// </summary>
         public static DateTime ParseOrDefault(string target, IFormatProvider provider, DateTimeStyles styles, DateTime defaultValue)
         {
@@ -211,7 +211,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Tries to convert target string to Decimal. If fails returns default value.
+        /// Tries to convert the target string to Decimal. If fails return the default value.
         /// </summary>
         public static Decimal ParseOrDefault(string target, Decimal defaultValue)
         {
@@ -221,7 +221,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Tries to convert target string to Decimal. If fails returns default value.
+        /// Tries to convert the target string to Decimal. If fails return the default value.
         /// </summary>
         public static Decimal ParseOrDefault(string target, NumberStyles style, IFormatProvider provider, Decimal defaultValue)
         {
@@ -231,7 +231,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Tries to convert target string to Double. If fails returns default value.
+        /// Tries to convert the target string to Double. If fails return the default value.
         /// </summary>
         public static Double ParseOrDefault(string target, Double defaultValue)
         {
@@ -241,7 +241,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Tries to convert target string to Double. If fails returns default value.
+        /// Tries to convert the target string to Double. If fails return the default value.
         /// </summary>
         public static Double ParseOrDefault(string target, NumberStyles style, IFormatProvider provider, Double defaultValue)
         {
@@ -251,7 +251,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Tries to convert target string to Int16. If fails returns default value.
+        /// Tries to convert the target string to Int16. If fails return the default value.
         /// </summary>
         public static Int16 ParseOrDefault(string target, Int16 defaultValue)
         {
@@ -261,7 +261,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Tries to convert target string to Int16. If fails returns default value.
+        /// Tries to convert the target string to Int16. If fails return the default value.
         /// </summary>
         public static Int16 ParseOrDefault(string target, NumberStyles style, IFormatProvider provider, Int16 defaultValue)
         {
@@ -271,7 +271,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Tries to convert target string to int. If fails returns default value.
+        /// Tries to convert the target string to int. If fails return the default value.
         /// </summary>
         public static Int32 ParseOrDefault(string target, Int32 defaultValue)
         {
@@ -281,7 +281,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Tries to convert target string to int. If fails returns default value.
+        /// Tries to convert the target string to int. If fails return the default value.
         /// </summary>
         public static Int32 ParseOrDefault(string target, NumberStyles style, IFormatProvider provider, Int32 defaultValue)
         {
@@ -291,7 +291,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Tries to convert target string to Int64. If fails returns default value.
+        /// Tries to convert the target string to Int64. If fails return the default value.
         /// </summary>
         public static Int64 ParseOrDefault(string target, Int64 defaultValue)
         {
@@ -301,7 +301,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Tries to convert target string to Int64. If fails returns default value.
+        /// Tries to convert the target string to Int64. If fails return the default value.
         /// </summary>
         public static Int64 ParseOrDefault(string target, NumberStyles style, IFormatProvider provider, Int64 defaultValue)
         {
@@ -311,7 +311,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Tries to convert target string to SByte. If fails returns default value.
+        /// Tries to convert the target string to SByte. If fails return the default value.
         /// </summary>
         [CLSCompliant(false)]
         public static SByte ParseOrDefault(string target, SByte defaultValue)
@@ -322,7 +322,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Tries to convert target string to SByte. If fails returns default value.
+        /// Tries to convert the target string to SByte. If fails return the default value.
         /// </summary>
         [CLSCompliant(false)]
         public static SByte ParseOrDefault(string target, NumberStyles style, IFormatProvider provider, SByte defaultValue)
@@ -333,7 +333,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Tries to convert target string to Single. If fails returns default value.
+        /// Tries to convert the target string to Single. If fails return the default value.
         /// </summary>
         public static Single ParseOrDefault(string target, Single defaultValue)
         {
@@ -343,7 +343,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Tries to convert target string to Single. If fails returns default value.
+        /// Tries to convert the target string to Single. If fails return the default value.
         /// </summary>
         public static Double ParseOrDefault(string target, NumberStyles style, IFormatProvider provider, Single defaultValue)
         {
@@ -353,7 +353,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Tries to convert target string to UInt16. If fails returns default value.
+        /// Tries to convert the target string to UInt16. If fails return the default value.
         /// </summary>
         [CLSCompliant(false)]
         public static UInt16 ParseOrDefault(string target, UInt16 defaultValue)
@@ -364,7 +364,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Tries to convert target string to UInt16. If fails returns default value.
+        /// Tries to convert the target string to UInt16. If fails return the default value.
         /// </summary>
         [CLSCompliant(false)]
         public static UInt16 ParseOrDefault(string target, NumberStyles style, IFormatProvider provider, UInt16 defaultValue)
@@ -375,7 +375,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Tries to convert target string to Uint. If fails returns default value.
+        /// Tries to convert the target string to Uint. If fails return the default value.
         /// </summary>
         [CLSCompliant(false)]
         public static UInt32 ParseOrDefault(string target, UInt32 defaultValue)
@@ -386,7 +386,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Tries to convert target string to Uint. If fails returns default value.
+        /// Tries to convert the target string to Uint. If fails return the default value.
         /// </summary>
         [CLSCompliant(false)]
         public static UInt32 ParseOrDefault(string target, NumberStyles style, IFormatProvider provider, UInt32 defaultValue)
@@ -397,7 +397,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Tries to convert target string to UInt64. If fails returns default value.
+        /// Tries to convert the target string to UInt64. If fails return the default value.
         /// </summary>
         [CLSCompliant(false)]
         public static UInt64 ParseOrDefault(string target, UInt64 defaultValue)
@@ -408,7 +408,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Tries to convert target string to UInt64. If fails returns default value.
+        /// Tries to convert the target string to UInt64. If fails return the default value.
         /// </summary>
         [CLSCompliant(false)]
         public static UInt64 ParseOrDefault(string target, NumberStyles style, IFormatProvider provider, UInt64 defaultValue)
@@ -419,7 +419,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Tries to convert target string to Enum. If fails returns default value.
+        /// Tries to convert the target string to Enum. If fails return the default value.
         /// </summary>
         public static T ParseOrDefault<T>(string target, T defaultValue) where T : struct
         {
@@ -427,7 +427,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Tries to convert target string to Enum. If fails returns default value.
+        /// Tries to convert the target string to Enum. If fails return the default value.
         /// </summary>
         public static T ParseOrDefault<T>(string target, Boolean ignoreCase, T defaultValue) where T : struct
         {

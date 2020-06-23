@@ -7,6 +7,7 @@
 [*] CollectionUtils.OrderMultiple generates InvalidOrderFieldException instead of InvalidOperationException.
 [*] CollectionUtils.OrderMultiple allows duplicating selector keys.
 [*] Overall code clean up.
+[*] Spelling fixes.
 
 3.1.1 [2019-12-28]
 [*] OrderParsingDelegates.ParseSeparated returns empty collection if string is empty.
@@ -38,7 +39,7 @@
 [+] Add Empty method to pagination factories.
 [+] Add shorthand Create method to pagination factories.
 [*] Comments update.
-[+] Memoize is thread safe now.
+[+] Memoize is thread-safe now.
 [-] Remove SkipMemoizeException.
 
 1.0.0 [2018-11-02]

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Saritasa.Tools.Emails.Interceptors
 {
     /// <summary>
-    /// Contains counters of sending and sent emails. Thread safe.
+    /// Contains counters of sending and sent emails. Thread-safe.
     /// </summary>
     public class CountEmailsInterceptor : IEmailInterceptor
     {

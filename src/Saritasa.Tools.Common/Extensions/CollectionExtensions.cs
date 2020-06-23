@@ -72,7 +72,7 @@ namespace Saritasa.Tools.Common.Extensions
 
         /// <summary>
         /// Breaks a list of items into chunks of a specific size. Be aware that this method generates one additional
-        /// sql query to get total number of collection elements.
+        /// SQL query to get the total number of collection elements.
         /// </summary>
         /// <param name="source">Source list.</param>
         /// <param name="chunkSize">Chunk size.</param>
@@ -99,7 +99,7 @@ namespace Saritasa.Tools.Common.Extensions
 
         /// <summary>
         /// Returns distinct elements from a sequence by using a specified <see cref="IEqualityComparer{T}" />
-        /// to compare values and specified key selector to get distinct key. This method is implemented by
+        /// to compare values and specified key selector to get a distinct key. This method is implemented by
         /// using deferred execution.
         /// </summary>
         /// <typeparam name="TSource">Type of the source sequence.</typeparam>

@@ -19,12 +19,12 @@ namespace Saritasa.Tools.Common.Pagination
     public class OffsetLimitList<T> : TotalCountList<T>
     {
         /// <summary>
-        /// Number of items to skip.
+        /// The number of items to skip.
         /// </summary>
         public int Offset { get; protected internal set; }
 
         /// <summary>
-        /// Maximum number of items to take.
+        /// The maximum number of items to take.
         /// </summary>
         public int Limit { get; protected internal set; }
 
@@ -45,9 +45,9 @@ namespace Saritasa.Tools.Common.Pagination
         /// Constructor.
         /// </summary>
         /// <param name="items">Collection items.</param>
-        /// <param name="offset">Number of items to skip.</param>
-        /// <param name="limit">Maximum number of items to take.</param>
-        /// <param name="totalCount">Total number of items in collection.</param>
+        /// <param name="offset">The number of items to skip.</param>
+        /// <param name="limit">The maximum number of items to take.</param>
+        /// <param name="totalCount">The total number of items in collection.</param>
         public OffsetLimitList(
             ICollection<T> items,
             int offset,
@@ -82,7 +82,7 @@ namespace Saritasa.Tools.Common.Pagination
         #region IMetadataEnumerable<OffsetLimitEnumerableMetadata, T>
 
         /// <summary>
-        /// Get offset limit metadata object.
+        /// Get the offset limit metadata object.
         /// </summary>
         /// <returns>Offset limit metadata.</returns>
         private OffsetLimitListMetadata GetMetadata()

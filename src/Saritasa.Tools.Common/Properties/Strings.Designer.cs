@@ -10,9 +10,8 @@
 
 namespace Saritasa.Tools.Common.Properties {
     using System;
-    using System.Reflection;
-
-
+    
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -40,7 +39,7 @@ namespace Saritasa.Tools.Common.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Saritasa.Tools.Common.Properties.Strings", typeof(Strings).GetTypeInfo().Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Saritasa.Tools.Common.Properties.Strings", typeof(Strings).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -62,7 +61,7 @@ namespace Saritasa.Tools.Common.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} cannot be empty guid..
+        ///   Looks up a localized string similar to {0} cannot be empty GUID..
         /// </summary>
         internal static string ArgumentCannotBeEmptyGuid {
             get {
@@ -143,7 +142,7 @@ namespace Saritasa.Tools.Common.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Class {0} must contain method {1}..
+        ///   Looks up a localized string similar to Class {0} must contain a method {1}..
         /// </summary>
         internal static string ClassMustContainMethod {
             get {

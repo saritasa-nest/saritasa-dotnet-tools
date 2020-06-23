@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -13,7 +13,7 @@ namespace Saritasa.Tools.Common.Extensions
     public static class DictionaryExtensions
     {
         /// <summary>
-        /// Tries to get the value in dictionary by key. If it does not exist it will return
+        /// Tries to get the value in the dictionary by key. If it does not exist it will return
         /// default value.
         /// </summary>
         /// <typeparam name="TKey">Dictionary key type.</typeparam>
@@ -32,7 +32,7 @@ namespace Saritasa.Tools.Common.Extensions
         /// <summary>
         /// Adds a key/value pair to the <see cref="IDictionary{TKey,TValue}" /> if the key does not already
         /// exist, or updates a key/value pair in the <see cref="IDictionary{TKey,TValue}" /> if the key
-        /// already exists. The default value will be used if key is missed to the <see cref="IDictionary{TKey,TValue}" />.
+        /// already exists. The default value will be used if the key is missed to the <see cref="IDictionary{TKey,TValue}" />.
         /// </summary>
         /// <typeparam name="TKey">Key type.</typeparam>
         /// <typeparam name="TValue">Value type.</typeparam>

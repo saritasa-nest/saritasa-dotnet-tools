@@ -15,7 +15,7 @@ namespace Saritasa.Tools.Common.Utils
     public static class DictionaryUtils
     {
         /// <summary>
-        /// Tries to get the value in dictionary by key. If it does not exist it will return
+        /// Tries to get the value in the dictionary by key. If it does not exist it will return
         /// default value.
         /// </summary>
         /// <typeparam name="TKey">Dictionary key type.</typeparam>
@@ -35,7 +35,7 @@ namespace Saritasa.Tools.Common.Utils
 
 #if NET40 || NETSTANDARD2_0 || NETSTANDARD2_1
         /// <summary>
-        /// Tries to get the value in <see cref="NameValueCollection" />. If value with specified
+        /// Tries to get the value in the <see cref="NameValueCollection" />. If value with specified
         /// key does not exist it will return default value.
         /// </summary>
         /// <param name="target">Target name value collection.</param>
@@ -72,7 +72,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Adds a key/value pair to the <see cref="IDictionary{TKey,TValue}" /> if the key does not already
         /// exist, or updates a key/value pair in the <see cref="IDictionary{TKey,TValue}" /> if the key
-        /// already exists. The default value will be used if key is missed to the <see cref="IDictionary{TKey,TValue}" />.
+        /// already exists. The default value will be used if the key is missed to the <see cref="IDictionary{TKey,TValue}" />.
         /// </summary>
         /// <typeparam name="TKey">Key type.</typeparam>
         /// <typeparam name="TValue">Value type.</typeparam>

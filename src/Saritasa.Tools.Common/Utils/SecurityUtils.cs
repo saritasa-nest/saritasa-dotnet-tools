@@ -11,7 +11,7 @@ using System.Text;
 namespace Saritasa.Tools.Common.Utils
 {
     /// <summary>
-    /// Shortcuts for hash generation to string.
+    /// Shortcuts for the hash generation to string.
     /// </summary>
     public static class SecurityUtils
     {
@@ -96,7 +96,7 @@ namespace Saritasa.Tools.Common.Utils
         private const int DefaultNumberOfIterations = 10000;
 
         /// <summary>
-        /// Returns PBKDF2 compatible hash by using a pseudo-random number generator based on HMACSHA1. Default number
+        /// Returns PBKDF2 compatible hash by using a pseudo-random number generator based on HMACSHA1. The default number
         /// of iterations is 10000.
         /// </summary>
         /// <param name="target">String to be hashed.</param>
@@ -196,7 +196,7 @@ namespace Saritasa.Tools.Common.Utils
             };
 
         /// <summary>
-        /// Hash string with selected hash method. The string will contain method name that was used for hashing.
+        /// Hash string with the selected hash method. The string will contain a method name that was used for hashing.
         /// </summary>
         /// <param name="target">String to hash.</param>
         /// <param name="method">Method to use to hash.</param>
@@ -243,7 +243,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Convert array of bytes to string representation. Replace dashes by empty strings.
+        /// Convert an array of bytes to string representation. Replace dashes with empty strings.
         /// </summary>
         /// <param name="bytes">Bytes array.</param>
         /// <returns>Hex string.</returns>
@@ -294,7 +294,7 @@ namespace Saritasa.Tools.Common.Utils
         public const uint Crc32Castagnoli = 0x82f63b78;
 
         /// <summary>
-        /// Koopman's polynomial. Also has better error detection characteristics than IEEE.
+        /// Koopman's polynomial. It also has better error detection characteristics than IEEE.
         /// </summary>
         /// <remarks>For reference look http://dx.doi.org/10.1109/DSN.2002.1028931 .</remarks>
         [CLSCompliant(false)]
@@ -387,7 +387,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Returns the CRC-64 checksum of data using the polynomial. Default implementation uses ISO polynomial.
+        /// Returns the CRC-64 checksum of data using the polynomial. The default implementation uses ISO polynomial.
         /// </summary>
         /// <param name="target">Array of bytes to be hashed.</param>
         /// <param name="polynomial">Polynomial.</param>

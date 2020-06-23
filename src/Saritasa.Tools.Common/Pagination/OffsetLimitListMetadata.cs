@@ -14,7 +14,7 @@ namespace Saritasa.Tools.Common.Pagination
     public class OffsetLimitListMetadata : TotalCountListMetadata
     {
         /// <summary>
-        /// Zero based data offset.
+        /// Zero-based data offset.
         /// </summary>
         public int Offset { get; set; }
 

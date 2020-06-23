@@ -9,7 +9,7 @@ using System.Linq;
 namespace Saritasa.Tools.Common.Pagination
 {
     /// <summary>
-    /// Represents list with additional property contains total number of objects within
+    /// Represents list with additional property contains the total number of objects within
     /// collection.
     /// </summary>
     /// <seealso cref="IEnumerable{T}" />
@@ -21,15 +21,15 @@ namespace Saritasa.Tools.Common.Pagination
         /// <summary>
         /// Source collection.
         /// </summary>
-        protected internal ICollection<T> Items { get; set; }
+        protected internal ICollection<T> Items { get; set; } = new List<T>();
 
         /// <summary>
-        /// Total number of items in collection.
+        /// The total number of items in collection.
         /// </summary>
         public int TotalCount { get; protected internal set; }
 
         /// <summary>
-        /// Gets the element at the specified index. Only works for list collections.
+        /// Gets the element at the specified index. It only works for list collections.
         /// </summary>
         /// <param name="index">The zero-based index of the element to get.</param>
         public T this[int index] => ((IList<T>)Items)[index];
@@ -63,7 +63,7 @@ namespace Saritasa.Tools.Common.Pagination
         /// Constructor.
         /// </summary>
         /// <param name="items">Collection items.</param>
-        /// <param name="totalCount">Total number of items of base collection.</param>
+        /// <param name="totalCount">The total number of items of base collection.</param>
         public TotalCountList(ICollection<T> items, int totalCount)
         {
             if (totalCount < 0)
@@ -78,7 +78,7 @@ namespace Saritasa.Tools.Common.Pagination
         #region IMetadataEnumerable<TotalCountEnumerableMetadata, T>
 
         /// <summary>
-        /// Get metadata object.
+        /// Get the metadata object.
         /// </summary>
         /// <returns>Metadata.</returns>
         private TotalCountListMetadata GetMetadata()

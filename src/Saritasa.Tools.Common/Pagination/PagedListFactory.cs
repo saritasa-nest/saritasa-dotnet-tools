@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -8,13 +8,13 @@ using System.Linq;
 namespace Saritasa.Tools.Common.Pagination
 {
     /// <summary>
-    /// Class contains static methods for <see cref="PagedList{T}" /> and is intended to
+    /// The class contains static methods for <see cref="PagedList{T}" /> and is intended to
     /// simplify instantiation and better API.
     /// </summary>
     public static class PagedListFactory
     {
         /// <summary>
-        /// Creates paged enumerable from enumerable source.
+        /// Creates paged enumerable from the enumerable source.
         /// </summary>
         /// <typeparam name="T">Item type.</typeparam>
         /// <param name="source">Enumerable.</param>
@@ -37,12 +37,12 @@ namespace Saritasa.Tools.Common.Pagination
         }
 
         /// <summary>
-        /// Creates paged enumerable from collection source.
+        /// Creates paged enumerable from the collection source.
         /// </summary>
-        /// <typeparam name="T">Item type.</typeparam>
-        /// <param name="source">Collection.</param>
-        /// <param name="page">Current page.</param>
-        /// <param name="pageSize">Page size.</param>
+        /// <typeparam name="T">The item type.</typeparam>
+        /// <param name="source">The collection.</param>
+        /// <param name="page">The current page.</param>
+        /// <param name="pageSize">The page size.</param>
         /// <returns>Paged list.</returns>
         public static PagedList<T> FromSource<T>(
             ICollection<T> source,
@@ -60,8 +60,8 @@ namespace Saritasa.Tools.Common.Pagination
         }
 
         /// <summary>
-        /// Creates paged list from queryable source and query source by page and page size.
-        /// The calling will evaluate query automatically.
+        /// Creates a paged list from queryable source and query source by page and page size.
+        /// The calling will evaluate the query automatically.
         /// </summary>
         /// <typeparam name="T">Item type.</typeparam>
         /// <param name="source">Queryable enumerable.</param>
@@ -84,7 +84,7 @@ namespace Saritasa.Tools.Common.Pagination
         }
 
         /// <summary>
-        /// Returns collection of items as paged list as one page.
+        /// Returns collection of items as a paged list as one page.
         /// </summary>
         /// <typeparam name="T">Item type.</typeparam>
         /// <param name="items">Items.</param>
@@ -108,13 +108,13 @@ namespace Saritasa.Tools.Common.Pagination
         public static PagedList<T> Empty<T>() => PagedList<T>.Empty;
 
         /// <summary>
-        /// Creates paged enumerable from collection. Shorthand to simplify type infer.
+        /// Creates paged enumerable from the collection. Shorthand to simplify type infer.
         /// </summary>
         /// <typeparam name="T">Item type.</typeparam>
         /// <param name="items">Items.</param>
-        /// <param name="page">Current page.</param>
-        /// <param name="pageSize">Page size.</param>
-        /// <param name="totalCount">Total number of items in collection.</param>
+        /// <param name="page">The current page.</param>
+        /// <param name="pageSize">The page size.</param>
+        /// <param name="totalCount">The total number of items in collection.</param>
         /// <returns>Paged list.</returns>
         public static PagedList<T> Create<T>(ICollection<T> items, int page, int pageSize, int totalCount)
             => new PagedList<T>(items, page, pageSize, totalCount);

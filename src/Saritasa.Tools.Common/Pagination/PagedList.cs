@@ -8,7 +8,7 @@ using System.Linq;
 namespace Saritasa.Tools.Common.Pagination
 {
     /// <summary>
-    /// Paged list. Also it forces evaluation with Take and Skip methods.
+    /// Paged list. Also, it forces evaluation with Take and Skip methods.
     /// </summary>
     /// <typeparam name="T">Source type.</typeparam>
     /// <seealso cref="IEnumerable{T}" />
@@ -18,12 +18,12 @@ namespace Saritasa.Tools.Common.Pagination
     public class PagedList<T> : OffsetLimitList<T>
     {
         /// <summary>
-        /// First page index.
+        /// First-page index.
         /// </summary>
         public const int FirstPage = 1;
 
         /// <summary>
-        /// Current page. Starts from 1.
+        /// Current page. It starts at 1.
         /// </summary>
         public int Page { get; protected internal set; }
 
@@ -54,12 +54,12 @@ namespace Saritasa.Tools.Common.Pagination
         }
 
         /// <summary>
-        /// Is pagination now on first page.
+        /// Is pagination now on the first page.
         /// </summary>
         public bool IsFirstPage => Page == FirstPage;
 
         /// <summary>
-        /// Is pagination now on last page.
+        /// Is pagination now on the last page.
         /// </summary>
         public bool IsLastPage => Page == TotalPages;
 
@@ -83,13 +83,13 @@ namespace Saritasa.Tools.Common.Pagination
 #endif
 
         /// <summary>
-        /// Creates paged enumerable from collection. Page starts from 1. Page size must be must be
+        /// Creates paged enumerable from the collection. The page starts at 1. Page size must be must be
         /// greater than zero.
         /// </summary>
         /// <param name="items">Collection.</param>
-        /// <param name="page">Current page.</param>
-        /// <param name="pageSize">Page size.</param>
-        /// <param name="totalCount">Total number of items in collection.</param>
+        /// <param name="page">The current page.</param>
+        /// <param name="pageSize">The page size.</param>
+        /// <param name="totalCount">The total number of items in collection.</param>
         public PagedList(
             ICollection<T> items,
             int page,
@@ -112,7 +112,7 @@ namespace Saritasa.Tools.Common.Pagination
         #region IMetadataEnumerable<PagedEnumerableMetadata, T>
 
         /// <summary>
-        /// Get paged metadata object.
+        /// Get a paged metadata object.
         /// </summary>
         /// <returns>Paged metadata.</returns>
         private PagedListMetadata GetMetadata()

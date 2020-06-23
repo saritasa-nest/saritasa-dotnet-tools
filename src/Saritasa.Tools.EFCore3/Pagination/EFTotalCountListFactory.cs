@@ -11,14 +11,14 @@ using Saritasa.Tools.Common.Pagination;
 namespace Saritasa.Tools.EFCore.Pagination
 {
     /// <summary>
-    /// Class contains Entity Framework related static methods for
+    /// The class contains Entity Framework related static methods for
     /// <see cref="TotalCountList{T}" /> and is intended to simplify instantiation and better API.
     /// </summary>
     public static class EFTotalCountListFactory
     {
         /// <summary>
-        /// Creates list with total count from queryable source.
-        /// The calling will evaluate query automatically.
+        /// Creates a list with the total count from queryable source.
+        /// The calling will evaluate the query automatically.
         /// </summary>
         /// <typeparam name="T">Item type.</typeparam>
         /// <param name="source">Queryable enumerable.</param>

@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ArgumentCannotBeEmptyGuid" xml:space="preserve">
-    <value>{0} cannot be empty guid.</value>
+    <value>{0} cannot be empty GUID.</value>
   </data>
   <data name="ArgumentCannotBeEmptyString" xml:space="preserve">
     <value>{0} cannot be empty string.</value>
@@ -145,7 +145,7 @@
     <value>{0} is not a valid email address.</value>
   </data>
   <data name="ClassMustContainMethod" xml:space="preserve">
-    <value>Class {0} must contain method {1}.</value>
+    <value>Class {0} must contain a method {1}.</value>
   </data>
   <data name="CollectionCannotEmpty" xml:space="preserve">
     <value>Collection cannot be empty.</value>

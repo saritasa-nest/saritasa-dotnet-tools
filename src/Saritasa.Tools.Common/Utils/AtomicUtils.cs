@@ -33,7 +33,7 @@ namespace Saritasa.Tools.Common.Utils
         #region CAS
 
         /// <summary>
-        /// Thread safe implementation CAS (Compare-And-Swap).
+        /// Thread-safe implementation CAS (Compare-And-Swap).
         /// Get the location variable from memory, perform an action on it and replace.
         /// </summary>
         /// <typeparam name="T">Input and output variable type.</typeparam>
@@ -52,7 +52,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Thread safe implementation CAS (Compare-And-Swap).
+        /// Thread-safe implementation CAS (Compare-And-Swap).
         /// Get the location variable from memory, perform an action on it and replace.
         /// </summary>
         /// <param name="location">Input and output variable.</param>
@@ -69,7 +69,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Thread safe implementation CAS (Compare-And-Swap).
+        /// Thread-safe implementation CAS (Compare-And-Swap).
         /// Get the location variable from memory, perform an action on it and replace.
         /// </summary>
         /// <param name="location">Input and output variable.</param>

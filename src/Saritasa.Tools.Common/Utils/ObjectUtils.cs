@@ -17,7 +17,7 @@ namespace Saritasa.Tools.Common.Utils
     public static class ObjectUtils
     {
         /// <summary>
-        /// Create object of specified type with dependency resolving.
+        /// Create an object of the specified type with dependency resolving.
         /// </summary>
         /// <typeparam name="T">Object type to create.</typeparam>
         /// <param name="serviceProvider">Service provider.</param>
@@ -26,7 +26,7 @@ namespace Saritasa.Tools.Common.Utils
             (T)CreateInstanceWithServiceProvider(typeof(T), serviceProvider);
 
         /// <summary>
-        /// Create object of specified type with dependency resolving.
+        /// Create an object of the specified type with dependency resolving.
         /// </summary>
         /// <param name="type">Object type.</param>
         /// <param name="serviceProvider">Service provider.</param>
@@ -51,8 +51,8 @@ namespace Saritasa.Tools.Common.Utils
 
         /// <summary>
         /// The method resolves <c>parameters</c> using arguments and service providers. At first, the method tries to
-        /// find value in args. Then, if it is value type or string and has default value the value will be default. Finally,
-        /// it tries to use service provider.
+        /// find value in args. Then, if it is a value type or string and has default value the value will be a default. Finally,
+        /// it tries to use a service provider.
         /// </summary>
         /// <param name="parameters">Parameters to resolve.</param>
         /// <param name="args">Arguments.</param>

@@ -11,19 +11,19 @@ using Saritasa.Tools.Common.Pagination;
 namespace Saritasa.Tools.EFCore.Pagination
 {
     /// <summary>
-    /// Class contains Entity Framework related static methods for
+    /// The class contains Entity Framework related static methods for
     /// <see cref="OffsetLimitList{T}" /> and is intended to simplify instantiation and better API.
     /// </summary>
     public static class EFOffsetLimitListFactory
     {
         /// <summary>
-        /// Creates new list with limit and offset properties from queryable source.
-        /// The calling will evaluate query automatically.
+        /// Creates a new list with limit and offset properties from the queryable source.
+        /// The calling will evaluate the query automatically.
         /// </summary>
         /// <typeparam name="T">Item type.</typeparam>
         /// <param name="source">Queryable source.</param>
-        /// <param name="offset">Number of items to skip.</param>
-        /// <param name="limit">Maximum number of items to take.</param>
+        /// <param name="offset">The number of items to skip.</param>
+        /// <param name="limit">The maximum number of items to take.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>List with offset and limit.</returns>
         public static async Task<OffsetLimitList<T>> FromSourceAsync<T>(

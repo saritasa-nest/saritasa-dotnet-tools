@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace Saritasa.Tools.Common.Pagination
 {
     /// <summary>
-    /// Metadata data transfer object for offset limit list. Combines metadata and enumerable items.
+    /// Metadata data transfer object for the offset limit list. Combines metadata and enumerable items.
     /// </summary>
     /// <typeparam name="TItem">Metadata items type.</typeparam>
 #if NET40 || NETSTANDARD2_0 || NETSTANDARD2_1

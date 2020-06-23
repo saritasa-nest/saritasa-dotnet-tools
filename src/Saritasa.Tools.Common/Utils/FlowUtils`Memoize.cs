@@ -36,7 +36,7 @@ namespace Saritasa.Tools.Common.Utils
         #region MaxAgeCacheStrategy
 
         /// <summary>
-        /// Cache strategy based on age validation. If item exceeds specific time of life it should be
+        /// Cache strategy based on age validation. If the item exceeds specific time of life it should be
         /// invalidated.
         /// </summary>
         /// <typeparam name="TKey">Cache key type.</typeparam>
@@ -67,7 +67,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Cache strategy based on age validation. If item exceed specific time on life it shoule be
+        /// Cache strategy based on age validation. If the item exceeds specific time on life it shoule be
         /// invalidated. Overload for delegates with no arguments.
         /// </summary>
         /// <typeparam name="TResult">Cache function result type.</typeparam>
@@ -78,7 +78,7 @@ namespace Saritasa.Tools.Common.Utils
             TimeSpan maxAge, IDictionary<int, DateTime>? timestampsStorage = null) => CreateMaxAgeCacheStrategy<int, TResult>(maxAge, timestampsStorage);
 
         /// <summary>
-        /// Cache strategy based on age validation. If item exceed specific time on life it shoule be
+        /// Cache strategy based on age validation. If the item exceeds specific time on life it shoule be
         /// invalidated. Overload for delegates with 2 arguments.
         /// </summary>
         /// <typeparam name="T1">Type component for key.</typeparam>
@@ -90,7 +90,7 @@ namespace Saritasa.Tools.Common.Utils
             => CreateMaxAgeCacheStrategy<Tuple<T1, T2>, TResult>(maxAge);
 
         /// <summary>
-        /// Cache strategy based on age validation. If item exceed specific time on life it shoule be
+        /// Cache strategy based on age validation. If the item exceeds specific time on life it shoule be
         /// invalidated. Overload for delegates with 3 arguments.
         /// </summary>
         /// <typeparam name="T1">Type component for key.</typeparam>
@@ -236,7 +236,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Returns a memoized version of a referentially transparent function. The memoized version of the
         /// function keeps a cache of the mapping of arguments to their results. When method is called with the same
-        /// arguments the memoized result is used. The method is thread safe.
+        /// arguments the memoized result is used. The method is thread-safe.
         /// </summary>
         /// <typeparam name="TKey">First argument type.</typeparam>
         /// <typeparam name="TResult">Function result type.</typeparam>
@@ -342,7 +342,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="func">The function to memoize.</param>
         /// <param name="strategies">Strategies to apply. By default limitless strategy will be used.</param>
         /// <param name="cache">Dictionary to use for caching. If not specified the standard Dictionary will be used which
-        /// is not thread safe.</param>
+        /// is not thread-safe.</param>
         /// <returns>Delegate the able to cache.</returns>
         public static Func<TResult> Memoize<TResult>(
             Func<TResult> func,
@@ -366,7 +366,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="func">The function to memoize.</param>
         /// <param name="strategies">Strategies to apply. By default limitless strategy will be used.</param>
         /// <param name="cache">Dictionary to use for caching. If not specified the standard Dictionary will be used which
-        /// is not thread safe.</param>
+        /// is not thread-safe.</param>
         /// <returns>Delegate the able to cache.</returns>
         public static Func<T1, T2, TResult> Memoize<T1, T2, TResult>(
             Func<T1, T2, TResult> func,
@@ -391,7 +391,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="func">The function to memoize.</param>
         /// <param name="strategies">Strategies to apply. By default limitless strategy will be used.</param>
         /// <param name="cache">Dictionary to use for caching. If not specified the standard Dictionary will be used which
-        /// is not thread safe.</param>
+        /// is not thread-safe.</param>
         /// <returns>Delegate the able to cache.</returns>
         public static Func<T1, T2, T3, TResult> Memoize<T1, T2, T3, TResult>(
             Func<T1, T2, T3, TResult> func,
