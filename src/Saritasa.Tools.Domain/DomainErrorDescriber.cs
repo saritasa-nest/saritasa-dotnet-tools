@@ -1,10 +1,10 @@
-﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 namespace Saritasa.Tools.Domain
 {
     /// <summary>
-    /// The class is used to get messages to display for end user.
+    /// The class is used to get messages to display for the end-user.
     /// </summary>
     public class DomainErrorDescriber
     {
@@ -57,7 +57,6 @@ namespace Saritasa.Tools.Domain
         /// <summary>
         /// Get validation error is required message.
         /// </summary>
-        /// <returns></returns>
         public virtual string ValidationErrorIsEmpty() => Properties.Strings.ValidationErrorIsEmpty;
 
         /// <summary>

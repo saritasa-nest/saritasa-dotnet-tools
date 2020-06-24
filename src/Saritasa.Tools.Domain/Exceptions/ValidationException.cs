@@ -9,7 +9,7 @@ using System.Runtime.Serialization;
 namespace Saritasa.Tools.Domain.Exceptions
 {
     /// <summary>
-    /// Validation exception. Can be mapped to 400 HTTP status code.
+    /// The validation exception. It can be mapped to 400 HTTP status code.
     /// </summary>
     [Serializable]
     public class ValidationException : DomainException
@@ -21,8 +21,8 @@ namespace Saritasa.Tools.Domain.Exceptions
             ValidationErrorsFormatter.SummaryOrDefaultMessageFormatter;
 
         /// <summary>
-        /// Errors dictionary. Key is a member name, value is an enumerable of error
-        /// messages. Empty member name relates to summary error message.
+        /// Errors dictionary. Key is a member name, value is enumerable of error
+        /// messages. Empty member name relates to a summary error message.
         /// For example:
         /// - Name: Field is required.
         /// - ConfirmPassword: Field is required, Should equal to Password field.
@@ -108,7 +108,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         }
 
         /// <summary>
-        /// Constructor with dictionary contain member field as key and error message as value.
+        /// Constructor with dictionary contains member field as key and error message as value.
         /// </summary>
         /// <param name="errors">Member error dictionary.</param>
         public ValidationException(IDictionary<string, string> errors) :
@@ -126,7 +126,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         }
 
         /// <summary>
-        /// Constructor with dictionary contain member field as key and error messages as value.
+        /// Constructor with dictionary contains member field as key and error messages as value.
         /// </summary>
         /// <param name="errors">Member errors dictionary.</param>
         public ValidationException(IDictionary<string, ICollection<string>> errors) :
@@ -141,7 +141,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         }
 
         /// <summary>
-        /// Constructor with dictionary contain member field as key and error messages as value.
+        /// Constructor with dictionary contains member field as key and error messages as value.
         /// </summary>
         /// <param name="errors">Member errors dictionary.</param>
         public ValidationException(IDictionary<string, IEnumerable<string>> errors) :
@@ -196,7 +196,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         }
 
         /// <summary>
-        /// If object contains validation errors throws instance of <see cref="ValidationException" />.
+        /// If object contains validation errors the method throws instance of <see cref="ValidationException" />.
         /// </summary>
         /// <param name="obj">The object to validate.</param>
         /// <param name="items">A dictionary of key/value pairs to make available to the service consumers.

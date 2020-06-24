@@ -7,7 +7,7 @@ using System.Runtime.Serialization;
 namespace Saritasa.Tools.Domain.Exceptions
 {
     /// <summary>
-    /// Domain forbidden security exception. Can be mapped to 403 HTTP status code.
+    /// Domain forbidden security exception. Can be mapped to the 403 HTTP status code.
     /// </summary>
     [Serializable]
     public class ForbiddenException : DomainException

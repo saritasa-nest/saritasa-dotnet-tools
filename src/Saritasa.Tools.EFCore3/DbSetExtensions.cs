@@ -21,7 +21,7 @@ namespace Saritasa.Tools.EFCore
         /// <param name="keyValues">Keys.</param>
         /// <typeparam name="TEntity">Entity type.</typeparam>
         /// <returns>Entity instance.</returns>
-        /// <exception cref="NotFoundException">Throws if entity not found.</exception>
+        /// <exception cref="NotFoundException">Is thrown if the etity not found.</exception>
         public static async Task<TEntity> GetAsync<TEntity>(this DbSet<TEntity> entities, params object[] keyValues)
             where TEntity : class
         {
@@ -35,14 +35,14 @@ namespace Saritasa.Tools.EFCore
         }
 
         /// <summary>
-        /// Get entity by key values. Throws <see cref="NotFoundException" /> if entity not found.
+        /// Get the entity by key values. Throws <see cref="NotFoundException" /> if entity not found.
         /// </summary>
         /// <param name="entities">DbSet instance.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <param name="keyValues">Keys.</param>
         /// <typeparam name="TEntity">Entity type.</typeparam>
         /// <returns>Entity instance.</returns>
-        /// <exception cref="NotFoundException">Throws if entity not found.</exception>
+        /// <exception cref="NotFoundException">Is thrown if the entity not found.</exception>
         public static async Task<TEntity> GetAsync<TEntity>(this DbSet<TEntity> entities, CancellationToken cancellationToken, params object[] keyValues)
             where TEntity : class
         {

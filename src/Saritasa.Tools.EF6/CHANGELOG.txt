@@ -1,6 +1,7 @@
 ﻿0.8.0 [TBD]
 [-] Remove EFRepository and EFQueryableRepository.
 [+] Add extension method DbSet.GetAsync .
+[*] Fix comments spelling.
 
 0.7.0 [2019-12-30]
 [-] Drop IUnitOfWork support.

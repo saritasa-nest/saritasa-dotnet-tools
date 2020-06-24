@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -12,7 +12,7 @@ namespace Saritasa.Tools.Domain
     /// </summary>
     public class DomainEventsManager : IDomainEventsManager
     {
-        readonly List<object> handlers = new List<object>();
+        private readonly List<object> handlers = new List<object>();
 
         /// <summary>
         /// List of handlers.

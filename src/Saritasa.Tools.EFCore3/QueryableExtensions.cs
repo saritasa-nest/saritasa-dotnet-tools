@@ -24,7 +24,7 @@ namespace Saritasa.Tools.EFCore
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <typeparam name="TEntity">Entity type.</typeparam>
         /// <returns>Entity instance.</returns>
-        /// <exception cref="NotFoundException">Throws if entity not found.</exception>
+        /// <exception cref="NotFoundException">Is thrown if the entity not found.</exception>
         public static async Task<TEntity> GetAsync<TEntity>(
             this IQueryable<TEntity> entities,
             Expression<Func<TEntity, bool>> predicate,

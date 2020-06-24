@@ -10,14 +10,14 @@ using System.Linq;
 namespace Saritasa.Tools.Domain
 {
     /// <summary>
-    /// The collection of key-value validation messages. Allows to accumulate
+    /// The collection of key-value validation messages. Allows accumulating
     /// errors per key.
     /// </summary>
     [DebuggerDisplay("{Count} errors: {ErrorsKeys}")]
     public class ValidationErrors : Dictionary<string, ICollection<string>>
     {
         /// <summary>
-        /// Default summary validation key. Should contain overall message.
+        /// Default summary validation key. Should contain the overall message.
         /// </summary>
         public const string SummaryKey = "";
 
@@ -45,7 +45,7 @@ namespace Saritasa.Tools.Domain
         /// Creates <see cref="ValidationErrors" /> instance from data annotation attributes.
         /// </summary>
         /// <param name="obj">The object to validate.</param>
-        /// <param name="items">A dictionary of key/value pairs to make available to the service consumers.
+        /// <param name="items">The dictionary of key/value pairs to make available to the service consumers.
         /// This parameter is optional.</param>
         /// <param name="serviceProvider">The object that implements the <see cref="IServiceProvider" /> interface.
         /// This parameter is optional and is not used for netstandard 2.0 .</param>
@@ -112,7 +112,7 @@ namespace Saritasa.Tools.Domain
 
         /// <summary>
         /// For some reason if type base <see cref="System.ComponentModel.DataAnnotations.MetadataTypeAttribute" /> type that contains
-        /// validation attributes they will not be taken into account. This is workaround that
+        /// validation attributes they will not be taken into account. This is a workaround that
         /// registers them explicitly.
         /// </summary>
         /// <param name="t">Type to register.</param>
@@ -137,9 +137,9 @@ namespace Saritasa.Tools.Domain
         #endregion
 
         /// <summary>
-        /// Add error to errors list for specific key.
+        /// Add error to errors list for the specific key.
         /// </summary>
-        /// <param name="key">Member of field name or key. Can be empty.</param>
+        /// <param name="key">Member of field name or key. It can be empty.</param>
         /// <param name="error">Error message.</param>
         public void AddError(string key, string error)
         {

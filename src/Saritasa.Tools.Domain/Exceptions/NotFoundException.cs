@@ -7,8 +7,8 @@ using System.Runtime.Serialization;
 namespace Saritasa.Tools.Domain.Exceptions
 {
     /// <summary>
-    /// Exception occurs in domain part of application if entity is not found by key.
-    /// Can be mapped to 404 HTTP status code.
+    /// The Exception occurs in the domain part of the application if an entity is not found by the key.
+    /// It can be mapped to 404 HTTP status code.
     /// </summary>
     [Serializable]
     public class NotFoundException : DomainException

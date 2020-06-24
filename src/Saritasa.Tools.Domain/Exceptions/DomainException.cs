@@ -7,8 +7,8 @@ using System.Runtime.Serialization;
 namespace Saritasa.Tools.Domain.Exceptions
 {
     /// <summary>
-    /// Exception occurs in domain part of application. It can be business logic or validation exception.
-    /// The message can be used as display messages to end user. InnerException should contain actual system exception.
+    /// The exception occurs in domain part of the application. It can be business logic or validation exception.
+    /// The message can be used as display messages to the end-user. InnerException should contain actual system exception.
     /// </summary>
     [Serializable]
     public class DomainException : Exception

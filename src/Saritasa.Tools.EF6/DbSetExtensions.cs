@@ -42,7 +42,7 @@ namespace Saritasa.Tools.EF
         /// <param name="keyValues">Keys.</param>
         /// <typeparam name="TEntity">Entity type.</typeparam>
         /// <returns>Entity instance.</returns>
-        /// <exception cref="NotFoundException">Throws if entity not found.</exception>
+        /// <exception cref="NotFoundException">Is thrown if the entity not found.</exception>
         public static async Task<TEntity> GetAsync<TEntity>(this DbSet<TEntity> entities, CancellationToken cancellationToken, params object[] keyValues)
             where TEntity : class
         {

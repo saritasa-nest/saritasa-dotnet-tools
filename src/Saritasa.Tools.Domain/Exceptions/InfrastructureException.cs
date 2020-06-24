@@ -7,9 +7,9 @@ using System.Runtime.Serialization;
 namespace Saritasa.Tools.Domain.Exceptions
 {
     /// <summary>
-    /// Exception occurs when something wrong happens on server side. When a resource is not available
-    /// or works incorrect so that system cannot process request. The client must provide source exception.
-    /// Can be mapped to 500 HTTP status code.
+    /// The exception occurs when something wrong happens on the server side. When a resource is not available
+    /// or works incorrectly so that system cannot process requests. The client must provide source exception.
+    /// It can be mapped to 500 HTTP status code.
     /// </summary>
     [Serializable]
     public class InfrastructureException : Exception

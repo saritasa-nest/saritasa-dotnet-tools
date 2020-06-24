@@ -1,2 +1,3 @@
 ﻿0.7.1 [2020-01-13]
 [*] Initial release based on https://www.nuget.org/packages/Saritasa.Tools.EFCore2/ .
+[*] Fix comments spelling.

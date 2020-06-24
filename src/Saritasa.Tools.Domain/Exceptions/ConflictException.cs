@@ -7,9 +7,9 @@ using System.Runtime.Serialization;
 namespace Saritasa.Tools.Domain.Exceptions
 {
     /// <summary>
-    /// Domain conflict exception. Indicates that the request could not be
+    /// Domain conflict exception. This indicates that the request could not be
     /// processed because of conflict in the request, such as an edit conflict between multiple simultaneous updates.
-    /// Can be mapped to 409 HTTP status code.
+    /// It can be mapped to the 409 HTTP status code.
     /// </summary>
     [Serializable]
     public class ConflictException : DomainException

@@ -7,7 +7,7 @@ using System.Runtime.Serialization;
 namespace Saritasa.Tools.Domain.Exceptions
 {
     /// <summary>
-    /// Domain user is not unauthorized exception. Can be mapped to 401 HTTP status code.
+    /// A domain user is not unauthorized exception. It can be mapped to 401 HTTP status code.
     /// </summary>
     [Serializable]
     public class UnauthorizedException : DomainException

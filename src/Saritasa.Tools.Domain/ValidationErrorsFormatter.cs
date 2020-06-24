@@ -14,7 +14,7 @@ namespace Saritasa.Tools.Domain
     public static class ValidationErrorsFormatter
     {
         /// <summary>
-        /// Validation message formatter delegate used for errors text formatting.
+        /// Validation message formatter delegate that is used for error text formatting.
         /// </summary>
         /// <param name="defaultMessage">Default message.</param>
         /// <param name="validationErrors">Validation errors.</param>
@@ -22,7 +22,7 @@ namespace Saritasa.Tools.Domain
         public delegate string ValidationErrorsMessageFormatter(string defaultMessage, ValidationErrors validationErrors);
 
         /// <summary>
-        /// Returns summary message if specific key exists or default one.
+        /// Returns summary message if a specific key exists or defaults one.
         /// </summary>
         /// <param name="defaultMessage">Default message.</param>
         /// <param name="validationErrors">Validation errors.</param>
@@ -46,7 +46,7 @@ namespace Saritasa.Tools.Domain
         }
 
         /// <summary>
-        /// Returns first available validation error. If no errors exist just return default message.
+        /// Returns the first available validation error. If no errors exist just return the default message.
         /// </summary>
         /// <param name="defaultMessage">Default message.</param>
         /// <param name="validationErrors">Validation errors.</param>
