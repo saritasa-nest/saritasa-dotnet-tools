@@ -1,4 +1,5 @@
-﻿0.7.2 [TBD]
+﻿0.8.0 [TBD]
+[-] Remove IRepository and IQueryableRepository.
 [*] Make errors formatters to use ValidationErrors instead of ValidationException.
 [*] Fix exceptions serialization for netstandard 2.0 .
 [+] Add support netstandard 2.1 .
