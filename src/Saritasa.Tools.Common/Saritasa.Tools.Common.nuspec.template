@@ -3,9 +3,9 @@
   <metadata>
     <id>Saritasa.Tools.Common</id>
     <title>Saritasa Tools Useful Utilities and Shortcuts</title>
-    <summary>Useful set of utilities that mostly used in development.</summary>
+    <summary>A useful set of utilities that mostly used in development.</summary>
     <version>0.0.0</version>
-    <description>The package is a part of Saritasa Tools project. Saritasa.Tools.Common contains various utilities and extensions for DateTime convertion, strings manipulation, validation utils (Guard), parse with default, flow (memoize, retry), collection processing (chunk select), atomic (CAS, swap), strings hash (md5, sha1, sha2), paged enumerable.</description>
+    <description>The package is a part of the Saritasa Tools project. Saritasa.Tools.Common contains various utilities and extensions for DateTime conversion, strings manipulation, validation utils (Guard), parse with default, flow (memoize, retry), collection processing (chunk select), atomic (CAS, swap), strings hash (md5, sha1, sha2), paged enumerable.</description>
     <authors>Saritasa</authors>
     <owners>Saritasa</owners>
     <license type="file">LICENSE.txt</license>
