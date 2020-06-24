@@ -1,4 +1,7 @@
-﻿0.7.0 [2019-12-30]
+﻿0.8.0 [TBD]
+[+] Add extension method DbSet.GetAsync .
+
+0.7.0 [2019-12-30]
 [-] Drop IUnitOfWork support.
 [+] SourceLink support.
 [+] Add EF related EfPagedListFactory, TotalCountListFactory and OffsetLimitListFactory.
