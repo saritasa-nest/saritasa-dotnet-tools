@@ -193,8 +193,7 @@ namespace Saritasa.Tools.Domain
         /// <summary>
         /// Summary errors. Returns zero enumerable if not defined.
         /// </summary>
-        public IEnumerable<string> SummaryErrors => this.ContainsKey(SummaryKey) ?
-            this[SummaryKey] : Enumerable.Empty<string>();
+        public IEnumerable<string> SummaryErrors => this.ContainsKey(SummaryKey) ? this[SummaryKey] : Enumerable.Empty<string>();
 
         private string ErrorsKeys => string.Join(", ",
             this.Keys.Select(k => k != SummaryKey ? k : "<summary>"));

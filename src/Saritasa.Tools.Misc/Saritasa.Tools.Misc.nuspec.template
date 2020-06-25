@@ -10,9 +10,9 @@
     <projectUrl>https://github.com/Saritasa/SaritasaTools</projectUrl>
     <icon>icon.png</icon>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>The package is a part of Saritasa Tools project. Saritasa.Tools.Misc contains miscellaneous items: passwords generation, passwords strength estimate.</description>
+    <description>The package is a part of the Saritasa Tools project. Saritasa.Tools.Misc contains miscellaneous items: passwords generation, passwords strength estimate.</description>
     <summary>Miscellaneous items.</summary>
-    <copyright>(c) Saritasa, 2016-2019</copyright>
+    <copyright>(c) Saritasa, 2016-2020</copyright>
     <tags>misc passwords</tags>
     <repository type="git" url="https://github.com/Saritasa/SaritasaTools" commit="$(CommitHash)" />
     <dependencies>
@@ -21,6 +21,7 @@
         <dependency id="NETStandard.Library" version="[1.6.0, )" />
         <dependency id="System.Data.Common" version="[4.1.0, )" />
       </group>
+      <group targetFramework="netstandard2.1" />
     </dependencies>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="System.Data" targetFramework=".NETFramework4.5.2" />

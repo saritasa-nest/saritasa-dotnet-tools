@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -213,14 +213,14 @@ namespace Saritasa.Tools.Misc.Security
 #endif
 
         /// <summary>
-        /// Lock object for RandomService.
+        /// Lock object for <see cref="RandomService" />.
         /// </summary>
         private static readonly object randomServiceLock = new object();
 
         /// <summary>
         /// Characters pool that is use for password generation.
         /// </summary>
-        private string CharactersPool { get; set; }
+        private string CharactersPool { get; set; } = string.Empty;
 
         /// <summary>
         /// Lower case characters pool.
