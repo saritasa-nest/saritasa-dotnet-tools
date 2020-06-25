@@ -196,7 +196,7 @@ namespace Saritasa.Tools.Domain.Exceptions
         }
 
         /// <summary>
-        /// If object contains validation errors the method throws instance of <see cref="ValidationException" />.
+        /// If the object contains validation errors the method throws an instance of <see cref="ValidationException" />.
         /// </summary>
         /// <param name="obj">The object to validate.</param>
         /// <param name="items">A dictionary of key/value pairs to make available to the service consumers.

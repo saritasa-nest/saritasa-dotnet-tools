@@ -161,7 +161,7 @@ namespace Saritasa.Tools.Domain
         }
 
         /// <summary>
-        /// Add summary error.
+        /// Add a summary error.
         /// </summary>
         /// <param name="error">Error message.</param>
         public void AddError(string error)
@@ -173,10 +173,7 @@ namespace Saritasa.Tools.Domain
         /// Returns dictionary that contains only one first error message per member name.
         /// </summary>
         /// <returns>Member error dictionary.</returns>
-        public IDictionary<string, string> GetOneErrorDictionary()
-        {
-            return this.ToDictionary(k => k.Key, v => v.Value.FirstOrDefault() ?? string.Empty);
-        }
+        public IDictionary<string, string> GetOneErrorDictionary() => this.ToDictionary(k => k.Key, v => v.Value.FirstOrDefault() ?? string.Empty);
 
         /// <summary>
         /// Merge with another errors dictionary.
