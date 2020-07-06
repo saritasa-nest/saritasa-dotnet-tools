@@ -115,5 +115,26 @@ namespace Saritasa.Tools.Common.Extensions
         {
             return CollectionUtils.DistinctBy(source, keySelector, comparer);
         }
+
+        /// <summary>
+        /// The extension allows adding whole enumerable collection into the target collection.
+        /// </summary>
+        /// <typeparam name="TSource">The source type.</typeparam>
+        /// <param name="target">The target collection to insert.</param>
+        /// <param name="collection">The source collection items to be inserted.</param>
+        public static void Add<TSource>(this ICollection<TSource> target, IEnumerable<TSource> collection)
+        {
+            // Much more optimized version to insert for List.
+            if (target is List<TSource> listTarget)
+            {
+                listTarget.AddRange(collection);
+                return;
+            }
+
+            foreach (var item in collection)
+            {
+                target.Add(item);
+            }
+        }
     }
 }
