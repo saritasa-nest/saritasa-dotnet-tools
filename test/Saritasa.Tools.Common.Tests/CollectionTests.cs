@@ -220,7 +220,7 @@ namespace Saritasa.Tools.Common.Tests
 
             // Act
             var target = CollectionUtils.OrderMultiple(
-                source.OrderBy(x => 1).AsQueryable(),
+                source.AsQueryable(),
                 OrderParsingDelegates.ParseSeparated("id:asc;name:desc"),
                 ("id", u => u.Id),
                 ("name", u => u.Name)

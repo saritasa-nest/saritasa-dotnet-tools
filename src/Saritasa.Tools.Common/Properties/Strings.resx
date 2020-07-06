@@ -141,6 +141,9 @@
   <data name="ArgumentMustBeLessThan" xml:space="preserve">
     <value>{0} must be less than {1}.</value>
   </data>
+  <data name="ArgumentMustBeOrderable" xml:space="preserve">
+    <value>The queryable collection must be queryable.</value>
+  </data>
   <data name="ArgumentNotValidEmail" xml:space="preserve">
     <value>{0} is not a valid email address.</value>
   </data>

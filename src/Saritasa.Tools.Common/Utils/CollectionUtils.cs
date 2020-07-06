@@ -73,7 +73,8 @@ namespace Saritasa.Tools.Common.Utils
 #if NETSTANDARD1_6 || NETSTANDARD2_0 || NETSTANDARD2_1
         /// <summary>
         /// Applies ordering to collection according to sorting entries and selectors. Allows to
-        /// make ordering in one method call.
+        /// make ordering in one method call. For the first item, the OrderBy method call is applied.
+        /// For subsequent items the ThenBy is used.
         /// </summary>
         /// <typeparam name="TSource">Type of data in the data source.</typeparam>
         /// <param name="source">Data source to order.</param>
@@ -153,7 +154,8 @@ namespace Saritasa.Tools.Common.Utils
 
         /// <summary>
         /// Applies ordering to collection according to sorting entries and selectors. Allows to
-        /// make ordering in one method call.
+        /// make ordering in one method call. For the first item, the OrderBy method call is applied.
+        /// For subsequent items the ThenBy is used.
         /// </summary>
         /// <typeparam name="TSource">Type of data in the data source.</typeparam>
         /// <param name="source">Data source to order.</param>
@@ -182,20 +184,27 @@ namespace Saritasa.Tools.Common.Utils
                 }
             }
 
+            bool useFirstOrderBy = true;
+
             IOrderedQueryable<TSource> OrderByField(IEnumerable<Expression<Func<TSource, object>>> selectors,
                 ListSortDirection direction,
                 IQueryable<TSource> target)
             {
-                var orderedTarget = target as IOrderedQueryable<TSource>;
-                if (orderedTarget == null)
+                if (useFirstOrderBy)
                 {
                     var firstSelector = selectors.FirstOrDefault();
-                    orderedTarget = direction == ListSortDirection.Ascending ?
+                    target = direction == ListSortDirection.Ascending ?
                         target.OrderBy(firstSelector) :
                         target.OrderByDescending(firstSelector);
                     selectors = selectors.Skip(1);
+                    useFirstOrderBy = false;
                 }
 
+                var orderedTarget = target as IOrderedQueryable<TSource>;
+                if (orderedTarget == null)
+                {
+                    throw new InvalidOperationException(Properties.Strings.ArgumentMustBeOrderable);
+                }
                 foreach (var selector in selectors)
                 {
                     orderedTarget = direction == ListSortDirection.Ascending ?
@@ -232,14 +241,14 @@ namespace Saritasa.Tools.Common.Utils
         }
 #endif
 
-        /// <summary>
-        /// Breaks a list of items into chunks of a specific size. Be aware that this method generates one additional
-        /// query to get the total number of collection elements.
-        /// </summary>
-        /// <param name="source">Source list.</param>
-        /// <param name="chunkSize">Chunk size.</param>
-        /// <returns>Enumeration of queryable collections.</returns>
-        public static IEnumerable<IQueryable<T>> ChunkSelectRange<T>(
+                    /// <summary>
+                    /// Breaks a list of items into chunks of a specific size. Be aware that this method generates one additional
+                    /// query to get the total number of collection elements.
+                    /// </summary>
+                    /// <param name="source">Source list.</param>
+                    /// <param name="chunkSize">Chunk size.</param>
+                    /// <returns>Enumeration of queryable collections.</returns>
+                    public static IEnumerable<IQueryable<T>> ChunkSelectRange<T>(
             IQueryable<T> source,
             int chunkSize = DefaultChunkSize)
         {

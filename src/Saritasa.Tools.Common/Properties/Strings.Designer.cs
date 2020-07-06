@@ -133,6 +133,15 @@ namespace Saritasa.Tools.Common.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The queryable collection must be queryable..
+        /// </summary>
+        internal static string ArgumentMustBeOrderable {
+            get {
+                return ResourceManager.GetString("ArgumentMustBeOrderable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} is not a valid email address..
         /// </summary>
         internal static string ArgumentNotValidEmail {
