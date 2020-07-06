@@ -163,7 +163,7 @@
     <value>The class {0} does not have public constructor.</value>
   </data>
   <data name="OrderByFieldIsNotSupported" xml:space="preserve">
-    <value>Ordering by field {0} is not supported.</value>
+    <value>Ordering by field "{0}" is not supported. Available fields are: {1}.</value>
   </data>
   <data name="TargetStringLengthIncorrect" xml:space="preserve">
     <value>Incorrect target string length.</value>

@@ -12,7 +12,6 @@ namespace Saritasa.Tools.Common.Properties {
     using System;
     using System.Reflection;
 
-
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -197,7 +196,7 @@ namespace Saritasa.Tools.Common.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Ordering by field {0} is not supported..
+        ///   Looks up a localized string similar to Ordering by field &quot;{0}&quot; is not supported. Available fields are: {1}..
         /// </summary>
         internal static string OrderByFieldIsNotSupported {
             get {

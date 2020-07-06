@@ -98,7 +98,7 @@ namespace Saritasa.Tools.Common.Utils
                 }
                 if (count == 0)
                 {
-                    throw new InvalidOrderFieldException(fieldName);
+                    throw new InvalidOrderFieldException(fieldName, keySelectors.Select(k => k.FieldName).ToArray());
                 }
             }
 
@@ -178,7 +178,7 @@ namespace Saritasa.Tools.Common.Utils
                 }
                 if (count == 0)
                 {
-                    throw new InvalidOrderFieldException(fieldName);
+                    throw new InvalidOrderFieldException(fieldName, keySelectors.Select(k => k.FieldName).ToArray());
                 }
             }
 

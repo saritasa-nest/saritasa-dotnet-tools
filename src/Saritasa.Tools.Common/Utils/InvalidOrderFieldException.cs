@@ -15,12 +15,19 @@ namespace Saritasa.Tools.Common.Utils
     public class InvalidOrderFieldException : Exception
     {
         /// <summary>
+        /// Available fields that can be used for ordering.
+        /// </summary>
+        public string[] AvailableFields { get; } = new string[0];
+
+        /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="fieldName">Order field name.</param>
-        public InvalidOrderFieldException(string fieldName) :
-            base(string.Format(Properties.Strings.OrderByFieldIsNotSupported, fieldName))
+        /// <param name="availableFields">Available fields that can be used for ordering.</param>
+        internal InvalidOrderFieldException(string fieldName, string[] availableFields) :
+            base(string.Format(Properties.Strings.OrderByFieldIsNotSupported, fieldName, string.Join(", ", availableFields)))
         {
+            AvailableFields = availableFields;
         }
 
 #if NET40 || NETSTANDARD2_0 || NETSTANDARD2_1
