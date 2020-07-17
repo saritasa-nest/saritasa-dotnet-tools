@@ -1,4 +1,9 @@
-﻿3.2.2 [2020-07-06]
+﻿3.5.0 [TBD]
+[+] New method DateTimeUtils.Add . It allows add specific amount of period "DateTimePeriod" to date.
+[*] DateTimeUtils.GetDiff now returns negative values.
+
+
+3.2.2 [2020-07-06]
 [+] Add extension method ICollection<T>.Add that allows adding enumerable.
 [*] InvalidOrderFieldException now returns all available fields to order by.
 [*] Fix OrderMultiple call for queryables.

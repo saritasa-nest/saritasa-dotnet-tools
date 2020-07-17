@@ -1,10 +1,11 @@
-﻿// Copyright (c) 2015-2018, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Globalization;
 using Xunit;
 using Saritasa.Tools.Common.Utils;
+using System.Collections.Generic;
 
 namespace Saritasa.Tools.Common.Tests
 {
@@ -13,52 +14,52 @@ namespace Saritasa.Tools.Common.Tests
     /// </summary>
     public class DateTimeTests
     {
-        [Fact]
-        public void Begin_of_month_should_truncate_date()
+        public static readonly IEnumerable<object[]> GetStartOfPeriod_DateWithinMonth_StartOfMonth_Data = new[]
         {
-            // Arrange
-            var date1 = new DateTime(2017, 2, 3);
-            var date2 = new DateTime(2016, 6, 3);
-            var date3 = new DateTime(2017, 9, 30);
-            var date4 = new DateTime(2017, 3, 1);
+            // Input, expected.
+            new object[] { new DateTime(2017, 2, 3), new DateTime(2017, 2, 1) },
+            new object[] { new DateTime(2016, 6, 3), new DateTime(2016, 6, 1) },
+            new object[] { new DateTime(2017, 9, 30), new DateTime(2017, 9, 1) },
+            new object[] { new DateTime(2017, 3, 1), new DateTime(2017, 3, 1) },
+        };
 
-            // Act & Assert
-            Assert.Equal(new DateTime(2017, 2, 1), DateTimeUtils.GetStartOfPeriod(date1, DateTimePeriod.Month));
-            Assert.Equal(new DateTime(2016, 6, 1), DateTimeUtils.GetStartOfPeriod(date2, DateTimePeriod.Month));
-            Assert.Equal(new DateTime(2017, 9, 1), DateTimeUtils.GetStartOfPeriod(date3, DateTimePeriod.Month));
-            Assert.Equal(new DateTime(2017, 3, 1), DateTimeUtils.GetStartOfPeriod(date4, DateTimePeriod.Month));
+        [Theory]
+        [MemberData(nameof(GetStartOfPeriod_DateWithinMonth_StartOfMonth_Data))]
+        public void GetStartOfPeriod_DateWithinMonth_StartOfMonth(DateTime input, DateTime beginOfMonth)
+        {
+            Assert.Equal(beginOfMonth, DateTimeUtils.GetStartOfPeriod(input, DateTimePeriod.Month));
         }
 
-        [Fact]
-        public void End_of_month_should_truncate_date()
+        public static readonly IEnumerable<object[]> GetEndOfPeriod_DateWithinMonth_EndOfMonth_Data = new[]
         {
-            // Arrange
-            var date1 = new DateTime(2017, 2, 3);
-            var date2 = new DateTime(2016, 6, 3);
-            var date3 = new DateTime(2017, 9, 30);
-            var date4 = new DateTime(2017, 3, 1);
+            // Input, expected.
+            new object[] { new DateTime(2017, 2, 3), new DateTime(2017, 2, 28) },
+            new object[] { new DateTime(2016, 6, 3), new DateTime(2016, 6, 30) },
+            new object[] { new DateTime(2017, 9, 30), new DateTime(2017, 9, 30) },
+            new object[] { new DateTime(2017, 3, 1), new DateTime(2017, 3, 31) },
+        };
 
-            // Act & Assert
-            Assert.Equal(new DateTime(2017, 2, 28), DateTimeUtils.GetEndOfPeriod(date1, DateTimePeriod.Month).Date);
-            Assert.Equal(new DateTime(2016, 6, 30), DateTimeUtils.GetEndOfPeriod(date2, DateTimePeriod.Month).Date);
-            Assert.Equal(new DateTime(2017, 9, 30), DateTimeUtils.GetEndOfPeriod(date3, DateTimePeriod.Month).Date);
-            Assert.Equal(new DateTime(2017, 3, 31), DateTimeUtils.GetEndOfPeriod(date4, DateTimePeriod.Month).Date);
+        [Theory]
+        [MemberData(nameof(GetEndOfPeriod_DateWithinMonth_EndOfMonth_Data))]
+        public void GetEndOfPeriod_DateWithinMonth_EndOfMonth(DateTime input, DateTime endOfMonth)
+        {
+            Assert.Equal(endOfMonth, DateTimeUtils.GetEndOfPeriod(input, DateTimePeriod.Month).Date);
         }
 
-        [Fact]
-        public void Start_of_quarters_should_be_correct()
+        public static readonly IEnumerable<object[]> GetStartOfPeriod_DateWithinQuarter_StartOfQuarter_Data = new[]
         {
-            // Arrange
-            var q1 = new DateTime(2017, 2, 3);
-            var q2 = new DateTime(2017, 5, 3);
-            var q3 = new DateTime(2017, 7, 5);
-            var q4 = new DateTime(2017, 11, 3);
+            // Input, expected.
+            new object[] { new DateTime(2017, 2, 3), new DateTime(2017, 1, 1) },
+            new object[] { new DateTime(2017, 5, 3), new DateTime(2017, 4, 1) },
+            new object[] { new DateTime(2017, 7, 5), new DateTime(2017, 7, 1) },
+            new object[] { new DateTime(2017, 11, 3), new DateTime(2017, 10, 1) },
+        };
 
-            // Act & Assert
-            Assert.Equal(new DateTime(2017, 1, 1), DateTimeUtils.GetStartOfPeriod(q1, DateTimePeriod.Quarter));
-            Assert.Equal(new DateTime(2017, 4, 1), DateTimeUtils.GetStartOfPeriod(q2, DateTimePeriod.Quarter));
-            Assert.Equal(new DateTime(2017, 7, 1), DateTimeUtils.GetStartOfPeriod(q3, DateTimePeriod.Quarter));
-            Assert.Equal(new DateTime(2017, 10, 1), DateTimeUtils.GetStartOfPeriod(q4, DateTimePeriod.Quarter));
+        [Theory]
+        [MemberData(nameof(GetStartOfPeriod_DateWithinQuarter_StartOfQuarter_Data))]
+        public void GetStartOfPeriod_DateWithinQuarter_StartOfQuarter(DateTime input, DateTime startOfQuarter)
+        {
+            Assert.Equal(startOfQuarter, DateTimeUtils.GetStartOfPeriod(input, DateTimePeriod.Quarter));
         }
 
         [Fact]
@@ -71,7 +72,7 @@ namespace Saritasa.Tools.Common.Tests
             var diffb2 = new DateTime(2014, 8, 10);
 
             // Act & Assert
-            Assert.InRange(DateTimeUtils.GetDiff(diffa1, diffa2, DateTimePeriod.Month), 26.35, 26.355);
+            Assert.InRange(DateTimeUtils.GetDiff(diffa1, diffa2, DateTimePeriod.Month), -26.355, -26.35);
             Assert.InRange(DateTimeUtils.GetDiff(diffa2, diffa1, DateTimePeriod.Month), 26.35, 26.355);
             Assert.InRange(DateTimeUtils.GetDiff(diffb2, diffb1, DateTimePeriod.Month), 50.38, 50.388);
         }

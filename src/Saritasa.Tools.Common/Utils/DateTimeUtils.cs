@@ -19,9 +19,53 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="fromDate">From date.</param>
         /// <param name="toDate">To date.</param>
+        /// <param name="period"></param>
         /// <returns>Dates range.</returns>
-        public static IEnumerable<DateTime> GetRange(DateTime fromDate, DateTime toDate)
-            => Enumerable.Range(0, toDate.Subtract(fromDate).Days + 1).Select(d => fromDate.AddDays(d));
+        public static IEnumerable<DateTime> GetRange(DateTime fromDate, DateTime toDate, DateTimePeriod period = DateTimePeriod.Day)
+        {
+            //Enumerable.Range(0, toDate.Subtract(fromDate).Days + 1).Select(d => fromDate.AddDays(d));
+            for (var currentDate = fromDate; fromDate < toDate; Add(currentDate, period, 1))
+            {
+                yield return currentDate;
+            }
+        }
+
+        /// <summary>
+        /// Add to target date a specific amount of period.
+        /// </summary>
+        /// <param name="target">Target date.</param>
+        /// <param name="period">Period to add.</param>
+        /// <param name="value">The specific amount to add.</param>
+        /// <returns>New modified date value.</returns>
+        public static DateTime Add(DateTime target, DateTimePeriod period, double value)
+        {
+            switch (period)
+            {
+                case DateTimePeriod.Millisecond:
+                    return target.AddMilliseconds(value);
+                case DateTimePeriod.Second:
+                    return target.AddSeconds(value);
+                case DateTimePeriod.Minute:
+                    return target.AddMinutes(value);
+                case DateTimePeriod.Hour:
+                    return target.AddHours(value);
+                case DateTimePeriod.Day:
+                    return target.AddDays(value);
+                case DateTimePeriod.Week:
+                    return target.AddDays(value * 7);
+                case DateTimePeriod.Month:
+                    return target.AddMonths((int)value);
+                case DateTimePeriod.Quarter:
+                    return target.AddMonths((int)value * 4);
+                case DateTimePeriod.Year:
+                    return target.AddYears((int)value);
+                case DateTimePeriod.Decade:
+                    return target.AddYears((int)value * 10);
+                case DateTimePeriod.None:
+                default:
+                    return target;
+            }
+        }
 
         /// <summary>
         /// Combines date part from first date and time from another. Kind is taken from time part.
@@ -55,49 +99,10 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="target">Target date.</param>
         /// <param name="period">Period type.</param>
-        /// <param name="cultureInfo">Specific culture to use. If null current culture is used.</param>
+        /// <param name="cultureInfo">Specific culture to use. If null the current culture is used.</param>
         /// <returns>End of period date.</returns>
         public static DateTime GetEndOfPeriod(DateTime target, DateTimePeriod period, CultureInfo? cultureInfo = null)
-        {
-            var result = target.Truncate(period, cultureInfo);
-            switch (period)
-            {
-                case DateTimePeriod.Millisecond:
-                    result = result.AddMilliseconds(1);
-                    break;
-                case DateTimePeriod.Second:
-                    result = result.AddSeconds(1);
-                    break;
-                case DateTimePeriod.Minute:
-                    result = result.AddMinutes(1);
-                    break;
-                case DateTimePeriod.Hour:
-                    result = result.AddHours(1);
-                    break;
-                case DateTimePeriod.Day:
-                    result = result.AddDays(1);
-                    break;
-                case DateTimePeriod.Week:
-                    result = result.AddDays(7);
-                    break;
-                case DateTimePeriod.Month:
-                    result = result.AddMonths(1);
-                    break;
-                case DateTimePeriod.Quarter:
-                    result = result.AddMonths(4);
-                    break;
-                case DateTimePeriod.Year:
-                    result = result.AddYears(1);
-                    break;
-                case DateTimePeriod.Decade:
-                    result = result.AddYears(10);
-                    break;
-                case DateTimePeriod.None:
-                default:
-                    return target;
-            }
-            return result.AddMilliseconds(-1);
-        }
+            => Add(target.Truncate(period, cultureInfo), period, 1).AddMilliseconds(-1);
 
         /// <summary>
         /// Shortcut to set date part. Method throws <see cref="System.ArgumentException" /> for
@@ -128,7 +133,7 @@ namespace Saritasa.Tools.Common.Utils
                         target.Millisecond, target.Kind);
                 case DateTimePeriod.Week:
                     throw new ArgumentException(
-                        String.Format(Properties.Strings.ArgumentCannotBeThePeriod, period), nameof(period));
+                        string.Format(Properties.Strings.ArgumentCannotBeThePeriod, period), nameof(period));
                 case DateTimePeriod.Month:
                     return new DateTime(target.Year, value, target.Day, target.Hour, target.Minute, target.Second,
                         target.Millisecond, target.Kind);
@@ -139,7 +144,7 @@ namespace Saritasa.Tools.Common.Utils
                         target.Millisecond, target.Kind);
                 case DateTimePeriod.Decade:
                     throw new ArgumentException(
-                        String.Format(Properties.Strings.ArgumentCannotBeThePeriod, period), nameof(period));
+                        string.Format(Properties.Strings.ArgumentCannotBeThePeriod, period), nameof(period));
                 case DateTimePeriod.None:
                 default:
                     return target;
@@ -211,25 +216,19 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="unixTimeStamp">Unix time stamp.</param>
         /// <returns>Datetime.</returns>
-        public static DateTime FromUnixTimestamp(double unixTimeStamp)
-        {
-            return UnixEpoch.AddSeconds(unixTimeStamp).ToLocalTime();
-        }
+        public static DateTime FromUnixTimestamp(double unixTimeStamp) => UnixEpoch.AddSeconds(unixTimeStamp).ToLocalTime();
 
         /// <summary>
         /// Converts <see cref="System.DateTime" /> to unix time stamp.
         /// </summary>
         /// <param name="target">Target datetime.</param>
         /// <returns>Unix time stamp.</returns>
-        public static double ToUnixTimestamp(DateTime target)
-        {
-            return (target - UnixEpoch).TotalSeconds;
-        }
+        public static double ToUnixTimestamp(DateTime target) => (target - UnixEpoch).TotalSeconds;
 
         #endregion
 
         /// <summary>
-        /// Return period difference between two dates. Negative values are converted to positive.
+        /// Return period difference between two dates.
         /// </summary>
         /// <param name="target1">Date 1.</param>
         /// <param name="target2">Date 2.</param>
@@ -237,12 +236,6 @@ namespace Saritasa.Tools.Common.Utils
         /// <returns>Difference.</returns>
         public static double GetDiff(DateTime target1, DateTime target2, DateTimePeriod period)
         {
-            // Swap to get positive value.
-            if (target1 > target2)
-            {
-                return GetDiff(target2, target1, period);
-            }
-
             switch (period)
             {
                 case DateTimePeriod.Millisecond:
