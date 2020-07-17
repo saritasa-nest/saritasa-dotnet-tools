@@ -3,9 +3,10 @@
 
 using System;
 using System.Globalization;
+using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 using Saritasa.Tools.Common.Utils;
-using System.Collections.Generic;
 
 namespace Saritasa.Tools.Common.Tests
 {
@@ -149,6 +150,43 @@ namespace Saritasa.Tools.Common.Tests
 
             // Assert
             Assert.Equal(11, result.Day);
+        }
+
+        public static readonly IEnumerable<object[]> GetRange_DifferentPeriodDates_CorrectRange_Data = new[]
+        {
+            // Input, expected.
+            new object[]
+            {
+                new DateTime(2020, 1, 1), new DateTime(2020, 1, 5), DateTimePeriod.Day,
+                new DateTime[]
+                {
+                    new DateTime(2020, 1, 1), new DateTime(2020, 1, 2), new DateTime(2020, 1, 3),
+                    new DateTime(2020, 1, 4), new DateTime(2020, 1, 5)
+                }
+            },
+            new object[]
+            {
+                new DateTime(2020, 1, 1, 1, 1, 1), new DateTime(2020, 1, 1, 1, 1, 2), DateTimePeriod.Second,
+                new DateTime[]
+                {
+                    new DateTime(2020, 1, 1, 1, 1, 1), new DateTime(2020, 1, 1, 1, 1, 2)
+                },
+            },
+            new object[]
+            {
+                new DateTime(2020, 3, 6), new DateTime(2020, 1, 1), DateTimePeriod.Month,
+                new DateTime[]
+                {
+                    new DateTime(2020, 3, 6), new DateTime(2020, 2, 6), new DateTime(2020, 1, 6)
+                },
+            }
+        };
+
+        [Theory]
+        [MemberData(nameof(GetRange_DifferentPeriodDates_CorrectRange_Data))]
+        public void GetRange_DifferentPeriodDates_CorrectRange(DateTime start, DateTime end, DateTimePeriod period, DateTime[] expected)
+        {
+            Assert.Equal(expected, DateTimeUtils.GetRange(start, end, period).ToArray());
         }
     }
 }

@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using Saritasa.Tools.Common.Extensions;
 
 namespace Saritasa.Tools.Common.Utils
@@ -23,10 +22,19 @@ namespace Saritasa.Tools.Common.Utils
         /// <returns>Dates range.</returns>
         public static IEnumerable<DateTime> GetRange(DateTime fromDate, DateTime toDate, DateTimePeriod period = DateTimePeriod.Day)
         {
-            //Enumerable.Range(0, toDate.Subtract(fromDate).Days + 1).Select(d => fromDate.AddDays(d));
-            for (var currentDate = fromDate; fromDate < toDate; Add(currentDate, period, 1))
+            if (fromDate <= toDate)
             {
-                yield return currentDate;
+                for (var currentDate = fromDate; currentDate <= toDate; currentDate = Add(currentDate, period, 1))
+                {
+                    yield return currentDate;
+                }
+            }
+            else
+            {
+                for (var currentDate = fromDate; currentDate >= toDate; currentDate = Add(currentDate, period, -1))
+                {
+                    yield return currentDate;
+                }
             }
         }
 
