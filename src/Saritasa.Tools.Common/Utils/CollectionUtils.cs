@@ -99,7 +99,7 @@ namespace Saritasa.Tools.Common.Utils
                 }
                 if (count == 0)
                 {
-                    throw new InvalidOrderFieldException(fieldName, keySelectors.Select(k => k.FieldName).ToArray());
+                    throw new InvalidOrderFieldException(fieldName, keySelectors.Select(k => k.FieldName).Distinct().ToArray());
                 }
             }
 
@@ -180,7 +180,7 @@ namespace Saritasa.Tools.Common.Utils
                 }
                 if (count == 0)
                 {
-                    throw new InvalidOrderFieldException(fieldName, keySelectors.Select(k => k.FieldName).ToArray());
+                    throw new InvalidOrderFieldException(fieldName, keySelectors.Select(k => k.FieldName).Distinct().ToArray());
                 }
             }
 
@@ -241,14 +241,14 @@ namespace Saritasa.Tools.Common.Utils
         }
 #endif
 
-                    /// <summary>
-                    /// Breaks a list of items into chunks of a specific size. Be aware that this method generates one additional
-                    /// query to get the total number of collection elements.
-                    /// </summary>
-                    /// <param name="source">Source list.</param>
-                    /// <param name="chunkSize">Chunk size.</param>
-                    /// <returns>Enumeration of queryable collections.</returns>
-                    public static IEnumerable<IQueryable<T>> ChunkSelectRange<T>(
+        /// <summary>
+        /// Breaks a list of items into chunks of a specific size. Be aware that this method generates one additional
+        /// query to get the total number of collection elements.
+        /// </summary>
+        /// <param name="source">Source list.</param>
+        /// <param name="chunkSize">Chunk size.</param>
+        /// <returns>Enumeration of queryable collections.</returns>
+        public static IEnumerable<IQueryable<T>> ChunkSelectRange<T>(
             IQueryable<T> source,
             int chunkSize = DefaultChunkSize)
         {
