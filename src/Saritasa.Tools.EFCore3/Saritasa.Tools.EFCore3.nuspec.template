@@ -4,7 +4,7 @@
     <id>Saritasa.Tools.EFCore3</id>
     <title>Saritasa Tools for Entity Framework Core 3</title>
     <version>0.0.0</version>
-    <description>The package is a part of Saritasa Tools project. Saritasa.Tools.EfCore3 contains various useful extensions..</description>
+    <description>The package is a part of Saritasa Tools project. Saritasa.Tools.EfCore3 contains various useful extensions.</description>
     <summary>DDD implementatons for Entity Framework Core 3.</summary>
     <authors>Saritasa</authors>
     <owners>Saritasa</owners>
