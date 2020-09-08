@@ -15,7 +15,7 @@ namespace Saritasa.Tools.EF
     public static class DbSetExtensions
     {
         /// <summary>
-        /// Get entity by key values. Throws <see cref="NotFoundException" /> if entity not found.
+        /// Get the entity by key values. Throws <see cref="NotFoundException" /> if the entity not found.
         /// </summary>
         /// <param name="entities">DbSet instance.</param>
         /// <param name="keyValues">Keys.</param>
@@ -35,7 +35,7 @@ namespace Saritasa.Tools.EF
         }
 
         /// <summary>
-        /// Get entity by key values. Throws <see cref="NotFoundException" /> if entity not found.
+        /// Get the entity by key values. Throws <see cref="NotFoundException" /> if the entity not found.
         /// </summary>
         /// <param name="entities">DbSet instance.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>

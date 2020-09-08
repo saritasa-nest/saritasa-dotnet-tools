@@ -36,11 +36,11 @@ namespace Saritasa.Tools.Common.Utils
 #if NET40 || NETSTANDARD2_0 || NETSTANDARD2_1
         /// <summary>
         /// Tries to get the value in the <see cref="NameValueCollection" />. If value with specified
-        /// key does not exist it will return default value.
+        /// key does not exist it will return default values.
         /// </summary>
         /// <param name="target">Target name value collection.</param>
         /// <param name="key">Key.</param>
-        /// <param name="defaultValues">Default value.</param>
+        /// <param name="defaultValues">Default values.</param>
         /// <returns>Values by key or default values.</returns>
         public static string? GetValueOrDefault(
             NameValueCollection target,

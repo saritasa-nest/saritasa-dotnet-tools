@@ -17,7 +17,7 @@ namespace Saritasa.Tools.EF.Pagination
     public static class EFTotalCountListFactory
     {
         /// <summary>
-        /// Creates a list with the total count from queryable source.
+        /// Creates a list with the total count from the queryable source.
         /// The calling will evaluate the query automatically.
         /// </summary>
         /// <typeparam name="T">Item type.</typeparam>
