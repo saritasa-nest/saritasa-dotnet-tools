@@ -1,6 +1,6 @@
 # Requires psake to run, see README.md for more details.
 
-Framework 4.7
+Framework 4.8
 $InformationPreference = 'Continue'
 $env:PSModulePath += ";$PSScriptRoot\Scripts\Modules"
 
@@ -30,9 +30,6 @@ $packages = @(
     'Saritasa.Tools.EF6' # ef6
     'Saritasa.Tools.EFCore3' # efcore3
     'Saritasa.Tools.Emails' # emails
-    'Saritasa.Tools.Messages' # messages
-    'Saritasa.Tools.Messages.Abstractions' # messages-abstractions
-    'Saritasa.Tools.Messages.TestRuns' # testruns
     'Saritasa.Tools.Misc' # misc
 )
 
@@ -102,22 +99,10 @@ Task clean -description 'Clean solution' `
     }
     Remove-Item "./test/Saritasa.Tools.Common.Tests/bin/*" -Recurse -Force -ErrorAction SilentlyContinue
     Remove-Item "./test/Saritasa.Tools.Common.Tests/obj/*" -Recurse -Force -ErrorAction SilentlyContinue
-    Remove-Item "./test/Saritasa.Tools.Messages.Benchmark/bin/*" -Recurse -Force -ErrorAction SilentlyContinue
-    Remove-Item "./test/Saritasa.Tools.Messages.Benchmark/obj/*" -Recurse -Force -ErrorAction SilentlyContinue
-    Remove-Item "./test/Saritasa.Tools.Messages.Tests/bin/*" -Recurse -Force -ErrorAction SilentlyContinue
-    Remove-Item "./test/Saritasa.Tools.Messages.Tests/obj/*" -Recurse -Force -ErrorAction SilentlyContinue
     Remove-Item "./test/Saritasa.Tools.Tests/bin/*" -Recurse -Force -ErrorAction SilentlyContinue
     Remove-Item "./test/Saritasa.Tools.Tests/obj/*" -Recurse -Force -ErrorAction SilentlyContinue
     Remove-Item './src/StyleCop.Cache' -Force -ErrorAction SilentlyContinue
-    Remove-Item './docs/_build' -Recurse -Force -ErrorAction SilentlyContinue
-    Remove-Item './docs/conf.py' -ErrorAction SilentlyContinue
     Remove-Item './scripts/nuget.exe' -ErrorAction SilentlyContinue
-}
-
-Task docs -depends get-version -description 'Compile and open documentation' `
-{
-    CompileDocs
-    Invoke-Item './docs/_build/html/index.html'
 }
 
 function GetVersion($package)
@@ -129,18 +114,6 @@ function GetPackageAssemblyVersion($package)
 {
     $version = GetVersion($package)
     return $version.Substring(0, $version.LastIndexOf('.')) + '.0.0'
-}
-
-function CompileDocs
-{
-    Copy-Item "$docsRoot\conf.py.template" "$docsRoot\conf.py"
-    (Get-Content "$docsRoot\conf.py").Replace('VX.VY', $Version) | Set-Content "$docsRoot\conf.py"
-
-    python -m sphinx.__init__ -b html -d "$docsRoot\_build\doctrees" $docsRoot "$docsRoot\_build\html"
-    if ($LASTEXITCODE)
-    {
-        throw 'Cannot compile documentation.'
-    }
 }
 
 function ReplaceVersionInAssemblyInfo($file, $attribute, $version)

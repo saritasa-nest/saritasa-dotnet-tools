@@ -17,6 +17,8 @@ using Saritasa.Tools.Messages.Common;
 using SandBox.Commands;
 using SandBox.Events;
 using SandBox.Queries;
+using Saritasa.Tools.Domain;
+using Saritasa.Tools.Domain.Exceptions;
 
 namespace SandBox
 {
@@ -89,8 +91,7 @@ namespace SandBox
             EventPipeline.AddMiddlewares(
                 new EventHandlerLocatorMiddleware(Assembly.GetEntryAssembly()),
                 new EventHandlerExecutorMiddleware(),
-                new RepositoryMiddleware(inMemoryMessageRepository)
-            );
+                new RepositoryMiddleware(inMemoryMessageRepository);
         }
 
         private static void Test()
