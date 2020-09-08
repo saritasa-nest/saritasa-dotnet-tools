@@ -2,6 +2,7 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading;
@@ -57,6 +58,24 @@ namespace Saritasa.Tools.EF.Pagination
             }
 
             return (page - 1) * pageSize;
+        }
+
+        /// <summary>
+        /// Returns collection of items as a paged list as one page.
+        /// </summary>
+        /// <typeparam name="T">Item type.</typeparam>
+        /// <param name="source">Queryable source.</param>
+        /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+        /// <returns>Paged list.</returns>
+        public static async Task<PagedList<T>> AsOnePage<T>(IQueryable<T> source, CancellationToken cancellationToken = default)
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            var items = await source.ToListAsync(cancellationToken);
+            return new PagedList<T>(items, PagedList<object>.FirstPage, items.Count, items.Count);
         }
     }
 }

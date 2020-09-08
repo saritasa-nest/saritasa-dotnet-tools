@@ -1,4 +1,7 @@
-﻿0.8.0 [2020-07-17]
+﻿0.8.1 [TBD]
+[+] Add method EFPagedListFactory.AsOnePage .
+
+0.8.0 [2020-07-17]
 [-] Remove EFRepository and EFQueryableRepository.
 [+] Add extension method DbSet.GetAsync .
 [*] Fix comments spelling.
