@@ -137,13 +137,13 @@ namespace Saritasa.Tools.Common.Utils
 
         /// <summary>
         /// Tries to convert the target string to Boolean. If fails return the default value.
-        /// SetPart extended parameter to true to be able to parse from values "0", "1", "Yes", "No".
+        /// The method also takes into account extended values (such as "0", "1", "Yes", "No") for conversion.
         /// </summary>
-        public static Boolean ParseOrDefault(string target, Boolean defaultValue, Boolean extended)
+        public static Boolean ParseOrDefaultExtended(string target, Boolean defaultValue)
         {
             Boolean result;
             var success = Boolean.TryParse(target, out result);
-            if (extended && !success)
+            if (!success)
             {
                 var trimmedTarget = target.ToLowerInvariant().Trim();
                 if (Array.IndexOf(trueValues, trimmedTarget) > -1)

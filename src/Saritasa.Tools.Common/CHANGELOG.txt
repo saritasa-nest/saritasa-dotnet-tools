@@ -1,4 +1,5 @@
 ﻿3.5.0 [TBD]
+[*] Rename StringUtils.ParseOrDefault extended method for bool to StringUtils.ParseOrDefaultExtended .
 [+] New method DateTimeUtils.Add . It allows add specific amount of period "DateTimePeriod" to date.
 [*] DateTimeUtils.GetDiff now returns negative values.
 [*] DateTimeUtils.GetRange now returns reverse collection if "from" date is greater than "to" date.

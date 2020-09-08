@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2017, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -16,7 +16,7 @@ namespace Saritasa.Tools.Common.Tests
         [InlineData("1234567890", 5, 5)]
         [InlineData("1234567890", 15, 10)]
         [InlineData("", 4, 0)]
-        public void Truncate_should_trim_string(string target, int truncate, int expectedLength)
+        public void SafeTruncate_NotTrimmedString_TrimmedString(string target, int truncate, int expectedLength)
         {
             // Arrange & Act
             var str = StringUtils.SafeTruncate(target, truncate);
@@ -33,17 +33,23 @@ namespace Saritasa.Tools.Common.Tests
         }
 
         [Theory]
-        [InlineData("incorrect", false, false, false)]
-        [InlineData("true", true, false, true)]
-        [InlineData("t", false, true, true)]
-        [InlineData("no", true, true, false)]
-        public void Test_default_parse_calls_for_bools(string val, bool @default, bool extended, bool expect)
+        [InlineData("true", true, true)]
+        [InlineData("t", false, true)]
+        [InlineData("no", true, false)]
+        public void ParseOrDefaultExtended_UseExtendedBool_UseExtendedValues(string val, bool @default, bool expect)
         {
-            Assert.Equal(expect, StringUtils.ParseOrDefault(val, @default, extended));
+            Assert.Equal(expect, StringUtils.ParseOrDefaultExtended(val, @default));
+        }
+
+        [Theory]
+        [InlineData("incorrect", false, false)]
+        public void ParseOrDefaultExtended_UseExtendedBool_ReturnDefaultValue(string val, bool @default, bool expect)
+        {
+            Assert.Equal(expect, StringUtils.ParseOrDefaultExtended(val, @default));
         }
 
         [Fact]
-        public void Test_default_parse_calls()
+        public void ParseOrDefault_CallWithIncorrectString_ShouldReturnDefaultValue()
         {
             Assert.Equal(1, StringUtils.ParseOrDefault("incorrect", 1)); // int
             Assert.Equal('a', StringUtils.ParseOrDefault("incorrect", 'a')); // char
@@ -57,13 +63,13 @@ namespace Saritasa.Tools.Common.Tests
         [Theory]
         [InlineData("23", "123", 1, 3)]
         [InlineData("23", "123", 1, 6)]
-        public void Safe_substring_should_not_throw_exceptions(string expect, string target, int start, int count)
+        public void SafeSubstring_ShortString_ShouldNotThrowExceptions(string expect, string target, int start, int count)
         {
             Assert.Equal(expect, StringUtils.SafeSubstring(target, start, count));
         }
 
         [Fact]
-        public void JoinIgnoreEmpty_should_allow_space_as_separator()
+        public void JoinIgnoreEmpty_SpaceAsSeparator_AllowSpaceAsSeparator()
         {
             // Arrange
             var arr = new[] { "1", "2", "", "3" };
@@ -76,7 +82,7 @@ namespace Saritasa.Tools.Common.Tests
         }
 
         [Fact]
-        public void Capitalize_should_make_first_character_upper()
+        public void Capitalize_NotCapitalizedString_CapitalizedString()
         {
             // Arrange
             var target = "form";
