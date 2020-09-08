@@ -137,6 +137,33 @@ namespace Saritasa.Tools.Domain
         #endregion
 
         /// <summary>
+        /// Create <see cref="ValidationErrors" /> object with the single key and errors.
+        /// </summary>
+        /// <param name="key">Member of field name or key. It can be empty.</param>
+        /// <param name="errors">Error messages.</param>
+        /// <returns><see cref="ValidationErrors" /> instance.</returns>
+        public static ValidationErrors CreateFromErrors(string key, params string[] errors)
+        {
+            if (key == null)
+            {
+                throw new ArgumentNullException(nameof(key));
+            }
+            if (errors == null)
+            {
+                throw new ArgumentNullException(nameof(errors));
+            }
+            if (errors.Length == 0)
+            {
+                throw new ArgumentException(Properties.Strings.ValidationErrorIsEmpty, nameof(errors));
+            }
+
+            return new ValidationErrors(new Dictionary<string, ICollection<string>>
+            {
+                [key] = errors
+            });
+        }
+
+        /// <summary>
         /// Add error to errors list for the specific key.
         /// </summary>
         /// <param name="key">Member of field name or key. It can be empty.</param>

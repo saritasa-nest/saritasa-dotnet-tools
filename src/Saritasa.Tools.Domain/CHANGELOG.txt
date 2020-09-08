@@ -1,4 +1,7 @@
-﻿0.8.0 [2020-07-17]
+﻿0.8.1 [TBD]
+[+] Add ValidationErrors.CreateFromErrors method.
+
+0.8.0 [2020-07-17]
 [-] Remove IRepository and IQueryableRepository.
 [*] Make errors formatters to use ValidationErrors instead of ValidationException.
 [*] Fix exceptions serialization for netstandard 2.0 .
