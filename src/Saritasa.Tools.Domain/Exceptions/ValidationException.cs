@@ -214,5 +214,52 @@ namespace Saritasa.Tools.Domain.Exceptions
                 throw new ValidationException(validationErrors);
             }
         }
+
+        /// <summary>
+        /// Throws validation exception from validation errors. If errors is empty
+        /// the exception will not be thrown.
+        /// </summary>
+        /// <param name="errors">Validation errors.</param>
+        public static void ThrowFromValidationErrors(ValidationErrors errors)
+        {
+            if (errors.HasErrors)
+            {
+                throw new ValidationException(errors);
+            }
+        }
+
+        /// <summary>
+        /// Throws validation exception from validation errors. If errors is empty
+        /// the exception will not be thrown.
+        /// </summary>
+        /// <param name="errors">Validation errors.</param>
+        /// <param name="code">Description code for this exception.</param>
+        public static void ThrowFromValidationErrors(ValidationErrors errors, string code)
+        {
+            if (errors.HasErrors)
+            {
+                throw new ValidationException(errors)
+                {
+                    Code = code
+                };
+            }
+        }
+
+        /// <summary>
+        /// Throws validation exception from validation errors. If errors is empty
+        /// the exception will not be thrown.
+        /// </summary>
+        /// <param name="errors">Validation errors.</param>
+        /// <param name="code">Description code for this exception.</param>
+        public static void ThrowFromValidationErrors(ValidationErrors errors, int code)
+        {
+            if (errors.HasErrors)
+            {
+                throw new ValidationException(errors)
+                {
+                    Code = code.ToString()
+                };
+            }
+        }
     }
 }

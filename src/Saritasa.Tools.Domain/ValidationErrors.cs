@@ -164,6 +164,22 @@ namespace Saritasa.Tools.Domain
         }
 
         /// <summary>
+        /// Create <see cref="ValidationErrors" /> object with the single summary key and errors.
+        /// </summary>
+        /// <param name="errors">Error messages.</param>
+        /// <returns><see cref="ValidationErrors" /> instance.</returns>
+        public static ValidationErrors CreateFromErrors(params string[] errors) => CreateFromErrors(SummaryKey, errors);
+
+#if !NET40
+        /// <summary>
+        /// Create <see cref="ValidationErrors" /> object with the single summary key and errors.
+        /// </summary>
+        /// <param name="errors">Error messages.</param>
+        /// <returns><see cref="ValidationErrors" /> instance.</returns>
+        public static ValidationErrors CreateFromErrors(IEnumerable<string> errors) => CreateFromErrors(SummaryKey, errors.ToArray());
+#endif
+
+        /// <summary>
         /// Add error to errors list for the specific key.
         /// </summary>
         /// <param name="key">Member of field name or key. It can be empty.</param>

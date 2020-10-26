@@ -1,5 +1,6 @@
-﻿0.8.1 [TBD]
-[+] Add ValidationErrors.CreateFromErrors method.
+﻿0.8.2 [TBD]
+[+] Add ValidationErrors.CreateFromErrors methods.
+[+] Add ValidationException.ThrowFromValidationErrors methods.
 
 0.8.0 [2020-07-17]
 [-] Remove IRepository and IQueryableRepository.
