@@ -283,21 +283,18 @@ namespace Saritasa.Tools.Common.Utils
         /// IEEE is the most common CRC-32 polynomial.
         /// Used by ethernet (IEEE 802.3), v.42, fddi, gzip, zip, png, etc.
         /// </summary>
-        [CLSCompliant(false)]
         public const uint Crc32Ieee = 0xedb88320;
 
         /// <summary>
         /// Castagnoli's polynomial, used in iSCSI. Has better error detection characteristics than IEEE.
         /// </summary>
         /// <remarks>For reference look http://dx.doi.org/10.1109/26.231911 .</remarks>
-        [CLSCompliant(false)]
         public const uint Crc32Castagnoli = 0x82f63b78;
 
         /// <summary>
         /// Koopman's polynomial. It also has better error detection characteristics than IEEE.
         /// </summary>
         /// <remarks>For reference look http://dx.doi.org/10.1109/DSN.2002.1028931 .</remarks>
-        [CLSCompliant(false)]
         public const uint Crc32Koopman = 0xeb31d82e;
 
         private static uint[] GenerateTableForCrc32(uint polynomial)
@@ -323,7 +320,6 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="polynomial">Polynomial.</param>
         /// <param name="seedCrc">Initial value for crc calculation, default is 0.</param>
         /// <returns>CRC-32 hash.</returns>
-        [CLSCompliant(false)]
         public static uint Crc32(byte[] target, uint polynomial = Crc32Ieee, uint seedCrc = 0)
         {
             Guard.IsNotNull(target, nameof(target));
@@ -354,13 +350,11 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// The ISO polynomial, defined in ISO 3309 and used in HDLC.
         /// </summary>
-        [CLSCompliant(false)]
         public const ulong Crc64IsoPolynomial = 0xD800000000000000;
 
         /// <summary>
         /// The ECMA polynomial, defined in ECMA 182.
         /// </summary>
-        [CLSCompliant(false)]
         public const ulong Crc64EcmaPolynomial = 0xC96C5795D7870F42;
 
         private static ulong[] GenerateTableForCrc64(ulong polynomial)
@@ -393,7 +387,6 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="polynomial">Polynomial.</param>
         /// <param name="seedCrc">Initial value for crc calculation, default is 0.</param>
         /// <returns>CRC-64 hash.</returns>
-        [CLSCompliant(false)]
         public static ulong Crc64(byte[] target, ulong polynomial = Crc64EcmaPolynomial, ulong seedCrc = 0)
         {
             Guard.IsNotNull(target, nameof(target));
