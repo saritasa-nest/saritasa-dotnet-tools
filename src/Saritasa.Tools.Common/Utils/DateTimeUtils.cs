@@ -11,14 +11,14 @@ namespace Saritasa.Tools.Common.Utils
     /// <summary>
     /// Date time utils.
     /// </summary>
-    public static class DateTimeUtils
+    public static partial class DateTimeUtils
     {
         /// <summary>
         /// Returns dates range. Uses lazy implementation.
         /// </summary>
         /// <param name="fromDate">From date.</param>
         /// <param name="toDate">To date.</param>
-        /// <param name="period"></param>
+        /// <param name="period">Period, the interval between dates.</param>
         /// <returns>Dates range.</returns>
         public static IEnumerable<DateTime> GetRange(DateTime fromDate, DateTime toDate, DateTimePeriod period = DateTimePeriod.Day)
         {
@@ -100,7 +100,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="cultureInfo">Specific culture to use. If null current culture is used.</param>
         /// <returns>Start of period date.</returns>
         public static DateTime GetStartOfPeriod(DateTime target, DateTimePeriod period, CultureInfo? cultureInfo = null)
-            => target.Truncate(period, cultureInfo);
+            => Truncate(target, period, cultureInfo);
 
         /// <summary>
         /// Returns end <see cref="System.DateTime" /> of period.
@@ -110,7 +110,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="cultureInfo">Specific culture to use. If null the current culture is used.</param>
         /// <returns>End of period date.</returns>
         public static DateTime GetEndOfPeriod(DateTime target, DateTimePeriod period, CultureInfo? cultureInfo = null)
-            => Add(target.Truncate(period, cultureInfo), period, 1).AddMilliseconds(-1);
+            => Add(Truncate(target, period, cultureInfo), period, 1).AddMilliseconds(-1);
 
         /// <summary>
         /// Shortcut to set date part. Method throws <see cref="System.ArgumentException" /> for
@@ -168,7 +168,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <returns>Truncated date.</returns>
         public static DateTime Truncate(DateTime target, DateTimePeriod period, CultureInfo? cultureInfo = null)
         {
-            // For reference https://www.postgresql.org/docs/10/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
+            // For reference: https://www.postgresql.org/docs/12/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
             switch (period)
             {
                 case DateTimePeriod.Millisecond:
