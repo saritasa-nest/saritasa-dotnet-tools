@@ -343,5 +343,108 @@ namespace Saritasa.Tools.Common.Tests
                 );
             });
         }
+
+        [Fact]
+        public void ChunkSelectRange_ListWithItems_ShouldIterateWholeList()
+        {
+            // Arrange
+            int capacity = 250;
+            int sum = 0;
+            IList<int> list = new List<int>(capacity);
+            for (int i = 0; i < capacity; i++)
+            {
+                list.Add(i);
+            }
+
+            // Act
+            foreach (var sublist in CollectionUtils.ChunkSelectRange(list.AsQueryable(), 45))
+            {
+                foreach (var item in sublist)
+                {
+                    sum += item;
+                }
+            }
+
+            // Assert
+            Assert.Equal(31125, sum);
+        }
+
+        [Fact]
+        public void ChunkSelect_ListWithItems_ShouldIterateWholeList()
+        {
+            // Arrange
+            int capacity = 250;
+            int sum = 0;
+            IList<int> list = new List<int>(capacity);
+            for (int i = 0; i < capacity; i++)
+            {
+                list.Add(i);
+            }
+
+            // Act
+            foreach (var item in CollectionUtils.ChunkSelect(list.AsQueryable(), 45))
+            {
+                sum += item;
+            }
+
+            // Assert
+            Assert.Equal(31125, sum);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task ChunkSelectAsync_EnumerableWithItems_ShouldIterateWholeList()
+        {
+            // Arrange
+            static async IAsyncEnumerable<int> GetInts()
+            {
+                for (int i = 0; i < 250; i++)
+                {
+                    yield return i;
+                }
+
+                await System.Threading.Tasks.Task.CompletedTask;
+            }
+            int sum = 0;
+
+            // Act
+            await foreach (var subitems in CollectionUtils.ChunkSelectRangeAsync(GetInts(), 250))
+            {
+                await foreach (var item in subitems)
+                {
+                    sum += item;
+                }
+            }
+
+            // Assert
+            Assert.Equal(31125, sum);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task ChunkSelectAsync_EnumerableWithItems_ShouldSkipItems()
+        {
+            // Arrange
+            static async IAsyncEnumerable<int> GetInts()
+            {
+                for (int i = 0; i < 250; i++)
+                {
+                    yield return i;
+                }
+
+                await System.Threading.Tasks.Task.CompletedTask;
+            }
+            int iterations = 0;
+
+            // Act
+            await foreach (var subitems in CollectionUtils.ChunkSelectRangeAsync(GetInts(), 25, 25))
+            {
+                iterations++;
+                await foreach (var item in subitems)
+                {
+                }
+            }
+
+            // Assert
+            Assert.Equal(9, iterations);
+        }
     }
 }

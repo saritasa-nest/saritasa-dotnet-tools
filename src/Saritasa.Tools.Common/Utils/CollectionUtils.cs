@@ -252,6 +252,16 @@ namespace Saritasa.Tools.Common.Utils
             IQueryable<T> source,
             int chunkSize = DefaultChunkSize)
         {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+            if (chunkSize < 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(chunkSize),
+                    string.Format(Properties.Strings.ArgumentMustBeGreaterThan, nameof(chunkSize), 1));
+            }
+
             var totalNumberOfElements = source.Count();
             int currentPosition = 0;
             var originalSource = source;
@@ -263,6 +273,65 @@ namespace Saritasa.Tools.Common.Utils
             }
         }
 
+#if NETSTANDARD2_1
+        /// <summary>
+        /// Breaks a list of async items into chunks of a specific size.
+        /// </summary>
+        /// <param name="source">Source list.</param>
+        /// <param name="chunkSize">Chunk size.</param>
+        /// <param name="skipCount">Number of items to skip.</param>
+        /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+        /// <returns>Enumeration of enumerable collections.</returns>
+        public static async IAsyncEnumerable<IAsyncEnumerable<T>> ChunkSelectRangeAsync<T>(
+            IAsyncEnumerable<T> source,
+            int chunkSize = DefaultChunkSize,
+            int skipCount = 0,
+            [System.Runtime.CompilerServices.EnumeratorCancellation] System.Threading.CancellationToken cancellationToken = default)
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+            if (chunkSize < 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(chunkSize),
+                    string.Format(Properties.Strings.ArgumentMustBeGreaterThan, nameof(chunkSize), 1));
+            }
+            if (skipCount < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(skipCount),
+                    string.Format(Properties.Strings.ArgumentMustBeGreaterThan, nameof(skipCount), 0));
+            }
+
+            var enumerator = source.GetAsyncEnumerator(cancellationToken);
+
+            async IAsyncEnumerable<T> Batch()
+            {
+                yield return enumerator.Current;
+                for (int i = 1; i < chunkSize; i++)
+                {
+                    if (await enumerator.MoveNextAsync().ConfigureAwait(false))
+                    {
+                        yield return enumerator.Current;
+                    }
+                }
+            }
+
+            for (var i = 0; i < skipCount; i++)
+            {
+                if (!await enumerator.MoveNextAsync().ConfigureAwait(false))
+                {
+                    yield break;
+                }
+            }
+
+            while (await enumerator.MoveNextAsync().ConfigureAwait(false))
+            {
+                yield return Batch();
+            }
+        }
+#endif
+
         /// <summary>
         /// Breaks a list of items into chunks of a specific size.
         /// </summary>
@@ -273,6 +342,16 @@ namespace Saritasa.Tools.Common.Utils
             IEnumerable<T> source,
             int chunkSize = DefaultChunkSize)
         {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+            if (chunkSize < 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(chunkSize),
+                    string.Format(Properties.Strings.ArgumentMustBeGreaterThan, nameof(chunkSize), 1));
+            }
+
             long totalNumberOfElements = source.Count();
             int currentPosition = 0;
             var originalSource = source;
@@ -294,6 +373,16 @@ namespace Saritasa.Tools.Common.Utils
             IQueryable<T> source,
             int chunkSize = DefaultChunkSize)
         {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+            if (chunkSize < 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(chunkSize),
+                    string.Format(Properties.Strings.ArgumentMustBeGreaterThan, nameof(chunkSize), 1));
+            }
+
             int currentPosition = 0;
             bool hasRecords;
             do
@@ -446,10 +535,10 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="source">The collection to compare to.</param>
         /// <param name="diff">Diff.</param>
-        /// <param name="update">Updater delegate to change state of object 1 according to object 2 and return
+        /// <param name="update">Optional updater delegate to change state of object 1 according to object 2 and return
         /// destination object. The new object is not used and this overload is only for AutoMapper compatibility.</param>
         /// <typeparam name="T">Collection source type.</typeparam>
-        public static void ApplyDiff<T>(ICollection<T> source, DiffResult<T> diff, Func<T, T, T> update)
+        public static void ApplyDiff<T>(ICollection<T> source, DiffResult<T> diff, Func<T, T, T>? update = null)
         {
             if (source == null)
             {
@@ -458,10 +547,6 @@ namespace Saritasa.Tools.Common.Utils
             if (diff == null)
             {
                 throw new ArgumentNullException(nameof(diff));
-            }
-            if (update == null)
-            {
-                throw new ArgumentNullException(nameof(update));
             }
 
             foreach (T removedItem in diff.Removed)
@@ -473,9 +558,12 @@ namespace Saritasa.Tools.Common.Utils
                 source.Add(addedItem);
             }
 
-            foreach ((T sourceItem, T targetItem) in diff.Updated)
+            if (update != null)
             {
-                update(sourceItem, targetItem);
+                foreach ((T sourceItem, T targetItem) in diff.Updated)
+                {
+                    update.Invoke(sourceItem, targetItem);
+                }
             }
         }
 
@@ -484,13 +572,13 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="source">The collection to compare to.</param>
         /// <param name="diff">Diff.</param>
-        /// <param name="update">Updater delegate to change state of object 1 according to object 2.</param>
+        /// <param name="update">Optional updater delegate to change state of object 1 according to object 2.</param>
         /// <typeparam name="T">Collection source type.</typeparam>
-        public static void ApplyDiff<T>(ICollection<T> source, DiffResult<T> diff, Action<T, T> update)
+        public static void ApplyDiff<T>(ICollection<T> source, DiffResult<T> diff, Action<T, T>? update = null)
         {
             ApplyDiff(source, diff, (obj1, obj2) =>
             {
-                update(obj1, obj2);
+                update?.Invoke(obj1, obj2);
                 return obj2;
             });
         }

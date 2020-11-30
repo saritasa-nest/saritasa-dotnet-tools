@@ -1,8 +1,11 @@
-﻿3.5.0 [TBD]
+﻿3.3.0 [TBD]
 [*] Rename StringUtils.ParseOrDefault extended method for bool to StringUtils.ParseOrDefaultExtended .
 [+] New method DateTimeUtils.Add . It allows add specific amount of period "DateTimePeriod" to date.
 [*] DateTimeUtils.GetDiff now returns negative values.
 [*] DateTimeUtils.GetRange now returns reverse collection if "from" date is greater than "to" date.
+[+] Add CollectionUtils.ChunkSelectRangeAsync for IAsyncEnumerable.
+[*] Make paramter update of CollectionUtils.ApplyDiff optional.
+[*] Improve CollectionUtils chunk select methods validation.
 
 3.2.2 [2020-07-06]
 [+] Add extension method ICollection<T>.Add that allows adding enumerable.
