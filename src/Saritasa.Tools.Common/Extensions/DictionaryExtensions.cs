@@ -21,13 +21,10 @@ namespace Saritasa.Tools.Common.Extensions
         /// <param name="target">Target dictionary.</param>
         /// <param name="key">Key.</param>
         /// <param name="defaultValue">Default value.</param>
-        public static TValue GetValueOrDefault<TKey, TValue>(
-            this IDictionary<TKey, TValue> target,
+        public static TValue? GetValueOrDefault<TKey, TValue>(
+            this IDictionary<TKey, TValue?> target,
             TKey key,
-            TValue defaultValue = default(TValue))
-        {
-            return DictionaryUtils.GetValueOrDefault(target, key, defaultValue);
-        }
+            TValue defaultValue = default) => DictionaryUtils.GetValueOrDefault(target, key, defaultValue);
 
         /// <summary>
         /// Adds a key/value pair to the <see cref="IDictionary{TKey,TValue}" /> if the key does not already
@@ -42,13 +39,10 @@ namespace Saritasa.Tools.Common.Extensions
         /// the key's existing value.</param>
         /// <param name="defaultValue">The value to be used for an absent key.</param>
         /// <returns>The new or updated value for the key.</returns>
-        public static TValue AddOrUpdate<TKey, TValue>(
-            this IDictionary<TKey, TValue> target,
+        public static TValue? AddOrUpdate<TKey, TValue>(
+            this IDictionary<TKey, TValue?> target,
             TKey key,
-            Func<TKey, TValue, TValue> updateFunc,
-            TValue defaultValue = default(TValue))
-        {
-            return DictionaryUtils.AddOrUpdate(target, key, updateFunc, defaultValue);
-        }
+            Func<TKey, TValue?, TValue> updateFunc,
+            TValue defaultValue = default) => DictionaryUtils.AddOrUpdate(target, key, updateFunc, defaultValue);
     }
 }

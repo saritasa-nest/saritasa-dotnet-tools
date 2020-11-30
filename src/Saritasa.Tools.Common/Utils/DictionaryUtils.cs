@@ -24,11 +24,16 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="key">Key.</param>
         /// <param name="defaultValue">Default value.</param>
         /// <returns>Value by key or default value.</returns>
-        public static TValue GetValueOrDefault<TKey, TValue>(
-            IDictionary<TKey, TValue> target,
+        public static TValue? GetValueOrDefault<TKey, TValue>(
+            IDictionary<TKey, TValue?> target,
             TKey key,
             TValue defaultValue = default)
         {
+            if (target == null)
+            {
+                throw new ArgumentNullException(nameof(target));
+            }
+
             bool success = target.TryGetValue(key, out TValue value);
             return success ? value : defaultValue;
         }
@@ -82,12 +87,21 @@ namespace Saritasa.Tools.Common.Utils
         /// the key's existing value.</param>
         /// <param name="defaultValue">The value to be used for an absent key.</param>
         /// <returns>The new or updated value for the key.</returns>
-        public static TValue AddOrUpdate<TKey, TValue>(
-            IDictionary<TKey, TValue> target,
+        public static TValue? AddOrUpdate<TKey, TValue>(
+            IDictionary<TKey, TValue?> target,
             TKey key,
-            Func<TKey, TValue, TValue> updateFunc,
+            Func<TKey, TValue?, TValue> updateFunc,
             TValue defaultValue = default)
         {
+            if (target == null)
+            {
+                throw new ArgumentNullException(nameof(target));
+            }
+            if (updateFunc == null)
+            {
+                throw new ArgumentNullException(nameof(updateFunc));
+            }
+
             var keyExists = target.TryGetValue(key, out TValue value);
             if (keyExists)
             {
