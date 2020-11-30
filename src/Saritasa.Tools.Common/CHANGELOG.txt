@@ -7,7 +7,6 @@
 [+] Add CollectionUtils.ChunkSelectRangeAsync for IAsyncEnumerable.
 [*] Make paramter update of CollectionUtils.ApplyDiff optional.
 [*] Improve CollectionUtils chunk select methods validation.
-[-] Remove not needed CLSCompliant attribute.
 
 3.2.2 [2020-07-06]
 [+] Add extension method ICollection<T>.Add that allows adding enumerable.

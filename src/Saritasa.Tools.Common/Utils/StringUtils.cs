@@ -313,6 +313,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert the target string to SByte. If fails return the default value.
         /// </summary>
+        [CLSCompliant(false)]
         public static SByte ParseOrDefault(string target, SByte defaultValue)
         {
             SByte result;
@@ -323,6 +324,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert the target string to SByte. If fails return the default value.
         /// </summary>
+        [CLSCompliant(false)]
         public static SByte ParseOrDefault(string target, NumberStyles style, IFormatProvider provider, SByte defaultValue)
         {
             SByte result;
@@ -353,6 +355,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert the target string to UInt16. If fails return the default value.
         /// </summary>
+        [CLSCompliant(false)]
         public static UInt16 ParseOrDefault(string target, UInt16 defaultValue)
         {
             UInt16 result;
@@ -363,6 +366,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert the target string to UInt16. If fails return the default value.
         /// </summary>
+        [CLSCompliant(false)]
         public static UInt16 ParseOrDefault(string target, NumberStyles style, IFormatProvider provider, UInt16 defaultValue)
         {
             UInt16 result;
@@ -373,6 +377,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert the target string to Uint. If fails return the default value.
         /// </summary>
+        [CLSCompliant(false)]
         public static UInt32 ParseOrDefault(string target, UInt32 defaultValue)
         {
             UInt32 result;
@@ -383,6 +388,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert the target string to Uint. If fails return the default value.
         /// </summary>
+        [CLSCompliant(false)]
         public static UInt32 ParseOrDefault(string target, NumberStyles style, IFormatProvider provider, UInt32 defaultValue)
         {
             UInt32 result;
@@ -393,6 +399,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert the target string to UInt64. If fails return the default value.
         /// </summary>
+        [CLSCompliant(false)]
         public static UInt64 ParseOrDefault(string target, UInt64 defaultValue)
         {
             UInt64 result;
@@ -403,6 +410,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert the target string to UInt64. If fails return the default value.
         /// </summary>
+        [CLSCompliant(false)]
         public static UInt64 ParseOrDefault(string target, NumberStyles style, IFormatProvider provider, UInt64 defaultValue)
         {
             UInt64 result;
