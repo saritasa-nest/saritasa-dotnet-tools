@@ -1,7 +1,7 @@
 Saritasa Tools
 ==============
 
-Infrastructure components and development tools for company projects. Read the latest documentation on [Read the Docs](http://saritasa-tools.readthedocs.io/en/latest/index.html).
+Infrastructure components and development tools for company projects. Read the latest documentation on [Wiki](https://github.com/Saritasa/SaritasaTools/wiki).
 
 Overview
 --------
