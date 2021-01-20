@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2021, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -43,6 +43,7 @@ namespace Saritasa.Tools.Common.Tests
 
         [Theory]
         [InlineData("incorrect", false, false)]
+        [InlineData(null, true, true)]
         public void ParseOrDefaultExtended_UseExtendedBool_ReturnDefaultValue(string val, bool @default, bool expect)
         {
             Assert.Equal(expect, StringUtils.ParseOrDefaultExtended(val, @default));
@@ -58,6 +59,9 @@ namespace Saritasa.Tools.Common.Tests
             Assert.Equal(TestEnum.ValueA, StringUtils.ParseOrDefault("incorrect", TestEnum.ValueA)); // enum
             Assert.Equal(TestEnum.ValueC, StringUtils.ParseOrDefault("ValueC", TestEnum.ValueA)); // enum
             Assert.Equal(1.2f, StringUtils.ParseOrDefault("incorrect", 1.2f)); // float
+            Assert.True(StringUtils.ParseOrDefault("true", false)); // bool
+            Assert.True(StringUtils.ParseOrDefault("incorrect", true)); // bool
+            Assert.True(StringUtils.ParseOrDefault(null, true)); // bool
         }
 
         [Theory]

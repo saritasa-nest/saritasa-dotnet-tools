@@ -1,4 +1,7 @@
-﻿3.3.0 [2020-11-30]
+﻿3.3.1 [2021-01-20]
+[*] Fix StringUtils.ParseOrDefaultExtended NRE if null value.
+
+3.3.0 [2020-11-30]
 [*] Rename StringUtils.ParseOrDefault extended method for bool to StringUtils.ParseOrDefaultExtended .
 [+] New method DateTimeUtils.Add . It allows add specific amount of period "DateTimePeriod" to date.
 [*] DateTimeUtils.GetDiff now returns negative values.

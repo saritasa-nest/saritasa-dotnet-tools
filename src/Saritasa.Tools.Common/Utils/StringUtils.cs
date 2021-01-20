@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2021, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -145,7 +145,7 @@ namespace Saritasa.Tools.Common.Utils
             var success = Boolean.TryParse(target, out result);
             if (!success)
             {
-                var trimmedTarget = target.ToLowerInvariant().Trim();
+                var trimmedTarget = target != null ? target.ToLower().Trim() : string.Empty;
                 if (Array.IndexOf(trueValues, trimmedTarget) > -1)
                 {
                     success = true;
