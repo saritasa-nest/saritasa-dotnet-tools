@@ -1,2 +1,0 @@
-Id,FirstName,LastName,Country,City,BirthDay,IsActive,UserName,PasswordHash,AccessFailedCount,PhoneNumber,IsPhoneNumberConfirmed,Email,EmailConfirmed,SecurityStamp,IsLockoutEnabled,LockoutEndDateUtc,IsTwoFactorEnabled,CreatedAt,UpdatedAt
-1,Ivan,Ivanov,RU,,,True,test@saritasa.com,SHA256$BCB15F821479B4D5772BD0CA866C00AD5F926E3580720659CC80D39C9D09802A,0,,False,test@saritasa.com,True,,False,,False,2016-10-04 21:35:32.0616979,

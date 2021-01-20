@@ -1,6 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<parameters>
-  <parameter name="AppDbContextProviderName" defaultvalue="System.Data.SQLite">
-    <parameterEntry kind="XmlFile" scope="Web.config" match="/configuration/connectionStrings/add[@name='AppDbContext']/@providerName" />
-  </parameter>
-</parameters>
