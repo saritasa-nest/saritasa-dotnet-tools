@@ -29,6 +29,7 @@ $packages = @(
     'Saritasa.Tools.Domain' # domain
     'Saritasa.Tools.EF6' # ef6
     'Saritasa.Tools.EFCore3' # efcore3
+    'Saritasa.Tools.EFCore5' # efcore5
     'Saritasa.Tools.Emails' # emails
     'Saritasa.Tools.Misc' # misc
 )

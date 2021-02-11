@@ -12,6 +12,7 @@ Overview
 4. [Saritasa.Tools.Misc](https://www.nuget.org/packages/Saritasa.Tools.Misc) - _miscellaneous: password generation;_
 5. [Saritasa.Tools.EF6](https://www.nuget.org/packages/Saritasa.Tools.EF6) - _unit of work and repository implementation for Entity Framework 6;_
 6. [Saritasa.Tools.EFCore3](https://www.nuget.org/packages/Saritasa.Tools.EFCore3) - _unit of work and repository implementation for Entity Framework Core 3;_
+7. [Saritasa.Tools.EFCore5](https://www.nuget.org/packages/Saritasa.Tools.EFCore5) - _unit of work and repository implementation for Entity Framework Core 5;_
 
 Goals
 -----

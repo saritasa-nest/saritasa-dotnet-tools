@@ -1,0 +1,2 @@
+﻿0.8.2 [2021-02-11]
+[*] Initial release of EFCore5 package.
