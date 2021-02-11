@@ -1,4 +1,4 @@
-﻿0.8.1 [TBD]
+﻿0.8.1 [2021-02-11]
 [+] Add method EFPagedListFactory.AsOnePage .
 
 0.7.1 [2020-01-13]
