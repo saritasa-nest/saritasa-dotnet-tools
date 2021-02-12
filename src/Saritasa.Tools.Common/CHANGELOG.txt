@@ -1,4 +1,7 @@
-﻿3.3.1 [2021-01-20]
+﻿3.4.0 [TBD]
+[*] CollectionUtils.OrderMultiple now makes case insensitive keys search.
+
+3.3.1 [2021-01-20]
 [*] Fix StringUtils.ParseOrDefaultExtended NRE if null value.
 
 3.3.0 [2020-11-30]
@@ -8,7 +11,7 @@
 [*] DateTimeUtils.GetRange now returns reverse collection if "from" date is greater than "to" date.
 [+] Add DateTimeUtils overloads for DateTimeOffset: GetRange, Add, GetStartOfPeriod, GetEndOfPeriod, Truncate.
 [+] Add CollectionUtils.ChunkSelectRangeAsync for IAsyncEnumerable.
-[*] Make paramter update of CollectionUtils.ApplyDiff optional.
+[*] Make parameter update of CollectionUtils.ApplyDiff optional.
 [*] Improve CollectionUtils chunk select methods validation.
 
 3.2.2 [2020-07-06]
@@ -106,7 +109,7 @@
 [+] Add DateTimeUtils.Set method.
 [*] Update Microsoft.NETCore.App to 1.1.1 .
 [-] Remove DateTimeExtensions.IsHoliday and more other utils and extensions.
-[+] Most of extension methods now have utils equivalent. Extenstions are shortcuts for utils methods.
+[+] Most of extension methods now have utils equivalent. Extensions are shortcuts for utils methods.
 [+] Add ObjectUtils.CreateTypeFactory method.
 [+] Add more CRC-32 and CRC-64 checks.
 

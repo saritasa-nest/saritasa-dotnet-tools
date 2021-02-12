@@ -345,6 +345,32 @@ namespace Saritasa.Tools.Common.Tests
         }
 
         [Fact]
+        public void OrderMultiple_OrderWithCamelCaseKey_KeysMatchShouldBeCaseInsensitive()
+        {
+            // Arrange
+            var source = new List<User>
+            {
+                new User(1, "B"),
+                new User(2, "A")
+            };
+
+            // Act
+            var target = CollectionUtils.OrderMultiple(
+                source,
+                OrderParsingDelegates.ParseSeparated("name:asc"),
+                ("Name", u => u.Name)
+            );
+
+            // Assert
+            var expected = new List<User>
+            {
+                new User(2, "A"),
+                new User(1, "B")
+            };
+            Assert.Equal(expected, target, new UserEqualityComparer());
+        }
+
+        [Fact]
         public void ChunkSelectRange_ListWithItems_ShouldIterateWholeList()
         {
             // Arrange

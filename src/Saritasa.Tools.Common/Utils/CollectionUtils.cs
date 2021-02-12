@@ -91,7 +91,7 @@ namespace Saritasa.Tools.Common.Utils
                 var count = 0;
                 for (int i = 0; i < keySelectors.Length; i++)
                 {
-                    if (keySelectors[i].FieldName == fieldName)
+                    if (keySelectors[i].FieldName.Equals(fieldName, StringComparison.OrdinalIgnoreCase))
                     {
                         count++;
                         yield return keySelectors[i].Selector;
@@ -172,7 +172,7 @@ namespace Saritasa.Tools.Common.Utils
                 var count = 0;
                 for (int i = 0; i < keySelectors.Length; i++)
                 {
-                    if (keySelectors[i].FieldName == fieldName)
+                    if (keySelectors[i].FieldName.Equals(fieldName, StringComparison.OrdinalIgnoreCase))
                     {
                         count++;
                         yield return keySelectors[i].Selector;
