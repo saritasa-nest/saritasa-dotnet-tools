@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2019, Saritasa. All rights reserved.
+// Copyright (c) 2015-2021, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -30,10 +30,11 @@ namespace Saritasa.Tools.Common.Tests
             }
         }
 
-        private sealed class UsersComparer : IComparer<User>
+        private sealed class UserIdentityEqualityComparer : IEqualityComparer<User>
         {
-            public int Compare(User x, User y) =>
-                y != null && (x != null && (x.Id == y.Id && x.Name == y.Name)) ? 0 : -1;
+            public bool Equals(User x, User y) => x.Id == y.Id;
+
+            public int GetHashCode(User obj) => obj.Id.GetHashCode();
         }
 
         private sealed class UserEqualityComparer : IEqualityComparer<User>
@@ -51,10 +52,12 @@ namespace Saritasa.Tools.Common.Tests
             var target = new[] { 1, 2, 4 };
 
             // Act
-            var actions = CollectionUtils.Diff(source, target);
+            var diff = CollectionUtils.Diff(source, target);
+            var diffEq = CollectionUtils.Diff(source, target, EqualityComparer<int>.Default);
 
             // Assert
-            Assert.Equal(new[] { 4 }, actions.Added);
+            Assert.Equal(new[] { 4 }, diff.Added);
+            Assert.Equal(new[] { 4 }, diffEq.Added);
         }
 
         [Fact]
@@ -65,10 +68,12 @@ namespace Saritasa.Tools.Common.Tests
             var target = new[] { 1, 4 };
 
             // Act
-            var actions = CollectionUtils.Diff(source, target);
+            var diff = CollectionUtils.Diff(source, target);
+            var diffEq = CollectionUtils.Diff(source, target, EqualityComparer<int>.Default);
 
             // Assert
-            Assert.Equal(new[] { 2, 3 }, actions.Removed);
+            Assert.Equal(new[] { 2, 3 }, diff.Removed);
+            Assert.Equal(new[] { 2, 3 }, diffEq.Removed);
         }
 
         [Fact]
@@ -89,31 +94,37 @@ namespace Saritasa.Tools.Common.Tests
 
             // Act
             var diff = CollectionUtils.Diff(source, target, (u1, u2) => u1.Id == u2.Id);
+            var diffEq = CollectionUtils.Diff(source, target, new UserIdentityEqualityComparer());
 
             // Assert
             Assert.Equal(new[] { new DiffResultUpdatedItems<User>(source[1], target[1]) }, diff.Updated);
+            Assert.Equal(new[] { new DiffResultUpdatedItems<User>(source[1], target[1]) }, diffEq.Updated);
         }
 
         [Fact]
         public void Diff_TargetCollectionWithUpdatedElementsAndComparer_NotUpdatedElementsSkipped()
         {
             // Arrange
-            var source = new[]
+            var source = new User[]
             {
-                new User(1, "Doug"),
-                new User(2, "Pasha")
+                new (1, "Doug"),
+                new (2, "Pasha")
             };
-            var target = new[]
+            var target = new User[]
             {
-                new User(1, "Doug"),
-                new User(2, "Pavel")
+                new (1, "Doug"),
+                new (2, "Pavel")
             };
 
             // Act
-            var diff = CollectionUtils.Diff(source, target, (u1, u2) => u1.Id == u2.Id, new UsersComparer());
+            var diff = CollectionUtils.Diff(source, target, (u1, u2) => u1.Id == u2.Id, (u1, u2) =>
+                u2 != null && (u1 != null && (u1.Id == u2.Id && u1.Name == u2.Name)));
+            var diffEq = CollectionUtils.Diff(source, target, new UserIdentityEqualityComparer(), (u1, u2) =>
+                u2 != null && (u1 != null && (u1.Id == u2.Id && u1.Name == u2.Name)));
 
             // Assert
             Assert.Equal(new[] { new DiffResultUpdatedItems<User>(source[1], target[1]) }, diff.Updated);
+            Assert.Equal(new[] { new DiffResultUpdatedItems<User>(source[1], target[1]) }, diffEq.Updated);
         }
 
         [Fact]
@@ -122,32 +133,36 @@ namespace Saritasa.Tools.Common.Tests
             // Arrange
             var source = new List<User>
             {
-                new User(1, "Ivan"),
-                new User(2, "Roma"),
-                new User(3, "Vlad"),
-                new User(4, "Denis"),
-                new User(5, "Nastya"),
-                new User(6, "Marina"),
-                new User(7, "Varvara"),
+                new (1, "Ivan"),
+                new (2, "Roma"),
+                new (3, "Vlad"),
+                new (4, "Denis"),
+                new (5, "Nastya"),
+                new (6, "Marina"),
+                new (7, "Varvara"),
             };
             var target = new List<User>
             {
-                new User(1, "Ivan"),
-                new User(2, "Roman"),
-                new User(5, "Anastasya"),
-                new User(6, "Marina"),
-                new User(7, "Varvara"),
-                new User(0, "Tamara"),
-                new User(0, "Pavel"),
+                new (1, "Ivan"),
+                new (2, "Roman"),
+                new (5, "Anastasya"),
+                new (6, "Marina"),
+                new (7, "Varvara"),
+                new (0, "Tamara"),
+                new (0, "Pavel"),
             };
 
             // Act
             var diff = CollectionUtils.Diff(source, target, (u1, u2) => u1.Id == u2.Id);
+            var diffEq = CollectionUtils.Diff(source, target, new UserIdentityEqualityComparer());
 
             // Assert
             Assert.Equal(2, diff.Added.Count);
             Assert.Equal(5, diff.Updated.Count);
             Assert.Equal(2, diff.Removed.Count);
+            Assert.Equal(2, diffEq.Added.Count);
+            Assert.Equal(5, diffEq.Updated.Count);
+            Assert.Equal(2, diffEq.Removed.Count);
         }
 
         [Fact]
@@ -156,23 +171,23 @@ namespace Saritasa.Tools.Common.Tests
             // Arrange
             var initialCollection = new List<User>
             {
-                new User(1, "Ivan"),
-                new User(2, "Roma"),
-                new User(3, "Vlad"),
-                new User(4, "Denis"),
-                new User(5, "Nastya"),
-                new User(6, "Marina"),
-                new User(7, "Varvara"),
+                new (1, "Ivan"),
+                new (2, "Roma"),
+                new (3, "Vlad"),
+                new (4, "Denis"),
+                new (5, "Nastya"),
+                new (6, "Marina"),
+                new (7, "Varvara"),
             };
             var newCollection = new List<User>
             {
-                new User(1, "Ivan"),
-                new User(2, "Roman"),
-                new User(5, "Anastasya"),
-                new User(6, "Marina"),
-                new User(7, "Varvara"),
-                new User(0, "Tamara"),
-                new User(0, "Pavel"),
+                new (1, "Ivan"),
+                new (2, "Roman"),
+                new (5, "Anastasya"),
+                new (6, "Marina"),
+                new (7, "Varvara"),
+                new (0, "Tamara"),
+                new (0, "Pavel"),
             };
 
             // Act
@@ -212,10 +227,10 @@ namespace Saritasa.Tools.Common.Tests
             // Arrange
             var source = new List<User>
             {
-                new User(1, "A"),
-                new User(4, "B"),
-                new User(4, "Z"),
-                new User(2, "D")
+                new (1, "A"),
+                new (4, "B"),
+                new (4, "Z"),
+                new (2, "D")
             };
 
             // Act
@@ -229,10 +244,10 @@ namespace Saritasa.Tools.Common.Tests
             // Assert
             var expected = new List<User>
             {
-                new User(1, "A"),
-                new User(2, "D"),
-                new User(4, "Z"),
-                new User(4, "B")
+                new (1, "A"),
+                new (2, "D"),
+                new (4, "Z"),
+                new (4, "B")
             };
             Assert.Equal(expected, target, new UserEqualityComparer());
         }
@@ -243,10 +258,10 @@ namespace Saritasa.Tools.Common.Tests
             // Arrange
             var source = new List<User>
             {
-                new User(1, "A"),
-                new User(4, "B"),
-                new User(4, "Z"),
-                new User(2, "D")
+                new (1, "A"),
+                new (4, "B"),
+                new (4, "Z"),
+                new (2, "D")
             };
 
             // Act
@@ -260,10 +275,10 @@ namespace Saritasa.Tools.Common.Tests
             // Assert
             var expected = new List<User>
             {
-                new User(1, "A"),
-                new User(2, "D"),
-                new User(4, "Z"),
-                new User(4, "B")
+                new (1, "A"),
+                new (2, "D"),
+                new (4, "Z"),
+                new (4, "B")
             };
             Assert.Equal(expected, target, new UserEqualityComparer());
         }
@@ -274,8 +289,8 @@ namespace Saritasa.Tools.Common.Tests
             // Arrange
             var source = new List<User>
             {
-                new User(2, "B"),
-                new User(1, "A")
+                new (2, "B"),
+                new (1, "A")
             };
 
             // Act
@@ -288,8 +303,8 @@ namespace Saritasa.Tools.Common.Tests
             // Assert
             var expected = new List<User>
             {
-                new User(2, "B"),
-                new User(1, "A")
+                new (2, "B"),
+                new (1, "A")
             };
             Assert.Equal(expected, target, new UserEqualityComparer());
         }
@@ -300,9 +315,9 @@ namespace Saritasa.Tools.Common.Tests
             // Arrange
             var source = new List<User>
             {
-                new User(1, "B"),
-                new User(1, "A"),
-                new User(2, "C"),
+                new (1, "B"),
+                new (1, "A"),
+                new (2, "C"),
             };
 
             // Act
@@ -316,9 +331,9 @@ namespace Saritasa.Tools.Common.Tests
             // Assert
             var expected = new List<User>
             {
-                new User(1, "A"),
-                new User(1, "B"),
-                new User(2, "C"),
+                new (1, "A"),
+                new (1, "B"),
+                new (2, "C"),
             };
             Assert.Equal(expected, target, new UserEqualityComparer());
         }
@@ -329,7 +344,7 @@ namespace Saritasa.Tools.Common.Tests
             // Arrange
             var source = new List<User>
             {
-                new User(1, "B"),
+                new (1, "B"),
             };
 
             // Assert
@@ -350,8 +365,8 @@ namespace Saritasa.Tools.Common.Tests
             // Arrange
             var source = new List<User>
             {
-                new User(1, "B"),
-                new User(2, "A")
+                new (1, "B"),
+                new (2, "A")
             };
 
             // Act

@@ -1,4 +1,4 @@
-﻿// Copyright(c) 2015-2020, Saritasa.All rights reserved.
+﻿// Copyright(c) 2015-2021, Saritasa.All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -442,25 +442,24 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Compares two collections and creates a list with items to add, remove and update based
+        /// Compares two collections and creates a diff with items to add, remove and update based
         /// on identity equality.
         ///
         /// The updated items are formatted using comparer argument. If defined, it is used to determine whether
-        /// to add items to "updated" collection. If not the method tries to use <see cref="IComparable{T}" /> interface.
-        /// Otherwise every item in target collection considered as updated.
+        /// to add items to "updated" collection. If not the method tries to use Equals call.
         /// </summary>
         /// <param name="source">Source collection.</param>
         /// <param name="target">Target collection (new).</param>
-        /// <param name="identityComparer">Comparer elements by identity. This means that elements may be
-        /// identity equal but target collection has its newer version. If null the Equals method will be used.</param>
-        /// <param name="comparer">Comparer for full objects compare. If not defined every object considered as updated.</param>
+        /// <param name="identityComparer">Comparer elements by identity. This means that elements might be
+        /// identity equal but target collection has its newer version.</param>
+        /// <param name="dataComparer">Comparer for full objects compare. If not defined every object considered as updated.</param>
         /// <typeparam name="T">Item type.</typeparam>
         /// <returns>Items to add, remove and update.</returns>
         public static DiffResult<T> Diff<T>(
             IEnumerable<T> source,
             IEnumerable<T> target,
-            Func<T, T, bool>? identityComparer = null,
-            IComparer<T>? comparer = null)
+            Func<T, T, bool> identityComparer,
+            Func<T, T, bool>? dataComparer = null)
         {
             if (source == null)
             {
@@ -470,26 +469,24 @@ namespace Saritasa.Tools.Common.Utils
             {
                 throw new ArgumentNullException(nameof(target));
             }
-            identityComparer ??= (obj1, obj2) => obj1 != null && obj1.Equals(obj2);
+            if (identityComparer == null)
+            {
+                throw new ArgumentNullException(nameof(identityComparer));
+            }
+            dataComparer ??= (o1, o2) => o1 != null && o1.Equals(o2);
 
-            var sourceArr = source.ToArray();
-            var targetArr = target.ToArray();
-            var added = new List<T>(sourceArr.Length / 2);
-            var updated = new List<DiffResultUpdatedItems<T>>(sourceArr.Length);
-            var removed = new List<T>(sourceArr.Length / 2);
-            var targetBits = new BitArray(targetArr.Length);
+            var sourceArr = source is ICollection<T> sourceList ? sourceList : source.ToArray();
+            var targetArr = target is IList<T> targetList ? targetList : target.ToArray();
+            var added = new List<T>(targetArr.Count / 2);
+            var updated = new List<DiffResultUpdatedItems<T>>(sourceArr.Count);
+            var removed = new List<T>(sourceArr.Count / 2);
+            var targetBits = new BitArray(targetArr.Count);
 
             // Determine updated and removed elements.
-            Func<T, T, bool> comparerFunc =
-                (o1, o2) => o1 != null && (o1.Equals(o2) || o1 is IComparable<T> comparable && comparable.CompareTo(o2) == 0);
-            if (comparer != null)
-            {
-                comparerFunc = (o1, o2) => comparer.Compare(o1, o2) == 0;
-            }
-            for (int i = 0; i < sourceArr.Length; i++)
+            foreach (var sourceItem in sourceArr)
             {
                 bool isRemoved = true;
-                for (int j = 0; j < targetArr.Length; j++)
+                for (int j = 0; j < targetArr.Count; j++)
                 {
                     if (targetBits[j])
                     {
@@ -497,11 +494,11 @@ namespace Saritasa.Tools.Common.Utils
                     }
 
                     // Elements are identity equal.
-                    if (identityComparer(sourceArr[i], targetArr[j]))
+                    if (identityComparer(sourceItem, targetArr[j]))
                     {
-                        if (!comparerFunc(sourceArr[i], targetArr[j]))
+                        if (!dataComparer(sourceItem, targetArr[j]))
                         {
-                            updated.Add(new DiffResultUpdatedItems<T>(sourceArr[i], targetArr[j]));
+                            updated.Add(new DiffResultUpdatedItems<T>(sourceItem, targetArr[j]));
                         }
                         targetBits[j] = true;
                         isRemoved = false;
@@ -511,23 +508,90 @@ namespace Saritasa.Tools.Common.Utils
 
                 if (isRemoved)
                 {
-                    removed.Add(sourceArr[i]);
+                    removed.Add(sourceItem);
                 }
             }
 
             // Determine new elements.
-            for (int i = 0; i < targetArr.Length; i++)
-            {
-                if (targetBits[i])
-                {
-                    continue;
-                }
-                added.Add(targetArr[i]);
-            }
+            added.AddRange(targetArr.Where((t, i) => !targetBits[i]));
 
             // Format result.
-            var dto = new DiffResult<T>(added, removed, updated);
-            return dto;
+            return new DiffResult<T>(added, removed, updated);
+        }
+
+        /// <summary>
+        /// Compares two collections and creates a diff with items to add, remove and update based
+        /// on identity equality.
+        ///
+        /// The updated items are formatted using comparer argument. If defined, it is used to determine whether
+        /// to add items to "updated" collection. If not the method tries to use Equals call.
+        /// </summary>
+        /// <param name="source">Source collection.</param>
+        /// <param name="target">Target collection (new).</param>
+        /// <param name="identityEqualityComparer">Comparer elements by identity. This means that elements might be
+        /// identity equal but target collection has its newer version. If null the Equals method will be used.</param>
+        /// <param name="dataComparer">Comparer for full objects compare. If not defined every object considered as updated.</param>
+        /// <typeparam name="T">Item type.</typeparam>
+        /// <returns>Items to add, remove and update.</returns>
+        public static DiffResult<T> Diff<T>(
+            IEnumerable<T> source,
+            IEnumerable<T> target,
+            IEqualityComparer<T>? identityEqualityComparer = null,
+            Func<T, T, bool>? dataComparer = null
+        )
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+            if (target == null)
+            {
+                throw new ArgumentNullException(nameof(target));
+            }
+            identityEqualityComparer ??= EqualityComparer<T>.Default;
+            dataComparer ??= (o1, o2) => o1 != null && o1.Equals(o2);
+
+            var sourceArr = source is ICollection<T> sourceList ? sourceList : source.ToArray();
+#if NETSTANDARD2_1
+            var targetSet = new HashSet<T>(target, identityEqualityComparer);
+#else
+            var targetSet = target.ToDictionary(t => t, t => t, identityEqualityComparer);
+#endif
+            var added = new List<T>(targetSet.Count / 2);
+            var updated = new List<DiffResultUpdatedItems<T>>(sourceArr.Count / 2);
+            var removed = new List<T>(sourceArr.Count / 2);
+
+            foreach (var sourceItem in sourceArr)
+            {
+                if (targetSet.TryGetValue(sourceItem, out T targetItemToCompare))
+                {
+                    if (!dataComparer(sourceItem, targetItemToCompare))
+                    {
+                        // No data equal - for update.
+                        updated.Add(new DiffResultUpdatedItems<T>(sourceItem, targetItemToCompare));
+                    }
+                    targetSet.Remove(targetItemToCompare);
+                }
+                else
+                {
+                    // Cannot find - to remove.
+                    removed.Add(sourceItem);
+                }
+            }
+
+            foreach (var item in target)
+            {
+                // Now in targetSet we only have items that are not in source set. They are new!
+#if NETSTANDARD2_1
+                if (targetSet.Contains(item))
+#else
+                if (targetSet.ContainsKey(item))
+#endif
+                {
+                    added.Add(item);
+                }
+            }
+            return new DiffResult<T>(added, removed, updated);
         }
 
         /// <summary>

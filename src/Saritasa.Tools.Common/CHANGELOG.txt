@@ -1,5 +1,7 @@
-﻿3.4.0 [TBD]
+﻿4.0.0 [TBD]
 [*] CollectionUtils.OrderMultiple now makes case insensitive keys search.
+[*] CollectionUtils.Diff now has overload with IEqualityComparer with much better performance.
+[*] CollectionUtils.Diff accepts delegate instead of IComparer interface.
 
 3.3.1 [2021-01-20]
 [*] Fix StringUtils.ParseOrDefaultExtended NRE if null value.

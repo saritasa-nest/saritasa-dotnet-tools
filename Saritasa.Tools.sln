@@ -27,6 +27,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saritasa.Tools.EFCore5", "s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.EFCore3", "src\Saritasa.Tools.EFCore3\Saritasa.Tools.EFCore3.csproj", "{66037F7C-03F2-4342-8023-26297304F8A3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.Benchmarks", "test\Saritasa.Tools.Benchmarks\Saritasa.Tools.Benchmarks.csproj", "{A8DD531A-243E-4B9B-B13B-791293F05989}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -73,6 +75,10 @@ Global
 		{66037F7C-03F2-4342-8023-26297304F8A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{66037F7C-03F2-4342-8023-26297304F8A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{66037F7C-03F2-4342-8023-26297304F8A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8DD531A-243E-4B9B-B13B-791293F05989}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8DD531A-243E-4B9B-B13B-791293F05989}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8DD531A-243E-4B9B-B13B-791293F05989}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8DD531A-243E-4B9B-B13B-791293F05989}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -88,6 +94,7 @@ Global
 		{C822750F-1D0D-434A-93E1-928A2D693F5B} = {635DB5B1-86B3-4F5B-97A6-04C71D672296}
 		{18DD7882-E4F8-4704-BA5D-80B5F811919F} = {45D13EC5-88F3-403A-8148-0812C2796062}
 		{66037F7C-03F2-4342-8023-26297304F8A3} = {45D13EC5-88F3-403A-8148-0812C2796062}
+		{A8DD531A-243E-4B9B-B13B-791293F05989} = {635DB5B1-86B3-4F5B-97A6-04C71D672296}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F298C89B-4162-49D5-B517-5306BD58DB59}
