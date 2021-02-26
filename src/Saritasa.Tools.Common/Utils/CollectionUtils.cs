@@ -579,18 +579,12 @@ namespace Saritasa.Tools.Common.Utils
                 }
             }
 
-            foreach (var item in target)
-            {
-                // Now in targetSet we only have items that are not in source set. They are new!
 #if NETSTANDARD2_1
-                if (targetSet.Contains(item))
+            added.AddRange(target.Where(item => targetSet.Contains(item)));
 #else
-                if (targetSet.ContainsKey(item))
+            added.AddRange(target.Where(item => targetSet.ContainsKey(item)));
 #endif
-                {
-                    added.Add(item);
-                }
-            }
+
             return new DiffResult<T>(added, removed, updated);
         }
 

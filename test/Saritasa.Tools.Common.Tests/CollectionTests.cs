@@ -169,7 +169,7 @@ namespace Saritasa.Tools.Common.Tests
         public void ApplyDiff_TargetCollectionWithElements_AfterApplyCollectionsAreEqual()
         {
             // Arrange
-            var initialCollection = new List<User>
+            var source = new List<User>
             {
                 new (1, "Ivan"),
                 new (2, "Roma"),
@@ -179,7 +179,7 @@ namespace Saritasa.Tools.Common.Tests
                 new (6, "Marina"),
                 new (7, "Varvara"),
             };
-            var newCollection = new List<User>
+            var target = new List<User>
             {
                 new (1, "Ivan"),
                 new (2, "Roman"),
@@ -191,14 +191,50 @@ namespace Saritasa.Tools.Common.Tests
             };
 
             // Act
-            var diff = CollectionUtils.Diff(initialCollection, newCollection, (u1, u2) => u1.Id == u2.Id);
-            CollectionUtils.ApplyDiff(initialCollection, diff, (source, target) =>
+            var diff = CollectionUtils.Diff(source, target, (u1, u2) => u1.Id == u2.Id);
+            CollectionUtils.ApplyDiff(source, diff, (source, target) =>
             {
                 source.Name = target.Name;
             });
 
             // Assert
-            Assert.Equal(newCollection.OrderBy(u => u.Id), initialCollection.OrderBy(u => u.Id), new UserEqualityComparer());
+            Assert.Equal(target.OrderBy(u => u.Id), source.OrderBy(u => u.Id), new UserEqualityComparer());
+        }
+
+        [Fact]
+        public void ApplyDiffEqComparer_TargetCollectionWithElements_AfterApplyCollectionsAreEqual()
+        {
+            // Arrange
+            var source = new List<User>
+            {
+                new (1, "Ivan"),
+                new (2, "Roma"),
+                new (3, "Vlad"),
+                new (4, "Denis"),
+                new (5, "Nastya"),
+                new (6, "Marina"),
+                new (7, "Varvara"),
+            };
+            var target = new List<User>
+            {
+                new (1, "Ivan"),
+                new (2, "Roman"),
+                new (5, "Anastasya"),
+                new (6, "Marina"),
+                new (7, "Varvara"),
+                new (0, "Tamara"),
+                new (0, "Pavel"),
+            };
+
+            // Act
+            var diff = CollectionUtils.Diff(source, target, new UserIdentityEqualityComparer());
+            CollectionUtils.ApplyDiff(source, diff, (source, target) =>
+            {
+                source.Name = target.Name;
+            });
+
+            // Assert
+            Assert.Equal(target.OrderBy(u => u.Id), source.OrderBy(u => u.Id), new UserEqualityComparer());
         }
 
         [Fact]
