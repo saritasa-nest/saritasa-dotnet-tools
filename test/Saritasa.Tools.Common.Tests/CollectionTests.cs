@@ -523,5 +523,46 @@ namespace Saritasa.Tools.Common.Tests
             // Assert
             Assert.Equal(9, iterations);
         }
+
+        [Fact]
+        public void Pairwise_List_ShouldCreateCorrectly()
+        {
+            // Arrange
+            var collection = new int[]
+            {
+                1,
+                2,
+                3,
+                4,
+            };
+
+            // Act
+            var pairwisedCollection = CollectionUtils.Pairwise(collection).ToList();
+
+            // Assert
+            var expected = new List<(int, int)>
+            {
+                (1, 2),
+                (2, 3),
+                (3, 4)
+            };
+            Assert.Equal(expected, pairwisedCollection);
+        }
+
+        [Fact]
+        public void Pairwise_List_EmptyIfOneElement()
+        {
+            // Arrange
+            var collection = new int[]
+            {
+                1,
+            };
+
+            // Act
+            var pairwisedCollection = CollectionUtils.Pairwise(collection).ToList();
+
+            // Assert
+            Assert.Empty(pairwisedCollection);
+        }
     }
 }

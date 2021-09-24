@@ -136,5 +136,19 @@ namespace Saritasa.Tools.Common.Extensions
                 target.Add(item);
             }
         }
+
+        /// <summary>
+        /// Iterate over a collection handling 2 items at a time, you always have the "previous" and "current" item.
+        /// </summary>
+        /// <typeparam name="TSource">Item source type.</typeparam>
+        /// <param name="source">Source collection.</param>
+        /// <returns>Enumeration in pairs.</returns>
+        /// <example>
+        /// Array [1, 2, 3, 4] will be transformed to [(1, 2), (2, 3), (3, 4)].
+        /// </example>
+        public static IEnumerable<(TSource, TSource)> Pairwise<TSource>(this IEnumerable<TSource> source)
+        {
+            return CollectionUtils.Pairwise(source);
+        }
     }
 }
