@@ -642,7 +642,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Iterate over a collection handling 2 items at a time, you always have the "previous" and "current" item.
+        /// Iterate over a collection handling 2 items at a time.
         /// </summary>
         /// <typeparam name="T">Item source type.</typeparam>
         /// <param name="source">Source collection.</param>
@@ -652,6 +652,10 @@ namespace Saritasa.Tools.Common.Utils
         /// </example>
         public static IEnumerable<(T, T)> Pairwise<T>(IEnumerable<T> source)
         {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
             var previous = default(T);
             using (var iterator = source.GetEnumerator())
             {
