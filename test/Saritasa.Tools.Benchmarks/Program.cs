@@ -14,7 +14,7 @@ namespace Saritasa.Tools.Benchmarks
         /// Entry point.
         /// </summary>
         /// <param name="args">Program arguments.</param>
-        public static void Main(string[] args)
+        public static void Main()
         {
             BenchmarkRunner.Run<CollectionUtilsDiffBenchmark>();
         }

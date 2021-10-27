@@ -140,7 +140,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
         /// <exception cref="ArgumentOutOfRangeException">Occurs when argument is negative.</exception>
-        public static void IsNotNegative(Int64 argument, string argumentName)
+        public static void IsNotNegative(long argument, string argumentName)
         {
             if (argument < 0)
             {
@@ -154,7 +154,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
         /// <exception cref="ArgumentOutOfRangeException">Occurs when argument is negative or zero.</exception>
-        public static void IsNotNegativeOrZero(Int64 argument, string argumentName)
+        public static void IsNotNegativeOrZero(long argument, string argumentName)
         {
             if (argument <= 0)
             {
@@ -168,7 +168,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
         /// <exception cref="ArgumentOutOfRangeException">Occurs when argument is negative.</exception>
-        public static void IsNotNegative(Single argument, string argumentName)
+        public static void IsNotNegative(float argument, string argumentName)
         {
             if (argument < 0)
             {
@@ -182,7 +182,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
         /// <exception cref="ArgumentOutOfRangeException">Occurs when argument is negative or zero.</exception>
-        public static void IsNotNegativeOrZero(Single argument, string argumentName)
+        public static void IsNotNegativeOrZero(float argument, string argumentName)
         {
             if (argument <= 0)
             {
@@ -196,7 +196,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
         /// <exception cref="ArgumentOutOfRangeException">Occurs when argument is negative.</exception>
-        public static void IsNotNegative(Decimal argument, string argumentName)
+        public static void IsNotNegative(decimal argument, string argumentName)
         {
             if (argument < 0)
             {
@@ -210,7 +210,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="argument">Argument.</param>
         /// <param name="argumentName">Argument name.</param>
         /// <exception cref="ArgumentOutOfRangeException">Occurs when argument is not negative or zero.</exception>
-        public static void IsNotNegativeOrZero(Decimal argument, string argumentName)
+        public static void IsNotNegativeOrZero(decimal argument, string argumentName)
         {
             if (argument <= 0)
             {

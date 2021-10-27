@@ -650,7 +650,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <example>
         /// Array [1, 2, 3, 4] will be transformed to [(1, 2), (2, 3), (3, 4)].
         /// </example>
-        public static IEnumerable<(T, T)> Pairwise<T>(IEnumerable<T> source)
+        public static IEnumerable<(T Item1, T Item2)> Pairwise<T>(IEnumerable<T> source)
         {
             if (source == null)
             {

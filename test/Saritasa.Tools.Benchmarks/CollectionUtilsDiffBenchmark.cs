@@ -49,7 +49,7 @@ namespace Saritasa.Tools.Benchmarks
             private bool Equals(User other) => Id.Equals(other.Id) && Name == other.Name;
 
             /// <inheritdoc />
-            public override bool Equals(object obj) => ReferenceEquals(this, obj) || obj is User other && Equals(other);
+            public override bool Equals(object obj) => ReferenceEquals(this, obj) || (obj is User other && Equals(other));
 
             /// <inheritdoc />
             public override int GetHashCode() => HashCode.Combine(Id, Name);
