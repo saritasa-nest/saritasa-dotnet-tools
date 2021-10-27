@@ -1,8 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<RuleSet Name="Saritasa Code Rules" Description="Saritasa code style conventions for .NET projects." ToolsVersion="14.0">
-  <Rules AnalyzerId="Microsoft.CodeAnalysis.CSharp" RuleNamespace="Microsoft.CodeAnalysis.CSharp">
-    <Rule Id="CS1574" Action="Error" />
-  </Rules>
+<RuleSet Name="Saritasa Code Rules" Description="Saritasa code style conventions for .NET projects." ToolsVersion="16.0">
   <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
     <Rule Id="CA1001" Action="Warning" />
     <Rule Id="CA1009" Action="Warning" />
@@ -75,6 +72,9 @@
     <Rule Id="CA2241" Action="Warning" />
     <Rule Id="CA2242" Action="Warning" />
   </Rules>
+  <Rules AnalyzerId="Microsoft.CodeAnalysis.CSharp.Features" RuleNamespace="Microsoft.CodeAnalysis.CSharp.Features">
+    <Rule Id="IDE0049" Action="Warning" />
+  </Rules>
   <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
     <Rule Id="SA0001" Action="None" />
     <Rule Id="SA1000" Action="Warning" />
@@ -105,6 +105,7 @@
     <Rule Id="SA1028" Action="Warning" />
     <Rule Id="SA1100" Action="None" />
     <Rule Id="SA1101" Action="None" />
+    <Rule Id="SA1107" Action="Warning" />
     <Rule Id="SA1111" Action="None" />
     <Rule Id="SA1116" Action="None" />
     <Rule Id="SA1117" Action="None" />
@@ -116,7 +117,7 @@
     <Rule Id="SA1125" Action="None" />
     <Rule Id="SA1127" Action="None" />
     <Rule Id="SA1128" Action="None" />
-    <Rule Id="SA1132" Action="None" />
+    <Rule Id="SA1132" Action="Warning" />
     <Rule Id="SA1200" Action="None" />
     <Rule Id="SA1201" Action="None" />
     <Rule Id="SA1202" Action="None" />
@@ -143,7 +144,7 @@
     <Rule Id="SA1400" Action="None" />
     <Rule Id="SA1402" Action="None" />
     <Rule Id="SA1407" Action="None" />
-    <Rule Id="SA1408" Action="None" />
+    <Rule Id="SA1408" Action="Warning" />
     <Rule Id="SA1413" Action="None" />
     <Rule Id="SA1503" Action="Warning" />
     <Rule Id="SA1504" Action="None" />
@@ -166,6 +167,7 @@
     <Rule Id="SA1606" Action="None" />
     <Rule Id="SA1607" Action="None" />
     <Rule Id="SA1608" Action="None" />
+    <Rule Id="SA1609" Action="None" />
     <Rule Id="SA1610" Action="None" />
     <Rule Id="SA1611" Action="None" />
     <Rule Id="SA1612" Action="None" />
