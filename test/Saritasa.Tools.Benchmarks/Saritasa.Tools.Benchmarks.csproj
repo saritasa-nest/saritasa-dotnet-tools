@@ -11,8 +11,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="All" />
       <PackageReference Include="BenchmarkDotNet" Version="0.13.1" />
+      <PackageReference Include="StyleCop.Analyzers.Unstable" Version="1.2.0.354">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
     </ItemGroup>
 
 </Project>
