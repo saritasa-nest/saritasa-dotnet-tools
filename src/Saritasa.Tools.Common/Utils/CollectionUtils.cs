@@ -70,7 +70,7 @@ namespace Saritasa.Tools.Common.Utils
             return sortOrder == ListSortDirection.Ascending ? source.OrderBy(keySelector) : source.OrderByDescending(keySelector);
         }
 
-#if NETSTANDARD1_6 || NETSTANDARD2_0 || NETSTANDARD2_1
+#if NETSTANDARD1_6_OR_GREATER || NET5_0_OR_GREATER
         /// <summary>
         /// Applies ordering to collection according to sorting entries and selectors. Allows to
         /// make ordering in one method call. For the first item, the OrderBy method call is applied.
@@ -273,7 +273,7 @@ namespace Saritasa.Tools.Common.Utils
             }
         }
 
-#if NETSTANDARD2_1
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
         /// <summary>
         /// Breaks a list of async items into chunks of a specific size.
         /// </summary>
@@ -552,7 +552,7 @@ namespace Saritasa.Tools.Common.Utils
             dataComparer ??= (o1, o2) => o1 != null && o1.Equals(o2);
 
             var sourceArr = source is ICollection<T> sourceList ? sourceList : source.ToArray();
-#if NETSTANDARD2_1
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
             var targetSet = new HashSet<T>(target, identityEqualityComparer);
 #else
             var targetSet = target.ToDictionary(t => t, t => t, identityEqualityComparer);
@@ -579,7 +579,7 @@ namespace Saritasa.Tools.Common.Utils
                 }
             }
 
-#if NETSTANDARD2_1
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
             added.AddRange(target.Where(item => targetSet.Contains(item)));
 #else
             added.AddRange(target.Where(item => targetSet.ContainsKey(item)));

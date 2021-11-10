@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2021, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace Saritasa.Tools.Common.Utils
 {
-#if NETSTANDARD2_0 || NETSTANDARD2_1
+#if NETSTANDARD2_0_OR_GREATER || NET5_0_OR_GREATER
     /// <summary>
     /// The class creates other object types with dependency resolving. Also has helpful methods
     /// to call object methods.

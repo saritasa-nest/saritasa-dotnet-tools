@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2021, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -13,7 +13,7 @@ namespace Saritasa.Tools.Common.Pagination
     /// </summary>
     /// <typeparam name="T">Source type.</typeparam>
     /// <seealso cref="IEnumerable{T}" />
-#if NET40 || NETSTANDARD2_0 || NETSTANDARD2_1
+#if NET40 || NETSTANDARD2_0_OR_GREATER || NET5_0_OR_GREATER
     [Serializable]
 #endif
     public class OffsetLimitList<T> : TotalCountList<T>
@@ -67,7 +67,7 @@ namespace Saritasa.Tools.Common.Pagination
             this.Limit = limit;
         }
 
-#if NET40 || NETSTANDARD2_0 || NETSTANDARD2_1
+#if NET40 || NETSTANDARD2_0_OR_GREATER || NET5_0_OR_GREATER
         /// <summary>
         /// Constructor for deserialization.
         /// </summary>

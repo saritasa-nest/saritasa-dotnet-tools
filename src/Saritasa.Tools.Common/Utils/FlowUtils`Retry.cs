@@ -1,10 +1,10 @@
-﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2021, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-#if NETSTANDARD1_6 || NETSTANDARD2_0 || NETSTANDARD2_1
+#if NETSTANDARD1_6_OR_GREATER || NET5_0_OR_GREATER
 using System.Reflection;
 #endif
 
@@ -71,7 +71,7 @@ namespace Saritasa.Tools.Common.Utils
                     }
                     if (delay.TotalMilliseconds > 0)
                     {
-#if NETSTANDARD1_6 || NETSTANDARD2_0 || NETSTANDARD2_1
+#if NETSTANDARD1_6_OR_GREATER || NET5_0_OR_GREATER
                         System.Threading.Tasks.Task.Delay(delay).Wait();
 #else
                         Thread.Sleep((int)delay.TotalMilliseconds);
@@ -204,7 +204,7 @@ namespace Saritasa.Tools.Common.Utils
 
                     if (delay.TotalMilliseconds > 0)
                     {
-#if NETSTANDARD1_6 || NETSTANDARD2_0 || NETSTANDARD2_1
+#if NETSTANDARD1_6_OR_GREATER || NET5_0_OR_GREATER
                         System.Threading.Tasks.Task.Delay((int)delay.TotalMilliseconds).Wait();
 #else
                         Thread.Sleep((int)delay.TotalMilliseconds);
@@ -263,7 +263,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 #endif
 
-#if NETSTANDARD1_6 || NETSTANDARD2_0 || NETSTANDARD2_1
+#if NETSTANDARD1_6_OR_GREATER || NET5_0_OR_GREATER
         /// <summary>
         /// Provides the async implementation of the retry mechanism for unreliable actions and transient conditions.
         /// </summary>
@@ -285,7 +285,7 @@ namespace Saritasa.Tools.Common.Utils
             // Based on TPL police we should check whether action already cancelled.
             if (cancellationToken.IsCancellationRequested)
             {
-#if NETSTANDARD1_6 || NETSTANDARD2_0 || NETSTANDARD2_1
+#if NETSTANDARD1_6_OR_GREATER || NET5_0_OR_GREATER
                 return await Task.FromCanceled<T>(cancellationToken);
 #else
                 var tcs = new TaskCompletionSource<T>();
@@ -362,7 +362,7 @@ namespace Saritasa.Tools.Common.Utils
             Type executedExceptionType = executedException.GetType();
             foreach (var exceptionType in exceptionsTypes)
             {
-#if NETSTANDARD1_6 || NETSTANDARD2_0 || NETSTANDARD2_1
+#if NETSTANDARD1_6_OR_GREATER || NET5_0_OR_GREATER
                 if (executedExceptionType == exceptionType || executedExceptionType.GetTypeInfo().IsSubclassOf(exceptionType))
 #else
                 if (executedExceptionType == exceptionType || executedExceptionType.IsSubclassOf(exceptionType))

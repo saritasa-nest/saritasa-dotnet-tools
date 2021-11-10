@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <AssemblyTitle>Saritasa Tools Domain, Emails Tests</AssemblyTitle>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <AssemblyName>Saritasa.Tools.Tests</AssemblyName>
     <AssemblyOriginatorKeyFile>../../tools/SaritasaTools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>

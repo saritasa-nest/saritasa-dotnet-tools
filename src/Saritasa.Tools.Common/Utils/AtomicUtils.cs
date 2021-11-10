@@ -1,8 +1,8 @@
-﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2021, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-#if NETSTANDARD1_6 || NETSTANDARD2_0 || NETSTANDARD2_1
+#if NETSTANDARD1_6_OR_GREATER || NET5_0_OR_GREATER
 using System.Runtime.CompilerServices;
 #endif
 using System.Threading;
@@ -20,7 +20,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <typeparam name="T">Variable type.</typeparam>
         /// <param name="item1">Variable 1.</param>
         /// <param name="item2">Variable 2.</param>
-#if NETSTANDARD1_6 || NETSTANDARD2_0 || NETSTANDARD2_1
+#if NETSTANDARD1_6_OR_GREATER || NET5_0_OR_GREATER
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
         public static void Swap<T>(ref T item1, ref T item2)

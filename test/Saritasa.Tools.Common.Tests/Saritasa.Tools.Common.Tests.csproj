@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <AssemblyTitle>Saritasa Tools Utils and Extensions Tests</AssemblyTitle>
     <AssemblyName>Saritasa.Tools.Common.Tests</AssemblyName>
     <PackageId>Saritasa.Tools.Common.Tests</PackageId>

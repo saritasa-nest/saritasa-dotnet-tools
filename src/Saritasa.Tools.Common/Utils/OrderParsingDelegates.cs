@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2021, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -6,7 +6,7 @@ using System.ComponentModel;
 
 namespace Saritasa.Tools.Common.Utils
 {
-#if NETSTANDARD1_6 || NETSTANDARD2_0 || NETSTANDARD2_1
+#if NETSTANDARD1_6_OR_GREATER || NET5_0_OR_GREATER
     /// <summary>
     /// Order entries parsing strategies to get array of (fieldName, order) tuples.
     /// </summary>

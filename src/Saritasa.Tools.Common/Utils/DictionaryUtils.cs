@@ -1,9 +1,9 @@
-﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2021, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
-#if NET40 || NETSTANDARD2_0 || NETSTANDARD2_1
+#if NET40 || NETSTANDARD2_0_OR_GREATER || NET5_0_OR_GREATER
 using System.Collections.Specialized;
 #endif
 
@@ -38,7 +38,7 @@ namespace Saritasa.Tools.Common.Utils
             return success ? value : defaultValue;
         }
 
-#if NET40 || NETSTANDARD2_0 || NETSTANDARD2_1
+#if NET40 || NETSTANDARD2_0_OR_GREATER || NET5_0_OR_GREATER
         /// <summary>
         /// Tries to get the value in the <see cref="NameValueCollection" />. If value with specified
         /// key does not exist it will return default values.

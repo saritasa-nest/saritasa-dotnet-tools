@@ -1,8 +1,8 @@
-﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2021, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
-#if NET40 || NETSTANDARD1_6 || NETSTANDARD2_0 || NETSTANDARD2_1
+#if NET40 || NETSTANDARD1_6_OR_GREATER || NET5_0_OR_GREATER
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
@@ -17,7 +17,7 @@ namespace Saritasa.Tools.Common.Utils
     /// </summary>
     public static class EnumUtils
     {
-#if NET40 || NETSTANDARD2_0 || NETSTANDARD2_1
+#if NET40 || NETSTANDARD2_0_OR_GREATER || NET5_0_OR_GREATER
         /// <summary>
         /// Splits intercapped string.
         /// </summary>
@@ -75,7 +75,7 @@ namespace Saritasa.Tools.Common.Utils
                 return null;
             }
 
-#if NETSTANDARD1_6 || NETSTANDARD2_0 || NETSTANDARD2_1
+#if NETSTANDARD1_6_OR_GREATER || NET5_0_OR_GREATER
             var attributes = fieldInfo.GetCustomAttributes<TAttribute>(false);
 #else
             var attributes =
@@ -91,7 +91,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <returns>Enumerable values.</returns>
         public static T[] GetValues<T>() where T : Enum => Enum.GetValues(typeof(T)).Cast<T>().ToArray();
 
-#if NET40 || NETSTANDARD2_0 || NETSTANDARD2_1
+#if NET40 || NETSTANDARD2_0_OR_GREATER || NET5_0_OR_GREATER
         /// <summary>
         /// Get the dictionary of enum name and enum description.
         /// </summary>
