@@ -24,7 +24,7 @@ namespace Saritasa.Tools.Common.Extensions
         public static TValue? GetValueOrDefault<TKey, TValue>(
             this IDictionary<TKey, TValue?> target,
             TKey key,
-            TValue defaultValue = default) => DictionaryUtils.GetValueOrDefault(target, key, defaultValue);
+            TValue? defaultValue = default) => DictionaryUtils.GetValueOrDefault(target, key, defaultValue);
 
         /// <summary>
         /// Adds a key/value pair to the <see cref="IDictionary{TKey,TValue}" /> if the key does not already
@@ -43,6 +43,6 @@ namespace Saritasa.Tools.Common.Extensions
             this IDictionary<TKey, TValue?> target,
             TKey key,
             Func<TKey, TValue?, TValue> updateFunc,
-            TValue defaultValue = default) => DictionaryUtils.AddOrUpdate(target, key, updateFunc, defaultValue);
+            TValue? defaultValue = default) => DictionaryUtils.AddOrUpdate(target, key, updateFunc, defaultValue);
     }
 }

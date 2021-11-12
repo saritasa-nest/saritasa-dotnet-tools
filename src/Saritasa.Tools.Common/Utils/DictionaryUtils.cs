@@ -27,14 +27,14 @@ namespace Saritasa.Tools.Common.Utils
         public static TValue? GetValueOrDefault<TKey, TValue>(
             IDictionary<TKey, TValue?> target,
             TKey key,
-            TValue defaultValue = default)
+            TValue? defaultValue)
         {
             if (target == null)
             {
                 throw new ArgumentNullException(nameof(target));
             }
 
-            bool success = target.TryGetValue(key, out TValue value);
+            bool success = target.TryGetValue(key, out TValue? value);
             return success ? value : defaultValue;
         }
 
@@ -91,7 +91,7 @@ namespace Saritasa.Tools.Common.Utils
             IDictionary<TKey, TValue?> target,
             TKey key,
             Func<TKey, TValue?, TValue> updateFunc,
-            TValue defaultValue = default)
+            TValue? defaultValue = default)
         {
             if (target == null)
             {
@@ -102,7 +102,7 @@ namespace Saritasa.Tools.Common.Utils
                 throw new ArgumentNullException(nameof(updateFunc));
             }
 
-            var keyExists = target.TryGetValue(key, out TValue value);
+            var keyExists = target.TryGetValue(key, out TValue? value);
             if (keyExists)
             {
                 value = updateFunc(key, value);

@@ -53,7 +53,7 @@ namespace Saritasa.Tools.Common.Utils
         /// </summary>
         /// <param name="tuple">The tuple to convert from.</param>
         /// <returns>The <see cref="DiffResultUpdatedItems{T}" /> instance.</returns>
-        public static implicit operator DiffResultUpdatedItems<T>(ValueTuple<T, T> tuple)
+        public static implicit operator DiffResultUpdatedItems<T>((T Item1, T Item2) tuple)
             => new DiffResultUpdatedItems<T>(tuple.Item1, tuple.Item2);
 #endif
 

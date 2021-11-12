@@ -107,13 +107,13 @@ namespace Saritasa.Tools.Common.Tests
             // Arrange
             var source = new User[]
             {
-                new (1, "Doug"),
-                new (2, "Pasha")
+                new(1, "Doug"),
+                new(2, "Pasha")
             };
             var target = new User[]
             {
-                new (1, "Doug"),
-                new (2, "Pavel")
+                new(1, "Doug"),
+                new(2, "Pavel")
             };
 
             // Act
@@ -133,23 +133,23 @@ namespace Saritasa.Tools.Common.Tests
             // Arrange
             var source = new List<User>
             {
-                new (1, "Ivan"),
-                new (2, "Roma"),
-                new (3, "Vlad"),
-                new (4, "Denis"),
-                new (5, "Nastya"),
-                new (6, "Marina"),
-                new (7, "Varvara"),
+                new(1, "Ivan"),
+                new(2, "Roma"),
+                new(3, "Vlad"),
+                new(4, "Denis"),
+                new(5, "Nastya"),
+                new(6, "Marina"),
+                new(7, "Varvara"),
             };
             var target = new List<User>
             {
-                new (1, "Ivan"),
-                new (2, "Roman"),
-                new (5, "Anastasya"),
-                new (6, "Marina"),
-                new (7, "Varvara"),
-                new (0, "Tamara"),
-                new (0, "Pavel"),
+                new(1, "Ivan"),
+                new(2, "Roman"),
+                new(5, "Anastasya"),
+                new(6, "Marina"),
+                new(7, "Varvara"),
+                new(0, "Tamara"),
+                new(0, "Pavel"),
             };
 
             // Act
@@ -171,23 +171,23 @@ namespace Saritasa.Tools.Common.Tests
             // Arrange
             var source = new List<User>
             {
-                new (1, "Ivan"),
-                new (2, "Roma"),
-                new (3, "Vlad"),
-                new (4, "Denis"),
-                new (5, "Nastya"),
-                new (6, "Marina"),
-                new (7, "Varvara"),
+                new(1, "Ivan"),
+                new(2, "Roma"),
+                new(3, "Vlad"),
+                new(4, "Denis"),
+                new(5, "Nastya"),
+                new(6, "Marina"),
+                new(7, "Varvara"),
             };
             var target = new List<User>
             {
-                new (1, "Ivan"),
-                new (2, "Roman"),
-                new (5, "Anastasya"),
-                new (6, "Marina"),
-                new (7, "Varvara"),
-                new (0, "Tamara"),
-                new (0, "Pavel"),
+                new(1, "Ivan"),
+                new(2, "Roman"),
+                new(5, "Anastasya"),
+                new(6, "Marina"),
+                new(7, "Varvara"),
+                new(0, "Tamara"),
+                new(0, "Pavel"),
             };
 
             // Act
@@ -207,23 +207,23 @@ namespace Saritasa.Tools.Common.Tests
             // Arrange
             var source = new List<User>
             {
-                new (1, "Ivan"),
-                new (2, "Roma"),
-                new (3, "Vlad"),
-                new (4, "Denis"),
-                new (5, "Nastya"),
-                new (6, "Marina"),
-                new (7, "Varvara"),
+                new(1, "Ivan"),
+                new(2, "Roma"),
+                new(3, "Vlad"),
+                new(4, "Denis"),
+                new(5, "Nastya"),
+                new(6, "Marina"),
+                new(7, "Varvara"),
             };
             var target = new List<User>
             {
-                new (1, "Ivan"),
-                new (2, "Roman"),
-                new (5, "Anastasya"),
-                new (6, "Marina"),
-                new (7, "Varvara"),
-                new (0, "Tamara"),
-                new (0, "Pavel"),
+                new(1, "Ivan"),
+                new(2, "Roman"),
+                new(5, "Anastasya"),
+                new(6, "Marina"),
+                new(7, "Varvara"),
+                new(0, "Tamara"),
+                new(0, "Pavel"),
             };
 
             // Act
@@ -263,10 +263,10 @@ namespace Saritasa.Tools.Common.Tests
             // Arrange
             var source = new List<User>
             {
-                new (1, "A"),
-                new (4, "B"),
-                new (4, "Z"),
-                new (2, "D")
+                new(1, "A"),
+                new(4, "B"),
+                new(4, "Z"),
+                new(2, "D")
             };
 
             // Act
@@ -280,10 +280,10 @@ namespace Saritasa.Tools.Common.Tests
             // Assert
             var expected = new List<User>
             {
-                new (1, "A"),
-                new (2, "D"),
-                new (4, "Z"),
-                new (4, "B")
+                new(1, "A"),
+                new(2, "D"),
+                new(4, "Z"),
+                new(4, "B")
             };
             Assert.Equal(expected, target, new UserEqualityComparer());
         }
@@ -294,10 +294,10 @@ namespace Saritasa.Tools.Common.Tests
             // Arrange
             var source = new List<User>
             {
-                new (1, "A"),
-                new (4, "B"),
-                new (4, "Z"),
-                new (2, "D")
+                new(1, "A"),
+                new(4, "B"),
+                new(4, "Z"),
+                new(2, "D")
             };
 
             // Act
@@ -311,10 +311,10 @@ namespace Saritasa.Tools.Common.Tests
             // Assert
             var expected = new List<User>
             {
-                new (1, "A"),
-                new (2, "D"),
-                new (4, "Z"),
-                new (4, "B")
+                new(1, "A"),
+                new(2, "D"),
+                new(4, "Z"),
+                new(4, "B")
             };
             Assert.Equal(expected, target, new UserEqualityComparer());
         }
@@ -325,8 +325,8 @@ namespace Saritasa.Tools.Common.Tests
             // Arrange
             var source = new List<User>
             {
-                new (2, "B"),
-                new (1, "A")
+                new(2, "B"),
+                new(1, "A")
             };
 
             // Act
@@ -339,8 +339,8 @@ namespace Saritasa.Tools.Common.Tests
             // Assert
             var expected = new List<User>
             {
-                new (2, "B"),
-                new (1, "A")
+                new(2, "B"),
+                new(1, "A")
             };
             Assert.Equal(expected, target, new UserEqualityComparer());
         }
@@ -351,9 +351,9 @@ namespace Saritasa.Tools.Common.Tests
             // Arrange
             var source = new List<User>
             {
-                new (1, "B"),
-                new (1, "A"),
-                new (2, "C"),
+                new(1, "B"),
+                new(1, "A"),
+                new(2, "C"),
             };
 
             // Act
@@ -367,9 +367,9 @@ namespace Saritasa.Tools.Common.Tests
             // Assert
             var expected = new List<User>
             {
-                new (1, "A"),
-                new (1, "B"),
-                new (2, "C"),
+                new(1, "A"),
+                new(1, "B"),
+                new(2, "C"),
             };
             Assert.Equal(expected, target, new UserEqualityComparer());
         }
@@ -380,7 +380,7 @@ namespace Saritasa.Tools.Common.Tests
             // Arrange
             var source = new List<User>
             {
-                new (1, "B"),
+                new(1, "B"),
             };
 
             // Assert
@@ -401,8 +401,8 @@ namespace Saritasa.Tools.Common.Tests
             // Arrange
             var source = new List<User>
             {
-                new (1, "B"),
-                new (2, "A")
+                new(1, "B"),
+                new(2, "A")
             };
 
             // Act

@@ -163,12 +163,12 @@ namespace Saritasa.Tools.Misc.Security
             ConsecutiveUppercaseLetters,
 
             /// <summary>
-            /// Consecutive Lowercase Letters
+            /// Consecutive Lowercase Letters.
             /// </summary>
             ConsecutiveLowercaseLetters,
 
             /// <summary>
-            /// Consecutive Numbers
+            /// Consecutive Numbers.
             /// </summary>
             ConsecutiveNumbers,
 

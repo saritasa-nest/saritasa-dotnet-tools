@@ -14,7 +14,8 @@ namespace Saritasa.Tools.Emails.Interceptors
     /// </summary>
     public class CountEmailsInterceptor : IEmailInterceptor
     {
-        private int sendingCallCount, sentCallCount;
+        private int sendingCallCount;
+        private int sentCallCount;
 
         /// <summary>
         /// Sending messages count. It is not necessary that all of these
