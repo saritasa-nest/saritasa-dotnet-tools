@@ -48,11 +48,17 @@ namespace Saritasa.Tools.Common.Pagination
 #if NETSTANDARD1_6_OR_GREATER || NET5_0_OR_GREATER
         [Required]
 #endif
+#if NET5_0_OR_GREATER
+        [System.Text.Json.Serialization.JsonInclude]
+#endif
         public TMetadata Metadata { get; protected set; }
 
         /// <inheritdoc />
 #if NETSTANDARD1_6_OR_GREATER || NET5_0_OR_GREATER
         [Required]
+#endif
+#if NET5_0_OR_GREATER
+        [System.Text.Json.Serialization.JsonInclude]
 #endif
         public IEnumerable<TItem> Items { get; protected set; }
     }

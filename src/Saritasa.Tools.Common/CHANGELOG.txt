@@ -1,4 +1,8 @@
-﻿4.0.0 [2021-04-06]
+﻿4.1.0 [TBD]
+[+] Add .NET 5.0 target.
+[+] Add Pairwise to collection utils.
+
+4.0.0 [2021-04-06]
 [*] CollectionUtils.OrderMultiple now makes case insensitive keys search.
 [*] CollectionUtils.Diff now has overload with IEqualityComparer with much better performance.
 [*] CollectionUtils.Diff accepts delegate instead of IComparer interface.

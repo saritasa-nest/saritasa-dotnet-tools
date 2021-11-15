@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2021, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -108,17 +108,57 @@ namespace Saritasa.Tools.Common.Tests
             PagedList<int> deserializedPagedList = null;
 
             // Act
+#pragma warning disable SYSLIB0011 // Type or member is obsolete
             using var memoryStream = new MemoryStream();
             formatter.Serialize(memoryStream, pagedList);
             memoryStream.Seek(0, SeekOrigin.Begin);
             deserializedPagedList = (PagedList<int>)formatter.Deserialize(memoryStream);
+#pragma warning restore SYSLIB0011 // Type or member is obsolete
 
             // Assert
             Assert.Equal(pagedList.Page, deserializedPagedList.Page);
             Assert.Equal(pagedList.PageSize, deserializedPagedList.PageSize);
             Assert.Equal(pagedList.TotalCount, deserializedPagedList.TotalCount);
             Assert.Equal(pagedList.Count(), deserializedPagedList.Count());
-            Assert.Equal(pagedList.Page, deserializedPagedList.Page);
+            Assert.Equal(pagedList[0], deserializedPagedList[0]);
         }
+
+#if NET5_0_OR_GREATER
+        [Fact]
+        public void JsonSerialize_PagedListMetadataWithDate_PersistAfterDeserialize()
+        {
+            // Arrange
+            var pagedListMetadata = new PagedList<int>(new[] { 10 }, 1, 10, 1).ToMetadataObject();
+
+            // Act
+            var json = System.Text.Json.JsonSerializer.Serialize(pagedListMetadata);
+            var deserializedPagedListMetadata = System.Text.Json.JsonSerializer.Deserialize<PagedListMetadataDto<int>>(json);
+
+            // Assert
+            Assert.Equal(pagedListMetadata.Metadata.Page, deserializedPagedListMetadata.Metadata.Page);
+            Assert.Equal(pagedListMetadata.Metadata.PageSize, deserializedPagedListMetadata.Metadata.PageSize);
+            Assert.Equal(pagedListMetadata.Metadata.TotalCount, deserializedPagedListMetadata.Metadata.TotalCount);
+            Assert.Equal(pagedListMetadata.Items.Count(), deserializedPagedListMetadata.Items.Count());
+            Assert.Equal(pagedListMetadata.Items.First(), deserializedPagedListMetadata.Items.First());
+        }
+
+        [Fact]
+        public void JsonSerialize_OffsetLimitListMetadataWithDate_PersistAfterDeserialize()
+        {
+            // Arrange
+            var offsetLimitListMetadata = new OffsetLimitList<int>(new[] { 10 }, 1, 10, 1).ToMetadataObject();
+
+            // Act
+            var json = System.Text.Json.JsonSerializer.Serialize(offsetLimitListMetadata);
+            var deserializedOffsetLimitListMetadata = System.Text.Json.JsonSerializer.Deserialize<OffsetLimitMetadataDto<int>>(json);
+
+            // Assert
+            Assert.Equal(offsetLimitListMetadata.Metadata.Limit, deserializedOffsetLimitListMetadata.Metadata.Limit);
+            Assert.Equal(offsetLimitListMetadata.Metadata.Offset, deserializedOffsetLimitListMetadata.Metadata.Offset);
+            Assert.Equal(offsetLimitListMetadata.Metadata.TotalCount, deserializedOffsetLimitListMetadata.Metadata.TotalCount);
+            Assert.Equal(offsetLimitListMetadata.Items.Count(), deserializedOffsetLimitListMetadata.Items.Count());
+            Assert.Equal(offsetLimitListMetadata.Items.First(), deserializedOffsetLimitListMetadata.Items.First());
+        }
+#endif
     }
 }
