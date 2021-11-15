@@ -1,6 +1,7 @@
 ﻿4.1.0 [TBD]
 [+] Add .NET 5.0 target.
 [+] Add Pairwise to collection utils.
+[*] Add more nullable reference type annotations.
 
 4.0.0 [2021-04-06]
 [*] CollectionUtils.OrderMultiple now makes case insensitive keys search.

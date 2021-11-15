@@ -28,9 +28,11 @@ namespace Saritasa.Tools.Domain.Tests
             // Act
             using (var memoryStream = new MemoryStream())
             {
+#pragma warning disable SYSLIB0011 // Type or member is obsolete
                 formatter.Serialize(memoryStream, domainException);
                 memoryStream.Seek(0, SeekOrigin.Begin);
                 deserializedDomainException = (DomainException)formatter.Deserialize(memoryStream);
+#pragma warning restore SYSLIB0011 // Type or member is obsolete
             }
 
             // Assert
@@ -54,9 +56,11 @@ namespace Saritasa.Tools.Domain.Tests
             // Act
             using (var memoryStream = new MemoryStream())
             {
+#pragma warning disable SYSLIB0011 // Type or member is obsolete
                 formatter.Serialize(memoryStream, validationException);
                 memoryStream.Seek(0, SeekOrigin.Begin);
                 deserializedValidationException = (Saritasa.Tools.Domain.Exceptions.ValidationException)formatter.Deserialize(memoryStream);
+#pragma warning restore SYSLIB0011 // Type or member is obsolete
             }
 
             // Assert
