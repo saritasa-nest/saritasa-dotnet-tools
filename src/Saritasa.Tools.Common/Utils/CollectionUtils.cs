@@ -111,9 +111,16 @@ namespace Saritasa.Tools.Common.Utils
                 if (orderedTarget == null)
                 {
                     var firstSelector = selectors.FirstOrDefault();
-                    orderedTarget = direction == ListSortDirection.Ascending ?
-                        target.OrderBy(firstSelector) :
-                        target.OrderByDescending(firstSelector);
+                    if (firstSelector != null)
+                    {
+                        orderedTarget = direction == ListSortDirection.Ascending ?
+                            target.OrderBy(firstSelector) :
+                            target.OrderByDescending(firstSelector);
+                    }
+                    else
+                    {
+                        orderedTarget = target.OrderBy(x => 1);
+                    }
                     selectors = selectors.Skip(1);
                 }
 
@@ -193,11 +200,14 @@ namespace Saritasa.Tools.Common.Utils
                 if (useFirstOrderBy)
                 {
                     var firstSelector = selectors.FirstOrDefault();
-                    target = direction == ListSortDirection.Ascending ?
+                    if (firstSelector != null)
+                    {
+                        target = direction == ListSortDirection.Ascending ?
                         target.OrderBy(firstSelector) :
                         target.OrderByDescending(firstSelector);
-                    selectors = selectors.Skip(1);
-                    useFirstOrderBy = false;
+                        selectors = selectors.Skip(1);
+                        useFirstOrderBy = false;
+                    }
                 }
 
                 var orderedTarget = target as IOrderedQueryable<TSource>;
@@ -563,7 +573,7 @@ namespace Saritasa.Tools.Common.Utils
 
             foreach (var sourceItem in sourceArr)
             {
-                if (targetSet.TryGetValue(sourceItem, out T targetItemToCompare))
+                if (targetSet.TryGetValue(sourceItem, out T? targetItemToCompare))
                 {
                     if (!dataComparer(sourceItem, targetItemToCompare))
                     {

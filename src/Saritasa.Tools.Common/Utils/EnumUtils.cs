@@ -66,9 +66,9 @@ namespace Saritasa.Tools.Common.Utils
             }
 
 #if NET40
-            FieldInfo fieldInfo = target.GetType().GetField(target.ToString());
+            FieldInfo? fieldInfo = target.GetType().GetField(target.ToString());
 #else
-            FieldInfo fieldInfo = target.GetType().GetTypeInfo().GetDeclaredField(target.ToString());
+            FieldInfo? fieldInfo = target.GetType().GetTypeInfo().GetDeclaredField(target.ToString());
 #endif
             if (fieldInfo == null)
             {

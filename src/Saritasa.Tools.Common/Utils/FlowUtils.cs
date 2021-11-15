@@ -46,7 +46,10 @@ namespace Saritasa.Tools.Common.Utils
                 }
                 catch (System.Reflection.TargetInvocationException ex)
                 {
-                    exceptions.Add(ex.InnerException);
+                    if (ex.InnerException != null)
+                    {
+                        exceptions.Add(ex.InnerException);
+                    }
                 }
                 catch (Exception ex)
                 {

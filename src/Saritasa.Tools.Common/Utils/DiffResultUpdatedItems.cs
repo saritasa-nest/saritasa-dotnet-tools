@@ -57,8 +57,10 @@ namespace Saritasa.Tools.Common.Utils
             => new DiffResultUpdatedItems<T>(tuple.Item1, tuple.Item2);
 #endif
 
+        #region IEquatable<ProjectDiagram>
+
         /// <inheritdoc />
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj == null)
             {
@@ -77,6 +79,24 @@ namespace Saritasa.Tools.Common.Utils
 
         /// <inheritdoc />
         public override int GetHashCode() => this.Source?.GetHashCode() ^ this.Target?.GetHashCode() ?? 0;
+
+        /// <summary>
+        /// Compares two <see cref="DiffResultUpdatedItems{T}" /> objects.
+        /// </summary>
+        /// <param name="left">A <see cref="DiffResultUpdatedItems{T}" /> object instance.</param>
+        /// <param name="right">A <see cref="DiffResultUpdatedItems{T}" /> object instance.</param>
+        /// <returns><c>True</c> if two objects are equal, <c>false</c> otherwise.</returns>
+        public static bool operator ==(DiffResultUpdatedItems<T>? left, DiffResultUpdatedItems<T>? right) => Equals(left, right);
+
+        /// <summary>
+        /// Compares two <see cref="DiffResultUpdatedItems{T}" /> objects for inequality.
+        /// </summary>
+        /// <param name="left">A <see cref="DiffResultUpdatedItems{T}" /> instance.</param>
+        /// <param name="right">A <see cref="DiffResultUpdatedItems{T}" /> instance.</param>
+        /// <returns><c>True</c> if two values are not equal, <c>false</c> otherwise.</returns>
+        public static bool operator !=(DiffResultUpdatedItems<T>? left, DiffResultUpdatedItems<T>? right) => !Equals(left, right);
+
+        #endregion
 
         /// <inheritdoc />
         public override string ToString() => this.Source + "; " + this.Target;

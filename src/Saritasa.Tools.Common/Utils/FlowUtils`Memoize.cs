@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2021, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -46,7 +46,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <returns>Cache strategy instance delegate.</returns>
         public static CacheStrategy<TKey, TResult> CreateMaxAgeCacheStrategy<TKey, TResult>(
             TimeSpan maxAge,
-            IDictionary<TKey, DateTime>? timestampsStorage = null)
+            IDictionary<TKey, DateTime>? timestampsStorage = null) where TKey : notnull
         {
             if (timestampsStorage == null)
             {
@@ -244,10 +244,10 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="strategies">Strategies to apply. By default limitless strategy will be used.</param>
         /// <param name="cache">Dictionary to use for caching. If not specified the standard Dictionary will be used.</param>
         /// <returns>Delegate with memoize.</returns>
-        public static Func<TKey, TResult> Memoize<TKey, TResult>(
+        public static Func<TKey, TResult?> Memoize<TKey, TResult>(
             Func<TKey, TResult> func,
             CacheStrategy<TKey, TResult>? strategies = null,
-            IDictionary<TKey, TResult>? cache = null)
+            IDictionary<TKey, TResult>? cache = null) where TKey : notnull
         {
             if (cache == null)
             {
@@ -274,7 +274,7 @@ namespace Saritasa.Tools.Common.Utils
             };
         }
 
-        private static TResult MemoizeInternal<TKey, TResult>(
+        private static TResult? MemoizeInternal<TKey, TResult>(
             TKey key,
             System.Threading.ReaderWriterLockSlim cacheLock,
             Func<TKey, TResult> func,
@@ -304,7 +304,7 @@ namespace Saritasa.Tools.Common.Utils
             }
 
             // If result is already in cache then no need to refresh it - just skip.
-            bool inCache = cache.TryGetValue(key, out TResult result), needResultUpdate = false;
+            bool inCache = cache.TryGetValue(key, out TResult? result), needResultUpdate = false;
             Debug.WriteLine($"Memoize: Start memoize with key = {key}, inCache = {inCache}.");
 
             needResultUpdate = ExecuteStrategiesReturnIfCacheUpdateRequired(notInCache: !inCache);
@@ -344,7 +344,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="cache">Dictionary to use for caching. If not specified the standard Dictionary will be used which
         /// is not thread-safe.</param>
         /// <returns>Delegate the able to cache.</returns>
-        public static Func<TResult> Memoize<TResult>(
+        public static Func<TResult?> Memoize<TResult>(
             Func<TResult> func,
             CacheStrategy<int, TResult>? strategies = null,
             IDictionary<int, TResult>? cache = null)
@@ -368,7 +368,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="cache">Dictionary to use for caching. If not specified the standard Dictionary will be used which
         /// is not thread-safe.</param>
         /// <returns>Delegate the able to cache.</returns>
-        public static Func<T1, T2, TResult> Memoize<T1, T2, TResult>(
+        public static Func<T1, T2, TResult?> Memoize<T1, T2, TResult>(
             Func<T1, T2, TResult> func,
             CacheStrategy<Tuple<T1, T2>, TResult>? strategies = null,
             IDictionary<Tuple<T1, T2>, TResult>? cache = null)
@@ -393,7 +393,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <param name="cache">Dictionary to use for caching. If not specified the standard Dictionary will be used which
         /// is not thread-safe.</param>
         /// <returns>Delegate the able to cache.</returns>
-        public static Func<T1, T2, T3, TResult> Memoize<T1, T2, T3, TResult>(
+        public static Func<T1, T2, T3, TResult?> Memoize<T1, T2, T3, TResult>(
             Func<T1, T2, T3, TResult> func,
             CacheStrategy<Tuple<T1, T2, T3>, TResult>? strategies = null,
             IDictionary<Tuple<T1, T2, T3>, TResult>? cache = null)
