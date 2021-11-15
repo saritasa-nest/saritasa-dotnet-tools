@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2019, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2021, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -13,7 +13,7 @@ namespace Saritasa.Tools.Common.Tests
     /// </summary>
     public class SecurityTests
     {
-#if NET40 || NET452 || NET461
+#if NET40 || NET5_0
 
         [Fact]
         public void Validate_md5_hash()

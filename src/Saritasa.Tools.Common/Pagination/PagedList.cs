@@ -12,7 +12,7 @@ namespace Saritasa.Tools.Common.Pagination
     /// </summary>
     /// <typeparam name="T">Source type.</typeparam>
     /// <seealso cref="IEnumerable{T}" />
-#if NET40 || NETSTANDARD2_0_OR_GREATER
+#if NET40 || NETSTANDARD2_0_OR_GREATER || NET5_0_OR_GREATER
     [Serializable]
 #endif
     public class PagedList<T> : OffsetLimitList<T>
