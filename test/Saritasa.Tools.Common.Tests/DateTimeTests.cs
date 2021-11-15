@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2021, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -107,8 +107,8 @@ namespace Saritasa.Tools.Common.Tests
             var dt = new DateTime(2017, 6, 5);
 
             // Act & Assert
-            Assert.Equal(DayOfWeek.Monday, DateTimeUtils.GetStartOfPeriod(dt, DateTimePeriod.Week, new CultureInfo("ru")).DayOfWeek);
-            Assert.Equal(5, DateTimeUtils.GetStartOfPeriod(dt, DateTimePeriod.Week, new CultureInfo("ru")).Day);
+            Assert.Equal(DayOfWeek.Monday, DateTimeUtils.GetStartOfPeriod(dt, DateTimePeriod.Week, new CultureInfo("ru-RU")).DayOfWeek);
+            Assert.Equal(5, DateTimeUtils.GetStartOfPeriod(dt, DateTimePeriod.Week, new CultureInfo("ru-RU")).Day);
         }
 
         [Fact]
@@ -118,7 +118,7 @@ namespace Saritasa.Tools.Common.Tests
             var date = new DateTime(2018, 7, 14, 0, 0, 0, DateTimeKind.Utc);
 
             // Act
-            var result = DateTimeUtils.Truncate(date, DateTimePeriod.Week, new CultureInfo("us"));
+            var result = DateTimeUtils.Truncate(date, DateTimePeriod.Week, new CultureInfo("en-US"));
 
             // Assert
             Assert.Equal(8, result.Day);
@@ -131,7 +131,7 @@ namespace Saritasa.Tools.Common.Tests
             var date = new DateTime(2018, 7, 15, 0, 0, 0, DateTimeKind.Utc);
 
             // Act
-            var result = DateTimeUtils.Truncate(date, DateTimePeriod.Week, new CultureInfo("ru"));
+            var result = DateTimeUtils.Truncate(date, DateTimePeriod.Week, new CultureInfo("ru-RU"));
 
             // Assert
             Assert.Equal(9, result.Day);
