@@ -1,7 +1,9 @@
 ﻿4.1.0 [TBD]
 [+] Add .NET 5.0 target.
 [+] Add Pairwise to collection utils.
+[*] Fix MetadataDto class deserialization for System.Text.Json for .NET 5.0 .
 [*] Add more nullable reference type annotations.
+[*] StringUtils.ParseOrDefault for enums now has Enum type constrain.
 
 4.0.0 [2021-04-06]
 [*] CollectionUtils.OrderMultiple now makes case insensitive keys search.

@@ -421,7 +421,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert the target string to Enum. If fails return the default value.
         /// </summary>
-        public static T ParseOrDefault<T>(string target, T defaultValue) where T : struct
+        public static T ParseOrDefault<T>(string target, T defaultValue) where T : Enum
         {
             return Enum.IsDefined(typeof(T), target) ? (T)Enum.Parse(typeof(T), target, true) : defaultValue;
         }
@@ -429,7 +429,7 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert the target string to Enum. If fails return the default value.
         /// </summary>
-        public static T ParseOrDefault<T>(string target, bool ignoreCase, T defaultValue) where T : struct
+        public static T ParseOrDefault<T>(string target, bool ignoreCase, T defaultValue) where T : Enum
         {
             return Enum.IsDefined(typeof(T), target) ? (T)Enum.Parse(typeof(T), target, ignoreCase) : defaultValue;
         }
