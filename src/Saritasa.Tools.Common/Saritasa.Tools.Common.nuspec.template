@@ -23,6 +23,7 @@
       <group targetFramework="netstandard2.0" />
       <group targetFramework="netstandard2.1" />
       <group targetFramework="net40" /> 
+      <group targetFramework="net50" /> 
     </dependencies>
     <releaseNotes>Release notes are at https://github.com/Saritasa/SaritasaTools/blob/master/src/Saritasa.Tools.Common/CHANGELOG.txt</releaseNotes>
   </metadata>
