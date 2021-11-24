@@ -160,5 +160,23 @@ namespace Saritasa.Tools.Common.Tests
             Assert.Equal(offsetLimitListMetadata.Items.First(), deserializedOffsetLimitListMetadata.Items.First());
         }
 #endif
+
+        [Fact]
+        public void NewtonJsonSerialize_PagedListMetadataWithDate_PersistAfterDeserialize()
+        {
+            // Arrange
+            var pagedListMetadata = new PagedList<int>(new[] { 10 }, 1, 10, 1).ToMetadataObject();
+
+            // Act
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(pagedListMetadata);
+            var deserializedPagedListMetadata = Newtonsoft.Json.JsonConvert.DeserializeObject<PagedListMetadataDto<int>>(json);
+
+            // Assert
+            Assert.Equal(pagedListMetadata.Metadata.Page, deserializedPagedListMetadata.Metadata.Page);
+            Assert.Equal(pagedListMetadata.Metadata.PageSize, deserializedPagedListMetadata.Metadata.PageSize);
+            Assert.Equal(pagedListMetadata.Metadata.TotalCount, deserializedPagedListMetadata.Metadata.TotalCount);
+            Assert.Equal(pagedListMetadata.Items.Count(), deserializedPagedListMetadata.Items.Count());
+            Assert.Equal(pagedListMetadata.Items.First(), deserializedPagedListMetadata.Items.First());
+        }
     }
 }
