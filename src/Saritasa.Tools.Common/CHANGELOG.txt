@@ -1,4 +1,4 @@
-﻿4.1.0 [TBD]
+﻿4.1.0 [2021-11-25]
 [+] Add .NET 5.0 target.
 [+] Add Pairwise to collection utils.
 [*] Fix MetadataDto class deserialization for System.Text.Json for .NET 5.0 .
