@@ -447,28 +447,6 @@ namespace Saritasa.Tools.Common.Tests
         }
 
         [Fact]
-        public void ChunkSelect_ListWithItems_ShouldIterateWholeList()
-        {
-            // Arrange
-            int capacity = 250;
-            int sum = 0;
-            IList<int> list = new List<int>(capacity);
-            for (int i = 0; i < capacity; i++)
-            {
-                list.Add(i);
-            }
-
-            // Act
-            foreach (var item in CollectionUtils.ChunkSelect(list.AsQueryable(), 45))
-            {
-                sum += item;
-            }
-
-            // Assert
-            Assert.Equal(31125, sum);
-        }
-
-        [Fact]
         public async System.Threading.Tasks.Task ChunkSelectAsync_EnumerableWithItems_ShouldIterateWholeList()
         {
             // Arrange

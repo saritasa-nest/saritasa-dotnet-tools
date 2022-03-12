@@ -12,7 +12,7 @@
     <projectUrl>https://github.com/saritasa/saritasatools</projectUrl>
     <icon>icon.png</icon>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <copyright>(c) Saritasa, 2016-2021</copyright>
+    <copyright>(c) Saritasa, 2016-2022</copyright>
     <tags>strings utils atomic pagination datetime security collections diff</tags>
     <repository type="git" url="https://github.com/Saritasa/SaritasaTools" commit="$(CommitHash)" />
     <dependencies>
@@ -22,8 +22,8 @@
       </group>
       <group targetFramework="netstandard2.0" />
       <group targetFramework="netstandard2.1" />
-      <group targetFramework="net40" /> 
-      <group targetFramework="net50" /> 
+      <group targetFramework="net50" />
+      <group targetFramework="net60" />
     </dependencies>
     <releaseNotes>Release notes are at https://github.com/Saritasa/SaritasaTools/blob/master/src/Saritasa.Tools.Common/CHANGELOG.txt</releaseNotes>
   </metadata>

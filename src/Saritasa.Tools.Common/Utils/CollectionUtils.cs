@@ -1,4 +1,4 @@
-﻿// Copyright(c) 2015-2021, Saritasa.All rights reserved.
+﻿// Copyright(c) 2015-2022, Saritasa.All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -352,6 +352,9 @@ namespace Saritasa.Tools.Common.Utils
             IEnumerable<T> source,
             int chunkSize = DefaultChunkSize)
         {
+#if NET6_0_OR_GREATER
+            return source.Chunk<T>(chunkSize);
+#else
             if (source == null)
             {
                 throw new ArgumentNullException(nameof(source));
@@ -371,44 +374,7 @@ namespace Saritasa.Tools.Common.Utils
                 originalSource = originalSource.Skip(chunkSize);
                 currentPosition += chunkSize;
             }
-        }
-
-        /// <summary>
-        /// Breaks a list of items into chunks of a specific size and yields T items.
-        /// </summary>
-        /// <param name="source">Source list.</param>
-        /// <param name="chunkSize">Chunk size.</param>
-        /// <returns>Items of type T.</returns>
-        public static IEnumerable<T> ChunkSelect<T>(
-            IQueryable<T> source,
-            int chunkSize = DefaultChunkSize)
-        {
-            if (source == null)
-            {
-                throw new ArgumentNullException(nameof(source));
-            }
-            if (chunkSize < 1)
-            {
-                throw new ArgumentOutOfRangeException(nameof(chunkSize),
-                    string.Format(Properties.Strings.ArgumentMustBeGreaterThan, nameof(chunkSize), 1));
-            }
-
-            int currentPosition = 0;
-            bool hasRecords;
-            do
-            {
-                var chunkedSource = source.Skip(currentPosition).Take(chunkSize);
-
-                hasRecords = false;
-                // Actual query goes here.
-                foreach (var item in chunkedSource)
-                {
-                    hasRecords = true;
-                    yield return item;
-                }
-                currentPosition += chunkSize;
-            }
-            while (hasRecords);
+#endif
         }
 
         /// <summary>
@@ -427,6 +393,9 @@ namespace Saritasa.Tools.Common.Utils
             Func<TSource, TKey> keySelector,
             IEqualityComparer<TKey>? comparer = null)
         {
+#if NET6_0_OR_GREATER
+            return source.DistinctBy(keySelector, comparer);
+#else
             if (source == null)
             {
                 throw new ArgumentNullException(nameof(source));
@@ -449,6 +418,7 @@ namespace Saritasa.Tools.Common.Utils
             }
 
             return DistinctByImpl();
+#endif
         }
 
         /// <summary>

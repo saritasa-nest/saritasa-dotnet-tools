@@ -85,19 +85,6 @@ namespace Saritasa.Tools.Common.Extensions
         }
 
         /// <summary>
-        /// Breaks a list of items into chunks of a specific size and yields T items.
-        /// </summary>
-        /// <param name="source">Source list.</param>
-        /// <param name="chunkSize">Chunk size.</param>
-        /// <returns>Items of type T.</returns>
-        public static IEnumerable<T> ChunkSelect<T>(
-            this IQueryable<T> source,
-            int chunkSize = DefaultChunkSize)
-        {
-            return CollectionUtils.ChunkSelect(source, chunkSize);
-        }
-
-        /// <summary>
         /// Returns distinct elements from a sequence by using a specified <see cref="IEqualityComparer{T}" />
         /// to compare values and specified key selector to get a distinct key. This method is implemented by
         /// using deferred execution.

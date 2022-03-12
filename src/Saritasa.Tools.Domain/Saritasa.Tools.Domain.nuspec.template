@@ -12,14 +12,13 @@
     <projectUrl>https://github.com/saritasa/saritasatools</projectUrl>
     <icon>icon.png</icon>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <copyright>(c) Saritasa, 2016-2021</copyright>
+    <copyright>(c) Saritasa, 2016-2022</copyright>
     <tags>uow repository domain</tags>
     <repository type="git" url="https://github.com/Saritasa/SaritasaTools"  commit="$(CommitHash)" />
     <dependencies>
       <group targetFramework="netstandard2.1" />
       <group targetFramework="netstandard2.0" />
       <group targetFramework="net452" />
-      <group targetFramework="net40" />
     </dependencies>
     <releaseNotes>Release notes are at https://github.com/Saritasa/SaritasaTools/blob/master/src/Saritasa.Tools.Domain/CHANGELOG.txt</releaseNotes>
   </metadata>
