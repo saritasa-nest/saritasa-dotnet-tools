@@ -51,22 +51,5 @@ namespace Saritasa.Tools.Common.Tests
                 S = s;
             }
         }
-
-        [Fact]
-        public void CreateInstance_ClassToCreate_CreatedInstance()
-        {
-            // Arrange.
-            var serviceProvider = new ServiceProvider();
-
-            // Act.
-            var obj = ObjectUtils.CreateInstanceWithServiceProvider<ClassToCreate>(serviceProvider);
-
-            // Assert.
-            Assert.NotNull(obj);
-            Assert.NotNull(obj.Dependency);
-            Assert.Equal(10, obj.A);
-            Assert.Null(obj.B);
-            Assert.Equal("test", obj.S);
-        }
     }
 }
