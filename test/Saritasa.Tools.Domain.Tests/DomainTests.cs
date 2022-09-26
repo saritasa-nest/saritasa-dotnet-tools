@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2020, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2022, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -149,7 +149,7 @@ namespace Saritasa.Tools.Domain.Tests
             Assert.Single(validationException.Errors);
         }
 
-#if NET48
+#if NET452
         [MetadataType(typeof(JobMetadata))]
         private class Job
         {
