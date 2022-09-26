@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2021, Saritasa. All rights reserved.
+// Copyright (c) 2015-2022, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using Saritasa.Tools.Common.Extensions;
 using Xunit;
 using Saritasa.Tools.Common.Utils;
 
@@ -28,6 +29,9 @@ namespace Saritasa.Tools.Common.Tests
                 this.Id = id;
                 this.Name = name;
             }
+
+            /// <inheritdoc />
+            public override string ToString() => $"{Id}, {Name}";
         }
 
         private sealed class UserIdentityEqualityComparer : IEqualityComparer<User>
@@ -541,6 +545,62 @@ namespace Saritasa.Tools.Common.Tests
 
             // Assert
             Assert.Empty(pairwisedCollection);
+        }
+
+        [Fact]
+        public void LeftJoin_TwoLists_FullResult()
+        {
+            // Arrange
+            var users1 = new List<User>
+            {
+                new(1, "Bobrik"),
+                new(2, "Vabrik"),
+                new(3, "Zubrik"),
+            };
+            var users2 = new List<User>
+            {
+                new(1, "Pupkin"),
+                new(4, "Bobkin"),
+            };
+
+            // Act.
+            var users3 = users1.LeftJoin(
+                users2,
+                outerKey => outerKey.Id,
+                innerKey => innerKey.Id,
+                (result1, result2) => result1.Name + " " + result2?.Name ?? string.Empty)
+                    .ToList();
+
+            // Assert.
+            Assert.Equal(3, users3.Count);
+        }
+
+        [Fact]
+        public void LeftJoin_TwoQueries_FullResult()
+        {
+            // Arrange
+            var users1 = new List<User>
+            {
+                new(1, "Bobrik"),
+                new(2, "Vabrik"),
+                new(3, "Zubrik"),
+            }.AsQueryable();
+            var users2 = new List<User>
+            {
+                new(1, "Pupkin"),
+                new(4, "Bobkin"),
+            }.AsQueryable();
+
+            // Act.
+            var users3 = users1.LeftJoin(
+                    users2,
+                    outerKey => outerKey.Id,
+                    innerKey => innerKey.Id,
+                    result => result.Item1.Name + " " + result.Item2 ?? string.Empty)
+                .ToList();
+
+            // Assert.
+            Assert.Equal(3, users3.Count);
         }
     }
 }

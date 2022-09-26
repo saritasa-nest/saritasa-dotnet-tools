@@ -3,6 +3,7 @@
 [-] Drop .NET 4.0 support.
 [-] Drop ObjectUtils.CreateInstanceWithServiceProvider . Use ActivatorUtilities.CreateInstance .
 [*] DictionaryUtils.GetValueOrDefault is only available for netstandard 1.6 and 2.0 .
+[+] Add LeftJoin collection extension.
 
 4.1.0 [2021-11-25]
 [+] Add .NET 5.0 target.

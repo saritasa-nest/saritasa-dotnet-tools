@@ -123,5 +123,72 @@ namespace Saritasa.Tools.Common.Extensions
                 target.Add(item);
             }
         }
+
+        /// <summary>
+        /// Implements the left join operation between two sequences.
+        /// </summary>
+        /// <param name="outer">The first sequence to join.</param>
+        /// <param name="inner">The sequence to join to the first sequence.</param>
+        /// <param name="outerKeySelector">A function to extract the join key from each element of the first sequence.</param>
+        /// <param name="innerKeySelector">A function to extract the join key from each element of the second sequence.</param>
+        /// <param name="resultSelector">A function to create a result element from an element from the first sequence
+        /// and a collection of matching elements from the second sequence.</param>
+        /// <typeparam name="TOuter">The type of the elements of the first sequence.</typeparam>
+        /// <typeparam name="TInner">The type of the elements of the second sequence.</typeparam>
+        /// <typeparam name="TKey">The type of the keys returned by the key selector functions.</typeparam>
+        /// <typeparam name="TResult">The type of the result elements.</typeparam>
+        /// <returns>Enumerable the contains the elements of type <see cref="TResult" />.</returns>
+        public static IEnumerable<TResult> LeftJoin<TOuter, TInner, TKey, TResult>(
+            this IEnumerable<TOuter> outer,
+            IEnumerable<TInner> inner,
+            Func<TOuter, TKey> outerKeySelector,
+            Func<TInner, TKey> innerKeySelector,
+            Func<TOuter, TInner, TResult> resultSelector)
+        {
+            return outer
+                .GroupJoin(inner,
+                    outerKeySelector,
+                    innerKeySelector,
+                    (outerObject, inners) => new
+                    {
+                        outerObject,
+                        inners = inners.DefaultIfEmpty()
+                    })
+                .SelectMany(a => a.inners.Select(innerObj => resultSelector(a.outerObject, innerObj)));
+        }
+
+        /// <summary>
+        /// Implements the left join operation between two sequences.
+        /// </summary>
+        /// <param name="outer">The first sequence to join.</param>
+        /// <param name="inner">The sequence to join to the first sequence.</param>
+        /// <param name="outerKeySelector">A function to extract the join key from each element of the first sequence.</param>
+        /// <param name="innerKeySelector">A function to extract the join key from each element of the second sequence.</param>
+        /// <param name="resultSelector">A function to create a result element from an element from the first sequence
+        /// and a collection of matching elements from the second sequence.</param>
+        /// <typeparam name="TOuter">The type of the elements of the first sequence.</typeparam>
+        /// <typeparam name="TInner">The type of the elements of the second sequence.</typeparam>
+        /// <typeparam name="TKey">The type of the keys returned by the key selector functions.</typeparam>
+        /// <typeparam name="TResult">The type of the result elements.</typeparam>
+        /// <returns>Enumerable the contains the elements of type <see cref="TResult" />.</returns>
+        public static IQueryable<TResult> LeftJoin<TOuter, TInner, TKey, TResult>(
+            this IQueryable<TOuter> outer,
+            IQueryable<TInner> inner,
+            Expression<Func<TOuter, TKey>> outerKeySelector,
+            Expression<Func<TInner, TKey>> innerKeySelector,
+            Expression<Func<Tuple<TOuter, TInner>, TResult>> resultSelector)
+        {
+            return outer
+                .GroupJoin(inner,
+                    outerKeySelector,
+                    innerKeySelector,
+                    (outerObject, inners) => new
+                    {
+                        outerObject,
+                        inners = inners.DefaultIfEmpty()
+                    })
+                .SelectMany(row => row.inners, (row, inner) => new Tuple<TOuter, TInner>(row.outerObject, inner))
+                .Select(resultSelector);
+        }
     }
 }
