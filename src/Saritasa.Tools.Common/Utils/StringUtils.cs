@@ -246,18 +246,6 @@ namespace Saritasa.Tools.Common.Utils
             return success ? result : defaultValue;
         }
 
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        /// <summary>
-        /// Tries to convert the target string to DateTime. If fails return the default value.
-        /// </summary>
-        public static DateTime ParseOrDefault(ReadOnlySpan<char> target, DateTime defaultValue)
-        {
-            DateTime result;
-            var success = DateTime.TryParse(target, out result);
-            return success ? result : defaultValue;
-        }
-#endif
-
         /// <summary>
         /// Tries to convert the target string to DateTime. If fails return the default value.
         /// </summary>
@@ -272,10 +260,112 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert the target string to DateTime. If fails return the default value.
         /// </summary>
+        public static DateTime ParseOrDefault(ReadOnlySpan<char> target, DateTime defaultValue)
+        {
+            DateTime result;
+            var success = DateTime.TryParse(target, out result);
+            return success ? result : defaultValue;
+        }
+
+        /// <summary>
+        /// Tries to convert the target string to DateTime. If fails return the default value.
+        /// </summary>
         public static DateTime ParseOrDefault(ReadOnlySpan<char> target, IFormatProvider provider, DateTimeStyles styles, DateTime defaultValue)
         {
             DateTime result;
             var success = DateTime.TryParse(target, provider, styles, out result);
+            return success ? result : defaultValue;
+        }
+#endif
+
+        #endregion
+
+        #region Parse or default date time offset
+
+        /// <summary>
+        /// Tries to convert the target string to <see cref="DateTimeOffset" />. If fails return the default value.
+        /// </summary>
+        public static DateTimeOffset ParseOrDefault(string target, DateTimeOffset defaultValue)
+        {
+            DateTimeOffset result;
+            var success = DateTimeOffset.TryParse(target, out result);
+            return success ? result : defaultValue;
+        }
+
+        /// <summary>
+        /// Tries to convert the target string to <see cref="DateTimeOffset" />. If fails return the default value.
+        /// </summary>
+        public static DateTimeOffset ParseOrDefault(string target, IFormatProvider provider, DateTimeStyles styles, DateTimeOffset defaultValue)
+        {
+            DateTimeOffset result;
+            var success = DateTimeOffset.TryParse(target, provider, styles, out result);
+            return success ? result : defaultValue;
+        }
+
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        /// <summary>
+        /// Tries to convert the target string to <see cref="DateTimeOffset" />. If fails return the default value.
+        /// </summary>
+        public static DateTimeOffset ParseOrDefault(ReadOnlySpan<char> target, DateTimeOffset defaultValue)
+        {
+            DateTimeOffset result;
+            var success = DateTimeOffset.TryParse(target, out result);
+            return success ? result : defaultValue;
+        }
+
+        /// <summary>
+        /// Tries to convert the target string to <see cref="DateTimeOffset" />. If fails return the default value.
+        /// </summary>
+        public static DateTimeOffset ParseOrDefault(ReadOnlySpan<char> target, IFormatProvider provider, DateTimeStyles styles, DateTimeOffset defaultValue)
+        {
+            DateTimeOffset result;
+            var success = DateTimeOffset.TryParse(target, provider, styles, out result);
+            return success ? result : defaultValue;
+        }
+#endif
+
+        #endregion
+
+        #region Parse or default date only
+
+#if NET6_0_OR_GREATER
+        /// <summary>
+        /// Tries to convert the target string to <see cref="DateOnly" />. If fails return the default value.
+        /// </summary>
+        public static DateOnly ParseOrDefault(string target, DateOnly defaultValue)
+        {
+            DateOnly result;
+            var success = DateOnly.TryParse(target, out result);
+            return success ? result : defaultValue;
+        }
+
+        /// <summary>
+        /// Tries to convert the target string to <see cref="DateOnly" />. If fails return the default value.
+        /// </summary>
+        public static DateOnly ParseOrDefault(string target, IFormatProvider provider, DateTimeStyles styles, DateOnly defaultValue)
+        {
+            DateOnly result;
+            var success = DateOnly.TryParse(target, provider, styles, out result);
+            return success ? result : defaultValue;
+        }
+
+        /// <summary>
+        /// Tries to convert the target string to <see cref="DateOnly" />. If fails return the default value.
+        /// </summary>
+        public static DateOnly ParseOrDefault(ReadOnlySpan<char> target, DateOnly defaultValue)
+        {
+            DateOnly result;
+            var success = DateOnly.TryParse(target, out result);
+            return success ? result : defaultValue;
+        }
+
+        /// <summary>
+        /// Tries to convert the target string to <see cref="DateTimeOffset" />. If fails return the default value.
+        /// </summary>
+        public static DateOnly ParseOrDefault(ReadOnlySpan<char> target, IFormatProvider provider, DateTimeStyles styles, DateOnly defaultValue)
+        {
+            DateOnly result;
+            var success = DateOnly.TryParse(target, provider, styles, out result);
             return success ? result : defaultValue;
         }
 #endif
