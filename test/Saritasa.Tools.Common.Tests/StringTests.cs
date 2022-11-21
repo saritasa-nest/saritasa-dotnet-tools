@@ -62,6 +62,9 @@ namespace Saritasa.Tools.Common.Tests
             Assert.True(StringUtils.ParseOrDefault("true", false)); // bool
             Assert.True(StringUtils.ParseOrDefault("incorrect", true)); // bool
             Assert.True(StringUtils.ParseOrDefault(null, true)); // bool
+#if NET6_0_OR_GREATER
+            Assert.Equal(new DateOnly(2022, 11, 14), StringUtils.ParseOrDefault("test", new DateOnly(2022, 11, 14))); // date only
+#endif
         }
 
         [Theory]
@@ -96,6 +99,31 @@ namespace Saritasa.Tools.Common.Tests
 
             // Assert
             Assert.Equal("Form", result);
+        }
+
+        private enum Color
+        {
+            Undefined,
+            Default,
+            Red,
+            Green,
+            Blue
+        }
+
+        [Fact]
+        public void ParseOrDefault_Enum_ShouldParseCaseInsensitive()
+        {
+            // Arrange and act
+            var red1 = StringUtils.ParseOrDefault("red", Color.Default);
+            var red2 = StringUtils.ParseOrDefault("red", ignoreCase: true, Color.Default);
+            var red3 = StringUtils.ParseOrDefault("Red", Color.Default);
+            var red4 = StringUtils.ParseOrDefault("Red", ignoreCase: true, Color.Default);
+
+            // Assert
+            Assert.Equal(Color.Default, red1);
+            Assert.Equal(Color.Red, red2);
+            Assert.Equal(Color.Default, red3);
+            Assert.Equal(Color.Red, red4);
         }
     }
 }
