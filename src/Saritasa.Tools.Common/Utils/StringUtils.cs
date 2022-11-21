@@ -237,7 +237,7 @@ namespace Saritasa.Tools.Common.Utils
         #region Parse or default date time
 
         /// <summary>
-        /// Tries to convert the target string to DateTime. If fails return the default value.
+        /// Tries to convert the target string to <see cref="DateTime" />. If fails return the default value.
         /// </summary>
         public static DateTime ParseOrDefault(string target, DateTime defaultValue)
         {
@@ -247,7 +247,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Tries to convert the target string to DateTime. If fails return the default value.
+        /// Tries to convert the target string to <see cref="DateTime" />. If fails return the default value.
         /// </summary>
         public static DateTime ParseOrDefault(string target, IFormatProvider provider, DateTimeStyles styles, DateTime defaultValue)
         {
@@ -258,7 +258,7 @@ namespace Saritasa.Tools.Common.Utils
 
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         /// <summary>
-        /// Tries to convert the target string to DateTime. If fails return the default value.
+        /// Tries to convert the target string to <see cref="DateTime" />. If fails return the default value.
         /// </summary>
         public static DateTime ParseOrDefault(ReadOnlySpan<char> target, DateTime defaultValue)
         {
@@ -268,7 +268,7 @@ namespace Saritasa.Tools.Common.Utils
         }
 
         /// <summary>
-        /// Tries to convert the target string to DateTime. If fails return the default value.
+        /// Tries to convert the target string to <see cref="DateTime" />. If fails return the default value.
         /// </summary>
         public static DateTime ParseOrDefault(ReadOnlySpan<char> target, IFormatProvider provider, DateTimeStyles styles, DateTime defaultValue)
         {
@@ -853,34 +853,38 @@ namespace Saritasa.Tools.Common.Utils
         /// <summary>
         /// Tries to convert the target string to Enum. If fails return the default value.
         /// </summary>
-        public static T ParseOrDefault<T>(string target, T defaultValue) where T : Enum
+        public static T ParseOrDefault<T>(string target, T defaultValue) where T : struct, Enum
         {
-            return Enum.IsDefined(typeof(T), target) ? (T)Enum.Parse(typeof(T), target, true) : defaultValue;
+            var success = Enum.TryParse<T>(target, ignoreCase: false, out var result);
+            return success ? (T)result! : defaultValue;
         }
 
         /// <summary>
         /// Tries to convert the target string to Enum. If fails return the default value.
         /// </summary>
-        public static T ParseOrDefault<T>(string target, bool ignoreCase, T defaultValue) where T : Enum
+        public static T ParseOrDefault<T>(string target, bool ignoreCase, T defaultValue) where T : struct, Enum
         {
-            return Enum.IsDefined(typeof(T), target) ? (T)Enum.Parse(typeof(T), target, ignoreCase) : defaultValue;
+            var success = Enum.TryParse<T>(target, ignoreCase, out var result);
+            return success ? (T)result! : defaultValue;
         }
 
 #if NET6_0_OR_GREATER
         /// <summary>
         /// Tries to convert the target string to Enum. If fails return the default value.
         /// </summary>
-        public static T ParseOrDefault<T>(ReadOnlySpan<char> target, T defaultValue) where T : Enum
+        public static T ParseOrDefault<T>(ReadOnlySpan<char> target, T defaultValue) where T : struct, Enum
         {
-            return Enum.IsDefined(typeof(T), target.ToString()) ? (T)Enum.Parse(typeof(T), target, true) : defaultValue;
+            var success = Enum.TryParse(typeof(T), target, ignoreCase: false, out var result);
+            return success ? (T)result! : defaultValue;
         }
 
         /// <summary>
         /// Tries to convert the target string to Enum. If fails return the default value.
         /// </summary>
-        public static T ParseOrDefault<T>(ReadOnlySpan<char> target, bool ignoreCase, T defaultValue) where T : Enum
+        public static T ParseOrDefault<T>(ReadOnlySpan<char> target, bool ignoreCase, T defaultValue) where T : struct, Enum
         {
-            return Enum.IsDefined(typeof(T), target.ToString()) ? (T)Enum.Parse(typeof(T), target, ignoreCase) : defaultValue;
+            var success = Enum.TryParse(typeof(T), target, ignoreCase, out var result);
+            return success ? (T)result! : defaultValue;
         }
 #endif
 

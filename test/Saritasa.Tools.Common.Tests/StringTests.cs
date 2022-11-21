@@ -122,7 +122,7 @@ namespace Saritasa.Tools.Common.Tests
             // Assert
             Assert.Equal(Color.Default, red1);
             Assert.Equal(Color.Red, red2);
-            Assert.Equal(Color.Default, red3);
+            Assert.Equal(Color.Red, red3);
             Assert.Equal(Color.Red, red4);
         }
     }

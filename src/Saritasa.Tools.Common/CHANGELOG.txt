@@ -3,6 +3,7 @@
 [-] Drop .NET 4.0 support.
 [-] Drop ObjectUtils.CreateInstanceWithServiceProvider . Use ActivatorUtilities.CreateInstance .
 [*] DictionaryUtils.GetValueOrDefault is only available for netstandard 1.6 and 2.0 .
+[*] Fix ParseOrDefault for enums with ignore case.
 [+] Add LeftJoin collection extension.
 [+] Add ReadOnlySpan overloads for StringUtils.
 [+] Add parse or default methods for DateTimeOffset and DateOnly types.
