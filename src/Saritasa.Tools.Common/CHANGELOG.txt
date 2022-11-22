@@ -1,4 +1,4 @@
-﻿5.0.0 [TBD]
+﻿5.0.0 [2022-11-22]
 [+] Add .NET 6.0 support.
 [-] Drop .NET Framework 4.0 support.
 [-] Drop .NET 5.0 support.
