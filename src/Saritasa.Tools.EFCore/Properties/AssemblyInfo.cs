@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Saritasa")]
 [assembly: AssemblyProduct("Saritasa.Tools.EFCore")]
-[assembly: AssemblyCopyright("Copyright © Saritasa, 2017-2021")]
+[assembly: AssemblyCopyright("Copyright © Saritasa, 2017-2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]
