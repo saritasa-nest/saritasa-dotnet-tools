@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Saritasa")]
 [assembly: AssemblyProduct("Saritasa.Tools.EntityFrameworkCore")]
-[assembly: AssemblyCopyright("Copyright © Saritasa, 2017-2022")]
+[assembly: AssemblyCopyright("Copyright © Saritasa, 2017-2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]

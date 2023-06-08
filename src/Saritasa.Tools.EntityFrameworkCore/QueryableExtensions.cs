@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2022, Saritasa. All rights reserved.
+// Copyright (c) 2015-2023, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System.Linq.Expressions;
@@ -25,7 +25,7 @@ public static class QueryableExtensions
         this IQueryable<TEntity> entities,
         Expression<Func<TEntity, bool>> predicate,
         CancellationToken cancellationToken = default)
-        where TEntity : class
+            where TEntity : class
     {
         var entity = await entities.FirstOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
         if (entity == null)
