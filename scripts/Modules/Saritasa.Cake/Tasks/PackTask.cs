@@ -56,7 +56,7 @@ public sealed class PackTask : FrostingTask<PackContext>
 
         foreach (var projectName in projectNamesForPack)
         {
-            var assemblyVersion = GetProjectAssemblyVersion(context, projectName);
+            var assemblyVersion = GetProjectAssemblyVersion(context, projectName).ToString();
             var fileVersion = $"{GetVersion(context, projectName)}.{revcount}";
             var productVersion = $"{fileVersion}-{hash}";
             context.Information($"{projectName} has versions {assemblyVersion} {fileVersion} {productVersion}");
@@ -117,10 +117,15 @@ public sealed class PackTask : FrostingTask<PackContext>
         return File.ReadAllText($"{context.SolutionDir}src\\{projectName}\\VERSION.txt").Trim();
     }
 
-    private string GetProjectAssemblyVersion(PackContext context, string projectName)
+    private Version GetProjectAssemblyVersion(PackContext context, string projectName)
     {
-        var version = GetVersion(context, projectName);
-        return version.Substring(0, version.LastIndexOf(".")) + ".0.0";
+        var versionString = GetVersion(context, projectName);
+        var version = new Version(versionString);
+
+        return new Version(version.Major,
+            version.Minor,
+            version.Build,
+            version.Revision > 0 ? version.Revision : 0);
     }
 
     private void ReplaceAttributeValueInAssemblyInfo(PackContext context, string projectName, string attribute, string value)
