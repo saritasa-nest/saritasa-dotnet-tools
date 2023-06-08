@@ -19,11 +19,6 @@ namespace Saritasa.Cake;
 public sealed class PackTask : FrostingTask<PackContext>
 {
     /// <summary>
-    /// Relative path to solution dir.
-    /// </summary>
-    private const string SolutionDir = "..\\..\\..\\";
-
-    /// <summary>
     /// Constructor.
     /// </summary>
     public PackTask()
@@ -47,7 +42,7 @@ public sealed class PackTask : FrostingTask<PackContext>
 
         PackProjects(context);
 
-        RevertAssemlyVersions();
+        RevertAssemlyVersions(context);
     }
 
     private void UpdateAssemlyVersions(PackContext context)
@@ -57,14 +52,14 @@ public sealed class PackTask : FrostingTask<PackContext>
 
         foreach (var projectName in projectNamesForPack)
         {
-            var assemblyVersion = GetProjectAssemblyVersion(projectName);
-            var fileVersion = $"{GetVersion(projectName)}.{revcount}";
+            var assemblyVersion = GetProjectAssemblyVersion(context, projectName);
+            var fileVersion = $"{GetVersion(context, projectName)}.{revcount}";
             var productVersion = $"{fileVersion}-{hash}";
             context.Information($"{projectName} has versions {assemblyVersion} {fileVersion} {productVersion}");
 
-            ReplaceAttributeValueInAssemblyInfo(projectName, "AssemblyVersion", assemblyVersion);
-            ReplaceAttributeValueInAssemblyInfo(projectName, "AssemblyFileVersion", fileVersion);
-            ReplaceAttributeValueInAssemblyInfo(projectName, "AssemblyInformationalVersion", productVersion);
+            ReplaceAttributeValueInAssemblyInfo(context, projectName, "AssemblyVersion", assemblyVersion);
+            ReplaceAttributeValueInAssemblyInfo(context, projectName, "AssemblyFileVersion", fileVersion);
+            ReplaceAttributeValueInAssemblyInfo(context, projectName, "AssemblyInformationalVersion", productVersion);
         }
     }
 
@@ -72,7 +67,7 @@ public sealed class PackTask : FrostingTask<PackContext>
     {
         foreach (var projectName in projectNamesForPack)
         {
-            var projectDir = $"{SolutionDir}src\\{projectName}";
+            var projectDir = $"{context.SolutionDir}src\\{projectName}";
 
             context.DotNetRestore(projectDir);
             context.DotNetBuild(projectDir, new DotNetBuildSettings
@@ -93,40 +88,40 @@ public sealed class PackTask : FrostingTask<PackContext>
 
         UpdateVariableInFile(nuspecFile, "CommitHash", longHash);
 
-        var assemblyVersion = GetVersion(projectName);
+        var assemblyVersion = GetVersion(context, projectName);
         var resultPackNuGet = context.ExecuteNuGetCommand($"pack {nuspecFile} " +
             $"-NonInteractive " +
             $"-Version {assemblyVersion} " +
             $"-Exclude .snk " +
-            $"-OutputDirectory {SolutionDir}");
+            $"-OutputDirectory {context.SolutionDir}");
 
         context.Information(resultPackNuGet);
     }
 
-    private void RevertAssemlyVersions()
+    private void RevertAssemlyVersions(PackContext context)
     {
         foreach (var projectName in projectNamesForPack)
         {
-            ReplaceAttributeValueInAssemblyInfo(projectName, "AssemblyVersion", "1.0.0.0");
-            ReplaceAttributeValueInAssemblyInfo(projectName, "AssemblyFileVersion", "1.0.0.0");
-            ReplaceAttributeValueInAssemblyInfo(projectName, "AssemblyInformationalVersion", "1.0.0.0");
+            ReplaceAttributeValueInAssemblyInfo(context, projectName, "AssemblyVersion", "1.0.0.0");
+            ReplaceAttributeValueInAssemblyInfo(context, projectName, "AssemblyFileVersion", "1.0.0.0");
+            ReplaceAttributeValueInAssemblyInfo(context, projectName, "AssemblyInformationalVersion", "1.0.0.0");
         }
     }
 
-    private string GetVersion(string projectName)
+    private string GetVersion(PackContext context, string projectName)
     {
-        return File.ReadAllText($"{SolutionDir}src\\{projectName}\\VERSION.txt").Trim();
+        return File.ReadAllText($"{context.SolutionDir}src\\{projectName}\\VERSION.txt").Trim();
     }
 
-    private string GetProjectAssemblyVersion(string projectName)
+    private string GetProjectAssemblyVersion(PackContext context, string projectName)
     {
-        var version = GetVersion(projectName);
+        var version = GetVersion(context, projectName);
         return version.Substring(0, version.LastIndexOf(".")) + ".0.0";
     }
 
-    private void ReplaceAttributeValueInAssemblyInfo(string projectName, string attribute, string value)
+    private void ReplaceAttributeValueInAssemblyInfo(PackContext context, string projectName, string attribute, string value)
     {
-        var assemblyInfoFile = $"{SolutionDir}src\\{projectName}\\Properties\\AssemblyInfo.cs";
+        var assemblyInfoFile = $"{context.SolutionDir}src\\{projectName}\\Properties\\AssemblyInfo.cs";
         var assemblyInfo = File.ReadAllText(assemblyInfoFile);
 
         //[assembly: AssemblyVersion("1.0.0.0")] -> match "AssemblyVersion("1.0.0.0")"

@@ -1,13 +1,12 @@
 ﻿using Cake.Common;
 using Cake.Core;
-using Cake.Frosting;
 
 namespace Saritasa.Cake;
 
 /// <summary>
 /// Build context.
 /// </summary>
-public class PackContext : FrostingContext
+public class PackContext : CommonContext
 {
     /// <summary>
     /// MsBuild Configuration.

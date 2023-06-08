@@ -1,5 +1,4 @@
-﻿using Cake.Core;
-using Cake.Frosting;
+﻿using Cake.Frosting;
 
 namespace Saritasa.Cake;
 
@@ -8,7 +7,7 @@ namespace Saritasa.Cake;
 /// </summary>
 [TaskName("Clean")]
 [TaskDescription("Clean solution")]
-public sealed class CleanTask : FrostingTask
+public sealed class CleanTask : FrostingTask<CommonContext>
 {
     /// <summary>
     /// Constructor.
@@ -33,22 +32,20 @@ public sealed class CleanTask : FrostingTask
     private string[] projectForClean;
 
     /// <inheritdoc />
-    public override void Run(ICakeContext context)
+    public override void Run(CommonContext context)
     {
-        var solutionDir = "..\\..\\..\\";
-
-        context.SafeDeleteFiles($"{solutionDir}Saritasa.*.nupkg");
-        context.SafeDeleteFiles($"{solutionDir}Saritasa.*.zip");
-        context.SafeDeleteFiles($"{solutionDir}src\\*.suo");
-        context.SafeDeleteFiles($"{solutionDir}*.tempex");
+        context.SafeDeleteFiles($"{context.SolutionDir}Saritasa.*.nupkg");
+        context.SafeDeleteFiles($"{context.SolutionDir}Saritasa.*.zip");
+        context.SafeDeleteFiles($"{context.SolutionDir} src\\*.suo");
+        context.SafeDeleteFiles($"{context.SolutionDir}*.tempex");
 
         foreach (var project in projectForClean)
         {
-            context.SafeCleanDirectory($"{solutionDir}{project}\\bin");
-            context.SafeCleanDirectory($"{solutionDir}{project}\\obj");
+            context.SafeCleanDirectory($"{context.SolutionDir}{project}\\bin");
+            context.SafeCleanDirectory($"{context.SolutionDir}{project}\\obj");
         }
 
-        context.SafeDeleteFile($"{solutionDir}src\\StyleCop.Cache");
-        context.SafeDeleteFile($"{solutionDir}scripts\\nuget.exe");
+        context.SafeDeleteFile($"{context.SolutionDir}src\\StyleCop.Cache");
+        context.SafeDeleteFile($"{context.SolutionDir}scripts\\nuget.exe");
     }
 }
