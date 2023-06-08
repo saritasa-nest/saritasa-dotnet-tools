@@ -18,9 +18,9 @@ namespace Saritasa.Cake;
 [IsDependentOn(typeof(CleanTask))]
 public sealed class PackTask : FrostingTask<PackContext>
 {
-    private const string AssemblyVersionAttribute = "AssemblyVersion";
-    private const string AssemblyFileVersionAttribute = "AssemblyFileVersion";
-    private const string AssemblyInformationalVersionAttribute = "AssemblyInformationalVersion";
+    public const string AssemblyVersionAttribute = "AssemblyVersion";
+    public const string AssemblyFileVersionAttribute = "AssemblyFileVersion";
+    public const string AssemblyInformationalVersionAttribute = "AssemblyInformationalVersion";
 
     /// <summary>
     /// Constructor.
@@ -133,12 +133,24 @@ public sealed class PackTask : FrostingTask<PackContext>
         var assemblyInfoFile = $"{context.SolutionDir}src\\{projectName}\\Properties\\AssemblyInfo.cs";
         var assemblyInfo = File.ReadAllText(assemblyInfoFile);
 
+        var newAssemblyInfo = ReplaceAttributeValueInAssemblyInfo(assemblyInfo, attribute, value);
+
+        File.WriteAllText(assemblyInfoFile, newAssemblyInfo, new UTF8Encoding(true));
+    }
+
+    /// <summary>
+    /// Replace attribute value in assembly info.
+    /// </summary>
+    /// <param name="assemblyInfo">Assembly info text.</param>
+    /// <param name="attribute">Attribute name.</param>
+    /// <param name="value">New attribute value.</param>
+    /// <returns>New assembly info text.</returns>
+    public string ReplaceAttributeValueInAssemblyInfo(string assemblyInfo, string attribute, string value)
+    {
         //[assembly: AssemblyVersion("1.0.0.0")] -> match "AssemblyVersion("1.0.0.0")"
         var pattern = attribute + @"\(""[0-9]+(\.([0-9a-zA-Z\-]+|\*)){1,3}""\)";
 
-        var newAssemblyInfo = Regex.Replace(assemblyInfo, pattern, $"{attribute}(\"{value}\")");
-
-        File.WriteAllText(assemblyInfoFile, newAssemblyInfo, new UTF8Encoding(true));
+        return Regex.Replace(assemblyInfo, pattern, $"{attribute}(\"{value}\")");
     }
 
     private void UpdateVariableInFile(string file, string variable, string value)
