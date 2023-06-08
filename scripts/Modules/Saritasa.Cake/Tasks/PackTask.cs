@@ -18,6 +18,10 @@ namespace Saritasa.Cake;
 [IsDependentOn(typeof(CleanTask))]
 public sealed class PackTask : FrostingTask<PackContext>
 {
+    private const string AssemblyVersionAttribute = "AssemblyVersion";
+    private const string AssemblyFileVersionAttribute = "AssemblyFileVersion";
+    private const string AssemblyInformationalVersionAttribute = "AssemblyInformationalVersion";
+
     /// <summary>
     /// Constructor.
     /// </summary>
@@ -57,9 +61,9 @@ public sealed class PackTask : FrostingTask<PackContext>
             var productVersion = $"{fileVersion}-{hash}";
             context.Information($"{projectName} has versions {assemblyVersion} {fileVersion} {productVersion}");
 
-            ReplaceAttributeValueInAssemblyInfo(context, projectName, "AssemblyVersion", assemblyVersion);
-            ReplaceAttributeValueInAssemblyInfo(context, projectName, "AssemblyFileVersion", fileVersion);
-            ReplaceAttributeValueInAssemblyInfo(context, projectName, "AssemblyInformationalVersion", productVersion);
+            ReplaceAttributeValueInAssemblyInfo(context, projectName, AssemblyVersionAttribute, assemblyVersion);
+            ReplaceAttributeValueInAssemblyInfo(context, projectName, AssemblyFileVersionAttribute, fileVersion);
+            ReplaceAttributeValueInAssemblyInfo(context, projectName, AssemblyInformationalVersionAttribute, productVersion);
         }
     }
 
@@ -102,9 +106,9 @@ public sealed class PackTask : FrostingTask<PackContext>
     {
         foreach (var projectName in projectNamesForPack)
         {
-            ReplaceAttributeValueInAssemblyInfo(context, projectName, "AssemblyVersion", "1.0.0.0");
-            ReplaceAttributeValueInAssemblyInfo(context, projectName, "AssemblyFileVersion", "1.0.0.0");
-            ReplaceAttributeValueInAssemblyInfo(context, projectName, "AssemblyInformationalVersion", "1.0.0.0");
+            ReplaceAttributeValueInAssemblyInfo(context, projectName, AssemblyVersionAttribute, "1.0.0.0");
+            ReplaceAttributeValueInAssemblyInfo(context, projectName, AssemblyFileVersionAttribute, "1.0.0.0");
+            ReplaceAttributeValueInAssemblyInfo(context, projectName, AssemblyInformationalVersionAttribute, "1.0.0.0");
         }
     }
 
