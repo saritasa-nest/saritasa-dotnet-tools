@@ -32,7 +32,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.EntityFrameworkCore", "src\Saritasa.Tools.EntityFrameworkCore\Saritasa.Tools.EntityFrameworkCore.csproj", "{42B411A6-8F91-439F-A006-00196ECF1DA0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.EntityFrameworkCore", "src\Saritasa.Tools.EntityFrameworkCore\Saritasa.Tools.EntityFrameworkCore.csproj", "{D80C1322-862D-467A-9735-5474346DCCCB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -80,10 +80,10 @@ Global
 		{A8DD531A-243E-4B9B-B13B-791293F05989}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A8DD531A-243E-4B9B-B13B-791293F05989}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A8DD531A-243E-4B9B-B13B-791293F05989}.Release|Any CPU.Build.0 = Release|Any CPU
-		{42B411A6-8F91-439F-A006-00196ECF1DA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{42B411A6-8F91-439F-A006-00196ECF1DA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{42B411A6-8F91-439F-A006-00196ECF1DA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{42B411A6-8F91-439F-A006-00196ECF1DA0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D80C1322-862D-467A-9735-5474346DCCCB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D80C1322-862D-467A-9735-5474346DCCCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D80C1322-862D-467A-9735-5474346DCCCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D80C1322-862D-467A-9735-5474346DCCCB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -99,7 +99,7 @@ Global
 		{18DD7882-E4F8-4704-BA5D-80B5F811919F} = {45D13EC5-88F3-403A-8148-0812C2796062}
 		{66037F7C-03F2-4342-8023-26297304F8A3} = {45D13EC5-88F3-403A-8148-0812C2796062}
 		{A8DD531A-243E-4B9B-B13B-791293F05989} = {635DB5B1-86B3-4F5B-97A6-04C71D672296}
-		{42B411A6-8F91-439F-A006-00196ECF1DA0} = {45D13EC5-88F3-403A-8148-0812C2796062}
+		{D80C1322-862D-467A-9735-5474346DCCCB} = {45D13EC5-88F3-403A-8148-0812C2796062}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F298C89B-4162-49D5-B517-5306BD58DB59}
