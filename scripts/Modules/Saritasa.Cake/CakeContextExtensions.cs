@@ -1,4 +1,6 @@
-﻿using Cake.Common.IO;
+﻿using System;
+using Cake.Common.Diagnostics;
+using Cake.Common.IO;
 using Cake.Common.Tools.Command;
 using Cake.Core;
 using Cake.Core.IO;
@@ -22,7 +24,10 @@ public static class CakeContextExtensions
         {
             context.DeleteFile(filePath);
         }
-        catch { }
+        catch (Exception ex)
+        {
+            context.Debug(ex);
+        }
     }
 
     /// <summary>
@@ -37,7 +42,10 @@ public static class CakeContextExtensions
         {
             context.DeleteFiles(pattern);
         }
-        catch { }
+        catch (Exception ex)
+        {
+            context.Debug(ex);
+        }
     }
 
     /// <summary>
@@ -52,7 +60,10 @@ public static class CakeContextExtensions
         {
             context.CleanDirectory(path);
         }
-        catch { }
+        catch (Exception ex)
+        {
+            context.Debug(ex);
+        }
     }
 
     /// <summary>
