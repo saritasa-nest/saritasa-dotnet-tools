@@ -16,11 +16,6 @@
     <tags>uow repository domain efcore dbcontext</tags>
     <repository type="git" url="https://github.com/Saritasa/SaritasaTools" commit="$(CommitHash)" />
     <dependencies>
-      <group targetFramework="netstandard2.1">
-        <dependency id="Microsoft.EntityFrameworkCore" version="[5.0.0, )" />
-        <dependency id="Saritasa.Tools.Domain" version="[0.8.0, )" />
-        <dependency id="Saritasa.Tools.Common" version="[3.3.0, )" />
-      </group>
       <group targetFramework="net6.0">
         <dependency id="Microsoft.EntityFrameworkCore" version="[6.0.0, )" />
         <dependency id="Saritasa.Tools.Domain" version="[0.8.0, )" />
