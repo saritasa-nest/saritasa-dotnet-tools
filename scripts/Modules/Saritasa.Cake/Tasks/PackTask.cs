@@ -67,7 +67,7 @@ public sealed class PackTask : FrostingTask<PackContext>
     {
         foreach (var projectName in projectNamesForPack)
         {
-            var projectDir = $"{context.SolutionDir}src\\{projectName}";
+            var projectDir = Path.Combine(context.SolutionDir, "src", projectName);
 
             context.DotNetRestore(projectDir);
             context.DotNetBuild(projectDir, new DotNetBuildSettings
@@ -82,7 +82,7 @@ public sealed class PackTask : FrostingTask<PackContext>
     private void PackNuGetFile(PackContext context, string projectName, string projectDir)
     {
         var longHash = context.ExecuteGitCommand("rev-parse HEAD").Replace(Environment.NewLine, string.Empty);
-        var nuspecFile = $"{projectDir}\\{projectName}.nuspec";
+        var nuspecFile = Path.Combine(projectDir, $"{projectName}.nuspec");
 
         context.CopyFile($"{nuspecFile}.template", nuspecFile);
 
@@ -110,7 +110,8 @@ public sealed class PackTask : FrostingTask<PackContext>
 
     private string GetVersion(PackContext context, string projectName)
     {
-        return File.ReadAllText($"{context.SolutionDir}src\\{projectName}\\VERSION.txt").Trim();
+        var versionFile = Path.Combine(context.SolutionDir, "src", projectName, "VERSION.txt");
+        return File.ReadAllText(versionFile).Trim();
     }
 
     private Version GetProjectAssemblyVersion(PackContext context, string projectName)
@@ -126,7 +127,7 @@ public sealed class PackTask : FrostingTask<PackContext>
 
     private void ReplaceAttributeValueInAssemblyInfo(PackContext context, string projectName, string attribute, string value)
     {
-        var assemblyInfoFile = $"{context.SolutionDir}src\\{projectName}\\Properties\\AssemblyInfo.cs";
+        var assemblyInfoFile = Path.Combine(context.SolutionDir, "src", projectName, "Properties", "AssemblyInfo.cs");
         var assemblyInfo = File.ReadAllText(assemblyInfoFile);
 
         var newAssemblyInfo = ReplaceAttributeValueInAssemblyInfo(assemblyInfo, attribute, value);

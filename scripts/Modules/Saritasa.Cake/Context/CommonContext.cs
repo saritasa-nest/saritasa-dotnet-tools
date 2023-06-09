@@ -1,4 +1,5 @@
-﻿using Cake.Common;
+﻿using System.IO;
+using Cake.Common;
 using Cake.Core;
 using Cake.Frosting;
 
@@ -25,6 +26,6 @@ public class CommonContext : FrostingContext
     /// <param name="context">Cake context.</param>
     public CommonContext(ICakeContext context) : base(context)
     {
-        SolutionDir = context.Argument("solutionDir", "..\\..\\..\\");
+        SolutionDir = context.Argument("solutionDir", Path.Combine("..", "..", ".."));
     }
 }
