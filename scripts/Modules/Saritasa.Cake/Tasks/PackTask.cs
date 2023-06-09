@@ -26,34 +26,26 @@ public sealed class PackTask : FrostingTask<PackContext>
     public const string AssemblyFileVersionAttribute = "AssemblyFileVersion";
     public const string AssemblyInformationalVersionAttribute = "AssemblyInformationalVersion";
 
-    /// <summary>
-    /// Constructor.
-    /// </summary>
-    public PackTask()
+    private readonly string[] projectNamesForPack = new[]
     {
-        projectNamesForPack = new[]
-        {
-            "Saritasa.Tools.Common",
-            "Saritasa.Tools.Domain",
-            "Saritasa.Tools.EntityFrameworkCore",
-            "Saritasa.Tools.Emails",
-            "Saritasa.Tools.Misc",
-        };
-    }
-
-    private string[] projectNamesForPack;
+        "Saritasa.Tools.Common",
+        "Saritasa.Tools.Domain",
+        "Saritasa.Tools.EntityFrameworkCore",
+        "Saritasa.Tools.Emails",
+        "Saritasa.Tools.Misc",
+    };
 
     /// <inheritdoc />
     public override void Run(PackContext context)
     {
-        UpdateAssemlyVersions(context);
+        UpdateAssemblyVersions(context);
 
         PackProjects(context);
 
-        RevertAssemlyVersions(context);
+        RevertAssemblyVersions(context);
     }
 
-    private void UpdateAssemlyVersions(PackContext context)
+    private void UpdateAssemblyVersions(PackContext context)
     {
         var revcount = context.ExecuteGitCommand("rev-list --all --count").Replace(Environment.NewLine, string.Empty);
         var hash = context.ExecuteGitCommand("log --pretty=format:%h -n 1").Replace(Environment.NewLine, string.Empty);
@@ -106,7 +98,7 @@ public sealed class PackTask : FrostingTask<PackContext>
         }.WithExpectedExitCode(1));
     }
 
-    private void RevertAssemlyVersions(PackContext context)
+    private void RevertAssemblyVersions(PackContext context)
     {
         foreach (var projectName in projectNamesForPack)
         {
