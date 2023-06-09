@@ -6,6 +6,10 @@ using Cake.Common.Diagnostics;
 using Cake.Common.IO;
 using Cake.Common.Tools.DotNet;
 using Cake.Common.Tools.DotNet.Build;
+using Cake.Common.Tools.NuGet;
+using Cake.Common.Tools.NuGet.Pack;
+using Cake.Core;
+using Cake.Core.Tooling;
 using Cake.Frosting;
 
 namespace Saritasa.Cake;
@@ -91,15 +95,15 @@ public sealed class PackTask : FrostingTask<PackContext>
         context.CopyFile($"{nuspecFile}.template", nuspecFile);
 
         UpdateVariableInFile(nuspecFile, "CommitHash", longHash);
-
         var assemblyVersion = GetVersion(context, projectName);
-        var resultPackNuGet = context.ExecuteNuGetCommand($"pack {nuspecFile} " +
-            $"-NonInteractive " +
-            $"-Version {assemblyVersion} " +
-            $"-Exclude .snk " +
-            $"-OutputDirectory {context.SolutionDir}");
 
-        context.Information(resultPackNuGet);
+        context.NuGetPack(nuspecFile, new NuGetPackSettings
+        {
+            Version = assemblyVersion,
+            OutputDirectory = context.SolutionDir,
+            ArgumentCustomization = args => args.Append("-NonInteractive")
+                                                .Append("-Exclude .snk")
+        }.WithExpectedExitCode(1));
     }
 
     private void RevertAssemlyVersions(PackContext context)

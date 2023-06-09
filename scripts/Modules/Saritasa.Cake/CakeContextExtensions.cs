@@ -84,23 +84,4 @@ public static class CakeContextExtensions
 
         return resultOutput;
     }
-
-    /// <summary>
-    /// Execute NuGet command.
-    /// </summary>
-    /// <param name="context">Cake context.</param>
-    /// <param name="commandText">Command text without "nuget" in start.</param>
-    /// <returns>Command output text.</returns>
-    public static string ExecuteNuGetCommand(this ICakeContext context, string commandText)
-    {
-        var gitCommandSettings = new CommandSettings
-        {
-            ToolName = "NuGet",
-            ToolExecutableNames = new[] { "nuget", "nuget.exe" },
-        };
-
-        context.Command(gitCommandSettings, out var resultOutput, commandText);
-
-        return resultOutput;
-    }
 }
