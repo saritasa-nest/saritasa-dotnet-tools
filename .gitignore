@@ -140,3 +140,6 @@ sonar-project.properties
 *.targets
 *.bak
 *.nuspec
+
+#Cake auto generated tools
+scripts/Modules/Saritasa.Cake/tools/

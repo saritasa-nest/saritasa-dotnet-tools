@@ -32,7 +32,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Tools.EntityFrameworkCore", "src\Saritasa.Tools.EntityFrameworkCore\Saritasa.Tools.EntityFrameworkCore.csproj", "{D80C1322-862D-467A-9735-5474346DCCCB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saritasa.Tools.EntityFrameworkCore", "src\Saritasa.Tools.EntityFrameworkCore\Saritasa.Tools.EntityFrameworkCore.csproj", "{D80C1322-862D-467A-9735-5474346DCCCB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Saritasa.Cake", "Saritasa.Cake", "{46B3292E-FB1B-42C7-8D7D-28904EE6424E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saritasa.Cake", "scripts\Modules\Saritasa.Cake\Saritasa.Cake.csproj", "{EA0E235B-0E52-4C8A-9690-2DF720953926}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saritasa.Cake.Tests", "test\Saritasa.Cake.Tests\Saritasa.Cake.Tests.csproj", "{B737B9A4-C9AD-4639-8F04-B515DB12B0E5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -84,6 +90,14 @@ Global
 		{D80C1322-862D-467A-9735-5474346DCCCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D80C1322-862D-467A-9735-5474346DCCCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D80C1322-862D-467A-9735-5474346DCCCB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA0E235B-0E52-4C8A-9690-2DF720953926}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA0E235B-0E52-4C8A-9690-2DF720953926}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA0E235B-0E52-4C8A-9690-2DF720953926}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA0E235B-0E52-4C8A-9690-2DF720953926}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B737B9A4-C9AD-4639-8F04-B515DB12B0E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B737B9A4-C9AD-4639-8F04-B515DB12B0E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B737B9A4-C9AD-4639-8F04-B515DB12B0E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B737B9A4-C9AD-4639-8F04-B515DB12B0E5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -100,6 +114,8 @@ Global
 		{66037F7C-03F2-4342-8023-26297304F8A3} = {45D13EC5-88F3-403A-8148-0812C2796062}
 		{A8DD531A-243E-4B9B-B13B-791293F05989} = {635DB5B1-86B3-4F5B-97A6-04C71D672296}
 		{D80C1322-862D-467A-9735-5474346DCCCB} = {45D13EC5-88F3-403A-8148-0812C2796062}
+		{EA0E235B-0E52-4C8A-9690-2DF720953926} = {46B3292E-FB1B-42C7-8D7D-28904EE6424E}
+		{B737B9A4-C9AD-4639-8F04-B515DB12B0E5} = {635DB5B1-86B3-4F5B-97A6-04C71D672296}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F298C89B-4162-49D5-B517-5306BD58DB59}

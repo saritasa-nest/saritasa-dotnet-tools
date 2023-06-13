@@ -37,11 +37,11 @@ Commands
 
 * Build the library, test it, and prepare NuGet packages.
 
-    `psake pack`
+    `./Saritasa.Cake.ps1 --target Pack` or `./Saritasa.Cake.ps1`
 
 * Clean project.
 
-    `psake clean`
+    `./Saritasa.Cake.ps1 --target Clean`
 
 Contributors
 ------------
