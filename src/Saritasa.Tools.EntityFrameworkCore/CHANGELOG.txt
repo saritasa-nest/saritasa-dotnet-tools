@@ -3,3 +3,6 @@
 
 6.0.0 [2023-06-05]
 [*] Initial release of EntityFrameworkCore 6.0 package.
+
+7.0.0 [2023-06-09]
+[*] Initial release of EntityFrameworkCore 7.0 package.
