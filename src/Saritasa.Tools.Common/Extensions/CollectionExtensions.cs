@@ -137,7 +137,7 @@ namespace Saritasa.Tools.Common.Extensions
         /// <typeparam name="TInner">The type of the elements of the second sequence.</typeparam>
         /// <typeparam name="TKey">The type of the keys returned by the key selector functions.</typeparam>
         /// <typeparam name="TResult">The type of the result elements.</typeparam>
-        /// <returns>Enumerable the contains the elements of type <see cref="TResult" />.</returns>
+        /// <returns>Enumerable the contains the elements of type <see ref="TResult" />.</returns>
         public static IEnumerable<TResult> LeftJoin<TOuter, TInner, TKey, TResult>(
             this IEnumerable<TOuter> outer,
             IEnumerable<TInner> inner,
@@ -154,7 +154,7 @@ namespace Saritasa.Tools.Common.Extensions
                         outerObject,
                         inners = inners.DefaultIfEmpty()
                     })
-                .SelectMany(a => a.inners.Select(innerObj => resultSelector(a.outerObject, innerObj)));
+                .SelectMany(a => a.inners.Select(innerObj => resultSelector(a.outerObject, innerObj!)));
         }
 
         /// <summary>
@@ -170,7 +170,7 @@ namespace Saritasa.Tools.Common.Extensions
         /// <typeparam name="TInner">The type of the elements of the second sequence.</typeparam>
         /// <typeparam name="TKey">The type of the keys returned by the key selector functions.</typeparam>
         /// <typeparam name="TResult">The type of the result elements.</typeparam>
-        /// <returns>Enumerable the contains the elements of type <see cref="TResult" />.</returns>
+        /// <returns>Enumerable the contains the elements of type <see ref="TResult" />.</returns>
         public static IQueryable<TResult> LeftJoin<TOuter, TInner, TKey, TResult>(
             this IQueryable<TOuter> outer,
             IQueryable<TInner> inner,
@@ -187,7 +187,7 @@ namespace Saritasa.Tools.Common.Extensions
                         outerObject,
                         inners = inners.DefaultIfEmpty()
                     })
-                .SelectMany(row => row.inners, (row, inner) => new Tuple<TOuter, TInner>(row.outerObject, inner))
+                .SelectMany(row => row.inners, (row, inner) => new Tuple<TOuter, TInner>(row.outerObject, inner!))
                 .Select(resultSelector);
         }
     }
