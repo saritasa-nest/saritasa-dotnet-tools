@@ -1,5 +1,6 @@
-using System;
 using Cake.Frosting;
+using Saritasa.Cake.Context;
+using Saritasa.Cake.Tasks;
 
 namespace Saritasa.Cake;
 
@@ -28,4 +29,6 @@ public static class Program
 /// "./Saritasa.Cake.ps1" - execute "Default" task;
 /// "./Saritasa.Cake.ps1 --target Clean" - execute "Clean" task.</remarks>
 [IsDependentOn(typeof(PackTask))]
-public sealed class Default : FrostingTask { }
+public sealed class Default : FrostingTask
+{
+}

@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
 using Cake.Common.Diagnostics;
 using Cake.Common.IO;
@@ -11,8 +9,9 @@ using Cake.Common.Tools.NuGet.Pack;
 using Cake.Core;
 using Cake.Core.Tooling;
 using Cake.Frosting;
+using Saritasa.Cake.Context;
 
-namespace Saritasa.Cake;
+namespace Saritasa.Cake.Tasks;
 
 /// <summary>
 /// Pack task.
@@ -22,8 +21,19 @@ namespace Saritasa.Cake;
 [IsDependentOn(typeof(CleanTask))]
 public sealed class PackTask : FrostingTask<PackContext>
 {
+    /// <summary>
+    /// Attribute that defines the assembly version.
+    /// </summary>
     public const string AssemblyVersionAttribute = "AssemblyVersion";
+
+    /// <summary>
+    /// Attribute that defines the assembly file version.
+    /// </summary>
     public const string AssemblyFileVersionAttribute = "AssemblyFileVersion";
+
+    /// <summary>
+    /// Attribute that defines the assembly informational version.
+    /// </summary>
     public const string AssemblyInformationalVersionAttribute = "AssemblyInformationalVersion";
 
     private readonly string[] projectNamesForPack = new[]
@@ -144,7 +154,7 @@ public sealed class PackTask : FrostingTask<PackContext>
     /// <returns>New assembly info text.</returns>
     public string ReplaceAttributeValueInAssemblyInfo(string assemblyInfo, string attribute, string value)
     {
-        //[assembly: AssemblyVersion("1.0.0.0")] -> match "AssemblyVersion("1.0.0.0")"
+        // [assembly: AssemblyVersion("1.0.0.0")] -> match "AssemblyVersion("1.0.0.0")"
         var pattern = attribute + @"\(""[0-9]+(\.([0-9a-zA-Z\-]+|\*)){1,3}""\)";
 
         return Regex.Replace(assemblyInfo, pattern, $"{attribute}(\"{value}\")");

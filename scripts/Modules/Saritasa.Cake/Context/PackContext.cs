@@ -1,7 +1,7 @@
 ﻿using Cake.Common;
 using Cake.Core;
 
-namespace Saritasa.Cake;
+namespace Saritasa.Cake.Context;
 
 /// <summary>
 /// Build context.

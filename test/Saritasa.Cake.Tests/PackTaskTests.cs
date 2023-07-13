@@ -1,3 +1,6 @@
+using Saritasa.Cake.Tasks;
+#pragma warning disable CS1591
+
 namespace Saritasa.Cake.Tests;
 
 public class PackTaskTests
