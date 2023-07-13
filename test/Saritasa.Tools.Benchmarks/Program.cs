@@ -3,20 +3,18 @@
 
 using BenchmarkDotNet.Running;
 
-namespace Saritasa.Tools.Benchmarks
+namespace Saritasa.Tools.Benchmarks;
+
+/// <summary>
+/// Program class.
+/// </summary>
+internal class Program
 {
     /// <summary>
-    /// Program class.
+    /// Entry point.
     /// </summary>
-    internal class Program
+    public static void Main()
     {
-        /// <summary>
-        /// Entry point.
-        /// </summary>
-        /// <param name="args">Program arguments.</param>
-        public static void Main()
-        {
-            BenchmarkRunner.Run<CollectionUtilsDiffBenchmark>();
-        }
+        BenchmarkRunner.Run<CollectionUtilsDiffBenchmark>();
     }
 }

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using Xunit;
 using Saritasa.Tools.Common.Utils;
+#pragma warning disable CS1591
 
 namespace Saritasa.Tools.Common.Tests;
 

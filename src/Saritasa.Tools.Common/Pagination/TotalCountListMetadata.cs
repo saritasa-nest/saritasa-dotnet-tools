@@ -3,19 +3,18 @@
 
 using System;
 
-namespace Saritasa.Tools.Common.Pagination
+namespace Saritasa.Tools.Common.Pagination;
+
+/// <summary>
+/// Metadata class with the total count of items.
+/// </summary>
+#if NET40 || NETSTANDARD2_0_OR_GREATER || NET5_0_OR_GREATER
+[Serializable]
+#endif
+public class TotalCountListMetadata
 {
     /// <summary>
-    /// Metadata class with the total count of items.
+    /// The total count of items.
     /// </summary>
-#if NET40 || NETSTANDARD2_0_OR_GREATER || NET5_0_OR_GREATER
-    [Serializable]
-#endif
-    public class TotalCountListMetadata
-    {
-        /// <summary>
-        /// The total count of items.
-        /// </summary>
-        public int TotalCount { get; set; }
-    }
+    public int TotalCount { get; set; }
 }

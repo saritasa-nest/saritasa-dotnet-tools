@@ -9,63 +9,62 @@ using System.Threading;
 
 using NameValueDict = System.Collections.Generic.IDictionary<string, object>;
 
-namespace Saritasa.Tools.Emails
+namespace Saritasa.Tools.Emails;
+
+/// <summary>
+/// Abstract email-sender implementation with interceptors' support.
+/// </summary>
+public abstract class EmailSender : IEmailSender
 {
+    readonly IList<IEmailInterceptor> interceptors = new List<IEmailInterceptor>();
+
     /// <summary>
-    /// Abstract email-sender implementation with interceptors' support.
+    /// Send message.
     /// </summary>
-    public abstract class EmailSender : IEmailSender
+    protected abstract Task Process(MailMessage message, NameValueDict? data);
+
+    /// <summary>
+    /// Execution strategy. <see cref="DefaultEmailExecutionStrategy" /> used by default. Determines the way how we should proceed
+    /// with actual email sending.
+    /// </summary>
+    protected IEmailExecutionStrategy ExecutionStrategy { get; } = new DefaultEmailExecutionStrategy();
+
+    /// <inheritdoc />
+    public async Task SendAsync(MailMessage message, CancellationToken cancellationToken = default)
     {
-        readonly IList<IEmailInterceptor> interceptors = new List<IEmailInterceptor>();
+        var data = new Dictionary<string, object>();
+        bool cancel = false;
 
-        /// <summary>
-        /// Send message.
-        /// </summary>
-        protected abstract Task Process(MailMessage message, NameValueDict? data);
-
-        /// <summary>
-        /// Execution strategy. <see cref="DefaultEmailExecutionStrategy" /> used by default. Determines the way how we should proceed
-        /// with actual email sending.
-        /// </summary>
-        protected IEmailExecutionStrategy ExecutionStrategy { get; } = new DefaultEmailExecutionStrategy();
-
-        /// <inheritdoc />
-        public async Task SendAsync(MailMessage message, CancellationToken cancellationToken = default)
+        // Run pre-process interceptors.
+        foreach (var interceptor in interceptors)
         {
-            var data = new Dictionary<string, object>();
-            bool cancel = false;
-
-            // Run pre-process interceptors.
-            foreach (var interceptor in interceptors)
+            await interceptor.SendingAsync(message, data, ref cancel, cancellationToken).ConfigureAwait(false);
+            if (cancel)
             {
-                await interceptor.SendingAsync(message, data, ref cancel, cancellationToken).ConfigureAwait(false);
-                if (cancel)
-                {
-                    return;
-                }
-            }
-
-            // Send email and run post process interceptors.
-            await ExecutionStrategy.ExecuteAsync(Process, message, data, cancellationToken).ConfigureAwait(false);
-
-            foreach (var interceptor in interceptors)
-            {
-                await interceptor.SentAsync(message, data, cancellationToken).ConfigureAwait(false);
+                return;
             }
         }
 
-        /// <summary>
-        /// Add interceptor.
-        /// </summary>
-        /// <param name="interceptor">Interceptor.</param>
-        public EmailSender AddInterceptor(IEmailInterceptor interceptor)
+        // Send email and run post process interceptors.
+        await ExecutionStrategy.ExecuteAsync(Process, message, data, cancellationToken).ConfigureAwait(false);
+
+        foreach (var interceptor in interceptors)
         {
-            if (interceptor == null)
-            {
-                throw new ArgumentNullException(nameof(interceptor));
-            }
-            interceptors.Add(interceptor);
-            return this;
+            await interceptor.SentAsync(message, data, cancellationToken).ConfigureAwait(false);
         }
+    }
+
+    /// <summary>
+    /// Add interceptor.
+    /// </summary>
+    /// <param name="interceptor">Interceptor.</param>
+    public EmailSender AddInterceptor(IEmailInterceptor interceptor)
+    {
+        if (interceptor == null)
+        {
+            throw new ArgumentNullException(nameof(interceptor));
+        }
+        interceptors.Add(interceptor);
+        return this;
     }
 }

@@ -6,14 +6,13 @@ using System.Collections.Generic;
 using System.Net.Mail;
 using System.Threading.Tasks;
 
-namespace Saritasa.Tools.Emails
+namespace Saritasa.Tools.Emails;
+
+/// <summary>
+/// Empty email sender. Can be used for testing.
+/// </summary>
+public class DummyEmailSender : EmailSender
 {
-    /// <summary>
-    /// Empty email sender. Can be used for testing.
-    /// </summary>
-    public class DummyEmailSender : EmailSender
-    {
-        /// <inheritdoc />
-        protected override Task Process(MailMessage message, IDictionary<string, object>? data) => Task.CompletedTask;
-    }
+    /// <inheritdoc />
+    protected override Task Process(MailMessage message, IDictionary<string, object>? data) => Task.CompletedTask;
 }

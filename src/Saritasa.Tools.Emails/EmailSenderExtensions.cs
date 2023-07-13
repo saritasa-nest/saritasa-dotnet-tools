@@ -3,21 +3,20 @@
 
 using System.Net.Mail;
 
-namespace Saritasa.Tools.Emails
+namespace Saritasa.Tools.Emails;
+
+/// <summary>
+/// Extensions to <see cref="IEmailSender" />.
+/// </summary>
+public static class EmailSenderExtensions
 {
     /// <summary>
-    /// Extensions to <see cref="IEmailSender" />.
+    /// Sync implementation of SendAsync method. Sends messages and configures await to false.
     /// </summary>
-    public static class EmailSenderExtensions
+    /// <param name="emailSender">Email sender instance.</param>
+    /// <param name="message">Message to send.</param>
+    public static void Send(this IEmailSender emailSender, MailMessage message)
     {
-        /// <summary>
-        /// Sync implementation of SendAsync method. Sends messages and configures await to false.
-        /// </summary>
-        /// <param name="emailSender">Email sender instance.</param>
-        /// <param name="message">Message to send.</param>
-        public static void Send(this IEmailSender emailSender, MailMessage message)
-        {
-            emailSender.SendAsync(message).ConfigureAwait(false).GetAwaiter().GetResult();
-        }
+        emailSender.SendAsync(message).ConfigureAwait(false).GetAwaiter().GetResult();
     }
 }

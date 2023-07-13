@@ -9,143 +9,142 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Saritasa.Tools.Emails.Interceptors
+namespace Saritasa.Tools.Emails.Interceptors;
+
+/// <summary>
+/// Saves emails into specified folder in .eml format.
+/// </summary>
+public class SaveToFileEmailsInterceptor : IEmailInterceptor
 {
     /// <summary>
-    /// Saves emails into specified folder in .eml format.
+    /// Directory to save emails.
     /// </summary>
-    public class SaveToFileEmailsInterceptor : IEmailInterceptor
+    public string Directory { get; }
+
+    /// <summary>
+    /// Save only sent emails.
+    /// </summary>
+    public bool AfterSend { get; }
+
+    private static readonly object @lock = new object();
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="directory">Directory to save emails.</param>
+    /// <param name="afterSend">Save only sent emails.</param>
+    public SaveToFileEmailsInterceptor(string directory, bool afterSend = false)
     {
-        /// <summary>
-        /// Directory to save emails.
-        /// </summary>
-        public string Directory { get; }
-
-        /// <summary>
-        /// Save only sent emails.
-        /// </summary>
-        public bool AfterSend { get; }
-
-        private static readonly object @lock = new object();
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="directory">Directory to save emails.</param>
-        /// <param name="afterSend">Save only sent emails.</param>
-        public SaveToFileEmailsInterceptor(string directory, bool afterSend = false)
+        if (string.IsNullOrEmpty(directory))
         {
-            if (string.IsNullOrEmpty(directory))
-            {
-                throw new ArgumentNullException(nameof(directory));
-            }
-            Directory = directory;
-            AfterSend = afterSend;
+            throw new ArgumentNullException(nameof(directory));
         }
+        Directory = directory;
+        AfterSend = afterSend;
+    }
 
-        private void Save(MailMessage message)
+    private void Save(MailMessage message)
+    {
+        // Sometimes we have emails sending at the same second, add postfix in that case.
+        lock (@lock)
         {
-            // Sometimes we have emails sending at the same second, add postfix in that case.
-            lock (@lock)
+            var path = Path.Combine(Directory, $"{DateTime.Now:yyyyMMdd-hhmmss}.msg");
+            for (int i = 0; File.Exists(path); i++)
             {
-                var path = Path.Combine(Directory, $"{DateTime.Now:yyyyMMdd-hhmmss}.msg");
-                for (int i = 0; File.Exists(path); i++)
-                {
-                    path = Path.Combine(Directory, $"{DateTime.Now:yyyyMMdd-hhmmss}-{i:000}.msg");
-                }
-                SaveMailMessage(message, path);
+                path = Path.Combine(Directory, $"{DateTime.Now:yyyyMMdd-hhmmss}-{i:000}.msg");
             }
+            SaveMailMessage(message, path);
         }
+    }
 
-        #region IEmailInterceptor implementation
+    #region IEmailInterceptor implementation
 
-        /// <inheritdoc />
-        public Task SendingAsync(MailMessage mailMessage, IDictionary<string, object> data, ref bool cancel,
-            CancellationToken cancellationToken)
+    /// <inheritdoc />
+    public Task SendingAsync(MailMessage mailMessage, IDictionary<string, object> data, ref bool cancel,
+        CancellationToken cancellationToken)
+    {
+        if (!AfterSend)
         {
-            if (!AfterSend)
-            {
-                Save(mailMessage);
-            }
-            return Task.CompletedTask;
+            Save(mailMessage);
         }
+        return Task.CompletedTask;
+    }
 
-        /// <inheritdoc />
-        public Task SentAsync(MailMessage mailMessage, IDictionary<string, object> data,
-            CancellationToken cancellationToken)
+    /// <inheritdoc />
+    public Task SentAsync(MailMessage mailMessage, IDictionary<string, object> data,
+        CancellationToken cancellationToken)
+    {
+        if (AfterSend)
         {
-            if (AfterSend)
-            {
-                Save(mailMessage);
-            }
-            return Task.CompletedTask;
+            Save(mailMessage);
         }
+        return Task.CompletedTask;
+    }
 
-        #endregion
+    #endregion
 
-        /// <summary>
-        /// Saves the specified message to disk.
-        /// </summary>
-        /// <param name="message">The message.</param>
-        /// <param name="fileName">Name of the file.</param>
-        private static void SaveMailMessage(MailMessage message, string fileName)
+    /// <summary>
+    /// Saves the specified message to disk.
+    /// </summary>
+    /// <param name="message">The message.</param>
+    /// <param name="fileName">Name of the file.</param>
+    private static void SaveMailMessage(MailMessage message, string fileName)
+    {
+        var assembly = typeof(SmtpClient).Assembly;
+        var mailWriterType = assembly.GetType("System.Net.Mail.MailWriter");
+
+        using (var fileStream = new FileStream(fileName, FileMode.Create))
         {
-            var assembly = typeof(SmtpClient).Assembly;
-            var mailWriterType = assembly.GetType("System.Net.Mail.MailWriter");
-
-            using (var fileStream = new FileStream(fileName, FileMode.Create))
-            {
-                // Get reflection info for MailWriter constructor.
-                var mailWriterConstructor =
-                    mailWriterType.GetConstructor(
-                        BindingFlags.Instance | BindingFlags.NonPublic,
-                        null,
-                        new[] { typeof(Stream) },
-                        null);
-
-                // Construct MailWriter object with our FileStream.
-                var mailWriter = mailWriterConstructor.Invoke(new object[] { fileStream });
-
-                // Get reflection info for Send() method on MailMessage.
-                var sendMethod =
-                    typeof(MailMessage).GetMethod(
-                        "Send",
-                        BindingFlags.Instance | BindingFlags.NonPublic);
-
-                // Call method passing in MailWriter.
-                if (sendMethod.GetParameters().Length == 2)
-                {
-                    sendMethod.Invoke(
-                        message,
-                        BindingFlags.Instance | BindingFlags.NonPublic,
-                        null,
-                        new[] { mailWriter, true },
-                        null);
-                }
-                else
-                {
-                    sendMethod.Invoke(
-                        message,
-                        BindingFlags.Instance | BindingFlags.NonPublic,
-                        null,
-                        new[] { mailWriter, true, true },
-                        null);
-                }
-
-                // Finally get reflection info for Close() method on our MailWriter.
-                var closeMethod =
-                    mailWriter.GetType().GetMethod(
-                        "Close",
-                        BindingFlags.Instance | BindingFlags.NonPublic);
-
-                // Call close method.
-                closeMethod.Invoke(
-                    mailWriter,
+            // Get reflection info for MailWriter constructor.
+            var mailWriterConstructor =
+                mailWriterType.GetConstructor(
                     BindingFlags.Instance | BindingFlags.NonPublic,
                     null,
-                    new object[] { },
+                    new[] { typeof(Stream) },
+                    null);
+
+            // Construct MailWriter object with our FileStream.
+            var mailWriter = mailWriterConstructor.Invoke(new object[] { fileStream });
+
+            // Get reflection info for Send() method on MailMessage.
+            var sendMethod =
+                typeof(MailMessage).GetMethod(
+                    "Send",
+                    BindingFlags.Instance | BindingFlags.NonPublic);
+
+            // Call method passing in MailWriter.
+            if (sendMethod.GetParameters().Length == 2)
+            {
+                sendMethod.Invoke(
+                    message,
+                    BindingFlags.Instance | BindingFlags.NonPublic,
+                    null,
+                    new[] { mailWriter, true },
                     null);
             }
+            else
+            {
+                sendMethod.Invoke(
+                    message,
+                    BindingFlags.Instance | BindingFlags.NonPublic,
+                    null,
+                    new[] { mailWriter, true, true },
+                    null);
+            }
+
+            // Finally get reflection info for Close() method on our MailWriter.
+            var closeMethod =
+                mailWriter.GetType().GetMethod(
+                    "Close",
+                    BindingFlags.Instance | BindingFlags.NonPublic);
+
+            // Call close method.
+            closeMethod.Invoke(
+                mailWriter,
+                BindingFlags.Instance | BindingFlags.NonPublic,
+                null,
+                new object[] { },
+                null);
         }
     }
 }

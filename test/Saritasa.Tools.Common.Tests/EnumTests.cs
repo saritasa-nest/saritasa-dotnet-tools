@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Linq;
 using Saritasa.Tools.Common.Utils;
 using Xunit;
+#pragma warning disable CS1591
 
 namespace Saritasa.Tools.Common.Tests;
 

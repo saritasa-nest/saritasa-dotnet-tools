@@ -6,179 +6,187 @@ using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
 using Saritasa.Tools.Common.Utils;
 
-namespace Saritasa.Tools.Benchmarks
+namespace Saritasa.Tools.Benchmarks;
+
+/// <summary>
+/// Benchmarks for <see cref="CollectionUtils" /> Diff method.
+/// </summary>
+[MemoryDiagnoser]
+public class CollectionUtilsDiffBenchmark
 {
     /// <summary>
-    /// Benchmarks for <see cref="CollectionUtils" /> Diff method.
+    /// Test class, for example user.
     /// </summary>
-    [MemoryDiagnoser]
-    public class CollectionUtilsDiffBenchmark
+    private sealed class User : ICloneable
     {
         /// <summary>
-        /// Test class, for example user.
+        /// Identifier.
         /// </summary>
-        private sealed class User : ICloneable
-        {
-            /// <summary>
-            /// Identifier.
-            /// </summary>
-            public Guid Id { get; set; }
-
-            /// <summary>
-            /// User name.
-            /// </summary>
-            public string Name { get; set; }
-
-            /// <summary>
-            /// Constructor.
-            /// </summary>
-            public User()
-            {
-            }
-
-            /// <summary>
-            /// Constructor.
-            /// </summary>
-            /// <param name="id">Identifier.</param>
-            public User(Guid id)
-            {
-                Id = id;
-                Name = id.ToString("N");
-            }
-
-            private bool Equals(User other) => Id.Equals(other.Id) && Name == other.Name;
-
-            /// <inheritdoc />
-            public override bool Equals(object obj) => ReferenceEquals(this, obj) || (obj is User other && Equals(other));
-
-            /// <inheritdoc />
-            public override int GetHashCode() => HashCode.Combine(Id, Name);
-
-            /// <inheritdoc />
-            public object Clone()
-            {
-                return new User
-                {
-                    Id = Id,
-                    Name = Name
-                };
-            }
-        }
+        public Guid Id { get; set; }
 
         /// <summary>
-        /// Identity comparer, it is used only to compare Id property.
+        /// User name.
         /// </summary>
-        private class UserIdentityComparer : IEqualityComparer<User>
-        {
-            /// <inheritdoc />
-            public bool Equals(User x, User y) => x.Id.Equals(y.Id);
-
-            /// <inheritdoc />
-            public int GetHashCode(User obj) => obj.Id.GetHashCode();
-        }
-
-        /// <summary>
-        /// Full properties user comparer.
-        /// </summary>
-        private class UserComparer : IEqualityComparer<User>
-        {
-            /// <inheritdoc />
-            public bool Equals(User x, User y)
-            {
-                if (ReferenceEquals(x, y))
-                {
-                    return true;
-                }
-                if (ReferenceEquals(x, null))
-                {
-                    return false;
-                }
-                if (ReferenceEquals(y, null))
-                {
-                    return false;
-                }
-                if (x.GetType() != y.GetType())
-                {
-                    return false;
-                }
-                return x.Id.Equals(y.Id) && x.Name == y.Name;
-            }
-
-            /// <inheritdoc />
-            public int GetHashCode(User obj)
-            {
-                return HashCode.Combine(obj.Id, obj.Name);
-            }
-        }
-
-        private readonly IList<User> usersSource = new List<User>();
-
-        private readonly IList<User> usersTarget = new List<User>();
-
-        private readonly IEqualityComparer<User> usersIdentityComparerInstance = new UserIdentityComparer();
-
-        private readonly IEqualityComparer<User> usersComparerInstance = new UserComparer();
+        public string? Name { get; set; }
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        public CollectionUtilsDiffBenchmark()
+        public User()
         {
-            // New items.
-            for (int i = 0; i < 30_000; i++)
-            {
-                usersTarget.Add(new User(Guid.NewGuid()));
-            }
-
-            // Updated items.
-            for (int i = 0; i < 10_000; i++)
-            {
-                var user = (User)usersTarget[i].Clone();
-                user.Name += "-updated";
-                usersSource.Add(user);
-            }
-
-            // Copy items.
-            for (int i = 10_000; i < 20_000; i++)
-            {
-                var user = (User)usersTarget[i].Clone();
-                usersSource.Add(user);
-            }
-
-            // Removed items.
-            for (int i = 0; i < 10_000; i++)
-            {
-                usersSource.Add(new User(Guid.NewGuid()));
-            }
         }
 
-        [Benchmark]
-        public void SaritasaToolsDiff()
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="id">Identifier.</param>
+        public User(Guid id)
         {
-            var diff = CollectionUtils.Diff(
-                usersSource,
-                usersTarget,
-                identityComparer: (user1, user2) => user1.Id == user2.Id,
-                dataComparer: (user1, user2) => user1.Name == user2.Name);
+            Id = id;
+            Name = id.ToString("N");
         }
 
-        [Benchmark]
-        public void SaritasaToolsDiffWithEqualityComparer()
+        private bool Equals(User other) => Id.Equals(other.Id) && Name == other.Name;
+
+        /// <inheritdoc />
+        public override bool Equals(object? obj) => ReferenceEquals(this, obj) || (obj is User other && Equals(other));
+
+        /// <inheritdoc />
+        public override int GetHashCode() => HashCode.Combine(Id, Name);
+
+        /// <inheritdoc />
+        public object Clone()
         {
-            var diff = CollectionUtils.Diff(
-                usersSource,
-                usersTarget,
-                identityEqualityComparer: usersIdentityComparerInstance,
-                dataComparer: (user1, user2) => user1.Name == user2.Name);
+            return new User
+            {
+                Id = Id,
+                Name = Name
+            };
+        }
+    }
+
+    /// <summary>
+    /// Identity comparer, it is used only to compare Id property.
+    /// </summary>
+    private class UserIdentityComparer : IEqualityComparer<User>
+    {
+        /// <inheritdoc />
+        public bool Equals(User? x, User? y) => x != null && y != null && x.Id.Equals(y.Id);
+
+        /// <inheritdoc />
+        public int GetHashCode(User obj) => obj.Id.GetHashCode();
+    }
+
+    /// <summary>
+    /// Full properties user comparer.
+    /// </summary>
+    private class UserComparer : IEqualityComparer<User>
+    {
+        /// <inheritdoc />
+        public bool Equals(User? x, User? y)
+        {
+            if (ReferenceEquals(x, y))
+            {
+                return true;
+            }
+            if (ReferenceEquals(x, null))
+            {
+                return false;
+            }
+            if (ReferenceEquals(y, null))
+            {
+                return false;
+            }
+            if (x.GetType() != y.GetType())
+            {
+                return false;
+            }
+            return x.Id.Equals(y.Id) && x.Name == y.Name;
         }
 
-        [Benchmark]
-        public void ExperimentalDiffWithEqualityComparer()
+        /// <inheritdoc />
+        public int GetHashCode(User obj)
         {
-            var diff = DifferenceService.GetDiffResult(
-                usersSource,
-                usersTarget,
-                usersIdentityComparerInstance);
+            return HashCode.Combine(obj.Id, obj.Name);
         }
+    }
+
+    private readonly IList<User> usersSource = new List<User>();
+
+    private readonly IList<User> usersTarget = new List<User>();
+
+    private readonly IEqualityComparer<User> usersIdentityComparerInstance = new UserIdentityComparer();
+
+    private readonly IEqualityComparer<User> usersComparerInstance = new UserComparer();
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public CollectionUtilsDiffBenchmark()
+    {
+        // New items.
+        for (int i = 0; i < 30_000; i++)
+        {
+            usersTarget.Add(new User(Guid.NewGuid()));
+        }
+
+        // Updated items.
+        for (int i = 0; i < 10_000; i++)
+        {
+            var user = (User)usersTarget[i].Clone();
+            user.Name += "-updated";
+            usersSource.Add(user);
+        }
+
+        // Copy items.
+        for (int i = 10_000; i < 20_000; i++)
+        {
+            var user = (User)usersTarget[i].Clone();
+            usersSource.Add(user);
+        }
+
+        // Removed items.
+        for (int i = 0; i < 10_000; i++)
+        {
+            usersSource.Add(new User(Guid.NewGuid()));
+        }
+    }
+
+    /// <summary>
+    /// Run a diff with identity comparer.
+    /// </summary>
+    [Benchmark]
+    public void SaritasaToolsDiff()
+    {
+        var diff = CollectionUtils.Diff(
+            usersSource,
+            usersTarget,
+            identityComparer: (user1, user2) => user1.Id == user2.Id,
+            dataComparer: (user1, user2) => user1.Name == user2.Name);
+    }
+
+    /// <summary>
+    /// Run a diff with an equality comparer.
+    /// </summary>
+    [Benchmark]
+    public void SaritasaToolsDiffWithEqualityComparer()
+    {
+        var diff = CollectionUtils.Diff(
+            usersSource,
+            usersTarget,
+            identityEqualityComparer: usersIdentityComparerInstance,
+            dataComparer: (user1, user2) => user1.Name == user2.Name);
+    }
+
+    /// <summary>
+    /// Run a diff from a service.
+    /// </summary>
+    [Benchmark]
+    public void ExperimentalDiffWithEqualityComparer()
+    {
+        var diff = DifferenceService.GetDiffResult(
+            usersSource,
+            usersTarget,
+            usersIdentityComparerInstance);
     }
 }
