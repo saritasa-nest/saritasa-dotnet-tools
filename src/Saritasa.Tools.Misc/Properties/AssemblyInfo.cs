@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Saritasa")]
 [assembly: AssemblyProduct("Saritasa.Tools.Misc")]
-[assembly: AssemblyCopyright("Copyright © Saritasa 2017-2018")]
+[assembly: AssemblyCopyright("Copyright © Saritasa 2017-2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
