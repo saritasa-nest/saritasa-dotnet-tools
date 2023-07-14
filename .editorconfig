@@ -13,7 +13,7 @@ indent_size = 4
 trim_trailing_whitespace = true
 
 # HTML files
-[*.{html, cshtml, xaml}]
+[*.{html,cshtml,xaml}]
 indent_size = 2
 
 # Generated code
@@ -154,6 +154,10 @@ indent_size = 2
 
 # YAML config files
 [*.{yml,yaml}]
+indent_size = 2
+
+# JSON config files
+[*.{json,json.template}]
 indent_size = 2
 
 # Shell scripts
