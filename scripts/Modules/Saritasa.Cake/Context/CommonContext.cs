@@ -17,5 +17,7 @@ public class CommonContext : FrostingContext
     /// Constructor.
     /// </summary>
     /// <param name="context">Cake context.</param>
-    public CommonContext(ICakeContext context) : base(context) { }
+    public CommonContext(ICakeContext context) : base(context)
+    {
+    }
 }
