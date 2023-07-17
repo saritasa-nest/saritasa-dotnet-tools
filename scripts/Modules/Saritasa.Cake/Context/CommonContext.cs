@@ -1,8 +1,7 @@
-﻿using System.IO;
-using Cake.Core;
+﻿using Cake.Core;
 using Cake.Frosting;
 
-namespace Saritasa.Cake;
+namespace Saritasa.Cake.Context;
 
 /// <summary>
 /// Common context.
@@ -12,11 +11,13 @@ public class CommonContext : FrostingContext
     /// <summary>
     /// Path to solution directory.
     /// </summary>
-    public readonly string SolutionDir = Path.Combine("..", "..", "..");
+    public string SolutionDir { get; } = Path.Combine("..", "..", "..");
 
     /// <summary>
     /// Constructor.
     /// </summary>
     /// <param name="context">Cake context.</param>
-    public CommonContext(ICakeContext context) : base(context) { }
+    public CommonContext(ICakeContext context) : base(context)
+    {
+    }
 }

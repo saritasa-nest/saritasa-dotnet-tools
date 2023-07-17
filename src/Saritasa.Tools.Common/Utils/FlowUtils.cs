@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2021, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2023, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -8,59 +8,58 @@ using System.Threading;
 using System.Reflection;
 #endif
 
-namespace Saritasa.Tools.Common.Utils
+namespace Saritasa.Tools.Common.Utils;
+
+/// <summary>
+/// Provides methods to control execution flow.
+/// </summary>
+public static partial class FlowUtils
 {
     /// <summary>
-    /// Provides methods to control execution flow.
+    /// It is null-safe and thread-safe way to raise event. The method calls every handler related to event regardless thrown exceptions.
+    /// If any handler throws an error the <see cref="System.AggregateException" /> will be thrown.
     /// </summary>
-    public static partial class FlowUtils
-    {
-        /// <summary>
-        /// It is null-safe and thread-safe way to raise event. The method calls every handler related to event regardless thrown exceptions.
-        /// If any handler throws an error the <see cref="System.AggregateException" /> will be thrown.
-        /// </summary>
-        public static void RaiseAll<TEventArgs>(object sender, TEventArgs e, ref EventHandler<TEventArgs> eventDelegate)
+    public static void RaiseAll<TEventArgs>(object sender, TEventArgs e, ref EventHandler<TEventArgs>? eventDelegate)
 #if NET40 || NETSTANDARD1_6_OR_GREATER || NET5_0_OR_GREATER
-            where TEventArgs : EventArgs
+        where TEventArgs : EventArgs
 #endif
-        {
+    {
 #if NETSTANDARD1_6_OR_GREATER || NET5_0_OR_GREATER
-            var temp = Volatile.Read(ref eventDelegate);
+        var temp = Volatile.Read(ref eventDelegate);
 #else
-            var temp = eventDelegate;
+        var temp = eventDelegate;
 #endif
 #if NET40 || NETSTANDARD2_0_OR_GREATER || NET5_0_OR_GREATER
-            Thread.MemoryBarrier();
+        Thread.MemoryBarrier();
 #endif
-            if (temp == null)
-            {
-                return;
-            }
+        if (temp == null)
+        {
+            return;
+        }
 
-            var exceptions = new List<Exception>();
-            foreach (var handler in temp.GetInvocationList())
+        var exceptions = new List<Exception>();
+        foreach (var handler in temp.GetInvocationList())
+        {
+            try
             {
-                try
+                handler.DynamicInvoke(sender, e);
+            }
+            catch (System.Reflection.TargetInvocationException ex)
+            {
+                if (ex.InnerException != null)
                 {
-                    handler.DynamicInvoke(sender, e);
-                }
-                catch (System.Reflection.TargetInvocationException ex)
-                {
-                    if (ex.InnerException != null)
-                    {
-                        exceptions.Add(ex.InnerException);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    exceptions.Add(ex);
+                    exceptions.Add(ex.InnerException);
                 }
             }
+            catch (Exception ex)
+            {
+                exceptions.Add(ex);
+            }
+        }
 
-            if (exceptions.Count > 0)
-            {
-                throw new AggregateException(exceptions);
-            }
+        if (exceptions.Count > 0)
+        {
+            throw new AggregateException(exceptions);
         }
     }
 }

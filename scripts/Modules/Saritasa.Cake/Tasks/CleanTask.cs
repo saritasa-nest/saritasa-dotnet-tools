@@ -1,7 +1,7 @@
-﻿using System.IO;
-using Cake.Frosting;
+﻿using Cake.Frosting;
+using Saritasa.Cake.Context;
 
-namespace Saritasa.Cake;
+namespace Saritasa.Cake.Tasks;
 
 /// <summary>
 /// Clean task.

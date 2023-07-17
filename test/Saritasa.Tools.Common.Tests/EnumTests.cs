@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2022, Saritasa. All rights reserved.
+// Copyright (c) 2015-2023, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Linq;
 using Saritasa.Tools.Common.Utils;
 using Xunit;
+#pragma warning disable CS1591
 
 namespace Saritasa.Tools.Common.Tests;
 
