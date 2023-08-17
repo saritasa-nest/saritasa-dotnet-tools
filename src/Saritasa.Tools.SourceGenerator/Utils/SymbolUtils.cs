@@ -92,6 +92,7 @@ internal static class SymbolUtils
     /// Gets symbol member.
     /// </summary>
     /// <param name="symbol">Type symbol.</param>
+    /// <param name="isBase">Should traverse base class.</param>
     /// <returns>List of members.</returns>
     public static IEnumerable<ISymbol> GetMembers(ITypeSymbol symbol, bool isBase = false)
     {
