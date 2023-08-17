@@ -37,6 +37,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saritasa.Cake", "scripts\Mo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saritasa.Cake.Tests", "test\Saritasa.Cake.Tests\Saritasa.Cake.Tests.csproj", "{B737B9A4-C9AD-4639-8F04-B515DB12B0E5}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saritasa.Tools.SourceGenerator", "src\Saritasa.Tools.SourceGenerator\Saritasa.Tools.SourceGenerator.csproj", "{39CF9888-B909-49D7-9A44-8A7B6177ECE0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saritasa.Tools.SourceGenerator.Benchmarks", "test\Saritasa.Tools.SourceGenerator.Benchmarks\Saritasa.Tools.SourceGenerator.Benchmarks.csproj", "{31FDE475-97E3-49C0-85BA-FD782061514B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +91,14 @@ Global
 		{B737B9A4-C9AD-4639-8F04-B515DB12B0E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B737B9A4-C9AD-4639-8F04-B515DB12B0E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B737B9A4-C9AD-4639-8F04-B515DB12B0E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39CF9888-B909-49D7-9A44-8A7B6177ECE0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39CF9888-B909-49D7-9A44-8A7B6177ECE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39CF9888-B909-49D7-9A44-8A7B6177ECE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39CF9888-B909-49D7-9A44-8A7B6177ECE0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{31FDE475-97E3-49C0-85BA-FD782061514B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31FDE475-97E3-49C0-85BA-FD782061514B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31FDE475-97E3-49C0-85BA-FD782061514B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31FDE475-97E3-49C0-85BA-FD782061514B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -103,6 +115,8 @@ Global
 		{D80C1322-862D-467A-9735-5474346DCCCB} = {45D13EC5-88F3-403A-8148-0812C2796062}
 		{EA0E235B-0E52-4C8A-9690-2DF720953926} = {46B3292E-FB1B-42C7-8D7D-28904EE6424E}
 		{B737B9A4-C9AD-4639-8F04-B515DB12B0E5} = {635DB5B1-86B3-4F5B-97A6-04C71D672296}
+		{39CF9888-B909-49D7-9A44-8A7B6177ECE0} = {45D13EC5-88F3-403A-8148-0812C2796062}
+		{31FDE475-97E3-49C0-85BA-FD782061514B} = {635DB5B1-86B3-4F5B-97A6-04C71D672296}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F298C89B-4162-49D5-B517-5306BD58DB59}
