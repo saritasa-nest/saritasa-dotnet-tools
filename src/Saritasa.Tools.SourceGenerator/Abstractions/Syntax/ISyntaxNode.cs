@@ -1,21 +1,20 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace Saritasa.Tools.Abstractions.Syntax
+namespace Saritasa.Tools.SourceGenerator.Abstractions.Syntax;
+
+/// <summary>
+/// Syntax node.
+/// </summary>
+public interface ISyntaxNode<TSymbol>
+    where TSymbol : class, ISymbol
 {
     /// <summary>
-    /// Syntax node.
+    /// Node symbol.
     /// </summary>
-    public interface ISyntaxNode<TSymbol>
-        where TSymbol : class, ISymbol
-    {
-        /// <summary>
-        /// Node symbol.
-        /// </summary>
-        TSymbol? Symbol { get; }
+    TSymbol? Symbol { get; }
 
-        /// <summary>
-        /// Semantic model.
-        /// </summary>
-        SemanticModel SemanticModel { get; }
-    }
+    /// <summary>
+    /// Semantic model.
+    /// </summary>
+    SemanticModel SemanticModel { get; }
 }
