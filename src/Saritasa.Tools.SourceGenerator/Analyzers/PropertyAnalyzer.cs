@@ -32,7 +32,8 @@ internal class PropertyAnalyzer : ISyntaxAnalyzer<IPropertySymbol, PropertyAnaly
             Modifier = SymbolUtils.GetModifier(symbol),
         };
 
-        var backingField = fields.FirstOrDefault(field => field.Name == symbol.Name.ToLower());
+        var propertyFieldName = PropertyUtils.Lowercase(symbol.Name);
+        var backingField = fields.FirstOrDefault(field => field.Name == propertyFieldName);
         if (backingField != null)
         {
             backingField.AssociatedProperty = propertyAnalysis;
