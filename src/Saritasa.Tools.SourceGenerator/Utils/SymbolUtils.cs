@@ -32,14 +32,6 @@ internal static class SymbolUtils
         => symbol.Type.ToDisplayString();
 
     /// <summary>
-    /// Gets a field type.
-    /// </summary>
-    /// <param name="symbol">Type symbol.</param>
-    /// <returns>Field type.</returns>
-    public static Type GetType(ITypeSymbol symbol)
-        => Type.GetType($"{symbol.ContainingNamespace.Name}.{symbol.Name}");
-
-    /// <summary>
     /// Indicates if symbol contains an attribute.
     /// </summary>
     /// <param name="symbol">Symbol.</param>
