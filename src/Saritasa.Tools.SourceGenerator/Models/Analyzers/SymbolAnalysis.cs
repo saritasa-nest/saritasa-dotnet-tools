@@ -1,0 +1,55 @@
+﻿using Microsoft.CodeAnalysis;
+using Saritasa.Tools.SourceGenerator.Abstractions.Analyzers;
+
+namespace Saritasa.Tools.SourceGenerator.Models.Analyzers;
+
+/// <summary>
+/// Symbol analysis.
+/// </summary>
+public record SymbolAnalysis : ISyntaxAnalysis
+{
+    /// <summary>
+    /// Symbol name.
+    /// </summary>
+    public string? Name => Symbol?.Name;
+
+    /// <summary>
+    /// Symbol namespace.
+    /// </summary>
+    public string? Namespace => Symbol?.ContainingNamespace.ToString();
+
+    /// <summary>
+    /// Related symbol.
+    /// </summary>
+    public ITypeSymbol Symbol { get; internal set; }
+
+    /// <summary>
+    /// Property changed interface analysis.
+    /// </summary>
+    public InterfaceAnalysis PropertyChanged { get; internal set; }
+
+    /// <summary>
+    /// Property changing interface analysis.
+    /// </summary>
+    public InterfaceAnalysis PropertyChanging { get; internal set; }
+
+    /// <summary>
+    /// Should proceed build action.
+    /// </summary>
+    public bool ShouldBuild => PropertyChanged != null || PropertyChanging != null;
+
+    /// <summary>
+    /// Properties analysis.
+    /// </summary>
+    public IReadOnlyCollection<PropertyAnalysis> Properties { get; internal set; }
+
+    /// <summary>
+    /// Fields analysis.
+    /// </summary>
+    public IReadOnlyCollection<FieldAnalysis> Fields { get; internal set; }
+
+    /// <summary>
+    /// Instance of <see cref="SymbolAnalysis"/>.
+    /// </summary>
+    public static SymbolAnalysis Instance => new();
+}
