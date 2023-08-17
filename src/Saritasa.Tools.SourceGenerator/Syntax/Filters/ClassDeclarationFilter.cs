@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Saritasa.Tools.Abstractions.Syntax;
+using Saritasa.Tools.SourceGenerator.Abstractions.Syntax;
 
 namespace Saritasa.Tools.SourceGenerator.Syntax.Filters;
 

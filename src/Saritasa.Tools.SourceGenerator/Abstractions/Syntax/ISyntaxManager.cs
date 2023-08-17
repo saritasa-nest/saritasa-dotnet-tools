@@ -1,5 +1,4 @@
 ﻿using Microsoft.CodeAnalysis;
-using Saritasa.Tools.Abstractions.Syntax;
 using Saritasa.Tools.SourceGenerator.Abstractions.Models;
 
 namespace Saritasa.Tools.SourceGenerator.Abstractions.Syntax;
