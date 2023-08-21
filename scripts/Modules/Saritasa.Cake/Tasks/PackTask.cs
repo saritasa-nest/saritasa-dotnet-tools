@@ -129,10 +129,12 @@ public sealed class PackTask : FrostingTask<PackContext>
         var versionString = GetVersion(context, projectName);
         var version = new Version(versionString);
 
-        return new Version(version.Major,
+        return new Version(
+            version.Major,
             version.Minor,
-            version.Build,
-            version.Revision > 0 ? version.Revision : 0);
+            // We use only major and major version for AssemblyVersion, since "build" is used more for fixes and should not break an API.
+            0,
+            0);
     }
 
     private void ReplaceAttributeValueInAssemblyInfo(PackContext context, string projectName, string attribute, string value)
