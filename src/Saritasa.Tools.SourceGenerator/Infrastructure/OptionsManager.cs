@@ -20,8 +20,7 @@ public class OptionsManager
     /// <summary>
     /// Constructor.
     /// </summary>
-    /// <param name="optionsProvider">Options provider.</param>
-    /// <param name="syntaxTree">Syntax tree.</param>
+    /// <param name="options">Syntax analyzer editor config options.</param>
     public OptionsManager(AnalyzerConfigOptions options)
     {
         PropertyChangedOptions = new(options);

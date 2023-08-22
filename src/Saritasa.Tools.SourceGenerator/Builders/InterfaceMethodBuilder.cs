@@ -6,7 +6,7 @@ using Saritasa.Tools.SourceGenerator.Models.Nodes;
 namespace Saritasa.Tools.SourceGenerator.Builders;
 
 /// <summary>
-/// Property changed delegate builder.
+/// Interface raise method builder for <see cref="InterfaceAnalysis.EventSymbol"/> implementation member.
 /// </summary>
 public class InterfaceMethodBuilder : ISyntaxBuilder<MethodMetadata, InterfaceAnalysis>
 {

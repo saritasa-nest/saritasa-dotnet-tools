@@ -45,7 +45,7 @@ internal class SourceGenerator : IIncrementalGenerator
         context.RegisterSourceOutput(analysis, Build);
     }
 
-    private static (SymbolAnalysis Analysis, DiagnosticsScope Scope, OptionsManager Options) GetAnalyzedNode(
+    private static (ClassAnalysis Analysis, DiagnosticsScope Scope, OptionsManager Options) GetAnalyzedNode(
         (SyntaxSymbolNode<ITypeSymbol> Node, AnalyzerConfigOptionsProvider Options) provider,
         CancellationToken cancellationToken)
     {
@@ -55,11 +55,11 @@ internal class SourceGenerator : IIncrementalGenerator
 
         if (provider.Node.Symbol is null)
         {
-            return (Analysis: SymbolAnalysis.Instance, Scope: scope, Options: optionsManager);
+            return (Analysis: ClassAnalysis.Instance, Scope: scope, Options: optionsManager);
         }
 
-        var symbolAnalyzer = new SymbolAnalyzer(optionsManager);
-        var analysis = symbolAnalyzer.Analyze(provider.Node.Symbol, provider.Node.SemanticModel, scope);
+        var analyzer = new ClassAnalyzer(optionsManager);
+        var analysis = analyzer.Analyze(provider.Node.Symbol, provider.Node.SemanticModel, scope);
 
         return (Analysis: analysis, Scope: scope, Options: optionsManager);
     }
@@ -69,14 +69,14 @@ internal class SourceGenerator : IIncrementalGenerator
 
     private static void Build(
         SourceProductionContext context,
-        (SymbolAnalysis Analysis, OptionsManager Options) provider)
+        (ClassAnalysis Analysis, OptionsManager Options) provider)
     {
         if (!provider.Analysis.ShouldBuild)
         {
             return;
         }
 
-        var builder = new SymbolBuilder(provider.Options);
+        var builder = new ClassBuilder(provider.Options);
         var node = builder.Build(provider.Analysis);
         var symbol = node.Build(IndentWriter.Instance);
         context.AddSource($"{node.Name}.g.cs", symbol);

@@ -9,12 +9,13 @@ namespace Saritasa.Tools.SourceGenerator.Models.Analyzers;
 public record InterfaceAnalysis : ISyntaxAnalysis
 {
     /// <summary>
-    /// Event property symbol.
+    /// Interface event syntax symbol.
+    /// It's an implementation of interface <see cref="ISymbol"/> member.
     /// </summary>
     public IEventSymbol? EventSymbol { get; set; }
 
     /// <summary>
-    /// Event raise method symbol.
+    /// Raise method of <see cref="EventSymbol"/> implementation member.
     /// </summary>
     public IMethodSymbol? MethodSymbol { get; set; }
 

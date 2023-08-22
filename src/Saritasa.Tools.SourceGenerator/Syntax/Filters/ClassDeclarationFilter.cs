@@ -6,7 +6,7 @@ using Saritasa.Tools.SourceGenerator.Abstractions.Syntax;
 namespace Saritasa.Tools.SourceGenerator.Syntax.Filters;
 
 /// <summary>
-/// Filter for <see cref="SyntaxManager"/>
+/// Partial class filter for <see cref="SyntaxManager"/>.
 /// </summary>
 internal class ClassDeclarationFilter : ISyntaxFilter<ClassDeclarationSyntax>
 {

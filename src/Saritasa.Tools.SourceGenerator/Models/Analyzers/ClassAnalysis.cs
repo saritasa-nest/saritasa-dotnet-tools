@@ -4,22 +4,22 @@ using Saritasa.Tools.SourceGenerator.Abstractions.Analyzers;
 namespace Saritasa.Tools.SourceGenerator.Models.Analyzers;
 
 /// <summary>
-/// Symbol analysis.
+/// Class analysis based on <see cref="ITypeSymbol"/> code analysis API.
 /// </summary>
-public record SymbolAnalysis : ISyntaxAnalysis
+public record ClassAnalysis : ISyntaxAnalysis
 {
     /// <summary>
-    /// Symbol name.
+    /// Class name.
     /// </summary>
     public string? Name => Symbol?.Name;
 
     /// <summary>
-    /// Symbol namespace.
+    /// Class namespace.
     /// </summary>
     public string? Namespace => Symbol?.ContainingNamespace.ToString();
 
     /// <summary>
-    /// Related symbol.
+    /// Related code analysis symbol data.
     /// </summary>
     public ITypeSymbol Symbol { get; internal set; }
 
@@ -49,7 +49,7 @@ public record SymbolAnalysis : ISyntaxAnalysis
     public IReadOnlyCollection<FieldAnalysis> Fields { get; internal set; }
 
     /// <summary>
-    /// Instance of <see cref="SymbolAnalysis"/>.
+    /// Instance of <see cref="ClassAnalysis"/>.
     /// </summary>
-    public static SymbolAnalysis Instance => new();
+    public static ClassAnalysis Instance => new();
 }

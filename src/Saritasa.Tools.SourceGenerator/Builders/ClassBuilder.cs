@@ -10,9 +10,9 @@ using Saritasa.Tools.SourceGenerator.Utils;
 namespace Saritasa.Tools.SourceGenerator.Builders;
 
 /// <summary>
-/// Builder of <see cref="SymbolAnalysis"/>.
+/// Partial class builder based on <see cref="ClassAnalysis"/>.
 /// </summary>
-public class SymbolBuilder : ISyntaxBuilder<SymbolMetadata, SymbolAnalysis>
+public class ClassBuilder : ISyntaxBuilder<ClassMetadata, ClassAnalysis>
 {
     private static readonly ISyntaxBuilder<PropertyMetadata, InterfaceAnalysis> propertyChangedPropertyBuilder
         = new InterfacePropertyBuilder(propertyName: "PropertyChanged", typeof(PropertyChangedEventHandler));
@@ -26,13 +26,13 @@ public class SymbolBuilder : ISyntaxBuilder<SymbolMetadata, SymbolAnalysis>
     /// Constructor.
     /// </summary>
     /// <param name="optionsManager">Options manager.</param>
-    public SymbolBuilder(OptionsManager optionsManager)
+    public ClassBuilder(OptionsManager optionsManager)
     {
         this.optionsManager = optionsManager;
     }
 
     /// <inheritdoc/>
-    public SymbolMetadata Build(SymbolAnalysis analysis)
+    public ClassMetadata Build(ClassAnalysis analysis)
     {
         var members = new List<MemberMetadata>();
         var methods = new List<MethodMetadata>();
@@ -99,7 +99,7 @@ public class SymbolBuilder : ISyntaxBuilder<SymbolMetadata, SymbolAnalysis>
                 propertyChanging);
         members.AddRange(additionalMembers);
 
-        return new SymbolMetadata()
+        return new ClassMetadata()
         {
             Name = analysis.Name,
             Namespace = analysis.Namespace,

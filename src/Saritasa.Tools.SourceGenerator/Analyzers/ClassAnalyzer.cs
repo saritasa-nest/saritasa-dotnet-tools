@@ -8,9 +8,9 @@ using Saritasa.Tools.SourceGenerator.Utils;
 namespace Saritasa.Tools.SourceGenerator.Analyzers;
 
 /// <summary>
-/// Analyzer of symbol node.
+/// Analyzer for partial class based on <see cref="ITypeSymbol"/> code analysis API.
 /// </summary>
-public class SymbolAnalyzer : ISyntaxAnalyzer<ITypeSymbol, SymbolAnalysis>
+public class ClassAnalyzer : ISyntaxAnalyzer<ITypeSymbol, ClassAnalysis>
 {
     private readonly ISyntaxAnalyzer<ITypeSymbol, InterfaceAnalysis> propertyChangedAnalyzer;
     private readonly ISyntaxAnalyzer<ITypeSymbol, InterfaceAnalysis> propertyChangingAnalyzer;
@@ -19,18 +19,18 @@ public class SymbolAnalyzer : ISyntaxAnalyzer<ITypeSymbol, SymbolAnalysis>
     /// Constructor.
     /// </summary>
     /// <param name="optionsManager">Options manager.</param>
-    public SymbolAnalyzer(OptionsManager optionsManager)
+    public ClassAnalyzer(OptionsManager optionsManager)
     {
         this.propertyChangedAnalyzer = InterfaceAnalyzerFactory.Create(optionsManager, InterfaceType.PropertyChanged);
         this.propertyChangingAnalyzer = InterfaceAnalyzerFactory.Create(optionsManager, InterfaceType.PropertyChanging);
     }
 
     /// <inheritdoc/>
-    public SymbolAnalysis Analyze(ITypeSymbol symbol, SemanticModel semanticModel, IDiagnosticsScope scope)
+    public ClassAnalysis Analyze(ITypeSymbol symbol, SemanticModel semanticModel, IDiagnosticsScope scope)
     {
         var analysis = GetMembersAnalysis(symbol, semanticModel, scope);
 
-        return new SymbolAnalysis
+        return new ClassAnalysis
         {
             Symbol = symbol,
             PropertyChanged = propertyChangedAnalyzer.Analyze(symbol, semanticModel, scope),

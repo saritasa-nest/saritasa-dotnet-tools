@@ -6,37 +6,37 @@ using Saritasa.Tools.SourceGenerator.Models.Metadata;
 namespace Saritasa.Tools.SourceGenerator.Models.Nodes;
 
 /// <summary>
-/// Symbol metadata.
+/// Class metadata.
 /// </summary>
-public class SymbolMetadata : SyntaxMetadata
+public class ClassMetadata : SyntaxMetadata
 {
     /// <summary>
-    /// Symbol name.
+    /// Class name.
     /// </summary>
     public string Name { get; set; } = string.Empty;
 
     /// <summary>
-    /// Symbol namespace.
+    /// Class namespace.
     /// </summary>
     public string Namespace { get; set; } = string.Empty;
 
     /// <summary>
-    /// Symbol modifier.
+    /// Class modifier.
     /// </summary>
     public string Modifier { get; set; } = MemberModifiers.Public;
 
     /// <summary>
-    /// Symbol methods.
+    /// Class methods.
     /// </summary>
     public IReadOnlyCollection<MethodMetadata> Methods { get; set; } = new List<MethodMetadata>();
 
     /// <summary>
-    /// Symbol members.
+    /// Class members.
     /// </summary>
     public IReadOnlyCollection<MemberMetadata> Members { get; set; } = new List<MemberMetadata>();
 
     /// <summary>
-    /// Interfaces.
+    /// Class inherited interfaces.
     /// </summary>
     public IList<string> Interfaces { get; set; } = new List<string>();
 
