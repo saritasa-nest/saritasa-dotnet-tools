@@ -12,17 +12,17 @@ namespace Saritasa.Tools.SourceGenerator.Analyzers;
 public class InterfaceAnalyzer : ISyntaxAnalyzer<ITypeSymbol, InterfaceAnalysis>
 {
     private readonly string[] methodNames;
-    private readonly string interfaceNamespace;
+    private readonly Type interfaceType;
 
     /// <summary>
     /// Constructor.
     /// </summary>
     /// <param name="methodNames">Available method names.</param>
-    /// <param name="interfaceNamespace">Interface namespace.</param>
-    public InterfaceAnalyzer(string[] methodNames, string interfaceNamespace)
+    /// <param name="interfaceType">Interface type.</param>
+    public InterfaceAnalyzer(string[] methodNames, Type interfaceType)
     {
         this.methodNames = methodNames;
-        this.interfaceNamespace = interfaceNamespace;
+        this.interfaceType = interfaceType;
     }
 
     /// <inheritdoc/>
@@ -30,7 +30,7 @@ public class InterfaceAnalyzer : ISyntaxAnalyzer<ITypeSymbol, InterfaceAnalysis>
     {
         var analysis = InterfaceAnalysis.Instance;
 
-        var @interface = semanticModel.Compilation.GetTypeByMetadataName(interfaceNamespace);
+        var @interface = semanticModel.Compilation.GetTypeByMetadataName(interfaceType.FullName);
         if (@interface is null)
         {
             return analysis;

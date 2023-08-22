@@ -1,4 +1,5 @@
-﻿using Saritasa.Tools.SourceGenerator.Infrastructure;
+﻿using System.ComponentModel;
+using Saritasa.Tools.SourceGenerator.Infrastructure;
 using Saritasa.Tools.SourceGenerator.Models.Analyzers;
 
 namespace Saritasa.Tools.SourceGenerator.Analyzers;
@@ -16,8 +17,8 @@ internal static class InterfaceAnalyzerFactory
     /// <returns>Interface analyzer.</returns>
     public static InterfaceAnalyzer Create(OptionsManager optionsManager, InterfaceType type) => type switch
     {
-        InterfaceType.PropertyChanged => new InterfaceAnalyzer(optionsManager.PropertyChangedOptions.MethodNames, interfaceNamespace: "System.ComponentModel.INotifyPropertyChanged"),
-        InterfaceType.PropertyChanging => new InterfaceAnalyzer(optionsManager.PropertyChangingOptions.MethodNames, interfaceNamespace: "System.ComponentModel.INotifyPropertyChanging"),
+        InterfaceType.PropertyChanged => new InterfaceAnalyzer(optionsManager.PropertyChangedOptions.MethodNames, typeof(INotifyPropertyChanged)),
+        InterfaceType.PropertyChanging => new InterfaceAnalyzer(optionsManager.PropertyChangingOptions.MethodNames, typeof(INotifyPropertyChanging)),
         _ => throw new ArgumentOutOfRangeException("Invalid interface type."),
     };
 }
