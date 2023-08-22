@@ -40,13 +40,10 @@ public class PropertyBuilder : ISyntaxBuilder<PropertyMetadata, FieldAnalysis>
 
         AddSetterDelegates(setter);
 
-        if (analysis.AlsoNotifyMembers.Any())
+        foreach (var fieldName in analysis.AlsoNotifyMembers)
         {
-            foreach (var fieldName in analysis.AlsoNotifyMembers)
-            {
-                var fieldPropertyName = PropertyUtils.Capitalize(fieldName);
-                AddSetterDelegates(setter, fieldPropertyName);
-            }
+            var fieldPropertyName = PropertyUtils.Capitalize(fieldName);
+            AddSetterDelegates(setter, fieldPropertyName);
         }
 
         return new PropertyMetadata()
