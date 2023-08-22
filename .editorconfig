@@ -373,5 +373,5 @@ dotnet_diagnostic.SX1309.severity = none
 dotnet_diagnostic.SX1309S.severity = none
 
 # Source generator settings
-property_changed_raise_method_name = OnPropertyChanged,RaisePropertyChanged
-property_changing_raise_method_name = OnPropertyChanging,RaisePropertyChanging
+property_changed_raise_method_names = OnPropertyChanged,RaisePropertyChanged
+property_changing_raise_method_names = OnPropertyChanging,RaisePropertyChanging

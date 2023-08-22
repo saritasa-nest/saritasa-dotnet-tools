@@ -16,9 +16,10 @@ public class PropertyChangedOptions
     /// <summary>
     /// Constructor.
     /// </summary>
+    /// <param name="options"></param>
     public PropertyChangedOptions(AnalyzerConfigOptions options)
     {
-        options.TryGetValue("property_changed_raise_method_name", out var methodNames);
+        options.TryGetValue(Options.PropertyChangedMethodNames, out var methodNames);
 
         MethodNames = methodNames?.Split(',') ?? Array.Empty<string>();
     }

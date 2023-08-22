@@ -18,7 +18,7 @@ public class PropertyChangingOptions
     /// </summary>
     public PropertyChangingOptions(AnalyzerConfigOptions options)
     {
-        options.TryGetValue("property_changing_raise_method_name", out var methodNames);
+        options.TryGetValue(Options.PropertyChangingMethodNames, out var methodNames);
 
         MethodNames = methodNames?.Split(',') ?? Array.Empty<string>();
     }
