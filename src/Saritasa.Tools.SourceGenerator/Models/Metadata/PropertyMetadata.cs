@@ -44,7 +44,6 @@ public class PropertyMetadata : MemberMetadata
 
         builder.Append($" {Name}");
 
-
         var shouldBuildAccessors = Getter != null && Setter != null;
         if (!shouldBuildAccessors)
         {
