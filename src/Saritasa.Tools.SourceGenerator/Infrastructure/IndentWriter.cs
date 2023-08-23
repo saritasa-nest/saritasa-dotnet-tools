@@ -24,8 +24,10 @@ public class IndentWriter
     {
         this.indentLevel = indentLevel;
 
-        var level = Enumerable.Range(0, indentLevel).Select(_ => "\t");
-        indent = string.Join(string.Empty, level);
+        if (indentLevel > 0)
+        {
+            indent = new string('\t', indentLevel);
+        }
     }
 
     /// <summary>
