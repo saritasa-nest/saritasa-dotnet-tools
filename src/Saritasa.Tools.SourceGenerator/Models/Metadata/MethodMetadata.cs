@@ -106,13 +106,13 @@ public class MethodMetadata : SyntaxMetadata
 
         writer.Append("{").AppendLine();
 
-        writer.SetIndent(writer.IndentLevel + 1);
+        using (writer.IncreaseIndent())
+        {
+            var invocationsWriter = IndentWriter.Instance;
+            var invocations = string.Join("\n", Invocations.Select(inv => inv.Build(invocationsWriter)));
+            writer.Append(invocations).AppendLine();
+        }
 
-        var invocationsWriter = IndentWriter.Instance;
-        var invocations = string.Join("\n", Invocations.Select(inv => inv.Build(invocationsWriter)));
-        writer.Append(invocations).AppendLine();
-
-        writer.SetIndent(writer.IndentLevel - 1);
         writer.Append("}");
 
         return writer.ToString();

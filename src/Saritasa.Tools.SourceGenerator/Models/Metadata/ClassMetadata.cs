@@ -49,40 +49,40 @@ public class ClassMetadata : SyntaxMetadata
         writer.AppendLine().Append($"namespace {Namespace}");
         writer.AppendLine().Append("{");
 
-        writer.SetIndent(indentLevel: 1);
-
-        var builder = new StringBuilder();
-        builder.Append($"{Modifier} partial class {Name}");
-
-        if (Interfaces.Any())
+        using (writer.IncreaseIndent())
         {
-            builder.Append($" : {string.Join(", ", Interfaces)}");
+            var builder = new StringBuilder();
+            builder.Append($"{Modifier} partial class {Name}");
+
+            if (Interfaces.Any())
+            {
+                builder.Append($" : {string.Join(", ", Interfaces)}");
+            }
+
+            var declaration = builder.ToString();
+
+            writer.AppendLine().Append(declaration);
+            writer.AppendLine().Append("{");
+
+            using (writer.IncreaseIndent())
+            {
+                foreach (var member in Members)
+                {
+                    writer.AppendLine();
+                    member.Build(writer);
+                    writer.AppendLine();
+                }
+
+                foreach (var method in Methods)
+                {
+                    writer.AppendLine();
+                    method.Build(writer);
+                }
+            }
+
+            writer.AppendLine().Append("}");
         }
 
-        var declaration = builder.ToString();
-
-        writer.AppendLine().Append(declaration);
-        writer.AppendLine().Append("{");
-
-        writer.SetIndent(indentLevel: 2);
-
-        foreach (var member in Members)
-        {
-            writer.AppendLine();
-            member.Build(writer);
-            writer.AppendLine();
-        }
-
-        foreach (var method in Methods)
-        {
-            writer.AppendLine();
-            method.Build(writer);
-        }
-
-        writer.SetIndent(indentLevel: 1);
-        writer.AppendLine().Append("}");
-
-        writer.SetIndent(indentLevel: 0);
         writer.AppendLine().Append("}");
 
         return writer.ToString();

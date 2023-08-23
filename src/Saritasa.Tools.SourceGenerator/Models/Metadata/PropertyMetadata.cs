@@ -44,33 +44,27 @@ public class PropertyMetadata : MemberMetadata
 
         builder.Append($" {Name}");
 
-        if (Getter == null && Setter == null)
+
+        var shouldBuildAccessors = Getter != null && Setter != null;
+        if (!shouldBuildAccessors)
         {
-            builder.Append(";");
+            var property = builder.Append(";").ToString();
+            return writer.Append(property).ToString();
         }
 
         var declaration = builder.ToString();
+
         writer.Append(declaration);
 
-        if (Getter != null)
+        writer.AppendLine().Append("{");
+
+        using (writer.IncreaseIndent())
         {
-            writer.AppendLine();
-            writer.Append("{");
-
-            writer.SetIndent(writer.IndentLevel + 1);
-
             Getter?.Build(writer);
-        }
-
-        if (Setter != null)
-        {
             Setter?.Build(writer);
-
-            writer.SetIndent(writer.IndentLevel - 1);
-
-            writer.AppendLine();
-            writer.Append("}");
         }
+
+        writer.AppendLine().Append("}");
 
         return writer.ToString();
     }

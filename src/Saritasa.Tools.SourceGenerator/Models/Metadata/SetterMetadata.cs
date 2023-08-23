@@ -35,29 +35,26 @@ public class SetterMetadata : SyntaxMetadata
         writer.Append("set");
         writer.AppendLine();
 
-        writer.Append("{");
-        writer.SetIndent(writer.IndentLevel + 1);
+        writer.Append("{").AppendLine();
 
-        writer.AppendLine();
-
-        foreach (var expression in OnChanging)
+        using (writer.IncreaseIndent())
         {
-            expression.Build(writer);
-            writer.AppendLine();
+            foreach (var expression in OnChanging)
+            {
+                expression.Build(writer);
+                writer.AppendLine();
+            }
+
+            writer.Append($"{backingField.Name} = value;");
+
+            foreach (var expression in OnChanged)
+            {
+                writer.AppendLine();
+                expression.Build(writer);
+            }
         }
 
-        writer.Append($"{backingField.Name} = value;");
-
-        foreach (var expression in OnChanged)
-        {
-            writer.AppendLine();
-            expression.Build(writer);
-        }
-
-        writer.AppendLine();
-
-        writer.SetIndent(writer.IndentLevel - 1);
-        writer.Append("}");
+        writer.AppendLine().Append("}");
 
         return writer.ToString();
     }

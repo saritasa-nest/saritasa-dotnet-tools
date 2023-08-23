@@ -31,6 +31,18 @@ public class IndentWriter
     }
 
     /// <summary>
+    /// Increase an indentation by one.
+    /// </summary>
+    /// <returns>Disposable identation block.</returns>
+    public IDisposable IncreaseIndent() => IndentBlock.Create(this, level: indentLevel + 1);
+
+    /// <summary>
+    /// Decrease an indentation by one.
+    /// </summary>
+    /// <returns>Disposable identation block.</returns>
+    public IDisposable DecreaseIndent() => IndentBlock.Create(this, level: indentLevel - 1);
+
+    /// <summary>
     /// Append line.
     /// </summary>
     public IndentWriter AppendLine() => Execute(() => builder.AppendLine());
