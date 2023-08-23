@@ -1,4 +1,5 @@
 ﻿using Saritasa.Tools.SourceGenerator.Abstractions.Syntax;
+using Saritasa.Tools.SourceGenerator.Infrastructure.Options;
 using Saritasa.Tools.SourceGenerator.Models.Analyzers;
 using Saritasa.Tools.SourceGenerator.Models.Metadata;
 using Saritasa.Tools.SourceGenerator.Utils;
@@ -10,18 +11,24 @@ namespace Saritasa.Tools.SourceGenerator.Builders;
 /// </summary>
 public class PropertyBuilder : ISyntaxBuilder<PropertyMetadata, FieldAnalysis>
 {
+    private readonly FieldOptions fieldOptions;
+
     private readonly InvocationMethodMetadata? invokePropertyChanged;
     private readonly InvocationMethodMetadata? invokePropertyChanging;
 
     /// <summary>
     /// Constructor.
     /// </summary>
+    /// <param name="fieldOptions">Field options.</param>
     /// <param name="invokePropertyChanged">Invocation method of property changed.</param>
     /// <param name="invokePropertyChanging">Invocation method of property changing.</param>
     public PropertyBuilder(
+        FieldOptions fieldOptions,
         InvocationMethodMetadata? invokePropertyChanged = null,
         InvocationMethodMetadata? invokePropertyChanging = null)
     {
+        this.fieldOptions = fieldOptions;
+
         this.invokePropertyChanged = invokePropertyChanged;
         this.invokePropertyChanging = invokePropertyChanging;
     }
@@ -42,13 +49,13 @@ public class PropertyBuilder : ISyntaxBuilder<PropertyMetadata, FieldAnalysis>
 
         foreach (var fieldName in analysis.AlsoNotifyMembers)
         {
-            var fieldPropertyName = PropertyUtils.Capitalize(fieldName);
+            var fieldPropertyName = FieldUtils.GetPropertyName(fieldName, fieldOptions);
             AddSetterDelegates(setter, fieldPropertyName);
         }
 
         return new PropertyMetadata()
         {
-            Name = PropertyUtils.Capitalize(analysis.Name),
+            Name = FieldUtils.GetPropertyName(analysis.Name, fieldOptions),
             Type = analysis.Type,
             Getter = new GetterMetadata(fieldMetadata),
             Setter = setter,

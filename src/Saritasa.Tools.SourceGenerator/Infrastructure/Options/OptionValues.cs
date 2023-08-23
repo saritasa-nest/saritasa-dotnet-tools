@@ -16,6 +16,16 @@ internal static class OptionValues
     public const int DefaultIndentSize = 4;
 
     /// <summary>
+    /// Default backing field naming convention.
+    /// </summary>
+    public const NamingConvention DefaultBackingFieldNamingConvention = NamingConvention.CamelCase;
+
+    /// <summary>
+    /// Default value which indicates whether backing field should use underscore.
+    /// </summary>
+    public const bool DefaultBackingFieldShouldUseUnderscore = false;
+
+    /// <summary>
     /// Default property changed raise method names.
     /// </summary>
     public static readonly string[] PropertyChangedNames = new[] { "OnPropertyChanged", "RaisePropertyChanged" };

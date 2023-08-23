@@ -48,6 +48,8 @@ public partial class ViewModel : EditableModel
         set => implementedField = value;
     }
 
+    public string PascalField;
+
     [AlsoNotify(nameof(reflectedField))]
     private string field;
 

@@ -12,6 +12,9 @@ public class ErrorDescriptor : IDiagnosticDescriptor
     public string Title { get; }
 
     /// <inheritdoc/>
+    public string Message { get; }
+
+    /// <inheritdoc/>
     public string Code { get; }
 
     /// <inheritdoc/>
@@ -24,11 +27,13 @@ public class ErrorDescriptor : IDiagnosticDescriptor
     /// Constructor.
     /// </summary>
     /// <param name="title">Error title.</param>
+    /// <param name="message">Error message.</param>
     /// <param name="code">Error code.</param>
     /// <param name="format">Error format.</param>
-    public ErrorDescriptor(string title, string code, string format)
+    public ErrorDescriptor(string title, string message, string code, string format)
     {
         Title = title;
+        Message = message;
         Code = code;
         Format = format;
     }

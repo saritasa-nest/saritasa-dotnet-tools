@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Saritasa.Tools.SourceGenerator.Abstractions.Analyzers;
 using Saritasa.Tools.SourceGenerator.Abstractions.Diagnostics;
+using Saritasa.Tools.SourceGenerator.Infrastructure.Options;
 using Saritasa.Tools.SourceGenerator.Models.Analyzers;
 using Saritasa.Tools.SourceGenerator.Utils;
 
@@ -12,14 +13,17 @@ namespace Saritasa.Tools.SourceGenerator.Analyzers;
 internal class PropertyAnalyzer : ISyntaxAnalyzer<IPropertySymbol, PropertyAnalysis>
 {
     private readonly IEnumerable<FieldAnalysis> fields;
+    private readonly FieldOptions fieldOptions;
 
     /// <summary>
     /// Constructor.
     /// </summary>
     /// <param name="fields">Field analysis.</param>
-    public PropertyAnalyzer(IEnumerable<FieldAnalysis> fields)
+    /// <param name="fieldOptions">Field options.</param>
+    public PropertyAnalyzer(IEnumerable<FieldAnalysis> fields, FieldOptions fieldOptions)
     {
         this.fields = fields;
+        this.fieldOptions = fieldOptions;
     }
 
     /// <inheritdoc/>
@@ -32,7 +36,7 @@ internal class PropertyAnalyzer : ISyntaxAnalyzer<IPropertySymbol, PropertyAnaly
             Modifier = SymbolUtils.GetModifier(symbol),
         };
 
-        var propertyFieldName = PropertyUtils.Lowercase(symbol.Name);
+        var propertyFieldName = PropertyUtils.GetFieldName(symbol.Name, fieldOptions);
         var backingField = fields.FirstOrDefault(field => field.Name == propertyFieldName);
         if (backingField != null)
         {

@@ -19,7 +19,14 @@ public abstract class ReporterBase<TDescriptor> : IDiagnosticReporter<TDescripto
     /// <inheritdoc/>
     public virtual void AddDiagnostic(TDescriptor descriptor)
     {
-        var diagnosticDescriptor = new DiagnosticDescriptor(descriptor.Code, descriptor.Title, descriptor.Format, "", descriptor.Severity, isEnabledByDefault: true);
+        var diagnosticDescriptor = new DiagnosticDescriptor(
+            descriptor.Code,
+            descriptor.Title,
+            descriptor.Format,
+            "",
+            descriptor.Severity,
+            isEnabledByDefault: true,
+            description: descriptor.Message);
         var diagnostic = Diagnostic.Create(diagnosticDescriptor, Location.None);
         AddDiagnostic(diagnostic);
     }

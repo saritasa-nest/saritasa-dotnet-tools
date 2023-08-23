@@ -12,6 +12,8 @@ namespace Saritasa.Tools.SourceGenerator.Analyzers;
 /// </summary>
 public class ClassAnalyzer : ISyntaxAnalyzer<ITypeSymbol, ClassAnalysis>
 {
+    private readonly OptionsManager optionsManager;
+
     private readonly ISyntaxAnalyzer<ITypeSymbol, InterfaceAnalysis> propertyChangedAnalyzer;
     private readonly ISyntaxAnalyzer<ITypeSymbol, InterfaceAnalysis> propertyChangingAnalyzer;
 
@@ -21,6 +23,8 @@ public class ClassAnalyzer : ISyntaxAnalyzer<ITypeSymbol, ClassAnalysis>
     /// <param name="optionsManager">Options manager.</param>
     public ClassAnalyzer(OptionsManager optionsManager)
     {
+        this.optionsManager = optionsManager;
+
         this.propertyChangedAnalyzer = InterfaceAnalyzerFactory.Create(optionsManager, InterfaceType.PropertyChanged);
         this.propertyChangingAnalyzer = InterfaceAnalyzerFactory.Create(optionsManager, InterfaceType.PropertyChanging);
     }
@@ -46,7 +50,9 @@ public class ClassAnalyzer : ISyntaxAnalyzer<ITypeSymbol, ClassAnalysis>
         IDiagnosticsScope scope)
     {
         var members = SymbolUtils.GetMembers(symbol);
-        var fields = members.OfType<IFieldSymbol>();
+        var fields = members.OfType<IFieldSymbol>()
+            .Where(field => field.CanBeReferencedByName)
+            .Where(field => FieldUtils.FollowConvention(field.Name, optionsManager.FieldOptions));
         var properties = members.OfType<IPropertySymbol>();
 
         var fieldAnalysis = new List<FieldAnalysis>();
@@ -58,7 +64,7 @@ public class ClassAnalyzer : ISyntaxAnalyzer<ITypeSymbol, ClassAnalysis>
         }
 
         var propertyAnalysis = new List<PropertyAnalysis>();
-        var propertyAnalyzer = new PropertyAnalyzer(fieldAnalysis);
+        var propertyAnalyzer = new PropertyAnalyzer(fieldAnalysis, optionsManager.FieldOptions);
         foreach (var property in properties)
         {
             var analysis = propertyAnalyzer.Analyze(property, semanticModel, scope);

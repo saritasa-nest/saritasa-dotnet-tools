@@ -13,6 +13,11 @@ public interface IDiagnosticDescriptor
     string Title { get; }
 
     /// <summary>
+    /// Diagnostic message.
+    /// </summary>
+    string Message { get; }
+
+    /// <summary>
     /// Diagnostic code.
     /// </summary>
     string Code { get; }

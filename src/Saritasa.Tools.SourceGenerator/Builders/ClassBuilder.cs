@@ -146,18 +146,23 @@ public class ClassBuilder : ISyntaxBuilder<ClassMetadata, ClassAnalysis>
         return propertyChanged;
     }
 
-    private static IReadOnlyCollection<MemberMetadata> GetMembersMetadata(
+    private IReadOnlyCollection<MemberMetadata> GetMembersMetadata(
         IReadOnlyCollection<PropertyAnalysis> properties,
         IReadOnlyCollection<FieldAnalysis> fields,
         InvocationMethodMetadata? propertyChanged = null,
         InvocationMethodMetadata? propertyChanging = null)
     {
-        var propertyNames = properties.Select(prop => PropertyUtils.Lowercase(prop.Name));
+        var propertyNames = properties.Select(property => PropertyUtils.GetFieldName(
+            property.Name,
+            optionsManager.FieldOptions));
         var fieldsToAnalyze = fields
             .Where(field => !propertyNames.Contains(field.Name))
             .Where(field => !field.DoNotNotify);
 
-        var propertyBuilder = new PropertyBuilder(propertyChanged, propertyChanging);
+        var propertyBuilder = new PropertyBuilder(
+            optionsManager.FieldOptions,
+            propertyChanged,
+            propertyChanging);
         var members = new List<MemberMetadata>();
         foreach (var fieldAnalysis in fieldsToAnalyze)
         {

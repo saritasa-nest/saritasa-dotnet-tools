@@ -52,7 +52,7 @@ internal class SourceGenerator : IIncrementalGenerator
     {
         var scope = new DiagnosticsScope();
         var options = provider.Options.GetOptions(provider.Node.SemanticModel.SyntaxTree);
-        var optionsManager = new OptionsManager(options);
+        var optionsManager = new OptionsManager(options, scope);
 
         if (provider.Node.Symbol is null)
         {

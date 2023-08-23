@@ -12,6 +12,9 @@ public class WarningDescriptor : IDiagnosticDescriptor
     public string Title { get; }
 
     /// <inheritdoc/>
+    public string Message { get; }
+
+    /// <inheritdoc/>
     public string Code { get; }
 
     /// <inheritdoc/>
@@ -23,12 +26,14 @@ public class WarningDescriptor : IDiagnosticDescriptor
     /// <summary>
     /// Constructor.
     /// </summary>
-    /// <param name="title">Error title.</param>
-    /// <param name="code">Error code.</param>
-    /// <param name="format">Error format.</param>
-    public WarningDescriptor(string title, string code, string format)
+    /// <param name="title">Warning title.</param>
+    /// <param name="message">Warning message.</param>
+    /// <param name="code">Warning code.</param>
+    /// <param name="format">Warning format.</param>
+    public WarningDescriptor(string title, string message, string code, string format)
     {
         Title = title;
+        Message = message;
         Code = code;
         Format = format;
     }

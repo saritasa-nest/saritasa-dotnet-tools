@@ -1,4 +1,6 @@
-﻿namespace Saritasa.Tools.SourceGenerator.Utils;
+﻿using Saritasa.Tools.SourceGenerator.Infrastructure.Options;
+
+namespace Saritasa.Tools.SourceGenerator.Utils;
 
 /// <summary>
 /// Property utilities.
@@ -6,16 +8,20 @@
 internal class PropertyUtils
 {
     /// <summary>
-    /// Capitalize value.
+    /// Gets possible property field name.
     /// </summary>
-    /// <param name="value">Value to capitalize.</param>
-    /// <returns>Capitalized string.</returns>
-    public static string Capitalize(string value) => char.ToUpper(value[0]) + value.Substring(1);
+    /// <param name="propertyName">Property name.</param>
+    /// <param name="options">Field options.</param>
+    /// <returns>Property field name.</returns>
+    public static string GetFieldName(string propertyName, FieldOptions options)
+    {
+        var name = NamingUtils.ToConvention(propertyName, options.Convention);
 
-    /// <summary>
-    /// Lowercase value.
-    /// </summary>
-    /// <param name="value">Value to lowercase.</param>
-    /// <returns>Lowercased string.</returns>
-    public static string Lowercase(string value) => char.ToLower(value[0]) + value.Substring(1);
+        if (options.UseUnderscore)
+        {
+            name = '_' + name;
+        }
+
+        return name;
+    }
 }
