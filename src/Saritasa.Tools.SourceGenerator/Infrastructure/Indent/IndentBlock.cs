@@ -1,4 +1,4 @@
-﻿namespace Saritasa.Tools.SourceGenerator.Infrastructure;
+﻿namespace Saritasa.Tools.SourceGenerator.Infrastructure.Indent;
 
 /// <summary>
 /// Indent block of <see cref="IndentWriter"/>.

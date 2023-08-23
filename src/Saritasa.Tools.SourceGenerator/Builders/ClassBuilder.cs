@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using Microsoft.CodeAnalysis;
 using Saritasa.Tools.SourceGenerator.Abstractions.Syntax;
-using Saritasa.Tools.SourceGenerator.Infrastructure;
+using Saritasa.Tools.SourceGenerator.Infrastructure.Options;
 using Saritasa.Tools.SourceGenerator.Models.Analyzers;
 using Saritasa.Tools.SourceGenerator.Models.Metadata;
 using Saritasa.Tools.SourceGenerator.Models.Nodes;

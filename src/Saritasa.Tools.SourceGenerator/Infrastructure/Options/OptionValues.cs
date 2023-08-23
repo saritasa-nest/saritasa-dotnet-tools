@@ -1,0 +1,27 @@
+﻿namespace Saritasa.Tools.SourceGenerator.Infrastructure.Options;
+
+/// <summary>
+/// Represents an application default option values.
+/// </summary>
+internal static class OptionValues
+{
+    /// <summary>
+    /// Default indentation style.
+    /// </summary>
+    public const IndentStyle DefaultIndentStyle = IndentStyle.Space;
+
+    /// <summary>
+    /// Default indentation size.
+    /// </summary>
+    public const int DefaultIndentSize = 4;
+
+    /// <summary>
+    /// Default property changed raise method names.
+    /// </summary>
+    public static readonly string[] PropertyChangedNames = new[] { "OnPropertyChanged", "RaisePropertyChanged" };
+
+    /// <summary>
+    /// Default property changing raise method names.
+    /// </summary>
+    public static readonly string[] PropertyChangingNames = new[] { "OnPropertyChanging", "RaisePropertyChanging" };
+}

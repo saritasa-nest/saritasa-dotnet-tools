@@ -1,5 +1,5 @@
 ﻿using Saritasa.Tools.SourceGenerator.Abstractions.Models;
-using Saritasa.Tools.SourceGenerator.Infrastructure;
+using Saritasa.Tools.SourceGenerator.Infrastructure.Indent;
 
 namespace Saritasa.Tools.SourceGenerator.Models.Metadata;
 

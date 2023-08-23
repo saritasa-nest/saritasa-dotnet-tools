@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace Saritasa.Tools.SourceGenerator.Infrastructure;
+namespace Saritasa.Tools.SourceGenerator.Infrastructure.Options;
 
 /// <summary>
 /// Options for <see cref="INotifyPropertyChanging"/>.
@@ -11,15 +11,17 @@ public class PropertyChangingOptions
     /// <summary>
     /// Available raise method names.
     /// </summary>
-    public string[] MethodNames { get; }
+    public string[] MethodNames { get; } = OptionValues.PropertyChangingNames;
 
     /// <summary>
     /// Constructor.
     /// </summary>
+    /// <param name="options">Analyzer options.</param>
     public PropertyChangingOptions(AnalyzerConfigOptions options)
     {
-        options.TryGetValue(Options.PropertyChangingMethodNames, out var methodNames);
-
-        MethodNames = methodNames?.Split(',') ?? Array.Empty<string>();
+        if (options.TryGetValue(OptionNames.PropertyChangingMethodNames, out var methodNames))
+        {
+            MethodNames = methodNames.Split(',');
+        }
     }
 }

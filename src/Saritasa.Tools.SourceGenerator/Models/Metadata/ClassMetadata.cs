@@ -1,6 +1,6 @@
 ﻿using System.Text;
 using Saritasa.Tools.SourceGenerator.Abstractions.Models;
-using Saritasa.Tools.SourceGenerator.Infrastructure;
+using Saritasa.Tools.SourceGenerator.Infrastructure.Indent;
 using Saritasa.Tools.SourceGenerator.Models.Metadata;
 
 namespace Saritasa.Tools.SourceGenerator.Models.Nodes;

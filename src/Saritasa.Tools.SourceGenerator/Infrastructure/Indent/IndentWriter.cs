@@ -1,6 +1,7 @@
 ﻿using System.Text;
+using Saritasa.Tools.SourceGenerator.Infrastructure.Options;
 
-namespace Saritasa.Tools.SourceGenerator.Infrastructure;
+namespace Saritasa.Tools.SourceGenerator.Infrastructure.Indent;
 
 /// <summary>
 /// Indent writer.
@@ -8,6 +9,8 @@ namespace Saritasa.Tools.SourceGenerator.Infrastructure;
 public class IndentWriter
 {
     private readonly StringBuilder builder = new();
+    private readonly IndentOptions options;
+
     private string indent = string.Empty;
     private int indentLevel = 0;
 
@@ -17,6 +20,15 @@ public class IndentWriter
     public int IndentLevel => indentLevel;
 
     /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="options">Application indentation options.</param>
+    public IndentWriter(IndentOptions options)
+    {
+        this.options = options;
+    }
+
+    /// <summary>
     /// Set indent level.
     /// </summary>
     /// <param name="indentLevel">Indent level.</param>
@@ -24,10 +36,17 @@ public class IndentWriter
     {
         this.indentLevel = indentLevel;
 
-        if (indentLevel > 0)
+        var builder = new StringBuilder();
+        if (options.IndentStyle == IndentStyle.Tab)
         {
-            indent = new string('\t', indentLevel);
+            builder.Append('\t');
         }
+        else
+        {
+            builder.Append(' ', indentLevel * options.IndentSize);
+        }
+
+        indent = builder.ToString();
     }
 
     /// <summary>
@@ -51,11 +70,6 @@ public class IndentWriter
         action();
         return this;
     }
-
-    /// <summary>
-    /// An instance of <see cref="IndentWriter"/>.
-    /// </summary>
-    public static IndentWriter Instance => new();
 
     /// <inheritdoc/>
     public override string ToString() => builder.ToString();

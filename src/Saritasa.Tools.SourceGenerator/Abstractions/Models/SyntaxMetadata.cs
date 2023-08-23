@@ -1,4 +1,4 @@
-﻿using Saritasa.Tools.SourceGenerator.Infrastructure;
+﻿using Saritasa.Tools.SourceGenerator.Infrastructure.Indent;
 
 namespace Saritasa.Tools.SourceGenerator.Abstractions.Models;
 

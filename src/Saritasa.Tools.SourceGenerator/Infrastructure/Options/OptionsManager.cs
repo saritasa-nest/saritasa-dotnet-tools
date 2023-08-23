@@ -1,12 +1,17 @@
 ﻿using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace Saritasa.Tools.SourceGenerator.Infrastructure;
+namespace Saritasa.Tools.SourceGenerator.Infrastructure.Options;
 
 /// <summary>
 /// Application options manager.
 /// </summary>
 public class OptionsManager
 {
+    /// <summary>
+    /// User indent options.
+    /// </summary>
+    public IndentOptions IndentOptions { get; }
+
     /// <summary>
     /// Property changed options.
     /// </summary>
@@ -23,6 +28,7 @@ public class OptionsManager
     /// <param name="options">Syntax analyzer editor config options.</param>
     public OptionsManager(AnalyzerConfigOptions options)
     {
+        IndentOptions = new(options);
         PropertyChangedOptions = new(options);
         PropertyChangingOptions = new(options);
     }

@@ -1,66 +1,9 @@
 ﻿using System.Text;
 using Saritasa.Tools.SourceGenerator.Abstractions.Models;
-using Saritasa.Tools.SourceGenerator.Infrastructure;
+using Saritasa.Tools.SourceGenerator.Infrastructure.Indent;
 using Saritasa.Tools.SourceGenerator.Models.Metadata;
 
 namespace Saritasa.Tools.SourceGenerator.Models.Nodes;
-
-/// <summary>
-/// Method parameter metadata.
-/// </summary>
-public class MethodParameterMetadata : SyntaxMetadata
-{
-    /// <summary>
-    /// Parameter name.
-    /// </summary>
-    public string Name { get; set; }
-
-    /// <summary>
-    /// Parameter type.
-    /// </summary>
-    public Type Type { get; set; }
-
-    /// <summary>
-    /// Parameter attribute name.
-    /// </summary>
-    public string? AttributeName { get; set; }
-
-    /// <summary>
-    /// Is parameter nullable.
-    /// </summary>
-    public bool IsNullable { get; set; }
-
-    /// <summary>
-    /// Parameter default value.
-    /// </summary>
-    public string? Value { get; set; }
-
-    /// <inheritdoc/>
-    public override string Build(IndentWriter writer)
-    {
-        var builder = new StringBuilder();
-
-        if (AttributeName != null)
-        {
-            builder.Append($"[{AttributeName}] ");
-        }
-
-        builder.Append(Type);
-        if (IsNullable)
-        {
-            builder.Append("? ");
-        }
-
-        builder.Append(Name);
-        if (Value != null)
-        {
-            builder.Append($" = {Value}");
-        }
-
-        var declaration = builder.ToString();
-        return writer.Append(declaration).ToString();
-    }
-}
 
 /// <summary>
 /// Method metadata.
@@ -96,9 +39,11 @@ public class MethodMetadata : SyntaxMetadata
         builder.Append($" void {Name}");
         builder.Append("(");
 
-        var parametersWriter = IndentWriter.Instance;
-        var parameters = string.Join(", ", Parameters.Select(parameter => parameter.Build(parametersWriter)));
-        builder.Append(parameters);
+        foreach (var parameter in Parameters)
+        {
+            parameter.Build(builder);
+        }
+
         builder.Append(")");
 
         var declaration = builder.ToString();
@@ -108,12 +53,14 @@ public class MethodMetadata : SyntaxMetadata
 
         using (writer.IncreaseIndent())
         {
-            var invocationsWriter = IndentWriter.Instance;
-            var invocations = string.Join("\n", Invocations.Select(inv => inv.Build(invocationsWriter)));
-            writer.Append(invocations).AppendLine();
+            foreach (var invocation in Invocations)
+            {
+                invocation.Build(writer);
+                writer.AppendLine();
+            }
         }
 
-        writer.Append("}");
+        writer.Append("}").AppendLine();
 
         return writer.ToString();
     }

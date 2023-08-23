@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel;
-using Saritasa.Tools.SourceGenerator.Infrastructure;
+using Saritasa.Tools.SourceGenerator.Infrastructure.Options;
 using Saritasa.Tools.SourceGenerator.Models.Analyzers;
 
 namespace Saritasa.Tools.SourceGenerator.Analyzers;

@@ -7,7 +7,8 @@ using Saritasa.Tools.SourceGenerator.Abstractions.Models;
 using Saritasa.Tools.SourceGenerator.Analyzers;
 using Saritasa.Tools.SourceGenerator.Builders;
 using Saritasa.Tools.SourceGenerator.Diagnostics;
-using Saritasa.Tools.SourceGenerator.Infrastructure;
+using Saritasa.Tools.SourceGenerator.Infrastructure.Indent;
+using Saritasa.Tools.SourceGenerator.Infrastructure.Options;
 using Saritasa.Tools.SourceGenerator.Models.Analyzers;
 using Saritasa.Tools.SourceGenerator.Syntax;
 using Saritasa.Tools.SourceGenerator.Syntax.Filters;
@@ -78,7 +79,8 @@ internal class SourceGenerator : IIncrementalGenerator
 
         var builder = new ClassBuilder(provider.Options);
         var node = builder.Build(provider.Analysis);
-        var symbol = node.Build(IndentWriter.Instance);
+        var writer = new IndentWriter(provider.Options.IndentOptions);
+        var symbol = node.Build(writer);
         context.AddSource($"{node.Name}.g.cs", symbol);
     }
 }

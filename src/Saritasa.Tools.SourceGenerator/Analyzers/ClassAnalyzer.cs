@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Saritasa.Tools.SourceGenerator.Abstractions.Analyzers;
 using Saritasa.Tools.SourceGenerator.Abstractions.Diagnostics;
-using Saritasa.Tools.SourceGenerator.Infrastructure;
+using Saritasa.Tools.SourceGenerator.Infrastructure.Options;
 using Saritasa.Tools.SourceGenerator.Models.Analyzers;
 using Saritasa.Tools.SourceGenerator.Utils;
 
