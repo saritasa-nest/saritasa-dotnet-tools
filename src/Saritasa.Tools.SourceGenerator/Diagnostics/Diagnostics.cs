@@ -3,9 +3,9 @@
 namespace Saritasa.Tools.SourceGenerator.Diagnostics;
 
 /// <summary>
-/// An application diagnostic descriptors.
+/// Contains an application diagnostics.
 /// </summary>
-internal class DiagnosticDescriptors
+internal class Diagnostics
 {
     /// <summary>
     /// Backing field convention mismatch warning.

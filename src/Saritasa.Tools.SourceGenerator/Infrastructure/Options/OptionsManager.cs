@@ -48,7 +48,7 @@ public class OptionsManager
     {
         if (options.Convention == NamingConvention.PascalCase && !options.UseUnderscore)
         {
-            scope.AddDiagnostic(DiagnosticDescriptors.BackingFieldConventionMismatch);
+            scope.AddDiagnostic(Diagnostics.Diagnostics.BackingFieldConventionMismatch);
         }
     }
 }
