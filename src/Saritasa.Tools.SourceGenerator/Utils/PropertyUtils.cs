@@ -17,11 +17,14 @@ internal class PropertyUtils
     {
         var name = NamingUtils.ToConvention(propertyName, options.Convention);
 
-        if (options.UseUnderscore)
+        if (options.UseUnderscore || PascalCaseConvention(options))
         {
             name = '_' + name;
         }
 
         return name;
     }
+
+    private static bool PascalCaseConvention(FieldOptions options)
+        => options.Convention == NamingConvention.PascalCase;
 }

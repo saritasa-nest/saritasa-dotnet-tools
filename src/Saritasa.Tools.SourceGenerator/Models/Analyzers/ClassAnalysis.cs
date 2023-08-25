@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Saritasa.Tools.SourceGenerator.Abstractions.Analyzers;
+using Saritasa.Tools.SourceGenerator.Utils;
 
 namespace Saritasa.Tools.SourceGenerator.Models.Analyzers;
 
@@ -12,6 +13,11 @@ public record ClassAnalysis : ISyntaxAnalysis
     /// Class name.
     /// </summary>
     public string? Name => Symbol?.Name;
+
+    /// <summary>
+    /// Class modifier.
+    /// </summary>
+    public string? Modifier => SymbolUtils.GetModifier(Symbol);
 
     /// <summary>
     /// Class namespace.

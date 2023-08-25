@@ -103,7 +103,7 @@ public class ClassBuilder : ISyntaxBuilder<ClassMetadata, ClassAnalysis>
         {
             Name = analysis.Name,
             Namespace = analysis.Namespace,
-            Modifier = MemberModifiers.Public,
+            Modifier = analysis.Modifier,
             Methods = methods,
             Members = members,
         };

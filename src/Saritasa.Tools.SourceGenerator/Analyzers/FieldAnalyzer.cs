@@ -11,15 +11,18 @@ namespace Saritasa.Tools.SourceGenerator.Analyzers;
 /// </summary>
 public class FieldAnalyzer : ISyntaxAnalyzer<IFieldSymbol, FieldAnalysis>
 {
-    private readonly IEnumerable<IFieldSymbol> symbols;
+    private readonly IEnumerable<IFieldSymbol> fields;
+    private readonly IEnumerable<IPropertySymbol> properties;
 
     /// <summary>
     /// Constructor.
     /// </summary>
-    /// <param name="symbols">Field symbols.</param>
-    public FieldAnalyzer(IEnumerable<IFieldSymbol> symbols)
+    /// <param name="fields">Field symbols.</param>
+    /// <param name="properties">Property symbols.</param>
+    public FieldAnalyzer(IEnumerable<IFieldSymbol> fields, IEnumerable<IPropertySymbol> properties)
     {
-        this.symbols = symbols;
+        this.fields = fields;
+        this.properties = properties;
     }
 
     /// <inheritdoc/>
@@ -37,11 +40,15 @@ public class FieldAnalyzer : ISyntaxAnalyzer<IFieldSymbol, FieldAnalysis>
         if (containsAlsoNotify)
         {
             var alsoNotify = SymbolUtils.GetAttribute(symbol, attributeName: Constants.AlsoNotifyAttributeName)!;
-            var fieldNames = symbols.Select(symbol => symbol.Name);
+
+            var fieldNames = fields.Select(symbol => symbol.Name);
+            var propertyNames = properties.Select(symbol => symbol.Name);
+            var names = fieldNames.Concat(propertyNames);
+
             analysis.AlsoNotifyMembers = alsoNotify.ConstructorArguments
                 .SelectMany(GetArgumentValues)
                 .OfType<string>()
-                .Where(name => fieldNames.Contains(name, StringComparer.OrdinalIgnoreCase));
+                .Where(names.Contains);
         }
 
         return analysis;

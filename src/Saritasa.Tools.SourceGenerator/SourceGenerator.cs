@@ -33,8 +33,8 @@ internal class SourceGenerator : IIncrementalGenerator
 
         var partialClassFilter = new ClassDeclarationFilter(new[]
         {
-            SyntaxKind.PartialKeyword,
             SyntaxKind.PublicKeyword,
+            SyntaxKind.InternalKeyword,
         });
         var classSymbols = syntaxManager.GetSymbols<ClassDeclarationSyntax, ITypeSymbol>(partialClassFilter);
         var classAnalysisAndDiagnostics = classSymbols.Combine(options).Select(GetAnalyzedNode);

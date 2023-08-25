@@ -15,7 +15,9 @@ internal class FieldUtils
     /// <returns>Field property name.</returns>
     public static string GetPropertyName(string fieldName, FieldOptions options)
     {
-        if (options.UseUnderscore && fieldName.StartsWith("_"))
+        var isPascalCase = PascalCaseConvention(options);
+        var isUnderscored = isPascalCase || options.UseUnderscore;
+        if (isUnderscored && fieldName.StartsWith("_"))
         {
             fieldName = fieldName.Remove(0, 1);
         }
@@ -36,7 +38,17 @@ internal class FieldUtils
             return false;
         }
 
-        var withoutUnderscore = fieldName.Remove(0, 1);
-        return NamingUtils.FollowConvention(withoutUnderscore, options.Convention);
+        // Pascal case backing fields must start with '_' character.
+        var isPascalCase = PascalCaseConvention(options);
+        if (isPascalCase && !fieldName.StartsWith("_"))
+        {
+            return false;
+        }
+
+        var name = options.UseUnderscore || isPascalCase ? fieldName.Remove(0, 1) : fieldName;
+        return NamingUtils.FollowConvention(name, options.Convention);
     }
+
+    private static bool PascalCaseConvention(FieldOptions options)
+        => options.Convention == NamingConvention.PascalCase;
 }

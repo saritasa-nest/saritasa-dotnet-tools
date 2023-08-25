@@ -69,8 +69,8 @@ public class PropertyBuilder : ISyntaxBuilder<PropertyMetadata, FieldAnalysis>
 
         if (propertyName != null)
         {
-            propertyChanging?.Arguments.Add(propertyName);
-            propertyChanged?.Arguments.Add(propertyName);
+            propertyChanging?.Arguments.Add($"nameof({propertyName})");
+            propertyChanged?.Arguments.Add($"nameof({propertyName})");
         }
 
         if (propertyChanging != null)

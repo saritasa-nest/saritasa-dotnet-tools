@@ -11,17 +11,17 @@ namespace Saritasa.Tools.SourceGenerator.Syntax.Filters;
 internal class ClassDeclarationFilter : ISyntaxFilter<ClassDeclarationSyntax>
 {
     /// <summary>
-    /// Class modifier kind.
+    /// Class modifier kinds.
     /// </summary>
-    public SyntaxKind[] ModifierKinds { get; }
+    public SyntaxKind[] Modifiers { get; }
 
     /// <summary>
     /// Constructor.
     /// </summary>
-    /// <param name="modifierKinds">Declaration modifier kinds.</param>
-    public ClassDeclarationFilter(SyntaxKind[] modifierKinds)
+    /// <param name="modifiers">Declaration modifier kinds.</param>
+    public ClassDeclarationFilter(SyntaxKind[] modifiers)
     {
-        ModifierKinds = modifierKinds;
+        Modifiers = modifiers;
     }
 
     /// <inheritdoc/>
@@ -32,6 +32,7 @@ internal class ClassDeclarationFilter : ISyntaxFilter<ClassDeclarationSyntax>
     public bool IsValid(ClassDeclarationSyntax node)
     {
         var classModifiers = node.Modifiers.Select(m => m.Kind());
-        return ModifierKinds.All(classModifiers.Contains);
+        var isPartial = classModifiers.Any(modifier => modifier == SyntaxKind.PartialKeyword);
+        return isPartial && Modifiers.Any(classModifiers.Contains);
     }
 }
