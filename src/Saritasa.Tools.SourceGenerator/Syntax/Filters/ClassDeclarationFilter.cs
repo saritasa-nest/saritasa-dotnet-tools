@@ -19,7 +19,7 @@ internal class ClassDeclarationFilter : ISyntaxFilter<ClassDeclarationSyntax>
     /// Constructor.
     /// </summary>
     /// <param name="modifiers">Declaration modifier kinds.</param>
-    public ClassDeclarationFilter(SyntaxKind[] modifiers)
+    public ClassDeclarationFilter(params SyntaxKind[] modifiers)
     {
         Modifiers = modifiers;
     }

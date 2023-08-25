@@ -31,11 +31,7 @@ internal class SourceGenerator : IIncrementalGenerator
         var options = context.AnalyzerConfigOptionsProvider.Select((opt, _) => opt);
         var syntaxManager = new SyntaxManager(context.SyntaxProvider);
 
-        var partialClassFilter = new ClassDeclarationFilter(new[]
-        {
-            SyntaxKind.PublicKeyword,
-            SyntaxKind.InternalKeyword,
-        });
+        var partialClassFilter = new ClassDeclarationFilter(SyntaxKind.PublicKeyword, SyntaxKind.InternalKeyword);
         var classSymbols = syntaxManager.GetSymbols<ClassDeclarationSyntax, ITypeSymbol>(partialClassFilter);
         var classAnalysisAndDiagnostics = classSymbols.Combine(options).Select(GetAnalyzedNode);
 
