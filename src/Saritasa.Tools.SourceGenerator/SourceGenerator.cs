@@ -42,7 +42,9 @@ internal class SourceGenerator : IIncrementalGenerator
         var diagnostics = classAnalysisAndDiagnostics.SelectMany((pair, token) => pair.Scope.GetDiagnostics());
         context.RegisterSourceOutput(diagnostics, Report);
 
-        var analysis = classAnalysisAndDiagnostics.Select((pair, token) => (pair.Analysis, pair.Options));
+        var analysis = classAnalysisAndDiagnostics
+            .Select((pair, token) => (pair.Analysis, pair.Options))
+            .Where(pair => pair.Analysis.ShouldBuild);
         context.RegisterSourceOutput(analysis, Build);
     }
 
@@ -72,11 +74,6 @@ internal class SourceGenerator : IIncrementalGenerator
         SourceProductionContext context,
         (ClassAnalysis Analysis, OptionsManager Options) provider)
     {
-        if (!provider.Analysis.ShouldBuild)
-        {
-            return;
-        }
-
         var builder = new ClassBuilder(provider.Options);
         var node = builder.Build(provider.Analysis);
         var writer = new IndentWriter(provider.Options.IndentOptions);
