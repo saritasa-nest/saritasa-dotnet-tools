@@ -9,16 +9,16 @@ namespace Saritasa.Tools.SourceGenerator.Models.Descriptors;
 public class WarningDescriptor : IDiagnosticDescriptor
 {
     /// <inheritdoc/>
+    public string Code { get; }
+
+    /// <inheritdoc/>
     public string Title { get; }
 
     /// <inheritdoc/>
     public string Message { get; }
 
     /// <inheritdoc/>
-    public string Code { get; }
-
-    /// <inheritdoc/>
-    public string Format { get; }
+    public string Category { get; }
 
     /// <inheritdoc/>
     public DiagnosticSeverity Severity => DiagnosticSeverity.Warning;
@@ -26,15 +26,15 @@ public class WarningDescriptor : IDiagnosticDescriptor
     /// <summary>
     /// Constructor.
     /// </summary>
+    /// <param name="code">Warning code.</param>
     /// <param name="title">Warning title.</param>
     /// <param name="message">Warning message.</param>
-    /// <param name="code">Warning code.</param>
-    /// <param name="format">Warning format.</param>
-    public WarningDescriptor(string title, string message, string code, string format)
+    /// <param name="category">Warning category.</param>
+    public WarningDescriptor(string code, string title, string message, string category)
     {
+        Code = code;
         Title = title;
         Message = message;
-        Code = code;
-        Format = format;
+        Category = category;
     }
 }

@@ -22,11 +22,10 @@ public abstract class ReporterBase<TDescriptor> : IDiagnosticReporter<TDescripto
         var diagnosticDescriptor = new DiagnosticDescriptor(
             descriptor.Code,
             descriptor.Title,
-            descriptor.Format,
-            "",
+            descriptor.Message,
+            descriptor.Category,
             descriptor.Severity,
-            isEnabledByDefault: true,
-            description: descriptor.Message);
+            isEnabledByDefault: true);
         var diagnostic = Diagnostic.Create(diagnosticDescriptor, Location.None);
         AddDiagnostic(diagnostic);
     }

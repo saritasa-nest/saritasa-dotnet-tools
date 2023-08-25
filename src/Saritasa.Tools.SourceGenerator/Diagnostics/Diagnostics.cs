@@ -11,8 +11,8 @@ internal class Diagnostics
     /// Backing field convention mismatch warning.
     /// </summary>
     public static readonly WarningDescriptor BackingFieldConventionMismatch = new(
+        code: "ST01",
         title: "Backing field options mismatch.",
         message: "Backing field PascalCase naming convention cannot be used without underscore.",
-        code: "ST01",
-        format: string.Empty);
+        category: "Convention");
 }

@@ -13,8 +13,8 @@ internal class ErrorReporter : ReporterBase<ErrorDescriptor>
     {
         var diagnosticDescriptor = new DiagnosticDescriptor(
             descriptor.Code,
+            descriptor.Title,
             descriptor.Message,
-            descriptor.Format,
             "",
             descriptor.Severity,
             isEnabledByDefault: true,

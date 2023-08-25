@@ -8,6 +8,11 @@ namespace Saritasa.Tools.SourceGenerator.Abstractions.Diagnostics;
 public interface IDiagnosticDescriptor
 {
     /// <summary>
+    /// Diagnostic code.
+    /// </summary>
+    string Code { get; }
+
+    /// <summary>
     /// Diagnostic title.
     /// </summary>
     string Title { get; }
@@ -18,14 +23,9 @@ public interface IDiagnosticDescriptor
     string Message { get; }
 
     /// <summary>
-    /// Diagnostic code.
+    /// Diagnostic category.
     /// </summary>
-    string Code { get; }
-
-    /// <summary>
-    /// Message format.
-    /// </summary>
-    string Format { get; }
+    string Category { get; }
 
     /// <summary>
     /// Diagnostic severity.

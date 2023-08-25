@@ -9,16 +9,16 @@ namespace Saritasa.Tools.SourceGenerator.Models.Descriptors;
 public class ErrorDescriptor : IDiagnosticDescriptor
 {
     /// <inheritdoc/>
+    public string Code { get; }
+
+    /// <inheritdoc/>
     public string Title { get; }
 
     /// <inheritdoc/>
     public string Message { get; }
 
     /// <inheritdoc/>
-    public string Code { get; }
-
-    /// <inheritdoc/>
-    public string Format { get; }
+    public string Category { get; }
 
     /// <inheritdoc/>
     public DiagnosticSeverity Severity => DiagnosticSeverity.Error;
@@ -29,12 +29,12 @@ public class ErrorDescriptor : IDiagnosticDescriptor
     /// <param name="title">Error title.</param>
     /// <param name="message">Error message.</param>
     /// <param name="code">Error code.</param>
-    /// <param name="format">Error format.</param>
-    public ErrorDescriptor(string title, string message, string code, string format)
+    /// <param name="category">Error category.</param>
+    public ErrorDescriptor(string title, string message, string code, string category)
     {
         Title = title;
         Message = message;
         Code = code;
-        Format = format;
+        Category = category;
     }
 }
