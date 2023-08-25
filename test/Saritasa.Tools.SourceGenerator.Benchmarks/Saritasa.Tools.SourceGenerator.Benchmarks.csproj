@@ -11,4 +11,8 @@
     <ProjectReference Include="..\..\src\Saritasa.Tools.SourceGenerator\Saritasa.Tools.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EditorConfigFiles Remove="C:\Projects\SaritasaToolsFork\test\Saritasa.Tools.SourceGenerator.Benchmarks\.editorconfig" />
+  </ItemGroup>
+
 </Project>
