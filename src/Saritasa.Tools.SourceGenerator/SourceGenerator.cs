@@ -17,7 +17,7 @@ namespace Saritasa.Tools.SourceGenerator;
 
 /// <summary>
 /// Generate <b>partial class</b> for each class which implement <see cref="INotifyPropertyChanged"/> interface.
-/// <br/>Generator will create the <i>public property</i> for each <i>private field</i> which isn't ignored by <see cref="DoNotNotifyAttribute"/> attribute.
+/// <br/>Generator will create the <i>public property</i> for each <i>private field</i>.
 /// <br/>Generated <i>public property</i> will raise <see cref="INotifyPropertyChanged.PropertyChanged"/> event.
 /// </summary>
 [Generator(LanguageNames.CSharp)]
