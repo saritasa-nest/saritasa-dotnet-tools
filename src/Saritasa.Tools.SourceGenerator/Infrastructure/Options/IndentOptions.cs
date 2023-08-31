@@ -10,12 +10,12 @@ public class IndentOptions
     /// <summary>
     /// User indent style.
     /// </summary>
-    public IndentStyle IndentStyle { get; } = IndentStyle.Space;
+    public IndentStyle IndentStyle { get; } = OptionValues.DefaultIndentStyle;
 
     /// <summary>
     /// User indent size.
     /// </summary>
-    public int IndentSize { get; } = 4;
+    public int IndentSize { get; } = OptionValues.DefaultIndentSize;
 
     /// <summary>
     /// Constructor.
