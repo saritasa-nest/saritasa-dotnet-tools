@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace Saritasa.Tools.SourceGenerator.Benchmarks.Models;
+namespace Saritasa.Tools.SourceGenerator.Demo.Models;
 
 /// <summary>
 /// Editable model.

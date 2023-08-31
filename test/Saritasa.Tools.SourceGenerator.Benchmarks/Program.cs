@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
-using Saritasa.Tools.SourceGenerator.Benchmarks.Models;
+using Saritasa.Tools.SourceGenerator.Demo.Models;
 
-namespace Saritasa.Tools.SourceGenerator.Benchmark;
+namespace Saritasa.Tools.SourceGenerator.Demo;
 
 /// <summary>
 /// Application point of entry.

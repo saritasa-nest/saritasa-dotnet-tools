@@ -1,4 +1,4 @@
-﻿namespace Saritasa.Tools.SourceGenerator.Benchmarks.Models;
+﻿namespace Saritasa.Tools.SourceGenerator.Demo.Models;
 
 /// <summary>
 /// Employee model.

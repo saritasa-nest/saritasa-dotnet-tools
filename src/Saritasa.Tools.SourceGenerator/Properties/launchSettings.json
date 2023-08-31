@@ -2,7 +2,7 @@
   "profiles": {
     "Debug": {
       "commandName": "DebugRoslynComponent",
-      "targetProject": "..\\..\\test\\Saritasa.Tools.SourceGenerator.Benchmarks\\Saritasa.Tools.SourceGenerator.Benchmarks.csproj"
+      "targetProject": "..\\..\\test\\Saritasa.Tools.SourceGenerator.Benchmarks\\Saritasa.Tools.SourceGenerator.Demo.csproj"
     }
   }
 }
