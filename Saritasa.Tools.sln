@@ -39,7 +39,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saritasa.Cake.Tests", "test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saritasa.Tools.SourceGenerator", "src\Saritasa.Tools.SourceGenerator\Saritasa.Tools.SourceGenerator.csproj", "{39CF9888-B909-49D7-9A44-8A7B6177ECE0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saritasa.Tools.SourceGenerator.Demo", "test\Saritasa.Tools.SourceGenerator.Benchmarks\Saritasa.Tools.SourceGenerator.Demo.csproj", "{31FDE475-97E3-49C0-85BA-FD782061514B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saritasa.Tools.SourceGenerator.Demo", "test\Saritasa.Tools.SourceGenerator.Demo\Saritasa.Tools.SourceGenerator.Demo.csproj", "{31FDE475-97E3-49C0-85BA-FD782061514B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
