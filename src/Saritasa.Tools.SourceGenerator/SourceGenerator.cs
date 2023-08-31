@@ -19,6 +19,7 @@ namespace Saritasa.Tools.SourceGenerator;
 /// Generate <b>partial class</b> for each class which implement <see cref="INotifyPropertyChanged"/> interface.
 /// <br/>Generator will create the <i>public property</i> for each <i>private field</i>.
 /// <br/>Generated <i>public property</i> will raise <see cref="INotifyPropertyChanged.PropertyChanged"/> event.
+/// Be aware, the consumer project cannot access the source code of Roslyn Source Generator.
 /// </summary>
 [Generator(LanguageNames.CSharp)]
 internal class SourceGenerator : IIncrementalGenerator
