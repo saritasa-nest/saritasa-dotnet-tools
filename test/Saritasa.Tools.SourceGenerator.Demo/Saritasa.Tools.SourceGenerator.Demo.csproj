@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EditorConfigFiles Remove="C:\Projects\SaritasaToolsFork\test\Saritasa.Tools.SourceGenerator.Benchmarks\.editorconfig" />
+    <EditorConfigFiles Remove="..\Saritasa.Tools.SourceGenerator.Demo\.editorconfig" />
   </ItemGroup>
 
 </Project>
