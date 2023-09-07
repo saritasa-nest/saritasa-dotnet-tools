@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Debug": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "..\\..\\test\\Saritasa.Tools.PropertyChangedGenerator.Demo\\Saritasa.Tools.PropertyChangedGenerator.Demo.csproj"
+    }
+  }
+}
