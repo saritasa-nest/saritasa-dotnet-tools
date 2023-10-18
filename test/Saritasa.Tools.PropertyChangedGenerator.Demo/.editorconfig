@@ -1,0 +1,12 @@
+# Default settings:
+# A newline ending every file
+# Use 4 spaces as indentation
+[*]
+indent_style = space
+indent_size = 4
+
+# Source generator settings
+property_changed_backing_fields_convention = camelcase
+property_changed_backing_fields_underscore = false
+property_changed_raise_method_names = OnPropertyChanged,RaisePropertyChanged
+property_changing_raise_method_names = OnPropertyChanging,RaisePropertyChanging

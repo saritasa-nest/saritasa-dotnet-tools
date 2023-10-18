@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Saritasa.Tools.PropertyChangedGenerator</id>
+    <title>Saritasa.Tools.PropertyChangedGenerator</title>
+    <version>0.1.0</version>
+    <description>The package is a part of the Saritasa Tools project. Saritasa.Tools.PropertyChangedGenerator generates the code that automatically raise property changed and property changing events.</description>
+    <summary>Source generator for the property changed and property changing events.</summary>
+    <authors>Saritasa</authors>
+    <owners>Saritasa</owners>
+    <license type="file">LICENSE.txt</license>
+    <projectUrl>https://github.com/saritasa/saritasatools</projectUrl>
+    <icon>icon.png</icon>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <copyright>(c) Saritasa, 2023</copyright>
+    <tags>Generator PropertyChanged PropertyChanging Roslyn SourceGenerator CodeGenerator PropertyChangedGenerator PropertyChangingGenerator</tags>
+    <repository type="git" url="https://github.com/Saritasa/SaritasaTools"  commit="$(CommitHash)" />
+    <dependencies>
+      <group targetFramework="netstandard2.0" />
+    </dependencies>
+    <releaseNotes>Release notes are at https://github.com/Saritasa/SaritasaTools/blob/master/src/Saritasa.Tools.PropertyChangedGenerator/CHANGELOG.txt</releaseNotes>
+  </metadata>
+  <files>
+    <file src="bin\Release\**\Saritasa.Tools.PropertyChangedGenerator.dll" target="lib" />
+    <file src="bin\Release\**\Saritasa.Tools.PropertyChangedGenerator.pdb" target="lib" />
+    <file src="bin\Release\**\Saritasa.Tools.PropertyChangedGenerator.xml" target="lib" />
+    <file src="..\..\LICENSE.txt" target="LICENSE.txt" />
+    <file src="..\..\icon.png" target="icon.png" />
+  </files>
+</package>
