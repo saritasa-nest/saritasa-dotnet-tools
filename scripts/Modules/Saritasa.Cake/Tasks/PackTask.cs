@@ -43,6 +43,7 @@ public sealed class PackTask : FrostingTask<PackContext>
         "Saritasa.Tools.EntityFrameworkCore",
         "Saritasa.Tools.Emails",
         "Saritasa.Tools.Misc",
+        "Saritasa.Tools.PropertyChangedGenerator",
     };
 
     /// <inheritdoc />
