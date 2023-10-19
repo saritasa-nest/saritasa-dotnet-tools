@@ -33,16 +33,33 @@ Installation
 PM> Install-Package Saritasa.Tools.<PackageName>
 ```
 
-Commands
+Library upload preparation
+--------
+
+* Create `nuspec` template file. Add it into library folder.
+> See an example file [here](https://github.com/Saritasa/SaritasaTools/blob/master/src/Saritasa.Tools.Common/Saritasa.Tools.Common.nuspec.template).
+
+* Create `Changelog` & `Version` files. Add it into library folder.
+> See an example files: [CHANGELOG](https://github.com/Saritasa/SaritasaTools/blob/master/src/Saritasa.Tools.Common/CHANGELOG.txt) and [VERSION](https://github.com/Saritasa/SaritasaTools/blob/master/src/Saritasa.Tools.Common/VERSION.txt).
+
+* Configure `Cake` build task.
+> Go [here](https://github.com/Saritasa/SaritasaTools/blob/master/scripts/Modules/Saritasa.Cake/Tasks/PackTask.cs). Add your library folder into build task.
+
+* Create & Configure `AssemblyInfo.cs` file for your library.
+
+NuGet package upload
 --------
 
 * Build the library, test it, and prepare NuGet packages.
 
-    `./Saritasa.Cake.ps1 --target Pack` or `./Saritasa.Cake.ps1`
+    `./build.ps1`
+    > Read an output logs if something went wrong.
 
-* Clean project.
+* Watch an output `nupkg` files in the executable directory.
 
-    `./Saritasa.Cake.ps1 --target Clean`
+* Request [Saritasa](https://www.nuget.org/profiles/Saritasa) profile access.
+
+* [Upload](https://www.nuget.org/packages/manage/upload) NuGet package co authored with [Saritasa](https://www.nuget.org/profiles/Saritasa).
 
 Contributors
 ------------
