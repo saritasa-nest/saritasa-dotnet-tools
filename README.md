@@ -33,33 +33,34 @@ Installation
 PM> Install-Package Saritasa.Tools.<PackageName>
 ```
 
-Library upload preparation
---------
+Package Preparation
+------------
 
-* Create `nuspec` template file. Add it into library folder.
+**1.** Create `nuspec` template file. Add it into library folder.
 > See an example file [here](https://github.com/Saritasa/SaritasaTools/blob/master/src/Saritasa.Tools.Common/Saritasa.Tools.Common.nuspec.template).
 
-* Create `Changelog` & `Version` files. Add it into library folder.
+**2.** Create `CHANGELOG` & `VERSION` files. Add it into library folder.
 > See an example files: [CHANGELOG](https://github.com/Saritasa/SaritasaTools/blob/master/src/Saritasa.Tools.Common/CHANGELOG.txt) and [VERSION](https://github.com/Saritasa/SaritasaTools/blob/master/src/Saritasa.Tools.Common/VERSION.txt).
 
-* Configure `Cake` build task.
+**3.** Configure `Cake` build task.
 > Go [here](https://github.com/Saritasa/SaritasaTools/blob/master/scripts/Modules/Saritasa.Cake/Tasks/PackTask.cs). Add your library folder into build task.
 
-* Create & Configure `AssemblyInfo.cs` file for your library.
+**4.** Create & Configure `AssemblyInfo.cs` file for your library.
 
 NuGet package upload
 --------
 
-* Build the library, test it, and prepare NuGet packages.
+**1.** Build the library, test it, and prepare NuGet packages. 
 
-    `./build.ps1`
-    > Read an output logs if something went wrong.
+    ./build.ps1
+    
+> Read an output logs if something went wrong.
 
-* Watch an output `nupkg` files in the executable directory.
+**2.** Watch an output `nupkg` files in the executable directory.
 
-* Request [Saritasa](https://www.nuget.org/profiles/Saritasa) profile access.
+**3.** Request [Saritasa](https://www.nuget.org/profiles/Saritasa) profile access.
 
-* [Upload](https://www.nuget.org/packages/manage/upload) NuGet package co authored with [Saritasa](https://www.nuget.org/profiles/Saritasa).
+**4.** [Upload](https://www.nuget.org/packages/manage/upload) NuGet package co authored with [Saritasa](https://www.nuget.org/profiles/Saritasa).
 
 Contributors
 ------------
