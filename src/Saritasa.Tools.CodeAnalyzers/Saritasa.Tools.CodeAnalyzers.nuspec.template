@@ -5,7 +5,7 @@
     <title>Saritasa Tools Code Analyzers</title>
     <summary>C# code analyzers.</summary>
     <version>0.0.0</version>
-    <description>The package is a part of the Saritasa Tools project. Saritasa.Tools.CodeAnalyzers contains C sharp code analyzers to avoid specific warnings that mostly presents in development.</description>
+    <description>The package is a part of the Saritasa Tools project. Saritasa.Tools.CodeAnalyzers contains C# code analyzers to prevent specific issues that might occur during development.</description>
     <authors>Saritasa</authors>
     <owners>Saritasa</owners>
     <license type="file">LICENSE.txt</license>
@@ -15,7 +15,7 @@
     <developmentDependency>true</developmentDependency>
     <copyright>(c) Saritasa, 2016-2023</copyright>
     <tags>code analyzers</tags>
-    <repository type="git" url="https://github.com/Saritasa/SaritasaTools"  commit="$(CommitHash)" />
+    <repository type="git" url="https://github.com/Saritasa/SaritasaTools" commit="$(CommitHash)" />
     <releaseNotes>Release notes are at https://github.com/Saritasa/SaritasaTools/blob/master/src/Saritasa.Tools.CodeAnalyzers/CHANGELOG.txt</releaseNotes>
   </metadata>
   <files>
