@@ -19,8 +19,8 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers
         /// </summary>
         public const string DiagnosticId = "SaritasaToolsRequestHandlersAnalyzer";
 
-        private static readonly LocalizableString title = "Request handler does not have a return type.";
-        private static readonly LocalizableString messageFormat = "Request handler '{0}' does not have a return type.";
+        private static readonly LocalizableString title = "Request handler does not have a return type";
+        private static readonly LocalizableString messageFormat = "Request handler '{0}' does not have a return type";
         private static readonly LocalizableString description = "Request handler must have a return type. " +
                                                                 "Otherwise pipeline behavior won't work.";
 
