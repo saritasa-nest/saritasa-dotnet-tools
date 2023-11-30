@@ -29,7 +29,7 @@ public class TestRequestHandler : IRequestHandler<TestRequest>
 }
 ```
 
-### Code causing a warning
+### Code causing no warning
 
 ```csharp
 public class TestRequestHandler : IRequestHandler<TestRequest, int>
