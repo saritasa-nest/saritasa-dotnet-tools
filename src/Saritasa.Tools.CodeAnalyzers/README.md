@@ -17,7 +17,7 @@ Add a package as a reference.
 
 ### Request handlers analyzer
 
-The warning `STAN1000` will be triggered every time the request handler from the MeditR package does not have a return type.
+The warning `STAN1000` will be triggered every time the request handler from the MediatR package does not have a return type.
 
 ### Code causing a warning
 
