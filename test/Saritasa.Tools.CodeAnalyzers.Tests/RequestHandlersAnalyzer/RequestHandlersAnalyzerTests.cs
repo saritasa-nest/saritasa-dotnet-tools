@@ -3,87 +3,95 @@ using VerifyCS = Saritasa.Tools.CodeAnalyzers.Tests.Verifiers.CSharpCodeFixVerif
     Saritasa.Tools.CodeAnalyzers.Analyzers.RequestHandlersAnalyzer,
     Saritasa.Tools.CodeAnalyzers.CodeFixProviders.RequestHandlersCodeFixProvider>;
 
-namespace Saritasa.Tools.CodeAnalyzers.Tests.RequestHandlersAnalyzer
+namespace Saritasa.Tools.CodeAnalyzers.Tests.RequestHandlersAnalyzer;
+
+/// <summary>
+/// Request handlers analyzer tests.
+/// </summary>
+[TestClass]
+public class RequestHandlersAnalyzerTests
 {
     /// <summary>
-    /// Request handlers analyzer tests.
+    /// Request handler analyzer test.
     /// </summary>
-    [TestClass]
-    public class RequestHandlersAnalyzerTests
+    [TestMethod]
+    public async Task DiagnosticCode_ClassWithRequestHandlerWithoutReturnType_DiagnosticWarning()
     {
-        [TestMethod]
-        public async Task DiagnosticCode_ClassWithRequestHandlerWithoutReturnType_DiagnosticWarning()
-        {
-            var diagnosticArgument = "TestRequestHandler";
-            var sourceCode = $@"
-                    using System;
-                    using MediatR;
-                    using System.Threading;
-                    using System.Threading.Tasks;
+        var diagnosticArgument = "TestRequestHandler";
+        var sourceCode = $@"
+                using System;
+                using MediatR;
+                using System.Threading;
+                using System.Threading.Tasks;
 
-                    namespace TestApplication
+                namespace TestApplication
+                {{
+                    class TestRequest : IRequest {{ }}
+                    class {diagnosticArgument} : IRequestHandler<TestRequest>
                     {{
-                        class TestRequest : IRequest {{ }}
-                        class {diagnosticArgument} : IRequestHandler<TestRequest>
-                        {{
-                            public Task Handle(TestRequest request, CancellationToken cancellationToken)
-                                 => throw new NotImplementedException();
-                        }}
-                    }}";
+                        public Task Handle(TestRequest request, CancellationToken cancellationToken)
+                             => throw new NotImplementedException();
+                    }}
+                }}";
 
-            await new RequestHandlersAnalyzerTestsHelper
+        await new RequestHandlersAnalyzerTestsHelper
+        {
+            TestCode = sourceCode,
+            ExpectedDiagnostics =
             {
-                TestCode = sourceCode,
-                ExpectedDiagnostics =
+                VerifyCS.Diagnostic(Analyzers.RequestHandlersAnalyzer.DiagnosticId)
+                    .WithSeverity(Microsoft.CodeAnalysis.DiagnosticSeverity.Warning)
+                    .WithSpan(10, 31, 10, 49)
+                    .WithArguments(diagnosticArgument)
+            }
+        }.RunAsync();
+    }
+
+    /// <summary>
+    /// Request handler analyzer test.
+    /// </summary>
+    [TestMethod]
+    public async Task DiagnosticCode_ClassWithRequestHandlerAndReturnType_NoDiagnostic()
+    {
+        const string sourceCode = @"
+                using System;
+                using MediatR;
+                using System.Threading;
+                using System.Threading.Tasks;
+
+                namespace TestApplication
                 {
-                    VerifyCS.Diagnostic(Analyzers.RequestHandlersAnalyzer.DiagnosticId)
-                        .WithSeverity(Microsoft.CodeAnalysis.DiagnosticSeverity.Warning)
-                        .WithSpan(10, 31, 10, 49)
-                        .WithArguments(diagnosticArgument)
-                }
-            }.RunAsync();
-        }
-
-        [TestMethod]
-        public async Task DiagnosticCode_ClassWithRequestHandlerAndReturnType_NoDiagnostic()
-        {
-            const string sourceCode = @"
-                    using System;
-                    using MediatR;
-                    using System.Threading;
-                    using System.Threading.Tasks;
-
-                    namespace TestApplication
+                    class TestRequest : IRequest<int> { }
+                    class TestRequestHandler : IRequestHandler<TestRequest, int>
                     {
-                        class TestRequest : IRequest<int> { }
-                        class TestRequestHandler : IRequestHandler<TestRequest, int>
-                        {
-                            public Task<int> Handle(TestRequest request, CancellationToken cancellationToken)
-                                 => throw new NotImplementedException();
-                        }
-                    }";
+                        public Task<int> Handle(TestRequest request, CancellationToken cancellationToken)
+                             => throw new NotImplementedException();
+                    }
+                }";
 
-            await new RequestHandlersAnalyzerTestsHelper
-            {
-                TestCode = sourceCode
-            }.RunAsync();
-        }
-
-        [TestMethod]
-        public async Task DiagnosticCode_ClassWithoutRequestHandler_NoDiagnostic()
+        await new RequestHandlersAnalyzerTestsHelper
         {
-            const string sourceCode = @"
-                    namespace TestApplication
-                    {
-                        class TestClass
-                        {
-                        }
-                    }";
+            TestCode = sourceCode
+        }.RunAsync();
+    }
 
-            await new RequestHandlersAnalyzerTestsHelper
-            {
-                TestCode = sourceCode
-            }.RunAsync();
-        }
+    /// <summary>
+    /// Request handler analyzer test.
+    /// </summary>
+    [TestMethod]
+    public async Task DiagnosticCode_ClassWithoutRequestHandler_NoDiagnostic()
+    {
+        const string sourceCode = @"
+                namespace TestApplication
+                {
+                    class TestClass
+                    {
+                    }
+                }";
+
+        await new RequestHandlersAnalyzerTestsHelper
+        {
+            TestCode = sourceCode
+        }.RunAsync();
     }
 }
