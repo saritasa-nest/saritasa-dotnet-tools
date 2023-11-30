@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Saritasa.Tools.CodeAnalyzers</id>
+    <title>Saritasa Tools Code Analyzers</title>
+    <summary>C# code analyzers.</summary>
+    <version>0.0.0</version>
+    <description>The package is a part of the Saritasa Tools project. Saritasa.Tools.CodeAnalyzers contains C# code analyzers to prevent specific issues that might occur during development.</description>
+    <authors>Saritasa</authors>
+    <owners>Saritasa</owners>
+    <license type="file">LICENSE.txt</license>
+    <projectUrl>https://github.com/saritasa/saritasatools</projectUrl>
+    <icon>icon.png</icon>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <developmentDependency>true</developmentDependency>
+    <copyright>(c) Saritasa, 2016-2023</copyright>
+    <tags>code analyzers</tags>
+    <repository type="git" url="https://github.com/Saritasa/SaritasaTools" commit="$(CommitHash)" />
+    <releaseNotes>Release notes are at https://github.com/Saritasa/SaritasaTools/blob/master/src/Saritasa.Tools.CodeAnalyzers/CHANGELOG.txt</releaseNotes>
+  </metadata>
+  <files>
+    <file src="bin\Release\netstandard2.0\Saritasa.Tools.CodeAnalyzers.dll" target="analyzers/dotnet/cs" />
+    <file src="tools\*.ps1" target="tools\" />
+    <file src="..\..\LICENSE.txt" target="LICENSE.txt" />
+    <file src="..\..\icon.png" target="icon.png" />
+  </files>
+</package>

@@ -22,6 +22,7 @@ public sealed class CleanTask : FrostingTask<CommonContext>
         Path.Combine("src", "Saritasa.Tools.Misc"),
         Path.Combine("test", "Saritasa.Tools.Common.Tests"),
         Path.Combine("test", "Saritasa.Tools.Tests"),
+        Path.Combine("src", "Saritasa.Tools.CodeAnalyzers"),
     };
 
     /// <inheritdoc />
