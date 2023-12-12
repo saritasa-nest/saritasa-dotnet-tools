@@ -19,11 +19,14 @@
       <group targetFramework="netstandard2.0" />
     </dependencies>
     <releaseNotes>Release notes are at https://github.com/Saritasa/SaritasaTools/blob/master/src/Saritasa.Tools.PropertyChangedGenerator/CHANGELOG.txt</releaseNotes>
+    <developmentDependency>true</developmentDependency>
   </metadata>
   <files>
+    <file src="bin\Release\netstandard2.0\Saritasa.Tools.PropertyChangedGenerator.dll" target="analyzers/dotnet/cs" />
     <file src="bin\Release\**\Saritasa.Tools.PropertyChangedGenerator.dll" target="lib" />
     <file src="bin\Release\**\Saritasa.Tools.PropertyChangedGenerator.pdb" target="lib" />
     <file src="bin\Release\**\Saritasa.Tools.PropertyChangedGenerator.xml" target="lib" />
+    <file src="tools\*.ps1" target="tools\" />
     <file src="..\..\LICENSE.txt" target="LICENSE.txt" />
     <file src="..\..\icon.png" target="icon.png" />
   </files>
