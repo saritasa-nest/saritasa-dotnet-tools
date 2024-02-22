@@ -24,17 +24,6 @@ internal partial class Employee : EditableModel
     /// </summary>
     public string FullName => firstname + surname;
 
-    private string asd;
-
-    public string Asd
-    {
-        get => asd;
-        set
-        {
-            asd = value;
-        }
-    }
-
     /// <summary>
     /// Constructor.
     /// </summary>
