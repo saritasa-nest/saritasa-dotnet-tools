@@ -79,15 +79,6 @@ internal static class Constants
                                              public AccessibilityAttribute(Setter setter)
                                              {
                                              }
-
-                                             /// <summary>
-                                             /// Constructor.
-                                             /// </summary>
-                                             /// <param name="getter">Specifies getter accessibility.</param>
-                                             /// <param name="setter">Specifies setter accessibility.</param>
-                                             public AccessibilityAttribute(Getter getter, Setter setter)
-                                             {
-                                             }
                                          }
                                      }
                                      """;
