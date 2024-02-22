@@ -43,7 +43,7 @@ public class PropertyBuilder : ISyntaxBuilder<PropertyMetadata, FieldAnalysis>
             Modifier = analysis.Modifier,
         };
 
-        var setter = new SetterMetadata(fieldMetadata);
+        var setter = new SetterMetadata(fieldMetadata, analysis.SetterAccessibility);
 
         AddSetterDelegates(setter);
 
@@ -57,7 +57,7 @@ public class PropertyBuilder : ISyntaxBuilder<PropertyMetadata, FieldAnalysis>
         {
             Name = FieldUtils.GetPropertyName(analysis.Name, fieldOptions),
             Type = analysis.Type,
-            Getter = new GetterMetadata(fieldMetadata),
+            Getter = new GetterMetadata(fieldMetadata, analysis.GetterAccessibility),
             Setter = setter,
         };
     }
