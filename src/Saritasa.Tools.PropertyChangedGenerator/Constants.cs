@@ -90,7 +90,7 @@ internal static class Constants
                                     namespace Saritasa.Tools.PropertyChangedGenerator
                                     {
                                         /// <summary>
-                                        /// Specifies the accessibility of a generated property getter
+                                        /// Specifies the accessibility of a generated property getter.
                                         /// </summary>
                                         internal enum Getter
                                         {
@@ -103,7 +103,7 @@ internal static class Constants
                                         }
 
                                         /// <summary>
-                                        /// Specifies the accessibility of a generated property getter
+                                        /// Specifies the accessibility of a generated property setter.
                                         /// </summary>
                                         internal enum Setter
                                         {
