@@ -11,6 +11,7 @@ internal partial class Employee : EditableModel
     [AlsoNotify(nameof(FullName))]
     private string surname;
 
+    [Accessibility(Setter.Internal)]
     private int age;
 
     private DateTime employedAt;
@@ -22,6 +23,17 @@ internal partial class Employee : EditableModel
     /// Employee full name.
     /// </summary>
     public string FullName => firstname + surname;
+
+    private string asd;
+
+    public string Asd
+    {
+        get => asd;
+        set
+        {
+            asd = value;
+        }
+    }
 
     /// <summary>
     /// Constructor.
