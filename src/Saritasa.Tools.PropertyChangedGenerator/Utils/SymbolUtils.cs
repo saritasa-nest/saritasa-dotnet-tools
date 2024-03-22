@@ -10,6 +10,14 @@ internal static class SymbolUtils
     private static readonly Accessibility[] baseClassModifiers = [Accessibility.Public, Accessibility.Protected];
 
     /// <summary>
+    /// Gets a symbol containing namespace.
+    /// </summary>
+    /// <param name="symbol">Symbol.</param>
+    /// <returns>Containing namespace.</returns>
+    public static string GetNamespace(ISymbol symbol)
+        => symbol.ContainingNamespace.ToString();
+
+    /// <summary>
     /// Gets an access modifier.
     /// </summary>
     /// <param name="symbol">Symbol.</param>
@@ -50,6 +58,15 @@ internal static class SymbolUtils
     /// <returns>Attribute data.</returns>
     public static AttributeData GetAttribute(ISymbol symbol, string attributeName)
         => symbol.GetAttributes().First(attr => attr.AttributeClass?.Name == attributeName);
+
+    /// <summary>
+    /// Return an attributes.
+    /// </summary>
+    /// <param name="symbol">Symbol.</param>
+    /// <param name="attributeName">Attribute name.</param>
+    /// <returns>Attributes data.</returns>
+    public static IEnumerable<AttributeData> GetAttributes(ISymbol symbol, string attributeName)
+        => symbol.GetAttributes().Where(attr => attr.AttributeClass?.Name == attributeName);
 
     /// <summary>
     /// Find an event raise method.
