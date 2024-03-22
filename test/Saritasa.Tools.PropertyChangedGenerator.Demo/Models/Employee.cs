@@ -44,8 +44,6 @@ internal partial class Employee : EditableModel
         Surname = surname;
         Age = age;
 
-        Attribute attr = new RangeAttribute(0, 100);
-
         EmployedAt = DateTime.Now;
     }
 }
