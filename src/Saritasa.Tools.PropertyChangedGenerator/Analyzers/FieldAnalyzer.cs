@@ -36,7 +36,8 @@ public class FieldAnalyzer : ISyntaxAnalyzer<IFieldSymbol, FieldAnalysis>
             DoNotNotify = SymbolUtils.ContainsAttribute(symbol, attributeName: Constants.DoNotNotifyAttributeName),
         };
 
-        var containsAlsoNotify = SymbolUtils.ContainsAttribute(symbol, attributeName: Constants.AlsoNotifyAttributeName);
+        var containsAlsoNotify =
+            SymbolUtils.ContainsAttribute(symbol, attributeName: Constants.AlsoNotifyAttributeName);
         if (containsAlsoNotify)
         {
             var alsoNotify = SymbolUtils.GetAttribute(symbol, attributeName: Constants.AlsoNotifyAttributeName)!;
@@ -49,6 +50,34 @@ public class FieldAnalyzer : ISyntaxAnalyzer<IFieldSymbol, FieldAnalysis>
                 .SelectMany(GetArgumentValues)
                 .OfType<string>()
                 .Where(names.Contains);
+        }
+
+        var containsAccessibility =
+            SymbolUtils.ContainsAttribute(symbol, attributeName: Constants.AccessibilityAttributeName);
+        if (containsAccessibility)
+        {
+            var accessibility = SymbolUtils.GetAttribute(symbol, attributeName: Constants.AccessibilityAttributeName);
+
+            const string getterAttributeName = "Getter";
+            const string setterAttributeName = "Setter";
+
+            foreach (var constructorArgument in accessibility.ConstructorArguments)
+            {
+                if (constructorArgument.Value == null)
+                {
+                    continue;
+                }
+
+                switch (constructorArgument.Type?.Name)
+                {
+                    case getterAttributeName:
+                        analysis.GetterAccessibility = (Accessibility)constructorArgument.Value;
+                        break;
+                    case setterAttributeName:
+                        analysis.SetterAccessibility = (Accessibility)constructorArgument.Value;
+                        break;
+                }
+            }
         }
 
         return analysis;

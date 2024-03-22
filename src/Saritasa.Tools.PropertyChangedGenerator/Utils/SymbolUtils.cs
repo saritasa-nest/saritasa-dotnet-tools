@@ -7,11 +7,7 @@ namespace Saritasa.Tools.PropertyChangedGenerator.Utils;
 /// </summary>
 internal static class SymbolUtils
 {
-    private static readonly Accessibility[] BaseClassModifiers = new[]
-    {
-        Accessibility.Public,
-        Accessibility.Protected,
-    };
+    private static readonly Accessibility[] baseClassModifiers = [Accessibility.Public, Accessibility.Protected];
 
     /// <summary>
     /// Gets an access modifier.
@@ -114,7 +110,7 @@ internal static class SymbolUtils
         {
             foreach (var member in symbol.GetMembers())
             {
-                if (BaseClassModifiers.Contains(member.DeclaredAccessibility))
+                if (baseClassModifiers.Contains(member.DeclaredAccessibility))
                 {
                     yield return member;
                 }

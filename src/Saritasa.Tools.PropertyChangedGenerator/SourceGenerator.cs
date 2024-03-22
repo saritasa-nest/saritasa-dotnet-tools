@@ -27,6 +27,7 @@ internal class SourceGenerator : IIncrementalGenerator
     /// <inheritdoc/>
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
+        context.RegisterPostInitializationOutput(ctx => ctx.AddSource("Accessors", Constants.Accessors));
         context.RegisterPostInitializationOutput(ctx => ctx.AddSource("Attributes", Constants.Attributes));
 
         var options = context.AnalyzerConfigOptionsProvider.Select((opt, _) => opt);

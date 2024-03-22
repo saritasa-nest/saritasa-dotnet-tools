@@ -1,4 +1,6 @@
-﻿using Saritasa.Tools.PropertyChangedGenerator.Abstractions.Models;
+﻿using System.Text;
+using Microsoft.CodeAnalysis;
+using Saritasa.Tools.PropertyChangedGenerator.Abstractions.Models;
 using Saritasa.Tools.PropertyChangedGenerator.Infrastructure.Indent;
 
 namespace Saritasa.Tools.PropertyChangedGenerator.Models.Metadata;
@@ -9,6 +11,7 @@ namespace Saritasa.Tools.PropertyChangedGenerator.Models.Metadata;
 public class SetterMetadata : SyntaxMetadata
 {
     private readonly MemberMetadata backingField;
+    private readonly Accessibility? accessibility;
 
     /// <summary>
     /// On changed expressions.
@@ -24,15 +27,26 @@ public class SetterMetadata : SyntaxMetadata
     /// Constructor.
     /// </summary>
     /// <param name="backingField">Backing field.</param>
-    public SetterMetadata(MemberMetadata backingField)
+    /// <param name="accessibility">Setter accessibility. Optional.</param>
+    public SetterMetadata(MemberMetadata backingField, Accessibility? accessibility = null)
     {
         this.backingField = backingField;
+        this.accessibility = accessibility;
     }
 
     /// <inheritdoc/>
     public override string Build(IndentWriter writer)
     {
-        writer.Append("set");
+        var sb = new StringBuilder();
+
+        if (accessibility != null)
+        {
+            sb.Append($"{accessibility.Value} ".ToLower());
+        }
+
+        sb.Append("set");
+
+        writer.Append(sb.ToString());
         writer.AppendLine();
 
         writer.Append("{").AppendLine();
