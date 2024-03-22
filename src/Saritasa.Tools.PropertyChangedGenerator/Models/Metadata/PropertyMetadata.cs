@@ -1,5 +1,10 @@
-﻿using System.Text;
+﻿using System.CodeDom.Compiler;
+using System.Text;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Saritasa.Tools.PropertyChangedGenerator.Infrastructure.Indent;
+using Saritasa.Tools.PropertyChangedGenerator.Infrastructure.Options;
 
 namespace Saritasa.Tools.PropertyChangedGenerator.Models.Metadata;
 
@@ -19,6 +24,11 @@ public class PropertyMetadata : MemberMetadata
     public SetterMetadata? Setter { get; set; }
 
     /// <summary>
+    /// Property attributes.
+    /// </summary>
+    public IEnumerable<AttributeMetadata> Attributes { get; set; } = Enumerable.Empty<AttributeMetadata>();
+
+    /// <summary>
     /// Indicates if property is delegate.
     /// </summary>
     public bool IsDelegate { get; set; }
@@ -26,6 +36,13 @@ public class PropertyMetadata : MemberMetadata
     /// <inheritdoc/>
     public override string Build(IndentWriter writer)
     {
+        foreach (var attribute in Attributes)
+        {
+            attribute.Build(writer);
+
+            writer.AppendLine();
+        }
+
         var builder = new StringBuilder();
 
         builder.Append(Modifier);
@@ -45,6 +62,7 @@ public class PropertyMetadata : MemberMetadata
         builder.Append($" {Name}");
 
         var shouldBuildAccessors = Getter != null && Setter != null;
+
         if (!shouldBuildAccessors)
         {
             var property = builder.Append(";").ToString();
