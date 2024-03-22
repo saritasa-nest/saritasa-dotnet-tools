@@ -1,4 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Saritasa.Tools.PropertyChangedGenerator.Abstractions.Analyzers;
 using Saritasa.Tools.PropertyChangedGenerator.Abstractions.Diagnostics;
 using Saritasa.Tools.PropertyChangedGenerator.Models.Analyzers;
@@ -42,8 +44,8 @@ public class FieldAnalyzer : ISyntaxAnalyzer<IFieldSymbol, FieldAnalysis>
         {
             var alsoNotify = SymbolUtils.GetAttribute(symbol, attributeName: Constants.AlsoNotifyAttributeName)!;
 
-            var fieldNames = fields.Select(symbol => symbol.Name);
-            var propertyNames = properties.Select(symbol => symbol.Name);
+            var fieldNames = fields.Select(field => field.Name);
+            var propertyNames = properties.Select(field => field.Name);
             var names = fieldNames.Concat(propertyNames);
 
             analysis.AlsoNotifyMembers = alsoNotify.ConstructorArguments
@@ -77,6 +79,34 @@ public class FieldAnalyzer : ISyntaxAnalyzer<IFieldSymbol, FieldAnalysis>
                         analysis.SetterAccessibility = (Accessibility)constructorArgument.Value;
                         break;
                 }
+            }
+        }
+
+        var containsAttributes = SymbolUtils.ContainsAttribute(symbol, attributeName: Constants.PropertyAttributeName);
+        if (containsAttributes)
+        {
+            var attributes = SymbolUtils.GetAttributes(symbol, attributeName: Constants.PropertyAttributeName);
+
+            foreach (var attribute in attributes)
+            {
+                // This shouldn't happen, but let's keep it in mind.
+                if (attribute.AttributeClass is not { IsGenericType: true })
+                {
+                    continue;
+                }
+
+                if (attribute.ApplicationSyntaxReference?.GetSyntax() is not AttributeSyntax syntax)
+                {
+                    continue;
+                }
+
+                var genericAttribute = attribute.AttributeClass.TypeArguments[0];
+                var genericAttributeAnalysis = new AttributeAnalysis(
+                    @namespace: SymbolUtils.GetNamespace(genericAttribute),
+                    genericAttribute.Name,
+                    syntax.ArgumentList);
+
+                analysis.AddAttribute(genericAttributeAnalysis);
             }
         }
 
