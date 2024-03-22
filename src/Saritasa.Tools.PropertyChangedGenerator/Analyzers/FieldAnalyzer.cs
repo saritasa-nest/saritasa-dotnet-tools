@@ -56,8 +56,7 @@ public class FieldAnalyzer : ISyntaxAnalyzer<IFieldSymbol, FieldAnalysis>
             analysis.AlsoNotifyMembers = alsoNotify.ConstructorArguments
                 .SelectMany(GetArgumentValues)
                 .OfType<string>()
-                .Where(names.Contains)
-                .ToArray();
+                .Where(names.Contains);
         }
 
         var containsAccessibility =
