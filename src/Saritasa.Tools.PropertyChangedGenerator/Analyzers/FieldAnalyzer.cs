@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Saritasa.Tools.PropertyChangedGenerator.Abstractions.Analyzers;
 using Saritasa.Tools.PropertyChangedGenerator.Abstractions.Diagnostics;
+using Saritasa.Tools.PropertyChangedGenerator.Infrastructure.Options;
 using Saritasa.Tools.PropertyChangedGenerator.Models.Analyzers;
 using Saritasa.Tools.PropertyChangedGenerator.Utils;
 
@@ -15,16 +16,19 @@ public class FieldAnalyzer : ISyntaxAnalyzer<IFieldSymbol, FieldAnalysis>
 {
     private readonly IEnumerable<IFieldSymbol> fields;
     private readonly IEnumerable<IPropertySymbol> properties;
+    private readonly FieldOptions options;
 
     /// <summary>
     /// Constructor.
     /// </summary>
     /// <param name="fields">Field symbols.</param>
     /// <param name="properties">Property symbols.</param>
-    public FieldAnalyzer(IEnumerable<IFieldSymbol> fields, IEnumerable<IPropertySymbol> properties)
+    /// <param name="options">Field options.</param>
+    public FieldAnalyzer(IEnumerable<IFieldSymbol> fields, IEnumerable<IPropertySymbol> properties, FieldOptions options)
     {
         this.fields = fields;
         this.properties = properties;
+        this.options = options;
     }
 
     /// <inheritdoc/>
@@ -46,12 +50,14 @@ public class FieldAnalyzer : ISyntaxAnalyzer<IFieldSymbol, FieldAnalysis>
 
             var fieldNames = fields.Select(field => field.Name);
             var propertyNames = properties.Select(field => field.Name);
-            var names = fieldNames.Concat(propertyNames);
+            var fieldPropertyNames = fields.Select(field => FieldUtils.GetPropertyName(field.Name, options));
+            var names = fieldNames.Concat(propertyNames).Concat(fieldPropertyNames);
 
             analysis.AlsoNotifyMembers = alsoNotify.ConstructorArguments
                 .SelectMany(GetArgumentValues)
                 .OfType<string>()
-                .Where(names.Contains);
+                .Where(names.Contains)
+                .ToArray();
         }
 
         var containsAccessibility =
@@ -120,12 +126,14 @@ public class FieldAnalyzer : ISyntaxAnalyzer<IFieldSymbol, FieldAnalysis>
             yield return argument.Value;
         }
 
-        if (argument.Kind == TypedConstantKind.Array)
+        if (argument.Kind != TypedConstantKind.Array)
         {
-            foreach (var value in argument.Values)
-            {
-                yield return value.Value;
-            }
+            yield break;
+        }
+
+        foreach (var innerValue in argument.Values.SelectMany(GetArgumentValues))
+        {
+            yield return innerValue;
         }
     }
 }

@@ -56,7 +56,7 @@ public class ClassAnalyzer : ISyntaxAnalyzer<ITypeSymbol, ClassAnalysis>
         var properties = members.OfType<IPropertySymbol>();
 
         var fieldAnalysis = new List<FieldAnalysis>();
-        var fieldAnalyzer = new FieldAnalyzer(fields, properties);
+        var fieldAnalyzer = new FieldAnalyzer(fields, properties, optionsManager.FieldOptions);
         foreach (var field in fields)
         {
             var analysis = fieldAnalyzer.Analyze(field, semanticModel, scope);
