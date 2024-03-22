@@ -53,17 +53,17 @@ internal static class Constants
                 /// <param name="propertyNames">Also notify property names.</param>
                 public AlsoNotifyAttribute(params string[] propertyNames)
                 {
-                PropertyNames = propertyNames;
+                    PropertyNames = propertyNames;
                 }
-                }
+            }
 
-                /// <summary>
-                /// Specifies field accessibility.
-                /// </summary>
-                [global::System.AttributeUsage(global::System.AttributeTargets.Field, AllowMultiple = false, Inherited = false)]
-                [global::System.Diagnostics.Conditional("DEBUG")]
-                internal class AccessibilityAttribute : global::System.Attribute
-                {
+            /// <summary>
+            /// Specifies field accessibility.
+            /// </summary>
+            [global::System.AttributeUsage(global::System.AttributeTargets.Field, AllowMultiple = false, Inherited = false)]
+            [global::System.Diagnostics.Conditional("DEBUG")]
+            internal class AccessibilityAttribute : global::System.Attribute
+            {
                 /// <summary>
                 /// Constructor.
                 /// </summary>
