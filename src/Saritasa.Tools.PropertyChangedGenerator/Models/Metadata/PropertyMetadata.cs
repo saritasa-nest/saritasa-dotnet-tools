@@ -1,10 +1,5 @@
-﻿using System.CodeDom.Compiler;
-using System.Text;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using System.Text;
 using Saritasa.Tools.PropertyChangedGenerator.Infrastructure.Indent;
-using Saritasa.Tools.PropertyChangedGenerator.Infrastructure.Options;
 
 namespace Saritasa.Tools.PropertyChangedGenerator.Models.Metadata;
 
