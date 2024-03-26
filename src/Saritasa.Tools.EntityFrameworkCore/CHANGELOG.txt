@@ -1,4 +1,7 @@
-﻿7.0.0 [2023-07-10]
+﻿8.0.0 [2024-03-26]
+[*] Initial release of Saritasa.Tools.EntityFrameworkCore 8.0 package.
+
+7.0.0 [2023-07-10]
 [*] Initial release of Saritasa.Tools.EntityFrameworkCore 7.0 package.
 
 6.0.0 [2023-06-05]
