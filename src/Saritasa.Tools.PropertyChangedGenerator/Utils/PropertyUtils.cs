@@ -5,7 +5,7 @@ namespace Saritasa.Tools.PropertyChangedGenerator.Utils;
 /// <summary>
 /// Property utilities.
 /// </summary>
-internal class PropertyUtils
+internal static class PropertyUtils
 {
     /// <summary>
     /// Gets possible property field name.
