@@ -8,12 +8,12 @@ namespace Saritasa.Tools.PropertyChangedGenerator.Demo.Models;
 internal partial class Employee : EditableModel
 {
     [AlsoNotify(nameof(FullName), nameof(Surname))]
-    [Property<RequiredAttribute>]
-    [Property<MinLengthAttribute>(3)]
+    [property: Required]
+    [property: MinLength(3)]
     private string firstname;
 
     [AlsoNotify(nameof(FullName))]
-    [Property<RequiredAttribute>]
+    [property: Required]
     private string surname;
 
     [Accessibility(Setter.Internal)]
@@ -21,7 +21,7 @@ internal partial class Employee : EditableModel
     [property: Range(0, 100)]
     private int age;
 
-    [Property<RequiredAttribute>]
+    [property: Required]
     private DateTime employedAt;
 
     [DoNotNotify]
