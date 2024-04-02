@@ -17,8 +17,8 @@ internal partial class Employee : EditableModel
     private string surname;
 
     [Accessibility(Setter.Internal)]
-    [Property<RequiredAttribute>]
-    [Property<RangeAttribute>(0, 100)]
+    [property: Required]
+    [property: Range(0, 100)]
     private int age;
 
     [Property<RequiredAttribute>]

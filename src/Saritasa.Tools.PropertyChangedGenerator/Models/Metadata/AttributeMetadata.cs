@@ -1,4 +1,5 @@
 using System.Text;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Saritasa.Tools.PropertyChangedGenerator.Abstractions.Models;
 using Saritasa.Tools.PropertyChangedGenerator.Infrastructure.Indent;
 using Saritasa.Tools.PropertyChangedGenerator.Models.Analyzers;
@@ -27,13 +28,7 @@ public class AttributeMetadata : SyntaxMetadata
         var builder = new StringBuilder();
 
         builder.Append("[");
-        builder.Append($"{analysis.Namespace}.{analysis.Name}");
-
-        if (analysis.Arguments is not null)
-        {
-            builder.Append(analysis.Arguments);
-        }
-
+        builder.Append($"{analysis.ContainingNamespace}.{analysis.Syntax}");
         builder.Append("]");
 
         var attribute = builder.ToString();

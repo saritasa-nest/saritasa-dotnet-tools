@@ -10,7 +10,7 @@ public class SyntaxSymbolNode<TSymbol> : ISyntaxNode<TSymbol>
     where TSymbol : class, ISymbol
 {
     /// <inheritdoc/>
-    public TSymbol? Symbol { get; }
+    public TSymbol Symbol { get; }
 
     /// <inheritdoc/>
     public SemanticModel SemanticModel { get; }
@@ -22,7 +22,9 @@ public class SyntaxSymbolNode<TSymbol> : ISyntaxNode<TSymbol>
     /// <param name="cancellationToken">Cancellation token.</param>
     public SyntaxSymbolNode(GeneratorSyntaxContext context, CancellationToken cancellationToken = default)
     {
-        Symbol = context.SemanticModel.GetDeclaredSymbol(context.Node, cancellationToken) as TSymbol;
+        var symbol = context.SemanticModel.GetDeclaredSymbol(context.Node, cancellationToken) as TSymbol;
+
+        Symbol = symbol ?? throw new ArgumentNullException(nameof(symbol), "Unable to find a symbol.");
         SemanticModel = context.SemanticModel;
     }
 }
