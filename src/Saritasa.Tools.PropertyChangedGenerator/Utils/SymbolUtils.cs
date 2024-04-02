@@ -60,15 +60,6 @@ internal static class SymbolUtils
         => symbol.GetAttributes().First(attr => attr.AttributeClass?.Name == attributeName);
 
     /// <summary>
-    /// Return an attributes.
-    /// </summary>
-    /// <param name="symbol">Symbol.</param>
-    /// <param name="attributeName">Attribute name.</param>
-    /// <returns>Attributes data.</returns>
-    public static IEnumerable<AttributeData> GetAttributes(ISymbol symbol, string attributeName)
-        => symbol.GetAttributes().Where(attr => attr.AttributeClass?.Name == attributeName);
-
-    /// <summary>
     /// Find an event raise method.
     /// </summary>
     /// <param name="symbol">Event symbol.</param>
