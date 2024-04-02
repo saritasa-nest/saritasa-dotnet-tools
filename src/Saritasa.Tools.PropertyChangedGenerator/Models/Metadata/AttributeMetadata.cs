@@ -1,5 +1,4 @@
 using System.Text;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Saritasa.Tools.PropertyChangedGenerator.Abstractions.Models;
 using Saritasa.Tools.PropertyChangedGenerator.Infrastructure.Indent;
 using Saritasa.Tools.PropertyChangedGenerator.Models.Analyzers;
