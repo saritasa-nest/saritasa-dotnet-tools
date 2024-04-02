@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Saritasa.Tools.PropertyChangedGenerator.Models.Analyzers;
 
