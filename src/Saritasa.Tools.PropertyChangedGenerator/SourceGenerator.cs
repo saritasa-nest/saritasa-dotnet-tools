@@ -54,6 +54,11 @@ internal class SourceGenerator : IIncrementalGenerator
         var options = provider.Options.GetOptions(provider.Node.SemanticModel.SyntaxTree);
         var optionsManager = new OptionsManager(options, scope);
 
+        if (provider.Node.Symbol is null)
+        {
+            return (Analysis: ClassAnalysis.Instance, Scope: scope, Options: optionsManager);
+        }
+
         var analyzer = new ClassAnalyzer(optionsManager);
         var analysis = analyzer.Analyze(provider.Node.Symbol, provider.Node.SemanticModel, scope);
 
