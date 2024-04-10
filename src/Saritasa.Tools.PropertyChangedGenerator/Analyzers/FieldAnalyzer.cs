@@ -105,20 +105,21 @@ public class FieldAnalyzer : ISyntaxAnalyzer<IFieldSymbol, FieldAnalysis>
             {
                 var symbolInfo = semanticModel.GetSymbolInfo(attribute);
 
-                // Roslyn ignores attributes in an attribute list with an invalid target, so we can't get the AttributeData as usual.
-                // To reconstruct all necessary attribute info to generate the serialized model, we use the following steps:
-                //   - We try to get the attribute symbol from the semantic model, for the current attribute syntax. In case this is not
-                //     available (in theory it shouldn't, but it can be), we try to get it from the candidate symbols list for the node.
-                //     If there are no candidates or more than one, we just issue a diagnostic and stop processing the current attribute.
-                //     The returned symbols might be method symbols (constructor attribute) so in that case we can get the declaring type.
-                //   - We then go over each attribute argument expression and get the operation for it. This will still be available even
-                //     though the rest of the attribute is not validated nor bound at all. From the operation we can still retrieve all
-                //     constant values to build the AttributeInfo model. After all, attributes only support constant values, typeof(T)
-                //     expressions, or arrays of either these two types, or of other arrays with the same rules, recursively.
-                //   - From the syntax, we can also determine the identifier names for named attribute arguments, if any.
-                // There is no need to validate anything here: the attribute will be forwarded as is, and then Roslyn will validate on the
-                // generated property. Users will get the same validation they'd have had directly over the field. The only drawback is the
-                // lack of IntelliSense when constructing attributes over the field, but this is the best we can do from this end anyway.
+                /* Roslyn ignores attributes in an attribute list with an invalid target, so we can't get the AttributeData as usual.
+                   To reconstruct all necessary attribute info to generate the serialized model, we use the following steps:
+                     - We try to get the attribute symbol from the semantic model, for the current attribute syntax. In case this is not
+                       available (in theory it shouldn't, but it can be), we try to get it from the candidate symbols list for the node.
+                       If there are no candidates or more than one, we just issue a diagnostic and stop processing the current attribute.
+                       The returned symbols might be method symbols (constructor attribute) so in that case we can get the declaring type.
+                     - We then go over each attribute argument expression and get the operation for it. This will still be available even
+                       though the rest of the attribute is not validated nor bound at all. From the operation we can still retrieve all
+                       constant values to build the AttributeInfo model. After all, attributes only support constant values, typeof(T)
+                       expressions, or arrays of either these two types, or of other arrays with the same rules, recursively.
+                     - From the syntax, we can also determine the identifier names for named attribute arguments, if any.
+                   There is no need to validate anything here: the attribute will be forwarded as is, and then Roslyn will validate on the
+                   generated property. Users will get the same validation they'd have had directly over the field. The only drawback is the
+                   lack of IntelliSense when constructing attributes over the field, but this is the best we can do from this end anyway.
+                */
                 if (!symbolInfo.TryGetAttributeTypeSymbol(out var nameSymbol))
                 {
                     continue;
