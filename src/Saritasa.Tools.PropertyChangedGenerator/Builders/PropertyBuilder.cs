@@ -59,6 +59,7 @@ public class PropertyBuilder : ISyntaxBuilder<PropertyMetadata, FieldAnalysis>
             Type = analysis.Type,
             Getter = new GetterMetadata(fieldMetadata, analysis.GetterAccessibility),
             Setter = setter,
+            Attributes = analysis.Attributes.Select(attr => new AttributeMetadata(attr)),
         };
     }
 

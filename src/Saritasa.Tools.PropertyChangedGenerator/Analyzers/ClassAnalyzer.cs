@@ -49,14 +49,22 @@ public class ClassAnalyzer : ISyntaxAnalyzer<ITypeSymbol, ClassAnalysis>
         SemanticModel semanticModel,
         IDiagnosticsScope scope)
     {
-        var members = SymbolUtils.GetMembers(symbol);
+        // Possible multiple iterations through symbol members,
+        // so cast them to fixed arrays.
+        var members = SymbolUtils
+            .GetMembers(symbol)
+            .ToArray();
+
         var fields = members.OfType<IFieldSymbol>()
             .Where(field => field.CanBeReferencedByName)
-            .Where(field => FieldUtils.FollowConvention(field.Name, optionsManager.FieldOptions));
-        var properties = members.OfType<IPropertySymbol>();
+            .Where(field => FieldUtils.FollowConvention(field.Name, optionsManager.FieldOptions))
+            .ToArray();
+        var properties = members
+            .OfType<IPropertySymbol>()
+            .ToArray();
 
         var fieldAnalysis = new List<FieldAnalysis>();
-        var fieldAnalyzer = new FieldAnalyzer(fields, properties);
+        var fieldAnalyzer = new FieldAnalyzer(fields, properties, optionsManager.FieldOptions);
         foreach (var field in fields)
         {
             var analysis = fieldAnalyzer.Analyze(field, semanticModel, scope);

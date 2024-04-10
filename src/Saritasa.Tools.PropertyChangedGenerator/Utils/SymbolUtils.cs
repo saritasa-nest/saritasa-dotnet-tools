@@ -10,6 +10,14 @@ internal static class SymbolUtils
     private static readonly Accessibility[] baseClassModifiers = [Accessibility.Public, Accessibility.Protected];
 
     /// <summary>
+    /// Gets a symbol containing namespace.
+    /// </summary>
+    /// <param name="symbol">Symbol.</param>
+    /// <returns>Containing namespace.</returns>
+    public static string GetNamespace(ISymbol symbol)
+        => symbol.ContainingNamespace.ToString();
+
+    /// <summary>
     /// Gets an access modifier.
     /// </summary>
     /// <param name="symbol">Symbol.</param>
