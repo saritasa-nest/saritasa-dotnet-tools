@@ -14,7 +14,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <copyright>(c) Saritasa, 2016-2022</copyright>
     <tags>strings utils atomic pagination datetime security collections diff</tags>
-    <repository type="git" url="https://github.com/Saritasa/SaritasaTools" commit="$(CommitHash)" />
+    <repository type="git" url="https://github.com/saritasa-nest/saritasa-dotnet-tools" commit="$(CommitHash)" />
     <dependencies>
       <group targetFramework="netstandard1.6">
         <dependency id="System.Linq.Queryable" version="[4.3.0, )" exclude="Build,Analyzers" />
@@ -24,7 +24,7 @@
       <group targetFramework="netstandard2.1" />
       <group targetFramework="net60" />
     </dependencies>
-    <releaseNotes>Release notes are at https://github.com/Saritasa/SaritasaTools/blob/master/src/Saritasa.Tools.Common/CHANGELOG.txt</releaseNotes>
+    <releaseNotes>Release notes are at https://github.com/saritasa-nest/saritasa-dotnet-tools/blob/master/src/Saritasa.Tools.Common/CHANGELOG.txt</releaseNotes>
   </metadata>
   <files>
     <file src="bin\Release\**\Saritasa.Tools.Common.dll" target="lib" />

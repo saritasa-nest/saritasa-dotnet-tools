@@ -7,14 +7,14 @@
     <authors>Saritasa</authors>
     <owners>Saritasa</owners>
     <license type="file">LICENSE.txt</license>
-    <projectUrl>https://github.com/Saritasa/SaritasaTools</projectUrl>
+    <projectUrl>https://github.com/saritasa-nest/saritasa-dotnet-tools</projectUrl>
     <icon>icon.png</icon>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>The package is a part of the Saritasa Tools project. Saritasa.Tools.Misc contains miscellaneous items: passwords generation, passwords strength estimate.</description>
     <summary>Miscellaneous items.</summary>
     <copyright>(c) Saritasa, 2016-2023</copyright>
     <tags>misc passwords</tags>
-    <repository type="git" url="https://github.com/Saritasa/SaritasaTools" commit="$(CommitHash)" />
+    <repository type="git" url="https://github.com/saritasa-nest/saritasa-dotnet-tools" commit="$(CommitHash)" />
     <dependencies>
       <group targetFramework="net452" />
       <group targetFramework="netstandard1.2">

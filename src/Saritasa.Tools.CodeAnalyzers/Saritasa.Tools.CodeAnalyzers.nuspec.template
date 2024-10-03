@@ -15,8 +15,8 @@
     <developmentDependency>true</developmentDependency>
     <copyright>(c) Saritasa, 2016-2023</copyright>
     <tags>code analyzers</tags>
-    <repository type="git" url="https://github.com/Saritasa/SaritasaTools" commit="$(CommitHash)" />
-    <releaseNotes>Release notes are at https://github.com/Saritasa/SaritasaTools/blob/master/src/Saritasa.Tools.CodeAnalyzers/CHANGELOG.txt</releaseNotes>
+    <repository type="git" url="https://github.com/saritasa-nest/saritasa-dotnet-tools" commit="$(CommitHash)" />
+    <releaseNotes>Release notes are at https://github.com/saritasa-nest/saritasa-dotnet-tools/blob/master/src/Saritasa.Tools.CodeAnalyzers/CHANGELOG.txt</releaseNotes>
   </metadata>
   <files>
     <file src="bin\Release\netstandard2.0\Saritasa.Tools.CodeAnalyzers.dll" target="analyzers/dotnet/cs" />
