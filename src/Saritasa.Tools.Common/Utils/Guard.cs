@@ -13,6 +13,9 @@ namespace Saritasa.Tools.Common.Utils;
 /// </summary>
 public static class Guard
 {
+    /// <summary>
+    /// Regex options.
+    /// </summary>
     internal const RegexOptions Options = RegexOptions.Singleline | RegexOptions.Compiled;
 
     /// <summary>

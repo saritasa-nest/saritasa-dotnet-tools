@@ -41,6 +41,15 @@ public static class EFPagedListFactory
             await source.CountAsync(cancellationToken));
     }
 
+    /// <summary>
+    /// Calculates the offset for pagination based on the page number and page size.
+    /// </summary>
+    /// <param name="page">The current page number. Must be greater than or equal to the first page.</param>
+    /// <param name="pageSize">The size of each page. Must be greater than zero.</param>
+    /// <returns>The offset value, which is the starting index for the specified page.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when the <paramref name="page"/> is less than the first page, or when <paramref name="pageSize"/> is less than 1.
+    /// </exception>
     internal static int GetOffset(int page, int pageSize)
     {
         if (page < PagedList<object>.FirstPage)
