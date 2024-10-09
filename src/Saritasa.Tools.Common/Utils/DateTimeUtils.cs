@@ -277,7 +277,7 @@ public static partial class DateTimeUtils
                 return GetMonthDiff(target2, target1) / 12 * 10;
         }
 
-        throw new ArgumentException(nameof(period));
+        throw new ArgumentException("Unsupported period value.", nameof(period));
     }
 
     /// <summary>

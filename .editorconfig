@@ -20,6 +20,10 @@ indent_size = 2
 [*{_AssemblyInfo.cs,.notsupported.cs}]
 generated_code = true
 
+# Analyzers
+dotnet_analyzer_diagnostic.category-Security.severity = error
+dotnet_code_quality.ca1802.api_surface = private, internal
+
 # C# files
 [*.cs]
 # New line preferences
@@ -66,13 +70,14 @@ dotnet_naming_style.pascal_case_style.capitalization = pascal_case
 # Code style defaults
 csharp_using_directive_placement = outside_namespace:suggestion
 dotnet_sort_system_directives_first = true
-csharp_prefer_braces = true:silent
+csharp_prefer_braces = true:refactoring
 csharp_preserve_single_line_blocks = true:none
 csharp_preserve_single_line_statements = false:none
 csharp_prefer_static_local_function = true:suggestion
 csharp_prefer_simple_using_statement = false:none
 csharp_style_prefer_switch_expression = true:suggestion
 dotnet_style_readonly_field = true:suggestion
+dotnet_code_quality_unused_parameters = non_public:suggestion
 
 # Expression-level preferences
 dotnet_style_object_initializer = true:suggestion
@@ -84,19 +89,19 @@ dotnet_style_prefer_is_null_check_over_reference_equality_method = true:suggesti
 dotnet_style_prefer_inferred_tuple_names = true:suggestion
 dotnet_style_prefer_inferred_anonymous_type_member_names = true:suggestion
 dotnet_style_prefer_auto_properties = true:suggestion
-dotnet_style_prefer_conditional_expression_over_assignment = true:silent
-dotnet_style_prefer_conditional_expression_over_return = true:silent
+dotnet_style_prefer_conditional_expression_over_assignment = true:refactoring
+dotnet_style_prefer_conditional_expression_over_return = true:refactoring
 csharp_prefer_simple_default_expression = true:suggestion
 
 # Expression-bodied members
-csharp_style_expression_bodied_methods = true:silent
-csharp_style_expression_bodied_constructors = true:silent
-csharp_style_expression_bodied_operators = true:silent
-csharp_style_expression_bodied_properties = true:silent
-csharp_style_expression_bodied_indexers = true:silent
-csharp_style_expression_bodied_accessors = true:silent
-csharp_style_expression_bodied_lambdas = true:silent
-csharp_style_expression_bodied_local_functions = true:silent
+csharp_style_expression_bodied_methods = true:refactoring
+csharp_style_expression_bodied_constructors = true:refactoring
+csharp_style_expression_bodied_operators = true:refactoring
+csharp_style_expression_bodied_properties = true:refactoring
+csharp_style_expression_bodied_indexers = true:refactoring
+csharp_style_expression_bodied_accessors = true:refactoring
+csharp_style_expression_bodied_lambdas = true:refactoring
+csharp_style_expression_bodied_local_functions = true:refactoring
 
 # Pattern matching
 csharp_style_pattern_matching_over_is_with_cast_check = true:suggestion
@@ -112,6 +117,7 @@ csharp_style_prefer_index_operator = false:none
 csharp_style_prefer_range_operator = false:none
 csharp_style_pattern_local_over_anonymous_function = false:none
 csharp_style_namespace_declarations = file_scoped:warning
+csharp_style_prefer_primary_constructors = false:none
 
 # Space preferences
 csharp_space_after_cast = false
@@ -136,6 +142,13 @@ csharp_space_between_method_declaration_name_and_open_parenthesis = false
 csharp_space_between_method_declaration_parameter_list_parentheses = false
 csharp_space_between_parentheses = false
 csharp_space_between_square_brackets = false
+
+# CA2208: Instantiate argument exceptions correctly
+dotnet_diagnostic.CA2208.severity = error
+
+# Should await Tasks
+dotnet_diagnostic.CS4014.severity = error
+dotnet_diagnostic.LindhartAnalyserMissingAwaitWarning.severity = error
 
 # Xml project files
 [*.{csproj,vbproj,vcxproj,vcxproj.filters,proj,nativeproj,locproj}]
@@ -173,6 +186,7 @@ end_of_line = crlf
 
 # Code files
 [*.{cs,vb}]
+charset = utf-8-bom
 
 dotnet_diagnostic.CA1001.severity = warning
 dotnet_diagnostic.CA1009.severity = warning
@@ -191,10 +205,13 @@ dotnet_diagnostic.CA1404.severity = warning
 dotnet_diagnostic.CA1405.severity = warning
 dotnet_diagnostic.CA1410.severity = warning
 dotnet_diagnostic.CA1415.severity = warning
+dotnet_diagnostic.CA1727.severity = warning
 dotnet_diagnostic.CA1801.severity = warning
 dotnet_diagnostic.CA1804.severity = warning
 dotnet_diagnostic.CA1816.severity = warning
 dotnet_diagnostic.CA1821.severity = warning
+dotnet_diagnostic.CA1822.severity = none
+dotnet_diagnostic.CA1860.severity = none
 dotnet_diagnostic.CA1900.severity = warning
 dotnet_diagnostic.CA1901.severity = warning
 dotnet_diagnostic.CA2002.severity = warning
@@ -244,8 +261,14 @@ dotnet_diagnostic.CA2238.severity = warning
 dotnet_diagnostic.CA2240.severity = warning
 dotnet_diagnostic.CA2241.severity = warning
 dotnet_diagnostic.CA2242.severity = warning
+dotnet_diagnostic.CA2254.severity = warning
+dotnet_diagnostic.CA1859.severity = none
+dotnet_diagnostic.IDE0007.severity = none
 dotnet_diagnostic.IDE0036.severity = warning
 dotnet_diagnostic.IDE0049.severity = warning
+dotnet_diagnostic.IDE0090.severity = none
+dotnet_diagnostic.IDE0270.severity = none
+dotnet_diagnostic.IDE0305.severity = none
 dotnet_diagnostic.SA0001.severity = none
 dotnet_diagnostic.SA1000.severity = warning
 dotnet_diagnostic.SA1001.severity = warning
@@ -254,7 +277,7 @@ dotnet_diagnostic.SA1006.severity = warning
 dotnet_diagnostic.SA1007.severity = warning
 dotnet_diagnostic.SA1008.severity = warning
 dotnet_diagnostic.SA1009.severity = none
-dotnet_diagnostic.SA1010.severity = warning
+dotnet_diagnostic.SA1010.severity = none
 dotnet_diagnostic.SA1011.severity = warning
 dotnet_diagnostic.SA1012.severity = warning
 dotnet_diagnostic.SA1013.severity = warning
@@ -330,7 +353,7 @@ dotnet_diagnostic.SA1516.severity = warning
 dotnet_diagnostic.SA1517.severity = warning
 dotnet_diagnostic.SA1519.severity = warning
 dotnet_diagnostic.SA1520.severity = warning
-dotnet_diagnostic.SA1600.severity = none
+dotnet_diagnostic.SA1600.severity = warning
 dotnet_diagnostic.SA1601.severity = none
 dotnet_diagnostic.SA1602.severity = none
 dotnet_diagnostic.SA1604.severity = none
@@ -371,3 +394,4 @@ dotnet_diagnostic.SA1651.severity = none
 dotnet_diagnostic.SA1652.severity = none
 dotnet_diagnostic.SX1309.severity = none
 dotnet_diagnostic.SX1309S.severity = none
+dotnet_diagnostic.STAN1000.severity = warning

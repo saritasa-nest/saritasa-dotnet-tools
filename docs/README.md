@@ -1,1 +1,1 @@
-Please refer to project wiki: https://github.com/Saritasa/SaritasaTools/wiki
+Please refer to project wiki: https://github.com/saritasa-nest/saritasa-dotnet-tools/wiki

@@ -1,7 +1,7 @@
 Saritasa Tools
 ==============
 
-Infrastructure components and development tools for company projects. Read the latest documentation on [Wiki](https://github.com/Saritasa/SaritasaTools/wiki).
+Infrastructure components and development tools for company projects. Read the latest documentation on [Wiki](https://github.com/saritasa-nest/saritasa-dotnet-tools/wiki).
 
 Overview
 --------
@@ -36,13 +36,13 @@ Package Preparation
 ------------
 
 **1.** Create `nuspec` template file. Add it into library folder.
-> See an example file [here](https://github.com/Saritasa/SaritasaTools/blob/master/src/Saritasa.Tools.Common/Saritasa.Tools.Common.nuspec.template).
+> See an example file [here](https://github.com/saritasa-nest/saritasa-dotnet-tools/blob/master/src/Saritasa.Tools.Common/Saritasa.Tools.Common.nuspec.template).
 
 **2.** Create `CHANGELOG` & `VERSION` files. Add it into library folder.
-> See an example files: [CHANGELOG](https://github.com/Saritasa/SaritasaTools/blob/master/src/Saritasa.Tools.Common/CHANGELOG.txt) and [VERSION](https://github.com/Saritasa/SaritasaTools/blob/master/src/Saritasa.Tools.Common/VERSION.txt).
+> See an example files: [CHANGELOG](https://github.com/saritasa-nest/saritasa-dotnet-tools/blob/master/src/Saritasa.Tools.Common/CHANGELOG.txt) and [VERSION](https://github.com/saritasa-nest/saritasa-dotnet-tools/blob/master/src/Saritasa.Tools.Common/VERSION.txt).
 
 **3.** Configure `Cake` build task.
-> Go [here](https://github.com/Saritasa/SaritasaTools/blob/master/scripts/Modules/Saritasa.Cake/Tasks/PackTask.cs). Add your library folder into build task.
+> Go [here](https://github.com/saritasa-nest/saritasa-dotnet-tools/blob/master/scripts/Modules/Saritasa.Cake/Tasks/PackTask.cs). Add your library folder into build task.
 
 **4.** Create & Configure `AssemblyInfo.cs` file for your library.
 
