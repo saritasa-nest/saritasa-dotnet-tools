@@ -12,13 +12,12 @@
     <projectUrl>https://github.com/saritasa/saritasatools</projectUrl>
     <icon>icon.png</icon>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <copyright>(c) Saritasa, 2016-2023</copyright>
-    <tags>uow repository domain</tags>
+    <copyright>(c) Saritasa, 2016-2025</copyright>
+    <tags>domain localization validation exceptions</tags>
     <repository type="git" url="https://github.com/saritasa-nest/saritasa-dotnet-tools"  commit="$(CommitHash)" />
     <dependencies>
       <group targetFramework="netstandard2.1" />
       <group targetFramework="netstandard2.0" />
-      <group targetFramework="net452" />
     </dependencies>
     <releaseNotes>Release notes are at https://github.com/saritasa-nest/saritasa-dotnet-tools/blob/master/src/Saritasa.Tools.Domain/CHANGELOG.txt</releaseNotes>
   </metadata>
