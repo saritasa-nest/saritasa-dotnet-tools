@@ -1,8 +1,8 @@
 ﻿// Copyright (c) 2015-2024, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Runtime.Serialization;
+using Microsoft.Extensions.Localization;
 
 namespace Saritasa.Tools.Domain.Exceptions;
 
@@ -12,7 +12,7 @@ namespace Saritasa.Tools.Domain.Exceptions;
 /// It can be mapped to 500 HTTP status code.
 /// </summary>
 [Serializable]
-public class InfrastructureException : Exception
+public class InfrastructureException : LocalizableException
 {
     /// <summary>
     /// Optional description code for this exception.
@@ -86,6 +86,90 @@ public class InfrastructureException : Exception
     /// <param name="code">Optional description code for this exception.</param>
     public InfrastructureException(string message, Exception innerException, string code) :
         base(message, innerException)
+    {
+        this.Code = code;
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="message">The message that describes the error.</param>
+    public InfrastructureException(LocalizedString message) : base(message)
+    {
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="message">The message format that describes the error.</param>
+    /// <param name="args">Arguments for formatting.</param>
+    public InfrastructureException(LocalizedString message, params object[] args) : base(message, args)
+    {
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="code">Optional description code for this exception.</param>
+    /// <param name="message">The message format that describes the error.</param>
+    /// <param name="args">Arguments for formatting.</param>
+    public InfrastructureException(int code, LocalizedString message, params object[] args) : base(message, args)
+    {
+        this.Code = code.ToString();
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="code">Optional description code for this exception.</param>
+    /// <param name="message">The message format that describes the error.</param>
+    /// <param name="args">Arguments for formatting.</param>
+    public InfrastructureException(string code, LocalizedString message, params object[] args) : base(message, args)
+    {
+        this.Code = code;
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="innerException">The exception that is the cause of the current exception, or a
+    /// null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
+    /// <param name="message">The message format that describes the error.</param>
+    /// <param name="args">Arguments for formatting.</param>
+    public InfrastructureException(Exception innerException, LocalizedString message, params object[] args) : base(innerException, message, args)
+    {
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="innerException">The exception that is the cause of the current exception, or a
+    /// null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
+    /// <param name="code">Optional description code for this exception.</param>
+    /// <param name="message">The message format that describes the error.</param>
+    /// <param name="args">Arguments for formatting.</param>
+    public InfrastructureException(
+        Exception innerException,
+        int code,
+        LocalizedString message,
+        params object[] args) : base(innerException, message, args)
+    {
+        this.Code = code.ToString();
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="innerException">The exception that is the cause of the current exception, or a
+    /// null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
+    /// <param name="code">Optional description code for this exception.</param>
+    /// <param name="message">The message format that describes the error.</param>
+    /// <param name="args">Arguments for formatting.</param>
+    public InfrastructureException(
+        Exception innerException,
+        string code,
+        LocalizedString message,
+        params object[] args) : base(innerException, message, args)
     {
         this.Code = code;
     }

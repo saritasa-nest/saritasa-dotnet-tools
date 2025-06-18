@@ -1,10 +1,9 @@
 ﻿// Copyright (c) 2015-2024, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
+using Microsoft.Extensions.Localization;
+using Saritasa.Tools.Domain.Exceptions;
 
 namespace Saritasa.Tools.Domain;
 
@@ -13,6 +12,17 @@ namespace Saritasa.Tools.Domain;
 /// </summary>
 public static class ValidationErrorsFormatter
 {
+    private readonly struct DummyStringLocalizer : IStringLocalizer
+    {
+        public static IStringLocalizer Instance { get; } = default(DummyStringLocalizer);
+
+        public LocalizedString this[string name] => new(name, name);
+
+        public LocalizedString this[string name, params object[] arguments] => new(name, value: string.Format(name, arguments));
+
+        IEnumerable<LocalizedString> IStringLocalizer.GetAllStrings(bool includeParentCultures) => throw new NotImplementedException();
+    }
+
     /// <summary>
     /// Validation message formatter delegate that is used for error text formatting.
     /// </summary>
@@ -29,20 +39,34 @@ public static class ValidationErrorsFormatter
     /// <returns>Validation message.</returns>
     public static string SummaryOrDefaultMessageFormatter(string defaultMessage, ValidationErrors validationErrors)
     {
-        if (string.IsNullOrEmpty(defaultMessage))
-        {
-            throw new ArgumentNullException(nameof(defaultMessage));
-        }
-        if (validationErrors == null)
-        {
-            throw new ArgumentNullException(nameof(validationErrors));
-        }
+        var formatter = SummaryOrDefaultMessageFormatter(DummyStringLocalizer.Instance);
+        return formatter(defaultMessage, validationErrors);
+    }
 
-        if (validationErrors.ContainsKey(ValidationErrors.SummaryKey))
+    /// <summary>
+    /// Returns summary message if a specific key exists or defaults one.
+    /// </summary>
+    /// <param name="localizer">Localizer.</param>
+    public static ValidationErrorsMessageFormatter SummaryOrDefaultMessageFormatter(IStringLocalizer localizer)
+    {
+        return (defaultMessage, validationErrors) =>
         {
-            return validationErrors[ValidationErrors.SummaryKey].First();
-        }
-        return defaultMessage;
+            if (string.IsNullOrEmpty(defaultMessage))
+            {
+                throw new ArgumentNullException(nameof(defaultMessage));
+            }
+            if (validationErrors == null)
+            {
+                throw new ArgumentNullException(nameof(validationErrors));
+            }
+
+            if (validationErrors.ContainsKey(ValidationErrors.SummaryKey))
+            {
+                var formattedMessage = validationErrors[ValidationErrors.SummaryKey].First();
+                return localizer.Format(formattedMessage);
+            }
+            return defaultMessage;
+        };
     }
 
     /// <summary>
@@ -53,20 +77,34 @@ public static class ValidationErrorsFormatter
     /// <returns>Validation message.</returns>
     public static string FirstErrorOrDefaultMessageFormatter(string defaultMessage, ValidationErrors validationErrors)
     {
-        if (string.IsNullOrEmpty(defaultMessage))
-        {
-            throw new ArgumentNullException(nameof(defaultMessage));
-        }
-        if (validationErrors == null)
-        {
-            throw new ArgumentNullException(nameof(validationErrors));
-        }
+        var formatter = FirstErrorOrDefaultMessageFormatter(DummyStringLocalizer.Instance);
+        return formatter(defaultMessage, validationErrors);
+    }
 
-        if (validationErrors.Any())
+    /// <summary>
+    /// Returns the first available validation error. If no errors exist just return the default message.
+    /// </summary>
+    /// <param name="localizer">Localizer.</param>
+    public static ValidationErrorsMessageFormatter FirstErrorOrDefaultMessageFormatter(IStringLocalizer localizer)
+    {
+        return (defaultMessage, validationErrors) =>
         {
-            return validationErrors.First().Value.First();
-        }
-        return defaultMessage;
+            if (string.IsNullOrEmpty(defaultMessage))
+            {
+                throw new ArgumentNullException(nameof(defaultMessage));
+            }
+            if (validationErrors == null)
+            {
+                throw new ArgumentNullException(nameof(validationErrors));
+            }
+
+            if (validationErrors.Any())
+            {
+                var formattedMessage = validationErrors.First().Value.First();
+                return localizer.Format(formattedMessage);
+            }
+            return defaultMessage;
+        };
     }
 
     /// <summary>
@@ -80,33 +118,50 @@ public static class ValidationErrorsFormatter
     /// <returns>Validation message.</returns>
     public static string GroupErrorsOrDefaultMessageFormatter(string defaultMessage, ValidationErrors validationErrors)
     {
-        if (string.IsNullOrEmpty(defaultMessage))
-        {
-            throw new ArgumentNullException(nameof(defaultMessage));
-        }
-        if (validationErrors == null)
-        {
-            throw new ArgumentNullException(nameof(validationErrors));
-        }
+        var formatter = GroupErrorsOrDefaultMessageFormatter(DummyStringLocalizer.Instance);
+        return formatter(defaultMessage, validationErrors);
+    }
 
-        const string separator = " ";
-        if (validationErrors.Any())
+    /// <summary>
+    /// Group messages by fields. Example:
+    /// Summary message.
+    /// - Field1: Validation message 1. Validation message 2.
+    /// - Field2: Validation message.
+    /// </summary>
+    /// <param name="localizer">Localizer.</param>
+    public static ValidationErrorsMessageFormatter GroupErrorsOrDefaultMessageFormatter(IStringLocalizer localizer)
+    {
+        return (defaultMessage, validationErrors) =>
         {
-            var sb = new StringBuilder(validationErrors.Count * 55);
-            foreach (KeyValuePair<string, ICollection<string>> errorMember in validationErrors.OrderBy(e => e.Key))
+            if (string.IsNullOrEmpty(defaultMessage))
             {
-                if (errorMember.Key.Equals(ValidationErrors.SummaryKey))
-                {
-                    sb.AppendLine(string.Join(separator, errorMember.Value));
-                }
-                else
-                {
-                    sb.AppendLine($"- {errorMember.Key}: {string.Join(separator, errorMember.Value)}");
-                }
+                throw new ArgumentNullException(nameof(defaultMessage));
             }
-            return sb.ToString();
-        }
-        return defaultMessage;
+            if (validationErrors == null)
+            {
+                throw new ArgumentNullException(nameof(validationErrors));
+            }
+
+            const string separator = " ";
+            if (validationErrors.Any())
+            {
+                var sb = new StringBuilder(validationErrors.Count * 55);
+                foreach (KeyValuePair<string, ICollection<FormattedString>> errorMember in validationErrors.OrderBy(e => e.Key))
+                {
+                    var formatted = string.Join(separator, errorMember.Value.Select(localizer.Format));
+                    if (errorMember.Key.Equals(ValidationErrors.SummaryKey))
+                    {
+                        sb.AppendLine(formatted);
+                    }
+                    else
+                    {
+                        sb.AppendLine($"- {errorMember.Key}: {formatted}");
+                    }
+                }
+                return sb.ToString();
+            }
+            return defaultMessage;
+        };
     }
 
     /// <summary>
@@ -132,7 +187,7 @@ public static class ValidationErrorsFormatter
         if (validationErrors.Any())
         {
             var sb = new StringBuilder(validationErrors.Count * 55);
-            foreach (KeyValuePair<string, ICollection<string>> errorMember in validationErrors)
+            foreach (KeyValuePair<string, ICollection<FormattedString>> errorMember in validationErrors)
             {
                 sb.AppendLine(errorMember.Key);
             }

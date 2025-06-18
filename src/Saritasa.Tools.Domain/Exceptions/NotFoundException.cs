@@ -1,8 +1,8 @@
 ﻿// Copyright (c) 2015-2024, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Runtime.Serialization;
+using Microsoft.Extensions.Localization;
 
 namespace Saritasa.Tools.Domain.Exceptions;
 
@@ -85,6 +85,86 @@ public class NotFoundException : DomainException
     /// <param name="code">Optional description code for this exception.</param>
     public NotFoundException(string message, Exception innerException, string code) :
         base(message, innerException, code)
+    {
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="message">The message that describes the error.</param>
+    public NotFoundException(LocalizedString message) : base(message)
+    {
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="message">The message format that describes the error.</param>
+    /// <param name="args">Arguments for formatting.</param>
+    public NotFoundException(LocalizedString message, params object[] args) : base(message, args)
+    {
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="code">Optional description code for this exception.</param>
+    /// <param name="message">The message format that describes the error.</param>
+    /// <param name="args">Arguments for formatting.</param>
+    public NotFoundException(int code, LocalizedString message, params object[] args) : base(code, message, args)
+    {
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="code">Optional description code for this exception.</param>
+    /// <param name="message">The message format that describes the error.</param>
+    /// <param name="args">Arguments for formatting.</param>
+    public NotFoundException(string code, LocalizedString message, params object[] args) : base(code, message, args)
+    {
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="innerException">The exception that is the cause of the current exception, or a
+    /// null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
+    /// <param name="message">The message format that describes the error.</param>
+    /// <param name="args">Arguments for formatting.</param>
+    public NotFoundException(Exception innerException, LocalizedString message, params object[] args) : base(innerException, message, args)
+    {
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="innerException">The exception that is the cause of the current exception, or a
+    /// null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
+    /// <param name="code">Optional description code for this exception.</param>
+    /// <param name="message">The message format that describes the error.</param>
+    /// <param name="args">Arguments for formatting.</param>
+    public NotFoundException(
+        Exception innerException,
+        int code,
+        LocalizedString message,
+        params object[] args) : base(innerException, code, message, args)
+    {
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="innerException">The exception that is the cause of the current exception, or a
+    /// null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
+    /// <param name="code">Optional description code for this exception.</param>
+    /// <param name="message">The message format that describes the error.</param>
+    /// <param name="args">Arguments for formatting.</param>
+    public NotFoundException(
+        Exception innerException,
+        string code,
+        LocalizedString message,
+        params object[] args) : base(innerException, code, message, args)
     {
     }
 

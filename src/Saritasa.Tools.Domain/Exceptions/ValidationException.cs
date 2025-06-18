@@ -1,10 +1,8 @@
 ﻿// Copyright (c) 2015-2024, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
+using Microsoft.Extensions.Localization;
 
 namespace Saritasa.Tools.Domain.Exceptions;
 
@@ -15,7 +13,7 @@ namespace Saritasa.Tools.Domain.Exceptions;
 public class ValidationException : DomainException
 {
     /// <summary>
-    /// Validation message formatter. <see cref="ValidationErrorsFormatter.SummaryOrDefaultMessageFormatter" /> by default.
+    /// Validation message formatter. <see cref="ValidationErrorsFormatter.SummaryOrDefaultMessageFormatter(string, ValidationErrors)" /> by default.
     /// </summary>
     public static ValidationErrorsFormatter.ValidationErrorsMessageFormatter MessageFormatter { get; set; } =
         ValidationErrorsFormatter.SummaryOrDefaultMessageFormatter;
@@ -121,7 +119,7 @@ public class ValidationException : DomainException
 
         foreach (var error in errors)
         {
-            this.Errors[error.Key] = new[] { error.Value };
+            this.Errors[error.Key] = [error.Value];
         }
     }
 
@@ -156,6 +154,54 @@ public class ValidationException : DomainException
     }
 
     /// <summary>
+    /// Constructor with dictionary contains member field as key and error message as value.
+    /// </summary>
+    /// <param name="errors">Member error dictionary.</param>
+    public ValidationException(IDictionary<string, FormattedString> errors) :
+        base(DomainErrorDescriber.Default.ValidationErrors())
+    {
+        if (errors == null)
+        {
+            throw new ArgumentNullException(nameof(errors));
+        }
+
+        foreach (var error in errors)
+        {
+            this.Errors[error.Key] = [error.Value];
+        }
+    }
+
+    /// <summary>
+    /// Constructor with dictionary contains member field as key and error messages as value.
+    /// </summary>
+    /// <param name="errors">Member errors dictionary.</param>
+    public ValidationException(IDictionary<string, ICollection<FormattedString>> errors) :
+        base(DomainErrorDescriber.Default.ValidationErrors())
+    {
+        if (errors == null)
+        {
+            throw new ArgumentNullException(nameof(errors));
+        }
+
+        this.Errors.Merge(errors);
+    }
+
+    /// <summary>
+    /// Constructor with dictionary contains member field as key and error messages as value.
+    /// </summary>
+    /// <param name="errors">Member errors dictionary.</param>
+    public ValidationException(IDictionary<string, IEnumerable<FormattedString>> errors) :
+        base(DomainErrorDescriber.Default.ValidationErrors())
+    {
+        if (errors == null)
+        {
+            throw new ArgumentNullException(nameof(errors));
+        }
+
+        this.Errors.Merge(errors.ToDictionary(k => k.Key, v => (ICollection<FormattedString>)v.Value));
+    }
+
+    /// <summary>
     /// Constructor for deserialization.
     /// </summary>
     /// <param name="info">Stores all the data needed to serialize or deserialize an object.</param>
@@ -168,10 +214,12 @@ public class ValidationException : DomainException
         if (!string.IsNullOrEmpty(xml))
         {
             var xelement = System.Xml.Linq.XElement.Parse(xml);
-            var errorsElements = xelement.Descendants("error").ToDictionary(
-                x => (string) x.Attribute("id"),
-                x => x.Elements("msg").Select(e => e.Value).ToList()
-            );
+            var errorsElements = xelement
+                .Descendants("error")
+                .ToDictionary(
+                    x => (string) x.Attribute("id"),
+                    x => x.Elements("msg").Select(e => new FormattedString(e.Value)).ToList());
+
             foreach (var error in errorsElements)
             {
                 Errors.Add(error.Key, error.Value);
@@ -193,6 +241,13 @@ public class ValidationException : DomainException
             );
             info.AddValue("errors", xelement.ToString(System.Xml.Linq.SaveOptions.DisableFormatting));
         }
+    }
+
+    /// <inheritdoc />
+    public override string GetLocalizedMessage(IStringLocalizer localizer)
+    {
+        var message = base.GetLocalizedMessage(localizer);
+        return MessageFormatter(message, Errors);
     }
 
     /// <summary>
