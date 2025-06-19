@@ -3,7 +3,7 @@
 
 using System.Text;
 using Microsoft.Extensions.Localization;
-using Saritasa.Tools.Domain.Exceptions;
+using Saritasa.Tools.Domain.Localization;
 
 namespace Saritasa.Tools.Domain;
 
@@ -12,6 +12,15 @@ namespace Saritasa.Tools.Domain;
 /// </summary>
 public static class ValidationErrorsFormatter
 {
+    private readonly struct DummyStringLocalizerFactory : IStringLocalizerFactory
+    {
+        public static IStringLocalizerFactory Instance { get; } = default(DummyStringLocalizerFactory);
+
+        public IStringLocalizer Create(Type resourceSource) => DummyStringLocalizer.Instance;
+
+        public IStringLocalizer Create(string baseName, string location) => DummyStringLocalizer.Instance;
+    }
+
     private readonly struct DummyStringLocalizer : IStringLocalizer
     {
         public static IStringLocalizer Instance { get; } = default(DummyStringLocalizer);
@@ -39,7 +48,7 @@ public static class ValidationErrorsFormatter
     /// <returns>Validation message.</returns>
     public static string SummaryOrDefaultMessageFormatter(string defaultMessage, ValidationErrors validationErrors)
     {
-        var formatter = SummaryOrDefaultMessageFormatter(DummyStringLocalizer.Instance);
+        var formatter = SummaryOrDefaultMessageFormatter(DummyStringLocalizerFactory.Instance);
         return formatter(defaultMessage, validationErrors);
     }
 
@@ -47,7 +56,7 @@ public static class ValidationErrorsFormatter
     /// Returns summary message if a specific key exists or defaults one.
     /// </summary>
     /// <param name="localizer">Localizer.</param>
-    public static ValidationErrorsMessageFormatter SummaryOrDefaultMessageFormatter(IStringLocalizer localizer)
+    public static ValidationErrorsMessageFormatter SummaryOrDefaultMessageFormatter(IStringLocalizerFactory localizer)
     {
         return (defaultMessage, validationErrors) =>
         {
@@ -77,7 +86,7 @@ public static class ValidationErrorsFormatter
     /// <returns>Validation message.</returns>
     public static string FirstErrorOrDefaultMessageFormatter(string defaultMessage, ValidationErrors validationErrors)
     {
-        var formatter = FirstErrorOrDefaultMessageFormatter(DummyStringLocalizer.Instance);
+        var formatter = FirstErrorOrDefaultMessageFormatter(DummyStringLocalizerFactory.Instance);
         return formatter(defaultMessage, validationErrors);
     }
 
@@ -85,7 +94,7 @@ public static class ValidationErrorsFormatter
     /// Returns the first available validation error. If no errors exist just return the default message.
     /// </summary>
     /// <param name="localizer">Localizer.</param>
-    public static ValidationErrorsMessageFormatter FirstErrorOrDefaultMessageFormatter(IStringLocalizer localizer)
+    public static ValidationErrorsMessageFormatter FirstErrorOrDefaultMessageFormatter(IStringLocalizerFactory localizer)
     {
         return (defaultMessage, validationErrors) =>
         {
@@ -118,7 +127,7 @@ public static class ValidationErrorsFormatter
     /// <returns>Validation message.</returns>
     public static string GroupErrorsOrDefaultMessageFormatter(string defaultMessage, ValidationErrors validationErrors)
     {
-        var formatter = GroupErrorsOrDefaultMessageFormatter(DummyStringLocalizer.Instance);
+        var formatter = GroupErrorsOrDefaultMessageFormatter(DummyStringLocalizerFactory.Instance);
         return formatter(defaultMessage, validationErrors);
     }
 
@@ -129,7 +138,7 @@ public static class ValidationErrorsFormatter
     /// - Field2: Validation message.
     /// </summary>
     /// <param name="localizer">Localizer.</param>
-    public static ValidationErrorsMessageFormatter GroupErrorsOrDefaultMessageFormatter(IStringLocalizer localizer)
+    public static ValidationErrorsMessageFormatter GroupErrorsOrDefaultMessageFormatter(IStringLocalizerFactory localizer)
     {
         return (defaultMessage, validationErrors) =>
         {

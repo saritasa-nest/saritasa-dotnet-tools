@@ -2,7 +2,7 @@
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System.Diagnostics;
-using Saritasa.Tools.Domain.Exceptions;
+using Saritasa.Tools.Domain.Localization;
 
 namespace Saritasa.Tools.Domain;
 

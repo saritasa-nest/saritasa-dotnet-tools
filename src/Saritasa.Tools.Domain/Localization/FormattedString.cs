@@ -1,30 +1,39 @@
 ﻿using Microsoft.Extensions.Localization;
 
-namespace Saritasa.Tools.Domain.Exceptions;
+namespace Saritasa.Tools.Domain.Localization;
 
 /// <summary>
 /// Formatted string.
 /// </summary>
-/// <param name="Format">Localized format.</param>
-/// <param name="Arguments">Arguments.</param>
-public record struct FormattedString(
-    LocalizedString Format,
-    params object[]? Arguments)
+public class FormattedString
 {
+    public LocalizedString Format { get; }
+
+    public Type? ResourceType { get; }
+
+    public object[]? Arguments { get; }
+
     /// <summary>
     /// Constructor.
     /// </summary>
     /// <param name="value">Literal value.</param>
-    public FormattedString(string value) : this(new LocalizedString(value, value))
+    public FormattedString(string value)
     {
+        Format = new(value, value, resourceNotFound: true);
     }
 
     /// <summary>
     /// Constructor.
     /// </summary>
     /// <param name="format">Literal localized value.</param>
-    public FormattedString(LocalizedString format) : this(format, null)
+    protected FormattedString(
+        Type resourceType,
+        LocalizedString format,
+        object[] args)
     {
+        ResourceType = resourceType;
+        Format = format;
+        Arguments = args;
     }
 
     /// <summary>
@@ -34,5 +43,11 @@ public record struct FormattedString(
     public static implicit operator FormattedString(string value) => new FormattedString(value);
 
     /// <inheritdoc />
-    public override readonly string ToString() => string.Format(Format, Arguments);
+    public override string ToString() => string.Format(Format, Arguments);
+}
+
+internal class FormattedString<T>(LocalizedString format, object[] args) :
+    FormattedString(type, format, args)
+{
+    private static readonly Type type = typeof(T);
 }

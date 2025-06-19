@@ -3,6 +3,7 @@
 
 using System.Runtime.Serialization;
 using Microsoft.Extensions.Localization;
+using Saritasa.Tools.Domain.Localization;
 
 namespace Saritasa.Tools.Domain.Exceptions;
 
@@ -53,12 +54,30 @@ public class ValidationException : DomainException
     {
     }
 
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="message">The message that describes the error.</param>
+    public ValidationException(FormattedString message) : base(message)
+    {
+    }
+
     /// <summary>
     /// Constructor.
     /// </summary>
     /// <param name="message">The message that describes the error.</param>
     /// <param name="code">Optional description code for this exception.</param>
     public ValidationException(string message, int code) : base(message, code)
+    {
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="message">The message that describes the error.</param>
+    /// <param name="code">Optional description code for this exception.</param>
+    public ValidationException(FormattedString message, int code) : base(message, code)
     {
     }
 
@@ -75,9 +94,28 @@ public class ValidationException : DomainException
     /// Constructor.
     /// </summary>
     /// <param name="message">The message that describes the error.</param>
+    /// <param name="code">Optional description code for this exception.</param>
+    public ValidationException(FormattedString message, string code) : base(message, code)
+    {
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="message">The message that describes the error.</param>
     /// <param name="innerException">The exception that is the cause of the current exception, or a
     /// null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
     public ValidationException(string message, Exception innerException) : base(message, innerException)
+    {
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="message">The message that describes the error.</param>
+    /// <param name="innerException">The exception that is the cause of the current exception, or a
+    /// null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
+    public ValidationException(FormattedString message, Exception innerException) : base(message, innerException)
     {
     }
 
@@ -100,7 +138,31 @@ public class ValidationException : DomainException
     /// <param name="innerException">The exception that is the cause of the current exception, or a
     /// null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
     /// <param name="code">Optional description code for this exception.</param>
+    public ValidationException(FormattedString message, Exception innerException, int code) :
+        base(message, innerException, code)
+    {
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="message">The message that describes the error.</param>
+    /// <param name="innerException">The exception that is the cause of the current exception, or a
+    /// null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
+    /// <param name="code">Optional description code for this exception.</param>
     public ValidationException(string message, Exception innerException, string code) :
+        base(message, innerException, code)
+    {
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="message">The message that describes the error.</param>
+    /// <param name="innerException">The exception that is the cause of the current exception, or a
+    /// null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
+    /// <param name="code">Optional description code for this exception.</param>
+    public ValidationException(FormattedString message, Exception innerException, string code) :
         base(message, innerException, code)
     {
     }
@@ -110,6 +172,24 @@ public class ValidationException : DomainException
     /// </summary>
     /// <param name="errors">Member error dictionary.</param>
     public ValidationException(IDictionary<string, string> errors) :
+        base(DomainErrorDescriber.Default.ValidationErrors())
+    {
+        if (errors == null)
+        {
+            throw new ArgumentNullException(nameof(errors));
+        }
+
+        foreach (var error in errors)
+        {
+            this.Errors[error.Key] = [error.Value];
+        }
+    }
+
+    /// <summary>
+    /// Constructor with dictionary contains member field as key and error message as value.
+    /// </summary>
+    /// <param name="errors">Member error dictionary.</param>
+    public ValidationException(IDictionary<string, FormattedString> errors) :
         base(DomainErrorDescriber.Default.ValidationErrors())
     {
         if (errors == null)
@@ -142,39 +222,6 @@ public class ValidationException : DomainException
     /// Constructor with dictionary contains member field as key and error messages as value.
     /// </summary>
     /// <param name="errors">Member errors dictionary.</param>
-    public ValidationException(IDictionary<string, IEnumerable<string>> errors) :
-        base(DomainErrorDescriber.Default.ValidationErrors())
-    {
-        if (errors == null)
-        {
-            throw new ArgumentNullException(nameof(errors));
-        }
-
-        this.Errors.Merge(errors.ToDictionary(k => k.Key, v => (ICollection<string>)v.Value));
-    }
-
-    /// <summary>
-    /// Constructor with dictionary contains member field as key and error message as value.
-    /// </summary>
-    /// <param name="errors">Member error dictionary.</param>
-    public ValidationException(IDictionary<string, FormattedString> errors) :
-        base(DomainErrorDescriber.Default.ValidationErrors())
-    {
-        if (errors == null)
-        {
-            throw new ArgumentNullException(nameof(errors));
-        }
-
-        foreach (var error in errors)
-        {
-            this.Errors[error.Key] = [error.Value];
-        }
-    }
-
-    /// <summary>
-    /// Constructor with dictionary contains member field as key and error messages as value.
-    /// </summary>
-    /// <param name="errors">Member errors dictionary.</param>
     public ValidationException(IDictionary<string, ICollection<FormattedString>> errors) :
         base(DomainErrorDescriber.Default.ValidationErrors())
     {
@@ -184,6 +231,21 @@ public class ValidationException : DomainException
         }
 
         this.Errors.Merge(errors);
+    }
+
+    /// <summary>
+    /// Constructor with dictionary contains member field as key and error messages as value.
+    /// </summary>
+    /// <param name="errors">Member errors dictionary.</param>
+    public ValidationException(IDictionary<string, IEnumerable<string>> errors) :
+        base(DomainErrorDescriber.Default.ValidationErrors())
+    {
+        if (errors == null)
+        {
+            throw new ArgumentNullException(nameof(errors));
+        }
+
+        this.Errors.Merge(errors.ToDictionary(k => k.Key, v => (ICollection<string>)v.Value));
     }
 
     /// <summary>
@@ -244,7 +306,7 @@ public class ValidationException : DomainException
     }
 
     /// <inheritdoc />
-    public override string GetLocalizedMessage(IStringLocalizer localizer)
+    public override string GetLocalizedMessage(IStringLocalizerFactory localizer)
     {
         var message = base.GetLocalizedMessage(localizer);
         return MessageFormatter(message, Errors);

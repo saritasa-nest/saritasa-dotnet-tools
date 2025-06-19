@@ -1,9 +1,8 @@
 ﻿// Copyright (c) 2015-2024, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Runtime.Serialization;
-using Microsoft.Extensions.Localization;
+using Saritasa.Tools.Domain.Localization;
 
 namespace Saritasa.Tools.Domain.Exceptions;
 
@@ -42,8 +41,25 @@ public class ConflictException : DomainException
     /// Constructor.
     /// </summary>
     /// <param name="message">The message that describes the error.</param>
+    public ConflictException(FormattedString message) : base(message)
+    {
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="message">The message that describes the error.</param>
     /// <param name="code">Optional description code for this exception.</param>
     public ConflictException(string message, int code) : base(message, code)
+    {
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="message">The message format that describes the error.</param>
+    /// <param name="code">Optional description code for this exception.</param>
+    public ConflictException(FormattedString message, int code) : base(message, code)
     {
     }
 
@@ -53,6 +69,15 @@ public class ConflictException : DomainException
     /// <param name="message">The message that describes the error.</param>
     /// <param name="code">Optional description code for this exception.</param>
     public ConflictException(string message, string code) : base(message, code)
+    {
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="message">The message format that describes the error.</param>
+    /// <param name="code">Optional description code for this exception.</param>
+    public ConflictException(FormattedString message, string code) : base(message, code)
     {
     }
 
@@ -69,11 +94,33 @@ public class ConflictException : DomainException
     /// <summary>
     /// Constructor.
     /// </summary>
+    /// <param name="message">The message format that describes the error.</param>
+    /// <param name="innerException">The exception that is the cause of the current exception, or a
+    /// null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
+    public ConflictException(FormattedString message, Exception innerException) : base(message, innerException)
+    {
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
     /// <param name="message">The message that describes the error.</param>
     /// <param name="innerException">The exception that is the cause of the current exception, or a
     /// null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
     /// <param name="code">Optional description code for this exception.</param>
     public ConflictException(string message, Exception innerException, int code) :
+        base(message, innerException, code)
+    {
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="message">The message format that describes the error.</param>
+    /// <param name="innerException">The exception that is the cause of the current exception, or a
+    /// null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
+    /// <param name="code">Optional description code for this exception.</param>
+    public ConflictException(FormattedString message, Exception innerException, int code) :
         base(message, innerException, code)
     {
     }
@@ -93,92 +140,12 @@ public class ConflictException : DomainException
     /// <summary>
     /// Constructor.
     /// </summary>
-    /// <param name="message">The message that describes the error.</param>
-    public ConflictException(
-        LocalizedString message) : base(message)
-    {
-    }
-
-    /// <summary>
-    /// Constructor.
-    /// </summary>
     /// <param name="message">The message format that describes the error.</param>
-    /// <param name="args">Arguments for formatting.</param>
-    public ConflictException(
-        LocalizedString message,
-        params object[] args) : base(message, args)
-    {
-    }
-
-    /// <summary>
-    /// Constructor.
-    /// </summary>
-    /// <param name="code">Optional description code for this exception.</param>
-    /// <param name="message">The message format that describes the error.</param>
-    /// <param name="args">Arguments for formatting.</param>
-    public ConflictException(
-        int code,
-        LocalizedString message,
-        params object[] args) : base(code, message, args)
-    {
-    }
-
-    /// <summary>
-    /// Constructor.
-    /// </summary>
-    /// <param name="code">Optional description code for this exception.</param>
-    /// <param name="message">The message format that describes the error.</param>
-    /// <param name="args">Arguments for formatting.</param>
-    public ConflictException(
-        string code,
-        LocalizedString message,
-        params object[] args) : base(code, message, args)
-    {
-    }
-
-    /// <summary>
-    /// Constructor.
-    /// </summary>
-    /// <param name="innerException">The exception that is the cause of the current exception, or a
-    /// null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
-    /// <param name="message">The message format that describes the error.</param>
-    /// <param name="args">Arguments for formatting.</param>
-    public ConflictException(
-        Exception innerException,
-        LocalizedString message,
-        params object[] args) : base(innerException, message, args)
-    {
-    }
-
-    /// <summary>
-    /// Constructor.
-    /// </summary>
     /// <param name="innerException">The exception that is the cause of the current exception, or a
     /// null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
     /// <param name="code">Optional description code for this exception.</param>
-    /// <param name="message">The message format that describes the error.</param>
-    /// <param name="args">Arguments for formatting.</param>
-    public ConflictException(
-        Exception innerException,
-        int code,
-        LocalizedString message,
-        params object[] args) : base(innerException, code, message, args)
-    {
-    }
-
-    /// <summary>
-    /// Constructor.
-    /// </summary>
-    /// <param name="innerException">The exception that is the cause of the current exception, or a
-    /// null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
-    /// <param name="code">Optional description code for this exception.</param>
-    /// <param name="message">The message format that describes the error.</param>
-    /// <param name="args">Arguments for formatting.</param>
-    public ConflictException(
-        Exception innerException,
-        string code,
-        LocalizedString message,
-        params object[] args) : base(innerException, code, message, args)
+    public ConflictException(FormattedString message, Exception innerException, string code) :
+        base(message, innerException, code)
     {
     }
 
