@@ -24,14 +24,14 @@
     <PackageReference Include="Microsoft.Extensions.Localization.Abstractions" Version="9.0.6" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="Properties\Strings.Designer.cs">
+    <Compile Update="Localization\System.ComponentModel.Annotations\Strings.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>Strings.resx</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Update="Properties\Strings.resx">
+    <EmbeddedResource Update="Localization\System.ComponentModel.Annotations\Strings.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>

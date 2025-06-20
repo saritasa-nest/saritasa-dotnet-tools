@@ -7,7 +7,7 @@ namespace Saritasa.Tools.Domain.Exceptions;
 /// <summary>
 /// Localizable exception.
 /// </summary>
-public class LocalizableException : Exception
+public abstract class LocalizableException : Exception
 {
     private readonly FormattedString? formattedString;
 
@@ -15,7 +15,7 @@ public class LocalizableException : Exception
     /// Constructor.
     /// </summary>
     /// <param name="message">The message that describes the error.</param>
-    public LocalizableException(string message) : base(message)
+    protected LocalizableException(string message) : base(message)
     {
     }
 
@@ -23,7 +23,7 @@ public class LocalizableException : Exception
     /// Constructor.
     /// </summary>
     /// <param name="message">The message that describes the error.</param>
-    public LocalizableException(FormattedString message) :
+    protected LocalizableException(FormattedString message) :
         base(message.ToString())
     {
         formattedString = message;
@@ -35,7 +35,7 @@ public class LocalizableException : Exception
     /// <param name="message">The message that describes the error.</param>
     /// <param name="innerException">The exception that is the cause of the current exception, or a
     /// null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
-    public LocalizableException(string message, Exception innerException) :
+    protected LocalizableException(string message, Exception innerException) :
         base(message, innerException)
     {
     }
@@ -46,7 +46,7 @@ public class LocalizableException : Exception
     /// <param name="message">The message that describes the error.</param>
     /// <param name="innerException">The exception that is the cause of the current exception, or a
     /// null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
-    public LocalizableException(FormattedString message, Exception innerException) :
+    protected LocalizableException(FormattedString message, Exception innerException) :
         base(message.ToString(), innerException)
     {
         formattedString = message;

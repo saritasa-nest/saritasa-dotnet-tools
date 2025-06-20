@@ -1,13 +1,14 @@
-﻿using Microsoft.Extensions.Localization;
+﻿
+using Saritasa.Tools.Domain.Localization;
 
-namespace Saritasa.Tools.Domain.Localization;
+namespace Microsoft.Extensions.Localization;
 
 /// <summary>
 /// Extension methods for <see cref="IStringLocalizer"/>.
 /// </summary>
 public static class StringLocalizerExtensions
 {
-    public static FormattedString Create<T>(IStringLocalizer<T> localizer, string nameOrFormat, params object[] args)
+    public static FormattedString Create<T>(this IStringLocalizer<T> localizer, string nameOrFormat, params object[] args)
     {
         return new FormattedString<T>(localizer[nameOrFormat], args);
     }
