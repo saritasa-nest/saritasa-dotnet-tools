@@ -26,6 +26,8 @@
     <file src="bin\Release\**\Saritasa.Tools.Domain.pdb" target="lib" />
     <file src="bin\Release\**\Saritasa.Tools.Domain.xml" target="lib" />
     <file src="bin\Release\**\fr\**" target="lib" />
+    <file src="bin\Release\**\es\**" target="lib" />
+    <file src="bin\Release\**\ru\**" target="lib" />
     <file src="..\..\LICENSE.txt" target="LICENSE.txt" />
     <file src="..\..\icon.png" target="icon.png" />
   </files>

@@ -3,7 +3,7 @@
   <metadata>
     <id>Saritasa.Tools.EntityFrameworkCore</id>
     <title>Saritasa Tools for Entity Framework Core</title>
-    <version>8.0.0</version>
+    <version>0.0.0</version>
     <description>The package is a part of Saritasa Tools project. Saritasa.Tools.EntityFrameworkCore contains various useful extensions.</description>
     <summary>DDD implementations for Entity Framework Core.</summary>
     <authors>Saritasa</authors>
@@ -12,7 +12,7 @@
     <projectUrl>https://github.com/saritasa/saritasatools</projectUrl>
     <icon>icon.png</icon>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <copyright>(c) Saritasa, 2016-2024</copyright>
+    <copyright>(c) Saritasa, 2016-2025</copyright>
     <tags>uow repository domain efcore dbcontext</tags>
     <repository type="git" url="https://github.com/saritasa-nest/saritasa-dotnet-tools" commit="$(CommitHash)" />
     <dependencies>
@@ -28,6 +28,9 @@
     <file src="bin\Release\**\Saritasa.Tools.EntityFrameworkCore.dll" target="lib" />
     <file src="bin\Release\**\Saritasa.Tools.EntityFrameworkCore.pdb" target="lib" />
     <file src="bin\Release\**\Saritasa.Tools.EntityFrameworkCore.xml" target="lib" />
+    <file src="bin\Release\**\fr\**" target="lib" />
+    <file src="bin\Release\**\es\**" target="lib" />
+    <file src="bin\Release\**\ru\**" target="lib" />
     <file src="..\..\LICENSE.txt" target="LICENSE.txt" />
     <file src="..\..\icon.png" target="icon.png" />
   </files>
