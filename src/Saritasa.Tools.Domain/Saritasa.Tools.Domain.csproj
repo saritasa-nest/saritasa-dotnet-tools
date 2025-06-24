@@ -37,7 +37,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Update="Localization\System.ComponentModel.Annotations\Strings.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
+      <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="Properties\Strings.resx">
