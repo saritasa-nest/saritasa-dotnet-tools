@@ -6,7 +6,7 @@
 [+] Add EmailRegexAttribute - replacement candidate for EmailAddressAttribute from System.ComponentModel.DataAnnotations.
 [+] Add resources localization for French, Spanish, Russian.
 [*] [Breaking] Modify DomainException and InfrastructureException to extend from LocalizableException.
-[*] [Breaking] Modify ValidationErrors to extend from Doctionary<string, ICollection<FormattedString>>.
+[*] [Breaking] Modify ValidationErrors to extend from Dictionary<string, ICollection<FormattedString>>.
 [*] [Breaking] Add new dependency Microsoft.Extensions.Localization.Abstractions.
 [-] [Breaking] Drop support for net452.
 
