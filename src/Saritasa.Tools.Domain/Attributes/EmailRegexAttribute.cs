@@ -5,7 +5,7 @@ using Saritasa.Tools.Domain.Properties;
 namespace Saritasa.Tools.Domain.Attributes;
 
 /// <summary>
-/// Required attribute with default message.
+/// Email address validation attribute that uses regular expression.
 /// </summary>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter, AllowMultiple = false)]
 public class EmailRegexAttribute : DataTypeAttribute

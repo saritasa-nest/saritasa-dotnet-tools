@@ -7,11 +7,21 @@ namespace Saritasa.Tools.Domain.Localization;
 /// </summary>
 public class FormattedString
 {
+    /// <summary>
+    /// Formatting pattern as localized string.
+    /// Contains the name of the resource and the neutral value.
+    /// </summary>
     public LocalizedString Format { get; }
 
-    public Type? ResourceType { get; }
-
+    /// <summary>
+    /// Formattable Arguments.
+    /// </summary>
     public object[]? Arguments { get; }
+
+    /// <summary>
+    /// Resource provider type.
+    /// </summary>
+    internal Type? ResourceType { get; }
 
     /// <summary>
     /// Constructor.
@@ -25,7 +35,9 @@ public class FormattedString
     /// <summary>
     /// Constructor.
     /// </summary>
-    /// <param name="format">Literal localized value.</param>
+    /// <param name="resourceType">Resource provider type.</param>
+    /// <param name="format">Localized format.</param>
+    /// <param name="args">Formattable arguments.</param>
     protected FormattedString(
         Type resourceType,
         LocalizedString format,
@@ -46,8 +58,15 @@ public class FormattedString
     public override string ToString() => string.Format(Format, Arguments);
 }
 
-internal class FormattedString<T>(LocalizedString format, object[] args) :
+/// <summary>
+/// Generic class for formatted string.
+/// Reuses the same ResourceType object per the closed generic class.
+/// </summary>
+/// <typeparam name="TResource">Resource type.</typeparam>
+/// <param name="format">Localized format.</param>
+/// <param name="args">Formattable arguments.</param>
+internal class FormattedString<TResource>(LocalizedString format, object[] args) :
     FormattedString(type, format, args)
 {
-    private static readonly Type type = typeof(T);
+    private static readonly Type type = typeof(TResource);
 }

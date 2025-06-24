@@ -22,7 +22,7 @@ namespace Saritasa.Tools.Domain.Localization.System.ComponentModel.Annotations {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class Strings {
+    internal class Strings {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace Saritasa.Tools.Domain.Localization.System.ComponentModel.Annotations {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Resources.ResourceManager ResourceManager {
+        internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Saritasa.Tools.Domain.Localization.System.ComponentModel.Annotations.Strings", typeof(Strings).Assembly);
@@ -51,7 +51,7 @@ namespace Saritasa.Tools.Domain.Localization.System.ComponentModel.Annotations {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Globalization.CultureInfo Culture {
+        internal static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace Saritasa.Tools.Domain.Localization.System.ComponentModel.Annotations {
         /// <summary>
         ///   Looks up a localized string similar to The {0} field does not equal any of the values specified in AllowedValuesAttribute..
         /// </summary>
-        public static string AllowedValuesAttribute_Invalid {
+        internal static string AllowedValuesAttribute_Invalid {
             get {
                 return ResourceManager.GetString("AllowedValuesAttribute_Invalid", resourceCulture);
             }
@@ -72,7 +72,7 @@ namespace Saritasa.Tools.Domain.Localization.System.ComponentModel.Annotations {
         /// <summary>
         ///   Looks up a localized string similar to The {0} field is not a valid Base64 encoding..
         /// </summary>
-        public static string Base64StringAttribute_Invalid {
+        internal static string Base64StringAttribute_Invalid {
             get {
                 return ResourceManager.GetString("Base64StringAttribute_Invalid", resourceCulture);
             }
@@ -81,7 +81,7 @@ namespace Saritasa.Tools.Domain.Localization.System.ComponentModel.Annotations {
         /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; and &apos;{1}&apos; do not match..
         /// </summary>
-        public static string CompareAttribute_MustMatch {
+        internal static string CompareAttribute_MustMatch {
             get {
                 return ResourceManager.GetString("CompareAttribute_MustMatch", resourceCulture);
             }
@@ -90,7 +90,7 @@ namespace Saritasa.Tools.Domain.Localization.System.ComponentModel.Annotations {
         /// <summary>
         ///   Looks up a localized string similar to The {0} field is not a valid credit card number..
         /// </summary>
-        public static string CreditCardAttribute_Invalid {
+        internal static string CreditCardAttribute_Invalid {
             get {
                 return ResourceManager.GetString("CreditCardAttribute_Invalid", resourceCulture);
             }
@@ -99,7 +99,7 @@ namespace Saritasa.Tools.Domain.Localization.System.ComponentModel.Annotations {
         /// <summary>
         ///   Looks up a localized string similar to {0} is not valid..
         /// </summary>
-        public static string CustomValidationAttribute_ValidationError {
+        internal static string CustomValidationAttribute_ValidationError {
             get {
                 return ResourceManager.GetString("CustomValidationAttribute_ValidationError", resourceCulture);
             }
@@ -108,7 +108,7 @@ namespace Saritasa.Tools.Domain.Localization.System.ComponentModel.Annotations {
         /// <summary>
         ///   Looks up a localized string similar to The {0} field equals one of the values specified in DeniedValuesAttribute..
         /// </summary>
-        public static string DeniedValuesAttribute_Invalid {
+        internal static string DeniedValuesAttribute_Invalid {
             get {
                 return ResourceManager.GetString("DeniedValuesAttribute_Invalid", resourceCulture);
             }
@@ -117,7 +117,7 @@ namespace Saritasa.Tools.Domain.Localization.System.ComponentModel.Annotations {
         /// <summary>
         ///   Looks up a localized string similar to The {0} field is not a valid e-mail address..
         /// </summary>
-        public static string EmailAddressAttribute_Invalid {
+        internal static string EmailAddressAttribute_Invalid {
             get {
                 return ResourceManager.GetString("EmailAddressAttribute_Invalid", resourceCulture);
             }
@@ -126,7 +126,7 @@ namespace Saritasa.Tools.Domain.Localization.System.ComponentModel.Annotations {
         /// <summary>
         ///   Looks up a localized string similar to The {0} field only accepts files with the following extensions: {1}.
         /// </summary>
-        public static string FileExtensionsAttribute_Invalid {
+        internal static string FileExtensionsAttribute_Invalid {
             get {
                 return ResourceManager.GetString("FileExtensionsAttribute_Invalid", resourceCulture);
             }
@@ -135,7 +135,7 @@ namespace Saritasa.Tools.Domain.Localization.System.ComponentModel.Annotations {
         /// <summary>
         ///   Looks up a localized string similar to The field {0} must be a string or collection type with a minimum length of &apos;{1}&apos; and maximum length of &apos;{2}&apos;..
         /// </summary>
-        public static string LengthAttribute_ValidationError {
+        internal static string LengthAttribute_ValidationError {
             get {
                 return ResourceManager.GetString("LengthAttribute_ValidationError", resourceCulture);
             }
@@ -144,7 +144,7 @@ namespace Saritasa.Tools.Domain.Localization.System.ComponentModel.Annotations {
         /// <summary>
         ///   Looks up a localized string similar to The field {0} must be a string or array type with a maximum length of &apos;{1}&apos;..
         /// </summary>
-        public static string MaxLengthAttribute_ValidationError {
+        internal static string MaxLengthAttribute_ValidationError {
             get {
                 return ResourceManager.GetString("MaxLengthAttribute_ValidationError", resourceCulture);
             }
@@ -153,7 +153,7 @@ namespace Saritasa.Tools.Domain.Localization.System.ComponentModel.Annotations {
         /// <summary>
         ///   Looks up a localized string similar to The field {0} must be a string or array type with a minimum length of &apos;{1}&apos;..
         /// </summary>
-        public static string MinLengthAttribute_ValidationError {
+        internal static string MinLengthAttribute_ValidationError {
             get {
                 return ResourceManager.GetString("MinLengthAttribute_ValidationError", resourceCulture);
             }
@@ -162,7 +162,7 @@ namespace Saritasa.Tools.Domain.Localization.System.ComponentModel.Annotations {
         /// <summary>
         ///   Looks up a localized string similar to The {0} field is not a valid phone number..
         /// </summary>
-        public static string PhoneAttribute_Invalid {
+        internal static string PhoneAttribute_Invalid {
             get {
                 return ResourceManager.GetString("PhoneAttribute_Invalid", resourceCulture);
             }
@@ -171,7 +171,7 @@ namespace Saritasa.Tools.Domain.Localization.System.ComponentModel.Annotations {
         /// <summary>
         ///   Looks up a localized string similar to The field {0} must be between {1} and {2}..
         /// </summary>
-        public static string RangeAttribute_ValidationError {
+        internal static string RangeAttribute_ValidationError {
             get {
                 return ResourceManager.GetString("RangeAttribute_ValidationError", resourceCulture);
             }
@@ -180,7 +180,7 @@ namespace Saritasa.Tools.Domain.Localization.System.ComponentModel.Annotations {
         /// <summary>
         ///   Looks up a localized string similar to The field {0} must be between {1} and {2} exclusive..
         /// </summary>
-        public static string RangeAttribute_ValidationError_MaxExclusive {
+        internal static string RangeAttribute_ValidationError_MaxExclusive {
             get {
                 return ResourceManager.GetString("RangeAttribute_ValidationError_MaxExclusive", resourceCulture);
             }
@@ -189,7 +189,7 @@ namespace Saritasa.Tools.Domain.Localization.System.ComponentModel.Annotations {
         /// <summary>
         ///   Looks up a localized string similar to The field {0} must be between {1} exclusive and {2}..
         /// </summary>
-        public static string RangeAttribute_ValidationError_MinExclusive {
+        internal static string RangeAttribute_ValidationError_MinExclusive {
             get {
                 return ResourceManager.GetString("RangeAttribute_ValidationError_MinExclusive", resourceCulture);
             }
@@ -198,7 +198,7 @@ namespace Saritasa.Tools.Domain.Localization.System.ComponentModel.Annotations {
         /// <summary>
         ///   Looks up a localized string similar to The field {0} must be between {1} exclusive and {2} exclusive..
         /// </summary>
-        public static string RangeAttribute_ValidationError_MinExclusive_MaxExclusive {
+        internal static string RangeAttribute_ValidationError_MinExclusive_MaxExclusive {
             get {
                 return ResourceManager.GetString("RangeAttribute_ValidationError_MinExclusive_MaxExclusive", resourceCulture);
             }
@@ -207,7 +207,7 @@ namespace Saritasa.Tools.Domain.Localization.System.ComponentModel.Annotations {
         /// <summary>
         ///   Looks up a localized string similar to The {0} field is required..
         /// </summary>
-        public static string RequiredAttribute_ValidationError {
+        internal static string RequiredAttribute_ValidationError {
             get {
                 return ResourceManager.GetString("RequiredAttribute_ValidationError", resourceCulture);
             }
@@ -216,7 +216,7 @@ namespace Saritasa.Tools.Domain.Localization.System.ComponentModel.Annotations {
         /// <summary>
         ///   Looks up a localized string similar to The field {0} must be a string with a maximum length of {1}..
         /// </summary>
-        public static string StringLengthAttribute_ValidationError {
+        internal static string StringLengthAttribute_ValidationError {
             get {
                 return ResourceManager.GetString("StringLengthAttribute_ValidationError", resourceCulture);
             }
@@ -225,7 +225,7 @@ namespace Saritasa.Tools.Domain.Localization.System.ComponentModel.Annotations {
         /// <summary>
         ///   Looks up a localized string similar to The field {0} must be a string with a minimum length of {2} and a maximum length of {1}..
         /// </summary>
-        public static string StringLengthAttribute_ValidationErrorIncludingMinimum {
+        internal static string StringLengthAttribute_ValidationErrorIncludingMinimum {
             get {
                 return ResourceManager.GetString("StringLengthAttribute_ValidationErrorIncludingMinimum", resourceCulture);
             }
@@ -234,7 +234,7 @@ namespace Saritasa.Tools.Domain.Localization.System.ComponentModel.Annotations {
         /// <summary>
         ///   Looks up a localized string similar to The {0} field is not a valid fully-qualified http, https, or ftp URL..
         /// </summary>
-        public static string UrlAttribute_Invalid {
+        internal static string UrlAttribute_Invalid {
             get {
                 return ResourceManager.GetString("UrlAttribute_Invalid", resourceCulture);
             }

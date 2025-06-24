@@ -1,5 +1,4 @@
-﻿
-using Saritasa.Tools.Domain.Localization;
+﻿using Saritasa.Tools.Domain.Localization;
 
 namespace Microsoft.Extensions.Localization;
 
@@ -8,6 +7,13 @@ namespace Microsoft.Extensions.Localization;
 /// </summary>
 public static class StringLocalizerExtensions
 {
+    /// <summary>
+    /// Create formatted string using <paramref name="localizer"/> resource type, resource key and arguments.
+    /// </summary>
+    /// <typeparam name="T">Resource provider class.</typeparam>
+    /// <param name="localizer">Localizer.</param>
+    /// <param name="nameOrFormat">Resource name.</param>
+    /// <param name="args">Formattable arguments.</param>
     public static FormattedString Create<T>(this IStringLocalizer<T> localizer, string nameOrFormat, params object[] args)
     {
         return new FormattedString<T>(localizer[nameOrFormat], args);
