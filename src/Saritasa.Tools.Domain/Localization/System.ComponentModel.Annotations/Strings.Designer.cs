@@ -207,9 +207,9 @@ namespace Saritasa.Tools.Domain.Localization.System.ComponentModel.Annotations {
         /// <summary>
         ///   Looks up a localized string similar to The {0} field is required..
         /// </summary>
-        public static string RequiredAttribute_ValidationError2 {
+        public static string RequiredAttribute_ValidationError {
             get {
-                return ResourceManager.GetString("RequiredAttribute_ValidationError2", resourceCulture);
+                return ResourceManager.GetString("RequiredAttribute_ValidationError", resourceCulture);
             }
         }
         

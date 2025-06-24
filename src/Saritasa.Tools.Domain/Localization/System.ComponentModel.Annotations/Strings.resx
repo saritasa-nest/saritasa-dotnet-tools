@@ -165,7 +165,7 @@
   <data name="RangeAttribute_ValidationError_MinExclusive_MaxExclusive" xml:space="preserve">
     <value>The field {0} must be between {1} exclusive and {2} exclusive.</value>
   </data>
-  <data name="RequiredAttribute_ValidationError2" xml:space="preserve">
+  <data name="RequiredAttribute_ValidationError" xml:space="preserve">
     <value>The {0} field is required.</value>
   </data>
   <data name="StringLengthAttribute_ValidationError" xml:space="preserve">

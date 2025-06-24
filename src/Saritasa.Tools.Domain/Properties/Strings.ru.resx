@@ -123,6 +123,9 @@
   <data name="Conflict" xml:space="preserve">
     <value>Произошёл конфликт.</value>
   </data>
+  <data name="EmailRegexAttribute_Invalid" xml:space="preserve">
+    <value>Поле {0} не является допустимым адресом электронной почты.</value>
+  </data>
   <data name="Error" xml:space="preserve">
     <value>Произошла ошибка.</value>
   </data>
