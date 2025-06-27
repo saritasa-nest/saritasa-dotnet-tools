@@ -3,7 +3,7 @@
 [+] Add LocalizableException - base class that stores exception message as FormattedString.
 [+] Add StringLocalizerExtenstions - extension methods for IStringLocalizer that supports FormattedStrings.
 [+] Add SystemResourceLocalizer - custom resource provider injector for System.ComponentModel.DataAnnotations.
-[+] Add EmailRegexAttribute - replacement candidate for EmailAddressAttribute from System.ComponentModel.DataAnnotations.
+[+] Add RfcEmailAttribute - replacement candidate for EmailAddressAttribute from System.ComponentModel.DataAnnotations.
 [+] Add resources localization for French, Spanish, Russian.
 [*] [Breaking] Modify DomainException and InfrastructureException to extend from LocalizableException.
 [*] [Breaking] Modify ValidationErrors to extend from Dictionary<string, ICollection<FormattedString>>.

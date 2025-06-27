@@ -79,15 +79,6 @@ namespace Saritasa.Tools.Domain.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The {0} field is not a valid e-mail address..
-        /// </summary>
-        internal static string EmailRegexAttribute_Invalid {
-            get {
-                return ResourceManager.GetString("EmailRegexAttribute_Invalid", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to An error has occurred..
         /// </summary>
         internal static string Error {
@@ -120,6 +111,15 @@ namespace Saritasa.Tools.Domain.Properties {
         internal static string NotFoundEntity {
             get {
                 return ResourceManager.GetString("NotFoundEntity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The {0} field is not a valid e-mail address..
+        /// </summary>
+        internal static string RfcEmailAttribute_Invalid {
+            get {
+                return ResourceManager.GetString("RfcEmailAttribute_Invalid", resourceCulture);
             }
         }
         

@@ -123,7 +123,7 @@
   <data name="Conflict" xml:space="preserve">
     <value>Se produjo un conflicto.</value>
   </data>
-  <data name="EmailRegexAttribute_Invalid" xml:space="preserve">
+  <data name="RfcEmailAttribute_Invalid" xml:space="preserve">
     <value>El campo {0} no es una dirección de correo electrónico válida.</value>
   </data>
   <data name="Error" xml:space="preserve">
