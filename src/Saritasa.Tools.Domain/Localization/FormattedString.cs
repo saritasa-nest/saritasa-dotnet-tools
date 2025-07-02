@@ -3,7 +3,8 @@
 namespace Saritasa.Tools.Domain.Localization;
 
 /// <summary>
-/// Formatted string.
+/// Formatted string. Constructed by <see cref="StringLocalizerExtensions"/>.
+/// See also <seealso href="https://github.com/saritasa-nest/saritasa-dotnet-tools/wiki/Domain/Domain-Localization"/>.
 /// </summary>
 public class FormattedString
 {

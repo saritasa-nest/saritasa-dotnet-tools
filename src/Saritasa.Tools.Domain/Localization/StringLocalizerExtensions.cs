@@ -4,6 +4,7 @@ namespace Microsoft.Extensions.Localization;
 
 /// <summary>
 /// Extension methods for <see cref="IStringLocalizer"/>.
+/// See also <seealso href="https://github.com/saritasa-nest/saritasa-dotnet-tools/wiki/Domain/Domain-Localization"/>.
 /// </summary>
 public static class StringLocalizerExtensions
 {
