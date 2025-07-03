@@ -56,7 +56,8 @@ public class FormattedString
     public static implicit operator FormattedString(string value) => new FormattedString(value);
 
     /// <inheritdoc />
-    public override string ToString() => string.Format(Format, Arguments);
+    public override string ToString()
+        => Arguments is null ? Format : string.Format(Format, Arguments);
 }
 
 /// <summary>

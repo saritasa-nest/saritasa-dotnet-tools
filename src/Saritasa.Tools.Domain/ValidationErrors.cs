@@ -286,7 +286,7 @@ public class ValidationErrors : Dictionary<string, ICollection<FormattedString>>
     /// </summary>
     /// <returns>Member error dictionary.</returns>
     public IDictionary<string, FormattedString> GetOneErrorDictionary()
-        => this.ToDictionary(k => k.Key, v => v.Value.FirstOrDefault());
+        => this.ToDictionary(k => k.Key, v => v.Value.FirstOrDefault() ?? string.Empty);
 
     /// <summary>
     /// Merge with another errors dictionary.
