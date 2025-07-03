@@ -1,4 +1,4 @@
-﻿5.0.1 [TBD]
+﻿5.0.1 [2025-07-03]
 [+] Add resources localization for French, Spanish, Russian.
 
 5.0.0 [2022-11-22]
