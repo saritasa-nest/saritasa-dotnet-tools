@@ -134,7 +134,7 @@ namespace Saritasa.Tools.Common.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The queryable collection must be queryable..
+        ///   Looks up a localized string similar to The collection must be of type &apos;IOrderedQueryable&apos;..
         /// </summary>
         internal static string ArgumentMustBeOrderable {
             get {

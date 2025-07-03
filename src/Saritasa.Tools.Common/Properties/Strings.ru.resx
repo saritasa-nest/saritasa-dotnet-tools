@@ -142,7 +142,7 @@
     <value>{0} должен быть меньше {1}.</value>
   </data>
   <data name="ArgumentMustBeOrderable" xml:space="preserve">
-    <value>Коллекция должна поддерживать запросы.</value>
+    <value>Коллекция должна иметь тип 'IOrderedQueryable'.</value>
   </data>
   <data name="ArgumentNotValidEmail" xml:space="preserve">
     <value>{0} не является допустимым email-адресом.</value>
