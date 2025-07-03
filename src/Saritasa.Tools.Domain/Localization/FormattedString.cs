@@ -39,10 +39,10 @@ public class FormattedString
     /// <param name="resourceType">Resource provider type.</param>
     /// <param name="format">Localized format.</param>
     /// <param name="args">Formattable arguments.</param>
-    protected FormattedString(
+    public FormattedString(
         Type resourceType,
         LocalizedString format,
-        object[] args)
+        params object[] args)
     {
         ResourceType = resourceType;
         Format = format;
@@ -67,7 +67,7 @@ public class FormattedString
 /// <typeparam name="TResource">Resource type.</typeparam>
 /// <param name="format">Localized format.</param>
 /// <param name="args">Formattable arguments.</param>
-internal class FormattedString<TResource>(LocalizedString format, object[] args) :
+public class FormattedString<TResource>(LocalizedString format, params object[] args) :
     FormattedString(type, format, args)
 {
     private static readonly Type type = typeof(TResource);
