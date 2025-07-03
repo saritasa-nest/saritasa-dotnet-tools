@@ -1,4 +1,7 @@
-﻿8.0.0 [2024-03-26]
+﻿8.0.1 [TBD]
+[+] Add resource localization for French, Spanish, Russian.
+
+8.0.0 [2024-03-26]
 [*] Initial release of Saritasa.Tools.EntityFrameworkCore 8.0 package.
 
 7.0.0 [2023-07-10]

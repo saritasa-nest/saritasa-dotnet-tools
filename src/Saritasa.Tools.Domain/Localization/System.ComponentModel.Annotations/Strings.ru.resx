@@ -117,58 +117,64 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ArgumentCannotBeEmptyGuid" xml:space="preserve">
-    <value>{0} cannot be empty GUID.</value>
+  <data name="AllowedValuesAttribute_Invalid" xml:space="preserve">
+    <value>Поле {0} не соответствует ни одному из значений, указанных в AllowedValuesAttribute.</value>
   </data>
-  <data name="ArgumentCannotBeEmptyString" xml:space="preserve">
-    <value>{0} cannot be empty string.</value>
+  <data name="Base64StringAttribute_Invalid" xml:space="preserve">
+    <value>Поле {0} не имеет допустимой кодировки Base64.</value>
   </data>
-  <data name="ArgumentCannotBeMoreThanChars" xml:space="preserve">
-    <value>{0} cannot be more than {1} character.</value>
+  <data name="CompareAttribute_MustMatch" xml:space="preserve">
+    <value>"{0}" и "{1}" не совпадают.</value>
   </data>
-  <data name="ArgumentCannotBeThePeriod" xml:space="preserve">
-    <value>{0} period cannot be used.</value>
+  <data name="CreditCardAttribute_Invalid" xml:space="preserve">
+    <value>Поле {0} не содержит допустимый номер кредитной карты.</value>
   </data>
-  <data name="ArgumentDateTimeKindMustBeEqual" xml:space="preserve">
-    <value>Date and time kinds must be equal.</value>
+  <data name="CustomValidationAttribute_ValidationError" xml:space="preserve">
+    <value>{0} является недопустимым.</value>
   </data>
-  <data name="ArgumentMustBeBetween" xml:space="preserve">
-    <value>{0} must be between {1}-{2}.</value>
+  <data name="DeniedValuesAttribute_Invalid" xml:space="preserve">
+    <value>Поле {0} равно одному из значений, указанных в DeniedValuesAttribute.</value>
   </data>
-  <data name="ArgumentMustBeGreaterThan" xml:space="preserve">
-    <value>{0} must be greater than {1}.</value>
+  <data name="EmailAddressAttribute_Invalid" xml:space="preserve">
+    <value>Поле {0} не содержит допустимый адрес электронной почты.</value>
   </data>
-  <data name="ArgumentMustBeLessThan" xml:space="preserve">
-    <value>{0} must be less than {1}.</value>
+  <data name="FileExtensionsAttribute_Invalid" xml:space="preserve">
+    <value>Поле {0} принимает только файлы со следующими расширениями: {1}</value>
   </data>
-  <data name="ArgumentMustBeOrderable" xml:space="preserve">
-    <value>The collection must be of type 'IOrderedQueryable'.</value>
+  <data name="MaxLengthAttribute_ValidationError" xml:space="preserve">
+    <value>Поле {0} должно иметь тип строки или массива с максимальной длиной "{1}".</value>
   </data>
-  <data name="ArgumentNotValidEmail" xml:space="preserve">
-    <value>{0} is not a valid email address.</value>
+  <data name="MinLengthAttribute_ValidationError" xml:space="preserve">
+    <value>Поле {0} должно иметь тип строки или массива с минимальной длиной "{1}".</value>
   </data>
-  <data name="ClassMustContainMethod" xml:space="preserve">
-    <value>Class {0} must contain a method {1}.</value>
+  <data name="LengthAttribute_ValidationError" xml:space="preserve">
+    <value>Поле {0} должно быть строкой или типом коллекции с минимальной длиной "{1}" и максимальной длиной "{2}".</value>
   </data>
-  <data name="CollectionCannotEmpty" xml:space="preserve">
-    <value>Collection cannot be empty.</value>
+  <data name="PhoneAttribute_Invalid" xml:space="preserve">
+    <value>Поле {0} не содержит допустимый номер телефона.</value>
   </data>
-  <data name="HashMethodCannotRecognize" xml:space="preserve">
-    <value>{0} contains method that is not possible to recognize.</value>
+  <data name="RangeAttribute_ValidationError" xml:space="preserve">
+    <value>Поле {0} должно иметь значение между {1} и {2}.</value>
   </data>
-  <data name="InvalidOrderDirection" xml:space="preserve">
-    <value>Cannot recognize sort direction {0}.</value>
+  <data name="RangeAttribute_ValidationError_MinExclusive" xml:space="preserve">
+    <value>Поле {0} должно иметь значение между {1} (исключая) и {2}.</value>
   </data>
-  <data name="NoHashMethod" xml:space="preserve">
-    <value>{0} does not contain hash method.</value>
+  <data name="RangeAttribute_ValidationError_MaxExclusive" xml:space="preserve">
+    <value>Поле {0} должно иметь значение между {1} и {2} (исключая).</value>
   </data>
-  <data name="NoSuitableConstructor" xml:space="preserve">
-    <value>The class {0} does not have public constructor.</value>
+  <data name="RangeAttribute_ValidationError_MinExclusive_MaxExclusive" xml:space="preserve">
+    <value>Поле {0} должно иметь значение между {1} (исключая) и {2} (исключая).</value>
   </data>
-  <data name="OrderByFieldIsNotSupported" xml:space="preserve">
-    <value>Ordering by field "{0}" is not supported. Available fields are: {1}.</value>
+  <data name="RequiredAttribute_ValidationError" xml:space="preserve">
+    <value>Требуется поле {0}.</value>
   </data>
-  <data name="TargetStringLengthIncorrect" xml:space="preserve">
-    <value>Incorrect target string length.</value>
+  <data name="StringLengthAttribute_ValidationError" xml:space="preserve">
+    <value>Поле {0} должно быть строкой с максимальной длиной {1}.</value>
+  </data>
+  <data name="StringLengthAttribute_ValidationErrorIncludingMinimum" xml:space="preserve">
+    <value>Поле {0} должно быть строкой с минимальной длиной {2} и максимальной {1}.</value>
+  </data>
+  <data name="UrlAttribute_Invalid" xml:space="preserve">
+    <value>Поле {0} не содержит допустимый полный URL-адрес http, https или ftp.</value>
   </data>
 </root>

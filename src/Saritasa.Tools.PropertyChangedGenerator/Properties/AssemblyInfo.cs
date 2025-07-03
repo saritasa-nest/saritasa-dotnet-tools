@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Saritasa")]
 [assembly: AssemblyProduct("Saritasa.Tools.PropertyChangedGenerator")]
-[assembly: AssemblyCopyright("Copyright © Saritasa 2023")]
+[assembly: AssemblyCopyright("Copyright © Saritasa 2025")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

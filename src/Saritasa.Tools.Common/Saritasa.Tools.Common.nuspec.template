@@ -12,7 +12,7 @@
     <projectUrl>https://github.com/saritasa/saritasatools</projectUrl>
     <icon>icon.png</icon>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <copyright>(c) Saritasa, 2016-2022</copyright>
+    <copyright>(c) Saritasa, 2016-2025</copyright>
     <tags>strings utils atomic pagination datetime security collections diff</tags>
     <repository type="git" url="https://github.com/saritasa-nest/saritasa-dotnet-tools" commit="$(CommitHash)" />
     <dependencies>
@@ -30,6 +30,9 @@
     <file src="bin\Release\**\Saritasa.Tools.Common.dll" target="lib" />
     <file src="bin\Release\**\Saritasa.Tools.Common.pdb" target="lib" />
     <file src="bin\Release\**\Saritasa.Tools.Common.xml" target="lib" />
+      <file src="bin\Release\**\fr\**" target="lib" />
+      <file src="bin\Release\**\es\**" target="lib" />
+      <file src="bin\Release\**\ru\**" target="lib" />
     <file src="..\..\LICENSE.txt" target="LICENSE.txt" />
     <file src="..\..\icon.png" target="icon.png" />
   </files>

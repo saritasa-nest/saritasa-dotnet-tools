@@ -1,11 +1,8 @@
-// Copyright (c) 2015-2024, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2024, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
+using Saritasa.Tools.Domain.Localization;
 
 namespace Saritasa.Tools.Domain;
 
@@ -14,7 +11,7 @@ namespace Saritasa.Tools.Domain;
 /// errors per key.
 /// </summary>
 [DebuggerDisplay("{Count} errors: {ErrorsKeys}")]
-public class ValidationErrors : Dictionary<string, ICollection<string>>
+public class ValidationErrors : Dictionary<string, ICollection<FormattedString>>
 {
     /// <summary>
     /// Default summary validation key. Should contain the overall message.
@@ -37,7 +34,20 @@ public class ValidationErrors : Dictionary<string, ICollection<string>>
     /// Constructor.
     /// </summary>
     /// <param name="errors">Initial errors to initialize with.</param>
-    public ValidationErrors(IDictionary<string, ICollection<string>> errors) : base(errors)
+    public ValidationErrors(IDictionary<string, ICollection<string>> errors)
+    {
+        foreach (var error in errors)
+        {
+            var formatted = error.Value.Select(x => new FormattedString(x)).ToArray();
+            Add(error.Key, formatted);
+        }
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="errors">Initial errors to initialize with.</param>
+    public ValidationErrors(IDictionary<string, ICollection<FormattedString>> errors) : base(errors)
     {
     }
 
@@ -164,11 +174,45 @@ public class ValidationErrors : Dictionary<string, ICollection<string>>
     }
 
     /// <summary>
+    /// Create <see cref="ValidationErrors" /> object with the single key and errors.
+    /// </summary>
+    /// <param name="key">Member of field name or key. It can be empty.</param>
+    /// <param name="errors">Error messages.</param>
+    /// <returns><see cref="ValidationErrors" /> instance.</returns>
+    public static ValidationErrors CreateFromErrors(string key, params FormattedString[] errors)
+    {
+        if (key == null)
+        {
+            throw new ArgumentNullException(nameof(key));
+        }
+        if (errors == null)
+        {
+            throw new ArgumentNullException(nameof(errors));
+        }
+        if (errors.Length == 0)
+        {
+            throw new ArgumentException(Properties.Strings.ValidationErrorIsEmpty, nameof(errors));
+        }
+
+        return new ValidationErrors(new Dictionary<string, ICollection<FormattedString>>
+        {
+            [key] = errors
+        });
+    }
+
+    /// <summary>
     /// Create <see cref="ValidationErrors" /> object with the single summary key and errors.
     /// </summary>
     /// <param name="errors">Error messages.</param>
     /// <returns><see cref="ValidationErrors" /> instance.</returns>
     public static ValidationErrors CreateFromErrors(params string[] errors) => CreateFromErrors(SummaryKey, errors);
+
+    /// <summary>
+    /// Create <see cref="ValidationErrors" /> object with the single summary key and errors.
+    /// </summary>
+    /// <param name="errors">Error messages.</param>
+    /// <returns><see cref="ValidationErrors" /> instance.</returns>
+    public static ValidationErrors CreateFromErrors(params FormattedString[] errors) => CreateFromErrors(SummaryKey, errors);
 
 #if !NET40
     /// <summary>
@@ -177,6 +221,13 @@ public class ValidationErrors : Dictionary<string, ICollection<string>>
     /// <param name="errors">Error messages.</param>
     /// <returns><see cref="ValidationErrors" /> instance.</returns>
     public static ValidationErrors CreateFromErrors(IEnumerable<string> errors) => CreateFromErrors(SummaryKey, errors.ToArray());
+
+    /// <summary>
+    /// Create <see cref="ValidationErrors" /> object with the single summary key and errors.
+    /// </summary>
+    /// <param name="errors">Error messages.</param>
+    /// <returns><see cref="ValidationErrors" /> instance.</returns>
+    public static ValidationErrors CreateFromErrors(IEnumerable<FormattedString> errors) => CreateFromErrors(SummaryKey, errors.ToArray());
 #endif
 
     /// <summary>
@@ -186,20 +237,29 @@ public class ValidationErrors : Dictionary<string, ICollection<string>>
     /// <param name="error">Error message.</param>
     public void AddError(string key, string error)
     {
-        if (string.IsNullOrEmpty(error))
+        AddError(key, new FormattedString(error));
+    }
+
+    /// <summary>
+    /// Add error to errors list for the specific key.
+    /// </summary>
+    /// <param name="key">Member of field name or key. It can be empty.</param>
+    /// <param name="error">Error message.</param>
+    public void AddError(string key, FormattedString error)
+    {
+        if (string.IsNullOrEmpty(error.Format.Value))
         {
             throw new ArgumentException(DomainErrorDescriber.Default.ValidationErrorIsEmpty(), nameof(error));
         }
 
-        if (this.TryGetValue(key, out var list))
+        if (base.TryGetValue(key, out var list))
         {
             list.Add(error);
         }
         else
         {
-            list = new List<string>();
-            list.Add(error);
-            this.Add(key, list);
+            list = new List<FormattedString>() { error };
+            base.Add(key, list);
         }
     }
 
@@ -213,10 +273,20 @@ public class ValidationErrors : Dictionary<string, ICollection<string>>
     }
 
     /// <summary>
+    /// Add a summary error.
+    /// </summary>
+    /// <param name="error">Error message.</param>
+    public void AddError(FormattedString error)
+    {
+        AddError(error);
+    }
+
+    /// <summary>
     /// Returns dictionary that contains only one first error message per member name.
     /// </summary>
     /// <returns>Member error dictionary.</returns>
-    public IDictionary<string, string> GetOneErrorDictionary() => this.ToDictionary(k => k.Key, v => v.Value.FirstOrDefault() ?? string.Empty);
+    public IDictionary<string, FormattedString> GetOneErrorDictionary()
+        => this.ToDictionary(k => k.Key, v => v.Value.FirstOrDefault() ?? string.Empty);
 
     /// <summary>
     /// Merge with another errors dictionary.
@@ -234,9 +304,25 @@ public class ValidationErrors : Dictionary<string, ICollection<string>>
     }
 
     /// <summary>
+    /// Merge with another errors dictionary.
+    /// </summary>
+    /// <param name="dictionary">Errors dictionary to merge with.</param>
+    public void Merge(IDictionary<string, ICollection<FormattedString>> dictionary)
+    {
+        foreach (KeyValuePair<string, ICollection<FormattedString>> errorKeyValue in dictionary)
+        {
+            foreach (var errors in errorKeyValue.Value)
+            {
+                this.AddError(errorKeyValue.Key, errors);
+            }
+        }
+    }
+
+    /// <summary>
     /// Summary errors. Returns zero enumerable if not defined.
     /// </summary>
-    public IEnumerable<string> SummaryErrors => this.ContainsKey(SummaryKey) ? this[SummaryKey] : Enumerable.Empty<string>();
+    public IEnumerable<FormattedString> SummaryErrors
+        => this.ContainsKey(SummaryKey) ? this[SummaryKey] : Enumerable.Empty<FormattedString>();
 
     private string ErrorsKeys => string.Join(", ",
         this.Keys.Select(k => k != SummaryKey ? k : "<summary>"));

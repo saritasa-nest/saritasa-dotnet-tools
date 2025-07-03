@@ -1,8 +1,8 @@
 ﻿// Copyright (c) 2015-2024, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Runtime.Serialization;
+using Saritasa.Tools.Domain.Localization;
 
 namespace Saritasa.Tools.Domain.Exceptions;
 
@@ -12,7 +12,7 @@ namespace Saritasa.Tools.Domain.Exceptions;
 /// It can be mapped to 500 HTTP status code.
 /// </summary>
 [Serializable]
-public class InfrastructureException : Exception
+public class InfrastructureException : LocalizableException
 {
     /// <summary>
     /// Optional description code for this exception.
@@ -67,6 +67,17 @@ public class InfrastructureException : Exception
     /// <summary>
     /// Constructor.
     /// </summary>
+    /// <param name="message">The message format that describes the error.</param>
+    /// <param name="innerException">The exception that is the cause of the current exception, or a
+    /// null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
+    public InfrastructureException(FormattedString message, Exception innerException) :
+        base(message, innerException)
+    {
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
     /// <param name="message">The message that describes the error.</param>
     /// <param name="innerException">The exception that is the cause of the current exception, or a
     /// null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
@@ -80,11 +91,37 @@ public class InfrastructureException : Exception
     /// <summary>
     /// Constructor.
     /// </summary>
+    /// <param name="message">The message format that describes the error.</param>
+    /// <param name="innerException">The exception that is the cause of the current exception, or a
+    /// null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
+    /// <param name="code">Optional description code for this exception.</param>
+    public InfrastructureException(FormattedString message, Exception innerException, int code) :
+        base(message, innerException)
+    {
+        this.Code = code.ToString();
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
     /// <param name="message">The message that describes the error.</param>
     /// <param name="innerException">The exception that is the cause of the current exception, or a
     /// null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
     /// <param name="code">Optional description code for this exception.</param>
     public InfrastructureException(string message, Exception innerException, string code) :
+        base(message, innerException)
+    {
+        this.Code = code;
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="message">The message format that describes the error.</param>
+    /// <param name="innerException">The exception that is the cause of the current exception, or a
+    /// null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
+    /// <param name="code">Optional description code for this exception.</param>
+    public InfrastructureException(FormattedString message, Exception innerException, string code) :
         base(message, innerException)
     {
         this.Code = code;
