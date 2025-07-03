@@ -6,7 +6,7 @@ namespace Saritasa.Tools.Domain.Localization;
 /// Formatted string. Constructed by <see cref="StringLocalizerExtensions"/>.
 /// See also <seealso href="https://github.com/saritasa-nest/saritasa-dotnet-tools/wiki/Domain-Localization"/>.
 /// </summary>
-public class FormattedString
+public class FormattedString : IEquatable<FormattedString?>
 {
     /// <summary>
     /// Formatting pattern as localized string.
@@ -58,6 +58,21 @@ public class FormattedString
     /// <inheritdoc />
     public override string ToString()
         => Arguments is null ? Format : string.Format(Format, Arguments);
+
+    /// <inheritdoc />
+    public override bool Equals(object? obj)
+        => Equals(obj as FormattedString);
+
+    /// <inheritdoc />
+    public bool Equals(FormattedString? other)
+        => other is not null && EqualityComparer<string>.Default.Equals(ToString(), other.ToString());
+
+    /// <inheritdoc />
+    public override int GetHashCode()
+    {
+        var hashCode = -2109979386;
+        return hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ToString());
+    }
 }
 
 /// <summary>
