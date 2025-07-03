@@ -5,7 +5,7 @@ namespace Saritasa.Tools.Domain.Localization;
 
 /// <summary>
 /// Localization provider for non-localized system resources.
-/// See also <seealso href="https://github.com/saritasa-nest/saritasa-dotnet-tools/wiki/Domain/Domain-Localization"/>.
+/// See also <seealso href="https://github.com/saritasa-nest/saritasa-dotnet-tools/wiki/Domain-Localization"/>.
 /// </summary>
 public static class SystemResourceLocalizer
 {
