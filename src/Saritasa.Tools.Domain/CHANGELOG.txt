@@ -1,4 +1,4 @@
-﻿0.9.0 [TBD]
+﻿1.0.0 [TBD]
 [+] Add FormattedString - class that stores LocalizedString with Arguments and resource location.
 [+] Add LocalizableException - base class that stores exception message as FormattedString.
 [+] Add StringLocalizerExtenstions - extension methods for IStringLocalizer that supports FormattedStrings.
