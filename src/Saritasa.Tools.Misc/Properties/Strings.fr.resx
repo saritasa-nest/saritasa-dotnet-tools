@@ -123,4 +123,7 @@
   <data name="PasswordLengthMin" xml:space="preserve">
     <value>Le mot de passe doit contenir au moins {0} caractères.</value>
   </data>
+  <data name="PasswordNotSet" xml:space="preserve">
+    <value>Le mot de passe n'est pas défini.</value>
+  </data>
 </root>
