@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Saritasa.Tools.Domain.Exceptions;
 using Saritasa.Tools.Domain.Localization;
+using Strings = Saritasa.Tools.EntityFrameworkCore.Properties.Strings;
 
 namespace Saritasa.Tools.EntityFrameworkCore;
 
@@ -32,12 +33,8 @@ public static class QueryableExtensions
         var entity = await entities.FirstOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
         if (entity == null)
         {
-            var errorMessageFormat = new LocalizedString(
-                name: nameof(Properties.Strings.CannotFindEntity),
-                value: Properties.Strings.CannotFindEntity);
-
-            var errorMessage = new FormattedString<Properties.Strings>(
-                errorMessageFormat,
+            var errorMessage = new FormattedString<Strings>(
+                Strings.CannotFindEntity.AsLocalizedString(),
                 typeof(TEntity).Name);
 
             throw new NotFoundException(errorMessage);

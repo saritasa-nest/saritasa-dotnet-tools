@@ -6,8 +6,27 @@ namespace Microsoft.Extensions.Localization;
 /// Extension methods for <see cref="IStringLocalizer"/>.
 /// See also <seealso href="https://github.com/saritasa-nest/saritasa-dotnet-tools/wiki/Domain-Localization"/>.
 /// </summary>
-public static class StringLocalizerExtensions
+public static class FormattedStringLocalizerExtensions
 {
+#if NETCOREAPP3_0_OR_GREATER
+    /// <summary>
+    /// Represent string value as localized string.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// Resources.Strings.EmailNotFound.AsLocalizedString();
+    /// </code>
+    /// </example>
+    /// <param name="value">Resource value.</param>
+    /// <param name="name">Resource name. Should be the same as <see cref="LocalizedString.Name"/>.</param>
+    public static LocalizedString AsLocalizedString(
+        this string value,
+        [System.Runtime.CompilerServices.CallerArgumentExpression(nameof(value))] string? name = null)
+    {
+        return new LocalizedString(name ?? value, value);
+    }
+#endif
+
     /// <summary>
     /// Create formatted string using <paramref name="localizer"/> resource type, resource key and arguments.
     /// For example usage see <seealso cref="Format"/>.

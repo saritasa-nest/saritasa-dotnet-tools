@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Saritasa.Tools.Domain.Exceptions;
 using Saritasa.Tools.Domain.Localization;
+using Strings = Saritasa.Tools.EntityFrameworkCore.Properties.Strings;
 
 namespace Saritasa.Tools.EntityFrameworkCore;
 
@@ -29,12 +30,9 @@ public static class DbSetExtensions
         {
             var ids = string.Join(", ", keyValues.Select(k => k.ToString()));
 
-            var errorMessageFormat = new LocalizedString(
-                name: nameof(Properties.Strings.CannotFindEntityWithIdentifier),
-                value: Properties.Strings.CannotFindEntityWithIdentifier);
-
-            var errorMessage = new FormattedString<Properties.Strings>(
-                errorMessageFormat, typeof(TEntity).Name, ids);
+            var errorMessage = new FormattedString<Strings>(
+                Strings.CannotFindEntityWithIdentifier.AsLocalizedString(),
+                typeof(TEntity).Name, ids);
 
             throw new NotFoundException(errorMessage);
         }
@@ -58,12 +56,9 @@ public static class DbSetExtensions
         {
             var ids = string.Join(", ", keyValues.Select(k => k.ToString()));
 
-            var errorMessageFormat = new LocalizedString(
-                name: nameof(Properties.Strings.CannotFindEntityWithIdentifier),
-                value: Properties.Strings.CannotFindEntityWithIdentifier);
-
-            var errorMessage = new FormattedString<Properties.Strings>(
-                errorMessageFormat, typeof(TEntity).Name, ids);
+            var errorMessage = new FormattedString<Strings>(
+                Strings.CannotFindEntityWithIdentifier.AsLocalizedString(),
+                typeof(TEntity).Name, ids);
 
             throw new NotFoundException(errorMessage);
         }
