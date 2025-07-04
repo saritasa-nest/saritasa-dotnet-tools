@@ -70,8 +70,12 @@ public class FormattedString : IEquatable<FormattedString?>
     /// <inheritdoc />
     public override int GetHashCode()
     {
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP
+        return HashCode.Combine(ToString());
+#else
         var hashCode = -2109979386;
         return hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ToString());
+#endif
     }
 }
 
