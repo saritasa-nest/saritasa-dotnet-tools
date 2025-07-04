@@ -23,6 +23,7 @@ public static class FormattedStringLocalizerExtensions
         this string value,
         [System.Runtime.CompilerServices.CallerArgumentExpression(nameof(value))] string? name = null)
     {
+        name = name?.Split('.')?.Last();
         return new LocalizedString(name ?? value, value);
     }
 #endif
