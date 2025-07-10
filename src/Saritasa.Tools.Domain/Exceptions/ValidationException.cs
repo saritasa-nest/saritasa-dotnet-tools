@@ -280,7 +280,7 @@ public class ValidationException : DomainException
                 .Descendants("error")
                 .ToDictionary(
                     x => (string) x.Attribute("id"),
-                    x => x.Elements("msg").Select(e => new FormattedString(e.Value)).ToList());
+                    x => x.Elements("msg").Select(e => (FormattedString)e.Value).ToList());
 
             foreach (var error in errorsElements)
             {
