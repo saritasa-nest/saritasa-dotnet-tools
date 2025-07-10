@@ -8,40 +8,57 @@ namespace Saritasa.Tools.Domain.Localization;
 /// </summary>
 public class FormattedString : IEquatable<FormattedString?>
 {
-    private readonly string neuterValue;
+    private readonly string neutralValue;
     private readonly object[] args;
 
-    public static FormattedString StronglyTypedResource(Func<string> resolve, params object[] args)
+    /// <inheritdoc cref="StronglyTypedFormattedString(Func{string}, object[])" />.
+    public static FormattedString StronglyTypedResource(
+        Func<string> stronglyTypedResourceLookup,
+        params object[] args)
     {
-        return new StronglyTypedFormattedString(resolve, args);
+        return new StronglyTypedFormattedString(stronglyTypedResourceLookup, args);
     }
 
     /// <summary>
     /// Constructor.
     /// </summary>
-    /// <param name="value">Literal value.</param>
+    /// <param name="value">Literal value. <see cref="ToString"/> should return this exact string.</param>
+    /// <param name="args">Formattable arguments.</param>
     protected FormattedString(string value, object[]? args)
     {
-        args ??= [];
-
-        this.args = args;
-        this.neuterValue = args.Length != 0 ? string.Format(value, args) : value;
+        this.args = args ??= [];
+        neutralValue = args.Length != 0 ? string.Format(value, args) : value;
     }
 
+    /// <summary>
+    /// Translate formatted message with current culture settings.
+    /// </summary>
+    /// <param name="stringLocalizerFactory">String localizer factory.</param>
     public string Localize(IStringLocalizerFactory stringLocalizerFactory)
     {
-        var arguments = args?.Select(arg => arg switch
-        {
-            FormattedString fs => fs.Localize(stringLocalizerFactory),
-            var obj => obj,
-        }).ToArray() ?? [];
+        var arguments = args?
+            .Select(arg => arg switch
+            {
+                FormattedString fs => fs.Localize(stringLocalizerFactory),
+                var obj => obj,
+            })
+            .ToArray() ?? [];
 
         return LocalizeInternal(stringLocalizerFactory, arguments);
     }
 
-    protected virtual string LocalizeInternal(IStringLocalizerFactory localizerFactory, object[] arguments)
+    /// <summary>
+    /// Translate formatted message with current culture settings.
+    /// </summary>
+    /// <param name="stringLocalizerFactory">String localizer factory.</param>
+    /// <param name="arguments">
+    /// For every argument of type <see cref="FormattedString"/> passed in a constructor,
+    /// there is an already localized string representation.
+    /// <see cref="Localize(IStringLocalizerFactory)"/> perform a recursive call to <paramref name="arguments"/>.
+    /// </param>
+    protected virtual string LocalizeInternal(IStringLocalizerFactory stringLocalizerFactory, object[] arguments)
     {
-        return string.Format(neuterValue, arguments);
+        return string.Format(neutralValue, arguments);
     }
 
     /// <summary>
@@ -51,7 +68,7 @@ public class FormattedString : IEquatable<FormattedString?>
     public static implicit operator FormattedString(string value) => new FormattedString(value, null);
 
     /// <inheritdoc />
-    public override string ToString() => neuterValue;
+    public override string ToString() => neutralValue;
 
     /// <inheritdoc />
     public override bool Equals(object? obj)

@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using Saritasa.Tools.Domain.Localization;
+﻿using Saritasa.Tools.Domain.Localization;
 
 namespace Microsoft.Extensions.Localization;
 
@@ -16,6 +15,7 @@ public static class StringLocalizerExtensions
     /// <typeparam name="T">Resource provider class.</typeparam>
     /// <param name="localizer">Localizer.</param>
     /// <param name="resourceName">Resource name.</param>
+    /// <param name="args">Formattable arguments.</param>
     public static FormattedString GetFormatted<T>(
         this IStringLocalizer<T> localizer,
         string resourceName,
@@ -28,7 +28,7 @@ public static class StringLocalizerExtensions
     /// Format message using localization resources.
     /// <para>
     /// Unlike <see cref="IStringLocalizer.get_Item(string, object[])"/>, this extension method
-    /// applies recursive localization to <see cref="FormattedString.Arguments"/>.
+    /// applies recursive localization to <see cref="FormattedString.args"/>.
     /// </para>
     /// </summary>
     /// <remarks>
@@ -71,13 +71,11 @@ public static class StringLocalizerExtensions
     /// </list>
     /// <para />
     ///
-    /// Wrapping strings to <see cref="CreateFromResource{T}(IStringLocalizer{T}, string, string?)" />
+    /// Wrapping strings to <see cref="GetFormatted{T}(IStringLocalizer{T}, string, object[])" />
     /// will produce the localizable <see cref="FormattedString"/>.
     /// <code>
     /// CultureInfo.CurrentUICulture = CultureInfo.GetCulture("en-US");
-    /// var formatted = localizer
-    ///     .CreateFromResource(Strings.LicenseExpired_Error)
-    ///     .WithArgs(part);
+    /// var formatted = localizer.GetFormatted("LicenseExpired_Error", part);
     ///
     /// CultureInfo.CurrentUICulture = CultureInfo.GetCulture("ru-RU");
     /// localizer.Format(formatted);

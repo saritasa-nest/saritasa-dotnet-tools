@@ -54,7 +54,6 @@ public class ValidationException : DomainException
     {
     }
 
-
     /// <summary>
     /// Constructor.
     /// </summary>
@@ -276,10 +275,10 @@ public class ValidationException : DomainException
         if (!string.IsNullOrEmpty(xml))
         {
             var xelement = System.Xml.Linq.XElement.Parse(xml);
-            var errorsElements = xelement
-                .Descendants("error")
+            var errorsElements = xelement!
+                .Descendants("error")!
                 .ToDictionary(
-                    x => (string) x.Attribute("id"),
+                    x => (string)x.Attribute("id")!,
                     x => x.Elements("msg").Select(e => (FormattedString)e.Value).ToList());
 
             foreach (var error in errorsElements)

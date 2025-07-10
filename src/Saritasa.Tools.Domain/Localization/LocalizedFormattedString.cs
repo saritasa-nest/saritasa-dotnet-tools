@@ -3,22 +3,27 @@
 namespace Saritasa.Tools.Domain.Localization;
 
 /// <summary>
-/// Generic class for formatted string.
-/// Reuses the same ResourceType object per the closed generic class.
+/// Formatted string implementation that uses <see cref="LocalizedString"/> for resource identification.
 /// </summary>
+/// <typeparam name="TResource">Resource provider class associated with a resx file.</typeparam>
 internal class LocalizedFormattedString<TResource> : FormattedString
 {
     private static readonly Type resourceType = typeof(TResource);
 
     private readonly LocalizedString format;
 
+    /// <summary>
+    /// Constructor.
+    /// </summary>
     /// <param name="format">Formatting pattern as localized string. Contains the name of the resource and the neutral value.</param>
+    /// <param name="args">Formattable arguments.</param>
     public LocalizedFormattedString(LocalizedString format, object[] args)
         : base(format.Value, args)
     {
         this.format = format;
     }
 
+    /// <inheritdoc />
     protected override string LocalizeInternal(
         IStringLocalizerFactory localizerFactory,
         object[] arguments)

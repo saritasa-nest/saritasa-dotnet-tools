@@ -2,16 +2,23 @@
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
+using Saritasa.Tools.Domain.Localization;
 using Xunit;
 
 namespace Saritasa.Tools.Domain.Tests;
 
+/// <summary>
+/// Tests for <see cref="LocalizedFormattedString{TResource}"/>.
+/// </summary>
 public class DynamicLocalizationTests
 {
     private readonly DateTime expirationDate;
     private readonly IStringLocalizerFactory stringLocalizerFactory;
     private readonly IStringLocalizer<DynamicLocalizationTests> stringLocalizer;
 
+    /// <summary>
+    /// Constructor.
+    /// </summary>
     public DynamicLocalizationTests()
     {
         expirationDate = new DateTime(2025, 7, 3);
@@ -25,6 +32,10 @@ public class DynamicLocalizationTests
         stringLocalizer = new StringLocalizer<DynamicLocalizationTests>(stringLocalizerFactory);
     }
 
+    /// <summary>
+    /// Check that <see cref="LocalizedFormattedString{TResource}"/> works even if resource key is not found in an associated resource file.
+    /// After switching the <see cref="CultureInfo.CurrentUICulture"/>, the <see cref="FormattedString.ToString"/> equals to <see cref="LocalizedString.Name"/>.
+    /// </summary>
     [Fact]
     public void FormattedString_ResourceKey_IsNotRequired()
     {
@@ -38,6 +49,10 @@ public class DynamicLocalizationTests
         Assert.Equal("This string is not in DynamicLocalizationTests.ru.resx.", localizerFormattedMessage.Localize(stringLocalizerFactory));
     }
 
+    /// <summary>
+    /// Check that <see cref="LocalizedFormattedString{TResource}"/> persists its internal state
+    /// after switching the <see cref="CultureInfo.CurrentUICulture"/>. The <see cref="FormattedString.ToString"/> is invariant.
+    /// </summary>
     [Fact]
     public void FormattedString_ToString_IsCultureIndependent()
     {
@@ -54,6 +69,10 @@ public class DynamicLocalizationTests
         Assert.Equal("The license expired on 07/03/2025.", localizerFormattedMessage.ToString());
     }
 
+    /// <summary>
+    /// Check that <see cref="LocalizedFormattedString{TResource}"/> varies its localization behaviour
+    /// after switching the <see cref="CultureInfo.CurrentUICulture"/>.
+    /// </summary>
     [Fact]
     public void FormattedString_Localize_IsCultureDependent()
     {
