@@ -30,9 +30,8 @@ public static class DbSetExtensions
         {
             var ids = string.Join(", ", keyValues.Select(k => k.ToString()));
 
-            var errorMessage = FormattedString
-                .FromResource<Strings>(Strings.CannotFindEntityWithIdentifier)
-                .WithArgs(typeof(TEntity).Name, ids);
+            var errorMessage = FormattedString.StronglyTypedResource(() =>
+                Strings.CannotFindEntityWithIdentifier, typeof(TEntity).Name, ids);
 
             throw new NotFoundException(errorMessage);
         }
@@ -56,9 +55,8 @@ public static class DbSetExtensions
         {
             var ids = string.Join(", ", keyValues.Select(k => k.ToString()));
 
-            var errorMessage = FormattedString
-                .FromResource<Strings>(Strings.CannotFindEntityWithIdentifier)
-                .WithArgs(typeof(TEntity).Name, ids);
+            var errorMessage = FormattedString.StronglyTypedResource(() =>
+                Strings.CannotFindEntityWithIdentifier, typeof(TEntity).Name, ids);
 
             throw new NotFoundException(errorMessage);
         }

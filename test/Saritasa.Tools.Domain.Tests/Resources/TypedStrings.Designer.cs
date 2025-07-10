@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Saritasa.Tools.Domain.Tests {
+namespace Saritasa.Tools.Domain.Tests.Resources {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace Saritasa.Tools.Domain.Tests {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Strings {
+    internal class TypedStrings {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Strings() {
+        internal TypedStrings() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Saritasa.Tools.Domain.Tests {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Saritasa.Tools.Domain.Tests.Strings", typeof(Strings).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Saritasa.Tools.Domain.Tests.Resources.TypedStrings", typeof(TypedStrings).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -63,9 +63,9 @@ namespace Saritasa.Tools.Domain.Tests {
         /// <summary>
         ///   Looks up a localized string similar to The license expired on {0:d}..
         /// </summary>
-        internal static string LicenseExpired_Error {
+        internal static string LicenseExpired_Error_1 {
             get {
-                return ResourceManager.GetString("LicenseExpired_Error", resourceCulture);
+                return ResourceManager.GetString("LicenseExpired_Error_1", resourceCulture);
             }
         }
     }

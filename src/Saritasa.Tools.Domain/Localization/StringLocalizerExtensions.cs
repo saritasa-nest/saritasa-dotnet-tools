@@ -15,15 +15,13 @@ public static class StringLocalizerExtensions
     /// </summary>
     /// <typeparam name="T">Resource provider class.</typeparam>
     /// <param name="localizer">Localizer.</param>
-    /// <param name="resourceValue">Resource value.</param>
-    /// <param name="name">Resource name.</param>
-    public static FormattedString CreateFromResource<T>(
+    /// <param name="resourceName">Resource name.</param>
+    public static FormattedString GetFormatted<T>(
         this IStringLocalizer<T> localizer,
-        string resourceValue,
-        [CallerArgumentExpression(nameof(resourceValue))] string? name = null)
+        string resourceName,
+        params object[] args)
     {
-        name = name?.Split('.')?.Last();
-        return new LocalizerFormattedString(typeof(T), localizer[name!]);
+        return new LocalizedFormattedString<T>(localizer[resourceName!], args);
     }
 
     /// <summary>

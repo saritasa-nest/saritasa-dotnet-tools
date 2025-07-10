@@ -117,7 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="LicenseExpired_Error" xml:space="preserve">
+  <data name="LicenseExpired_Error_1" xml:space="preserve">
     <value>Срок лицензии истек {0:d}.</value>
   </data>
 </root>
