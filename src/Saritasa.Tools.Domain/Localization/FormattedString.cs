@@ -3,7 +3,7 @@
 namespace Saritasa.Tools.Domain.Localization;
 
 /// <summary>
-/// Formatted string. Constructed by <see cref="StringLocalizerExtensions"/>.
+/// Formatted string. Consists of localizable resource string and its arguments.
 /// See also <seealso href="https://github.com/saritasa-nest/saritasa-dotnet-tools/wiki/Domain-Localization"/>.
 /// </summary>
 public class FormattedString : IEquatable<FormattedString?>
@@ -12,7 +12,7 @@ public class FormattedString : IEquatable<FormattedString?>
     private readonly object[] args;
 
     /// <inheritdoc cref="StronglyTypedFormattedString(Func{string}, object[])" />.
-    public static FormattedString StronglyTypedResource(
+    public static FormattedString FromResGen(
         Func<string> stronglyTypedResourceLookup,
         params object[] args)
     {

@@ -30,7 +30,7 @@ public class StronglyTypedLocalizationTests
     [Fact]
     public void FormattedString_ToString_IsCultureIndependent()
     {
-        var message = FormattedString.StronglyTypedResource(() =>
+        var message = FormattedString.FromResGen(() =>
             TypedStrings.LicenseExpired_Error_1, expirationDate);
 
         Assert.Equal("The license expired on 07/03/2025.", message.ToString());
@@ -48,13 +48,41 @@ public class StronglyTypedLocalizationTests
     [Fact]
     public void FormattedString_Localize_IsCultureDependent()
     {
-        var message = FormattedString.StronglyTypedResource(() =>
+        var message = FormattedString.FromResGen(() =>
             TypedStrings.LicenseExpired_Error_1, expirationDate);
 
         CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo("ru-RU");
         CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("ru-RU");
 
         Assert.Equal("Срок лицензии истек 03.07.2025.", message.Localize(stringLocalizerFactory: default!));
+    }
+
+    /// <summary>
+    /// Check that <see cref="StronglyTypedFormattedString"/> constructor can accept args or have them captured in lambda.
+    /// </summary>
+    [Fact]
+    public void FormattedString_Format_IsComposed()
+    {
+        var postFormattedMessage = FormattedString.FromResGen(() =>
+            TypedStrings.LicenseExpired_Error_1, expirationDate);
+
+        var preFormattedMessage = FormattedString.FromResGen(() =>
+            string.Format(TypedStrings.LicenseExpired_Error_1, expirationDate));
+
+        Assert.Equal("The license expired on 07/03/2025.", preFormattedMessage.ToString());
+        Assert.Equal("The license expired on 07/03/2025.", postFormattedMessage.ToString());
+
+        Assert.Equal("The license expired on 07/03/2025.", preFormattedMessage.Localize(stringLocalizerFactory: default!));
+        Assert.Equal("The license expired on 07/03/2025.", postFormattedMessage.Localize(stringLocalizerFactory: default!));
+
+        CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo("ru-RU");
+        CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("ru-RU");
+
+        Assert.Equal("The license expired on 07/03/2025.", preFormattedMessage.ToString());
+        Assert.Equal("The license expired on 07/03/2025.", postFormattedMessage.ToString());
+
+        Assert.Equal("Срок лицензии истек 03.07.2025.", preFormattedMessage.Localize(stringLocalizerFactory: default!));
+        Assert.Equal("Срок лицензии истек 03.07.2025.", postFormattedMessage.Localize(stringLocalizerFactory: default!));
     }
 
     /// <summary>
@@ -66,7 +94,7 @@ public class StronglyTypedLocalizationTests
     {
         try
         {
-            throw new DomainException(FormattedString.StronglyTypedResource(() =>
+            throw new DomainException(FormattedString.FromResGen(() =>
                 TypedStrings.LicenseExpired_Error_1, expirationDate));
         }
         catch (LocalizableException ex)

@@ -33,7 +33,7 @@ public static class QueryableExtensions
         var entity = await entities.FirstOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
         if (entity == null)
         {
-            var errorMessage = FormattedString.StronglyTypedResource(() =>
+            var errorMessage = FormattedString.FromResGen(() =>
                 Strings.CannotFindEntity, typeof(TEntity).Name);
 
             throw new NotFoundException(errorMessage);
