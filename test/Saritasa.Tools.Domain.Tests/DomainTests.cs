@@ -1,14 +1,10 @@
 ﻿// Copyright (c) 2015-2024, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.IO;
-using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
-using Xunit;
 using Saritasa.Tools.Domain.Exceptions;
+using Xunit;
 #pragma warning disable CS1591
 
 namespace Saritasa.Tools.Domain.Tests;

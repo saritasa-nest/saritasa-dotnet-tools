@@ -65,7 +65,6 @@ public class DomainException : LocalizableException
     /// </summary>
     /// <param name="code">Optional description code for this exception.</param>
     /// <param name="message">The message format that describes the error.</param>
-    /// <param name="args">Arguments for formatting.</param>
     public DomainException(FormattedString message, int code) : base(message)
     {
         this.Code = code.ToString();
@@ -173,7 +172,7 @@ public class DomainException : LocalizableException
     protected DomainException(SerializationInfo info, StreamingContext context)
         : base(info, context)
     {
-        this.Code = info.GetString("code");
+        this.Code = info.GetString("code") ?? string.Empty;
     }
 
     /// <inheritdoc />

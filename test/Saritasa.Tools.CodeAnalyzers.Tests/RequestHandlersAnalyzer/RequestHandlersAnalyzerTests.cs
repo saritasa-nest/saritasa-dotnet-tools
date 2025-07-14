@@ -41,7 +41,7 @@ public class RequestHandlersAnalyzerTests
             {
                 VerifyCS.Diagnostic(Analyzers.RequestHandlersAnalyzer.DiagnosticId)
                     .WithSeverity(Microsoft.CodeAnalysis.DiagnosticSeverity.Warning)
-                    .WithSpan(10, 31, 10, 49)
+                    .WithSpan(10, 27, 10, 27 + diagnosticArgument.Length)
                     .WithArguments(diagnosticArgument)
             }
         }.RunAsync();

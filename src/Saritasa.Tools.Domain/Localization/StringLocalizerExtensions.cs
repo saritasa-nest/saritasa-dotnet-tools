@@ -14,30 +14,32 @@ public static class StringLocalizerExtensions
     /// </summary>
     /// <typeparam name="T">Resource provider class.</typeparam>
     /// <param name="localizer">Localizer.</param>
-    /// <param name="nameOrFormat">Resource name.</param>
+    /// <param name="resourceName">Resource name.</param>
     /// <param name="args">Formattable arguments.</param>
-    public static FormattedString Create<T>(this IStringLocalizer<T> localizer, string nameOrFormat, params object[] args)
+    public static FormattedString GetFormatted<T>(
+        this IStringLocalizer<T> localizer,
+        string resourceName,
+        params object[] args)
     {
-        return new FormattedString<T>(localizer[nameOrFormat], args);
+        return new LocalizedFormattedString<T>(localizer[resourceName], args);
     }
 
     /// <summary>
     /// Format message using localization resources.
     /// <para>
     /// Unlike <see cref="IStringLocalizer.get_Item(string, object[])"/>, this extension method
-    /// applies recursive localization to <see cref="FormattedString.Arguments"/>.
+    /// applies recursive localization to <see cref="FormattedString.args"/>.
     /// </para>
     /// </summary>
     /// <remarks>
     /// Say, you have a parameterized localized string:
     /// <code>
-    /// var genericMessage = new LocalizedString(
-    ///     name: "ValidationError_Generic",
-    ///     value: "Validation error ocurred: '{0}'");
-    ///
-    /// var concreteMessage = new LocalizedString(
-    ///     name: "ValidationError_RequiredEmail",
-    ///     value: "Email is required.");
+    /// public static partial class Strings
+    /// {
+    ///     public static string LicenseExpired_Error => GetResource(
+    ///         nameof(LicenseExpired_Error),
+    ///         "The license expired on {0:d}.");
+    /// }
     /// </code>
     ///
     /// <list type="number">
@@ -45,56 +47,47 @@ public static class StringLocalizerExtensions
     /// The following code:
     /// <code>
     /// CultureInfo.CurrentUICulture = CultureInfo.GetCulture("en-US");
-    /// localizer[genericMessage.Name, concreteMessage];
+    /// localizer[nameof(Strings.LicenseExpired_Error), licenseExpiredAt];
     /// </code>
-    /// Will result in "Validation error ocurred: 'Email is required.'".
+    /// Will produce "The license expired on 7/3/2025".
     /// </item>
     /// <item>
     /// The following code:
     /// <code>
     /// CultureInfo.CurrentUICulture = CultureInfo.GetCulture("ru-RU");
-    /// localizer[genericMessage.Name, concreteMessage];
+    /// localizer[nameof(Strings.LicenseExpired_Error), licenseExpiredAt];
     /// </code>
-    /// Will result in "Ошибка валидации: 'Email is required.'".
+    /// Will produce "Срок лицензии истек 03.07.2025.".
+    /// </item>
+    ///
+    /// <item>
+    /// The following code:
+    /// <code>
+    /// CultureInfo.CurrentUICulture = CultureInfo.GetCulture("ru-RU");
+    /// localizer[Strings.LicenseExpired_Error, licenseExpiredAt];
+    /// </code>
+    /// Will fail because it will use resource string value as a key.
     /// </item>
     /// </list>
     /// <para />
     ///
-    /// Wrapping strings to <see cref="Create{T}(IStringLocalizer{T}, string, object[])" />
+    /// Wrapping strings to <see cref="GetFormatted{T}(IStringLocalizer{T}, string, object[])" />
     /// will produce the localizable <see cref="FormattedString"/>.
     /// <code>
     /// CultureInfo.CurrentUICulture = CultureInfo.GetCulture("en-US");
-    /// var part = localizer.Create(concreteMessage.Name);
-    /// var formatted = localizer.Create(genericMessage.Name, part);
+    /// var formatted = localizer.GetFormatted("LicenseExpired_Error", part);
     ///
     /// CultureInfo.CurrentUICulture = CultureInfo.GetCulture("ru-RU");
     /// localizer.Format(formatted);
     /// </code>
-    /// Will result in "Ошибка валидации: 'Требуется E-mail.'".
+    /// Will also produce "Срок лицензии истек 03.07.2025.".
     /// </remarks>
     /// <param name="localizerFactory">Localizer factory.</param>
     /// <param name="formattedString">Formatted string.</param>
-    public static LocalizedString Format(this IStringLocalizerFactory localizerFactory, FormattedString formattedString)
+    public static string Format(
+        this IStringLocalizerFactory localizerFactory,
+        FormattedString formattedString)
     {
-        var name = formattedString.Format.Name;
-        if (formattedString.ResourceType is null)
-        {
-            return new LocalizedString(name, formattedString.ToString());
-        }
-
-        var localizer = localizerFactory.Create(formattedString.ResourceType);
-
-        if (formattedString.Arguments is null)
-        {
-            return localizer[name];
-        }
-
-        var arguments = formattedString.Arguments.Select(arg => arg switch
-        {
-            FormattedString fs => localizerFactory.Format(fs),
-            var obj => obj,
-        });
-
-        return localizer[name, arguments];
+        return formattedString.Localize(localizerFactory);
     }
 }

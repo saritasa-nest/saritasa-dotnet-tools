@@ -136,7 +136,7 @@ public class InfrastructureException : LocalizableException
     protected InfrastructureException(SerializationInfo info, StreamingContext context)
         : base(info, context)
     {
-        this.Code = info.GetString("code");
+        this.Code = info.GetString("code") ?? string.Empty;
     }
 
     /// <inheritdoc />

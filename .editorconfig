@@ -162,7 +162,7 @@ charset = utf-8
 indent_size = 2
 
 # Xml config files
-[*.{props,targets,config,nuspec}]
+[*.{props,targets,config,nuspec,nuspec.template}]
 indent_size = 2
 
 # YAML config files

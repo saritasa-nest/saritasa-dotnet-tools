@@ -1,9 +1,12 @@
-// Copyright (c) 2015-2024, Saritasa. All rights reserved.
+﻿// Copyright (c) 2015-2025, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Saritasa.Tools.Domain.Exceptions;
+using Saritasa.Tools.Domain.Localization;
+using Strings = Saritasa.Tools.EntityFrameworkCore.Properties.Strings;
 
 namespace Saritasa.Tools.EntityFrameworkCore;
 
@@ -30,7 +33,10 @@ public static class QueryableExtensions
         var entity = await entities.FirstOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
         if (entity == null)
         {
-            throw new NotFoundException(string.Format(Properties.Strings.CannotFindEntity, typeof(TEntity).Name));
+            var errorMessage = FormattedString.FromResGen(() =>
+                Strings.CannotFindEntity, typeof(TEntity).Name);
+
+            throw new NotFoundException(errorMessage);
         }
         return entity;
     }

@@ -38,7 +38,7 @@ public class ValidationErrors : Dictionary<string, ICollection<FormattedString>>
     {
         foreach (var error in errors)
         {
-            var formatted = error.Value.Select(x => new FormattedString(x)).ToArray();
+            var formatted = error.Value.Select(x => (FormattedString)x).ToArray();
             Add(error.Key, formatted);
         }
     }
@@ -237,7 +237,7 @@ public class ValidationErrors : Dictionary<string, ICollection<FormattedString>>
     /// <param name="error">Error message.</param>
     public void AddError(string key, string error)
     {
-        AddError(key, new FormattedString(error));
+        AddError(key, (FormattedString)error);
     }
 
     /// <summary>
@@ -247,7 +247,7 @@ public class ValidationErrors : Dictionary<string, ICollection<FormattedString>>
     /// <param name="error">Error message.</param>
     public void AddError(string key, FormattedString error)
     {
-        if (string.IsNullOrEmpty(error.Format.Value))
+        if (string.IsNullOrEmpty(error.ToString()))
         {
             throw new ArgumentException(DomainErrorDescriber.Default.ValidationErrorIsEmpty(), nameof(error));
         }
