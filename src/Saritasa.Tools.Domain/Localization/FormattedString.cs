@@ -22,12 +22,13 @@ public class FormattedString : IEquatable<FormattedString?>
     /// <summary>
     /// Constructor.
     /// </summary>
-    /// <param name="value">Literal value. <see cref="ToString"/> should return this exact string.</param>
+    /// <param name="neutralFormat">Neutral format value.</param>
     /// <param name="args">Formattable arguments.</param>
-    protected FormattedString(string value, object[]? args)
+    /// <remarks><see cref="ToString()"/> should be constructed from both <paramref name="neutralFormat"/> and <paramref name="args"/>.</remarks>
+    protected FormattedString(string neutralFormat, object[]? args)
     {
         this.args = args ??= [];
-        neutralValue = args.Length != 0 ? string.Format(value, args) : value;
+        neutralValue = args.Length != 0 ? string.Format(neutralFormat, args) : neutralFormat;
     }
 
     /// <summary>
@@ -36,7 +37,7 @@ public class FormattedString : IEquatable<FormattedString?>
     /// <param name="stringLocalizerFactory">String localizer factory.</param>
     public string Localize(IStringLocalizerFactory stringLocalizerFactory)
     {
-        var arguments = args?
+        var arguments = args
             .Select(arg => arg switch
             {
                 FormattedString fs => fs.Localize(stringLocalizerFactory),
@@ -51,14 +52,16 @@ public class FormattedString : IEquatable<FormattedString?>
     /// Translate formatted message with current culture settings.
     /// </summary>
     /// <param name="stringLocalizerFactory">String localizer factory.</param>
-    /// <param name="arguments">
+    /// <param name="localizedArguments">
     /// For every argument of type <see cref="FormattedString"/> passed in a constructor,
     /// there is an already localized string representation.
-    /// <see cref="Localize(IStringLocalizerFactory)"/> perform a recursive call to <paramref name="arguments"/>.
+    /// <see cref="Localize(IStringLocalizerFactory)"/> perform a recursive call to <paramref name="localizedArguments"/>.
     /// </param>
-    protected virtual string LocalizeInternal(IStringLocalizerFactory stringLocalizerFactory, object[] arguments)
+    protected virtual string LocalizeInternal(IStringLocalizerFactory stringLocalizerFactory, object[] localizedArguments)
     {
-        return string.Format(neutralValue, arguments);
+        // The base class aggregates only neutral (erased) version of the string, so it is not localizable by design.
+        // This method must be overriden by all of the subclasses.
+        return ToString();
     }
 
     /// <summary>

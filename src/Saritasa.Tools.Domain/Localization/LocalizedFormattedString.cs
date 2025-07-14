@@ -26,19 +26,19 @@ internal class LocalizedFormattedString<TResource> : FormattedString
     /// <inheritdoc />
     protected override string LocalizeInternal(
         IStringLocalizerFactory localizerFactory,
-        object[] arguments)
+        object[] localizedArguments)
     {
         if (resourceType is null)
         {
-            return ToString();
+            return base.LocalizeInternal(localizerFactory, localizedArguments);
         }
 
         var localizer = localizerFactory.Create(resourceType);
-        if (arguments.Length == 0)
+        if (localizedArguments.Length == 0)
         {
             return localizer[format.Name];
         }
 
-        return localizer[format.Name, arguments];
+        return localizer[format.Name, localizedArguments];
     }
 }

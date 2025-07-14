@@ -21,8 +21,12 @@ internal class StronglyTypedFormattedString : FormattedString
         this.stronglyTypedResourceLookup = stronglyTypedResourceLookup;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// <inheritdoc path="/summary"/>
+    /// </summary>
+    /// <param name="localizerFactory">This implementation does not use <see cref="IStringLocalizer"/> to get localized values.</param>
+    /// <param name="localizedArguments"><inheritdoc path="/param[@name='localizedArguments']"/></param>
     protected override string LocalizeInternal(
         IStringLocalizerFactory localizerFactory,
-        object[] arguments) => string.Format(stronglyTypedResourceLookup(), arguments);
+        object[] localizedArguments) => string.Format(stronglyTypedResourceLookup(), localizedArguments);
 }
