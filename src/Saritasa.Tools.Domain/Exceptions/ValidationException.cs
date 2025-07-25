@@ -29,7 +29,11 @@ public class ValidationException : DomainException
     public ValidationErrors Errors { get; } = new ValidationErrors();
 
     /// <inheritdoc />
-    public override string Message => MessageFormatter(base.Message, this.Errors);
+    public override string Message => MessageFormatter(
+        base.Message,
+        new ValidationErrors(Errors.ToDictionary(
+            e => e.Key,
+            e => e.Value.Select(v => (FormattedString)v.ToString()).ToList() as ICollection<FormattedString>)));
 
     /// <summary>
     /// Constructor.

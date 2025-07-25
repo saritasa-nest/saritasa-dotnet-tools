@@ -136,6 +136,10 @@ public class StronglyTypedLocalizationTests
             ValidationException.MessageFormatter = ValidationErrorsFormatter.GroupErrorsOrDefaultMessageFormatter;
 
             Assert.Equal(
+                "- expirationDate: The license expired on 07/03/2025.\r\n",
+                ex.Message);
+
+            Assert.Equal(
                 "- expirationDate: Срок лицензии истек 03.07.2025.\r\n",
                 ex.GetLocalizedMessage(localizer: default!));
         }
