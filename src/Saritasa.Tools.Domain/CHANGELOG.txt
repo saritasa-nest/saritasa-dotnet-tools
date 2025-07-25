@@ -1,4 +1,7 @@
-﻿1.0.0 [2025-07-03]
+﻿1.0.1 [2025-07-25]
+[+] Translate title text for ValidationException when it is used with localizable constructor.
+
+1.0.0 [2025-07-03]
 [+] Add FormattedString - class that stores LocalizedString with Arguments and resource location.
 [+] Add LocalizableException - base class that stores exception message as FormattedString.
 [+] Add StringLocalizerExtenstions - extension methods for IStringLocalizer that supports FormattedStrings.
