@@ -189,7 +189,7 @@ public class ValidationException : DomainException
     /// </summary>
     /// <param name="errors">Member error dictionary.</param>
     public ValidationException(IDictionary<string, FormattedString> errors) :
-        base(FormattedString.FromResGen(DomainErrorDescriber.Default.ValidationErrors))
+        base(FormattedString.FromResources(DomainErrorDescriber.Default.ValidationErrors))
     {
         if (errors == null)
         {
@@ -222,7 +222,7 @@ public class ValidationException : DomainException
     /// </summary>
     /// <param name="errors">Member errors dictionary.</param>
     public ValidationException(IDictionary<string, ICollection<FormattedString>> errors) :
-        base(FormattedString.FromResGen(DomainErrorDescriber.Default.ValidationErrors))
+        base(FormattedString.FromResources(DomainErrorDescriber.Default.ValidationErrors))
     {
         if (errors == null)
         {
@@ -252,7 +252,7 @@ public class ValidationException : DomainException
     /// </summary>
     /// <param name="errors">Member errors dictionary.</param>
     public ValidationException(IDictionary<string, IEnumerable<FormattedString>> errors) :
-        base(FormattedString.FromResGen(DomainErrorDescriber.Default.ValidationErrors))
+        base(FormattedString.FromResources(DomainErrorDescriber.Default.ValidationErrors))
     {
         if (errors == null)
         {

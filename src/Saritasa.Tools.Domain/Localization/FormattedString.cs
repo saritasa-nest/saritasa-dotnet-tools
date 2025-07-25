@@ -12,7 +12,7 @@ public class FormattedString : IEquatable<FormattedString?>
     private readonly object[] args;
 
     /// <inheritdoc cref="StronglyTypedFormattedString(Func{string}, object[])" />.
-    public static FormattedString FromResGen(
+    public static FormattedString FromResources(
         Func<string> stronglyTypedResourceLookup,
         params object[] args)
     {

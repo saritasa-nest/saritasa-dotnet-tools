@@ -30,7 +30,7 @@ public class StronglyTypedLocalizationTests
     [Fact]
     public void FormattedString_ToString_IsCultureIndependent()
     {
-        var message = FormattedString.FromResGen(() =>
+        var message = FormattedString.FromResources(() =>
             TypedStrings.LicenseExpired_Error_1, expirationDate);
 
         Assert.Equal("The license expired on 07/03/2025.", message.ToString());
@@ -48,7 +48,7 @@ public class StronglyTypedLocalizationTests
     [Fact]
     public void FormattedString_Localize_IsCultureDependent()
     {
-        var message = FormattedString.FromResGen(() =>
+        var message = FormattedString.FromResources(() =>
             TypedStrings.LicenseExpired_Error_1, expirationDate);
 
         CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo("ru-RU");
@@ -63,10 +63,10 @@ public class StronglyTypedLocalizationTests
     [Fact]
     public void FormattedString_Format_IsComposed()
     {
-        var postFormattedMessage = FormattedString.FromResGen(() =>
+        var postFormattedMessage = FormattedString.FromResources(() =>
             TypedStrings.LicenseExpired_Error_1, expirationDate);
 
-        var preFormattedMessage = FormattedString.FromResGen(() =>
+        var preFormattedMessage = FormattedString.FromResources(() =>
             string.Format(TypedStrings.LicenseExpired_Error_1, expirationDate));
 
         Assert.Equal("The license expired on 07/03/2025.", preFormattedMessage.ToString());
@@ -94,7 +94,7 @@ public class StronglyTypedLocalizationTests
     {
         try
         {
-            throw new DomainException(FormattedString.FromResGen(() =>
+            throw new DomainException(FormattedString.FromResources(() =>
                 TypedStrings.LicenseExpired_Error_1, expirationDate));
         }
         catch (LocalizableException ex)
@@ -118,7 +118,7 @@ public class StronglyTypedLocalizationTests
         {
             throw new ValidationException(ValidationErrors.CreateFromErrors(
                 nameof(expirationDate),
-                FormattedString.FromResGen(() => TypedStrings.LicenseExpired_Error_1, expirationDate)));
+                FormattedString.FromResources(() => TypedStrings.LicenseExpired_Error_1, expirationDate)));
         }
         catch (ValidationException ex)
         {
