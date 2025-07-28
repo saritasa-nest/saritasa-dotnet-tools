@@ -38,7 +38,7 @@ public class ValidationErrors : Dictionary<string, ICollection<FormattedString>>
     {
         foreach (var error in errors)
         {
-            var formatted = error.Value.Select(x => (FormattedString)x).ToArray();
+            var formatted = error.Value.Select<string, FormattedString>(x => x).ToArray();
             Add(error.Key, formatted);
         }
     }

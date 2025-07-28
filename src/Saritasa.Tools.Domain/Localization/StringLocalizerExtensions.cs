@@ -21,7 +21,7 @@ public static class StringLocalizerExtensions
         string resourceName,
         params object[] args)
     {
-        return new LocalizedFormattedString<T>(localizer[resourceName], args);
+        return FormattedString.FromResourceKey<T>(localizer[resourceName], args);
     }
 
     /// <summary>
