@@ -30,7 +30,7 @@ public class StronglyTypedLocalizationTests
     [Fact]
     public void FormattedString_ToString_IsCultureIndependent()
     {
-        var message = FormattedString.FromResGen(() =>
+        var message = FormattedString.FromResource(() =>
             TypedStrings.LicenseExpired_Error_1, expirationDate);
 
         Assert.Equal("The license expired on 07/03/2025.", message.ToString());
@@ -48,7 +48,7 @@ public class StronglyTypedLocalizationTests
     [Fact]
     public void FormattedString_Localize_IsCultureDependent()
     {
-        var message = FormattedString.FromResGen(() =>
+        var message = FormattedString.FromResource(() =>
             TypedStrings.LicenseExpired_Error_1, expirationDate);
 
         CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo("ru-RU");
@@ -63,10 +63,10 @@ public class StronglyTypedLocalizationTests
     [Fact]
     public void FormattedString_Format_IsComposed()
     {
-        var postFormattedMessage = FormattedString.FromResGen(() =>
+        var postFormattedMessage = FormattedString.FromResource(() =>
             TypedStrings.LicenseExpired_Error_1, expirationDate);
 
-        var preFormattedMessage = FormattedString.FromResGen(() =>
+        var preFormattedMessage = FormattedString.FromResource(() =>
             string.Format(TypedStrings.LicenseExpired_Error_1, expirationDate));
 
         Assert.Equal("The license expired on 07/03/2025.", preFormattedMessage.ToString());
@@ -94,7 +94,7 @@ public class StronglyTypedLocalizationTests
     {
         try
         {
-            throw new DomainException(FormattedString.FromResGen(() =>
+            throw new DomainException(FormattedString.FromResource(() =>
                 TypedStrings.LicenseExpired_Error_1, expirationDate));
         }
         catch (LocalizableException ex)
@@ -104,6 +104,44 @@ public class StronglyTypedLocalizationTests
 
             Assert.Equal("The license expired on 07/03/2025.", ex.Message);
             Assert.Equal("Срок лицензии истек 03.07.2025.", ex.GetLocalizedMessage(localizerFactory: default!));
+        }
+    }
+
+    /// <summary>
+    /// Check that <see cref="ValidationException"/> does not break the state of internal <see cref="FormattedString"/>.
+    /// Also, that <see cref="Exception.Message"/> is invariant, and culture independent.
+    /// </summary>
+    [Fact]
+    public void ValidationException_Message_IsCultureDependent()
+    {
+        try
+        {
+            throw new ValidationException(ValidationErrors.CreateFromErrors(
+                nameof(expirationDate),
+                FormattedString.FromResource(() => TypedStrings.LicenseExpired_Error_1, expirationDate)));
+        }
+        catch (ValidationException ex)
+        {
+            CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo("ru-RU");
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("ru-RU");
+
+            Assert.Equal(
+                "Validation errors.",
+                ex.Message);
+
+            Assert.Equal(
+                "Ошибки при проверке данных.",
+                ex.GetLocalizedMessage(localizer: default!));
+
+            ValidationException.MessageFormatter = ValidationErrorsFormatter.GroupErrorsOrDefaultMessageFormatter;
+
+            Assert.Equal(
+                "- expirationDate: The license expired on 07/03/2025.\r\n",
+                ex.Message);
+
+            Assert.Equal(
+                "- expirationDate: Срок лицензии истек 03.07.2025.\r\n",
+                ex.GetLocalizedMessage(localizer: default!));
         }
     }
 }

@@ -1,7 +1,9 @@
 ﻿// Copyright (c) 2015-2024, Saritasa. All rights reserved.
 // Licensed under the BSD license. See LICENSE file in the project root for full license information.
 
+using System.Linq;
 using System.Runtime.Serialization;
+using System.Xml.Linq;
 using Microsoft.Extensions.Localization;
 using Saritasa.Tools.Domain.Localization;
 
@@ -29,7 +31,13 @@ public class ValidationException : DomainException
     public ValidationErrors Errors { get; } = new ValidationErrors();
 
     /// <inheritdoc />
-    public override string Message => MessageFormatter(base.Message, this.Errors);
+    public override string Message => MessageFormatter(
+        base.Message,
+        new ValidationErrors(Errors.ToDictionary(
+            e => e.Key,
+            e => e.Value
+                .Select<FormattedString, FormattedString>(v => v.ToString())
+                .ToList() as ICollection<FormattedString>)));
 
     /// <summary>
     /// Constructor.
@@ -189,7 +197,7 @@ public class ValidationException : DomainException
     /// </summary>
     /// <param name="errors">Member error dictionary.</param>
     public ValidationException(IDictionary<string, FormattedString> errors) :
-        base(DomainErrorDescriber.Default.ValidationErrors())
+        base(FormattedString.FromResource(DomainErrorDescriber.Default.ValidationErrors))
     {
         if (errors == null)
         {
@@ -222,7 +230,7 @@ public class ValidationException : DomainException
     /// </summary>
     /// <param name="errors">Member errors dictionary.</param>
     public ValidationException(IDictionary<string, ICollection<FormattedString>> errors) :
-        base(DomainErrorDescriber.Default.ValidationErrors())
+        base(FormattedString.FromResource(DomainErrorDescriber.Default.ValidationErrors))
     {
         if (errors == null)
         {
@@ -252,7 +260,7 @@ public class ValidationException : DomainException
     /// </summary>
     /// <param name="errors">Member errors dictionary.</param>
     public ValidationException(IDictionary<string, IEnumerable<FormattedString>> errors) :
-        base(DomainErrorDescriber.Default.ValidationErrors())
+        base(FormattedString.FromResource(DomainErrorDescriber.Default.ValidationErrors))
     {
         if (errors == null)
         {
@@ -279,7 +287,7 @@ public class ValidationException : DomainException
                 .Descendants("error")!
                 .ToDictionary(
                     x => (string)x.Attribute("id")!,
-                    x => x.Elements("msg").Select(e => (FormattedString)e.Value).ToList());
+                    x => x.Elements("msg").Select<XElement, FormattedString>(e => e.Value).ToList());
 
             foreach (var error in errorsElements)
             {

@@ -1,4 +1,7 @@
-﻿8.1.0 [2025-07-03]
+﻿8.2.0 [2025-07-25
+[*] [Breaking] Patch Saritasa.Tools.Domain dependency.
+
+8.1.0 [2025-07-03]
 [+] Add resource localization for French, Spanish, Russian.
 [+] Bump Saritasa.Tools.Domain dependency version to 1.0.0.
 
