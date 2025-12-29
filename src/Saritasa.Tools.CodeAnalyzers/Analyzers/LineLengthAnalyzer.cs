@@ -7,6 +7,10 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers;
 /// <summary>
 /// Reports warning when a source line exceeds the configured maximum length.
 /// </summary>
+/// <remarks>
+/// According to
+/// <see href="https://wiki.saritasa.rocks/dotnet/development/c-sharp-style-guide/#code-lines">5.2 code style</see>.
+/// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class LineLengthAnalyzer : DiagnosticAnalyzer
 {
@@ -16,10 +20,6 @@ public sealed class LineLengthAnalyzer : DiagnosticAnalyzer
     private const string DiagnosticId = "STAN1001";
     private const string Category = "Style";
 
-    /// <summary>
-    /// According to
-    /// <see href="https://wiki.saritasa.rocks/dotnet/development/c-sharp-style-guide/#code-lines">5.2 code style</see>.
-    /// </summary>
     private const int MaxLineLength = 130;
 
     private static readonly LocalizableString Title = "Line exceeds maximum length";

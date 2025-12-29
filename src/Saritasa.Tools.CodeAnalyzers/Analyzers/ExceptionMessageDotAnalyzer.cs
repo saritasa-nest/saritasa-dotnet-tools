@@ -1,0 +1,142 @@
+﻿using System.Collections.Immutable;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Operations;
+
+namespace Saritasa.Tools.CodeAnalyzers.Analyzers;
+
+/// <summary>
+/// Ensures exception messages end with a dot.
+/// </summary>
+/// <remarks>
+/// According to
+/// <see href="https://wiki.saritasa.rocks/dotnet/development/c-sharp-style-guide/#english-spelling">6.4 code style</see>.
+/// </remarks>
+[DiagnosticAnalyzer(LanguageNames.CSharp)]
+public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
+{
+    private const string DiagnosticId = "STAN1002";
+    private const string Category = "Spelling";
+
+    private static readonly LocalizableString Title = "Exception message should end with a dot";
+    private static readonly LocalizableString MessageFormat = "Exception message should end with a dot";
+    private static readonly LocalizableString Description
+        = "Ensure exception messages end with a dot to keep consistent phrasing.";
+
+    private static readonly DiagnosticDescriptor Rule = new(
+        DiagnosticId,
+        Title,
+        MessageFormat,
+        Category,
+        DiagnosticSeverity.Warning,
+        isEnabledByDefault: true,
+        description: Description);
+
+    /// <inheritdoc />
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
+
+    /// <inheritdoc />
+    public override void Initialize(AnalysisContext context)
+    {
+        context.EnableConcurrentExecution();
+        context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
+        context.RegisterOperationAction(AnalyzeObjectCreation, OperationKind.ObjectCreation);
+    }
+
+    private static void AnalyzeObjectCreation(OperationAnalysisContext context)
+    {
+        if (context.Operation is not IObjectCreationOperation creation || creation.Type is null)
+        {
+            return;
+        }
+
+        // Only analyze types deriving from System.Exception.
+        if (!DerivesFromException(creation.Type, context.Compilation))
+        {
+            return;
+        }
+
+        // Find the message argument (named "message" and of type string).
+        var messageArgument = creation.Arguments.FirstOrDefault(a =>
+            a.Parameter?.Name == "message" && a.Parameter.Type.SpecialType == SpecialType.System_String);
+
+        if (messageArgument?.Value is null)
+        {
+            return;
+        }
+
+        if (MessageEndsWithDot(messageArgument.Value))
+        {
+            return;
+        }
+
+        var diagnostic = Diagnostic.Create(Rule, messageArgument.Syntax.GetLocation(), messageArgument.Value.Syntax.ToString());
+        context.ReportDiagnostic(diagnostic);
+    }
+
+    private static bool MessageEndsWithDot(IOperation value)
+    {
+        if (value.ConstantValue is { HasValue: true, Value: string constant })
+        {
+            return EndsWithDot(constant);
+        }
+
+        if (value is IInterpolatedStringOperation interpolated)
+        {
+            var lastPart = interpolated.Parts.LastOrDefault();
+            if (lastPart is IInterpolatedStringTextOperation textPart &&
+                textPart.Text.ConstantValue is { HasValue: true, Value: string text })
+            {
+                return EndsWithDot(text);
+            }
+        }
+
+        // Handles such case:
+        // var error = "Error"; Important: it is variable, not constant. With constant, it would be a different case.
+        // throw new Exception(error + ".");
+        if (value is IBinaryOperation { OperatorKind: BinaryOperatorKind.Add } binary && IsStringType(binary.Type))
+        {
+            var rightMost = GetRightMostOperand(binary);
+            return MessageEndsWithDot(rightMost);
+        }
+
+        return false;
+    }
+
+    private static IOperation GetRightMostOperand(IOperation operation)
+    {
+        var current = operation;
+        while (current is IBinaryOperation { OperatorKind: BinaryOperatorKind.Add } binary && IsStringType(binary.Type))
+        {
+            current = binary.RightOperand;
+        }
+
+        return current;
+    }
+
+    private static bool IsStringType(ITypeSymbol? type) => type?.SpecialType == SpecialType.System_String;
+
+    private static bool EndsWithDot(string value) => value.TrimEnd().EndsWith(".", StringComparison.Ordinal);
+
+    private static bool DerivesFromException(ITypeSymbol type, Compilation compilation)
+    {
+        var exceptionType = compilation.GetTypeByMetadataName("System.Exception");
+        if (exceptionType is null)
+        {
+            return false;
+        }
+
+        var current = type;
+        while (current is not null)
+        {
+            if (SymbolEqualityComparer.Default.Equals(current, exceptionType))
+            {
+                return true;
+            }
+
+            current = current.BaseType;
+        }
+
+        return false;
+    }
+}
