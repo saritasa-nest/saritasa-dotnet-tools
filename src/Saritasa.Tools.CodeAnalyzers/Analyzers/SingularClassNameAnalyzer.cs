@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
+﻿using System.Collections.Immutable;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -9,7 +6,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers;
 
 /// <summary>
-/// Warns when a class name starts with plural noun (should be singular).
+/// Warns when a class name contains plural noun (should be singular).
 /// </summary>
 /// <remarks>
 /// According to
@@ -22,9 +19,11 @@ public sealed class SingularClassNameAnalyzer : DiagnosticAnalyzer
     private const string Category = "Naming";
 
     private static readonly LocalizableString Title = "Class name should use singular nouns";
-    private static readonly LocalizableString MessageFormat = "Class name '{0}' starts with plural noun; use singular nouns";
+    private static readonly LocalizableString MessageFormat
+        = "Class name '{0}' contains plural noun; only last noun can be plural";
+
     private static readonly LocalizableString Description
-        = "Class names should use start with singular noun (e.g. 'UserController' instead of 'UsersController').";
+        = "Class names should use singular nouns (e.g. 'UserController' instead of 'UsersController'). Last noun can be plural.";
 
     private static readonly ImmutableHashSet<string> AllowedPluralWords = ImmutableHashSet.Create(
         StringComparer.Ordinal,
