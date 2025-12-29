@@ -31,6 +31,7 @@ public class LineLengthAnalyzerTests
     public async Task Line_IsTooLong_ShouldProduceWarning()
     {
         const string sourceCode =
+            /* lang=c# */
             """
             using System;
             using System.Threading;
@@ -54,6 +55,7 @@ public class LineLengthAnalyzerTests
     public async Task Line_Short_ShouldNotProduceWarning()
     {
         const string sourceCode =
+            /* lang=c# */
             """
             using System;
             using System.Threading;
