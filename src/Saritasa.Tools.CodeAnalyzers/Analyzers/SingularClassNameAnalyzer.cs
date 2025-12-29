@@ -39,7 +39,8 @@ public sealed class SingularClassNameAnalyzer : DiagnosticAnalyzer
         "Class",
         "Gas",
         "Bus",
-        "Cors");
+        "Cors",
+        "Status");
 
     private static readonly DiagnosticDescriptor Rule = new(
         DiagnosticId,
