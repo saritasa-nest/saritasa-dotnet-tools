@@ -6,3 +6,6 @@
 
 0.3.0 [2025-12-29]
 [+] Add exception message ends with dot analyzer.
+
+0.4.0 [2025-12-29]
+[+] Add class singular name analyzer.

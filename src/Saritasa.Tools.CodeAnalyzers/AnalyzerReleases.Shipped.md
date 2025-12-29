@@ -21,3 +21,11 @@ STAN1000 | Usage | Warning | STAN1000_RequestHandlersAnalyzer
  Rule ID  | Category | Severity | Notes
 ----------|----------|----------|--------------------------------------
  STAN1002 | Spelling | Warning  | STAN1002_ExceptionMessageDotAnalyzer
+
+## Release 4.0
+
+### New Rules
+
+ Rule ID  | Category | Severity | Notes
+----------|----------|----------|--------------------------------------
+ STAN1003 | Naming   | Warning  | STAN1003_SingularClassNameAnalyzer
