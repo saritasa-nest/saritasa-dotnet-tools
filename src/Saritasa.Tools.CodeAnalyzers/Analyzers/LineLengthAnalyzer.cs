@@ -7,6 +7,10 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers;
 /// <summary>
 /// Reports warning when a source line exceeds the configured maximum length.
 /// </summary>
+/// <remarks>
+/// Line length can be configured via .editorconfig option:
+/// <c>dotnet_diagnostic.STAN1001.max_line_length = 160</c>.
+/// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class LineLengthAnalyzer : DiagnosticAnalyzer
 {
@@ -17,10 +21,11 @@ public sealed class LineLengthAnalyzer : DiagnosticAnalyzer
     private const string Category = "Style";
 
     /// <summary>
+    /// Default value (used when no .editorconfig option is provided).
     /// According to
     /// <see href="https://wiki.saritasa.rocks/dotnet/development/c-sharp-style-guide/#code-lines">5.2 code style</see>.
     /// </summary>
-    private const int MaxLineLength = 130;
+    private const int DefaultMaxLineLength = 130;
 
     private static readonly LocalizableString Title = "Line exceeds maximum length";
     private static readonly LocalizableString MessageFormat = "Line length is {0} characters, which exceeds the limit of {1}";
@@ -48,18 +53,36 @@ public sealed class LineLengthAnalyzer : DiagnosticAnalyzer
 
     private static void AnalyzeSyntaxTree(SyntaxTreeAnalysisContext context)
     {
+        var maxLineLength = GetMaxLineLength(context);
+
         var text = context.Tree.GetText(context.CancellationToken);
         foreach (var line in text.Lines)
         {
             var length = line.End - line.Start;
-            if (length <= MaxLineLength)
+            if (length <= maxLineLength)
             {
                 continue;
             }
 
             var location = Location.Create(context.Tree, line.Span);
-            var diagnostic = Diagnostic.Create(Rule, location, length, MaxLineLength);
+            var diagnostic = Diagnostic.Create(Rule, location, length, maxLineLength);
             context.ReportDiagnostic(diagnostic);
         }
+    }
+
+    private static int GetMaxLineLength(SyntaxTreeAnalysisContext context)
+    {
+        var options = context.Options.AnalyzerConfigOptionsProvider.GetOptions(context.Tree);
+
+        const string maxLineLengthOptionName = "max_line_length";
+
+        var hasConfiguredMaxLength = options
+            .TryGetValue($"dotnet_diagnostic.{DiagnosticId}.{maxLineLengthOptionName}", out var rawValue);
+        if (hasConfiguredMaxLength && int.TryParse(rawValue, out var configured) && configured > 0)
+        {
+            return configured;
+        }
+
+        return DefaultMaxLineLength;
     }
 }
