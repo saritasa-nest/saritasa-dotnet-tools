@@ -76,8 +76,7 @@ public sealed class LineLengthAnalyzer : DiagnosticAnalyzer
 
         const string maxLineLengthOptionName = "max_line_length";
 
-        var hasConfiguredMaxLength = options
-            .TryGetValue($"dotnet_diagnostic.{DiagnosticId}.{maxLineLengthOptionName}", out var rawValue);
+        var hasConfiguredMaxLength = options.TryGetValue(maxLineLengthOptionName, out var rawValue);
         if (hasConfiguredMaxLength && int.TryParse(rawValue, out var configured) && configured > 0)
         {
             return configured;
