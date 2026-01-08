@@ -32,6 +32,8 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         isEnabledByDefault: true,
         description: Description);
 
+    internal const string DiagnosticPropertyWord = "word";
+
     /// <inheritdoc />
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
@@ -197,7 +199,11 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
 
     private static void Report(SyntaxTreeAnalysisContext context, string word, Location location)
     {
-        var diagnostic = Diagnostic.Create(Rule, location, word);
+        var diagnostic = Diagnostic.Create(
+            Rule,
+            location,
+            properties: ImmutableDictionary<string, string?>.Empty.Add(DiagnosticPropertyWord, word),
+            messageArgs: [word]);
         context.ReportDiagnostic(diagnostic);
     }
 
@@ -320,6 +326,8 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
 
     private static class SpellDictionaryLoader
     {
+        private const string ExclusionsFileName = "exclusions.txt";
+
         public static ImmutableHashSet<string> Load(IEnumerable<AdditionalText> files)
         {
             var builder = ImmutableHashSet.CreateBuilder<string>(StringComparer.OrdinalIgnoreCase);
@@ -328,6 +336,38 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
             {
                 var path = file.Path;
                 if (string.IsNullOrWhiteSpace(path) || !ContainsWordsMarker(path))
+                {
+                    continue;
+                }
+
+                // Exclusions live in the same folder, but are treated as allowed words.
+                if (path.EndsWith(ExclusionsFileName, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                var text = file.GetText();
+                if (text is null)
+                {
+                    continue;
+                }
+
+                foreach (var line in text.Lines)
+                {
+                    AddWord(line.ToString(), builder);
+                }
+            }
+
+            // Load exclusions last so they always win.
+            foreach (var file in files)
+            {
+                var path = file.Path;
+                if (string.IsNullOrWhiteSpace(path) || !ContainsWordsMarker(path))
+                {
+                    continue;
+                }
+
+                if (!path.EndsWith(ExclusionsFileName, StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
@@ -346,7 +386,6 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
 
             return builder.ToImmutable();
         }
-
 
         private static bool ContainsWordsMarker(string path) => path.Contains("words", StringComparison.OrdinalIgnoreCase);
 
