@@ -29,3 +29,11 @@ STAN1000 | Usage | Warning | STAN1000_RequestHandlersAnalyzer
  Rule ID  | Category | Severity | Notes
 ----------|----------|----------|--------------------------------------
  STAN1003 | Naming   | Warning  | STAN1003_SingularClassNameAnalyzer
+
+## Release 5.0
+
+### New Rules
+
+Rule ID | Category | Severity | Notes
+--- | --- | --- | ---
+STAN1004 | Spelling | Warning | SpellingAnalyzer

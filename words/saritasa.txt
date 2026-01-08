@@ -1,0 +1,7 @@
+Saritasa
+healthz
+livez
+readyz
+devops
+Cors
+CORS
