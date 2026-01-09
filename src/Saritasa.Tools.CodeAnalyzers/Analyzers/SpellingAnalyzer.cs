@@ -59,21 +59,9 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
     {
         var root = context.Tree.GetRoot(context.CancellationToken);
 
-        foreach (var token in root.DescendantTokens(descendIntoTrivia: true))
+        var descendantTokens = root.DescendantTokens(descendIntoTrivia: true);
+        foreach (var token in descendantTokens)
         {
-            if (token.IsKind(SyntaxKind.IdentifierToken))
-            {
-                CheckIdentifierToken(context, dictionary, token);
-                continue;
-            }
-
-            if (token.IsKind(SyntaxKind.StringLiteralToken) || token.IsKind(SyntaxKind.CharacterLiteralToken) ||
-                token.IsKind(SyntaxKind.InterpolatedStringTextToken) || token.IsKind(SyntaxKind.XmlTextLiteralToken))
-            {
-                var textContent = token.ValueText.Length > 0 ? token.ValueText : token.Text;
-                CheckTextToken(context, dictionary, textContent, token.Span);
-            }
-
             foreach (var trivia in token.LeadingTrivia)
             {
                 CheckTrivia(context, dictionary, trivia);
@@ -82,6 +70,19 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
             foreach (var trivia in token.TrailingTrivia)
             {
                 CheckTrivia(context, dictionary, trivia);
+            }
+
+            if (token.IsKind(SyntaxKind.IdentifierToken))
+            {
+                CheckIdentifierToken(context, dictionary, token);
+            }
+
+            if (token.IsKind(SyntaxKind.StringLiteralToken)
+                || token.IsKind(SyntaxKind.CharacterLiteralToken)
+                || token.IsKind(SyntaxKind.InterpolatedStringTextToken))
+            {
+                var textContent = token.ValueText.Length > 0 ? token.ValueText : token.Text;
+                CheckTextToken(context, dictionary, textContent, token.Span);
             }
         }
     }
@@ -340,7 +341,6 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
                     continue;
                 }
 
-                // Exclusions live in the same folder, but are treated as allowed words.
                 if (path.EndsWith(ExclusionsFileName, StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
@@ -393,11 +393,6 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         {
             var word = line?.Trim();
             if (string.IsNullOrWhiteSpace(word))
-            {
-                return;
-            }
-
-            if (word!.StartsWith("#", StringComparison.Ordinal) || word.StartsWith("//", StringComparison.Ordinal))
             {
                 return;
             }

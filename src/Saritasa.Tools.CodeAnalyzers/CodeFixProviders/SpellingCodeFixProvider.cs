@@ -108,17 +108,11 @@ public sealed class SpellingCodeFixProvider : CodeFixProvider
 
     private static bool ContainsWord(string content, string word)
     {
-        // Keep parsing logic consistent with the analyzer (trim; ignore blank; ignore # and // comments).
-        var lines = content.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+        var lines = content.Split(["\r\n", "\n"], StringSplitOptions.None);
         foreach (var line in lines)
         {
             var trimmed = line.Trim();
             if (string.IsNullOrWhiteSpace(trimmed))
-            {
-                continue;
-            }
-
-            if (trimmed.StartsWith("#", StringComparison.Ordinal) || trimmed.StartsWith("//", StringComparison.Ordinal))
             {
                 continue;
             }
