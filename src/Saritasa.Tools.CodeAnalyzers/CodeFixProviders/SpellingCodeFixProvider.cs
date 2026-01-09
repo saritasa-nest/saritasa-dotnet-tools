@@ -19,7 +19,7 @@ public sealed class SpellingCodeFixProvider : CodeFixProvider
     private const string ExclusionsFileName = "exclusions.txt";
 
     /// <inheritdoc />
-    public override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create("STAN1004");
+    public override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(SpellingAnalyzer.DiagnosticId);
 
     /// <inheritdoc />
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
@@ -27,7 +27,7 @@ public sealed class SpellingCodeFixProvider : CodeFixProvider
     /// <inheritdoc />
     public override Task RegisterCodeFixesAsync(CodeFixContext context)
     {
-        var diagnostic = context.Diagnostics.FirstOrDefault(d => d.Id == "STAN1004");
+        var diagnostic = context.Diagnostics.FirstOrDefault(d => d.Id == SpellingAnalyzer.DiagnosticId);
         if (diagnostic is null)
         {
             return Task.CompletedTask;

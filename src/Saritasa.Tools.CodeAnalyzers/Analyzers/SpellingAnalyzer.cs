@@ -12,7 +12,11 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class SpellingAnalyzer : DiagnosticAnalyzer
 {
-    private const string DiagnosticId = "STAN1004";
+    /// <summary>
+    /// Diagnostic identifier.
+    /// </summary>
+    public const string DiagnosticId = "STAN1004";
+
     private const string Category = "Spelling";
 
     private static readonly LocalizableString Title = "Possible spelling mistake";
