@@ -328,8 +328,6 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
 
     private static class SpellDictionaryLoader
     {
-        private const string ExclusionsFileName = "exclusions.txt";
-
         public static ImmutableHashSet<string> Load(IEnumerable<AdditionalText> files)
         {
             var builder = ImmutableHashSet.CreateBuilder<string>(StringComparer.OrdinalIgnoreCase);
@@ -338,37 +336,6 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
             {
                 var path = file.Path;
                 if (string.IsNullOrWhiteSpace(path) || !ContainsWordsMarker(path))
-                {
-                    continue;
-                }
-
-                if (path.EndsWith(ExclusionsFileName, StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-
-                var text = file.GetText();
-                if (text is null)
-                {
-                    continue;
-                }
-
-                foreach (var line in text.Lines)
-                {
-                    AddWord(line.ToString(), builder);
-                }
-            }
-
-            // Load exclusions last so they always win.
-            foreach (var file in files)
-            {
-                var path = file.Path;
-                if (string.IsNullOrWhiteSpace(path) || !ContainsWordsMarker(path))
-                {
-                    continue;
-                }
-
-                if (!path.EndsWith(ExclusionsFileName, StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
