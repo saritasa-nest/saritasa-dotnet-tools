@@ -10,7 +10,7 @@ namespace Saritasa.Tools.CodeAnalyzers.CodeFixProviders;
 
 /// <summary>
 /// Quick-fix for <see cref="SpellingAnalyzer"/> that adds the reported word to <c>exclusions.txt</c>
-/// under the configured <c>words</c> folder (fed via Analyzer AdditionalFiles).
+/// under the configured <c>words</c> folder.
 /// </summary>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(SpellingCodeFixProvider))]
 [Shared]
