@@ -9,7 +9,7 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers;
 /// </summary>
 /// <remarks>
 /// Line length can be configured via .editorconfig option:
-/// <c>dotnet_diagnostic.STAN1001.max_line_length = 160</c>.
+/// <c>max_line_length = 160</c>.
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class LineLengthAnalyzer : DiagnosticAnalyzer
