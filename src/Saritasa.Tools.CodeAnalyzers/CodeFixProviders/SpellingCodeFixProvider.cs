@@ -62,7 +62,7 @@ public sealed class SpellingCodeFixProvider : CodeFixProvider
         ImmutableArray<AdditionalText> additionalFiles)
     {
         // We can only apply a fix if exclusions.txt is included as an AdditionalFile in the solution.
-        // (Roslyn code fix can't reliably create arbitrary new files on disk.)
+        // (Roslyn code fix cannot reliably create arbitrary new files on disk.)
         var exclusionsPath = additionalFiles
             .Select(f => f.Path)
             .FirstOrDefault(p =>
