@@ -9,9 +9,6 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers;
 /// <summary>
 /// Reports warning when a word in identifiers, strings or comments is not found in the configured dictionaries.
 /// </summary>
-/// <remarks>
-/// Dictionaries are loaded from additional files placed under <c>SpellCheck/words/**</c>.
-/// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class SpellingAnalyzer : DiagnosticAnalyzer
 {
