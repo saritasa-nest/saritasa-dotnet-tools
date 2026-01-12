@@ -25,10 +25,6 @@ public sealed class LineLengthAnalyzer : DiagnosticAnalyzer
     /// According to
     /// <see href="https://wiki.saritasa.rocks/dotnet/development/c-sharp-style-guide/#code-lines">5.2 code style</see>.
     /// </summary>
-    /// <remarks>
-    /// According to
-    /// <see href="https://wiki.saritasa.rocks/dotnet/development/c-sharp-style-guide/#code-lines">5.2 code style</see>.
-    /// </remarks>
     private const int DefaultMaxLineLength = 130;
 
     private static readonly LocalizableString Title = "Line exceeds maximum length";
