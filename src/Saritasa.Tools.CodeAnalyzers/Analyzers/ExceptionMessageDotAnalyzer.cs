@@ -50,15 +50,13 @@ public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        // Only analyze types deriving from System.Exception.
         if (!DerivesFromException(creation.Type, context.Compilation))
         {
             return;
         }
 
-        // Find the message argument (named "message" and of type string).
-        var messageArgument = creation.Arguments.FirstOrDefault(a =>
-            a.Parameter?.Name == "message" && a.Parameter.Type.SpecialType == SpecialType.System_String);
+        var messageArgument = creation.Arguments
+            .FirstOrDefault(a => a.Parameter?.Name == "message" && IsStringType(a.Parameter.Type));
 
         if (messageArgument?.Value is null)
         {
