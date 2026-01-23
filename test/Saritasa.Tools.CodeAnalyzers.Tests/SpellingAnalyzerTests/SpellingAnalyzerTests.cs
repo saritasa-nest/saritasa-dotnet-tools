@@ -406,4 +406,96 @@ public class SpellingAnalyzerTests
 
         await context.RunAsync();
     }
+
+    /// <summary>
+    /// Verifies class name produces a warning when it contains a typo.
+    /// </summary>
+    [TestMethod]
+    public async Task Class_WithTypo_ShouldProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClassWith[|Typoo|]
+                {
+                    public void TestMethod()
+                    {
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies class name does not produce a warning when it is correct.
+    /// </summary>
+    [TestMethod]
+    public async Task Class_WithoutTypo_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClassWithoutTypo
+                {
+                    public void TestMethod()
+                    {
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies method name produces a warning when it contains a typo.
+    /// </summary>
+    [TestMethod]
+    public async Task Method_WithTypo_ShouldProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethodWithout[|Typoo|]()
+                    {
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies method name does not produce a warning when it is correct.
+    /// </summary>
+    [TestMethod]
+    public async Task Method_WithoutTypo_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethodWithoutTypo()
+                    {
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
 }
