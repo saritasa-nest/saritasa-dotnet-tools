@@ -15,8 +15,6 @@
   <ItemGroup>
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <None Update="tools\*.ps1" CopyToOutputDirectory="Always"  Pack="true"  PackagePath="tools"  />
-    <None Include="..\..\words\*.dic" CopyToOutputDirectory="Always" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-    <None Include="..\..\words\*.aff" CopyToOutputDirectory="Always" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,6 +27,11 @@
   <ItemGroup>
     <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
     <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\words\en.dic" />
+    <EmbeddedResource Include="..\..\words\en.aff" />
   </ItemGroup>
 
   <Target Name="CopyWeCantSpellHunspell" AfterTargets="Build">

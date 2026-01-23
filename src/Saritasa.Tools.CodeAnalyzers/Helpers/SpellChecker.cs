@@ -1,4 +1,9 @@
-﻿using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using Microsoft.CodeAnalysis;
 using WeCantSpell.Hunspell;
 
@@ -9,6 +14,9 @@ namespace Saritasa.Tools.CodeAnalyzers.Helpers;
 /// </summary>
 public class SpellChecker
 {
+    private const string DefaultDicFileName = "en.dic";
+    private const string DefaultAffFileName = "en.aff";
+
     private readonly WordList? wordList;
     private readonly ImmutableHashSet<string> customWords;
 
@@ -47,8 +55,9 @@ public class SpellChecker
     {
         var customWords = ImmutableHashSet.CreateBuilder<string>(StringComparer.OrdinalIgnoreCase);
 
-        // Load dictionary files from analyzer assembly directory
-        var wordList = LoadWordListFromAssemblyDirectory();
+        // Load dictionaries shipped with the analyzer package.
+        // Prefer embedded resources (works reliably when analyzers are loaded from NuGet cache).
+        var wordList = LoadWordListFromEmbeddedResources();
 
         // Load custom words from additional files (if provided by user projects)
         var additionalFiles = files.ToList();
@@ -88,36 +97,45 @@ public class SpellChecker
     }
 
 #pragma warning disable RS1035 // Do not use APIs banned for analyzers
-    private static WordList? LoadWordListFromAssemblyDirectory()
+    private static WordList? LoadWordListFromEmbeddedResources()
     {
         try
         {
-            var analyzerLocation = typeof(SpellChecker).Assembly.Location;
-            var analyzerDir = Path.GetDirectoryName(analyzerLocation);
-            if (string.IsNullOrWhiteSpace(analyzerDir))
+            var assembly = typeof(SpellChecker).Assembly;
+
+            var dicStream = TryOpenResourceStream(assembly, DefaultDicFileName);
+            if (dicStream is null)
             {
                 return null;
             }
 
-            var dicFile = Path.Combine(analyzerDir, "en.dic");
-            var affFile = Path.Combine(analyzerDir, "en.aff");
-
-            if (!File.Exists(dicFile))
+            using (dicStream)
             {
-                return null;
-            }
+                var affStream = TryOpenResourceStream(assembly, DefaultAffFileName);
+                if (affStream is null)
+                {
+                    return null;
+                }
 
-            if (File.Exists(affFile))
-            {
-                return WordList.CreateFromFiles(dicFile, affFile);
+                using (affStream)
+                {
+                    return WordList.CreateFromStreams(dicStream, affStream);
+                }
             }
-
-            return WordList.CreateFromFiles(dicFile);
         }
         catch
         {
             return null;
         }
+    }
+
+    private static Stream? TryOpenResourceStream(Assembly assembly, string fileName)
+    {
+        var match = assembly
+            .GetManifestResourceNames()
+            .FirstOrDefault(n => n.EndsWith(fileName, StringComparison.OrdinalIgnoreCase));
+
+        return match is null ? null : assembly.GetManifestResourceStream(match);
     }
 
     private static void LoadCustomWordsFromAssemblyDirectory(ImmutableHashSet<string>.Builder customWords)
