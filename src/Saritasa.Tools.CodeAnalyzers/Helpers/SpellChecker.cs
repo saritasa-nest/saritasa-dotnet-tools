@@ -39,48 +39,19 @@ public class SpellChecker
     }
 
     /// <summary>
-    /// Creates spell checker from additional files.
+    /// Creates spell checker from packaged dictionary files and optional additional files.
     /// </summary>
-    /// <param name="files">Dictionary files. Should contain <c>.dic</c>, <c>.aff</c> and <c>exclusions.txt</c> files.</param>
+    /// <param name="files">Optional additional files for custom words (e.g., <c>exclusions.txt</c>).</param>
     /// <returns>Spell checker.</returns>
     public static SpellChecker Create(IEnumerable<AdditionalText> files)
     {
         var customWords = ImmutableHashSet.CreateBuilder<string>(StringComparer.OrdinalIgnoreCase);
-        WordList? wordList = null;
 
+        // Load dictionary files from analyzer assembly directory
+        var wordList = LoadWordListFromAssemblyDirectory();
+
+        // Load custom words from additional files (if provided by user projects)
         var additionalFiles = files.ToList();
-        var dicFile = additionalFiles.FirstOrDefault(f => f.Path.EndsWith(".dic", StringComparison.OrdinalIgnoreCase));
-
-        if (dicFile != null)
-        {
-            var dicSourceText = dicFile.GetText();
-            if (dicSourceText != null)
-            {
-                var affFile = additionalFiles.FirstOrDefault(f => f.Path.EndsWith(".aff", StringComparison.OrdinalIgnoreCase));
-                var affSourceText = affFile?.GetText();
-
-                using var dicStream = new MemoryStream();
-                var dicStreamWriter = new StreamWriter(dicStream);
-                dicSourceText.Write(dicStreamWriter);
-                dicStreamWriter.Flush();
-                dicStream.Position = 0;
-
-                if (affSourceText != null)
-                {
-                    using var affStream = new MemoryStream();
-                    var affStreamWriter = new StreamWriter(affStream);
-                    affSourceText.Write(affStreamWriter);
-                    affStreamWriter.Flush();
-                    affStream.Position = 0;
-                    wordList = WordList.CreateFromStreams(dicStream, affStream);
-                }
-                else
-                {
-                    wordList = WordList.CreateFromStreams(dicStream, new MemoryStream());
-                }
-            }
-        }
-
         foreach (var file in additionalFiles)
         {
             var path = file.Path;
@@ -110,6 +81,74 @@ public class SpellChecker
             }
         }
 
+        // Also load custom word files from analyzer directory
+        LoadCustomWordsFromAssemblyDirectory(customWords);
+
         return new SpellChecker(wordList, customWords.ToImmutable());
     }
+
+#pragma warning disable RS1035 // Do not use APIs banned for analyzers
+    private static WordList? LoadWordListFromAssemblyDirectory()
+    {
+        try
+        {
+            var analyzerLocation = typeof(SpellChecker).Assembly.Location;
+            var analyzerDir = Path.GetDirectoryName(analyzerLocation);
+            if (string.IsNullOrWhiteSpace(analyzerDir))
+            {
+                return null;
+            }
+
+            var dicFile = Path.Combine(analyzerDir, "en.dic");
+            var affFile = Path.Combine(analyzerDir, "en.aff");
+
+            if (!File.Exists(dicFile))
+            {
+                return null;
+            }
+
+            if (File.Exists(affFile))
+            {
+                return WordList.CreateFromFiles(dicFile, affFile);
+            }
+
+            return WordList.CreateFromFiles(dicFile);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private static void LoadCustomWordsFromAssemblyDirectory(ImmutableHashSet<string>.Builder customWords)
+    {
+        try
+        {
+            var analyzerLocation = typeof(SpellChecker).Assembly.Location;
+            var analyzerDir = Path.GetDirectoryName(analyzerLocation);
+            if (string.IsNullOrWhiteSpace(analyzerDir))
+            {
+                return;
+            }
+
+            var txtFiles = Directory.GetFiles(analyzerDir, "*.txt");
+            foreach (var txtFile in txtFiles)
+            {
+                var lines = File.ReadAllLines(txtFile);
+                foreach (var line in lines)
+                {
+                    var word = line.Trim();
+                    if (!string.IsNullOrWhiteSpace(word))
+                    {
+                        customWords.Add(word);
+                    }
+                }
+            }
+        }
+        catch
+        {
+            // Silently ignore errors loading custom word files
+        }
+    }
+#pragma warning restore RS1035
 }

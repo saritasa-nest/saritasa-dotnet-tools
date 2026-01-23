@@ -1,4 +1,0 @@
-appsettings
-argname
-Mediat
-newtonsoftjson
