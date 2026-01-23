@@ -1,8 +1,10 @@
-﻿using System.Collections.Immutable;
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
+using Saritasa.Tools.CodeAnalyzers.Helpers;
 
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers;
 
@@ -12,6 +14,11 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class SpellingAnalyzer : DiagnosticAnalyzer
 {
+    static SpellingAnalyzer()
+    {
+        AssemblyResolver.ResolveAssemblies();
+    }
+
     /// <summary>
     /// Diagnostic identifier.
     /// </summary>
@@ -46,17 +53,17 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
 
         context.RegisterCompilationStartAction(compilationContext =>
         {
-            var dictionary = SpellDictionaryLoader.Load(compilationContext.Options.AdditionalFiles);
-            if (dictionary.Count == 0)
+            var spellChecker = SpellChecker.Create(compilationContext.Options.AdditionalFiles);
+            if (spellChecker.IsEmpty)
             {
                 return;
             }
 
-            compilationContext.RegisterSyntaxTreeAction(c => AnalyzeSyntaxTree(c, dictionary));
+            compilationContext.RegisterSyntaxTreeAction(c => AnalyzeSyntaxTree(c, spellChecker));
         });
     }
 
-    private static void AnalyzeSyntaxTree(SyntaxTreeAnalysisContext context, ImmutableHashSet<string> dictionary)
+    private static void AnalyzeSyntaxTree(SyntaxTreeAnalysisContext context, SpellChecker spellChecker)
     {
         var root = context.Tree.GetRoot(context.CancellationToken);
 
@@ -65,17 +72,17 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         {
             foreach (var trivia in token.LeadingTrivia)
             {
-                CheckTrivia(context, dictionary, trivia);
+                CheckTrivia(context, spellChecker, trivia);
             }
 
             foreach (var trivia in token.TrailingTrivia)
             {
-                CheckTrivia(context, dictionary, trivia);
+                CheckTrivia(context, spellChecker, trivia);
             }
 
             if (token.IsKind(SyntaxKind.IdentifierToken))
             {
-                CheckIdentifierToken(context, dictionary, token);
+                CheckIdentifierToken(context, spellChecker, token);
             }
 
             if (token.IsKind(SyntaxKind.StringLiteralToken)
@@ -83,24 +90,24 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
                 || token.IsKind(SyntaxKind.InterpolatedStringTextToken))
             {
                 var textContent = token.ValueText.Length > 0 ? token.ValueText : token.Text;
-                CheckTextToken(context, dictionary, textContent, token.Span);
+                CheckTextToken(context, spellChecker, textContent, token.Span);
             }
         }
     }
 
     private static void CheckIdentifierToken(
         SyntaxTreeAnalysisContext context,
-        ImmutableHashSet<string> dictionary,
+        SpellChecker spellChecker,
         SyntaxToken token)
     {
-        if (dictionary.Contains(token.ValueText))
+        if (spellChecker.Check(token.ValueText))
         {
             return;
         }
 
         foreach (var (word, offset) in SplitIdentifier(token.ValueText))
         {
-            if (!ShouldCheckWord(dictionary, word))
+            if (!ShouldCheckWord(spellChecker, word))
             {
                 continue;
             }
@@ -112,13 +119,13 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
 
     private static void CheckTextToken(
         SyntaxTreeAnalysisContext context,
-        ImmutableHashSet<string> dictionary,
+        SpellChecker spellChecker,
         string text,
         TextSpan span)
     {
         foreach (var (word, offset) in SplitByNonLetters(text))
         {
-            if (!ShouldCheckWord(dictionary, word))
+            if (!ShouldCheckWord(spellChecker, word))
             {
                 continue;
             }
@@ -127,7 +134,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
             {
                 foreach (var (partWord, partOffset) in SplitCamelCase(word, offset))
                 {
-                    if (!ShouldCheckWord(dictionary, partWord))
+                    if (!ShouldCheckWord(spellChecker, partWord))
                     {
                         continue;
                     }
@@ -146,7 +153,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
 
     private static void CheckTrivia(
         SyntaxTreeAnalysisContext context,
-        ImmutableHashSet<string> dictionary,
+        SpellChecker spellChecker,
         SyntaxTrivia trivia)
     {
         if (!IsCommentTrivia(trivia))
@@ -157,7 +164,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         var text = trivia.ToFullString();
         foreach (var (word, offset) in SplitByNonLetters(text))
         {
-            if (!ShouldCheckWord(dictionary, word))
+            if (!ShouldCheckWord(spellChecker, word))
             {
                 continue;
             }
@@ -166,7 +173,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
             {
                 foreach (var (partWord, partOffset) in SplitCamelCase(word, offset))
                 {
-                    if (!ShouldCheckWord(dictionary, partWord))
+                    if (!ShouldCheckWord(spellChecker, partWord))
                     {
                         continue;
                     }
@@ -184,9 +191,9 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         }
     }
 
-    private static bool ShouldCheckWord(ImmutableHashSet<string> dictionary, string word)
+    private static bool ShouldCheckWord(SpellChecker spellChecker, string word)
     {
-        if (dictionary.Count == 0)
+        if (spellChecker.IsEmpty)
         {
             return false;
         }
@@ -196,7 +203,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
             return false;
         }
 
-        return !dictionary.Contains(word);
+        return !spellChecker.Check(word);
     }
 
     private static void Report(SyntaxTreeAnalysisContext context, string word, Location location)
@@ -323,49 +330,6 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         if (start < word.Length)
         {
             yield return (word.Substring(start, word.Length - start), baseOffset + start);
-        }
-    }
-
-    private static class SpellDictionaryLoader
-    {
-        public static ImmutableHashSet<string> Load(IEnumerable<AdditionalText> files)
-        {
-            var builder = ImmutableHashSet.CreateBuilder<string>(StringComparer.OrdinalIgnoreCase);
-
-            foreach (var file in files)
-            {
-                var path = file.Path;
-                if (string.IsNullOrWhiteSpace(path) || !ContainsWordsMarker(path))
-                {
-                    continue;
-                }
-
-                var text = file.GetText();
-                if (text is null)
-                {
-                    continue;
-                }
-
-                foreach (var line in text.Lines)
-                {
-                    AddWord(line.ToString(), builder);
-                }
-            }
-
-            return builder.ToImmutable();
-        }
-
-        private static bool ContainsWordsMarker(string path) => path.Contains("words", StringComparison.OrdinalIgnoreCase);
-
-        private static void AddWord(string? line, ImmutableHashSet<string>.Builder builder)
-        {
-            var word = line?.Trim();
-            if (string.IsNullOrWhiteSpace(word))
-            {
-                return;
-            }
-
-            builder.Add(word);
         }
     }
 }
