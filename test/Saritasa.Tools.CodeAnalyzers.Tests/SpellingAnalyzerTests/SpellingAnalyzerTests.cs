@@ -84,6 +84,30 @@ public class SpellingAnalyzerTests
     }
 
     /// <summary>
+    /// Verifies single word string literal does not produce a warning when it is correct.
+    /// </summary>
+    [TestMethod]
+    public async Task StringLiteral_SingleWord_WithoutTypo_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var test = "typo";
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
     /// Verifies sentence string literal produces a warning when it contains a typo.
     /// </summary>
     [TestMethod]
@@ -99,6 +123,30 @@ public class SpellingAnalyzerTests
                     public void TestMethod()
                     {
                         var test = "It's string literal with a [|typoo|].";
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies sentence string literal does not produce a warning when it is correct.
+    /// </summary>
+    [TestMethod]
+    public async Task StringLiteral_Sentence_WithoutTypo_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var test = "It's string literal without a typo.";
                     }
                 }
             }
@@ -132,6 +180,30 @@ public class SpellingAnalyzerTests
     }
 
     /// <summary>
+    /// Verifies identifier does not produce a warning when it is correct.
+    /// </summary>
+    [TestMethod]
+    public async Task Identifier_WithoutTypo_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var typo = string.Empty;
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
     /// Verifies single line comment produces a warning when it contains a typo.
     /// </summary>
     [TestMethod]
@@ -147,6 +219,30 @@ public class SpellingAnalyzerTests
                     public void TestMethod()
                     {
                         // It's single line comment with a [|typoo|].
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies single line comment does not produce a warning when it is correct.
+    /// </summary>
+    [TestMethod]
+    public async Task Comment_SingleLine_WithoutTypo_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        // It's single line comment without a typo.
                     }
                 }
             }
@@ -172,6 +268,32 @@ public class SpellingAnalyzerTests
                     {
                         /*
                         It's multi line comment with a [|typoo|].
+                        */
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies multi line comment does not produce a warning when it is correct.
+    /// </summary>
+    [TestMethod]
+    public async Task Comment_MultiLine_WithoutTypo_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        /*
+                        It's multi line comment without a typo.
                         */
                     }
                 }
@@ -208,154 +330,6 @@ public class SpellingAnalyzerTests
     }
 
     /// <summary>
-    /// Verifies documentation comment (/** ... */ form) produces a warning when it contains a typo.
-    /// </summary>
-    [TestMethod]
-    public async Task Documentation_Classic_WithTypo_ShouldProduceWarning()
-    {
-        context.TestCode =
-            /* lang=c# */
-            """
-            namespace TestApplication
-            {
-                /**
-                 * It's multi line documentation (classic) with a [|typoo|].
-                 */
-                class TestClass
-                {
-                    public void TestMethod()
-                    {
-                    }
-                }
-            }
-            """;
-
-        await context.RunAsync();
-    }
-
-    /// <summary>
-    /// Verifies single word string literal does not produce a warning when it is correct.
-    /// </summary>
-    [TestMethod]
-    public async Task StringLiteral_SingleWord_WithoutTypo_ShouldNotProduceWarning()
-    {
-        context.TestCode =
-            /* lang=c# */
-            """
-            namespace TestApplication
-            {
-                class TestClass
-                {
-                    public void TestMethod()
-                    {
-                        var test = "typo";
-                    }
-                }
-            }
-            """;
-
-        await context.RunAsync();
-    }
-
-    /// <summary>
-    /// Verifies sentence string literal does not produce a warning when it is correct.
-    /// </summary>
-    [TestMethod]
-    public async Task StringLiteral_Sentence_WithoutTypo_ShouldNotProduceWarning()
-    {
-        context.TestCode =
-            /* lang=c# */
-            """
-            namespace TestApplication
-            {
-                class TestClass
-                {
-                    public void TestMethod()
-                    {
-                        var test = "It's string literal without a typo.";
-                    }
-                }
-            }
-            """;
-
-        await context.RunAsync();
-    }
-
-    /// <summary>
-    /// Verifies identifier does not produce a warning when it is correct.
-    /// </summary>
-    [TestMethod]
-    public async Task Identifier_WithoutTypo_ShouldNotProduceWarning()
-    {
-        context.TestCode =
-            /* lang=c# */
-            """
-            namespace TestApplication
-            {
-                class TestClass
-                {
-                    public void TestMethod()
-                    {
-                        var typo = string.Empty;
-                    }
-                }
-            }
-            """;
-
-        await context.RunAsync();
-    }
-
-    /// <summary>
-    /// Verifies single line comment does not produce a warning when it is correct.
-    /// </summary>
-    [TestMethod]
-    public async Task Comment_SingleLine_WithoutTypo_ShouldNotProduceWarning()
-    {
-        context.TestCode =
-            /* lang=c# */
-            """
-            namespace TestApplication
-            {
-                class TestClass
-                {
-                    public void TestMethod()
-                    {
-                        // It's single line comment without a typo.
-                    }
-                }
-            }
-            """;
-
-        await context.RunAsync();
-    }
-
-    /// <summary>
-    /// Verifies multi line comment does not produce a warning when it is correct.
-    /// </summary>
-    [TestMethod]
-    public async Task Comment_MultiLine_WithoutTypo_ShouldNotProduceWarning()
-    {
-        context.TestCode =
-            /* lang=c# */
-            """
-            namespace TestApplication
-            {
-                class TestClass
-                {
-                    public void TestMethod()
-                    {
-                        /*
-                        It's multi line comment without a typo.
-                        */
-                    }
-                }
-            }
-            """;
-
-        await context.RunAsync();
-    }
-
-    /// <summary>
     /// Verifies documentation does not produce a warning when it is correct.
     /// </summary>
     [TestMethod]
@@ -369,6 +343,32 @@ public class SpellingAnalyzerTests
                 /// <summary>
                 /// It's multi line documentation comment without a typo.
                 /// </summary>
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies documentation comment (/** ... */ form) produces a warning when it contains a typo.
+    /// </summary>
+    [TestMethod]
+    public async Task Documentation_Classic_WithTypo_ShouldProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                /**
+                 * It's multi line documentation (classic) with a [|typoo|].
+                 */
                 class TestClass
                 {
                     public void TestMethod()
