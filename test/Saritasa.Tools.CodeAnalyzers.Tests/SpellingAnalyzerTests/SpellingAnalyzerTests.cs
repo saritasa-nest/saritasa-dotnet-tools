@@ -182,34 +182,10 @@ public class SpellingAnalyzerTests
     }
 
     /// <summary>
-    /// Verifies single line documentation comment produces a warning when it contains a typo.
+    /// Verifies documentation produces a warning when it contains a typo.
     /// </summary>
     [TestMethod]
-    public async Task Documentation_SingleLine_WithTypo_ShouldProduceWarning()
-    {
-        context.TestCode =
-            /* lang=c# */
-            """
-            namespace TestApplication
-            {
-                /// <summary>It's single line documentation comment with a [|typoo|].</summary>
-                class TestClass
-                {
-                    public void TestMethod()
-                    {
-                    }
-                }
-            }
-            """;
-
-        await context.RunAsync();
-    }
-
-    /// <summary>
-    /// Verifies multi line documentation comment (exterior) produces a warning when it contains a typo.
-    /// </summary>
-    [TestMethod]
-    public async Task Documentation_MultiLineExterior_WithTypo_ShouldProduceWarning()
+    public async Task Documentation_WithTypo_ShouldProduceWarning()
     {
         context.TestCode =
             /* lang=c# */
@@ -232,10 +208,10 @@ public class SpellingAnalyzerTests
     }
 
     /// <summary>
-    /// Verifies multi line documentation comment (classic /** ... */ form) produces a warning when it contains a typo.
+    /// Verifies documentation comment (/** ... */ form) produces a warning when it contains a typo.
     /// </summary>
     [TestMethod]
-    public async Task Documentation_MultiLineCommentTrivia_WithTypo_ShouldProduceWarning()
+    public async Task Documentation_Classic_WithTypo_ShouldProduceWarning()
     {
         context.TestCode =
             /* lang=c# */
@@ -380,34 +356,10 @@ public class SpellingAnalyzerTests
     }
 
     /// <summary>
-    /// Verifies single line documentation comment does not produce a warning when it is correct.
+    /// Verifies documentation does not produce a warning when it is correct.
     /// </summary>
     [TestMethod]
-    public async Task Documentation_SingleLine_WithoutTypo_ShouldNotProduceWarning()
-    {
-        context.TestCode =
-            /* lang=c# */
-            """
-            namespace TestApplication
-            {
-                /// <summary>It's single line documentation comment without a typo.</summary>
-                class TestClass
-                {
-                    public void TestMethod()
-                    {
-                    }
-                }
-            }
-            """;
-
-        await context.RunAsync();
-    }
-
-    /// <summary>
-    /// Verifies multi line documentation comment (exterior) does not produce a warning when it is correct.
-    /// </summary>
-    [TestMethod]
-    public async Task Documentation_MultiLineExterior_WithoutTypo_ShouldNotProduceWarning()
+    public async Task Documentation_WithoutTypo_ShouldNotProduceWarning()
     {
         context.TestCode =
             /* lang=c# */
@@ -430,10 +382,10 @@ public class SpellingAnalyzerTests
     }
 
     /// <summary>
-    /// Verifies multi line documentation comment (classic /** ... */ form) does not produce a warning when it is correct.
+    /// Verifies documentation (/** ... */ form) does not produce a warning when it is correct.
     /// </summary>
     [TestMethod]
-    public async Task Documentation_MultiLineCommentTriviaForm_WithoutTypo_ShouldNotProduceWarning()
+    public async Task Documentation_Classic_WithoutTypo_ShouldNotProduceWarning()
     {
         context.TestCode =
             /* lang=c# */
