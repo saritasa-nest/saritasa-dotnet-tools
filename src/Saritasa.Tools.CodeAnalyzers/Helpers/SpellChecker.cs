@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.IO;
-using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
 using Microsoft.CodeAnalysis;
 using WeCantSpell.Hunspell;
 
@@ -12,88 +7,50 @@ namespace Saritasa.Tools.CodeAnalyzers.Helpers;
 /// <summary>
 /// Spell checker.
 /// </summary>
-public class SpellChecker
+public static class SpellChecker
 {
     private const string DefaultDicFileName = "en.dic";
     private const string DefaultAffFileName = "en.aff";
-
-    private readonly WordList? wordList;
-    private readonly ImmutableHashSet<string> customWords;
-
-    private SpellChecker(WordList? wordList, ImmutableHashSet<string> customWords)
-    {
-        this.wordList = wordList;
-        this.customWords = customWords;
-    }
-
-    /// <summary>
-    /// Indicates that spell checker has no words to check against.
-    /// </summary>
-    public bool IsEmpty => wordList == null && customWords.IsEmpty;
-
-    /// <summary>
-    /// Checks whether word is spelled correctly. It uses custom words then built-in word list.
-    /// </summary>
-    /// <param name="word">Word to check.</param>
-    /// <returns>True if the word is spelled correctly.</returns>
-    public bool Check(string word)
-    {
-        if (customWords.Contains(word))
-        {
-            return true;
-        }
-
-        return wordList?.Check(word) ?? false;
-    }
 
     /// <summary>
     /// Creates spell checker from packaged dictionary files and optional additional files.
     /// </summary>
     /// <param name="files">Optional additional files for custom words (e.g., <c>exclusions.txt</c>).</param>
     /// <returns>Spell checker.</returns>
-    public static SpellChecker Create(IEnumerable<AdditionalText> files)
+    public static WordList? CreateWordList(IEnumerable<AdditionalText> files)
     {
-        var customWords = ImmutableHashSet.CreateBuilder<string>(StringComparer.OrdinalIgnoreCase);
-
-        // Load dictionaries shipped with the analyzer package.
-        // Prefer embedded resources (works reliably when analyzers are loaded from NuGet cache).
         var wordList = LoadWordListFromEmbeddedResources();
 
-        // Load custom words from additional files (if provided by user projects)
-        var additionalFiles = files.ToList();
-        foreach (var file in additionalFiles)
+        if (wordList is null)
         {
-            var path = file.Path;
-            if (string.IsNullOrWhiteSpace(path) || !path.Contains("words", StringComparison.OrdinalIgnoreCase))
-            {
-                continue;
-            }
-
-            if (path.EndsWith(".dic", StringComparison.OrdinalIgnoreCase) || path.EndsWith(".aff", StringComparison.OrdinalIgnoreCase))
-            {
-                continue;
-            }
-
-            var text = file.GetText();
-            if (text is null)
-            {
-                continue;
-            }
-
-            foreach (var line in text.Lines)
-            {
-                var word = line.ToString().Trim();
-                if (!string.IsNullOrWhiteSpace(word))
-                {
-                    customWords.Add(word);
-                }
-            }
+            return null;
         }
 
-        // Also load custom word files from analyzer directory
-        LoadCustomWordsFromAssemblyDirectory(customWords);
+        AddExclusions(files, wordList);
 
-        return new SpellChecker(wordList, customWords.ToImmutable());
+        return wordList;
+    }
+
+    private static void AddExclusions(IEnumerable<AdditionalText> files, WordList wordList)
+    {
+        var exclusionsFile = files.FirstOrDefault(file =>
+            file.Path.Contains("exclusions") && (file.Path.EndsWith(".txt") || file.Path.EndsWith(".dic")));
+
+        var text = exclusionsFile?.GetText();
+
+        if (text is null)
+        {
+            return;
+        }
+
+        foreach (var line in text.Lines)
+        {
+            var word = line.ToString().Trim();
+            if (!string.IsNullOrWhiteSpace(word))
+            {
+                wordList.Add(word);
+            }
+        }
     }
 
 #pragma warning disable RS1035 // Do not use APIs banned for analyzers
@@ -136,37 +93,6 @@ public class SpellChecker
             .FirstOrDefault(n => n.EndsWith(fileName, StringComparison.OrdinalIgnoreCase));
 
         return match is null ? null : assembly.GetManifestResourceStream(match);
-    }
-
-    private static void LoadCustomWordsFromAssemblyDirectory(ImmutableHashSet<string>.Builder customWords)
-    {
-        try
-        {
-            var analyzerLocation = typeof(SpellChecker).Assembly.Location;
-            var analyzerDir = Path.GetDirectoryName(analyzerLocation);
-            if (string.IsNullOrWhiteSpace(analyzerDir))
-            {
-                return;
-            }
-
-            var txtFiles = Directory.GetFiles(analyzerDir, "*.txt");
-            foreach (var txtFile in txtFiles)
-            {
-                var lines = File.ReadAllLines(txtFile);
-                foreach (var line in lines)
-                {
-                    var word = line.Trim();
-                    if (!string.IsNullOrWhiteSpace(word))
-                    {
-                        customWords.Add(word);
-                    }
-                }
-            }
-        }
-        catch
-        {
-            // Silently ignore errors loading custom word files
-        }
     }
 #pragma warning restore RS1035
 }

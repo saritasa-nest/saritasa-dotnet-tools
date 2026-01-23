@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
 using Saritasa.Tools.CodeAnalyzers.Helpers;
+using WeCantSpell.Hunspell;
 
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers;
 
@@ -52,17 +53,17 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
 
         context.RegisterCompilationStartAction(compilationContext =>
         {
-            var spellChecker = SpellChecker.Create(compilationContext.Options.AdditionalFiles);
-            if (spellChecker.IsEmpty)
+            var wordList = SpellChecker.CreateWordList(compilationContext.Options.AdditionalFiles);
+            if (wordList is null)
             {
                 return;
             }
 
-            compilationContext.RegisterSyntaxTreeAction(c => AnalyzeSyntaxTree(c, spellChecker));
+            compilationContext.RegisterSyntaxTreeAction(c => AnalyzeSyntaxTree(c, wordList));
         });
     }
 
-    private static void AnalyzeSyntaxTree(SyntaxTreeAnalysisContext context, SpellChecker spellChecker)
+    private static void AnalyzeSyntaxTree(SyntaxTreeAnalysisContext context, WordList wordList)
     {
         var root = context.Tree.GetRoot(context.CancellationToken);
 
@@ -71,17 +72,17 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         {
             foreach (var trivia in token.LeadingTrivia)
             {
-                CheckTrivia(context, spellChecker, trivia);
+                CheckTrivia(context, wordList, trivia);
             }
 
             foreach (var trivia in token.TrailingTrivia)
             {
-                CheckTrivia(context, spellChecker, trivia);
+                CheckTrivia(context, wordList, trivia);
             }
 
             if (token.IsKind(SyntaxKind.IdentifierToken))
             {
-                CheckIdentifierToken(context, spellChecker, token);
+                CheckIdentifierToken(context, wordList, token);
             }
 
             if (token.IsKind(SyntaxKind.StringLiteralToken)
@@ -89,24 +90,24 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
                 || token.IsKind(SyntaxKind.InterpolatedStringTextToken))
             {
                 var textContent = token.ValueText.Length > 0 ? token.ValueText : token.Text;
-                CheckTextToken(context, spellChecker, textContent, token.Span);
+                CheckTextToken(context, wordList, textContent, token.Span);
             }
         }
     }
 
     private static void CheckIdentifierToken(
         SyntaxTreeAnalysisContext context,
-        SpellChecker spellChecker,
+        WordList wordList,
         SyntaxToken token)
     {
-        if (spellChecker.Check(token.ValueText))
+        if (wordList.Check(token.ValueText))
         {
             return;
         }
 
         foreach (var (word, offset) in SplitIdentifier(token.ValueText))
         {
-            if (!ShouldCheckWord(spellChecker, word))
+            if (!ShouldCheckWord(wordList, word))
             {
                 continue;
             }
@@ -116,15 +117,11 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         }
     }
 
-    private static void CheckTextToken(
-        SyntaxTreeAnalysisContext context,
-        SpellChecker spellChecker,
-        string text,
-        TextSpan span)
+    private static void CheckTextToken(SyntaxTreeAnalysisContext context, WordList wordList, string text, TextSpan span)
     {
         foreach (var (word, offset) in SplitByNonLetters(text))
         {
-            if (!ShouldCheckWord(spellChecker, word))
+            if (!ShouldCheckWord(wordList, word))
             {
                 continue;
             }
@@ -133,7 +130,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
             {
                 foreach (var (partWord, partOffset) in SplitCamelCase(word, offset))
                 {
-                    if (!ShouldCheckWord(spellChecker, partWord))
+                    if (!ShouldCheckWord(wordList, partWord))
                     {
                         continue;
                     }
@@ -152,7 +149,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
 
     private static void CheckTrivia(
         SyntaxTreeAnalysisContext context,
-        SpellChecker spellChecker,
+        WordList wordList,
         SyntaxTrivia trivia)
     {
         if (!IsCommentTrivia(trivia))
@@ -163,7 +160,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         var text = trivia.ToFullString();
         foreach (var (word, offset) in SplitByNonLetters(text))
         {
-            if (!ShouldCheckWord(spellChecker, word))
+            if (!ShouldCheckWord(wordList, word))
             {
                 continue;
             }
@@ -172,7 +169,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
             {
                 foreach (var (partWord, partOffset) in SplitCamelCase(word, offset))
                 {
-                    if (!ShouldCheckWord(spellChecker, partWord))
+                    if (!ShouldCheckWord(wordList, partWord))
                     {
                         continue;
                     }
@@ -190,19 +187,14 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         }
     }
 
-    private static bool ShouldCheckWord(SpellChecker spellChecker, string word)
+    private static bool ShouldCheckWord(WordList wordList, string word)
     {
-        if (spellChecker.IsEmpty)
-        {
-            return false;
-        }
-
         if (word.Length <= 2)
         {
             return false;
         }
 
-        return !spellChecker.Check(word);
+        return !wordList.Check(word);
     }
 
     private static void Report(SyntaxTreeAnalysisContext context, string word, Location location)
