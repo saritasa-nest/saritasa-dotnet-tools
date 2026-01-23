@@ -28,7 +28,6 @@ public class SpellingAnalyzerTests
 
         AddAdditionalFileFromDisk(Path.Combine(wordsDir, "en.dic"), "words/en.dic");
         AddAdditionalFileFromDisk(Path.Combine(wordsDir, "en.aff"), "words/en.aff");
-        AddAdditionalFileFromDisk(Path.Combine(wordsDir, "exclusions.txt"), "words/exclusions.txt");
     }
 
     private static string FindRepoRoot(string startDirectory)
@@ -541,6 +540,31 @@ public class SpellingAnalyzerTests
                 {
                     public void TestMethodWithoutTypo()
                     {
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies word in exclusions does not produce a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task WordInExclusions_ShouldNotProduceWarning()
+    {
+        context.TestState.AdditionalFiles.Add(("words/exclusions.txt", "typoo"));
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var test = "typoo";
                     }
                 }
             }
