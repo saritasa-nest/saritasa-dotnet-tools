@@ -156,6 +156,56 @@ public class SpellingAnalyzerTests
     }
 
     /// <summary>
+    /// Verifies interpolated string produces a warning when it contains a typo.
+    /// </summary>
+    [TestMethod]
+    public async Task InterpolatedString_WithTypo_ShouldProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var testText = "Test text";
+                        var test = $"It's interpolated string {testText} with a [|typoo|].";
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies interpolated string does not produce a warning when it is correct.
+    /// </summary>
+    [TestMethod]
+    public async Task InterpolatedString_WithoutTypo_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var testText = "Test text";
+                        var test = $"It's interpolated string {testText} without a typo.";
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
     /// Verifies identifier produces a warning when it contains a typo.
     /// </summary>
     [TestMethod]
