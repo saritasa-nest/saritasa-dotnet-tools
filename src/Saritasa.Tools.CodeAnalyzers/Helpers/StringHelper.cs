@@ -40,5 +40,55 @@ public static class StringHelper
 
         return false;
     }
-}
 
+    /// <summary>
+    /// Splits a string into words by non-letter characters, returning each word with its offset.
+    /// </summary>
+    /// <param name="text">The text to split.</param>
+    /// <returns>Enumerable of tuples containing the word and its offset in the original text.</returns>
+    /// <remarks>
+    /// The offset represents the zero-based starting index position of each word within the original text string.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// var result = StringHelper.SplitByNonLetters("hello world");
+    /// Returns: [("hello", 0), ("world", 6)]
+    /// </code>
+    /// <code>
+    /// var result = StringHelper.SplitByNonLetters("  hello");
+    /// Returns: [("hello", 2)]
+    /// </code>
+    /// <code>
+    /// var result = StringHelper.SplitByNonLetters("hello, world!");
+    /// Returns: [("hello", 0), ("world", 8)]
+    /// </code>
+    /// </example>
+    public static IEnumerable<(string Word, int Offset)> SplitByNonLetters(string text)
+    {
+        var start = -1;
+        for (var i = 0; i < text.Length; i++)
+        {
+            var character = text[i];
+            if (char.IsLetter(character))
+            {
+                if (start < 0)
+                {
+                    start = i;
+                }
+
+                continue;
+            }
+
+            if (start >= 0)
+            {
+                yield return (text.Substring(start, i - start), start);
+                start = -1;
+            }
+        }
+
+        if (start >= 0)
+        {
+            yield return (text.Substring(start, text.Length - start), start);
+        }
+    }
+}

@@ -1,13 +1,13 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Saritasa.Tools.CodeAnalyzers.Helpers;
 
-namespace Saritasa.Tools.CodeAnalyzers.Tests.Helpers;
+namespace Saritasa.Tools.CodeAnalyzers.Tests.Helpers.StringHelperTests;
 
 /// <summary>
-/// Tests for <see cref="StringHelper"/>.
+/// Tests for <see cref="StringHelper.IsCamelCaseWord"/>.
 /// </summary>
 [TestClass]
-public class StringHelperTests
+public class IsCamelCaseWordTests
 {
     /// <summary>
     /// Test that camelCase words are correctly identified.
@@ -233,4 +233,3 @@ public class StringHelperTests
         Assert.IsTrue(isCamelCase);
     }
 }
-

@@ -104,7 +104,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         }
 
         var text = trivia.ToFullString();
-        var words = SplitByNonLetters(text);
+        var words = StringHelper.SplitByNonLetters(text);
         foreach (var (word, offset) in words)
         {
             if (!ShouldCheckWord(wordList, word))
@@ -161,7 +161,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
 
     private static void CheckTextToken(SyntaxTreeAnalysisContext context, WordList wordList, string text, TextSpan span)
     {
-        var words = SplitByNonLetters(text);
+        var words = StringHelper.SplitByNonLetters(text);
         foreach (var (word, offset) in words)
         {
             if (!ShouldCheckWord(wordList, word))
@@ -221,11 +221,9 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         _ => false
     };
 
-
-
     private static IEnumerable<(string Word, int Offset)> SplitIdentifier(string identifier)
     {
-        var segments = SplitByNonLetters(identifier);
+        var segments = StringHelper.SplitByNonLetters(identifier);
         foreach (var segment in segments)
         {
             foreach (var part in SplitCamelCase(segment.Word, segment.Offset))
@@ -235,34 +233,6 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         }
     }
 
-    private static IEnumerable<(string Word, int Offset)> SplitByNonLetters(string text)
-    {
-        var start = -1;
-        for (var i = 0; i < text.Length; i++)
-        {
-            var character = text[i];
-            if (char.IsLetter(character))
-            {
-                if (start < 0)
-                {
-                    start = i;
-                }
-
-                continue;
-            }
-
-            if (start >= 0)
-            {
-                yield return (text.Substring(start, i - start), start);
-                start = -1;
-            }
-        }
-
-        if (start >= 0)
-        {
-            yield return (text.Substring(start, text.Length - start), start);
-        }
-    }
 
     private static IEnumerable<(string Word, int Offset)> SplitCamelCase(string word, int baseOffset)
     {
