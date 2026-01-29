@@ -85,9 +85,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
                 CheckIdentifierToken(context, wordList, token);
             }
 
-            if (token.IsKind(SyntaxKind.StringLiteralToken)
-                || token.IsKind(SyntaxKind.CharacterLiteralToken)
-                || token.IsKind(SyntaxKind.InterpolatedStringTextToken))
+            if (token.IsKind(SyntaxKind.StringLiteralToken) || token.IsKind(SyntaxKind.InterpolatedStringTextToken))
             {
                 var textContent = token.ValueText.Length > 0 ? token.ValueText : token.Text;
                 CheckTextToken(context, wordList, textContent, token.Span);
