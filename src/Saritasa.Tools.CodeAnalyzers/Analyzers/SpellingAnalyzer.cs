@@ -112,7 +112,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
                 continue;
             }
 
-            if (IsCamelCaseWord(word))
+            if (StringHelper.IsCamelCaseWord(word))
             {
                 var camelCaseWords = SplitCamelCase(word, offset);
                 foreach (var (partWord, partOffset) in camelCaseWords)
@@ -169,7 +169,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
                 continue;
             }
 
-            if (IsCamelCaseWord(word))
+            if (StringHelper.IsCamelCaseWord(word))
             {
                 foreach (var (partWord, partOffset) in SplitCamelCase(word, offset))
                 {
@@ -221,34 +221,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         _ => false
     };
 
-    private static bool IsCamelCaseWord(string word)
-    {
-        var hasLower = false;
-        var hasUpper = false;
-        foreach (var ch in word)
-        {
-            if (!char.IsLetter(ch))
-            {
-                return false;
-            }
 
-            if (char.IsLower(ch))
-            {
-                hasLower = true;
-            }
-            else if (char.IsUpper(ch))
-            {
-                hasUpper = true;
-            }
-
-            if (hasLower && hasUpper)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
 
     private static IEnumerable<(string Word, int Offset)> SplitIdentifier(string identifier)
     {
