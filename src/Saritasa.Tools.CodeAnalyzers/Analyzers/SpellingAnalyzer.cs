@@ -87,9 +87,51 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
 
             if (token.IsKind(SyntaxKind.StringLiteralToken) || token.IsKind(SyntaxKind.InterpolatedStringTextToken))
             {
-                var textContent = token.ValueText.Length > 0 ? token.ValueText : token.Text;
-                CheckTextToken(context, wordList, textContent, token.Span);
+                var text = token.ValueText.Length > 0 ? token.ValueText : token.Text;
+                CheckTextToken(context, wordList, text, token.Span);
             }
+        }
+    }
+
+    private static void CheckTrivia(
+        SyntaxTreeAnalysisContext context,
+        WordList wordList,
+        SyntaxTrivia trivia)
+    {
+        if (!IsCommentTrivia(trivia))
+        {
+            return;
+        }
+
+        var text = trivia.ToFullString();
+        var words = SplitByNonLetters(text);
+        foreach (var (word, offset) in words)
+        {
+            if (!ShouldCheckWord(wordList, word))
+            {
+                continue;
+            }
+
+            if (IsCamelCaseWord(word))
+            {
+                var camelCaseWords = SplitCamelCase(word, offset);
+                foreach (var (partWord, partOffset) in camelCaseWords)
+                {
+                    if (!ShouldCheckWord(wordList, partWord))
+                    {
+                        continue;
+                    }
+
+                    var partLocation = Location
+                        .Create(context.Tree, new TextSpan(trivia.FullSpan.Start + partOffset, partWord.Length));
+                    Report(context, partWord, partLocation);
+                }
+
+                continue;
+            }
+
+            var location = Location.Create(context.Tree, new TextSpan(trivia.FullSpan.Start + offset, word.Length));
+            Report(context, word, location);
         }
     }
 
@@ -98,12 +140,14 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         WordList wordList,
         SyntaxToken token)
     {
-        if (wordList.Check(token.ValueText))
+        var tokenText = token.ValueText;
+        if (!ShouldCheckWord(wordList, tokenText))
         {
             return;
         }
 
-        foreach (var (word, offset) in SplitIdentifier(token.ValueText))
+        var words = SplitIdentifier(tokenText);
+        foreach (var (word, offset) in words)
         {
             if (!ShouldCheckWord(wordList, word))
             {
@@ -117,7 +161,8 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
 
     private static void CheckTextToken(SyntaxTreeAnalysisContext context, WordList wordList, string text, TextSpan span)
     {
-        foreach (var (word, offset) in SplitByNonLetters(text))
+        var words = SplitByNonLetters(text);
+        foreach (var (word, offset) in words)
         {
             if (!ShouldCheckWord(wordList, word))
             {
@@ -141,46 +186,6 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
             }
 
             var location = Location.Create(context.Tree, new TextSpan(span.Start + offset, word.Length));
-            Report(context, word, location);
-        }
-    }
-
-    private static void CheckTrivia(
-        SyntaxTreeAnalysisContext context,
-        WordList wordList,
-        SyntaxTrivia trivia)
-    {
-        if (!IsCommentTrivia(trivia))
-        {
-            return;
-        }
-
-        var text = trivia.ToFullString();
-        foreach (var (word, offset) in SplitByNonLetters(text))
-        {
-            if (!ShouldCheckWord(wordList, word))
-            {
-                continue;
-            }
-
-            if (IsCamelCaseWord(word))
-            {
-                foreach (var (partWord, partOffset) in SplitCamelCase(word, offset))
-                {
-                    if (!ShouldCheckWord(wordList, partWord))
-                    {
-                        continue;
-                    }
-
-                    var partLocation = Location
-                        .Create(context.Tree, new TextSpan(trivia.FullSpan.Start + partOffset, partWord.Length));
-                    Report(context, partWord, partLocation);
-                }
-
-                continue;
-            }
-
-            var location = Location.Create(context.Tree, new TextSpan(trivia.FullSpan.Start + offset, word.Length));
             Report(context, word, location);
         }
     }
@@ -262,8 +267,8 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         var start = -1;
         for (var i = 0; i < text.Length; i++)
         {
-            var ch = text[i];
-            if (char.IsLetter(ch))
+            var character = text[i];
+            if (char.IsLetter(character))
             {
                 if (start < 0)
                 {
