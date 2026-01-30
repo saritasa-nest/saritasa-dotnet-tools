@@ -88,7 +88,20 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
             if (token.IsKind(SyntaxKind.StringLiteralToken) || token.IsKind(SyntaxKind.InterpolatedStringTextToken))
             {
                 var text = token.ValueText.Length > 0 ? token.ValueText : token.Text;
-                CheckTextToken(context, wordList, text, token.Span);
+
+                int spanStart;
+                if (token.IsKind(SyntaxKind.StringLiteralToken))
+                {
+                    // We consider string prefixes like @, $@, etc.
+                    var prefixLength = token.Span.Length - token.ValueText.Length - 2;
+                    spanStart = token.Span.Start + prefixLength + 1;
+                }
+                else
+                {
+                    spanStart = token.Span.Start;
+                }
+
+                CheckTextToken(context, wordList, text, spanStart);
             }
         }
     }
@@ -159,7 +172,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         }
     }
 
-    private static void CheckTextToken(SyntaxTreeAnalysisContext context, WordList wordList, string text, TextSpan span)
+    private static void CheckTextToken(SyntaxTreeAnalysisContext context, WordList wordList, string text, int spanStart)
     {
         var words = StringHelper.SplitByNonLetters(text);
         foreach (var (word, offset) in words)
@@ -178,14 +191,14 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
                         continue;
                     }
 
-                    var partLocation = Location.Create(context.Tree, new TextSpan(span.Start + partOffset, partWord.Length));
+                    var partLocation = Location.Create(context.Tree, new TextSpan(spanStart + partOffset, partWord.Length));
                     Report(context, partWord, partLocation);
                 }
 
                 continue;
             }
 
-            var location = Location.Create(context.Tree, new TextSpan(span.Start + offset, word.Length));
+            var location = Location.Create(context.Tree, new TextSpan(spanStart + offset, word.Length));
             Report(context, word, location);
         }
     }

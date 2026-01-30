@@ -205,6 +205,62 @@ public class SpellingAnalyzerTests
     }
 
     /// <summary>
+    /// Verifies raw string produces a warning when it contains a typo.
+    /// </summary>
+    [TestMethod]
+    public async Task RawString_WithTypo_ShouldProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """"
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var test =
+                            """
+                            It's raw string
+                            with a [|typoo|].
+                            """;
+                    }
+                }
+            }
+            """";
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies raw string produces a warning when it contains a typo.
+    /// </summary>
+    [TestMethod]
+    public async Task RawString_WithoutTypo_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """"
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var test =
+                            """
+                            It's raw string
+                            without a typo.
+                            """;
+                    }
+                }
+            }
+            """";
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
     /// Verifies identifier produces a warning when it contains a typo.
     /// </summary>
     [TestMethod]
