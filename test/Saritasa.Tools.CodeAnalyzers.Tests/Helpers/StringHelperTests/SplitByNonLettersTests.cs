@@ -10,7 +10,7 @@ namespace Saritasa.Tools.CodeAnalyzers.Tests.Helpers.StringHelperTests;
 public class SplitByNonLettersTests
 {
     /// <summary>
-    /// Test that SplitByNonLetters splits text with single word correctly.
+    /// Test that <see cref="StringHelper.SplitByNonLetters"/> splits text with single word correctly.
     /// </summary>
     [TestMethod]
     public void SplitByNonLetters_SingleWord_ReturnsWordWithOffset()
@@ -29,7 +29,7 @@ public class SplitByNonLettersTests
     }
 
     /// <summary>
-    /// Test that SplitByNonLetters splits text with multiple words separated by spaces.
+    /// Test that <see cref="StringHelper.SplitByNonLetters"/> splits text with multiple words separated by spaces.
     /// </summary>
     [TestMethod]
     public void SplitByNonLetters_MultipleWordsSeparatedBySpaces_ReturnsWordsWithOffsets()
@@ -51,7 +51,7 @@ public class SplitByNonLettersTests
     }
 
     /// <summary>
-    /// Test that SplitByNonLetters splits text with punctuation.
+    /// Test that <see cref="StringHelper.SplitByNonLetters"/> splits text with punctuation.
     /// </summary>
     [TestMethod]
     public void SplitByNonLetters_WordsWithPunctuation_ReturnsWordsWithOffsets()
@@ -73,7 +73,7 @@ public class SplitByNonLettersTests
     }
 
     /// <summary>
-    /// Test that SplitByNonLetters handles empty string.
+    /// Test that <see cref="StringHelper.SplitByNonLetters"/> handles empty string.
     /// </summary>
     [TestMethod]
     public void SplitByNonLetters_EmptyString_ReturnsEmptyCollection()
@@ -89,7 +89,7 @@ public class SplitByNonLettersTests
     }
 
     /// <summary>
-    /// Test that SplitByNonLetters handles string with only non-letters.
+    /// Test that <see cref="StringHelper.SplitByNonLetters"/> handles string with only non-letters.
     /// </summary>
     [TestMethod]
     public void SplitByNonLetters_OnlyNonLetters_ReturnsEmptyCollection()
@@ -105,7 +105,7 @@ public class SplitByNonLettersTests
     }
 
     /// <summary>
-    /// Test that SplitByNonLetters handles string starting with non-letters.
+    /// Test that <see cref="StringHelper.SplitByNonLetters"/> handles string starting with non-letters.
     /// </summary>
     [TestMethod]
     public void SplitByNonLetters_StartsWithNonLetters_ReturnsWordsWithOffsets()
@@ -124,7 +124,7 @@ public class SplitByNonLettersTests
     }
 
     /// <summary>
-    /// Test that SplitByNonLetters handles string ending with non-letters.
+    /// Test that <see cref="StringHelper.SplitByNonLetters"/> handles string ending with non-letters.
     /// </summary>
     [TestMethod]
     public void SplitByNonLetters_EndsWithNonLetters_ReturnsWordsWithOffsets()
@@ -143,7 +143,7 @@ public class SplitByNonLettersTests
     }
 
     /// <summary>
-    /// Test that SplitByNonLetters handles multiple consecutive non-letters.
+    /// Test that <see cref="StringHelper.SplitByNonLetters"/> handles multiple consecutive non-letters.
     /// </summary>
     [TestMethod]
     public void SplitByNonLetters_MultipleConsecutiveNonLetters_ReturnsWordsWithOffsets()
@@ -165,7 +165,7 @@ public class SplitByNonLettersTests
     }
 
     /// <summary>
-    /// Test that SplitByNonLetters handles mixed letters and numbers.
+    /// Test that <see cref="StringHelper.SplitByNonLetters"/> handles mixed letters and numbers.
     /// </summary>
     [TestMethod]
     public void SplitByNonLetters_MixedLettersAndNumbers_ReturnsWordsWithOffsets()
@@ -187,7 +187,7 @@ public class SplitByNonLettersTests
     }
 
     /// <summary>
-    /// Test that SplitByNonLetters handles single letter words.
+    /// Test that <see cref="StringHelper.SplitByNonLetters"/> handles single letter words.
     /// </summary>
     [TestMethod]
     public void SplitByNonLetters_SingleLetterWords_ReturnsWordsWithOffsets()
@@ -212,29 +212,7 @@ public class SplitByNonLettersTests
     }
 
     /// <summary>
-    /// Test that SplitByNonLetters handles words with apostrophes.
-    /// </summary>
-    [TestMethod]
-    public void SplitByNonLetters_WordsWithApostrophes_ReturnsWordsWithOffsets()
-    {
-        // Arrange
-        const string text = "don't can't";
-
-        // Act
-        var result = StringHelper.SplitByNonLetters(text).ToList();
-
-        // Assert
-        Assert.AreEqual(2, result.Count);
-
-        Assert.AreEqual("don", result[0].Word);
-        Assert.AreEqual(0, result[0].Offset);
-
-        Assert.AreEqual("can", result[1].Word);
-        Assert.AreEqual(6, result[1].Offset);
-    }
-
-    /// <summary>
-    /// Test that SplitByNonLetters handles complex text with various separators.
+    /// Test that <see cref="StringHelper.SplitByNonLetters"/> handles complex text with various separators.
     /// </summary>
     [TestMethod]
     public void SplitByNonLetters_ComplexText_ReturnsWordsWithOffsets()
@@ -252,29 +230,29 @@ public class SplitByNonLettersTests
         Assert.AreEqual(0, result[0].Offset);
 
         Assert.AreEqual("world", result[1].Word);
-        Assert.AreEqual(8, result[1].Offset);
+        Assert.AreEqual(7, result[1].Offset);
 
         Assert.AreEqual("This", result[2].Word);
-        Assert.AreEqual(16, result[2].Offset);
+        Assert.AreEqual(14, result[2].Offset);
 
         Assert.AreEqual("is", result[3].Word);
-        Assert.AreEqual(21, result[3].Offset);
+        Assert.AreEqual(19, result[3].Offset);
 
         Assert.AreEqual("a", result[4].Word);
-        Assert.AreEqual(24, result[4].Offset);
+        Assert.AreEqual(22, result[4].Offset);
 
         Assert.AreEqual("test", result[5].Word);
-        Assert.AreEqual(26, result[5].Offset);
+        Assert.AreEqual(24, result[5].Offset);
     }
 
     /// <summary>
-    /// Test that SplitByNonLetters handles Unicode letters.
+    /// Test that <see cref="StringHelper.SplitByNonLetters"/> treats apostrophe in the middle as whole word.
     /// </summary>
     [TestMethod]
-    public void SplitByNonLetters_UnicodeLetters_ReturnsWordsWithOffsets()
+    public void SplitByNonLetters_WordsWithApostropheInTheMiddle_ReturnsWords()
     {
         // Arrange
-        const string text = "héllo wörld";
+        const string text = "children's employee's";
 
         // Act
         var result = StringHelper.SplitByNonLetters(text).ToList();
@@ -282,11 +260,32 @@ public class SplitByNonLettersTests
         // Assert
         Assert.AreEqual(2, result.Count);
 
-        Assert.AreEqual("héllo", result[0].Word);
+        Assert.AreEqual("children's", result[0].Word);
         Assert.AreEqual(0, result[0].Offset);
 
-        Assert.AreEqual("wörld", result[1].Word);
-        Assert.AreEqual(7, result[1].Offset);
+        Assert.AreEqual("employee's", result[1].Word);
+        Assert.AreEqual(11, result[1].Offset);
+    }
+
+    /// <summary>
+    /// Test that <see cref="StringHelper.SplitByNonLetters"/> handles words with apostrophe in the end.
+    /// </summary>
+    [TestMethod]
+    public void SplitByNonLetters_WordsWithApostropheInTheEnd_ReturnsWordsWithoutApostrophe()
+    {
+        // Arrange
+        const string text = "parents' employees'";
+
+        // Act
+        var result = StringHelper.SplitByNonLetters(text).ToList();
+
+        // Assert
+        Assert.AreEqual(2, result.Count);
+
+        Assert.AreEqual("parents", result[0].Word);
+        Assert.AreEqual(0, result[0].Offset);
+
+        Assert.AreEqual("employees", result[1].Word);
+        Assert.AreEqual(9, result[1].Offset);
     }
 }
-

@@ -69,7 +69,11 @@ public static class StringHelper
         for (var i = 0; i < text.Length; i++)
         {
             var character = text[i];
-            if (char.IsLetter(character))
+
+            // Do not skip words with apostrophes in the middle, e.g. "parent's", "it's", "don't".
+            // But skip apostrophes in the end of a word, e.g. "parents'".
+            var apostropheInTheMiddle = character == '\'' && i + 1 < text.Length && char.IsLetter(text[i + 1]);
+            if (char.IsLetter(character) || apostropheInTheMiddle)
             {
                 if (start < 0)
                 {
