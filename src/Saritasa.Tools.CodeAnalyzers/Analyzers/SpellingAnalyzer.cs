@@ -114,7 +114,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
 
             if (StringHelper.IsCamelCaseWord(word))
             {
-                var camelCaseWords = SplitCamelCase(word, offset);
+                var camelCaseWords = StringHelper.SplitCamelCase(word, offset);
                 foreach (var (partWord, partOffset) in camelCaseWords)
                 {
                     if (!ShouldCheckWord(wordList, partWord))
@@ -171,7 +171,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
 
             if (StringHelper.IsCamelCaseWord(word))
             {
-                foreach (var (partWord, partOffset) in SplitCamelCase(word, offset))
+                foreach (var (partWord, partOffset) in StringHelper.SplitCamelCase(word, offset))
                 {
                     if (!ShouldCheckWord(wordList, partWord))
                     {
@@ -226,47 +226,10 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         var segments = StringHelper.SplitByNonLetters(identifier);
         foreach (var segment in segments)
         {
-            foreach (var part in SplitCamelCase(segment.Word, segment.Offset))
+            foreach (var part in StringHelper.SplitCamelCase(segment.Word, segment.Offset))
             {
                 yield return part;
             }
-        }
-    }
-
-
-    private static IEnumerable<(string Word, int Offset)> SplitCamelCase(string word, int baseOffset)
-    {
-        var start = 0;
-        for (var i = 1; i < word.Length; i++)
-        {
-            var current = word[i];
-            var previous = word[i - 1];
-            var nextIsLower = i + 1 < word.Length && char.IsLower(word[i + 1]);
-
-            if (!char.IsLetter(current))
-            {
-                if (i > start)
-                {
-                    yield return (word.Substring(start, i - start), baseOffset + start);
-                }
-
-                start = i + 1;
-                continue;
-            }
-
-            var boundaryFromLowerToUpper = char.IsLower(previous) && char.IsUpper(current);
-            var boundaryFromAcronymToWord = char.IsUpper(previous) && char.IsUpper(current) && nextIsLower;
-
-            if (boundaryFromLowerToUpper || boundaryFromAcronymToWord)
-            {
-                yield return (word.Substring(start, i - start), baseOffset + start);
-                start = i;
-            }
-        }
-
-        if (start < word.Length)
-        {
-            yield return (word.Substring(start, word.Length - start), baseOffset + start);
         }
     }
 }

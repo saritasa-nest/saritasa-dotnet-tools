@@ -42,6 +42,58 @@ public static class StringHelper
     }
 
     /// <summary>
+    /// Splits a camel case word into its constituent parts, returning each part with its offset relative to the base offset.
+    /// </summary>
+    /// <param name="word">The camel case word to split.</param>
+    /// <param name="baseOffset">The base offset to add to each part's offset.</param>
+    /// <returns>Enumerable of tuples containing each word part and its offset.</returns>
+    /// <remarks>
+    /// The offset is the start of the word index within the original string.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// var result = StringHelper.SplitCamelCase("camelCaseWord", 0);
+    /// Returns: [("camel", 0), ("Case", 5), ("Word", 9)]
+    /// </code>
+    /// </example>
+    public static IEnumerable<(string Word, int Offset)> SplitCamelCase(string word, int baseOffset)
+    {
+        var start = 0;
+        for (var i = 1; i < word.Length; i++)
+        {
+            var previous = word[i - 1];
+            var current = word[i];
+
+            var nextIsLower = i + 1 < word.Length && char.IsLower(word[i + 1]);
+
+            if (!char.IsLetter(current))
+            {
+                if (i > start)
+                {
+                    yield return (word.Substring(start, i - start), baseOffset + start);
+                }
+
+                start = i + 1;
+                continue;
+            }
+
+            var boundaryFromLowerToUpper = char.IsLower(previous) && char.IsUpper(current);
+            var boundaryFromAcronymToWord = char.IsUpper(previous) && char.IsUpper(current) && nextIsLower;
+
+            if (boundaryFromLowerToUpper || boundaryFromAcronymToWord)
+            {
+                yield return (word.Substring(start, i - start), baseOffset + start);
+                start = i;
+            }
+        }
+
+        if (start < word.Length)
+        {
+            yield return (word.Substring(start, word.Length - start), baseOffset + start);
+        }
+    }
+
+    /// <summary>
     /// Splits a string into words by non-letter characters, returning each word with its offset.
     /// </summary>
     /// <param name="text">The text to split.</param>
