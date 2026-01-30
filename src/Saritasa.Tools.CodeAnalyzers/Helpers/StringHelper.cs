@@ -60,7 +60,7 @@ public static class StringHelper
     /// </code>
     /// <code>
     /// var result = StringHelper.SplitByNonLetters("hello, world!");
-    /// Returns: [("hello", 0), ("world", 8)]
+    /// Returns: [("hello", 0), ("world", 7)]
     /// </code>
     /// </example>
     public static IEnumerable<(string Word, int Offset)> SplitByNonLetters(string text)

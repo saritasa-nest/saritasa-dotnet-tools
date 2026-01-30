@@ -69,7 +69,7 @@ public class SplitByNonLettersTests
         Assert.AreEqual(0, result[0].Offset);
 
         Assert.AreEqual("world", result[1].Word);
-        Assert.AreEqual(8, result[1].Offset);
+        Assert.AreEqual(7, result[1].Offset);
     }
 
     /// <summary>
@@ -230,7 +230,7 @@ public class SplitByNonLettersTests
         Assert.AreEqual(0, result[0].Offset);
 
         Assert.AreEqual("can", result[1].Word);
-        Assert.AreEqual(7, result[1].Offset);
+        Assert.AreEqual(6, result[1].Offset);
     }
 
     /// <summary>
@@ -281,8 +281,10 @@ public class SplitByNonLettersTests
 
         // Assert
         Assert.AreEqual(2, result.Count);
+
         Assert.AreEqual("héllo", result[0].Word);
         Assert.AreEqual(0, result[0].Offset);
+
         Assert.AreEqual("wörld", result[1].Word);
         Assert.AreEqual(7, result[1].Offset);
     }
