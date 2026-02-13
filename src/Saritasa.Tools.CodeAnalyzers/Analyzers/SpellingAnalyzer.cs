@@ -14,10 +14,12 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class SpellingAnalyzer : DiagnosticAnalyzer
 {
+#if DEBUG
     static SpellingAnalyzer()
     {
         AssemblyResolver.ResolveAssemblies();
     }
+#endif
 
     /// <summary>
     /// Diagnostic identifier.

@@ -10,6 +10,7 @@ public static class AssemblyResolver
     private static readonly object AssemblyResolverLock = new();
     private static bool assemblyResolverInstalled;
 
+    // It is disabled because we only use this method while debugging.
 #pragma warning disable RS1035 // Do not use APIs banned for analyzers
     /// <summary>
     /// Resolved assemblies specified in <see cref="IsKnownDependency"/> method.
