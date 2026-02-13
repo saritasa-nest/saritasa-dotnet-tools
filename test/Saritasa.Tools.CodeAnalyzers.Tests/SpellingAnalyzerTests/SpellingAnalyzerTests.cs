@@ -22,40 +22,6 @@ public class SpellingAnalyzerTests
         {
             ReferenceAssemblies = ReferenceAssemblies.Net.Net60
         };
-
-        var repoRoot = FindRepoRoot(AppContext.BaseDirectory);
-        var wordsDir = Path.Combine(repoRoot, "words");
-
-        AddAdditionalFileFromDisk(Path.Combine(wordsDir, "en.dic"), "words/en.dic");
-        AddAdditionalFileFromDisk(Path.Combine(wordsDir, "en.aff"), "words/en.aff");
-    }
-
-    private static string FindRepoRoot(string startDirectory)
-    {
-        var directoryInfo = new DirectoryInfo(startDirectory);
-        while (directoryInfo != null)
-        {
-            if (Directory.Exists(Path.Combine(directoryInfo.FullName, "words")))
-            {
-                return directoryInfo.FullName;
-            }
-
-            directoryInfo = directoryInfo.Parent;
-        }
-
-        throw new DirectoryNotFoundException(
-            $"Could not locate repo root containing 'words' folder starting from '{startDirectory}'.");
-    }
-
-    private void AddAdditionalFileFromDisk(string physicalPath, string additionalFilePath)
-    {
-        if (!File.Exists(physicalPath))
-        {
-            throw new FileNotFoundException(
-                $"Required dictionary file was not found: '{physicalPath}'.", physicalPath);
-        }
-
-        context.TestState.AdditionalFiles.Add((additionalFilePath, File.ReadAllText(physicalPath)));
     }
 
     /// <summary>
