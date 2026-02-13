@@ -53,7 +53,6 @@ public static class SpellChecker
         }
     }
 
-#pragma warning disable RS1035 // Do not use APIs banned for analyzers
     private static WordList? LoadWordListFromEmbeddedResources()
     {
         try
@@ -94,5 +93,4 @@ public static class SpellChecker
 
         return match is null ? null : assembly.GetManifestResourceStream(match);
     }
-#pragma warning restore RS1035
 }
