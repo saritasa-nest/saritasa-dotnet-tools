@@ -85,7 +85,10 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
                 CheckIdentifierToken(context, wordList, token);
             }
 
-            if (token.IsKind(SyntaxKind.StringLiteralToken) || token.IsKind(SyntaxKind.InterpolatedStringTextToken))
+            if (token.IsKind(SyntaxKind.StringLiteralToken)
+                || token.IsKind(SyntaxKind.InterpolatedStringTextToken)
+                || token.IsKind(SyntaxKind.SingleLineRawStringLiteralToken)
+                || token.IsKind(SyntaxKind.MultiLineRawStringLiteralToken))
             {
                 var text = token.ValueText.Length > 0 ? token.ValueText : token.Text;
 
@@ -95,6 +98,13 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
                     // We consider string prefixes like @, $@, etc.
                     var prefixLength = token.Span.Length - token.ValueText.Length - 2;
                     spanStart = token.Span.Start + prefixLength + 1;
+                }
+                else if (token.IsKind(SyntaxKind.SingleLineRawStringLiteralToken)
+                         || token.IsKind(SyntaxKind.MultiLineRawStringLiteralToken))
+                {
+                    // Raw string value text is de-indented/normalized, so use raw token text for correct offsets.
+                    text = token.Text;
+                    spanStart = token.Span.Start;
                 }
                 else
                 {
