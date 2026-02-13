@@ -83,33 +83,9 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
                 CheckIdentifierToken(context, wordList, token);
             }
 
-            if (token.IsKind(SyntaxKind.StringLiteralToken)
-                || token.IsKind(SyntaxKind.InterpolatedStringTextToken)
-                || token.IsKind(SyntaxKind.SingleLineRawStringLiteralToken)
-                || token.IsKind(SyntaxKind.MultiLineRawStringLiteralToken))
+            if (IsString(token))
             {
-                var text = token.ValueText.Length > 0 ? token.ValueText : token.Text;
-
-                int spanStart;
-                if (token.IsKind(SyntaxKind.StringLiteralToken))
-                {
-                    // We consider string prefixes like @, $@, etc.
-                    var prefixLength = token.Span.Length - token.ValueText.Length - 2;
-                    spanStart = token.Span.Start + prefixLength + 1;
-                }
-                else if (token.IsKind(SyntaxKind.SingleLineRawStringLiteralToken)
-                         || token.IsKind(SyntaxKind.MultiLineRawStringLiteralToken))
-                {
-                    // Raw string value text is de-indented/normalized, so use raw token text for correct offsets.
-                    text = token.Text;
-                    spanStart = token.Span.Start;
-                }
-                else
-                {
-                    spanStart = token.Span.Start;
-                }
-
-                CheckTextToken(context, wordList, text, spanStart);
+                CheckTextToken(context, wordList, token);
             }
         }
     }
@@ -180,9 +156,17 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         }
     }
 
-    private static void CheckTextToken(SyntaxTreeAnalysisContext context, WordList wordList, string text, int spanStart)
+    private static bool IsString(SyntaxToken token) =>
+        token.IsKind(SyntaxKind.StringLiteralToken)
+        || token.IsKind(SyntaxKind.InterpolatedStringTextToken)
+        || token.IsKind(SyntaxKind.SingleLineRawStringLiteralToken)
+        || token.IsKind(SyntaxKind.MultiLineRawStringLiteralToken);
+
+    private static void CheckTextToken(SyntaxTreeAnalysisContext context, WordList wordList, SyntaxToken token)
     {
-        var words = StringHelper.SplitByNonLetters(text);
+        var spanStart = token.Span.Start;
+
+        var words = StringHelper.SplitByNonLetters(token.Text);
         foreach (var (word, offset) in words)
         {
             if (!ShouldCheckWord(wordList, word))
