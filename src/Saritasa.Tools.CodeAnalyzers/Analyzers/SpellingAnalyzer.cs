@@ -56,10 +56,6 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         context.RegisterCompilationStartAction(compilationContext =>
         {
             var wordList = SpellChecker.CreateWordList(compilationContext.Options.AdditionalFiles);
-            if (wordList is null)
-            {
-                return;
-            }
 
             compilationContext.RegisterSyntaxTreeAction(c => AnalyzeSyntaxTree(c, wordList));
         });
