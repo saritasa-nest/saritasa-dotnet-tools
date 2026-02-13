@@ -28,8 +28,8 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
 
     private const string Category = "Spelling";
 
-    private static readonly LocalizableString Title = "Possible spelling mistake";
-    private static readonly LocalizableString MessageFormat = "Word '{0}' may be misspelled";
+    private static readonly LocalizableString Title = "Typo";
+    private static readonly LocalizableString MessageFormat = "Word '{0}' has a typo";
     private static readonly LocalizableString Description
         = "Verifies words in identifiers, strings and comments against provided dictionaries.";
 
