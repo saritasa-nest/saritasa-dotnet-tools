@@ -205,10 +205,58 @@ public class SpellingAnalyzerTests
     }
 
     /// <summary>
-    /// Verifies raw string produces a warning when it contains a typo.
+    /// Verifies single raw string produces a warning when it contains a typo.
     /// </summary>
     [TestMethod]
-    public async Task RawString_WithTypo_ShouldProduceWarning()
+    public async Task SingleRawString_WithTypo_ShouldProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """"
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var test ="""It's raw string with a [|typoo|].""";
+                    }
+                }
+            }
+            """";
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies single raw string does not produce a warning when it is correct.
+    /// </summary>
+    [TestMethod]
+    public async Task SingleRawString_WithoutTypo_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """"
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var test ="""It's raw string without a typo.""";
+                    }
+                }
+            }
+            """";
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies multiline raw string produces a warning when it contains a typo.
+    /// </summary>
+    [TestMethod]
+    public async Task MultilineRawString_WithTypo_ShouldProduceWarning()
     {
         context.TestCode =
             /* lang=c# */
@@ -233,10 +281,10 @@ public class SpellingAnalyzerTests
     }
 
     /// <summary>
-    /// Verifies raw string produces a warning when it contains a typo.
+    /// Verifies multiline raw string does not produce a warning when it is correct.
     /// </summary>
     [TestMethod]
-    public async Task RawString_WithoutTypo_ShouldNotProduceWarning()
+    public async Task MultilineRawString_WithoutTypo_ShouldNotProduceWarning()
     {
         context.TestCode =
             /* lang=c# */
