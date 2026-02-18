@@ -27,7 +27,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Outline
 
-1. **Setup and Configuration**: First, read shell configuration from `src/.speckit/memory/environment.local.md` if it exists, otherwise from `src/.speckit/memory/environment.md`. Check the `shell` variable value (prefer values from environment.local.md). If shell is `PowerShell`, run `powershell -File src/.speckit/scripts/powershell/setup-tasks.ps1` from repo root. If shell is `sh`, run `bash src/.speckit/scripts/sh/setup-tasks.sh` from repo root. Parse JSON output for SpecPath, PlanPath, TasksPath, CurrentBranch.
+1. **Setup and Configuration**: Use the `setup_tasks` MCP tool to create the tasks file for the current feature. Parse JSON output for SpecPath, PlanPath, TasksPath, CurrentBranch. All paths are absolute.
 
 2. **Load design documents**: Read from SpecPath and PlanPath:
    - Note: Not all projects have all documents. Generate tasks based on what's available.

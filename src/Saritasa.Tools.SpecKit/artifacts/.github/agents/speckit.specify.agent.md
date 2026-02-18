@@ -24,13 +24,11 @@ The text the user typed after `/speckit.specify` in the triggering message **is*
 Given that feature description, do this:
 
 1. **Setup a spec**:
-   - First, read shell configuration from `src/.speckit/memory/environment.local.md` if it exists, otherwise from `src/.speckit/memory/environment.md`. Check the `shell` variable value (prefer values from environment.local.md)
-   - If shell is `PowerShell`: Run `powershell -File src/.speckit/scripts/powershell/setup-spec.ps1` from repo root
-   - If shell is `sh`: Run `bash src/.speckit/scripts/sh/setup-spec.sh` from repo root
-   - Script has JSON output format
-   - You must only ever run this script once per feature
-   - The JSON is provided in the terminal as output - always refer to it to get the actual content you're looking for
+   - Use the `setup_spec` MCP tool to create the spec file for the current feature
+   - Tool returns JSON output format
+   - You must only ever call this tool once per feature
    - The JSON output will contain CurrentBranch, FeatureName and SpecPath
+   - All paths are absolute
 
 2. Stay focus on SpecPath file structure.
 

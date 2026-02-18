@@ -133,23 +133,6 @@ internal class ArtifactsService : IArtifactsService
             }
         }
 
-        // Copy templates (always update)
-        await CopyDirectoryAsync(
-            BuildSpeckitTemplatesPath(ArtifactsPath),
-            BuildSpeckitTemplatesPath(destination),
-            overwrite: true,
-            cancellationToken);
-        logger.LogInformation("Updated .speckit/templates");
-
-        // Copy README if exists
-        var readmePath = BuildSpeckitReadmePath(ArtifactsPath);
-        if (File.Exists(readmePath))
-        {
-            var destReadme = BuildSpeckitReadmePath(destination);
-            await CopyFileAsync(readmePath, destReadme, cancellationToken);
-            logger.LogInformation("Updated .speckit/README.md");
-        }
-
         logger.LogInformation("Spec Kit installation completed successfully");
     }
 
@@ -171,7 +154,7 @@ internal class ArtifactsService : IArtifactsService
         // Create the spec.md file only if it doesn't exist
         if (!File.Exists(specPath))
         {
-            var template = BuildSpecTemplatePath(speckitFolder);
+            var template = BuildTemplateFilePath(TasksFileName);
             if (File.Exists(template))
             {
                 await CopyFileAsync(template, specPath, cancellationToken, overwrite: false);
@@ -211,7 +194,7 @@ internal class ArtifactsService : IArtifactsService
         // Create the plan.md file only if it doesn't exist
         if (!File.Exists(planPath))
         {
-            var template = BuildPlanTemplatePath(speckitFolder);
+            var template = BuildTemplateFilePath(PlanFileName);
             if (File.Exists(template))
             {
                 await CopyFileAsync(template, planPath, cancellationToken, overwrite: false);
@@ -259,7 +242,7 @@ internal class ArtifactsService : IArtifactsService
         // Create the tasks.md file only if it doesn't exist
         if (!File.Exists(tasksPath))
         {
-            var template = BuildTasksTemplatePath(speckitFolder);
+            var template = BuildTemplateFilePath(TasksFileName);
             if (File.Exists(template))
             {
                 await CopyFileAsync(template, tasksPath, cancellationToken, overwrite: false);
@@ -324,18 +307,6 @@ internal class ArtifactsService : IArtifactsService
         Path.Combine(root, SpeckitDirectory, MemoryDirectory);
 
     /// <summary>
-    /// Builds the path to .speckit/templates directory.
-    /// </summary>
-    private static string BuildSpeckitTemplatesPath(string root) =>
-        Path.Combine(root, SpeckitDirectory, TemplatesDirectory);
-
-    /// <summary>
-    /// Builds the path to .speckit/README.md file.
-    /// </summary>
-    private static string BuildSpeckitReadmePath(string root) =>
-        Path.Combine(root, SpeckitDirectory, ReadmeFileName);
-
-    /// <summary>
     /// Builds the path to src/.speckit directory.
     /// </summary>
     private static string BuildSpeckitFolderPath(string repoRoot) =>
@@ -372,22 +343,10 @@ internal class ArtifactsService : IArtifactsService
         Path.Combine(featureFolder, TasksFileName);
 
     /// <summary>
-    /// Builds the path to spec-template.md file.
+    /// Builds the path to *-template.md file.
     /// </summary>
-    private static string BuildSpecTemplatePath(string speckitFolder) =>
-        Path.Combine(speckitFolder, TemplatesDirectory, SpecTemplateFileName);
-
-    /// <summary>
-    /// Builds the path to plan-template.md file.
-    /// </summary>
-    private static string BuildPlanTemplatePath(string speckitFolder) =>
-        Path.Combine(speckitFolder, TemplatesDirectory, PlanTemplateFileName);
-
-    /// <summary>
-    /// Builds the path to tasks-template.md file.
-    /// </summary>
-    private static string BuildTasksTemplatePath(string speckitFolder) =>
-        Path.Combine(speckitFolder, TemplatesDirectory, TasksTemplateFileName);
+    private static string BuildTemplateFilePath(string templateName) =>
+        Path.Combine(GetArtifactsPath(), TemplatesDirectory, templateName);
 
     #endregion
 

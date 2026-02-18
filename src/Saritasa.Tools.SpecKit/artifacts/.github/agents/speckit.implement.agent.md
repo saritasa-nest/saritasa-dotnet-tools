@@ -16,7 +16,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Outline
 
-1. First, read shell configuration from `src/.speckit/memory/environment.local.md` if it exists, otherwise from `src/.speckit/memory/environment.md`. Check the `shell` variable value (prefer values from environment.local.md). If shell is `PowerShell`, run `powershell -File src/.speckit/scripts/powershell/get-spec-files.ps1` from repo root. If shell is `sh`, run `bash src/.speckit/scripts/sh/get-spec-files.sh` from repo root. Parse JSON output for SpecPath, PlanPath and TasksPath list. All paths must be absolute.
+1. Use the `get_spec_files` MCP tool to retrieve the paths for the current feature. Parse JSON output for SpecPath, PlanPath and TasksPath. All paths are absolute.
 
 2. Load and analyze the implementation context:
    - **REQUIRED**: Read TasksPath for the complete task list and execution plan. Stop execution if doesn't exist

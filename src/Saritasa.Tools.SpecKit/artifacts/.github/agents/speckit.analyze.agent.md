@@ -24,7 +24,7 @@ Identify inconsistencies, duplications, ambiguities, and underspecified items ac
 
 ### 1. Initialize Analysis Context
 
-First, read shell configuration from `src/.speckit/memory/environment.local.md` if it exists, otherwise from `src/.speckit/memory/environment.md`. Check the `shell` variable value (prefer values from environment.local.md). If shell is `PowerShell`, run `powershell -File src/.speckit/scripts/powershell/get-spec-files.ps1` from repo root. If shell is `sh`, run `bash src/.speckit/scripts/sh/get-spec-files.sh` from repo root. Parse JSON output for SpecPath, PlanPath and Tasks path. Derive absolute paths:
+Use the `get_spec_files` MCP tool to retrieve the paths for the current feature. Parse JSON output for SpecPath, PlanPath and TasksPath. All paths are absolute.
 
 Abort with an error message if any required file is missing (instruct the user to run missing prerequisite command).
 

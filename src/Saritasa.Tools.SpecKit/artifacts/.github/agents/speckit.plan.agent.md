@@ -15,7 +15,7 @@ $ARGUMENTS
 
 ## Outline
 
-1. **Setup**: First, read shell configuration from `src/.speckit/memory/environment.local.md` if it exists, otherwise from `src/.speckit/memory/environment.md`. Check the `shell` variable value (prefer values from environment.local.md). If shell is `PowerShell`, run `powershell -File src/.speckit/scripts/powershell/setup-plan.ps1` from repo root. If shell is `sh`, run `bash src/.speckit/scripts/sh/setup-plan.sh` from repo root. Parse JSON output for SpecPath, PlanPath, CurrentBranch.
+1. **Setup**: Use the `setup_plan` MCP tool to create the plan file for the current feature. Parse JSON output for SpecPath, PlanPath, CurrentBranch. All paths are absolute.
 
 2. **Load context**: Read SpecPath, `src/.speckit/memory/constitution.md`.
 

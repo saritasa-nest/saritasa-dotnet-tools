@@ -22,10 +22,10 @@ Note: This clarification workflow is expected to run (and be completed) BEFORE i
 
 Execution steps:
 
-1. First, read shell configuration from `src/.speckit/memory/environment.local.md` if it exists, otherwise from `src/.speckit/memory/environment.md`. Check the `shell` variable value (prefer values from environment.local.md). If shell is `PowerShell`, run `powershell -File src/.speckit/scripts/powershell/get-spec-files.ps1` from repo root. If shell is `sh`, run `bash src/.speckit/scripts/sh/get-spec-files.sh` from repo root. Parse minimal JSON payload fields:
+1. Use the `get_spec_files` MCP tool to retrieve the paths for the current feature. Parse minimal JSON payload fields:
    - `SpecPath`
    - (Optionally capture `PlanPath`, `TasksPath` for future chained flows.)
-   - If JSON parsing fails, abort and instruct user to re-run `/speckit.specify` or verify feature branch environment.
+   - If tool fails, abort and instruct user to re-run `/speckit.specify` or verify feature branch environment.
 
 2. Load the current spec file. Perform a structured ambiguity & coverage scan using this taxonomy. For each category, mark status: Clear / Partial / Missing. Produce an internal coverage map used for prioritization (do not output raw map unless no questions will be asked).
 
