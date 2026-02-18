@@ -45,6 +45,7 @@ public sealed class PackTask : FrostingTask<PackContext>
         "Saritasa.Tools.Misc",
         "Saritasa.Tools.PropertyChangedGenerator",
         "Saritasa.Tools.CodeAnalyzers",
+        "Saritasa.Tools.SpecKit",
     };
 
     /// <inheritdoc />

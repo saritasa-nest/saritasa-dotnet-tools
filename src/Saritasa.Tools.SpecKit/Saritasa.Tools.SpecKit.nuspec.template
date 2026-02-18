@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Saritasa.Tools.SpecKit</id>
+    <title>Saritasa Tools Spec Kit</title>
+    <summary>A dotnet tool package for managing Spec Kit artifacts and providing MCP server functionality.</summary>
+    <version>0.0.0</version>
+    <description>The package is a part of the Saritasa Tools project. Saritasa.Tools.SpecKit contains all the necessary artifacts for spec kit workflow including agents, prompts, templates, and memory files. It can be used as a dotnet tool to install spec kit artifacts and implements a Model Context Protocol (MCP) server for spec management. The MCP server exposes 4 tools using Microsoft.Extensions.AI and follows the MCP protocol specification for LLM integration.</description>
+    <authors>Saritasa</authors>
+    <owners>Saritasa</owners>
+    <license type="file">LICENSE.txt</license>
+    <projectUrl>https://github.com/saritasa/saritasatools</projectUrl>
+    <icon>icon.png</icon>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <copyright>(c) Saritasa, 2026</copyright>
+    <tags>speckit specifications documentation agents mcp dotnet-tool ai llm</tags>
+    <repository type="git" url="https://github.com/saritasa-nest/saritasa-dotnet-tools" commit="$(CommitHash)" />
+    <packageTypes>
+      <packageType name="DotnetTool" />
+    </packageTypes>
+    <dependencies>
+      <group targetFramework="net8.0">
+        <dependency id="McMaster.Extensions.CommandLineUtils" version="4.1.1" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.AI" version="9.0.1-preview.1.24570.5" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.DependencyInjection" version="8.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Hosting" version="8.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Logging" version="8.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Logging.Console" version="8.0.0" exclude="Build,Analyzers" />
+        <dependency id="System.Text.Json" version="8.0.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+    <releaseNotes>Release notes are at https://github.com/saritasa-nest/saritasa-dotnet-tools/blob/master/src/Saritasa.Tools.SpecKit/CHANGELOG.txt</releaseNotes>
+  </metadata>
+  <files>
+    <file src="bin\Release\**\Saritasa.Tools.SpecKit.dll" target="lib" />
+    <file src="bin\Release\**\Saritasa.Tools.SpecKit.pdb" target="lib" />
+    <file src="artifacts\**\*" target="contentFiles\any\any" />
+    <file src="..\..\LICENSE.txt" target="LICENSE.txt" />
+    <file src="..\..\icon.png" target="icon.png" />
+  </files>
+</package>

@@ -13,6 +13,7 @@ Overview
 5. [Saritasa.Tools.EF6](https://www.nuget.org/packages/Saritasa.Tools.EF6) - _unit of work and repository implementation for Entity Framework 6;_
 6. [Saritasa.Tools.EntityFrameworkCore](https://www.nuget.org/packages/Saritasa.Tools.EntityFrameworkCore) - _unit of work and repository implementation for Entity Framework Core X;_
 7. [Saritasa.Tools.PropertyChangedGenerator](https://www.nuget.org/packages/Saritasa.Tools.PropertyChangedGenerator) - _Source code generator for `PropertyChanged` and `PropertyChanging` events;_
+8. [Saritasa.Tools.SpecKit](https://www.nuget.org/packages/Saritasa.Tools.SpecKit) - _dotnet tool for managing Spec Kit artifacts with Model Context Protocol (MCP) server;_
 
 Goals
 -----
@@ -49,10 +50,10 @@ Package Preparation
 NuGet package upload
 --------
 
-**1.** Build the library, test it, and prepare NuGet packages. 
+**1.** Build the library, test it, and prepare NuGet packages.
 
     ./build.ps1
-    
+
 > Read an output logs if something went wrong.
 
 **2.** Watch an output `nupkg` files in the executable directory.
