@@ -1,10 +1,10 @@
-using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Saritasa.Tools.SpecKit.Commands;
 using Saritasa.Tools.SpecKit.Services;
+using Saritasa.Tools.SpecKit.Services.Artifacts;
 
 namespace Saritasa.Tools.SpecKit;
 
@@ -48,8 +48,8 @@ internal class Program
     private static void ConfigureServices(IServiceCollection services)
     {
         // Services
-        services.AddSingleton<IGitService, GitService>();
-        services.AddSingleton<IArtifactsService, ArtifactsService>();
+        services.AddTransient<GitService>();
+        services.AddSingleton<ArtifactsService>();
 
         services
             .AddMcpServer()

@@ -1,44 +1,30 @@
-using System;
 using System.Diagnostics;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Saritasa.Tools.SpecKit.Services;
 
 /// <summary>
-/// Service for Git operations.
+/// Implementation of Git service.
 /// </summary>
-internal interface IGitService
+internal class GitService
 {
     /// <summary>
     /// Gets the current git branch name.
     /// </summary>
-    Task<string> GetCurrentBranchAsync(CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Gets the repository root directory path.
-    /// </summary>
-    Task<string> GetRepoRootAsync(CancellationToken cancellationToken = default);
-}
-
-/// <summary>
-/// Implementation of Git service.
-/// </summary>
-internal class GitService : IGitService
-{
-    /// <inheritdoc />
-    public async Task<string> GetCurrentBranchAsync(CancellationToken cancellationToken = default)
+    public async Task<string> GetCurrentBranchAsync(string projectFolder, CancellationToken cancellationToken = default)
     {
-        return await ExecuteGitCommandAsync("rev-parse --abbrev-ref HEAD", cancellationToken);
+        return await ExecuteGitCommandAsync($"-C \"{projectFolder}\" rev-parse --abbrev-ref HEAD", cancellationToken);
     }
 
-    /// <inheritdoc />
-    public async Task<string> GetRepoRootAsync(CancellationToken cancellationToken = default)
+    /// <summary>
+    /// Get feature name by branch name.
+    /// </summary>
+    /// <param name="branchName">Branch name.</param>
+    public string GetFeatureName(string branchName)
     {
-        var gitDir = await ExecuteGitCommandAsync("rev-parse --git-dir", cancellationToken);
-        var gitDirPath = System.IO.Path.GetFullPath(gitDir);
-        return System.IO.Path.GetDirectoryName(gitDirPath) ?? throw new InvalidOperationException("Failed to get repository root");
+        return branchName
+            .Split("/")
+            .Last();
     }
 
     private static async Task<string> ExecuteGitCommandAsync(string arguments, CancellationToken cancellationToken)

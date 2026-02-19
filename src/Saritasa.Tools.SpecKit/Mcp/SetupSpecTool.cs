@@ -1,10 +1,12 @@
 using System;
 using System.ComponentModel;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using ModelContextProtocol.Server;
 using Saritasa.Tools.SpecKit.Services;
+using Saritasa.Tools.SpecKit.Services.Artifacts;
 
 namespace Saritasa.Tools.SpecKit.Mcp;
 
@@ -20,31 +22,28 @@ internal static class SetupSpecTool
     [McpServerTool(Name = "setup_spec")]
     [Description("Creates a new spec folder and spec.md file based on the current git branch")]
     public static async Task<string> SetupSpecAsync(
-        IArtifactsService artifactsService,
-        IGitService gitService,
+        ArtifactsService artifactsService,
+        GitService gitService,
         ILoggerFactory loggerFactory,
+        [Description("Parent folder which contains currently opened folder")] string projectFolder,
         CancellationToken cancellationToken = default)
     {
         var logger = loggerFactory.CreateLogger(nameof(SetupSpecTool));
 
         try
         {
-            // Get current branch and repo root
-            var currentBranch = await gitService.GetCurrentBranchAsync(cancellationToken);
-            var repoRoot = await gitService.GetRepoRootAsync(cancellationToken);
+            if (!artifactsService.TryGetSpecKitDirectory(projectFolder, out var specKitDirectory))
+            {
+                return "Cannot find .speckit directory";
+            }
 
-            // Extract feature name (remove prefix before first '/')
-            var featureName = currentBranch.Contains('/')
-                ? currentBranch.Substring(currentBranch.IndexOf('/') + 1)
-                : currentBranch;
+            var currentBranch = await gitService.GetCurrentBranchAsync(projectFolder, cancellationToken);
+            var featureName = gitService.GetFeatureName(currentBranch);
 
-            logger.LogInformation("Setting up spec for branch {Branch}, feature {Feature}", currentBranch, featureName);
+            var featureArtifacts = artifactsService.SetupSpecAsync(specKitDirectory!, featureName);
 
-            // Setup spec
-            var result = await artifactsService.SetupSpecAsync(currentBranch, featureName, repoRoot, cancellationToken);
-
-            logger.LogInformation("Spec setup completed successfully");
-            return result;
+            logger.LogInformation("Plan setup completed successfully");
+            return JsonSerializer.Serialize(featureArtifacts);
         }
         catch (Exception ex)
         {

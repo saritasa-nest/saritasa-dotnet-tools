@@ -1,10 +1,10 @@
 using System;
 using System.ComponentModel;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using ModelContextProtocol.Server;
 using Saritasa.Tools.SpecKit.Services;
+using Saritasa.Tools.SpecKit.Services.Artifacts;
 
 namespace Saritasa.Tools.SpecKit.Mcp;
 
@@ -20,31 +20,28 @@ internal static class GetSpecFilesTool
     [McpServerTool(Name = "get_spec_files")]
     [Description("Gets the paths to spec.md, plan.md, and tasks.md for the current git branch")]
     public static async Task<string> GetSpecFilesAsync(
-        IArtifactsService artifactsService,
-        IGitService gitService,
+        ArtifactsService artifactsService,
+        GitService gitService,
         ILoggerFactory loggerFactory,
+        [Description("Parent folder which contains currently opened folder")] string projectFolder,
         CancellationToken cancellationToken = default)
     {
         var logger = loggerFactory.CreateLogger(nameof(GetSpecFilesTool));
 
         try
         {
-            // Get current branch and repo root
-            var currentBranch = await gitService.GetCurrentBranchAsync(cancellationToken);
-            var repoRoot = await gitService.GetRepoRootAsync(cancellationToken);
+            if (!artifactsService.TryGetSpecKitDirectory(projectFolder, out var specKitDirectory))
+            {
+                return "Cannot find .speckit directory";
+            }
 
-            // Extract feature name (remove prefix before first '/')
-            var featureName = currentBranch.Contains('/')
-                ? currentBranch.Substring(currentBranch.IndexOf('/') + 1)
-                : currentBranch;
+            var currentBranch = await gitService.GetCurrentBranchAsync(projectFolder, cancellationToken);
+            var featureName = gitService.GetFeatureName(currentBranch);
 
-            logger.LogInformation("Getting spec files for branch {Branch}, feature {Feature}", currentBranch, featureName);
-
-            // Get spec metadata
-            var result = await artifactsService.GetSpecMetadataAsync(repoRoot, featureName, cancellationToken);
+            var featureArtifacts = artifactsService.GetFeatureArtifacts(specKitDirectory!, featureName);
 
             logger.LogInformation("Spec files retrieved successfully");
-            return result;
+            return JsonSerializer.Serialize(featureArtifacts);
         }
         catch (Exception ex)
         {
