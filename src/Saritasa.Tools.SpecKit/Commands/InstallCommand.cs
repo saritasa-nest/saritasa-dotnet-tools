@@ -1,8 +1,4 @@
-using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
-using Microsoft.Extensions.Logging;
-using Saritasa.Tools.SpecKit.Services;
 using Saritasa.Tools.SpecKit.Services.Artifacts;
 
 namespace Saritasa.Tools.SpecKit.Commands;
@@ -14,22 +10,20 @@ namespace Saritasa.Tools.SpecKit.Commands;
 internal class InstallCommand
 {
     private readonly ArtifactsService artifactsService;
-    private readonly ILogger<InstallCommand> logger;
 
     /// <summary>
     /// Constructor.
     /// </summary>
-    public InstallCommand(ArtifactsService artifactsService, ILogger<InstallCommand> logger)
+    public InstallCommand(ArtifactsService artifactsService)
     {
         this.artifactsService = artifactsService;
-        this.logger = logger;
     }
 
     /// <summary>
     /// The destination path where spec kit artifacts will be installed.
     /// </summary>
     [Option(template: "--destination|-d", Description = "The destination path where spec kit artifacts will be installed")]
-    public string Destination { get; set; } = System.Environment.CurrentDirectory;
+    public string Destination { get; set; } = Environment.CurrentDirectory;
 
     /// <summary>
     /// Execute the command.

@@ -1,3 +1,3 @@
 # Update Project Constitution
 
-Call 'cat ..\agents\speckit.constitution.agent.md' and provide user input to this agent
+Read to the end '..\agents\speckit.constitution.agent.md' and act as this agent

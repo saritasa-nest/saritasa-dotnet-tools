@@ -72,12 +72,12 @@ internal class ArtifactsService(ILogger<ArtifactsService> logger)
     /// <param name="projectRoot">The root directory of the project.</param>
     /// <param name="featureName">The name of the feature.</param>
     /// <returns>The path to the created or existing specification file.</returns>
-    public string SetupSpecAsync(string projectRoot, string featureName)
+    public SpecKitFeatureArtifacts SetupSpecAsync(string projectRoot, string featureName)
     {
         var featureArtifacts = GetFeatureArtifacts(projectRoot, featureName);
         if (featureArtifacts.Specification.IsExist)
         {
-            return featureArtifacts.Specification.Path;
+            return featureArtifacts;
         }
 
         var specFolder = Path.GetDirectoryName(featureArtifacts.Specification.Path);
@@ -96,7 +96,7 @@ internal class ArtifactsService(ILogger<ArtifactsService> logger)
 
         File.Copy(specTemplate, featureArtifacts.Specification.Path);
 
-        return featureArtifacts.Specification.Path;
+        return GetFeatureArtifacts(projectRoot, featureName);
     }
 
     /// <summary>
@@ -105,12 +105,12 @@ internal class ArtifactsService(ILogger<ArtifactsService> logger)
     /// <param name="projectRoot">The root directory of the project.</param>
     /// <param name="featureName">The name of the feature.</param>
     /// <returns>The path to the created or existing plan file.</returns>
-    public string SetupPlanAsync(string projectRoot, string featureName)
+    public SpecKitFeatureArtifacts SetupPlanAsync(string projectRoot, string featureName)
     {
         var featureArtifacts = GetFeatureArtifacts(projectRoot, featureName);
         if (featureArtifacts.Plan.IsExist)
         {
-            return featureArtifacts.Plan.Path;
+            return featureArtifacts;
         }
 
         if (!featureArtifacts.Specification.IsExist)
@@ -126,7 +126,7 @@ internal class ArtifactsService(ILogger<ArtifactsService> logger)
 
         File.Copy(planTemplate, featureArtifacts.Plan.Path);
 
-        return featureArtifacts.Plan.Path;
+        return GetFeatureArtifacts(projectRoot, featureName);
     }
 
     /// <summary>
@@ -135,12 +135,12 @@ internal class ArtifactsService(ILogger<ArtifactsService> logger)
     /// <param name="projectRoot">The root directory of the project.</param>
     /// <param name="featureName">The name of the feature.</param>
     /// <returns>The path to the created or existing tasks file.</returns>
-    public string SetupTasksAsync(string projectRoot, string featureName)
+    public SpecKitFeatureArtifacts SetupTasksAsync(string projectRoot, string featureName)
     {
         var featureArtifacts = GetFeatureArtifacts(projectRoot, featureName);
         if (featureArtifacts.Tasks.IsExist)
         {
-            return featureArtifacts.Plan.Path;
+            return featureArtifacts;
         }
 
         if (!featureArtifacts.Specification.IsExist)
@@ -161,7 +161,7 @@ internal class ArtifactsService(ILogger<ArtifactsService> logger)
 
         File.Copy(tasksTemplate, featureArtifacts.Tasks.Path);
 
-        return featureArtifacts.Tasks.Path;
+        return GetFeatureArtifacts(projectRoot, featureName);
     }
 
     /// <summary>
@@ -185,13 +185,13 @@ internal class ArtifactsService(ILogger<ArtifactsService> logger)
     }
 
     private string BuildSpecFilePath(string specKitDirectory, string featureName) =>
-        Path.Combine(specKitDirectory, featureName, SpecsDirectory, SpecFileName);
+        Path.Combine(specKitDirectory, SpecsDirectory, featureName, SpecFileName);
 
     private string BuildPlanFilePath(string specKitDirectory, string featureName) =>
-        Path.Combine(specKitDirectory, featureName, SpecsDirectory, PlanFileName);
+        Path.Combine(specKitDirectory, SpecsDirectory, featureName, PlanFileName);
 
     private string BuildTasksFilePath(string specKitDirectory, string featureName) =>
-        Path.Combine(specKitDirectory, featureName, SpecsDirectory, TasksFileName);
+        Path.Combine(specKitDirectory, SpecsDirectory, featureName, TasksFileName);
 
     /// <summary>
     /// Tries to find the .speckit directory in the project path.
@@ -227,8 +227,8 @@ internal class ArtifactsService(ILogger<ArtifactsService> logger)
     /// <summary>
     /// Builds the path to *-template.md file.
     /// </summary>
-    private static string BuildTemplateFilePath(string templateName) =>
-        Path.Combine(GetArtifactsPath(), TemplatesDirectory, templateName);
+    private string BuildTemplateFilePath(string templateName) =>
+        Path.Combine(bundledArtifactsRoot, SpeckitDirectory, TemplatesDirectory, templateName);
 
     private static string GetArtifactsPath()
     {

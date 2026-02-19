@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
@@ -37,10 +36,8 @@ internal static class GetSpecFilesTool
 
             var currentBranch = await gitService.GetCurrentBranchAsync(projectFolder, cancellationToken);
             var featureName = gitService.GetFeatureName(currentBranch);
-
             var featureArtifacts = artifactsService.GetFeatureArtifacts(specKitDirectory!, featureName);
 
-            logger.LogInformation("Spec files retrieved successfully");
             return JsonSerializer.Serialize(featureArtifacts);
         }
         catch (Exception ex)

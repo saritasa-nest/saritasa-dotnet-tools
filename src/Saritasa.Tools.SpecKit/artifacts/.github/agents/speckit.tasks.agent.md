@@ -27,14 +27,14 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Outline
 
-1. **Setup and Configuration**: Use the `setup_tasks` MCP tool to create the tasks file for the current feature. Parse JSON output for SpecPath, PlanPath, TasksPath, CurrentBranch. All paths are absolute.
+1. **Setup and Configuration**: Use the `setup_tasks` MCP tool to create the tasks file for the current feature. Parse JSON output for Specification, Plan, Tasks, CurrentBranch. All paths are absolute.
 
-2. **Load design documents**: Read from SpecPath and PlanPath:
+2. **Load design documents**: Read from Specification and Plan:
    - Note: Not all projects have all documents. Generate tasks based on what's available.
 
 3. **Execute task generation workflow**:
-   - Load PlanPath and extract tech stack, libraries, project structure
-   - Load SpecPath and extract user stories with their priorities (P1, P2, P3, etc.)
+   - Load Plan and extract tech stack, libraries, project structure
+   - Load Specification and extract user stories with their priorities (P1, P2, P3, etc.)
    - If `Data Model` section exists: Extract entities and map to user stories
    - If `Contracts` section exists: Map endpoints to user stories
    - If `Research` section exists: Extract decisions for setup tasks
@@ -43,11 +43,11 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Create parallel execution examples per user story
    - Validate task completeness (each user story has all needed tasks, independently testable)
 
-4. **Fill tasks.md**: Use TasksPath as structure, fill with:
-   - Correct feature name from PlanPath
+4. **Fill tasks.md**: Use Tasks as structure, fill with:
+   - Correct feature name from Plan
    - Phase 1: Setup tasks (project initialization)
    - Phase 2: Foundational tasks (blocking prerequisites for all user stories)
-   - Phase 3+: One phase per user story (in priority order from SpecPath)
+   - Phase 3+: One phase per user story (in priority order from Specification)
    - Each phase includes: story goal, independent test criteria, tests (if requested), implementation tasks
    - Final Phase: Polish & cross-cutting concerns
    - All tasks must follow the strict checklist format (see Task Generation Rules below)
@@ -88,7 +88,7 @@ Every task MUST strictly follow this format:
 2. **Task ID**: Sequential number (T001, T002, T003...) in execution order
 3. **[P] marker**: Include ONLY if task is parallelizable (different files, no dependencies on incomplete tasks)
 4. **[Story] label**: REQUIRED for user story phase tasks only
-   - Format: [US1], [US2], [US3], etc. (maps to user stories from SpecPath)
+   - Format: [US1], [US2], [US3], etc. (maps to user stories from Specification)
    - Setup phase: NO story label
    - Foundational phase: NO story label
    - User Story phases: MUST have story label
@@ -108,7 +108,7 @@ Every task MUST strictly follow this format:
 
 ### Task Organization
 
-1. **From User Stories (SpecPath)** - PRIMARY ORGANIZATION:
+1. **From User Stories (Specification)** - PRIMARY ORGANIZATION:
    - Each user story (P1, P2, P3...) gets its own phase
    - Map all related components to their story:
      - Models needed for that story

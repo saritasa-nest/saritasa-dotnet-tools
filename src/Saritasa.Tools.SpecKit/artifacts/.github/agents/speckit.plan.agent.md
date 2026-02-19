@@ -15,9 +15,9 @@ $ARGUMENTS
 
 ## Outline
 
-1. **Setup**: Use the `setup_plan` MCP tool to create the plan file for the current feature. Parse JSON output for SpecPath, PlanPath, CurrentBranch. All paths are absolute.
+1. **Setup**: Use the `setup_plan` MCP tool to create the plan file for the current feature. Parse JSON output for Specification, Plan, CurrentBranch. All paths are absolute.
 
-2. **Load context**: Read SpecPath, `src/.speckit/memory/constitution.md`.
+2. **Load context**: Read Specification, `src/.speckit/memory/constitution.md`.
 
 3. **Execute plan workflow**: Follow the structure in plan template to:
    - Fill Technical Context (mark unknowns as "NEEDS CLARIFICATION")
@@ -28,7 +28,7 @@ $ARGUMENTS
    - Plan Quality Validation
    - Re-evaluate Constitution Check post-design
 
-4. **Stop and report**: Command ends after Phase 2 planning. Report CurrentBranch, PlanPath path, and generated artifacts.
+4. **Stop and report**: Command ends after Phase 2 planning. Report CurrentBranch, Plan path, and generated artifacts.
 
 ## Phases
 
@@ -53,7 +53,7 @@ $ARGUMENTS
    - References have keywords to find information which might be useful in current context without loading all files
    - Use them when planning
 
-4. **Consolidate findings** in `Research` section of PlanPath file:
+4. **Consolidate findings** in `Research` section of Plan file:
    - Decision: [what was chosen]
    - Rationale: [why chosen]
    - Alternatives considered: [what else evaluated]

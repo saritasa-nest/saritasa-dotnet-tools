@@ -24,7 +24,7 @@ Identify inconsistencies, duplications, ambiguities, and underspecified items ac
 
 ### 1. Initialize Analysis Context
 
-Use the `get_spec_files` MCP tool to retrieve the paths for the current feature. Parse JSON output for SpecPath, PlanPath and TasksPath. All paths are absolute.
+Use the `get_spec_files` MCP tool to retrieve the paths for the current feature. Parse JSON output for Specification, Plan and Tasks. All paths are absolute.
 
 Abort with an error message if any required file is missing (instruct the user to run missing prerequisite command).
 

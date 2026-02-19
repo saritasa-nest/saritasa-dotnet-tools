@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Text;
 
 namespace Saritasa.Tools.SpecKit.Services;
 
@@ -27,12 +26,13 @@ internal class GitService
             .Last();
     }
 
-    private static async Task<string> ExecuteGitCommandAsync(string arguments, CancellationToken cancellationToken)
+    private async Task<string> ExecuteGitCommandAsync(string arguments, CancellationToken cancellationToken)
     {
         var processStartInfo = new ProcessStartInfo
         {
             FileName = "git",
             Arguments = arguments,
+            RedirectStandardInput = true,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,
@@ -40,36 +40,21 @@ internal class GitService
         };
 
         using var process = new Process { StartInfo = processStartInfo };
-        var output = new StringBuilder();
-        var error = new StringBuilder();
-
-        process.OutputDataReceived += (sender, e) =>
-        {
-            if (!string.IsNullOrEmpty(e.Data))
-            {
-                output.AppendLine(e.Data);
-            }
-        };
-
-        process.ErrorDataReceived += (sender, e) =>
-        {
-            if (!string.IsNullOrEmpty(e.Data))
-            {
-                error.AppendLine(e.Data);
-            }
-        };
-
         process.Start();
-        process.BeginOutputReadLine();
-        process.BeginErrorReadLine();
+
+        // Close stdin immediately so git doesn't wait for input from MCP client.
+        process.StandardInput.Close();
 
         await process.WaitForExitAsync(cancellationToken);
 
         if (process.ExitCode != 0)
         {
+            var error = await process.StandardError.ReadToEndAsync(cancellationToken);
             throw new InvalidOperationException($"Git command failed: {error}");
         }
 
-        return output.ToString().Trim();
+        var output = await process.StandardOutput.ReadToEndAsync(cancellationToken);
+
+        return output.TrimEnd();
     }
 }

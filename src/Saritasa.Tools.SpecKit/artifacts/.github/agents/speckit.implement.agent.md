@@ -16,13 +16,13 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Outline
 
-1. Use the `get_spec_files` MCP tool to retrieve the paths for the current feature. Parse JSON output for SpecPath, PlanPath and TasksPath. All paths are absolute.
+1. Use the `get_spec_files` MCP tool to retrieve the paths for the current feature. Parse JSON output for Specification, Plan and Tasks. All paths are absolute.
 
 2. Load and analyze the implementation context:
-   - **REQUIRED**: Read TasksPath for the complete task list and execution plan. Stop execution if doesn't exist
-   - **REQUIRED**: Read PlanPath for tech stack, architecture, and file structure. Stop execution if doesn't exist
+   - **REQUIRED**: Read Tasks for the complete task list and execution plan. Stop execution if doesn't exist
+   - **REQUIRED**: Read Plan for tech stack, architecture, and file structure. Stop execution if doesn't exist
 
-3. Parse TasksPath structure and extract:
+3. Parse Tasks structure and extract:
    - **Task phases**: Setup, Tests, Core, Integration, Polish
    - **Task dependencies**: Sequential vs parallel execution rules
    - **Task details**: ID, description, file paths, parallel markers [P]
@@ -59,4 +59,4 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Ensure that code hasn't high cognitive complexity
    - Report final status with summary of completed work
 
-Note: This command assumes a complete task breakdown exists in TasksPath. If tasks are incomplete or missing, suggest running `/speckit.tasks` first to regenerate the task list.
+Note: This command assumes a complete task breakdown exists in Tasks. If tasks are incomplete or missing, suggest running `/speckit.tasks` first to regenerate the task list.

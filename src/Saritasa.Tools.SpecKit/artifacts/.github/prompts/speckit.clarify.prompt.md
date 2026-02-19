@@ -1,3 +1,3 @@
 # Clarify Specifications
 
-Call 'cat ..\agents\speckit.clarify.agent.md' and provide user input to this agent
+Read to the end '..\agents\speckit.clarify.agent.md' and act as this agent

@@ -27,10 +27,10 @@ Given that feature description, do this:
    - Use the `setup_spec` MCP tool to create the spec file for the current feature
    - Tool returns JSON output format
    - You must only ever call this tool once per feature
-   - The JSON output will contain CurrentBranch, FeatureName and SpecPath
+   - The JSON output will contain CurrentBranch, FeatureName and Specification
    - All paths are absolute
 
-2. Stay focus on SpecPath file structure.
+2. Stay focus on Specification file structure.
 
 3. Follow this execution flow:
 
@@ -57,7 +57,7 @@ Given that feature description, do this:
        Each criterion must be verifiable without implementation details
     7. Return: SUCCESS (spec ready for planning)
 
-4. Write the specification to SpecPath using the template structure, replacing placeholders with concrete details derived from the feature description (arguments) while preserving section order and headings.
+4. Write the specification to Specification using the template structure, replacing placeholders with concrete details derived from the feature description (arguments) while preserving section order and headings.
 
 5. **Specification Quality Validation**: After writing the initial spec, validate it against quality criteria:
 

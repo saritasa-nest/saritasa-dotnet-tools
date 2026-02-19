@@ -23,8 +23,8 @@ Note: This clarification workflow is expected to run (and be completed) BEFORE i
 Execution steps:
 
 1. Use the `get_spec_files` MCP tool to retrieve the paths for the current feature. Parse minimal JSON payload fields:
-   - `SpecPath`
-   - (Optionally capture `PlanPath`, `TasksPath` for future chained flows.)
+   - `Specification`
+   - (Optionally capture `Plan`, `Tasks` for future chained flows.)
    - If tool fails, abort and instruct user to re-run `/speckit.specify` or verify feature branch environment.
 
 2. Load the current spec file. Perform a structured ambiguity & coverage scan using this taxonomy. For each category, mark status: Clear / Partial / Missing. Produce an internal coverage map used for prioritization (do not output raw map unless no questions will be asked).
@@ -150,7 +150,7 @@ Execution steps:
    - Markdown structure valid; only allowed new headings: `## Clarifications`, `### Session YYYY-MM-DD`.
    - Terminology consistency: same canonical term used across all updated sections.
 
-7. Write the updated spec back to `SpecPath`.
+7. Write the updated spec back to `Specification`.
 
 8. Report completion (after questioning loop ends or early termination):
    - Number of questions asked & answered.
