@@ -23,7 +23,7 @@ To set up Spec Kit in your project:
    dnx Saritasa.Tools.SpecKit@0.1.0 -- install [-d|--destination <PATH>]
    ```
 
-   This extracts artifacts (agents, prompts, memory files) to your project directory. Installing near the solution file enables IDEs, such as Copilot, to discover and utilize the agents and prompts.
+   This extracts artifacts (agents, prompts, memory files) to your project directory. Installing near the solution file enables IDE's Copilot to discover and utilize the agents and prompts.
 
 3. Configure the MCP server in your IDE's Copilot settings by adding:
 
