@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -12,7 +12,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCulture("")]
 
 [assembly: ComVisible(false)]
-[assembly: CLSCompliant(true)]
 
 [assembly: Guid("3a11e99b-3633-4d5e-9f4d-7bf37c85d92d")]
 

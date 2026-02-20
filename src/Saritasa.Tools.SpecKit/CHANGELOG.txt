@@ -1,0 +1,8 @@
+0.1.0 [2026-02-20]
+[+] Add `get_spec_files` MCP tool to get all files related to the working spec.
+[+] Add `setup_spec` MCP tool to setup new spec.md file based on the template.
+[+] Add `setup_plan` MCP tool to setup new plan.md file based on the template.
+[+] Add `setup_tasks` MCP tool to setup new tasks.md file based on the template.
+[+] Add `setup_business_doc` MCP tool to setup new business documentation file based on the template.
+[+] Add `setup_tech_doc` MCP tool to setup new technical documentation file based on the template.
+[+] Add `install -d <destination_folder>` command which unarchives required artifacts into a destination_folder.

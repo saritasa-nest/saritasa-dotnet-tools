@@ -58,7 +58,6 @@ internal class ArtifactsService
             BuildSpeckitMemoryPath(destination),
             overwrite: false,
             cancellationToken);
-
     }
 
     /// <summary>
