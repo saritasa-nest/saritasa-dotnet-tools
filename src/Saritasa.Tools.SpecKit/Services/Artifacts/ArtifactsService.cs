@@ -254,7 +254,14 @@ internal class ArtifactsService(ILogger<ArtifactsService> logger)
         {
             var fileName = Path.GetFileName(file);
             var destFile = Path.Combine(destDir, fileName);
-            File.Copy(file, destFile, overwrite: false);
+
+            var skipCopy = File.Exists(destFile) && !overwrite;
+            if (skipCopy)
+            {
+                continue;
+            }
+
+            File.Copy(file, destFile, overwrite: overwrite);
         }
 
         foreach (var directory in Directory.GetDirectories(sourceDir))
