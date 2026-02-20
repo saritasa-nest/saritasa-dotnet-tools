@@ -1,124 +1,78 @@
 # Saritasa.Tools.SpecKit
 
-A production-ready .NET tool package for managing Spec Kit artifacts with MCP (Model Context Protocol) server functionality.
+Saritasa.Tools.SpecKit is a lightweight LLM framework that combines the benefits of the SDD (Specification Driven Development) approach and AI-powered code generation
 
-## Features
+## Overview
 
-- 🚀 **Dotnet Tool** - Install globally or per-project
-- 📦 **Artifact Management** - Automated deployment of spec kit files
-- 🤖 **MCP Integration** - AI-friendly functions decorated with `AIFunction`
-- 🛠️ **Production Ready** - Service-based architecture with proper logging
-- 📝 **Template Management** - Access to spec, plan, and tasks templates
+This package serves as both an MCP (Model Context Protocol) server and a self-extracting package containing all necessary artifacts and tools for the Spec Kit workflow.
 
 ## Installation
 
-### Global Installation
-```bash
-dotnet tool install -g Saritasa.Tools.SpecKit
+To set up Spec Kit in your project:
+
+1. Navigate to your solution file directory.
+2. Install Spec Kit by running:
+
+   ```
+   dotnet tool exec Saritasa.Tools.SpecKit@0.1.0 -- install [-d|--destination <PATH>]
+   ```
+
+   Alternatively, using the legacy `dnx` command:
+
+   ```
+   dnx Saritasa.Tools.SpecKit@0.1.0 -- install [-d|--destination <PATH>]
+   ```
+
+   This extracts artifacts (agents, prompts, memory files) to your project directory. Installing near the solution file enables IDEs, such as Copilot, to discover and utilize the agents and prompts.
+
+3. Configure the MCP server in your IDE's Copilot settings by adding:
+
+   ```json
+   "spec-kit": {
+     "type": "stdio",
+     "command": "dnx",
+     "args": ["Saritasa.Tools.SpecKit@0.1.0", "--source", "https://api.nuget.org/v3/index.json", "--yes"]
+   }
+   ```
+
+   Refer to this [guide](https://docs.github.com/en/copilot/how-tos/provide-context/use-mcp/extend-copilot-chat-with-mcp) and select your IDE to learn how to integrate MCP servers.
+
+## Available Agents
+
+| Agent                  | Purpose                                                                 |
+|------------------------|-------------------------------------------------------------------------|
+| `speckit.constitution` | Create or update project constitution with non-negotiable principles and rules |
+| `speckit.specify`      | Generate or update feature specifications from natural language descriptions |
+| `speckit.plan`         | Develop technical implementation plans including architecture, data models, and contracts based on specifications |
+| `speckit.tasks`        | Produce dependency-ordered, actionable task lists from technical plans |
+| `speckit.implement`    | Execute implementation by processing task lists phase by phase         |
+| `speckit.document`     | Summarize spec files and prepare documentation                          |
+| `speckit.clarify`      | Identify underspecified areas and pose targeted clarification questions |
+| `speckit.analyze`      | Perform read-only consistency analysis across spec, plan, and task artifacts |
+
+## Agent Workflow
+
+The following diagram illustrates the interconnections between agents. **Green blocks** denote the primary workflow agents that constitute the core specification-to-implementation pipeline. The remaining agents offer supplementary functions such as clarification, analysis, and documentation.
+
+```mermaid
+graph TD
+    constitution[speckit.constitution]
+    specify[speckit.specify]:::main
+    clarify[speckit.clarify]
+    plan[speckit.plan]:::main
+    tasks[speckit.tasks]:::main
+    implement[speckit.implement]:::main
+    analyze[speckit.analyze]
+    document[speckit.document]:::main
+
+    constitution --> specify
+    specify --> plan
+    specify --> clarify
+    clarify --> plan
+    plan --> tasks
+    tasks --> implement
+    tasks --> analyze
+    implement --> document
+
+    classDef main fill:#4CAF50,stroke:#2E7D32,stroke-width:3px,color:#fff
 ```
-
-### Local Installation
-```bash
-dotnet tool install Saritasa.Tools.SpecKit
-```
-
-## Usage
-
-### Install Spec Kit Artifacts
-
-Deploy spec kit artifacts to your project:
-
-```bash
-# Install to current directory
-speckit install
-
-# Install to specific directory
-speckit install /path/to/your/project
-```
-
-**What gets installed:**
-- **`.github/agents/`** - 8 agent files (force updated)
-- **`.github/prompts/`** - 8 prompt files (force updated)
-- **`.speckit/memory/`** - Constitution and project index (preserved if exist)
-- **`.speckit/templates/`** - Business doc, tech doc, plan, spec, tasks templates (updated)
-- **`.speckit/README.md`** - Spec Kit documentation (updated)
-
-### MCP Server
-
-The package provides a Model Context Protocol (MCP) server that exposes spec kit management tools to LLM clients:
-
-```bash
-speckit mcp
-```
-
-This starts an MCP server that exposes the following tools:
-- **`setup_spec`** - Gets the spec template content for creating a new specification document
-- **`setup_plan`** - Gets the plan template content for creating a new implementation plan
-- **`setup_tasks`** - Gets the tasks template content for creating a new tasks list
-- **`get_spec_files`** - Lists all specification files in the `.speckit` directory
-
-The MCP server runs as a hosted service and communicates via stdio, following the MCP protocol specification.
-
-## Architecture
-
-### Services
-
-**`GitService`** - Abstraction for Git operations:
-- Get revision count
-- Get short/long commit hash
-- Async operations with cancellation support
-
-**`ArtifactsService`** - Manages spec kit artifacts:
-- Install artifacts to target directory
-- Get template contents
-- List spec files
-- Async file operations
-
-### Commands
-
-**`InstallCommand`** - Deploys artifacts to target project
-
-**`McpCommand`** - Runs the MCP server that exposes spec kit tools
-
-### MCP Server
-
-**`SpecKitMcpServer`** - Implements the Model Context Protocol server:
-- Uses `AIFunctionFactory` to create MCP-compatible tools
-- Exposes 4 tools for spec management
-- Runs as a hosted service with proper logging
-
-## Technical Details
-
-- **Framework**: .NET 8.0
-- **Command Line**: McMaster.Extensions.CommandLineUtils
-- **AI Integration**: Microsoft.Extensions.AI.Abstractions
-- **Logging**: Microsoft.Extensions.Logging with console output
-- **Architecture**: Service-based with dependency injection
-
-## What's Included
-
-### Agents (.github/agents)
-- Constitution Agent
-- Analyze Agent
-- Clarify Agent
-- Document Agent
-- Implement Agent
-- Plan Agent
-- Specify Agent
-- Tasks Agent
-
-### Prompts (.github/prompts)
-Corresponding prompts for all agents listed above.
-
-### Spec Kit Artifacts (.speckit)
-- **Memory files**: Constitution, project index (preserved on install)
-- **Templates**: Business doc, tech doc, plan, spec, tasks
-- **README**: Spec Kit workflow documentation
-
-## Development
-
-This tool is part of the Saritasa.Tools suite. For development instructions, see the main repository README.
-
-## License
-
-BSD License - See LICENSE.txt in the root of the repository.
