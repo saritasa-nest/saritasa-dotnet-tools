@@ -22,7 +22,7 @@ internal static class SetupSpecTool
         ArtifactsService artifactsService,
         GitService gitService,
         ILoggerFactory loggerFactory,
-        [Description("Parent folder which contains currently opened folder")] string projectFolder,
+        [Description("Absolute path to parent folder which contains currently opened folder")] string projectFolder,
         CancellationToken cancellationToken = default)
     {
         var logger = loggerFactory.CreateLogger(nameof(SetupSpecTool));

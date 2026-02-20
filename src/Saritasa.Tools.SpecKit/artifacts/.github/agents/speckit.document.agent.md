@@ -25,7 +25,7 @@ When building documentation, use the following sources:
 
 1. Based on `$ARGUMENTS`, identify the user's intent and evaluate the complexity of the system the user wants to document.
 2. Using available tools, analyze the structure of the docs folder.
-3. Using [Business Documentation](src/.speckit/templates/business-doc-template.md) and [Technical Documentation](src/.speckit/templates/tech-doc-template.md) templates, create or update documentation files based on the user's intent. User might specify it's own structure.
+3. Use the setup_business_doc and setup_tech_doc MCP tools to create documentation files at appropriate paths in the docs folder based on the user's intent. User might specify their own structure.
 4. Update the glossary.
 
 ## Documentation Folder
@@ -99,7 +99,7 @@ This documentation contains only descriptions of high-complexity subsystems, whi
   - Focus on the core idea; skip details that are easy to understand.
 
 **When complete**:
-  - Add a record about the solution in `src/.speckit/memory/project-index.md`.
+  - Add a record about the solution in `.speckit/memory/project-index.md`.
 
 ## Documentation Extension
 

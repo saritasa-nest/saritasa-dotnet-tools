@@ -12,7 +12,9 @@ namespace Saritasa.Tools.SpecKit;
 /// Entry point class for SpecKit tool.
 /// </summary>
 [Command(Name = "speckit", Description = "Saritasa Spec Kit - Tool for managing specification artifacts")]
+#pragma warning disable CS3016 // Arrays as attribute arguments is not CLS-compliant
 [Subcommand(typeof(InstallCommand))]
+#pragma warning restore CS3016 // Arrays as attribute arguments is not CLS-compliant
 internal class Program
 {
     private static IHost app;

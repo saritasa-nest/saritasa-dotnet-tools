@@ -23,6 +23,8 @@ internal class ArtifactsService(ILogger<ArtifactsService> logger)
     private const string SpecTemplateFileName = "spec-template.md";
     private const string PlanTemplateFileName = "plan-template.md";
     private const string TasksTemplateFileName = "tasks-template.md";
+    private const string BusinessDocTemplateFileName = "business-doc-template.md";
+    private const string TechDocTemplateFileName = "tech-doc-template.md";
 
     private readonly string bundledArtifactsRoot = GetArtifactsPath();
 
@@ -162,6 +164,46 @@ internal class ArtifactsService(ILogger<ArtifactsService> logger)
         File.Copy(tasksTemplate, featureArtifacts.Tasks.Path);
 
         return GetFeatureArtifacts(projectRoot, featureName);
+    }
+
+    /// <summary>
+    /// Sets up a business documentation file from template at the specified destination path.
+    /// </summary>
+    /// <param name="destinationPath">The destination path for the business documentation file.</param>
+    public void SetupBusinessDocAsync(string destinationPath)
+    {
+        SetupDocFromTemplate(destinationPath, BusinessDocTemplateFileName);
+    }
+
+    /// <summary>
+    /// Sets up a technical documentation file from template at the specified destination path.
+    /// </summary>
+    /// <param name="destinationPath">The destination path for the technical documentation file.</param>
+    public void SetupTechDocAsync(string destinationPath)
+    {
+        SetupDocFromTemplate(destinationPath, TechDocTemplateFileName);
+    }
+
+    private void SetupDocFromTemplate(string destinationPath, string templateFileName)
+    {
+        if (File.Exists(destinationPath))
+        {
+            throw new InvalidOperationException("Doc with the same name already exists");
+        }
+
+        var template = BuildTemplateFilePath(templateFileName);
+        if (!File.Exists(template))
+        {
+            throw new InvalidOperationException($"Cannot find {templateFileName} template");
+        }
+
+        var directory = Path.GetDirectoryName(destinationPath);
+        if (directory != null)
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        File.Copy(template, destinationPath);
     }
 
     /// <summary>
