@@ -39,7 +39,6 @@ internal static class SetupSpecTool
 
             var featureArtifacts = artifactsService.SetupSpecAsync(specKitDirectory!, featureName);
 
-            logger.LogInformation("Plan setup completed successfully");
             return JsonSerializer.Serialize(featureArtifacts);
         }
         catch (Exception ex)

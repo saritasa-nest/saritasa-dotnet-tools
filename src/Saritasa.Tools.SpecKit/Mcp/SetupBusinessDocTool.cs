@@ -16,11 +16,10 @@ internal static class SetupBusinessDocTool
     /// </summary>
     [McpServerTool(Name = "setup_business_doc")]
     [Description("Creates a business documentation file from template at the specified destination path")]
-    public static async Task<string> SetupBusinessDocAsync(
+    public static string SetupBusinessDocument(
         ArtifactsService artifactsService,
         ILoggerFactory loggerFactory,
-        [Description("Absolute destination file path for the business documentation")] string destinationPath,
-        CancellationToken cancellationToken = default)
+        [Description("Absolute destination file path for the business documentation")] string destinationPath)
     {
         var logger = loggerFactory.CreateLogger(nameof(SetupBusinessDocTool));
 
@@ -28,7 +27,6 @@ internal static class SetupBusinessDocTool
         {
             artifactsService.SetupBusinessDocAsync(destinationPath);
 
-            logger.LogInformation("Business doc setup completed successfully");
             return $"Business documentation created at {destinationPath}";
         }
         catch (Exception ex)

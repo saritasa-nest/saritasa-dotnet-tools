@@ -1,12 +1,11 @@
 using System.Reflection;
-using Microsoft.Extensions.Logging;
 
 namespace Saritasa.Tools.SpecKit.Services.Artifacts;
 
 /// <summary>
 /// Implementation of artifacts service.
 /// </summary>
-internal class ArtifactsService(ILogger<ArtifactsService> logger)
+internal class ArtifactsService
 {
     private const string SpeckitDirectory = ".speckit";
     private const string SpecsDirectory = "specs";
@@ -36,8 +35,6 @@ internal class ArtifactsService(ILogger<ArtifactsService> logger)
     /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task InstallAsync(string destination, CancellationToken cancellationToken = default)
     {
-        logger.LogInformation("Installing Spec Kit artifacts to: {Destination}", destination);
-
         if (!Directory.Exists(bundledArtifactsRoot))
         {
             throw new InvalidOperationException($"Artifacts path not found: {bundledArtifactsRoot}");
@@ -49,23 +46,19 @@ internal class ArtifactsService(ILogger<ArtifactsService> logger)
             BuildGithubAgentsPath(destination),
             overwrite: true,
             cancellationToken);
-        logger.LogInformation("Updated .github/agents");
 
         await CopyDirectoryAsync(
             BuildGithubPromptsPath(bundledArtifactsRoot),
             BuildGithubPromptsPath(destination),
             overwrite: true,
             cancellationToken);
-        logger.LogInformation("Updated .github/prompts");
 
         await CopyDirectoryAsync(
             BuildSpeckitMemoryPath(bundledArtifactsRoot),
             BuildSpeckitMemoryPath(destination),
             overwrite: false,
             cancellationToken);
-        logger.LogInformation("Updated memory folder");
 
-        logger.LogInformation("Spec Kit installation completed successfully");
     }
 
     /// <summary>

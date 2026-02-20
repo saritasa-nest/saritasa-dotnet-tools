@@ -7,18 +7,8 @@ namespace Saritasa.Tools.SpecKit.Commands;
 /// Install command to deploy spec kit artifacts.
 /// </summary>
 [Command(Name = "install", Description = "Install spec kit artifacts to a destination path")]
-internal class InstallCommand
+internal class InstallCommand(ArtifactsService artifactsService)
 {
-    private readonly ArtifactsService artifactsService;
-
-    /// <summary>
-    /// Constructor.
-    /// </summary>
-    public InstallCommand(ArtifactsService artifactsService)
-    {
-        this.artifactsService = artifactsService;
-    }
-
     /// <summary>
     /// The destination path where spec kit artifacts will be installed.
     /// </summary>

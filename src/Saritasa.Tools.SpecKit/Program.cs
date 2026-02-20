@@ -27,7 +27,7 @@ internal class Program
         var builder = Host.CreateApplicationBuilder(args);
         builder.Logging.AddConsole(consoleLogOptions =>
         {
-            // Configure all logs to go to stderr
+            // Configure all logs to go to stderr to not show provide them in chat.
             consoleLogOptions.LogToStandardErrorThreshold = LogLevel.Trace;
         });
 

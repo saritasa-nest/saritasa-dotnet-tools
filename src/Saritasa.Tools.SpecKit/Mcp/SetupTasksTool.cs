@@ -39,7 +39,6 @@ internal static class SetupTasksTool
 
             var featureArtifacts = artifactsService.SetupTasksAsync(specKitDirectory!, featureName);
 
-            logger.LogInformation("Plan setup completed successfully");
             return JsonSerializer.Serialize(featureArtifacts);
         }
         catch (Exception ex)

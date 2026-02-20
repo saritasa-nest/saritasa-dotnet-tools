@@ -16,19 +16,16 @@ internal static class SetupTechDocTool
     /// </summary>
     [McpServerTool(Name = "setup_tech_doc")]
     [Description("Creates a technical documentation file from template at the specified destination path")]
-    public static async Task<string> SetupTechDocAsync(
+    public static string SetupTechDocument(
         ArtifactsService artifactsService,
         ILoggerFactory loggerFactory,
-        [Description("Absolute destination file path for the technical documentation")] string destinationPath,
-        CancellationToken cancellationToken = default)
+        [Description("Absolute destination file path for the technical documentation")] string destinationPath)
     {
         var logger = loggerFactory.CreateLogger(nameof(SetupTechDocTool));
 
         try
         {
             artifactsService.SetupTechDocAsync(destinationPath);
-
-            logger.LogInformation("Tech doc setup completed successfully");
             return $"Technical documentation created at {destinationPath}";
         }
         catch (Exception ex)
