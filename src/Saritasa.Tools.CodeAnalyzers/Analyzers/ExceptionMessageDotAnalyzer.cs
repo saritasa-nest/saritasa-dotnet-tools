@@ -40,25 +40,35 @@ public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
     {
         context.EnableConcurrentExecution();
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-        context.RegisterOperationAction(AnalyzeObjectCreation, OperationKind.ObjectCreation);
+
+        context.RegisterCompilationStartAction(compilationContext =>
+        {
+            var exceptionType = compilationContext.Compilation.GetTypeByMetadataName("System.Exception");
+            if (exceptionType is null)
+            {
+                return;
+            }
+
+            compilationContext.RegisterOperationAction(
+                operationContext => AnalyzeObjectCreation(operationContext, exceptionType),
+                OperationKind.ObjectCreation);
+        });
     }
 
-    private static void AnalyzeObjectCreation(OperationAnalysisContext context)
+    private static void AnalyzeObjectCreation(OperationAnalysisContext context, INamedTypeSymbol exceptionType)
     {
         if (context.Operation is not IObjectCreationOperation creation || creation.Type is null)
         {
             return;
         }
 
-        // Only analyze types deriving from System.Exception.
-        if (!DerivesFromException(creation.Type, context.Compilation))
+        if (!DerivesFromException(creation.Type, exceptionType))
         {
             return;
         }
 
-        // Find the message argument (named "message" and of type string).
-        var messageArgument = creation.Arguments.FirstOrDefault(a =>
-            a.Parameter?.Name == "message" && a.Parameter.Type.SpecialType == SpecialType.System_String);
+        var messageArgument = creation.Arguments
+            .FirstOrDefault(a => a.Parameter?.Name == "message" && IsStringType(a.Parameter.Type));
 
         if (messageArgument?.Value is null)
         {
@@ -118,14 +128,8 @@ public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
 
     private static bool EndsWithDot(string value) => value.TrimEnd().EndsWith(".", StringComparison.Ordinal);
 
-    private static bool DerivesFromException(ITypeSymbol type, Compilation compilation)
+    private static bool DerivesFromException(ITypeSymbol type, INamedTypeSymbol exceptionType)
     {
-        var exceptionType = compilation.GetTypeByMetadataName("System.Exception");
-        if (exceptionType is null)
-        {
-            return false;
-        }
-
         var current = type;
         while (current is not null)
         {

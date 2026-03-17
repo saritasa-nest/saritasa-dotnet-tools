@@ -54,6 +54,67 @@ public class ExceptionMessageDotAnalyzerTests
     }
 
     /// <summary>
+    /// Validates that an interpolated exception message without a dot produces a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task ExceptionMessage_Interpolated_WithoutDot_ShouldProduceWarning()
+    {
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        const string test = "test";
+                        const string test2 = "test2";
+                        throw new ArgumentException([|$"{test} {test2}"|]);
+                    }
+                }
+            }
+            """;
+
+        context.TestCode = sourceCode;
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Validates that a binary operation in exception message without a dot produces a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task ExceptionMessage_BinaryOperation_WithoutDot_ShouldProduceWarning()
+    {
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var error = "Error";
+                        throw new ArgumentException([|error + "test"|]);
+                    }
+                }
+            }
+            """;
+
+        context.TestCode = sourceCode;
+        await context.RunAsync();
+    }
+
+    /// <summary>
     /// Validates that an exception message wit a dot does not produce a warning.
     /// </summary>
     [TestMethod]
@@ -73,6 +134,67 @@ public class ExceptionMessageDotAnalyzerTests
                     public void TestMethod()
                     {
                         throw new ArgumentException("This is an error message with a dot.");
+                    }
+                }
+            }
+            """;
+
+        context.TestCode = sourceCode;
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Validates that an interpolated exception message with a dot does not produce a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task ExceptionMessage_Interpolated_WithDot_ShouldNotProduceWarning()
+    {
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        const string test = "test";
+                        const string test2 = ".";
+                        throw new ArgumentException($"{test} {test2}");
+                    }
+                }
+            }
+            """;
+
+        context.TestCode = sourceCode;
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Validates that a binary operation in exception message with a dot does not produce a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task ExceptionMessage_BinaryOperation_WithDot_ShouldNotProduceWarning()
+    {
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var error = "Error";
+                        throw new ArgumentException(error + ".");
                     }
                 }
             }
