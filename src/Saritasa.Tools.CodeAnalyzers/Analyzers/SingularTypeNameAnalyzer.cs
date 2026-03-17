@@ -18,13 +18,13 @@ public sealed class SingularTypeNameAnalyzer : DiagnosticAnalyzer
     private const string DiagnosticId = "STAN1003";
     private const string Category = "Naming";
 
-    private static readonly LocalizableString Title = "Type names should use singular nouns";
-    private static readonly LocalizableString MessageFormat = "Type name '{0}' contains plural noun";
+    private static readonly LocalizableString title = "Type names should use singular nouns";
+    private static readonly LocalizableString messageFormat = "Type name '{0}' contains plural noun";
 
-    private static readonly LocalizableString Description
+    private static readonly LocalizableString description
         = "Type names should use singular nouns (e.g. 'UserController' instead of 'UsersController').";
 
-    private static readonly ImmutableHashSet<string> AllowedPluralWords = ImmutableHashSet.Create(
+    private static readonly ImmutableHashSet<string> allowedPluralWords = ImmutableHashSet.Create(
         StringComparer.Ordinal,
         "News",
         "Settings",
@@ -41,14 +41,14 @@ public sealed class SingularTypeNameAnalyzer : DiagnosticAnalyzer
         "Cors",
         "Status");
 
-    private static readonly DiagnosticDescriptor Rule = new(
+    private static readonly DiagnosticDescriptor rule = new(
         DiagnosticId,
-        Title,
-        MessageFormat,
+        title,
+        messageFormat,
         Category,
         DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
-        description: Description);
+        description: description);
 
     private static readonly List<TypeKind> typeKindsToAnalyze =
     [
@@ -63,7 +63,7 @@ public sealed class SingularTypeNameAnalyzer : DiagnosticAnalyzer
     ];
 
     /// <inheritdoc />
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(rule);
 
     /// <inheritdoc />
     public override void Initialize(AnalysisContext context)
@@ -95,7 +95,7 @@ public sealed class SingularTypeNameAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var diagnostic = Diagnostic.Create(Rule, location, name);
+        var diagnostic = Diagnostic.Create(rule, location, name);
         context.ReportDiagnostic(diagnostic);
     }
 
@@ -113,7 +113,7 @@ public sealed class SingularTypeNameAnalyzer : DiagnosticAnalyzer
                 continue;
             }
 
-            if (AllowedPluralWords.Contains(segment))
+            if (allowedPluralWords.Contains(segment))
             {
                 continue;
             }
