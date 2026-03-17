@@ -371,6 +371,30 @@ public class SpellingAnalyzerTests
     }
 
     /// <summary>
+    /// Verifies apostrophe is handled correctly.
+    /// </summary>
+    [TestMethod]
+    public async Task Comment_WithApostrophe_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        // It's employees' employee's.
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
     /// Verifies multi line comment produces a warning when it contains a typo.
     /// </summary>
     [TestMethod]
