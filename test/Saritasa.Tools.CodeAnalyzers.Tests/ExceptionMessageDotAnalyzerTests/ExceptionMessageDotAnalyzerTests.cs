@@ -203,4 +203,34 @@ public class ExceptionMessageDotAnalyzerTests
         context.TestCode = sourceCode;
         await context.RunAsync();
     }
+
+    /// <summary>
+    /// Validates that methods calls do not produce warnings, because we cannot analyze method results.
+    /// </summary>
+    [TestMethod]
+    public async Task ExceptionMessage_ToString_ShouldNotProduceWarning()
+    {
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var error = "Error";
+                        throw new ArgumentException(error.ToString());
+                    }
+                }
+            }
+            """;
+
+        context.TestCode = sourceCode;
+        await context.RunAsync();
+    }
 }

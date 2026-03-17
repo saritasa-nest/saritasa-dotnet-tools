@@ -110,6 +110,12 @@ public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
             return MessageEndsWithDot(rightMost);
         }
 
+        // Exclude method invocations from analysis, as we cannot analyze method results.
+        if (value is IInvocationOperation)
+        {
+            return true;
+        }
+
         return false;
     }
 
