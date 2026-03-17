@@ -51,6 +51,12 @@ public sealed class SingularClassNameAnalyzer : DiagnosticAnalyzer
         isEnabledByDefault: true,
         description: Description);
 
+    private static readonly List<string> keywordsToCheck =
+    [
+        "Controller",
+        "Service"
+    ];
+
     /// <inheritdoc />
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
@@ -70,7 +76,10 @@ public sealed class SingularClassNameAnalyzer : DiagnosticAnalyzer
         }
 
         var name = typeSymbol.Name;
-        if (!HasPluralSegment(name))
+
+        var segments = SplitPascalCase(name).ToList();
+        var hasKeyword = segments.Any(segment => keywordsToCheck.Contains(segment));
+        if (!hasKeyword || !HasPluralSegment(segments))
         {
             return;
         }
@@ -85,9 +94,8 @@ public sealed class SingularClassNameAnalyzer : DiagnosticAnalyzer
         context.ReportDiagnostic(diagnostic);
     }
 
-    private static bool HasPluralSegment(string name)
+    private static bool HasPluralSegment(List<string> segments)
     {
-        var segments = SplitPascalCase(name).ToList();
         if (segments.Count <= 1)
         {
             return false;

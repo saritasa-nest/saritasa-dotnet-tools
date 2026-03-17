@@ -36,6 +36,17 @@ public class SingularClassNameAnalyzerTests
     }
 
     /// <summary>
+    /// Validates case when class name contains plural word but does not have keyword.
+    /// </summary>
+    [TestMethod]
+    public async Task Class_WithPluralWord_WithoutKeyword_ShouldNotProduceWarning()
+    {
+        context.TestCode = "class UsersExtensions { }";
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
     /// Validates case when class name contains multiple words including plural word.
     /// </summary>
     [TestMethod]
@@ -50,9 +61,9 @@ public class SingularClassNameAnalyzerTests
     /// Validates case when class name starts and ends with plural word.
     /// </summary>
     [TestMethod]
-    public async Task Class_WithPluralFirstAndLastWord_ShouldProduceWarning()
+    public async Task Class_WithMultiplePluralWords_ShouldProduceWarning()
     {
-        context.TestCode = "class [|ProjectsExtensions|] { }";
+        context.TestCode = "class [|ProjectsExtensionsController|] { }";
 
         await context.RunAsync();
     }
@@ -83,31 +94,9 @@ public class SingularClassNameAnalyzerTests
     /// Validates case when class name contains multiple words without plural ones.
     /// </summary>
     [TestMethod]
-    public async Task Class_MultipleWords_WithSingularWord_ShouldNotProduceWarning()
+    public async Task Class_MultipleSingularWords_ShouldNotProduceWarning()
     {
         context.TestCode = "class ProjectQualifiedSpecificationController { }";
-
-        await context.RunAsync();
-    }
-
-    /// <summary>
-    /// Validates case when class name ends with plural word.
-    /// </summary>
-    [TestMethod]
-    public async Task Class_WithPluralLastWord_ShouldNotProduceWarning()
-    {
-        context.TestCode = "class IEnumerableExtensions { }";
-
-        await context.RunAsync();
-    }
-
-    /// <summary>
-    /// Validates case when class name contains single plural word.
-    /// </summary>
-    [TestMethod]
-    public async Task Class_WithPluralSingleWord_ShouldNotProduceWarning()
-    {
-        context.TestCode = "class Extensions { }";
 
         await context.RunAsync();
     }
