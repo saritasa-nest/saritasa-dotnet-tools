@@ -82,9 +82,9 @@ public sealed class SingularTypeNameAnalyzer : DiagnosticAnalyzer
 
         var name = typeSymbol.Name;
 
-        var segments = SplitPascalCase(name).ToList();
-        var hasKeyword = segments.Any(segment => keywordsToCheck.Contains(segment));
-        if (!hasKeyword || !HasPluralSegment(segments))
+        var words = SplitPascalCase(name).ToList();
+        var hasKeyword = words.Any(segment => keywordsToCheck.Contains(segment));
+        if (!hasKeyword || !HasPluralWord(words))
         {
             return;
         }
@@ -99,31 +99,31 @@ public sealed class SingularTypeNameAnalyzer : DiagnosticAnalyzer
         context.ReportDiagnostic(diagnostic);
     }
 
-    private static bool HasPluralSegment(List<string> segments)
+    private static bool HasPluralWord(List<string> words)
     {
-        if (segments.Count <= 1)
+        if (words.Count <= 1)
         {
             return false;
         }
 
-        foreach (var segment in segments.Take(segments.Count - 1))
+        foreach (var word in words.Take(words.Count - 1))
         {
-            if (string.IsNullOrEmpty(segment))
+            if (string.IsNullOrEmpty(word))
             {
                 continue;
             }
 
-            if (allowedPluralWords.Contains(segment))
+            if (allowedPluralWords.Contains(word))
             {
                 continue;
             }
 
-            if (segment.EndsWith("ss", StringComparison.OrdinalIgnoreCase))
+            if (word.EndsWith("ss", StringComparison.OrdinalIgnoreCase))
             {
                 continue;
             }
 
-            if (segment.EndsWith("s", StringComparison.OrdinalIgnoreCase))
+            if (word.EndsWith("s", StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
