@@ -233,4 +233,34 @@ public class ExceptionMessageDotAnalyzerTests
         context.TestCode = sourceCode;
         await context.RunAsync();
     }
+
+    /// <summary>
+    /// Validates that identifiers do not produce warnings, because we cannot analyze which value identifier contains.
+    /// </summary>
+    [TestMethod]
+    public async Task ExceptionMessage_Identifier_ShouldNotProduceWarning()
+    {
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var error = "Error";
+                        throw new ArgumentException(error);
+                    }
+                }
+            }
+            """;
+
+        context.TestCode = sourceCode;
+        await context.RunAsync();
+    }
 }
