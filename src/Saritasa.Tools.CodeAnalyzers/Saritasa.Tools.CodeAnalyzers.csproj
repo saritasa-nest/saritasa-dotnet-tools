@@ -30,8 +30,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="..\..\words\en.dic" />
-    <EmbeddedResource Include="..\..\words\en.aff" />
+    <EmbeddedResource Include="..\..\dictionaries\en-us.dic" />
+    <EmbeddedResource Include="..\..\dictionaries\en-us.aff" />
   </ItemGroup>
 
   <Target Name="CopyWeCantSpellHunspell" AfterTargets="Build">

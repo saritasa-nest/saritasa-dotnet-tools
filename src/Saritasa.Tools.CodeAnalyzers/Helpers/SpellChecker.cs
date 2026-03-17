@@ -9,8 +9,8 @@ namespace Saritasa.Tools.CodeAnalyzers.Helpers;
 /// </summary>
 public static class SpellChecker
 {
-    private const string DefaultDicFileName = "en.dic";
-    private const string DefaultAffFileName = "en.aff";
+    private const string DefaultDicFileName = "en-us.dic";
+    private const string DefaultAffFileName = "en-us.aff";
 
     /// <summary>
     /// Creates word list from packaged dictionary files and optional additional files.

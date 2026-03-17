@@ -648,7 +648,7 @@ public class SpellingAnalyzerTests
     [TestMethod]
     public async Task WordInExclusions_ShouldNotProduceWarning()
     {
-        context.TestState.AdditionalFiles.Add(("words/exclusions.txt", "typoo"));
+        context.TestState.AdditionalFiles.Add(("dictionaries/exclusions.txt", "typoo"));
         context.TestCode =
             /* lang=c# */
             """
