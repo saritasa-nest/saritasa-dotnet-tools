@@ -28,24 +28,24 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
 
     private const string Category = "Spelling";
 
-    private static readonly LocalizableString Title = "Typo";
-    private static readonly LocalizableString MessageFormat = "Word '{0}' has a typo";
-    private static readonly LocalizableString Description
+    private static readonly LocalizableString title = "Typo";
+    private static readonly LocalizableString messageFormat = "Word '{0}' has a typo";
+    private static readonly LocalizableString description
         = "Verifies words in identifiers, strings and comments against provided dictionaries.";
 
-    private static readonly DiagnosticDescriptor Rule = new(
+    private static readonly DiagnosticDescriptor rule = new(
         DiagnosticId,
-        Title,
-        MessageFormat,
+        title,
+        messageFormat,
         Category,
         DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
-        description: Description);
+        description: description);
 
     internal const string DiagnosticPropertyWord = "word";
 
     /// <inheritdoc />
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(rule);
 
     /// <inheritdoc />
     public override void Initialize(AnalysisContext context)
@@ -208,7 +208,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
     private static void Report(SyntaxTreeAnalysisContext context, string word, Location location)
     {
         var diagnostic = Diagnostic.Create(
-            Rule,
+            rule,
             location,
             properties: ImmutableDictionary<string, string?>.Empty.Add(DiagnosticPropertyWord, word),
             messageArgs: [word]);
