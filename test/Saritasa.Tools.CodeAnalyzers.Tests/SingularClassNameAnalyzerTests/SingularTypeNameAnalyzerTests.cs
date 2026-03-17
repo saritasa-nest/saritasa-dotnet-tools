@@ -6,19 +6,19 @@ using Saritasa.Tools.CodeAnalyzers.Analyzers;
 namespace Saritasa.Tools.CodeAnalyzers.Tests.SingularClassNameAnalyzerTests;
 
 /// <summary>
-/// Tests for <see cref="SingularClassNameAnalyzer"/>.
+/// Tests for <see cref="SingularTypeNameAnalyzer"/>.
 /// </summary>
 [TestClass]
-public class SingularClassNameAnalyzerTests
+public class SingularTypeNameAnalyzerTests
 {
-    private readonly CSharpAnalyzerTest<SingularClassNameAnalyzer, DefaultVerifier> context;
+    private readonly CSharpAnalyzerTest<SingularTypeNameAnalyzer, DefaultVerifier> context;
 
     /// <summary>
     /// Constructor.
     /// </summary>
-    public SingularClassNameAnalyzerTests()
+    public SingularTypeNameAnalyzerTests()
     {
-        context = new CSharpAnalyzerTest<SingularClassNameAnalyzer, DefaultVerifier>
+        context = new CSharpAnalyzerTest<SingularTypeNameAnalyzer, DefaultVerifier>
         {
             ReferenceAssemblies = ReferenceAssemblies.Net.Net60
         };
@@ -31,6 +31,17 @@ public class SingularClassNameAnalyzerTests
     public async Task Class_WithPluralWord_ShouldProduceWarning()
     {
         context.TestCode = "class [|UsersController|] { }";
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Validates case when interface name contains plural word.
+    /// </summary>
+    [TestMethod]
+    public async Task Interface_WithPluralWord_ShouldProduceWarning()
+    {
+        context.TestCode = "interface [|IUsersController|] { }";
 
         await context.RunAsync();
     }

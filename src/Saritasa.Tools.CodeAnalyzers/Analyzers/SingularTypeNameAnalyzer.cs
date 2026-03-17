@@ -6,24 +6,23 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers;
 
 /// <summary>
-/// Warns when a class name contains plural noun (should be singular).
+/// Warns when a type name contains plural noun (should be singular).
 /// </summary>
 /// <remarks>
 /// According to
 /// <see href="https://wiki.saritasa.rocks/dotnet/development/c-sharp-style-guide/#naming">9.1 code style</see>.
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class SingularClassNameAnalyzer : DiagnosticAnalyzer
+public sealed class SingularTypeNameAnalyzer : DiagnosticAnalyzer
 {
     private const string DiagnosticId = "STAN1003";
     private const string Category = "Naming";
 
-    private static readonly LocalizableString Title = "Class name should use singular nouns";
-    private static readonly LocalizableString MessageFormat
-        = "Class name '{0}' contains plural noun; only last noun can be plural";
+    private static readonly LocalizableString Title = "Type names should use singular nouns";
+    private static readonly LocalizableString MessageFormat = "Type name '{0}' contains plural noun";
 
     private static readonly LocalizableString Description
-        = "Class names should use singular nouns (e.g. 'UserController' instead of 'UsersController'). Last noun can be plural.";
+        = "Type names should use singular nouns (e.g. 'UserController' instead of 'UsersController').";
 
     private static readonly ImmutableHashSet<string> AllowedPluralWords = ImmutableHashSet.Create(
         StringComparer.Ordinal,
@@ -51,6 +50,12 @@ public sealed class SingularClassNameAnalyzer : DiagnosticAnalyzer
         isEnabledByDefault: true,
         description: Description);
 
+    private static readonly List<TypeKind> typeKindsToAnalyze =
+    [
+        TypeKind.Class,
+        TypeKind.Interface
+    ];
+
     private static readonly List<string> keywordsToCheck =
     [
         "Controller",
@@ -70,7 +75,7 @@ public sealed class SingularClassNameAnalyzer : DiagnosticAnalyzer
 
     private static void AnalyzeNamedType(SymbolAnalysisContext context)
     {
-        if (context.Symbol is not INamedTypeSymbol { TypeKind: TypeKind.Class } typeSymbol)
+        if (context.Symbol is not INamedTypeSymbol typeSymbol || !typeKindsToAnalyze.Contains(typeSymbol.TypeKind))
         {
             return;
         }
