@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Saritasa.Tools.CodeAnalyzers.Analyzers;
 
-namespace Saritasa.Tools.CodeAnalyzers.Tests.SingularClassNameAnalyzerTests;
+namespace Saritasa.Tools.CodeAnalyzers.Tests.SingularTypeNameAnalyzerTests;
 
 /// <summary>
 /// Tests for <see cref="SingularTypeNameAnalyzer"/>.
