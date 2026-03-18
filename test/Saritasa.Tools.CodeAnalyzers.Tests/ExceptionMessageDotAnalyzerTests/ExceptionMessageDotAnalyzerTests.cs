@@ -54,6 +54,128 @@ public class ExceptionMessageDotAnalyzerTests
     }
 
     /// <summary>
+    /// Validates that local constant without a dot produces a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task ExceptionMessage_LocalConstant_WithoutDot_ShouldProduceWarning()
+    {
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        const string error = "Error";
+                        throw new ArgumentException([|error|]);
+                    }
+                }
+            }
+            """;
+
+        context.TestCode = sourceCode;
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Validates that local constant with a dot does not produce a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task ExceptionMessage_LocalConstant_WithDot_ShouldNotProduceWarning()
+    {
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        const string error = "Error.";
+                        throw new ArgumentException(error);
+                    }
+                }
+            }
+            """;
+
+        context.TestCode = sourceCode;
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Validates that field constant without a dot produces a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task ExceptionMessage_FieldConstant_WithoutDot_ShouldProduceWarning()
+    {
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    private const string Error = "Error";
+
+                    public void TestMethod()
+                    {
+                        throw new ArgumentException([|Error|]);
+                    }
+                }
+            }
+            """;
+
+        context.TestCode = sourceCode;
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Validates that field constant with a dot does not produce a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task ExceptionMessage_FieldConstant_WithDot_ShouldNotProduceWarning()
+    {
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    private const string Error = "Error.";
+
+                    public void TestMethod()
+                    {
+                        throw new ArgumentException(Error);
+                    }
+                }
+            }
+            """;
+
+        context.TestCode = sourceCode;
+        await context.RunAsync();
+    }
+
+    /// <summary>
     /// Validates that an interpolated exception message without a dot produces a warning.
     /// </summary>
     [TestMethod]
