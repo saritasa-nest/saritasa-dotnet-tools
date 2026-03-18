@@ -164,8 +164,17 @@ public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
         }
 
         // We cannot analyze method results.
-        if (value is IInvocationOperation)
+        if (value is IInvocationOperation invocation)
         {
+            if (IsStringFormat(invocation.TargetMethod))
+            {
+                var formatArg = invocation.Arguments.FirstOrDefault(a => a.Parameter?.Name == "format");
+                if (formatArg?.Value.ConstantValue is { HasValue: true, Value: string format })
+                {
+                    return EndsWithDot(format);
+                }
+            }
+
             return true;
         }
 
@@ -211,5 +220,10 @@ public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
         }
 
         return false;
+    }
+
+    private static bool IsStringFormat(IMethodSymbol method)
+    {
+        return method.ContainingType.SpecialType == SpecialType.System_String && method.Name == "Format";
     }
 }

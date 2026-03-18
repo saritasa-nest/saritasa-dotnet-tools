@@ -714,4 +714,62 @@ public class ExceptionMessageDotAnalyzerTests
         context.TestCode = sourceCode;
         await context.RunAsync();
     }
+
+    /// <summary>
+    /// Validates that string.Format without dot produces a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task ExceptionMessage_StringFormat_WithoutDot_ShouldProduceWarning()
+    {
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(int id)
+                    {
+                        throw new ArgumentException([|string.Format("Error {0}", id)|]);
+                    }
+                }
+            }
+            """;
+
+        context.TestCode = sourceCode;
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Validates that string.Format with dot does not produce a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task ExceptionMessage_StringFormat_WithDot_ShouldNotProduceWarning()
+    {
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(int id)
+                    {
+                        throw new ArgumentException(string.Format("Error {0}.", id));
+                    }
+                }
+            }
+            """;
+
+        context.TestCode = sourceCode;
+        await context.RunAsync();
+    }
 }
