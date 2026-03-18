@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -164,6 +165,11 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
 
     private static void CheckTextToken(SyntaxTreeAnalysisContext context, WordList wordList, SyntaxToken token)
     {
+        if (IsGuid(token.ValueText))
+        {
+            return;
+        }
+
         var spanStart = token.Span.Start;
 
         var words = StringHelper.SplitByNonLetters(token.Text);
@@ -193,6 +199,12 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
             var location = Location.Create(context.Tree, new TextSpan(spanStart + offset, word.Length));
             Report(context, word, location);
         }
+    }
+
+    private static bool IsGuid(string text)
+    {
+        var guidRegex = new Regex("^[({]?[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}[)}]?$");
+        return guidRegex.IsMatch(text.Trim());
     }
 
     private static bool ShouldCheckWord(WordList wordList, string word)
