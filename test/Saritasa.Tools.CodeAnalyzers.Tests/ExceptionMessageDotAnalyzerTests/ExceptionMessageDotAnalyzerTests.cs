@@ -267,6 +267,188 @@ public class ExceptionMessageDotAnalyzerTests
     }
 
     /// <summary>
+    /// Validates that ternary operator without dot produces a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task ExceptionMessage_TernaryOperator_WithoutDot_ShouldProduceWarning()
+    {
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(bool isValid)
+                    {
+                        throw new ArgumentException([|isValid ? "Valid" : "Invalid"|]);
+                    }
+                }
+            }
+            """;
+
+        context.TestCode = sourceCode;
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Validates that ternary operator with dot does not produce a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task ExceptionMessage_TernaryOperator_WithDot_ShouldNotProduceWarning()
+    {
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(bool isValid)
+                    {
+                        throw new ArgumentException(isValid ? "Valid." : "Invalid.");
+                    }
+                }
+            }
+            """;
+
+        context.TestCode = sourceCode;
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Validates that null coalescing operator without dot produces a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task ExceptionMessage_NullCoalescing_WithoutDot_ShouldProduceWarning()
+    {
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(string message)
+                    {
+                        throw new ArgumentException([|message ?? "Default error"|]);
+                    }
+                }
+            }
+            """;
+
+        context.TestCode = sourceCode;
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Validates that null coalescing operator with dot does not produce a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task ExceptionMessage_NullCoalescing_WithDot_ShouldNotProduceWarning()
+    {
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(string message)
+                    {
+                        throw new ArgumentException(message ?? "Default error.");
+                    }
+                }
+            }
+            """;
+
+        context.TestCode = sourceCode;
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Validates that switch expression without dot produces a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task ExceptionMessage_SwitchExpression_WithoutDot_ShouldProduceWarning()
+    {
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(int code)
+                    {
+                        throw new ArgumentException([|code switch
+                        {
+                            1 => "One",
+                            _ => "Two"
+                        }|]);
+                    }
+                }
+            }
+            """;
+
+        context.TestCode = sourceCode;
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Validates that switch expression with dot does not produce a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task ExceptionMessage_SwitchExpression_WithDot_ShouldNotProduceWarning()
+    {
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(int code)
+                    {
+                        throw new ArgumentException(code switch
+                        {
+                            1 => "One.",
+                            _ => "Two."
+                        });
+                    }
+                }
+            }
+            """;
+
+        context.TestCode = sourceCode;
+        await context.RunAsync();
+    }
+
+    /// <summary>
     /// Validates that a binary operation in exception message without a dot produces a warning.
     /// </summary>
     [TestMethod]

@@ -84,8 +84,13 @@ public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
         context.ReportDiagnostic(diagnostic);
     }
 
-    private static bool MessageEndsWithDot(IOperation value)
+    private static bool MessageEndsWithDot(IOperation? value)
     {
+        if (value is null)
+        {
+            return true;
+        }
+
         if (value.ConstantValue is { HasValue: true, Value: string constant })
         {
             return EndsWithDot(constant);
@@ -108,6 +113,29 @@ public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
         {
             var rightMost = GetRightMostOperand(binary);
             return MessageEndsWithDot(rightMost);
+        }
+
+        if (value is IConditionalOperation conditional)
+        {
+            return MessageEndsWithDot(conditional.WhenTrue) && MessageEndsWithDot(conditional.WhenFalse);
+        }
+
+        if (value is ICoalesceOperation coalesce)
+        {
+            return MessageEndsWithDot(coalesce.Value) && MessageEndsWithDot(coalesce.WhenNull);
+        }
+
+        if (value is ISwitchExpressionOperation switchExpression)
+        {
+            foreach (var arm in switchExpression.Arms)
+            {
+                if (!MessageEndsWithDot(arm.Value))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         // We cannot analyze method results.
