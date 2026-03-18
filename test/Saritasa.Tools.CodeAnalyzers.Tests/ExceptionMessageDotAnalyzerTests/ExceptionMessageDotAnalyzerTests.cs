@@ -235,10 +235,10 @@ public class ExceptionMessageDotAnalyzerTests
     }
 
     /// <summary>
-    /// Validates that identifiers do not produce warnings, because we cannot analyze which value identifier contains.
+    /// Validates that local variable do not produce warnings, because we cannot analyze which value it contains.
     /// </summary>
     [TestMethod]
-    public async Task ExceptionMessage_Identifier_ShouldNotProduceWarning()
+    public async Task ExceptionMessage_LocalVariable_ShouldNotProduceWarning()
     {
         const string sourceCode =
             /* lang=c# */
@@ -255,6 +255,97 @@ public class ExceptionMessageDotAnalyzerTests
                     {
                         var error = "Error";
                         throw new ArgumentException(error);
+                    }
+                }
+            }
+            """;
+
+        context.TestCode = sourceCode;
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Validates that parameter does not produce warnings, because we cannot analyze which value it contains.
+    /// </summary>
+    [TestMethod]
+    public async Task ExceptionMessage_MethodParameter_ShouldNotProduceWarning()
+    {
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(string errorMessage)
+                    {
+                        throw new ArgumentException(errorMessage);
+                    }
+                }
+            }
+            """;
+
+        context.TestCode = sourceCode;
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Validates that field does not produce warnings, because we cannot analyze which value it contains.
+    /// </summary>
+    [TestMethod]
+    public async Task ExceptionMessage_Field_ShouldNotProduceWarning()
+    {
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    private string errorMessage = "Error";
+
+                    public void TestMethod()
+                    {
+                        throw new ArgumentException(errorMessage);
+                    }
+                }
+            }
+            """;
+
+        context.TestCode = sourceCode;
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Validates that property do not produce warnings, because we cannot analyze which value it contains.
+    /// </summary>
+    [TestMethod]
+    public async Task ExceptionMessage_Property_ShouldNotProduceWarning()
+    {
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public string ErrorMessage { get; set; } = "Error";
+
+                    public void TestMethod()
+                    {
+                        throw new ArgumentException(ErrorMessage);
                     }
                 }
             }

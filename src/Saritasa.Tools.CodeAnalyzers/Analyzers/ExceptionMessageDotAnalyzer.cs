@@ -110,8 +110,18 @@ public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
             return MessageEndsWithDot(rightMost);
         }
 
-        // Exclude method invocations from analysis, as we cannot analyze method results.
+        // We cannot analyze method results.
         if (value is IInvocationOperation)
+        {
+            return true;
+        }
+
+        // We cannot analyze identifier values (local variables, parameters, fields, properties).
+        if (value
+            is ILocalReferenceOperation
+            or IParameterReferenceOperation
+            or IFieldReferenceOperation
+            or IPropertyReferenceOperation)
         {
             return true;
         }
