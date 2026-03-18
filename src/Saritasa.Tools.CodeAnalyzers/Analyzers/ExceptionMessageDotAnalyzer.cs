@@ -52,6 +52,10 @@ public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
             compilationContext.RegisterOperationAction(
                 operationContext => AnalyzeObjectCreation(operationContext, exceptionType),
                 OperationKind.ObjectCreation);
+
+            compilationContext.RegisterOperationAction(
+                operationContext => AnalyzeBaseConstructor(operationContext, exceptionType),
+                OperationKind.Invocation);
         });
     }
 
@@ -67,7 +71,28 @@ public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var messageArgument = creation.Arguments
+        CheckExceptionMessage(creation.Arguments, context.ReportDiagnostic);
+    }
+
+    private static void AnalyzeBaseConstructor(OperationAnalysisContext context, INamedTypeSymbol exceptionType)
+    {
+        if (context.Operation is not IInvocationOperation invocation ||
+            invocation.TargetMethod.MethodKind != MethodKind.Constructor)
+        {
+            return;
+        }
+
+        if (!DerivesFromException(invocation.TargetMethod.ContainingType, exceptionType))
+        {
+            return;
+        }
+
+        CheckExceptionMessage(invocation.Arguments, context.ReportDiagnostic);
+    }
+
+    private static void CheckExceptionMessage(IEnumerable<IArgumentOperation> arguments, Action<Diagnostic> reportDiagnostic)
+    {
+        var messageArgument = arguments
             .FirstOrDefault(a => a.Parameter?.Name == "message" && IsStringType(a.Parameter.Type));
 
         if (messageArgument?.Value is null)
@@ -81,7 +106,7 @@ public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
         }
 
         var diagnostic = Diagnostic.Create(Rule, messageArgument.Syntax.GetLocation(), messageArgument.Value.Syntax.ToString());
-        context.ReportDiagnostic(diagnostic);
+        reportDiagnostic(diagnostic);
     }
 
     private static bool MessageEndsWithDot(IOperation? value)

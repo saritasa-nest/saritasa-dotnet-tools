@@ -658,4 +658,60 @@ public class ExceptionMessageDotAnalyzerTests
         context.TestCode = sourceCode;
         await context.RunAsync();
     }
+
+    /// <summary>
+    /// Validates that base constructor call in exception without a dot produces a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task ExceptionMessage_BaseConstructor_WithoutDot_ShouldProduceWarning()
+    {
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestException : Exception
+                {
+                    public TestException() : base([|"Error without dot"|])
+                    {
+                    }
+                }
+            }
+            """;
+
+        context.TestCode = sourceCode;
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Validates that base constructor call in exception with a dot does not produce a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task ExceptionMessage_BaseConstructor_WithDot_ShouldNotProduceWarning()
+    {
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestException : Exception
+                {
+                    public TestException() : base("Error with dot.")
+                    {
+                    }
+                }
+            }
+            """;
+
+        context.TestCode = sourceCode;
+        await context.RunAsync();
+    }
 }
