@@ -57,42 +57,46 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         context.RegisterCompilationStartAction(compilationContext =>
         {
             var wordList = SpellChecker.CreateWordList(compilationContext.Options.AdditionalFiles);
+            var compilation = compilationContext.Compilation;
 
-            compilationContext.RegisterSyntaxTreeAction(c => AnalyzeSyntaxTree(c, wordList));
+            compilationContext.RegisterSemanticModelAction(c => AnalyzeSemanticModel(c, wordList, compilation));
         });
     }
 
-    private static void AnalyzeSyntaxTree(SyntaxTreeAnalysisContext context, WordList wordList)
+    private static void AnalyzeSemanticModel(SemanticModelAnalysisContext context, WordList wordList, Compilation compilation)
     {
-        var root = context.Tree.GetRoot(context.CancellationToken);
+        var semanticModel = context.SemanticModel;
+        var tree = semanticModel.SyntaxTree;
+        var root = tree.GetRoot(context.CancellationToken);
 
         var descendantTokens = root.DescendantTokens(descendIntoTrivia: true);
         foreach (var token in descendantTokens)
         {
             foreach (var trivia in token.LeadingTrivia)
             {
-                CheckTrivia(context, wordList, trivia);
+                CheckTrivia(context, tree, wordList, trivia);
             }
 
             foreach (var trivia in token.TrailingTrivia)
             {
-                CheckTrivia(context, wordList, trivia);
+                CheckTrivia(context, tree, wordList, trivia);
             }
 
             if (token.IsKind(SyntaxKind.IdentifierToken))
             {
-                CheckIdentifierToken(context, wordList, token);
+                CheckIdentifierToken(context, tree, wordList, token, semanticModel, compilation);
             }
 
             if (IsString(token))
             {
-                CheckTextToken(context, wordList, token);
+                CheckTextToken(context, tree, wordList, token);
             }
         }
     }
 
     private static void CheckTrivia(
-        SyntaxTreeAnalysisContext context,
+        SemanticModelAnalysisContext context,
+        SyntaxTree tree,
         WordList wordList,
         SyntaxTrivia trivia)
     {
@@ -121,23 +125,31 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
                     }
 
                     var partLocation = Location
-                        .Create(context.Tree, new TextSpan(trivia.FullSpan.Start + partOffset, partWord.Length));
+                        .Create(tree, new TextSpan(trivia.FullSpan.Start + partOffset, partWord.Length));
                     Report(context, partWord, partLocation);
                 }
 
                 continue;
             }
 
-            var location = Location.Create(context.Tree, new TextSpan(trivia.FullSpan.Start + offset, word.Length));
+            var location = Location.Create(tree, new TextSpan(trivia.FullSpan.Start + offset, word.Length));
             Report(context, word, location);
         }
     }
 
     private static void CheckIdentifierToken(
-        SyntaxTreeAnalysisContext context,
+        SemanticModelAnalysisContext context,
+        SyntaxTree tree,
         WordList wordList,
-        SyntaxToken token)
+        SyntaxToken token,
+        SemanticModel semanticModel,
+        Compilation compilation)
     {
+        if (IsExternalSymbol(token, semanticModel, compilation))
+        {
+            return;
+        }
+
         var tokenText = token.ValueText;
         if (!ShouldCheckWord(wordList, tokenText))
         {
@@ -152,9 +164,32 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
                 continue;
             }
 
-            var location = Location.Create(context.Tree, new TextSpan(token.Span.Start + offset, word.Length));
+            var location = Location.Create(tree, new TextSpan(token.Span.Start + offset, word.Length));
             Report(context, word, location);
         }
+    }
+
+    private static bool IsExternalSymbol(SyntaxToken token, SemanticModel semanticModel, Compilation compilation)
+    {
+        var node = token.Parent;
+        if (node == null)
+        {
+            return false;
+        }
+
+        var symbol = semanticModel.GetSymbolInfo(node).Symbol ?? semanticModel.GetDeclaredSymbol(node);
+        if (symbol == null)
+        {
+            return false;
+        }
+
+        var containingAssembly = symbol.ContainingAssembly;
+        if (containingAssembly == null)
+        {
+            return false;
+        }
+
+        return !SymbolEqualityComparer.Default.Equals(containingAssembly, compilation.Assembly);
     }
 
     private static bool IsString(SyntaxToken token) =>
@@ -163,7 +198,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         || token.IsKind(SyntaxKind.SingleLineRawStringLiteralToken)
         || token.IsKind(SyntaxKind.MultiLineRawStringLiteralToken);
 
-    private static void CheckTextToken(SyntaxTreeAnalysisContext context, WordList wordList, SyntaxToken token)
+    private static void CheckTextToken(SemanticModelAnalysisContext context, SyntaxTree tree, WordList wordList, SyntaxToken token)
     {
         if (IsGuid(token.ValueText))
         {
@@ -189,14 +224,14 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
                         continue;
                     }
 
-                    var partLocation = Location.Create(context.Tree, new TextSpan(spanStart + partOffset, partWord.Length));
+                    var partLocation = Location.Create(tree, new TextSpan(spanStart + partOffset, partWord.Length));
                     Report(context, partWord, partLocation);
                 }
 
                 continue;
             }
 
-            var location = Location.Create(context.Tree, new TextSpan(spanStart + offset, word.Length));
+            var location = Location.Create(tree, new TextSpan(spanStart + offset, word.Length));
             Report(context, word, location);
         }
     }
@@ -217,7 +252,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         return !wordList.Check(word);
     }
 
-    private static void Report(SyntaxTreeAnalysisContext context, string word, Location location)
+    private static void Report(SemanticModelAnalysisContext context, string word, Location location)
     {
         var diagnostic = Diagnostic.Create(
             rule,

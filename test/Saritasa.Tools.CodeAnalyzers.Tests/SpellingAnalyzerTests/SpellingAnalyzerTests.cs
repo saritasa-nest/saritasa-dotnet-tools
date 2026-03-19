@@ -714,4 +714,59 @@ public class SpellingAnalyzerTests
 
         await context.RunAsync();
     }
+
+    /// <summary>
+    /// Verifies external method call does not produce a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task ExternalMethodCall_WithTypo_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        const int testNumber = 1;
+                        var squareRoot = Math.Sqrt(testNumber);
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies user method call produces a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task UserMethodCall_WithTypo_ShouldProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        MethodWith[|Typoo|]();
+                    }
+
+                    private void MethodWith[|Typoo|]()
+                    {
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
 }
