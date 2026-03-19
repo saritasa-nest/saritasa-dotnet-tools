@@ -32,6 +32,7 @@
   <ItemGroup>
     <EmbeddedResource Include="..\..\dictionaries\en-us.dic" />
     <EmbeddedResource Include="..\..\dictionaries\en-us.aff" />
+    <EmbeddedResource Include="..\..\dictionaries\general exclusions\**\*" />
   </ItemGroup>
 
   <Target Name="CopyWeCantSpellHunspell" AfterTargets="Build">

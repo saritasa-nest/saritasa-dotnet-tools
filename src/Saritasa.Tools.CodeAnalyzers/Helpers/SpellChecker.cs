@@ -12,6 +12,13 @@ public static class SpellChecker
     private const string DefaultDicFileName = "en-us.dic";
     private const string DefaultAffFileName = "en-us.aff";
 
+    private static readonly string[] knownDictionaryFiles =
+    [
+        DefaultDicFileName,
+        DefaultAffFileName,
+        "exclusions.txt"
+    ];
+
     /// <summary>
     /// Creates word list from packaged dictionary files and optional additional files.
     /// </summary>
@@ -19,17 +26,18 @@ public static class SpellChecker
     /// <returns>Word list.</returns>
     public static WordList CreateWordList(IEnumerable<AdditionalText> files)
     {
-        var wordList = CreateWordListFromEmbeddedResources();
+        var assembly = typeof(SpellChecker).Assembly;
 
+        var wordList = CreateWordListFromEmbeddedResources(assembly);
+
+        AddGeneralExclusions(wordList, assembly);
         AddExclusions(files, wordList);
 
         return wordList;
     }
 
-    private static WordList CreateWordListFromEmbeddedResources()
+    private static WordList CreateWordListFromEmbeddedResources(Assembly assembly)
     {
-        var assembly = typeof(SpellChecker).Assembly;
-
         var dicStream = TryOpenResourceStream(assembly, DefaultDicFileName);
         if (dicStream is null)
         {
@@ -58,6 +66,34 @@ public static class SpellChecker
             .FirstOrDefault(n => n.EndsWith(fileName, StringComparison.OrdinalIgnoreCase));
 
         return match is null ? null : assembly.GetManifestResourceStream(match);
+    }
+
+    private static void AddGeneralExclusions(WordList wordList, Assembly assembly)
+    {
+        var resourceNames = assembly
+            .GetManifestResourceNames()
+            .Where(n => n.EndsWith(".txt", StringComparison.OrdinalIgnoreCase) &&
+                       !knownDictionaryFiles.Any(known => n.EndsWith(known, StringComparison.OrdinalIgnoreCase)))
+            .ToList();
+
+        foreach (var resourceName in resourceNames)
+        {
+            using var stream = assembly.GetManifestResourceStream(resourceName);
+            if (stream is null)
+            {
+                continue;
+            }
+
+            using var reader = new StreamReader(stream);
+            while (reader.ReadLine() is { } line)
+            {
+                var word = line.Trim();
+                if (!string.IsNullOrWhiteSpace(word))
+                {
+                    wordList.Add(word);
+                }
+            }
+        }
     }
 
     private static void AddExclusions(IEnumerable<AdditionalText> files, WordList wordList)

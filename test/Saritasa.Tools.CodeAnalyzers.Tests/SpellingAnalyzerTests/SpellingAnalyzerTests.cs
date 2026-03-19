@@ -668,6 +668,30 @@ public class SpellingAnalyzerTests
     }
 
     /// <summary>
+    /// Verifies word in general exclusions does not produce a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task WordInGeneralExclusions_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var test = "linq";
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
     /// Verifies <see cref="Guid"/> string does not produce a warning.
     /// </summary>
     [TestMethod]
