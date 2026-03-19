@@ -17,6 +17,7 @@ public sealed class SingularTypeNameAnalyzer : DiagnosticAnalyzer
 {
     private const string DiagnosticId = "STAN1003";
     private const string Category = "Naming";
+    private const string AllowedPluralWordsOptionName = "dotnet_diagnostic.STAN1003.allowed_plural_words";
 
     private static readonly LocalizableString title = "Type names should use singular nouns";
     private static readonly LocalizableString messageFormat = "Type name '{0}' contains plural noun";
@@ -24,6 +25,10 @@ public sealed class SingularTypeNameAnalyzer : DiagnosticAnalyzer
     private static readonly LocalizableString description
         = "Type names should use singular nouns (e.g. 'UserController' instead of 'UsersController').";
 
+    /// <remarks>
+    /// Additional allowed plural words can be configured via .editorconfig option:
+    /// <c>dotnet_diagnostic.STAN1003.allowed_plural_words = Accounts, Items</c>.
+    /// </remarks>
     private static readonly ImmutableHashSet<string> allowedPluralWords = ImmutableHashSet.Create(
         StringComparer.Ordinal,
         "News",
@@ -84,7 +89,13 @@ public sealed class SingularTypeNameAnalyzer : DiagnosticAnalyzer
 
         var words = SplitPascalCase(name).ToList();
         var hasKeyword = words.Any(segment => keywordsToCheck.Contains(segment));
-        if (!hasKeyword || !HasPluralWord(words))
+        if (!hasKeyword)
+        {
+            return;
+        }
+
+        var userAllowedWords = GetUserAllowedPluralWords(context);
+        if (!HasPluralWord(words, userAllowedWords))
         {
             return;
         }
@@ -99,7 +110,29 @@ public sealed class SingularTypeNameAnalyzer : DiagnosticAnalyzer
         context.ReportDiagnostic(diagnostic);
     }
 
-    private static bool HasPluralWord(List<string> words)
+    private static ImmutableHashSet<string> GetUserAllowedPluralWords(SymbolAnalysisContext context)
+    {
+        var syntaxTree = context.Symbol.Locations.FirstOrDefault()?.SourceTree;
+        if (syntaxTree is null)
+        {
+            return ImmutableHashSet<string>.Empty;
+        }
+
+        var options = context.Options.AnalyzerConfigOptionsProvider.GetOptions(syntaxTree);
+        if (!options.TryGetValue(AllowedPluralWordsOptionName, out var rawValue) || string.IsNullOrWhiteSpace(rawValue))
+        {
+            return ImmutableHashSet<string>.Empty;
+        }
+
+        var words = rawValue
+            .Split(',')
+            .Select(w => w.Trim())
+            .Where(w => w.Length > 0);
+
+        return ImmutableHashSet.CreateRange(StringComparer.Ordinal, words);
+    }
+
+    private static bool HasPluralWord(List<string> words, ImmutableHashSet<string> userAllowedWords)
     {
         if (words.Count <= 1)
         {
@@ -113,7 +146,7 @@ public sealed class SingularTypeNameAnalyzer : DiagnosticAnalyzer
                 continue;
             }
 
-            if (allowedPluralWords.Contains(word))
+            if (allowedPluralWords.Contains(word) || userAllowedWords.Contains(word))
             {
                 continue;
             }

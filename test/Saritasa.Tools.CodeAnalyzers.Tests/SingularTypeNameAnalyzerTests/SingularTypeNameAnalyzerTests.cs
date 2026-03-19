@@ -111,4 +111,69 @@ public class SingularTypeNameAnalyzerTests
 
         await context.RunAsync();
     }
+
+    /// <summary>
+    /// Validates case when class name contains plural word that is allowed by user via .editorconfig.
+    /// </summary>
+    [TestMethod]
+    public async Task Class_WithUserAllowedPluralWord_ShouldNotProduceWarning()
+    {
+        var test = new CSharpAnalyzerTest<SingularTypeNameAnalyzer, DefaultVerifier>
+        {
+            TestCode = "class UsersController { }",
+            ReferenceAssemblies = ReferenceAssemblies.Net.Net60,
+        };
+
+        const string editorconfigWithUserAllowedWords = """
+                                                        is_global = true
+                                                        dotnet_diagnostic.STAN1003.allowed_plural_words = Users
+                                                        """;
+        test.TestState.AnalyzerConfigFiles.Add(("/.editorconfig", editorconfigWithUserAllowedWords));
+
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Validates case when class name contains plural word that is allowed by user via .editorconfig (multiple words).
+    /// </summary>
+    [TestMethod]
+    public async Task Class_WithMultipleUserAllowedPluralWords_ShouldNotProduceWarning()
+    {
+        var test = new CSharpAnalyzerTest<SingularTypeNameAnalyzer, DefaultVerifier>
+        {
+            TestCode = "class AccountsService { }",
+            ReferenceAssemblies = ReferenceAssemblies.Net.Net60,
+        };
+
+        const string editorconfigWithUserAllowedWords =
+            """
+            is_global = true
+            dotnet_diagnostic.STAN1003.allowed_plural_words = Accounts, Items
+            """;
+        test.TestState.AnalyzerConfigFiles.Add(("/.editorconfig", editorconfigWithUserAllowedWords));
+
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Validates case when class name contains plural word that is NOT in the user allowed list.
+    /// </summary>
+    [TestMethod]
+    public async Task Class_WithPluralWordNotInUserAllowedList_ShouldProduceWarning()
+    {
+        var test = new CSharpAnalyzerTest<SingularTypeNameAnalyzer, DefaultVerifier>
+        {
+            TestCode = "class [|UsersController|] { }",
+            ReferenceAssemblies = ReferenceAssemblies.Net.Net60,
+        };
+
+        const string editorconfigWithUserAllowedWords =
+            """
+            is_global = true
+            dotnet_diagnostic.STAN1003.allowed_plural_words = Accounts
+            """;
+        test.TestState.AnalyzerConfigFiles.Add(("/.editorconfig", editorconfigWithUserAllowedWords));
+
+        await test.RunAsync();
+    }
 }
