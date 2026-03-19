@@ -11828,6 +11828,7 @@ amendment/SM
 amenity/SM
 amerce/GLDS
 amercement/SM
+american
 americium/M
 amethyst/SM
 amiability/M
@@ -13016,6 +13017,9 @@ autonomous/Y
 autonomy/M
 autopilot/SM
 autopsy/GDSM
+autosave/BJMZGDRS
+autosaved/U
+autosaver/M
 autosuggestion
 autoworker/MS
 autumn/SM
@@ -19920,6 +19924,9 @@ desertification
 desertion/SM
 deserved/UY
 deserving/U
+deserial/SMY
+deserialization/SM
+deserialize/GDSB
 desiccant/SM
 desiccate/DSGN
 desiccation/M

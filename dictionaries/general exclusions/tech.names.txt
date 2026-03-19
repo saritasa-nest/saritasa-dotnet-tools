@@ -83,6 +83,7 @@ Git
 Gitea
 Gitflow
 GitHub
+github
 GitLab
 GitLink
 Gitter
@@ -253,6 +254,7 @@ Splunk
 SQL
 SQLAlchemy
 SQLite
+sqlite
 StyleCop
 Supabase
 Suse
@@ -299,7 +301,20 @@ XHTML
 XML
 XSL
 xUnit
+Xunit
 YAML
 YouTrack
 Zipkin
 Zlib
+stackoverflow
+velopack
+youtube
+MediatR
+microsoft
+downloader
+namespace
+autocomplete
+readonly
+ctor
+configurator
+automapper
