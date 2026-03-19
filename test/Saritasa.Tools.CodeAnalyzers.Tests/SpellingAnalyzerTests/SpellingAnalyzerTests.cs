@@ -769,4 +769,52 @@ public class SpellingAnalyzerTests
 
         await context.RunAsync();
     }
+
+    /// <summary>
+    /// Verifies string with apostrophe does not produce a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task StringWithApostrophe_WithoutTypo_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var test = "'test'";
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies string with apostrophe produces a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task StringWithApostrophe_WithTypo_ShouldProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var test = "'[|typoo|]'";
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
 }

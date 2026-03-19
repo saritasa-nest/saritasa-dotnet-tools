@@ -288,4 +288,26 @@ public class SplitByNonLettersTests
         Assert.AreEqual("employees", result[1].Word);
         Assert.AreEqual(9, result[1].Offset);
     }
+
+    /// <summary>
+    /// Test that <see cref="StringHelper.SplitByNonLetters"/> handles words with apostrophe at the start.
+    /// </summary>
+    [TestMethod]
+    public void SplitByNonLetters_WordsWithApostropheAtTheStart_ReturnsWordsWithoutApostrophe()
+    {
+        // Arrange
+        const string text = "'hello' 'world'";
+
+        // Act
+        var result = StringHelper.SplitByNonLetters(text).ToList();
+
+        // Assert
+        Assert.AreEqual(2, result.Count);
+
+        Assert.AreEqual("hello", result[0].Word);
+        Assert.AreEqual(1, result[0].Offset);
+
+        Assert.AreEqual("world", result[1].Word);
+        Assert.AreEqual(9, result[1].Offset);
+    }
 }
