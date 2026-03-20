@@ -75,10 +75,34 @@ public sealed class SingularTypeNameAnalyzer : DiagnosticAnalyzer
     {
         context.EnableConcurrentExecution();
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-        context.RegisterSymbolAction(AnalyzeNamedType, SymbolKind.NamedType);
+
+        context.RegisterCompilationStartAction(compilationContext =>
+        {
+            var userAllowedWords = GetUserAllowedPluralWords(compilationContext.Options);
+
+            compilationContext.RegisterSymbolAction(
+                symbolContext => AnalyzeNamedType(symbolContext, userAllowedWords),
+                SymbolKind.NamedType);
+        });
     }
 
-    private static void AnalyzeNamedType(SymbolAnalysisContext context)
+    private static ImmutableHashSet<string> GetUserAllowedPluralWords(AnalyzerOptions analyzerOptions)
+    {
+        var options = analyzerOptions.AnalyzerConfigOptionsProvider.GlobalOptions;
+        if (!options.TryGetValue(AllowedPluralWordsOptionName, out var rawValue) || string.IsNullOrWhiteSpace(rawValue))
+        {
+            return ImmutableHashSet<string>.Empty;
+        }
+
+        var words = rawValue
+            .Split(',')
+            .Select(w => w.Trim())
+            .Where(w => w.Length > 0);
+
+        return ImmutableHashSet.CreateRange(StringComparer.Ordinal, words);
+    }
+
+    private static void AnalyzeNamedType(SymbolAnalysisContext context, ImmutableHashSet<string> userAllowedWords)
     {
         if (context.Symbol is not INamedTypeSymbol typeSymbol || !typeKindsToAnalyze.Contains(typeSymbol.TypeKind))
         {
@@ -94,7 +118,6 @@ public sealed class SingularTypeNameAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var userAllowedWords = GetUserAllowedPluralWords(context);
         if (!HasPluralWord(words, userAllowedWords))
         {
             return;
@@ -108,28 +131,6 @@ public sealed class SingularTypeNameAnalyzer : DiagnosticAnalyzer
 
         var diagnostic = Diagnostic.Create(rule, location, name);
         context.ReportDiagnostic(diagnostic);
-    }
-
-    private static ImmutableHashSet<string> GetUserAllowedPluralWords(SymbolAnalysisContext context)
-    {
-        var syntaxTree = context.Symbol.Locations.FirstOrDefault()?.SourceTree;
-        if (syntaxTree is null)
-        {
-            return ImmutableHashSet<string>.Empty;
-        }
-
-        var options = context.Options.AnalyzerConfigOptionsProvider.GetOptions(syntaxTree);
-        if (!options.TryGetValue(AllowedPluralWordsOptionName, out var rawValue) || string.IsNullOrWhiteSpace(rawValue))
-        {
-            return ImmutableHashSet<string>.Empty;
-        }
-
-        var words = rawValue
-            .Split(',')
-            .Select(w => w.Trim())
-            .Where(w => w.Length > 0);
-
-        return ImmutableHashSet.CreateRange(StringComparer.Ordinal, words);
     }
 
     private static bool HasPluralWord(List<string> words, ImmutableHashSet<string> userAllowedWords)
