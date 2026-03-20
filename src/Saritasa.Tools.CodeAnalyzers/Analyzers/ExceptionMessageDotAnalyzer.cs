@@ -52,6 +52,10 @@ public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
             compilationContext.RegisterOperationAction(
                 operationContext => AnalyzeObjectCreation(operationContext, exceptionType),
                 OperationKind.ObjectCreation);
+
+            compilationContext.RegisterOperationAction(
+                operationContext => AnalyzeBaseConstructor(operationContext, exceptionType),
+                OperationKind.Invocation);
         });
     }
 
@@ -67,7 +71,28 @@ public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var messageArgument = creation.Arguments
+        CheckExceptionMessage(creation.Arguments, context.ReportDiagnostic);
+    }
+
+    private static void AnalyzeBaseConstructor(OperationAnalysisContext context, INamedTypeSymbol exceptionType)
+    {
+        if (context.Operation is not IInvocationOperation invocation ||
+            invocation.TargetMethod.MethodKind != MethodKind.Constructor)
+        {
+            return;
+        }
+
+        if (!DerivesFromException(invocation.TargetMethod.ContainingType, exceptionType))
+        {
+            return;
+        }
+
+        CheckExceptionMessage(invocation.Arguments, context.ReportDiagnostic);
+    }
+
+    private static void CheckExceptionMessage(IEnumerable<IArgumentOperation> arguments, Action<Diagnostic> reportDiagnostic)
+    {
+        var messageArgument = arguments
             .FirstOrDefault(a => a.Parameter?.Name == "message" && IsStringType(a.Parameter.Type));
 
         if (messageArgument?.Value is null)
@@ -80,12 +105,17 @@ public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var diagnostic = Diagnostic.Create(rule, messageArgument.Syntax.GetLocation(), messageArgument.Value.Syntax.ToString());
-        context.ReportDiagnostic(diagnostic);
+        var diagnostic = Diagnostic.Create(rule, messageArgument.Syntax.GetLocation());
+        reportDiagnostic(diagnostic);
     }
 
-    private static bool MessageEndsWithDot(IOperation value)
+    private static bool MessageEndsWithDot(IOperation? value)
     {
+        if (value is null)
+        {
+            return true;
+        }
+
         if (value.ConstantValue is { HasValue: true, Value: string constant })
         {
             return EndsWithDot(constant);
@@ -108,6 +138,54 @@ public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
         {
             var rightMost = GetRightMostOperand(binary);
             return MessageEndsWithDot(rightMost);
+        }
+
+        if (value is IConditionalOperation conditional)
+        {
+            return MessageEndsWithDot(conditional.WhenTrue) && MessageEndsWithDot(conditional.WhenFalse);
+        }
+
+        if (value is ICoalesceOperation coalesce)
+        {
+            return MessageEndsWithDot(coalesce.Value) && MessageEndsWithDot(coalesce.WhenNull);
+        }
+
+        if (value is ISwitchExpressionOperation switchExpression)
+        {
+            foreach (var arm in switchExpression.Arms)
+            {
+                if (!MessageEndsWithDot(arm.Value))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        // We cannot analyze method results.
+        if (value is IInvocationOperation invocation)
+        {
+            if (IsStringFormat(invocation.TargetMethod))
+            {
+                var formatArg = invocation.Arguments.FirstOrDefault(a => a.Parameter?.Name == "format");
+                if (formatArg?.Value.ConstantValue is { HasValue: true, Value: string format })
+                {
+                    return EndsWithDot(format);
+                }
+            }
+
+            return true;
+        }
+
+        // We cannot analyze identifier values (local variables, parameters, fields, properties).
+        if (value
+            is ILocalReferenceOperation
+            or IParameterReferenceOperation
+            or IFieldReferenceOperation
+            or IPropertyReferenceOperation)
+        {
+            return true;
         }
 
         return false;
@@ -142,5 +220,10 @@ public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
         }
 
         return false;
+    }
+
+    private static bool IsStringFormat(IMethodSymbol method)
+    {
+        return method.ContainingType.SpecialType == SpecialType.System_String && method.Name == "Format";
     }
 }
