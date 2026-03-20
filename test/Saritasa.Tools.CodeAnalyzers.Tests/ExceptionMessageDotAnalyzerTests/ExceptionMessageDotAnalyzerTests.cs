@@ -54,7 +54,7 @@ public class ExceptionMessageDotAnalyzerTests
     }
 
     /// <summary>
-    /// Validates that an exception message wit a dot does not produce a warning.
+    /// Validates that an exception message with a dot does not produce a warning.
     /// </summary>
     [TestMethod]
     public async Task ExceptionMessage_WithDot_ShouldNotProduceWarning()
@@ -509,7 +509,7 @@ public class ExceptionMessageDotAnalyzerTests
     }
 
     /// <summary>
-    /// Validates that methods calls do not produce warnings, because we cannot analyze method results.
+    /// Validates that method calls do not produce warnings, because we cannot analyze method results.
     /// </summary>
     [TestMethod]
     public async Task ExceptionMessage_ToString_ShouldNotProduceWarning()
