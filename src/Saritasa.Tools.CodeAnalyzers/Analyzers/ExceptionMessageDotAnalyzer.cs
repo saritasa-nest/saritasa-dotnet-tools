@@ -105,7 +105,7 @@ public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var diagnostic = Diagnostic.Create(Rule, messageArgument.Syntax.GetLocation(), messageArgument.Value.Syntax.ToString());
+        var diagnostic = Diagnostic.Create(Rule, messageArgument.Syntax.GetLocation());
         reportDiagnostic(diagnostic);
     }
 
