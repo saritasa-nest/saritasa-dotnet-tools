@@ -27,21 +27,21 @@ public sealed class LineLengthAnalyzer : DiagnosticAnalyzer
     /// </summary>
     private const int DefaultMaxLineLength = 130;
 
-    private static readonly LocalizableString Title = "Line exceeds maximum length";
-    private static readonly LocalizableString MessageFormat = "Line length is {0} characters, which exceeds the limit of {1}";
-    private static readonly LocalizableString Description = "Keep lines within the configured maximum length.";
+    private static readonly LocalizableString title = "Line exceeds maximum length";
+    private static readonly LocalizableString messageFormat = "Line length is {0} characters, which exceeds the limit of {1}";
+    private static readonly LocalizableString description = "Keep lines within the configured maximum length.";
 
-    private static readonly DiagnosticDescriptor Rule = new(
+    private static readonly DiagnosticDescriptor rule = new(
         DiagnosticId,
-        Title,
-        MessageFormat,
+        title,
+        messageFormat,
         Category,
         DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
-        description: Description);
+        description: description);
 
     /// <inheritdoc />
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(rule);
 
     /// <inheritdoc />
     public override void Initialize(AnalysisContext context)
@@ -65,7 +65,7 @@ public sealed class LineLengthAnalyzer : DiagnosticAnalyzer
             }
 
             var location = Location.Create(context.Tree, line.Span);
-            var diagnostic = Diagnostic.Create(Rule, location, length, maxLineLength);
+            var diagnostic = Diagnostic.Create(rule, location, length, maxLineLength);
             context.ReportDiagnostic(diagnostic);
         }
     }

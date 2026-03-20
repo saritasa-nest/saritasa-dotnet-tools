@@ -18,22 +18,22 @@ public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
     private const string DiagnosticId = "STAN1002";
     private const string Category = "Spelling";
 
-    private static readonly LocalizableString Title = "Exception message should end with a dot";
-    private static readonly LocalizableString MessageFormat = "Exception message should end with a dot";
-    private static readonly LocalizableString Description
+    private static readonly LocalizableString title = "Exception message should end with a dot";
+    private static readonly LocalizableString messageFormat = "Exception message should end with a dot";
+    private static readonly LocalizableString description
         = "Ensure exception messages end with a dot to keep consistent phrasing.";
 
-    private static readonly DiagnosticDescriptor Rule = new(
+    private static readonly DiagnosticDescriptor rule = new(
         DiagnosticId,
-        Title,
-        MessageFormat,
+        title,
+        messageFormat,
         Category,
         DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
-        description: Description);
+        description: description);
 
     /// <inheritdoc />
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(rule);
 
     /// <inheritdoc />
     public override void Initialize(AnalysisContext context)
@@ -105,7 +105,7 @@ public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var diagnostic = Diagnostic.Create(Rule, messageArgument.Syntax.GetLocation());
+        var diagnostic = Diagnostic.Create(rule, messageArgument.Syntax.GetLocation());
         reportDiagnostic(diagnostic);
     }
 

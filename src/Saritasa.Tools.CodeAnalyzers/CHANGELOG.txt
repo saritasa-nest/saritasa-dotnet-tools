@@ -1,6 +1,7 @@
 ﻿0.1.0 [2023-11-26]
 [+] Initial release.
 
-0.2.0 [2026-01-12]
+0.2.0 [2026-03-18]
 [+] Add line length analyzer.
 [+] Add exception message ends with dot analyzer.
+[+] Add class singular name analyzer.
