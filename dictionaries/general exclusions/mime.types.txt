@@ -1,0 +1,10 @@
+javascript
+mpegurl
+opendocument
+spreadsheetml
+openxmlformats
+officedocument
+wordprocessingml
+powerpoint
+presentationmlf
+shockwave
