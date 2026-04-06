@@ -706,7 +706,7 @@ public class SpellingAnalyzerTests
                 {
                     public void TestMethod()
                     {
-                        var test = "1b6cdb5b-8449-4d8e-ad3b-6b3dd8f4158d";
+                        var test = "This is GUID 1b6cdb5b-8449-4d8e-ad3b-6b3dd8f4158d";
                     }
                 }
             }
@@ -810,6 +810,128 @@ public class SpellingAnalyzerTests
                     public void TestMethod()
                     {
                         var test = "'[|typoo|]'";
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies URL in string literal does not produce a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task StringLiteral_WithUrl_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var test = "https://qweqwe.com/zxc/asd?param=value";
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies URL in comment does not produce a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task Comment_WithUrl_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        // See more details at https://asdasd.com/qwe/rty?foo=bar
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies URL in documentation does not produce a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task Documentation_WithUrl_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                /// <summary>
+                /// See more details at https://zxczxc.com/dfg/hjk
+                /// </summary>
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies HTTP URL does not produce a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task StringLiteral_WithHttpUrl_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var test = "http://qweqwe.com/zxc/asd";
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies sentence with URL does not produce a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task StringLiteral_SentenceWithUrl_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var test = "Visit https://fghfgh.com/bnm/vbn for more information.";
                     }
                 }
             }

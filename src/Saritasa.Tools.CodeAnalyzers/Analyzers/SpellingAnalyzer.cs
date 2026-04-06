@@ -106,10 +106,17 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         }
 
         var text = trivia.ToFullString();
+        var urlRanges = GetUrlRanges(text);
+
         var words = StringHelper.SplitByNonLetters(text);
         foreach (var (word, offset) in words)
         {
             if (!ShouldCheckWord(wordList, word))
+            {
+                continue;
+            }
+
+            if (IsInsideUrl(offset, word.Length, urlRanges))
             {
                 continue;
             }
@@ -120,6 +127,11 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
                 foreach (var (partWord, partOffset) in camelCaseWords)
                 {
                     if (!ShouldCheckWord(wordList, partWord))
+                    {
+                        continue;
+                    }
+
+                    if (IsInsideUrl(partOffset, partWord.Length, urlRanges))
                     {
                         continue;
                     }
@@ -206,11 +218,18 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         }
 
         var spanStart = token.Span.Start;
+        var text = token.Text;
+        var urlRanges = GetUrlRanges(token.ValueText);
 
-        var words = StringHelper.SplitByNonLetters(token.Text);
+        var words = StringHelper.SplitByNonLetters(text);
         foreach (var (word, offset) in words)
         {
             if (!ShouldCheckWord(wordList, word))
+            {
+                continue;
+            }
+
+            if (IsInsideUrl(offset, word.Length, urlRanges))
             {
                 continue;
             }
@@ -220,6 +239,11 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
                 foreach (var (partWord, partOffset) in StringHelper.SplitCamelCase(word, offset))
                 {
                     if (!ShouldCheckWord(wordList, partWord))
+                    {
+                        continue;
+                    }
+
+                    if (IsInsideUrl(partOffset, partWord.Length, urlRanges))
                     {
                         continue;
                     }
@@ -240,6 +264,37 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
     {
         var guidRegex = new Regex("^[({]?[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}[)}]?$");
         return guidRegex.IsMatch(text.Trim());
+    }
+
+    private static List<(int Start, int End)> GetUrlRanges(string text)
+    {
+        var urlRanges = new List<(int Start, int End)>();
+        var urlRegex = new Regex("r", RegexOptions.IgnoreCase);
+        var matches = urlRegex.Matches(text);
+
+        foreach (Match match in matches)
+        {
+            urlRanges.Add((match.Index, match.Index + match.Length));
+        }
+
+        return urlRanges;
+    }
+
+    private static bool IsInsideUrl(int offset, int length, List<(int Start, int End)> urlRanges)
+    {
+        var wordStart = offset;
+        var wordEnd = offset + length;
+
+        foreach (var (urlStart, urlEnd) in urlRanges)
+        {
+            // Check if word overlaps with URL range
+            if (wordStart < urlEnd && wordEnd > urlStart)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static bool ShouldCheckWord(WordList wordList, string word)
