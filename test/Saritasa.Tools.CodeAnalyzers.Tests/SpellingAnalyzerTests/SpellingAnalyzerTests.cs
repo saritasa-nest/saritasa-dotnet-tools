@@ -695,7 +695,7 @@ public class SpellingAnalyzerTests
     /// Verifies <see cref="Guid"/> string does not produce a warning.
     /// </summary>
     [TestMethod]
-    public async Task Guid_ShouldNotProduceWarning()
+    public async Task Guid_String_ShouldNotProduceWarning()
     {
         context.TestCode =
             /* lang=c# */
@@ -706,7 +706,31 @@ public class SpellingAnalyzerTests
                 {
                     public void TestMethod()
                     {
-                        var test = "This is GUID 1b6cdb5b-8449-4d8e-ad3b-6b3dd8f4158d";
+                        var test = "This GUID 1b6cdb5b-8449-4d8e-ad3b-6b3dd8f4158d should not be spellchecked";
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies <see cref="Guid"/> comment does not produce a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task Guid_Comment_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        // This GUID 1b6cdb5b-8449-4d8e-ad3b-6b3dd8f4158d should not be spellchecked
                     }
                 }
             }
