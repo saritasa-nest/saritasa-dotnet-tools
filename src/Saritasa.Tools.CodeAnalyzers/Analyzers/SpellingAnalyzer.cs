@@ -107,6 +107,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
 
         var text = trivia.ToFullString();
         var urlRanges = GetUrlRanges(text);
+        var guidRanges = GetGuidRanges(text);
 
         var words = StringHelper.SplitByNonLetters(text);
         foreach (var (word, offset) in words)
@@ -117,6 +118,11 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
             }
 
             if (IsInsideUrl(offset, word.Length, urlRanges))
+            {
+                continue;
+            }
+
+            if (IsInsideRange(offset, word.Length, guidRanges))
             {
                 continue;
             }
@@ -132,6 +138,11 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
                     }
 
                     if (IsInsideUrl(partOffset, partWord.Length, urlRanges))
+                    {
+                        continue;
+                    }
+
+                    if (IsInsideRange(partOffset, partWord.Length, guidRanges))
                     {
                         continue;
                     }
@@ -212,14 +223,10 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
 
     private static void CheckTextToken(SemanticModelAnalysisContext context, SyntaxTree tree, WordList wordList, SyntaxToken token)
     {
-        if (IsGuid(token.ValueText))
-        {
-            return;
-        }
-
         var spanStart = token.Span.Start;
         var text = token.Text;
-        var urlRanges = GetUrlRanges(token.ValueText);
+        var urlRanges = GetUrlRanges(text);
+        var guidRanges = GetGuidRanges(text);
 
         var words = StringHelper.SplitByNonLetters(text);
         foreach (var (word, offset) in words)
@@ -230,6 +237,11 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
             }
 
             if (IsInsideUrl(offset, word.Length, urlRanges))
+            {
+                continue;
+            }
+
+            if (IsInsideRange(offset, word.Length, guidRanges))
             {
                 continue;
             }
@@ -248,6 +260,11 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
                         continue;
                     }
 
+                    if (IsInsideRange(partOffset, partWord.Length, guidRanges))
+                    {
+                        continue;
+                    }
+
                     var partLocation = Location.Create(tree, new TextSpan(spanStart + partOffset, partWord.Length));
                     Report(context, partWord, partLocation);
                 }
@@ -258,12 +275,6 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
             var location = Location.Create(tree, new TextSpan(spanStart + offset, word.Length));
             Report(context, word, location);
         }
-    }
-
-    private static bool IsGuid(string text)
-    {
-        var guidRegex = new Regex("^[({]?[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}[)}]?$");
-        return guidRegex.IsMatch(text.Trim());
     }
 
     private static List<(int Start, int End)> GetUrlRanges(string text)
@@ -289,6 +300,37 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         {
             // Check if word overlaps with URL range
             if (wordStart < urlEnd && wordEnd > urlStart)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static List<(int Start, int End)> GetGuidRanges(string text)
+    {
+        var guidRanges = new List<(int Start, int End)>();
+        var guidRegex = new Regex(@"[({]?[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}[)}]?", RegexOptions.IgnoreCase);
+        var matches = guidRegex.Matches(text);
+
+        foreach (Match match in matches)
+        {
+            guidRanges.Add((match.Index, match.Index + match.Length));
+        }
+
+        return guidRanges;
+    }
+
+    private static bool IsInsideRange(int offset, int length, List<(int Start, int End)> ranges)
+    {
+        var wordStart = offset;
+        var wordEnd = offset + length;
+
+        foreach (var (rangeStart, rangeEnd) in ranges)
+        {
+            // Check if word overlaps with range
+            if (wordStart < rangeEnd && wordEnd > rangeStart)
             {
                 return true;
             }
