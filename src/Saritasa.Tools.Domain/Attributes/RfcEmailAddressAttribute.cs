@@ -25,8 +25,8 @@ public class RfcEmailAddressAttribute : DataTypeAttribute
     /// <inheritdoc/>
     public override bool IsValid(object? value)
     {
-        return value is string valueAsString
-            && MailAddress.TryCreate(valueAsString, displayName: null, out _);
+        return value is not string valueAsString
+            || MailAddress.TryCreate(valueAsString, displayName: null, out _);
     }
 }
 #endif
