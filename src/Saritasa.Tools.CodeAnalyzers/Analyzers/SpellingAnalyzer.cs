@@ -269,7 +269,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
     private static List<(int Start, int End)> GetUrlRanges(string text)
     {
         var urlRanges = new List<(int Start, int End)>();
-        var urlRegex = new Regex("r", RegexOptions.IgnoreCase);
+        var urlRegex = new Regex(@"[a-zA-Z][a-zA-Z0-9+.-]*://[^\s]+", RegexOptions.IgnoreCase);
         var matches = urlRegex.Matches(text);
 
         foreach (Match match in matches)
