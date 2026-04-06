@@ -89,7 +89,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
 
             if (IsString(token))
             {
-                CheckTextToken(context, tree, wordList, token);
+                CheckText(context, tree, wordList, token.Text, token.Span.Start);
             }
         }
     }
@@ -106,58 +106,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         }
 
         var text = trivia.ToFullString();
-        var urlRanges = GetUrlRanges(text);
-        var guidRanges = GetGuidRanges(text);
-
-        var words = StringHelper.SplitByNonLetters(text);
-        foreach (var (word, offset) in words)
-        {
-            if (!ShouldCheckWord(wordList, word))
-            {
-                continue;
-            }
-
-            if (IsInsideUrl(offset, word.Length, urlRanges))
-            {
-                continue;
-            }
-
-            if (IsInsideRange(offset, word.Length, guidRanges))
-            {
-                continue;
-            }
-
-            if (StringHelper.IsCamelCaseWord(word))
-            {
-                var camelCaseWords = StringHelper.SplitCamelCase(word, offset);
-                foreach (var (partWord, partOffset) in camelCaseWords)
-                {
-                    if (!ShouldCheckWord(wordList, partWord))
-                    {
-                        continue;
-                    }
-
-                    if (IsInsideUrl(partOffset, partWord.Length, urlRanges))
-                    {
-                        continue;
-                    }
-
-                    if (IsInsideRange(partOffset, partWord.Length, guidRanges))
-                    {
-                        continue;
-                    }
-
-                    var partLocation = Location
-                        .Create(tree, new TextSpan(trivia.FullSpan.Start + partOffset, partWord.Length));
-                    Report(context, partWord, partLocation);
-                }
-
-                continue;
-            }
-
-            var location = Location.Create(tree, new TextSpan(trivia.FullSpan.Start + offset, word.Length));
-            Report(context, word, location);
-        }
+        CheckText(context, tree, wordList, text, trivia.FullSpan.Start);
     }
 
     private static void CheckIdentifierToken(
@@ -221,122 +170,96 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         || token.IsKind(SyntaxKind.SingleLineRawStringLiteralToken)
         || token.IsKind(SyntaxKind.MultiLineRawStringLiteralToken);
 
-    private static void CheckTextToken(SemanticModelAnalysisContext context, SyntaxTree tree, WordList wordList, SyntaxToken token)
+    private static void CheckText(
+        SemanticModelAnalysisContext context,
+        SyntaxTree tree,
+        WordList wordList,
+        string text,
+        int baseOffset)
     {
-        var spanStart = token.Span.Start;
-        var text = token.Text;
-        var urlRanges = GetUrlRanges(text);
-        var guidRanges = GetGuidRanges(text);
+        var parts = SplitByWhitespace(text);
 
-        var words = StringHelper.SplitByNonLetters(text);
-        foreach (var (word, offset) in words)
+        foreach (var (part, partOffset) in parts)
         {
-            if (!ShouldCheckWord(wordList, word))
+            if (IsGuid(part) || IsUrl(part))
             {
                 continue;
             }
 
-            if (IsInsideUrl(offset, word.Length, urlRanges))
+            var words = StringHelper.SplitByNonLetters(part);
+            foreach (var (word, wordOffset) in words)
             {
-                continue;
-            }
-
-            if (IsInsideRange(offset, word.Length, guidRanges))
-            {
-                continue;
-            }
-
-            if (StringHelper.IsCamelCaseWord(word))
-            {
-                foreach (var (partWord, partOffset) in StringHelper.SplitCamelCase(word, offset))
+                if (!ShouldCheckWord(wordList, word))
                 {
-                    if (!ShouldCheckWord(wordList, partWord))
-                    {
-                        continue;
-                    }
-
-                    if (IsInsideUrl(partOffset, partWord.Length, urlRanges))
-                    {
-                        continue;
-                    }
-
-                    if (IsInsideRange(partOffset, partWord.Length, guidRanges))
-                    {
-                        continue;
-                    }
-
-                    var partLocation = Location.Create(tree, new TextSpan(spanStart + partOffset, partWord.Length));
-                    Report(context, partWord, partLocation);
+                    continue;
                 }
 
-                continue;
+                if (StringHelper.IsCamelCaseWord(word))
+                {
+                    var camelCaseWords = StringHelper.SplitCamelCase(word, partOffset + wordOffset);
+                    foreach (var (camelWord, camelOffset) in camelCaseWords)
+                    {
+                        if (!ShouldCheckWord(wordList, camelWord))
+                        {
+                            continue;
+                        }
+
+                        var location = Location.Create(tree, new TextSpan(baseOffset + camelOffset, camelWord.Length));
+                        Report(context, camelWord, location);
+                    }
+
+                    continue;
+                }
+
+                var wordLocation = Location.Create(tree, new TextSpan(baseOffset + partOffset + wordOffset, word.Length));
+                Report(context, word, wordLocation);
             }
-
-            var location = Location.Create(tree, new TextSpan(spanStart + offset, word.Length));
-            Report(context, word, location);
         }
     }
 
-    private static List<(int Start, int End)> GetUrlRanges(string text)
+    private static IEnumerable<(string Part, int Offset)> SplitByWhitespace(string text)
     {
-        var urlRanges = new List<(int Start, int End)>();
-        var urlRegex = new Regex(@"[a-zA-Z][a-zA-Z0-9+.-]*://[^\s]+", RegexOptions.IgnoreCase);
-        var matches = urlRegex.Matches(text);
+        var currentPart = string.Empty;
+        var partStart = 0;
 
-        foreach (Match match in matches)
+        for (var i = 0; i < text.Length; i++)
         {
-            urlRanges.Add((match.Index, match.Index + match.Length));
-        }
-
-        return urlRanges;
-    }
-
-    private static bool IsInsideUrl(int offset, int length, List<(int Start, int End)> urlRanges)
-    {
-        var wordStart = offset;
-        var wordEnd = offset + length;
-
-        foreach (var (urlStart, urlEnd) in urlRanges)
-        {
-            // Check if word overlaps with URL range
-            if (wordStart < urlEnd && wordEnd > urlStart)
+            if (char.IsWhiteSpace(text[i]))
             {
-                return true;
+                if (currentPart.Length > 0)
+                {
+                    yield return (currentPart, partStart);
+                    currentPart = string.Empty;
+                }
+                partStart = i + 1;
             }
-        }
-
-        return false;
-    }
-
-    private static List<(int Start, int End)> GetGuidRanges(string text)
-    {
-        var guidRanges = new List<(int Start, int End)>();
-        var guidRegex = new Regex(@"[({]?[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}[)}]?", RegexOptions.IgnoreCase);
-        var matches = guidRegex.Matches(text);
-
-        foreach (Match match in matches)
-        {
-            guidRanges.Add((match.Index, match.Index + match.Length));
-        }
-
-        return guidRanges;
-    }
-
-    private static bool IsInsideRange(int offset, int length, List<(int Start, int End)> ranges)
-    {
-        var wordStart = offset;
-        var wordEnd = offset + length;
-
-        foreach (var (rangeStart, rangeEnd) in ranges)
-        {
-            // Check if word overlaps with range
-            if (wordStart < rangeEnd && wordEnd > rangeStart)
+            else
             {
-                return true;
+                if (currentPart.Length == 0)
+                {
+                    partStart = i;
+                }
+                currentPart += text[i];
             }
         }
 
-        return false;
+        if (currentPart.Length > 0)
+        {
+            yield return (currentPart, partStart);
+        }
+    }
+
+    private static bool IsGuid(string text)
+    {
+        var guidRegex = new Regex(
+            "^[({]?[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}[)}]?$", RegexOptions.IgnoreCase);
+        return guidRegex.IsMatch(text);
+    }
+
+    private static bool IsUrl(string text)
+    {
+        var urlRegex = new Regex("^[a-zA-Z][a-zA-Z0-9+.-]*://", RegexOptions.IgnoreCase);
+        return urlRegex.IsMatch(text);
     }
 
     private static bool ShouldCheckWord(WordList wordList, string word)
