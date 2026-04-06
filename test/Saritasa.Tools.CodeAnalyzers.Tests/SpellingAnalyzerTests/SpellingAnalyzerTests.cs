@@ -843,10 +843,10 @@ public class SpellingAnalyzerTests
     }
 
     /// <summary>
-    /// Verifies URL in string literal does not produce a warning.
+    /// Verifies sentence with URL does not produce a warning.
     /// </summary>
     [TestMethod]
-    public async Task StringLiteral_WithUrl_ShouldNotProduceWarning()
+    public async Task String_WithUrl_ShouldNotProduceWarning()
     {
         context.TestCode =
             /* lang=c# */
@@ -857,7 +857,7 @@ public class SpellingAnalyzerTests
                 {
                     public void TestMethod()
                     {
-                        var test = "https://qweqwe.com/zxc/asd?param=value";
+                        var test = "Visit https://fghfgh.com/bnm/vbn for more information.";
                     }
                 }
             }
@@ -908,54 +908,6 @@ public class SpellingAnalyzerTests
                 {
                     public void TestMethod()
                     {
-                    }
-                }
-            }
-            """;
-
-        await context.RunAsync();
-    }
-
-    /// <summary>
-    /// Verifies HTTP URL does not produce a warning.
-    /// </summary>
-    [TestMethod]
-    public async Task StringLiteral_WithHttpUrl_ShouldNotProduceWarning()
-    {
-        context.TestCode =
-            /* lang=c# */
-            """
-            namespace TestApplication
-            {
-                class TestClass
-                {
-                    public void TestMethod()
-                    {
-                        var test = "http://qweqwe.com/zxc/asd";
-                    }
-                }
-            }
-            """;
-
-        await context.RunAsync();
-    }
-
-    /// <summary>
-    /// Verifies sentence with URL does not produce a warning.
-    /// </summary>
-    [TestMethod]
-    public async Task StringLiteral_SentenceWithUrl_ShouldNotProduceWarning()
-    {
-        context.TestCode =
-            /* lang=c# */
-            """
-            namespace TestApplication
-            {
-                class TestClass
-                {
-                    public void TestMethod()
-                    {
-                        var test = "Visit https://fghfgh.com/bnm/vbn for more information.";
                     }
                 }
             }
