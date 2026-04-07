@@ -221,7 +221,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
     /// </returns>
     /// <remarks>
     /// Note that we replace ignored letters with spaces,
-    /// not just removing letters because we work with text offset in the analyzer.
+    /// not just removing letters because we need to maintain text offset so we can report location correctly.
     /// </remarks>
     private static string MaskIgnoredText(string text)
     {
