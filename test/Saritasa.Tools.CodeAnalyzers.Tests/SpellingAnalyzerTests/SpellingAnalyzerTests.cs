@@ -371,30 +371,6 @@ public class SpellingAnalyzerTests
     }
 
     /// <summary>
-    /// Verifies apostrophe is handled correctly.
-    /// </summary>
-    [TestMethod]
-    public async Task Comment_WithApostrophe_ShouldNotProduceWarning()
-    {
-        context.TestCode =
-            /* lang=c# */
-            """
-            namespace TestApplication
-            {
-                class TestClass
-                {
-                    public void TestMethod()
-                    {
-                        // It's employees' employee's.
-                    }
-                }
-            }
-            """;
-
-        await context.RunAsync();
-    }
-
-    /// <summary>
     /// Verifies multi line comment produces a warning when it contains a typo.
     /// </summary>
     [TestMethod]
@@ -748,7 +724,7 @@ public class SpellingAnalyzerTests
     }
 
     /// <summary>
-    /// Verifies external method call does not produce a warning.
+    /// Verifies external method call is excluded from analysis.
     /// </summary>
     [TestMethod]
     public async Task ExternalMethodCall_WithTypo_ShouldNotProduceWarning()
@@ -803,7 +779,55 @@ public class SpellingAnalyzerTests
     }
 
     /// <summary>
-    /// Verifies string with apostrophe does not produce a warning.
+    /// Verifies word without typo but with possession apostrophe does not produce a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task Comment_WithApostrophe_WithoutTypo_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        // It's employees' employee's.
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies string with typo and apostrophe produces a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task String_WithApostrophe_WithTypo_ShouldProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var test = "'[|typoo|]'";
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies string without typo but with apostrophe does not produce a warning.
     /// </summary>
     [TestMethod]
     public async Task StringWithApostrophe_WithoutTypo_ShouldNotProduceWarning()
@@ -827,31 +851,7 @@ public class SpellingAnalyzerTests
     }
 
     /// <summary>
-    /// Verifies string with apostrophe produces a warning.
-    /// </summary>
-    [TestMethod]
-    public async Task StringWithApostrophe_WithTypo_ShouldProduceWarning()
-    {
-        context.TestCode =
-            /* lang=c# */
-            """
-            namespace TestApplication
-            {
-                class TestClass
-                {
-                    public void TestMethod()
-                    {
-                        var test = "'[|typoo|]'";
-                    }
-                }
-            }
-            """;
-
-        await context.RunAsync();
-    }
-
-    /// <summary>
-    /// Verifies sentence with URL does not produce a warning.
+    /// Verifies URL in sentence is excluded from analysis.
     /// </summary>
     [TestMethod]
     public async Task String_WithUrl_ShouldNotProduceWarning()
@@ -875,7 +875,7 @@ public class SpellingAnalyzerTests
     }
 
     /// <summary>
-    /// Verifies URL in comment does not produce a warning.
+    /// Verifies URL in comment is excluded from analysis.
     /// </summary>
     [TestMethod]
     public async Task Comment_WithUrl_ShouldNotProduceWarning()
@@ -899,7 +899,7 @@ public class SpellingAnalyzerTests
     }
 
     /// <summary>
-    /// Verifies URL in documentation does not produce a warning.
+    /// Verifies URL in documentation is excluded from analysis.
     /// </summary>
     [TestMethod]
     public async Task Documentation_WithUrl_ShouldNotProduceWarning()
@@ -926,7 +926,7 @@ public class SpellingAnalyzerTests
     }
 
     /// <summary>
-    /// Verifies format string does not produce a warning.
+    /// Verifies format string is excluded from analysis.
     /// </summary>
     [TestMethod]
     public async Task Comment_Format_ShouldNotProduceWarning()
@@ -955,7 +955,7 @@ public class SpellingAnalyzerTests
     }
 
     /// <summary>
-    /// Verifies file path does not produce a warning.
+    /// Verifies file path is excluded from analysis.
     /// </summary>
     [TestMethod]
     public async Task Comment_FilePath_ShouldNotProduceWarning()
@@ -986,7 +986,7 @@ public class SpellingAnalyzerTests
     }
 
     /// <summary>
-    /// Verifies hex does not produce a warning.
+    /// Verifies hex is excluded from analysis.
     /// </summary>
     [TestMethod]
     public async Task Comment_Hex_ShouldNotProduceWarning()
