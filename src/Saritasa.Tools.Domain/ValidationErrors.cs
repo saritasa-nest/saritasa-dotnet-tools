@@ -278,7 +278,7 @@ public class ValidationErrors : Dictionary<string, ICollection<FormattedString>>
     /// <param name="error">Error message.</param>
     public void AddError(FormattedString error)
     {
-        AddError(error.ToString());
+        AddError(SummaryKey, error);
     }
 
     /// <summary>
