@@ -488,6 +488,9 @@ public class SpellingAnalyzerTests
                 /// </summary>
                 class TestClass
                 {
+                    /// <summary>
+                    /// Environments.
+                    /// </summary>
                     public void TestMethod()
                     {
                     }

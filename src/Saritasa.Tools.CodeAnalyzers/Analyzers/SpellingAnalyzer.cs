@@ -267,7 +267,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
     }
 
     private static readonly Regex formatStringRegex = new(
-        @"[yMdHhmsfFtKz:/\-_\.]{3,}",
+        @"\b[yMdHhmsfFtKz:/\-_\.]{3,}\b",
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     private static string MaskFormatStrings(string text)
