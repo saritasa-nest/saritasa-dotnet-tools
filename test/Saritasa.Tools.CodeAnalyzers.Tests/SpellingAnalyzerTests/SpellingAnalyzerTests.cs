@@ -920,4 +920,93 @@ public class SpellingAnalyzerTests
 
         await context.RunAsync();
     }
+
+    /// <summary>
+    /// Verifies format string does not produce a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task Comment_Format_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    // yyyy-MM-dd
+                    // yyyy-MM-dd_HH-mm-ss
+                    // HH:mm:ss
+                    // dd/MM/yyyy
+                    // yyyyMMddHHmmss
+                    // yyyy-MM-dd_HH-mm-ss_fff
+                    public void TestMethod()
+                    {
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies file path does not produce a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task Comment_FilePath_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    // C:\Program Files\MyApp\asd.exe
+                    // D:\Work\project\asd.json
+                    // \\Server\Shared\folder\asd.txt
+                    // /home/user/project/asd.cs
+                    // ./relative/path/asd.txt
+                    // ../up/one/level/asd.yaml
+                    public void TestMethod()
+                    {
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies hex does not produce a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task Comment_Hex_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    // 0xFF
+                    // 0x1A3B
+                    // #FFAABB
+                    // #fff
+                    public void TestMethod()
+                    {
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
 }

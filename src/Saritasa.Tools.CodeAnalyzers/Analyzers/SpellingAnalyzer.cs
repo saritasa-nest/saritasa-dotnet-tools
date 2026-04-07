@@ -232,6 +232,9 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
 
         text = MaskUrls(text);
         text = MaskGuids(text);
+        text = MaskHex(text);
+        text = MaskFilePath(text);
+        text = MaskFormatStrings(text);
 
         return text;
     }
@@ -252,6 +255,33 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
     private static string MaskGuids(string text)
     {
         return guidRegex.Replace(text, ReplaceWithWhitespaces());
+    }
+
+    private static readonly Regex hexRegex = new(
+        @"(?:0x[0-9a-fA-F]+|#[0-9a-fA-F]+)",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+    private static string MaskHex(string text)
+    {
+        return hexRegex.Replace(text, ReplaceWithWhitespaces());
+    }
+
+    private static readonly Regex formatStringRegex = new(
+        @"[yMdHhmsfFtKz:/\-_\.]{3,}",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+    private static string MaskFormatStrings(string text)
+    {
+        return formatStringRegex.Replace(text, ReplaceWithWhitespaces());
+    }
+
+    private static readonly Regex filePathRegex = new(
+        @"[a-zA-Z]:[^\r\n]*|\\\\[^\s\r\n]+|(?:\.\./|\./)(?:[^\s\r\n]+)|/[a-zA-Z][^\s\r\n]*",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+    private static string MaskFilePath(string text)
+    {
+        return filePathRegex.Replace(text, ReplaceWithWhitespaces());
     }
 
     private static MatchEvaluator ReplaceWithWhitespaces() => static match => new string(' ', match.Length);
