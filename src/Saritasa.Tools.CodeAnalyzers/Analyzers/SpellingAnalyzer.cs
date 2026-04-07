@@ -177,90 +177,84 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         string text,
         int baseOffset)
     {
-        var parts = SplitByWhitespace(text);
+        text = MaskIgnoredText(text);
 
-        foreach (var (part, partOffset) in parts)
+        var words = StringHelper.SplitByNonLetters(text);
+        foreach (var (word, offset) in words)
         {
-            if (IsGuid(part) || IsUrl(part))
+            if (!ShouldCheckWord(wordList, word))
             {
                 continue;
             }
 
-            var words = StringHelper.SplitByNonLetters(part);
-            foreach (var (word, wordOffset) in words)
+            if (StringHelper.IsCamelCaseWord(word))
             {
-                if (!ShouldCheckWord(wordList, word))
+                var camelCaseWords = StringHelper.SplitCamelCase(word, offset);
+                foreach (var (camelWord, camelOffset) in camelCaseWords)
                 {
-                    continue;
-                }
-
-                if (StringHelper.IsCamelCaseWord(word))
-                {
-                    var camelCaseWords = StringHelper.SplitCamelCase(word, partOffset + wordOffset);
-                    foreach (var (camelWord, camelOffset) in camelCaseWords)
+                    if (!ShouldCheckWord(wordList, camelWord))
                     {
-                        if (!ShouldCheckWord(wordList, camelWord))
-                        {
-                            continue;
-                        }
-
-                        var location = Location.Create(tree, new TextSpan(baseOffset + camelOffset, camelWord.Length));
-                        Report(context, camelWord, location);
+                        continue;
                     }
 
-                    continue;
+                    var location = Location.Create(tree, new TextSpan(baseOffset + camelOffset, camelWord.Length));
+                    Report(context, camelWord, location);
                 }
 
-                var wordLocation = Location.Create(tree, new TextSpan(baseOffset + partOffset + wordOffset, word.Length));
-                Report(context, word, wordLocation);
+                continue;
             }
+
+            var wordLocation = Location.Create(tree, new TextSpan(baseOffset + offset, word.Length));
+            Report(context, word, wordLocation);
         }
     }
 
-    private static IEnumerable<(string Part, int Offset)> SplitByWhitespace(string text)
+    /// <summary>
+    /// Masks text that should be ignored from analysis.
+    /// </summary>
+    /// <param name="text">Text where ignored text should be masked.</param>
+    /// <returns>
+    /// Text with ignored parts masked. For example, this sentence:
+    /// <c>This GUID 1b6cdb5b-8449-4d8e-ad3b-6b3dd8f4158d is ignored.</c>
+    /// will become:
+    /// <c>This GUID                                      is ignored.</c>
+    /// </returns>
+    /// <remarks>
+    /// Note that we replace ignored letters with spaces,
+    /// not just removing letters because we work with text offset in the analyzer.
+    /// </remarks>
+    private static string MaskIgnoredText(string text)
     {
-        var currentPart = string.Empty;
-        var partStart = 0;
-
-        for (var i = 0; i < text.Length; i++)
+        if (string.IsNullOrEmpty(text))
         {
-            if (char.IsWhiteSpace(text[i]))
-            {
-                if (currentPart.Length > 0)
-                {
-                    yield return (currentPart, partStart);
-                    currentPart = string.Empty;
-                }
-                partStart = i + 1;
-            }
-            else
-            {
-                if (currentPart.Length == 0)
-                {
-                    partStart = i;
-                }
-                currentPart += text[i];
-            }
+            return text;
         }
 
-        if (currentPart.Length > 0)
-        {
-            yield return (currentPart, partStart);
-        }
+        text = MaskUrls(text);
+        text = MaskGuids(text);
+
+        return text;
     }
 
-    private static bool IsGuid(string text)
+    private static readonly Regex urlRegex = new(
+        @"(https?://|www\.)[^\s\]\)]+",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+    private static string MaskUrls(string text)
     {
-        var guidRegex = new Regex(
-            "^[({]?[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}[)}]?$", RegexOptions.IgnoreCase);
-        return guidRegex.IsMatch(text);
+        return urlRegex.Replace(text, ReplaceWithWhitespaces());
     }
 
-    private static bool IsUrl(string text)
+    private static readonly Regex guidRegex = new(
+        "[({]?[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}[)}]?",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+
+    private static string MaskGuids(string text)
     {
-        var urlRegex = new Regex("^[a-zA-Z][a-zA-Z0-9+.-]*://", RegexOptions.IgnoreCase);
-        return urlRegex.IsMatch(text);
+        return guidRegex.Replace(text, ReplaceWithWhitespaces());
     }
+
+    private static MatchEvaluator ReplaceWithWhitespaces() => static match => new string(' ', match.Length);
 
     private static bool ShouldCheckWord(WordList wordList, string word)
     {

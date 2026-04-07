@@ -700,6 +700,8 @@ public class SpellingAnalyzerTests
         context.TestCode =
             /* lang=c# */
             """
+            using System;
+
             namespace TestApplication
             {
                 class TestClass
@@ -707,6 +709,7 @@ public class SpellingAnalyzerTests
                     public void TestMethod()
                     {
                         var test = "This GUID 1b6cdb5b-8449-4d8e-ad3b-6b3dd8f4158d should not be spellchecked";
+                        var guid = new Guid("1b6cdb5b-8449-4d8e-ad3b-6b3dd8f4158d");
                     }
                 }
             }
@@ -731,6 +734,7 @@ public class SpellingAnalyzerTests
                     public void TestMethod()
                     {
                         // This GUID 1b6cdb5b-8449-4d8e-ad3b-6b3dd8f4158d should not be spellchecked
+                        // This GUID [1b6cdb5b-8449-4d8e-ad3b-6b3dd8f4158d] should not be spellchecked
                     }
                 }
             }
@@ -902,6 +906,7 @@ public class SpellingAnalyzerTests
             namespace TestApplication
             {
                 /// <summary>
+                /// See more details at [https://zxczxc.com/dfg/hjk]
                 /// See more details at https://zxczxc.com/dfg/hjk
                 /// </summary>
                 class TestClass
