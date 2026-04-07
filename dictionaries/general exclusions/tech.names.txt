@@ -14,6 +14,7 @@ Artifactory
 AsciiDoc
 Asciidoctor
 Atari
+Atlassian
 Authenticode
 Autocrypt
 Autofac
@@ -149,6 +150,7 @@ Magento
 MariaDB
 Markdig
 MATLAB
+mailgun
 MinGW
 Mintty
 Modernizr
@@ -205,6 +207,7 @@ PKWare
 PKZIP
 Plotly
 Polly
+postgre
 Postgres
 PostgreSQL
 PostScript
@@ -238,6 +241,7 @@ Sass
 Scala
 Scilab
 SciPy
+Scriban
 SemanticMerge
 Serilog
 SharpLab
@@ -306,15 +310,9 @@ YAML
 YouTrack
 Zipkin
 Zlib
-stackoverflow
-velopack
-youtube
+StackOverflow
+Velopack
+YouTube
 MediatR
-microsoft
-downloader
-namespace
-autocomplete
-readonly
-ctor
-configurator
-automapper
+Microsoft
+AutoMapper

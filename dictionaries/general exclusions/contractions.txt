@@ -7,4 +7,13 @@ dev
 prod
 auth
 ctrl
+asc
 desc
+msg
+expr
+attr
+src
+dest
+img
+cfg
+ctor

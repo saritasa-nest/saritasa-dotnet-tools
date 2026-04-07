@@ -352,6 +352,7 @@ ssrs
 sstp
 svg
 svga
+sql
 tcp
 tcpip
 tcs
