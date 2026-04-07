@@ -230,11 +230,11 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
             return text;
         }
 
-        text = MaskUrls(text);
-        text = MaskGuids(text);
+        text = MaskUrl(text);
+        text = MaskGuid(text);
         text = MaskHex(text);
         text = MaskFilePath(text);
-        text = MaskFormatStrings(text);
+        text = MaskFormatString(text);
 
         return text;
     }
@@ -243,7 +243,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         @"(https?://|www\.)[^\s\]\)]+",
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
-    private static string MaskUrls(string text)
+    private static string MaskUrl(string text)
     {
         return urlRegex.Replace(text, ReplaceWithWhitespaces());
     }
@@ -252,7 +252,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         "[({]?[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}[)}]?",
         RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
 
-    private static string MaskGuids(string text)
+    private static string MaskGuid(string text)
     {
         return guidRegex.Replace(text, ReplaceWithWhitespaces());
     }
@@ -266,15 +266,6 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         return hexRegex.Replace(text, ReplaceWithWhitespaces());
     }
 
-    private static readonly Regex formatStringRegex = new(
-        @"\b[yMdHhmsfFtKz:/\-_\.]{3,}\b",
-        RegexOptions.Compiled | RegexOptions.CultureInvariant);
-
-    private static string MaskFormatStrings(string text)
-    {
-        return formatStringRegex.Replace(text, ReplaceWithWhitespaces());
-    }
-
     private static readonly Regex filePathRegex = new(
         @"[a-zA-Z]:[^\r\n]*|\\\\[^\s\r\n]+|(?:\.\./|\./)(?:[^\s\r\n]+)|/[a-zA-Z][^\s\r\n]*",
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
@@ -282,6 +273,15 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
     private static string MaskFilePath(string text)
     {
         return filePathRegex.Replace(text, ReplaceWithWhitespaces());
+    }
+
+    private static readonly Regex formatStringRegex = new(
+        @"\b[yMdHhmsfFtKz:/\-_\.]{3,}\b",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+    private static string MaskFormatString(string text)
+    {
+        return formatStringRegex.Replace(text, ReplaceWithWhitespaces());
     }
 
     private static MatchEvaluator ReplaceWithWhitespaces() => static match => new string(' ', match.Length);
