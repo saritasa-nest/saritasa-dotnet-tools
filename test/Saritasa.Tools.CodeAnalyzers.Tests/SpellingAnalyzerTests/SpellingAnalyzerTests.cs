@@ -489,6 +489,7 @@ public class SpellingAnalyzerTests
                 class TestClass
                 {
                     /// <summary>
+                    /// Example of use case:
                     /// Environments.
                     /// </summary>
                     public void TestMethod()
