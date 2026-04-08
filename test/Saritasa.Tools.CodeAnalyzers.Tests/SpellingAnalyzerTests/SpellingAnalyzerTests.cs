@@ -1013,4 +1013,29 @@ public class SpellingAnalyzerTests
 
         await context.RunAsync();
     }
+
+    /// <summary>
+    /// Verifies that word in code in lowercase
+    /// does not produce warning when in dictionary the same word stored in different case.
+    /// </summary>
+    [TestMethod]
+    public async Task DifferentCase_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    // hangfire
+                    public void TestMethod()
+                    {
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
 }

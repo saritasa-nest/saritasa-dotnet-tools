@@ -90,7 +90,7 @@ public static class SpellChecker
                 var word = line.Trim();
                 if (!string.IsNullOrWhiteSpace(word))
                 {
-                    wordList.Add(word);
+                    wordList.Add(word.ToLowerInvariant());
                 }
             }
         }
