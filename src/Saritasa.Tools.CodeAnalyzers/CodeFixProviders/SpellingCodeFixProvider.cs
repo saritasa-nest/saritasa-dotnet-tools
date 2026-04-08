@@ -85,6 +85,8 @@ public sealed class SpellingCodeFixProvider : CodeFixProvider
         string word,
         CancellationToken cancellationToken)
     {
+        word = word.ToLowerInvariant();
+
         var text = await exclusionsDocument.GetTextAsync(cancellationToken).ConfigureAwait(false);
         var content = text.ToString();
 
