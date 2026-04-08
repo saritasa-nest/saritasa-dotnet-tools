@@ -22,7 +22,12 @@ public sealed class SpellingCodeFixProvider : CodeFixProvider
     public override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(SpellingAnalyzer.DiagnosticId);
 
     /// <inheritdoc />
-    public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
+    /// <remarks>
+    /// Returning <c>null</c> intentionally disables the "Fix all occurrences" menu
+    /// (fix in file / folder / solution). The exclusions word is added globally to the
+    /// solution-level exclusions file, so per-scope batch fixing does not make sense here.
+    /// </remarks>
+    public override FixAllProvider? GetFixAllProvider() => null;
 
     /// <inheritdoc />
     public override Task RegisterCodeFixesAsync(CodeFixContext context)
