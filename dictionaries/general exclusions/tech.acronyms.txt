@@ -47,6 +47,7 @@ cmos
 cms
 cncf
 com
+cors
 cpp
 cpu
 cqrs

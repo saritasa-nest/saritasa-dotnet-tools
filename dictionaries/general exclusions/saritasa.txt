@@ -3,4 +3,3 @@ healthz
 livez
 readyz
 devops
-cors
