@@ -50,7 +50,8 @@ public sealed class SpellingCodeFixProvider : CodeFixProvider
         context.RegisterCodeFix(
             CodeAction.Create(
                 title,
-                ct => AddWordToExclusionsAsync(context.Document.Project.Solution, exclusions, word!, ct),
+                cancellationToken
+                    => AddWordToExclusions(context.Document.Project.Solution, exclusions, word!, cancellationToken),
                 equivalenceKey: title),
             diagnostic);
 
@@ -79,7 +80,7 @@ public sealed class SpellingCodeFixProvider : CodeFixProvider
             .FirstOrDefault(d => string.Equals(d.FilePath, exclusionsPath, StringComparison.OrdinalIgnoreCase));
     }
 
-    private static async Task<Solution> AddWordToExclusionsAsync(
+    private static async Task<Solution> AddWordToExclusions(
         Solution solution,
         TextDocument exclusionsDocument,
         string word,
