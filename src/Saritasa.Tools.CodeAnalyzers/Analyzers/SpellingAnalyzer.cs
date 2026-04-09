@@ -120,7 +120,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         }
 
         var tokenText = token.ValueText;
-        if (!ShouldCheckWord(wordList, tokenText))
+        if (IsValidWord(wordList, tokenText))
         {
             return;
         }
@@ -129,7 +129,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         var words = SplitIdentifier(maskedText);
         foreach (var (word, offset) in words)
         {
-            if (!ShouldCheckWord(wordList, word))
+            if (IsValidWord(wordList, word))
             {
                 continue;
             }
@@ -182,7 +182,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         var words = StringHelper.SplitByNonLetters(text);
         foreach (var (word, offset) in words)
         {
-            if (!ShouldCheckWord(wordList, word))
+            if (IsValidWord(wordList, word))
             {
                 continue;
             }
@@ -192,7 +192,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
                 var camelCaseWords = StringHelper.SplitCamelCase(word, offset);
                 foreach (var (camelWord, camelOffset) in camelCaseWords)
                 {
-                    if (!ShouldCheckWord(wordList, camelWord))
+                    if (IsValidWord(wordList, camelWord))
                     {
                         continue;
                     }
@@ -304,23 +304,23 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
 
     private static MatchEvaluator ReplaceWithWhitespaces() => static match => new string(' ', match.Length);
 
-    private static bool ShouldCheckWord(WordList wordList, string word)
+    private static bool IsValidWord(WordList wordList, string word)
     {
         if (word.Length <= 2)
         {
-            return false;
+            return true;
         }
 
         if (wordList.Check(word))
         {
-            return false;
+            return true;
         }
 
         // We also check with upper-case first letter in case the word stored in that way in dictionary.
         // For example, word "Monday" stored with upper-case first letter, but we could use it in identifier
         // where we have to use it with lower-case first letter.
         var titleCased = char.ToUpperInvariant(word[0]) + word.Substring(1);
-        return !wordList.Check(titleCased);
+        return wordList.Check(titleCased);
     }
 
     private static void Report(SemanticModelAnalysisContext context, string word, Location location)
