@@ -124,6 +124,10 @@ public static class SpellChecker
     /// <summary>
     /// Builds a regex that matches any of the provided names.
     /// </summary>
+    /// <remarks>
+    /// Only the first character is case-flexible (to allow camelCase identifiers that start with lowercase).
+    /// The rest of the name must match the original case exactly to prevent false matches.
+    /// </remarks>
     public static Regex? BuildNamesRegex(WordList wordList)
     {
         var names = GetNames(wordList);
@@ -133,10 +137,19 @@ public static class SpellChecker
             return null;
         }
 
-        var escapedNames = names.Select(Regex.Escape);
-        var pattern = string.Join("|", escapedNames);
+        var patterns = names.Select(name =>
+        {
+            var firstLetterUpper = char.ToUpperInvariant(name[0]);
+            var firstLetterLower = char.ToLowerInvariant(name[0]);
+            var firstLetter = firstLetterUpper != firstLetterLower
+                ? $"[{firstLetterUpper}{firstLetterLower}]"
+                : Regex.Escape(name[0].ToString());
+            return firstLetter + Regex.Escape(name.Substring(1));
+        });
 
-        return new Regex(pattern, RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+        var pattern = string.Join("|", patterns);
+
+        return new Regex(pattern, RegexOptions.Compiled | RegexOptions.CultureInvariant);
     }
 
     /// <summary>

@@ -1015,11 +1015,10 @@ public class SpellingAnalyzerTests
     }
 
     /// <summary>
-    /// Verifies that word in code in lowercase
-    /// does not produce warning when in dictionary the same word stored in different case.
+    /// Verifies that name in camelCase does not produce a warning.
     /// </summary>
     [TestMethod]
-    public async Task DifferentCase_ShouldNotProduceWarning()
+    public async Task Name_ShouldNotProduceWarning()
     {
         context.TestCode =
             /* lang=c# */
@@ -1035,6 +1034,62 @@ public class SpellingAnalyzerTests
                     {
                         // MediatRRequest
                         var mediatRRequest = "MediatRRequest";
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that name in regular words does not produce a warning.
+    /// We have name "Suse" and "devopsUsers" has it as "sUse". We check that in this case we do not mask the name.
+    /// </summary>
+    [TestMethod]
+    public async Task Name_ContainedInRegularWord_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var devopsUsers = "";
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that name with different first letter case does not produce a warning.
+    /// </summary>
+    /// <remarks>
+    /// We have name "Hangfire" in the dictionary, so when we use "hangfire" in identifier it should not produce warning.
+    /// </remarks>
+    [TestMethod]
+    public async Task Name_WithDifferentFirstLetterCase_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    /// <summary>
+                    /// hangfire.
+                    /// </summary>
+                    public void TestMethod()
+                    {
+                        // hangfire
+                        var hangfire = "hangfire";
                     }
                 }
             }
