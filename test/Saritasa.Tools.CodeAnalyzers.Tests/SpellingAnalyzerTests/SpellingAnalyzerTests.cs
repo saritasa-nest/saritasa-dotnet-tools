@@ -1097,4 +1097,34 @@ public class SpellingAnalyzerTests
 
         await context.RunAsync();
     }
+
+    /// <summary>
+    /// Verifies that word stored in dictionary with upper-case first letter does not produce warnings
+    /// when used with lower-case first letter.
+    /// </summary>
+    /// <remarks>
+    /// Word "Monday" stored with upper-case first letter.
+    /// When split from "mondayDate", the segment "monday" must still pass the check.
+    /// </remarks>
+    [TestMethod]
+    public async Task Identifier_DictionaryWordStartWithUpperCase_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var mondayDate = System.DateTime.Now;
+                        var januaryReport = System.DateTime.Now;
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
 }

@@ -318,7 +318,16 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
             return false;
         }
 
-        return !wordList.Check(word);
+        if (wordList.Check(word))
+        {
+            return false;
+        }
+
+        // We also check with upper-case first letter in case the word stored in that way in dictionary.
+        // For example, word "Monday" stored with upper-case first letter, but we could use it in identifier
+        // where we have to use it with lower-case first letter.
+        var titleCased = char.ToUpperInvariant(word[0]) + word.Substring(1);
+        return !wordList.Check(titleCased);
     }
 
     private static void Report(SemanticModelAnalysisContext context, string word, Location location)
