@@ -9,8 +9,7 @@ using Saritasa.Tools.CodeAnalyzers.Analyzers;
 namespace Saritasa.Tools.CodeAnalyzers.CodeFixProviders;
 
 /// <summary>
-/// Quick-fix for <see cref="SpellingAnalyzer"/> that adds the reported word to <c>exclusions.txt</c>
-/// under the configured <c>words</c> folder.
+/// Quick-fix for <see cref="SpellingAnalyzer"/> that adds the reported word to <c>exclusions.txt</c>.
 /// </summary>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(SpellingCodeFixProvider))]
 [Shared]
@@ -44,7 +43,7 @@ public sealed class SpellingCodeFixProvider : CodeFixProvider
             return Task.CompletedTask;
         }
 
-        var exclusions = TryFindExclusionsAdditionalDocument(
+        var exclusions = GetExclusions(
             context.Document.Project.Solution, context.Document.Project.AnalyzerOptions.AdditionalFiles);
         if (exclusions is null)
         {
@@ -63,17 +62,15 @@ public sealed class SpellingCodeFixProvider : CodeFixProvider
         return Task.CompletedTask;
     }
 
-    private static TextDocument? TryFindExclusionsAdditionalDocument(
-        Solution solution,
-        ImmutableArray<AdditionalText> additionalFiles)
+    private static TextDocument? GetExclusions(Solution solution, ImmutableArray<AdditionalText> additionalFiles)
     {
         // We can only apply a fix if exclusions.txt is included as an AdditionalFile in the solution.
         // (Roslyn code fix cannot reliably create arbitrary new files on disk.)
         var exclusionsPath = additionalFiles
-            .Select(f => f.Path)
-            .FirstOrDefault(p =>
-                !string.IsNullOrWhiteSpace(p) &&
-                p.EndsWith(ExclusionsFileName, StringComparison.OrdinalIgnoreCase));
+            .Select(additionalText => additionalText.Path)
+            .FirstOrDefault(path =>
+                !string.IsNullOrWhiteSpace(path) &&
+                path.EndsWith(ExclusionsFileName, StringComparison.OrdinalIgnoreCase));
 
         if (string.IsNullOrWhiteSpace(exclusionsPath))
         {
@@ -81,8 +78,8 @@ public sealed class SpellingCodeFixProvider : CodeFixProvider
         }
 
         return solution.Projects
-            .SelectMany(p => p.AdditionalDocuments)
-            .FirstOrDefault(d => string.Equals(d.FilePath, exclusionsPath, StringComparison.OrdinalIgnoreCase));
+            .SelectMany(project => project.AdditionalDocuments)
+            .FirstOrDefault(document => string.Equals(document.FilePath, exclusionsPath, StringComparison.OrdinalIgnoreCase));
     }
 
     private static async Task<Solution> AddWordToExclusions(
