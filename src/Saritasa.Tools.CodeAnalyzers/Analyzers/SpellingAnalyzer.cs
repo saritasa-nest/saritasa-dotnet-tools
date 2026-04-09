@@ -134,8 +134,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
                 continue;
             }
 
-            var location = Location.Create(tree, new TextSpan(token.Span.Start + offset, word.Length));
-            Report(context, word, location);
+            Report(context, tree, word, token.Span.Start, offset);
         }
     }
 
@@ -197,15 +196,13 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
                         continue;
                     }
 
-                    var location = Location.Create(tree, new TextSpan(baseOffset + camelOffset, camelWord.Length));
-                    Report(context, camelWord, location);
+                    Report(context, tree, camelWord, baseOffset, camelOffset);
                 }
 
                 continue;
             }
 
-            var wordLocation = Location.Create(tree, new TextSpan(baseOffset + offset, word.Length));
-            Report(context, word, wordLocation);
+            Report(context, tree, word, baseOffset, offset);
         }
     }
 
@@ -323,8 +320,10 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         return wordList.Check(titleCased);
     }
 
-    private static void Report(SemanticModelAnalysisContext context, string word, Location location)
+    private static void Report(
+        SemanticModelAnalysisContext context, SyntaxTree tree, string word, int baseOffset, int wordOffset)
     {
+        var location = Location.Create(tree, new TextSpan(baseOffset + wordOffset, word.Length));
         var diagnostic = Diagnostic.Create(
             rule,
             location,
