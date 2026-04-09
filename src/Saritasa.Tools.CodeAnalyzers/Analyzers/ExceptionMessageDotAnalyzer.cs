@@ -18,47 +18,82 @@ public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
     private const string DiagnosticId = "STAN1002";
     private const string Category = "Spelling";
 
-    private static readonly LocalizableString Title = "Exception message should end with a dot";
-    private static readonly LocalizableString MessageFormat = "Exception message should end with a dot";
-    private static readonly LocalizableString Description
+    private static readonly LocalizableString title = "Exception message should end with a dot";
+    private static readonly LocalizableString messageFormat = "Exception message should end with a dot";
+    private static readonly LocalizableString description
         = "Ensure exception messages end with a dot to keep consistent phrasing.";
 
-    private static readonly DiagnosticDescriptor Rule = new(
+    private static readonly DiagnosticDescriptor rule = new(
         DiagnosticId,
-        Title,
-        MessageFormat,
+        title,
+        messageFormat,
         Category,
         DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
-        description: Description);
+        description: description);
 
     /// <inheritdoc />
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(rule);
 
     /// <inheritdoc />
     public override void Initialize(AnalysisContext context)
     {
         context.EnableConcurrentExecution();
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-        context.RegisterOperationAction(AnalyzeObjectCreation, OperationKind.ObjectCreation);
+
+        context.RegisterCompilationStartAction(compilationContext =>
+        {
+            var exceptionType = compilationContext.Compilation.GetTypeByMetadataName("System.Exception");
+            if (exceptionType is null)
+            {
+                return;
+            }
+
+            compilationContext.RegisterOperationAction(
+                operationContext => AnalyzeObjectCreation(operationContext, exceptionType),
+                OperationKind.ObjectCreation);
+
+            compilationContext.RegisterOperationAction(
+                operationContext => AnalyzeBaseConstructor(operationContext, exceptionType),
+                OperationKind.Invocation);
+        });
     }
 
-    private static void AnalyzeObjectCreation(OperationAnalysisContext context)
+    private static void AnalyzeObjectCreation(OperationAnalysisContext context, INamedTypeSymbol exceptionType)
     {
         if (context.Operation is not IObjectCreationOperation creation || creation.Type is null)
         {
             return;
         }
 
-        // Only analyze types deriving from System.Exception.
-        if (!DerivesFromException(creation.Type, context.Compilation))
+        if (!DerivesFromException(creation.Type, exceptionType))
         {
             return;
         }
 
-        // Find the message argument (named "message" and of type string).
-        var messageArgument = creation.Arguments.FirstOrDefault(a =>
-            a.Parameter?.Name == "message" && a.Parameter.Type.SpecialType == SpecialType.System_String);
+        CheckExceptionMessage(creation.Arguments, context.ReportDiagnostic);
+    }
+
+    private static void AnalyzeBaseConstructor(OperationAnalysisContext context, INamedTypeSymbol exceptionType)
+    {
+        if (context.Operation is not IInvocationOperation invocation ||
+            invocation.TargetMethod.MethodKind != MethodKind.Constructor)
+        {
+            return;
+        }
+
+        if (!DerivesFromException(invocation.TargetMethod.ContainingType, exceptionType))
+        {
+            return;
+        }
+
+        CheckExceptionMessage(invocation.Arguments, context.ReportDiagnostic);
+    }
+
+    private static void CheckExceptionMessage(IEnumerable<IArgumentOperation> arguments, Action<Diagnostic> reportDiagnostic)
+    {
+        var messageArgument = arguments
+            .FirstOrDefault(a => a.Parameter?.Name == "message" && IsStringType(a.Parameter.Type));
 
         if (messageArgument?.Value is null)
         {
@@ -70,12 +105,17 @@ public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var diagnostic = Diagnostic.Create(Rule, messageArgument.Syntax.GetLocation(), messageArgument.Value.Syntax.ToString());
-        context.ReportDiagnostic(diagnostic);
+        var diagnostic = Diagnostic.Create(rule, messageArgument.Syntax.GetLocation());
+        reportDiagnostic(diagnostic);
     }
 
-    private static bool MessageEndsWithDot(IOperation value)
+    private static bool MessageEndsWithDot(IOperation? value)
     {
+        if (value is null)
+        {
+            return true;
+        }
+
         if (value.ConstantValue is { HasValue: true, Value: string constant })
         {
             return EndsWithDot(constant);
@@ -100,6 +140,54 @@ public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
             return MessageEndsWithDot(rightMost);
         }
 
+        if (value is IConditionalOperation conditional)
+        {
+            return MessageEndsWithDot(conditional.WhenTrue) && MessageEndsWithDot(conditional.WhenFalse);
+        }
+
+        if (value is ICoalesceOperation coalesce)
+        {
+            return MessageEndsWithDot(coalesce.Value) && MessageEndsWithDot(coalesce.WhenNull);
+        }
+
+        if (value is ISwitchExpressionOperation switchExpression)
+        {
+            foreach (var arm in switchExpression.Arms)
+            {
+                if (!MessageEndsWithDot(arm.Value))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        // We cannot analyze method results.
+        if (value is IInvocationOperation invocation)
+        {
+            if (IsStringFormat(invocation.TargetMethod))
+            {
+                var formatArg = invocation.Arguments.FirstOrDefault(a => a.Parameter?.Name == "format");
+                if (formatArg?.Value.ConstantValue is { HasValue: true, Value: string format })
+                {
+                    return EndsWithDot(format);
+                }
+            }
+
+            return true;
+        }
+
+        // We cannot analyze identifier values (local variables, parameters, fields, properties).
+        if (value
+            is ILocalReferenceOperation
+            or IParameterReferenceOperation
+            or IFieldReferenceOperation
+            or IPropertyReferenceOperation)
+        {
+            return true;
+        }
+
         return false;
     }
 
@@ -118,14 +206,8 @@ public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
 
     private static bool EndsWithDot(string value) => value.TrimEnd().EndsWith(".", StringComparison.Ordinal);
 
-    private static bool DerivesFromException(ITypeSymbol type, Compilation compilation)
+    private static bool DerivesFromException(ITypeSymbol type, INamedTypeSymbol exceptionType)
     {
-        var exceptionType = compilation.GetTypeByMetadataName("System.Exception");
-        if (exceptionType is null)
-        {
-            return false;
-        }
-
         var current = type;
         while (current is not null)
         {
@@ -138,5 +220,10 @@ public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
         }
 
         return false;
+    }
+
+    private static bool IsStringFormat(IMethodSymbol method)
+    {
+        return method.ContainingType.SpecialType == SpecialType.System_String && method.Name == "Format";
     }
 }
