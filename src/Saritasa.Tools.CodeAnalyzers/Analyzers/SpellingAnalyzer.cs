@@ -141,19 +141,14 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
     private static bool IsExternalSymbol(SyntaxToken token, SemanticModel semanticModel, Compilation compilation)
     {
         var node = token.Parent;
-        if (node == null)
+        if (node is null)
         {
             return false;
         }
 
         var symbol = semanticModel.GetSymbolInfo(node).Symbol ?? semanticModel.GetDeclaredSymbol(node);
-        if (symbol == null)
-        {
-            return false;
-        }
-
-        var containingAssembly = symbol.ContainingAssembly;
-        if (containingAssembly == null)
+        var containingAssembly = symbol?.ContainingAssembly;
+        if (containingAssembly is null)
         {
             return false;
         }
