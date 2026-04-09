@@ -1026,11 +1026,15 @@ public class SpellingAnalyzerTests
             """
             namespace TestApplication
             {
-                class TestClass
+                /// <summary>
+                /// MediatRModule.
+                /// </summary>
+                class MediatRModule
                 {
-                    // hangfire
-                    public void TestMethod()
+                    public void MediatRBehavior()
                     {
+                        // MediatRRequest
+                        var mediatRRequest = "MediatRRequest";
                     }
                 }
             }

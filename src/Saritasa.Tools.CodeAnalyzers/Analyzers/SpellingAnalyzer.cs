@@ -57,13 +57,15 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         context.RegisterCompilationStartAction(compilationContext =>
         {
             var wordList = SpellChecker.CreateWordList(compilationContext.Options.AdditionalFiles);
+            var namesRegex = SpellChecker.BuildNamesRegex(wordList);
             var compilation = compilationContext.Compilation;
 
-            compilationContext.RegisterSemanticModelAction(c => AnalyzeSemanticModel(c, wordList, compilation));
+            compilationContext.RegisterSemanticModelAction(c => AnalyzeSemanticModel(c, wordList, namesRegex, compilation));
         });
     }
 
-    private static void AnalyzeSemanticModel(SemanticModelAnalysisContext context, WordList wordList, Compilation compilation)
+    private static void AnalyzeSemanticModel(
+        SemanticModelAnalysisContext context, WordList wordList, Regex? namesRegex, Compilation compilation)
     {
         var semanticModel = context.SemanticModel;
         var tree = semanticModel.SyntaxTree;
@@ -74,22 +76,22 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         {
             foreach (var trivia in token.LeadingTrivia)
             {
-                CheckTrivia(context, tree, wordList, trivia);
+                CheckTrivia(context, tree, wordList, namesRegex, trivia);
             }
 
             foreach (var trivia in token.TrailingTrivia)
             {
-                CheckTrivia(context, tree, wordList, trivia);
+                CheckTrivia(context, tree, wordList, namesRegex, trivia);
             }
 
             if (token.IsKind(SyntaxKind.IdentifierToken))
             {
-                CheckIdentifierToken(context, tree, wordList, token, semanticModel, compilation);
+                CheckIdentifierToken(context, tree, wordList, namesRegex, token, semanticModel, compilation);
             }
 
             if (IsString(token))
             {
-                CheckText(context, tree, wordList, token.Text, token.Span.Start);
+                CheckText(context, tree, wordList, namesRegex, token.Text, token.Span.Start);
             }
         }
     }
@@ -98,6 +100,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         SemanticModelAnalysisContext context,
         SyntaxTree tree,
         WordList wordList,
+        Regex? namesRegex,
         SyntaxTrivia trivia)
     {
         if (!IsCommentTrivia(trivia))
@@ -106,13 +109,14 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         }
 
         var text = trivia.ToFullString();
-        CheckText(context, tree, wordList, text, trivia.FullSpan.Start);
+        CheckText(context, tree, wordList, namesRegex, text, trivia.FullSpan.Start);
     }
 
     private static void CheckIdentifierToken(
         SemanticModelAnalysisContext context,
         SyntaxTree tree,
         WordList wordList,
+        Regex? namesRegex,
         SyntaxToken token,
         SemanticModel semanticModel,
         Compilation compilation)
@@ -128,7 +132,8 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var words = SplitIdentifier(tokenText);
+        var maskedText = MaskNames(tokenText, namesRegex);
+        var words = SplitIdentifier(maskedText);
         foreach (var (word, offset) in words)
         {
             if (!ShouldCheckWord(wordList, word))
@@ -174,10 +179,12 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         SemanticModelAnalysisContext context,
         SyntaxTree tree,
         WordList wordList,
+        Regex? namesRegex,
         string text,
         int baseOffset)
     {
         text = MaskIgnoredText(text);
+        text = MaskNames(text, namesRegex);
 
         var words = StringHelper.SplitByNonLetters(text);
         foreach (var (word, offset) in words)
@@ -207,6 +214,24 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
             var wordLocation = Location.Create(tree, new TextSpan(baseOffset + offset, word.Length));
             Report(context, word, wordLocation);
         }
+    }
+
+    /// <summary>
+    /// Masks names in the given text by replacing them with spaces.
+    /// This prevents tech names from being incorrectly split by camelCase splitting.
+    /// </summary>
+    /// <remarks>
+    /// For example, "MediatR" will be split to "Mediat" and "R" and word "Mediat" will have warning.
+    /// To prevent this we mask such names beforehand. So "MediatRModule" will become "       Module".
+    /// </remarks>
+    private static string MaskNames(string text, Regex? namesRegex)
+    {
+        if (namesRegex is null)
+        {
+            return text;
+        }
+
+        return namesRegex.Replace(text, ReplaceWithWhitespaces());
     }
 
     /// <summary>

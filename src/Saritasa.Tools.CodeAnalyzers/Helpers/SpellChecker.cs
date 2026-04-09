@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using WeCantSpell.Hunspell;
 
@@ -11,11 +12,15 @@ public static class SpellChecker
 {
     private const string DefaultDicFileName = "en-us.dic";
     private const string DefaultAffFileName = "en-us.aff";
+    private const string TechNamesFileName = "tech.names.txt";
+
+    private static readonly Assembly assembly = typeof(SpellChecker).Assembly;
 
     private static readonly string[] knownDictionaryFiles =
     [
         DefaultDicFileName,
         DefaultAffFileName,
+        TechNamesFileName,
         "exclusions.txt"
     ];
 
@@ -26,19 +31,17 @@ public static class SpellChecker
     /// <returns>Word list.</returns>
     public static WordList CreateWordList(IEnumerable<AdditionalText> files)
     {
-        var assembly = typeof(SpellChecker).Assembly;
+        var wordList = CreateWordListFromEmbeddedResources();
 
-        var wordList = CreateWordListFromEmbeddedResources(assembly);
-
-        AddGeneralExclusions(wordList, assembly);
+        AddGeneralExclusions(wordList);
         AddExclusions(files, wordList);
 
         return wordList;
     }
 
-    private static WordList CreateWordListFromEmbeddedResources(Assembly assembly)
+    private static WordList CreateWordListFromEmbeddedResources()
     {
-        var dicStream = TryOpenResourceStream(assembly, DefaultDicFileName);
+        var dicStream = TryOpenResourceStream(DefaultDicFileName);
         if (dicStream is null)
         {
             throw new InvalidOperationException($"Could not find dictionary resource '{DefaultDicFileName}'.");
@@ -46,7 +49,7 @@ public static class SpellChecker
 
         using (dicStream)
         {
-            var affStream = TryOpenResourceStream(assembly, DefaultAffFileName);
+            var affStream = TryOpenResourceStream(DefaultAffFileName);
             if (affStream is null)
             {
                 throw new InvalidOperationException($"Could not find affixes resource '{DefaultAffFileName}'.");
@@ -59,7 +62,7 @@ public static class SpellChecker
         }
     }
 
-    private static Stream? TryOpenResourceStream(Assembly assembly, string fileName)
+    private static Stream? TryOpenResourceStream(string fileName)
     {
         var match = assembly
             .GetManifestResourceNames()
@@ -68,7 +71,7 @@ public static class SpellChecker
         return match is null ? null : assembly.GetManifestResourceStream(match);
     }
 
-    private static void AddGeneralExclusions(WordList wordList, Assembly assembly)
+    private static void AddGeneralExclusions(WordList wordList)
     {
         var resourceNames = assembly
             .GetManifestResourceNames()
@@ -116,5 +119,55 @@ public static class SpellChecker
                 wordList.Add(word);
             }
         }
+    }
+
+    /// <summary>
+    /// Builds a regex that matches any of the provided names.
+    /// </summary>
+    public static Regex? BuildNamesRegex(WordList wordList)
+    {
+        var names = GetNames(wordList);
+
+        if (names.Count == 0)
+        {
+            return null;
+        }
+
+        var escapedNames = names.Select(Regex.Escape);
+        var pattern = string.Join("|", escapedNames);
+
+        return new Regex(pattern, RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+    }
+
+    /// <summary>
+    /// Gets a list of names that should be masked before spell checking to prevent incorrect camelCase splitting.
+    /// </summary>
+    /// <returns>List of names.</returns>
+    private static List<string> GetNames(WordList wordList)
+    {
+        List<string> names = [];
+
+        using var stream = TryOpenResourceStream(TechNamesFileName);
+        if (stream is null)
+        {
+            return names;
+        }
+
+        using var reader = new StreamReader(stream);
+        while (reader.ReadLine() is { } line)
+        {
+            var name = line.Trim();
+            if (StringHelper.IsCamelCaseWord(name))
+            {
+                names.Add(name);
+            }
+            else
+            {
+                // When name does not have camelCase we check it as usual.
+                wordList.Add(name.ToLowerInvariant());
+            }
+        }
+
+        return names;
     }
 }
