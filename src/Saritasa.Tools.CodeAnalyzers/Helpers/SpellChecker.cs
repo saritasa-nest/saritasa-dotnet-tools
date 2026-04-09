@@ -62,15 +62,6 @@ public static class SpellChecker
         }
     }
 
-    private static Stream? TryOpenResourceStream(string fileName)
-    {
-        var match = assembly
-            .GetManifestResourceNames()
-            .FirstOrDefault(n => n.EndsWith(fileName, StringComparison.OrdinalIgnoreCase));
-
-        return match is null ? null : assembly.GetManifestResourceStream(match);
-    }
-
     private static void AddGeneralExclusions(WordList wordList)
     {
         var resourceNames = assembly
@@ -93,7 +84,7 @@ public static class SpellChecker
                 var word = line.Trim();
                 if (!string.IsNullOrWhiteSpace(word))
                 {
-                    wordList.Add(word.ToLowerInvariant());
+                    wordList.Add(word);
                 }
             }
         }
@@ -177,10 +168,19 @@ public static class SpellChecker
             else
             {
                 // When name does not have camelCase we check it as usual.
-                wordList.Add(name.ToLowerInvariant());
+                wordList.Add(name);
             }
         }
 
         return names;
+    }
+
+    private static Stream? TryOpenResourceStream(string fileName)
+    {
+        var match = assembly
+            .GetManifestResourceNames()
+            .FirstOrDefault(n => n.EndsWith(fileName, StringComparison.OrdinalIgnoreCase));
+
+        return match is null ? null : assembly.GetManifestResourceStream(match);
     }
 }
