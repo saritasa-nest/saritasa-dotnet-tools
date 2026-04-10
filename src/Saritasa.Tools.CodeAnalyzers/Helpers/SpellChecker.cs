@@ -13,6 +13,7 @@ public static class SpellChecker
     private const string DefaultDicFileName = "en-us.dic";
     private const string DefaultAffFileName = "en-us.aff";
     private const string TechNamesFileName = "tech.names.txt";
+    private const string ExclusionsFileName = "exclusions.txt";
 
     private static readonly Assembly assembly = typeof(SpellChecker).Assembly;
 
@@ -21,7 +22,7 @@ public static class SpellChecker
         DefaultDicFileName,
         DefaultAffFileName,
         TechNamesFileName,
-        "exclusions.txt"
+        ExclusionsFileName
     ];
 
     /// <summary>
@@ -92,9 +93,8 @@ public static class SpellChecker
 
     private static void AddExclusions(IEnumerable<AdditionalText> files, WordList wordList)
     {
-        var exclusionsFile = files.FirstOrDefault(file =>
-            file.Path.Contains("exclusions") && (file.Path.EndsWith(".txt") || file.Path.EndsWith(".dic")));
-
+        var exclusionsFile = files
+            .FirstOrDefault(file => file.Path.EndsWith(ExclusionsFileName, StringComparison.OrdinalIgnoreCase));
         var text = exclusionsFile?.GetText();
 
         if (text is null)
