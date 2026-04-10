@@ -277,7 +277,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
     }
 
     private static readonly Regex filePathRegex = new(
-        @"(?:^|(?<=\s))[a-zA-Z]:[^\r\n]*|\\\\[^\s\r\n]+|(?:\.\./|\./)(?:[^\s\r\n]+)|/[a-zA-Z][^\s\r\n]*",
+        @"(?:^|(?<=\s))[a-zA-Z]:\\(?:[^\r\n\\]*\\)*[^\s\r\n]*|\\\\[^\s\r\n]+|(?:\.\./|\./)(?:[^\s\r\n]+)|/[a-zA-Z][^\s\r\n]*",
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     private static string MaskFilePath(string text)

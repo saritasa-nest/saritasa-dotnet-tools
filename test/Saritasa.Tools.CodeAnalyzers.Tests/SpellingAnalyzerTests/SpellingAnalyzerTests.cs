@@ -986,6 +986,32 @@ public class SpellingAnalyzerTests
     }
 
     /// <summary>
+    /// Verifies that file path typo after produces a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task Comment_FilePath_TypoAfterFilePath_ShouldProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    // See C:\Users\foo\bar.txt [|typoo|]
+                    public void TestMethod()
+                    {
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
     /// Verifies hex is excluded from analysis.
     /// </summary>
     [TestMethod]
