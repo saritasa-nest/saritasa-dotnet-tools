@@ -22,5 +22,5 @@
   <AdditionalFiles Include="$(MSBuildThisFileDirectory)dictionaries\exclusions.txt"/>
 </ItemGroup>
 ```
-3. Create `exlusions.txt` by selected path to have ability to use code fix for adding project related words to whitelist
+3. Create `exclusions.txt` by selected path to have ability to use code fix for adding project related words to whitelist
 4. Fix all appeared warnings

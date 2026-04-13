@@ -6,5 +6,5 @@ openxmlformats
 officedocument
 wordprocessingml
 powerpoint
-presentationmlf
+presentationml
 shockwave
