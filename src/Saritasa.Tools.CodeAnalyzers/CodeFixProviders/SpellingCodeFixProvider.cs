@@ -98,17 +98,36 @@ public sealed class SpellingCodeFixProvider : CodeFixProvider
             return solution;
         }
 
-        // Add a trailing newline if missing, then append the word.
+        var lineSeparator = GetLineSeparator(content);
+
         var appended = content;
-        if (appended.Length > 0 && !appended.EndsWith("\n", StringComparison.Ordinal))
+        if (appended.Length > 0 && !appended.EndsWith(lineSeparator, StringComparison.Ordinal))
         {
-            appended += "\r\n";
+            appended += lineSeparator;
         }
 
-        appended += word + "\r\n";
+        appended += word + lineSeparator;
 
         var newText = SourceText.From(appended, text.Encoding);
         return solution.WithAdditionalDocumentText(exclusionsDocument.Id, newText);
+    }
+
+    private static string GetLineSeparator(string content)
+    {
+        const string crlfNewLine = "\r\n";
+        if (content.Contains(crlfNewLine, StringComparison.Ordinal))
+        {
+            return crlfNewLine;
+        }
+
+        const string lfNewLine = "\n";
+        if (content.Contains(lfNewLine, StringComparison.Ordinal))
+        {
+            return lfNewLine;
+        }
+
+        const string crNewLine = "\r";
+        return crNewLine;
     }
 
     private static bool ContainsWord(string content, string word)
