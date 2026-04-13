@@ -14,7 +14,7 @@
 2. Fix all appeared warnings
 3. If you want to allow some plural words in type name you can add them in `.editorconfig` in that way: `dotnet_diagnostic.STAN1003.allowed_plural_words = Accounts, Items`
 
-## STAN 1004 Spellcheck
+## STAN1004 Spellcheck
 1. Install the latest version of `Saritasa.Tools.CodeAnalyzers` NuGet
 2. Add or update `Directory.Build.props` with content (path to file can be changed, `$(MSBuildThisFileDirectory)` is the path to the `Directory.Build.props`):
 ```
