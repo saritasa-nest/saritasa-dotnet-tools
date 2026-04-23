@@ -29,6 +29,28 @@
     <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <DicUrl>https://raw.githubusercontent.com/wooorm/dictionaries/main/dictionaries/en/index.dic</DicUrl>
+    <AffUrl>https://raw.githubusercontent.com/wooorm/dictionaries/main/dictionaries/en/index.aff</AffUrl>
+    <DictionaryDir>Dictionaries</DictionaryDir>
+  </PropertyGroup>
+
+  <Target Name="DownloadDictionaries" BeforeTargets="BeforeBuild">
+    <Message Text="Downloading en-us Hunspell dictionaries..." Importance="high" />
+
+    <MakeDir Directories="$(DictionaryDir)" Condition="!Exists('$(DictionaryDir)')" />
+
+    <DownloadFile SourceUrl="$(DicUrl)"
+                  DestinationFolder="$(DictionaryDir)"
+                  DestinationFileName="en-us.dic"
+                  SkipUnchangedFiles="true" />
+
+    <DownloadFile SourceUrl="$(AffUrl)"
+                  DestinationFolder="$(DictionaryDir)"
+                  DestinationFileName="en-us.aff"
+                  SkipUnchangedFiles="true" />
+  </Target>
+
   <ItemGroup>
     <EmbeddedResource Include="..\..\dictionaries\en-us.dic" />
     <EmbeddedResource Include="..\..\dictionaries\en-us.aff" />
