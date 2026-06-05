@@ -17,7 +17,7 @@ public static class SpellChecker
 
     private static readonly Assembly assembly = typeof(SpellChecker).Assembly;
 
-    private static readonly string[] knownDictionaryFiles =
+    private static readonly string[] handledDictionaryFiles =
     [
         DefaultDicFileName,
         DefaultAffFileName,
@@ -67,8 +67,7 @@ public static class SpellChecker
     {
         var resourceNames = assembly
             .GetManifestResourceNames()
-            .Where(n => n.EndsWith(".txt", StringComparison.OrdinalIgnoreCase) &&
-                       !knownDictionaryFiles.Any(known => n.EndsWith(known, StringComparison.OrdinalIgnoreCase)))
+            .Where(name => name.EndsWith(".txt", StringComparison.OrdinalIgnoreCase) && !IsDictionaryHandled(name))
             .ToList();
 
         foreach (var resourceName in resourceNames)
@@ -90,6 +89,9 @@ public static class SpellChecker
             }
         }
     }
+
+    private static bool IsDictionaryHandled(string name) =>
+        handledDictionaryFiles.Any(handledFile => name.EndsWith(handledFile, StringComparison.OrdinalIgnoreCase));
 
     private static void AddExclusions(IEnumerable<AdditionalText> files, WordList wordList)
     {
