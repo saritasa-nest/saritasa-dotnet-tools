@@ -33,6 +33,8 @@
     <DicUrl>https://raw.githubusercontent.com/wooorm/dictionaries/main/dictionaries/en/index.dic</DicUrl>
     <AffUrl>https://raw.githubusercontent.com/wooorm/dictionaries/main/dictionaries/en/index.aff</AffUrl>
     <DictionaryDir>Dictionaries</DictionaryDir>
+    <DicFileName>en-us.dic</DicFileName>
+    <AffFileName>en-us.aff</AffFileName>
   </PropertyGroup>
 
   <Target Name="DownloadDictionaries" BeforeTargets="BeforeBuild">
@@ -42,19 +44,19 @@
 
     <DownloadFile SourceUrl="$(DicUrl)"
                   DestinationFolder="$(DictionaryDir)"
-                  DestinationFileName="en-us.dic"
+                  DestinationFileName="$(DicFileName)"
                   SkipUnchangedFiles="true" />
 
     <DownloadFile SourceUrl="$(AffUrl)"
                   DestinationFolder="$(DictionaryDir)"
-                  DestinationFileName="en-us.aff"
+                  DestinationFileName="$(AffFileName)"
                   SkipUnchangedFiles="true" />
   </Target>
 
   <ItemGroup>
-    <EmbeddedResource Include="..\..\dictionaries\en-us.dic" />
-    <EmbeddedResource Include="..\..\dictionaries\en-us.aff" />
-    <EmbeddedResource Include="..\..\dictionaries\general exclusions\**\*" />
+    <EmbeddedResource Include="$(DictionaryDir)\$(DicFileName)" />
+    <EmbeddedResource Include="$(DictionaryDir)\$(AffFileName)" />
+    <EmbeddedResource Include="$(DictionaryDir)\general exclusions\**\*" />
   </ItemGroup>
 
   <Target Name="CopyWeCantSpellHunspell" AfterTargets="Build">
