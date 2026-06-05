@@ -30,6 +30,7 @@
   </ItemGroup>
 
   <PropertyGroup>
+    <EnableDictionaryDownload>true</EnableDictionaryDownload>
     <DicUrl>https://raw.githubusercontent.com/wooorm/dictionaries/main/dictionaries/en/index.dic</DicUrl>
     <AffUrl>https://raw.githubusercontent.com/wooorm/dictionaries/main/dictionaries/en/index.aff</AffUrl>
     <DictionaryDir>Dictionaries</DictionaryDir>
@@ -37,7 +38,7 @@
     <AffFileName>en-us.aff</AffFileName>
   </PropertyGroup>
 
-  <Target Name="DownloadDictionaries" BeforeTargets="BeforeBuild">
+  <Target Name="DownloadDictionaries" BeforeTargets="BeforeBuild" Condition="'$(EnableDictionaryDownload)' == 'true'">
     <Message Text="Downloading en-us Hunspell dictionaries..." Importance="high" />
 
     <MakeDir Directories="$(DictionaryDir)" Condition="!Exists('$(DictionaryDir)')" />
@@ -54,8 +55,8 @@
   </Target>
 
   <ItemGroup>
-    <EmbeddedResource Include="$(DictionaryDir)\$(DicFileName)" />
-    <EmbeddedResource Include="$(DictionaryDir)\$(AffFileName)" />
+    <EmbeddedResource Include="$(DictionaryDir)\$(DicFileName)" Condition="'$(EnableDictionaryDownload)' == 'true'" />
+    <EmbeddedResource Include="$(DictionaryDir)\$(AffFileName)" Condition="'$(EnableDictionaryDownload)' == 'true'" />
     <EmbeddedResource Include="$(DictionaryDir)\general exclusions\**\*" />
   </ItemGroup>
 
