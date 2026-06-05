@@ -141,5 +141,9 @@ sonar-project.properties
 *.bak
 *.nuspec
 
+# spellchecking files
+*.dic
+*.aff
+
 #Cake auto generated tools
 scripts/Modules/Saritasa.Cake/tools/
