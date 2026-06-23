@@ -5,3 +5,4 @@
 [+] Add line length analyzer.
 [+] Add exception message ends with dot analyzer.
 [+] Add class singular name analyzer.
+[+] Add class singular name analyzer.
