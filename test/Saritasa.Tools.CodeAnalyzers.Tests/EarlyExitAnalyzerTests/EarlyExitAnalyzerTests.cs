@@ -1,7 +1,7 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Testing;
-using Microsoft.CodeAnalysis.Testing;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Saritasa.Tools.CodeAnalyzers.Analyzers;
+using VerifyCS = Saritasa.Tools.CodeAnalyzers.Tests.Verifiers.CSharpAnalyzerVerifier<
+    Saritasa.Tools.CodeAnalyzers.Analyzers.EarlyExitAnalyzer>;
 
 namespace Saritasa.Tools.CodeAnalyzers.Tests.EarlyExitAnalyzerTests;
 
@@ -11,19 +11,6 @@ namespace Saritasa.Tools.CodeAnalyzers.Tests.EarlyExitAnalyzerTests;
 [TestClass]
 public class EarlyExitAnalyzerTests
 {
-    private readonly CSharpAnalyzerTest<EarlyExitAnalyzer, DefaultVerifier> context;
-
-    /// <summary>
-    /// Constructor.
-    /// </summary>
-    public EarlyExitAnalyzerTests()
-    {
-        context = new CSharpAnalyzerTest<EarlyExitAnalyzer, DefaultVerifier>
-        {
-            ReferenceAssemblies = ReferenceAssemblies.Net.Net60
-        };
-    }
-
     /// <summary>
     /// Validates that case produces warning: else have return statement after if with return.
     /// </summary>
@@ -52,8 +39,7 @@ public class EarlyExitAnalyzerTests
             }
             """;
 
-        context.TestCode = sourceCode;
-        await context.RunAsync();
+        await VerifyCS.VerifyAnalyzerAsync(sourceCode);
     }
 
     /// <summary>
@@ -86,8 +72,7 @@ public class EarlyExitAnalyzerTests
             }
             """;
 
-        context.TestCode = sourceCode;
-        await context.RunAsync();
+        await VerifyCS.VerifyAnalyzerAsync(sourceCode);
     }
 
     /// <summary>
@@ -121,9 +106,7 @@ public class EarlyExitAnalyzerTests
                 }
             }
             """;
-
-        context.TestCode = sourceCode;
-        await context.RunAsync();
+        await VerifyCS.VerifyAnalyzerAsync(sourceCode);
     }
 
     /// <summary>
@@ -155,8 +138,7 @@ public class EarlyExitAnalyzerTests
             }
             """;
 
-        context.TestCode = sourceCode;
-        await context.RunAsync();
+        await VerifyCS.VerifyAnalyzerAsync(sourceCode);
     }
 
     /// <summary>
@@ -188,7 +170,99 @@ public class EarlyExitAnalyzerTests
             }
             """;
 
-        context.TestCode = sourceCode;
-        await context.RunAsync();
+        await VerifyCS.VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// Validates that case produces warning: else have return statement after if that throws.
+    /// </summary>
+    [TestMethod]
+    public async Task IfElse_IfThrows_ShouldWarn()
+    {
+        const string sourceCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    string M(bool flag)
+                    {
+                        if (flag)
+                        {
+                            throw new System.Exception();
+                        }
+                        [|else|]
+                        {
+                            return "false";
+                        }
+                    }
+                }
+            }
+            """;
+
+        await VerifyCS.VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// Validates that case produces warning: else throws after if with return.
+    /// </summary>
+    [TestMethod]
+    public async Task IfElse_ElseThrows_ShouldWarn()
+    {
+        const string sourceCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    string M(bool flag)
+                    {
+                        if (flag)
+                        {
+                            return "true";
+                        }
+                        [|else|]
+                        {
+                            throw new System.Exception();
+                        }
+                    }
+                }
+            }
+            """;
+
+        await VerifyCS.VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// Validates that case produces warning: both if and else throw.
+    /// </summary>
+    [TestMethod]
+    public async Task IfElse_BothThrow_ShouldWarn()
+    {
+        const string sourceCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    string M(bool flag)
+                    {
+                        if (flag)
+                        {
+                            throw new System.ArgumentException();
+                        }
+                        [|else|]
+                        {
+                            throw new System.InvalidOperationException();
+                        }
+                    }
+                }
+            }
+            """;
+
+        await VerifyCS.VerifyAnalyzerAsync(sourceCode);
     }
 }

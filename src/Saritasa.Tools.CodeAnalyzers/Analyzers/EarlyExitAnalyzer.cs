@@ -54,15 +54,15 @@ public sealed class EarlyExitAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (!ReturnsFromStatement(ifStatement.Statement))
+        if (!ExitsFromStatement(ifStatement.Statement))
         {
             return;
         }
 
-        // If the else is an else-if, warn when that branch also returns.
+        // If the else is an else-if, warn when that branch also exits.
         if (ifStatement.Else.Statement is IfStatementSyntax elseIf)
         {
-            if (!ReturnsFromStatement(elseIf.Statement))
+            if (!ExitsFromStatement(elseIf.Statement))
             {
                 return;
             }
@@ -72,7 +72,7 @@ public sealed class EarlyExitAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (!ReturnsFromStatement(ifStatement.Else.Statement))
+        if (!ExitsFromStatement(ifStatement.Else.Statement))
         {
             return;
         }
@@ -81,15 +81,16 @@ public sealed class EarlyExitAnalyzer : DiagnosticAnalyzer
         context.ReportDiagnostic(diagnostic);
     }
 
-    private static bool ReturnsFromStatement(StatementSyntax statement)
+    private static bool ExitsFromStatement(StatementSyntax statement)
     {
         switch (statement)
         {
             case ReturnStatementSyntax:
+            case ThrowStatementSyntax:
                 return true;
-            case BlockSyntax block when block.Statements.Count == 1 && block.Statements[0] is ReturnStatementSyntax:
-                return true;
-            case IfStatementSyntax nestedIf when ReturnsFromStatement(nestedIf.Statement) && nestedIf.Else is not null && ReturnsFromStatement(nestedIf.Else.Statement):
+            case BlockSyntax block when block.Statements.Count == 1:
+                return ExitsFromStatement(block.Statements[0]);
+            case IfStatementSyntax nestedIf when ExitsFromStatement(nestedIf.Statement) && nestedIf.Else is not null && ExitsFromStatement(nestedIf.Else.Statement):
                 return true;
             default:
                 return false;
