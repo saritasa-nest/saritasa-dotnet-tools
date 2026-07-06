@@ -33,13 +33,13 @@ env:
   DIR_TARGET_REPORTS: './artifacts-target'
   PATH_REPORT_RESULT: './BenchmarkReporter/benchmark-comparison-report.md'
   TEST_PROJECT_FOLDER: './testProject'
-  PATH_TO_TEST_SOLUTION: 'src/Saritasa.SlackApp.sln'
+  PATH_TO_TEST_SOLUTION: 'src/Saritasa.NetForge.slnx'
   THRESHOLD_MEAN: 50%
   THRESHOLD_ALLOCATION: 50%
 
 jobs:
   compare-code-analyzers-performance:
-    runs-on: saritasa-rocks-eks
+    runs-on: ubuntu-latest
 
     steps:
       # Ensure a clean test project directory before checkout.
@@ -55,7 +55,7 @@ jobs:
         id: external_checkout
         uses: actions/checkout@v4
         with:
-          repository: 'saritasa-nest/saritasa-crm-slack-app'
+          repository: 'saritasa-nest/saritasa-forge-admin'
           path: ${{ env.TEST_PROJECT_FOLDER }}
           persist-credentials: false
           ssh-strict: false
@@ -66,8 +66,8 @@ jobs:
       - name: Reset to specific commit
         uses: actions/checkout@v4
         with:
-            repository: 'saritasa-nest/saritasa-crm-slack-app'
-            ref: 771257af493247a2d43c6cf9de21156a6ad27021
+            repository: 'saritasa-nest/saritasa-forge-admin'
+            ref: dc2d1ed5d58be20e709de5ba884beeaba0c6a733
             path: ${{ env.TEST_PROJECT_FOLDER }}
 
       - name: Setup .NET
@@ -79,7 +79,7 @@ jobs:
       # BenchmarkDotNet to raise the process priority for more stable measurements.
       - name: Run PR Benchmarks
         run: |
-          sudo -E dotnet run -c Release --project ${{ env.PATH_BENCHMARKS_PROJECT }} -- --artifacts ${{ env.DIR_TARGET_REPORTS }} --testProjectPath ${{ env.TEST_PROJECT_FOLDER }}/${{ env.PATH_TO_TEST_SOLUTION }}
+          sudo -E dotnet run --no-launch-profile -c Release --project ${{ env.PATH_BENCHMARKS_PROJECT }} -- --artifacts ${{ env.DIR_TARGET_REPORTS }} --testProjectPath ${{ env.TEST_PROJECT_FOLDER }}/${{ env.PATH_TO_TEST_SOLUTION }}
 
       # Swap the Saritasa.Tools.CodeAnalyzers code to the base branch while keeping the test project intact.
       # The directory is removed first to ensure files added in the PR (not present in base) are deleted.
@@ -94,7 +94,7 @@ jobs:
       # Benchmark the base branch with the same test project for a fair comparison.
       - name: Run Base Benchmarks
         run: |
-          sudo -E dotnet run -c Release --project ${{ env.PATH_BENCHMARKS_PROJECT }} -- --artifacts ${{ env.DIR_BASELINE_REPORTS }} --testProjectPath ${{ env.TEST_PROJECT_FOLDER }}/${{ env.PATH_TO_TEST_SOLUTION }}
+          sudo -E dotnet run --no-launch-profile -c Release --project ${{ env.PATH_BENCHMARKS_PROJECT }} -- --artifacts ${{ env.DIR_BASELINE_REPORTS }} --testProjectPath ${{ env.TEST_PROJECT_FOLDER }}/${{ env.PATH_TO_TEST_SOLUTION }}
 
       - name: Install lib for benchmarks comparison
         run: sudo -E dotnet tool install --global PowerUtils.BenchmarkDotnet.Reporter
