@@ -623,12 +623,12 @@ public class SpellingAnalyzerTests
     }
 
     /// <summary>
-    /// Verifies word in exclusions does not produce a warning.
+    /// Verifies word in user exclusions does not produce a warning.
     /// </summary>
     [TestMethod]
-    public async Task WordInExclusions_ShouldNotProduceWarning()
+    public async Task WordInUserExclusions_ShouldNotProduceWarning()
     {
-        context.TestState.AdditionalFiles.Add(("dictionaries/exclusions.txt", "typoo"));
+        context.TestState.AdditionalFiles.Add(("dictionaries/spell-checker-exclusions.txt", "typoo"));
         context.TestCode =
             /* lang=c# */
             """

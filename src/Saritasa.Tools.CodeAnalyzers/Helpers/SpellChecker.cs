@@ -13,7 +13,7 @@ public static class SpellChecker
     private const string DefaultDicFileName = "en-us.dic";
     private const string DefaultAffFileName = "en-us.aff";
     private const string TechNamesFileName = "tech.names.txt";
-    private const string ExclusionsFileName = "exclusions.txt";
+    private const string UserExclusionsFileName = "spell-checker-exclusions.txt";
 
     private static readonly Assembly assembly = typeof(SpellChecker).Assembly;
 
@@ -22,7 +22,7 @@ public static class SpellChecker
         DefaultDicFileName,
         DefaultAffFileName,
         TechNamesFileName,
-        ExclusionsFileName
+        UserExclusionsFileName
     ];
 
     /// <summary>
@@ -35,7 +35,7 @@ public static class SpellChecker
         var wordList = CreateWordListFromEmbeddedResources();
 
         AddGeneralExclusions(wordList);
-        AddExclusions(files, wordList);
+        AddUserExclusions(files, wordList);
 
         return wordList;
     }
@@ -93,11 +93,11 @@ public static class SpellChecker
     private static bool IsDictionaryHandled(string name) =>
         handledDictionaryFiles.Any(handledFile => name.EndsWith(handledFile, StringComparison.OrdinalIgnoreCase));
 
-    private static void AddExclusions(IEnumerable<AdditionalText> files, WordList wordList)
+    private static void AddUserExclusions(IEnumerable<AdditionalText> files, WordList wordList)
     {
-        var exclusionsFile = files
-            .FirstOrDefault(file => file.Path.EndsWith(ExclusionsFileName, StringComparison.OrdinalIgnoreCase));
-        var text = exclusionsFile?.GetText();
+        var userExclusionsFile = files
+            .FirstOrDefault(file => file.Path.EndsWith(UserExclusionsFileName, StringComparison.OrdinalIgnoreCase));
+        var text = userExclusionsFile?.GetText();
 
         if (text is null)
         {
