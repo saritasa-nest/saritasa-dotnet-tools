@@ -22,7 +22,8 @@
   <AdditionalFiles Include="$(MSBuildThisFileDirectory)dictionaries\spell-checker-exclusions.txt"/>
 </ItemGroup>
 ```
-Note that the spellchecker accepts only one `AdditionalFiles` statement with `spell-checker-exclusions.txt` name.
+2.1 This file will contain word per line that should not be spell checked.
+2.2 Note that the spellchecker accepts only one `AdditionalFiles` statement with `spell-checker-exclusions.txt` name.
 You might have other `AdditionalFiles` statements in `Directory.Build.props`,
 so please ensure that other analyzers do not use files with the same name.
 3. Create `exclusions.txt` by selected path to have ability to use code fix for adding project related words to whitelist
