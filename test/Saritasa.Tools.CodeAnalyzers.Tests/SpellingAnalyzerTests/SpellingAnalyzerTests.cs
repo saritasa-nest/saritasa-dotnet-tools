@@ -649,18 +649,86 @@ public class SpellingAnalyzerTests
     }
 
     /// <summary>
-    /// Verifies word in user exclusions does not produce a warning when the file is configured via .editorconfig.
+    /// Verifies word in user exclusions does not produce a warning when the same paths are used for file in .editorconfig.
     /// </summary>
     [TestMethod]
-    public async Task WordInUserExclusions_FileFromEditorconfig_ShouldNotProduceWarning()
+    public async Task WordInUserExclusions_FileFromEditorconfig_EqualPaths_ShouldNotProduceWarning()
     {
         const string userExclusionsPath = "custom/my-exclusions.txt";
         context.TestState.AdditionalFiles.Add((userExclusionsPath, "typoo"));
 
         const string editorconfig =
             $"""
+             is_global = true
+             dotnet_diagnostic.STAN1004.exclusions_file = {userExclusionsPath}
+             """;
+        context.TestState.AnalyzerConfigFiles.Add(("/.editorconfig", editorconfig));
+
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var test = "typoo";
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies word in user exclusions does not produce a warning when the different paths are used for file in .editorconfig.
+    /// </summary>
+    [TestMethod]
+    public async Task WordInUserExclusions_FileFromEditorconfig_DifferentPaths_ShouldNotProduceWarning()
+    {
+        const string userExclusionsPath = "custom/my-exclusions.txt";
+        context.TestState.AdditionalFiles.Add(($"dictionaries/{userExclusionsPath}", "typoo"));
+
+        const string editorconfig =
+            $"""
             is_global = true
             dotnet_diagnostic.STAN1004.exclusions_file = {userExclusionsPath}
+            """;
+        context.TestState.AnalyzerConfigFiles.Add(("/.editorconfig", editorconfig));
+
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var test = "typoo";
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies word in user exclusions does not produce a warning
+    /// when inconsistent separators are used for paths.
+    /// </summary>
+    [TestMethod]
+    public async Task WordInUserExclusions_FileFromEditorconfig_InconsistentSeparators_ShouldNotProduceWarning()
+    {
+        context.TestState.AdditionalFiles.Add(("custom/my-exclusions.txt", "typoo"));
+
+        const string editorconfig =
+            """
+            is_global = true
+            dotnet_diagnostic.STAN1004.exclusions_file = custom\my-exclusions.txt
             """;
         context.TestState.AnalyzerConfigFiles.Add(("/.editorconfig", editorconfig));
 
