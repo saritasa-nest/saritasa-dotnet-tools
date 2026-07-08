@@ -1,4 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Testing;
+using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Saritasa.Tools.CodeAnalyzers.Analyzers;
@@ -623,12 +623,47 @@ public class SpellingAnalyzerTests
     }
 
     /// <summary>
-    /// Verifies word in user exclusions does not produce a warning.
+    /// Verifies word in user exclusions does not produce a warning when using the default file is used.
     /// </summary>
     [TestMethod]
-    public async Task WordInUserExclusions_ShouldNotProduceWarning()
+    public async Task WordInUserExclusions_DefaultFile_ShouldNotProduceWarning()
     {
         context.TestState.AdditionalFiles.Add(("dictionaries/spell-checker-exclusions.txt", "typoo"));
+
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var test = "typoo";
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies word in user exclusions does not produce a warning when the file is configured via .editorconfig.
+    /// </summary>
+    [TestMethod]
+    public async Task WordInUserExclusions_FileFromEditorconfig_ShouldNotProduceWarning()
+    {
+        const string userExclusionsPath = "custom/my-exclusions.txt";
+        context.TestState.AdditionalFiles.Add((userExclusionsPath, "typoo"));
+
+        const string editorconfig =
+            $"""
+            is_global = true
+            dotnet_diagnostic.STAN1004.exclusions_file = {userExclusionsPath}
+            """;
+        context.TestState.AnalyzerConfigFiles.Add(("/.editorconfig", editorconfig));
+
         context.TestCode =
             /* lang=c# */
             """

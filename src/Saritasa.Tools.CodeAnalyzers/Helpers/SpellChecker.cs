@@ -1,6 +1,7 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Text.RegularExpressions;
-using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Text;
 using WeCantSpell.Hunspell;
 
 namespace Saritasa.Tools.CodeAnalyzers.Helpers;
@@ -15,6 +16,12 @@ public static class SpellChecker
     private const string TechNamesFileName = "tech.names.txt";
     private const string UserExclusionsFileName = "spell-checker-exclusions.txt";
 
+    /// <summary>
+    /// The .editorconfig option name that specifies a custom path to the exclusions file.
+    /// Example: <c>dotnet_diagnostic.STAN1004.exclusions_file = path/to/exclusions.txt</c>
+    /// </summary>
+    private const string ExclusionsFileOptionName = "dotnet_diagnostic.STAN1004.exclusions_file";
+
     private static readonly Assembly assembly = typeof(SpellChecker).Assembly;
 
     private static readonly string[] handledDictionaryFiles =
@@ -28,14 +35,14 @@ public static class SpellChecker
     /// <summary>
     /// Creates word list from packaged dictionary files and optional additional files.
     /// </summary>
-    /// <param name="files">Optional additional files for custom words (e.g., <c>exclusions.txt</c>).</param>
+    /// <param name="options">Analyzer options that provide editorconfig values and additional files.</param>
     /// <returns>Word list.</returns>
-    public static WordList CreateWordList(IEnumerable<AdditionalText> files)
+    public static WordList CreateWordList(AnalyzerOptions options)
     {
         var wordList = CreateWordListFromEmbeddedResources();
 
         AddGeneralExclusions(wordList);
-        AddUserExclusions(files, wordList);
+        AddUserExclusions(options, wordList);
 
         return wordList;
     }
@@ -93,11 +100,9 @@ public static class SpellChecker
     private static bool IsDictionaryHandled(string name) =>
         handledDictionaryFiles.Any(handledFile => name.EndsWith(handledFile, StringComparison.OrdinalIgnoreCase));
 
-    private static void AddUserExclusions(IEnumerable<AdditionalText> files, WordList wordList)
+    private static void AddUserExclusions(AnalyzerOptions options, WordList wordList)
     {
-        var userExclusionsFile = files
-            .FirstOrDefault(file => file.Path.EndsWith(UserExclusionsFileName, StringComparison.OrdinalIgnoreCase));
-        var text = userExclusionsFile?.GetText();
+        var text = TryGetUserExclusionsText(options);
 
         if (text is null)
         {
@@ -112,6 +117,24 @@ public static class SpellChecker
                 wordList.Add(word);
             }
         }
+    }
+
+    private static SourceText? TryGetUserExclusionsText(AnalyzerOptions options)
+    {
+        var globalOptions = options.AnalyzerConfigOptionsProvider.GlobalOptions;
+        if (globalOptions.TryGetValue(ExclusionsFileOptionName, out var configuredPath)
+            && !string.IsNullOrWhiteSpace(configuredPath))
+        {
+            var userExclusionsFile = options.AdditionalFiles
+                .FirstOrDefault(f => string.Equals(f.Path, configuredPath, StringComparison.OrdinalIgnoreCase)
+                    || f.Path.EndsWith(configuredPath.Replace('/', '\\'), StringComparison.OrdinalIgnoreCase)
+                    || f.Path.EndsWith(configuredPath.Replace('\\', '/'), StringComparison.OrdinalIgnoreCase));
+            return userExclusionsFile?.GetText();
+        }
+
+        var defaultUserExclusionsFile = options.AdditionalFiles
+            .FirstOrDefault(file => file.Path.EndsWith(UserExclusionsFileName, StringComparison.OrdinalIgnoreCase));
+        return defaultUserExclusionsFile?.GetText();
     }
 
     /// <summary>

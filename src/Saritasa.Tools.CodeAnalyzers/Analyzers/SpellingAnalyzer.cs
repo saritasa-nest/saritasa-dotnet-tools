@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -49,7 +49,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
 
         context.RegisterCompilationStartAction(compilationContext =>
         {
-            var wordList = SpellChecker.CreateWordList(compilationContext.Options.AdditionalFiles);
+            var wordList = SpellChecker.CreateWordList(compilationContext.Options);
             var namesRegex = SpellChecker.BuildNamesRegex(wordList);
             var compilation = compilationContext.Compilation;
 
