@@ -2,6 +2,7 @@ using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Saritasa.Tools.CodeAnalyzers.Analyzers;
+using Saritasa.Tools.CodeAnalyzers.Tests.Helpers;
 
 namespace Saritasa.Tools.CodeAnalyzers.Tests.SpellingAnalyzerTests;
 
@@ -11,8 +12,6 @@ namespace Saritasa.Tools.CodeAnalyzers.Tests.SpellingAnalyzerTests;
 [TestClass]
 public class SpellingAnalyzerTests
 {
-    private const string EditorConfigFilePath = "/src/.editorconfig";
-    private const string TestSourceFilePath = "/src/Test0.cs";
     private const string CustomUserExclusionsFilePath = "custom/my-exclusions.txt";
     private const string CodeWithExcludedTypo =
         /* lang=c# */
@@ -666,8 +665,8 @@ public class SpellingAnalyzerTests
              [*.cs]
              dotnet_diagnostic.STAN1004.exclusions_file = {CustomUserExclusionsFilePath}
              """;
-        context.TestState.AnalyzerConfigFiles.Add((EditorConfigFilePath, editorconfig));
-        context.TestState.Sources.Add((TestSourceFilePath, CodeWithExcludedTypo));
+        context.TestState.AnalyzerConfigFiles.Add((TestConstants.EditorConfigFilePath, editorconfig));
+        context.TestState.Sources.Add((TestConstants.TestSourceFilePath, CodeWithExcludedTypo));
 
         await context.RunAsync();
     }
@@ -685,8 +684,8 @@ public class SpellingAnalyzerTests
              [*.cs]
              dotnet_diagnostic.STAN1004.exclusions_file = {CustomUserExclusionsFilePath}
              """;
-        context.TestState.AnalyzerConfigFiles.Add((EditorConfigFilePath, editorconfig));
-        context.TestState.Sources.Add((TestSourceFilePath, CodeWithExcludedTypo));
+        context.TestState.AnalyzerConfigFiles.Add((TestConstants.EditorConfigFilePath, editorconfig));
+        context.TestState.Sources.Add((TestConstants.TestSourceFilePath, CodeWithExcludedTypo));
 
         await context.RunAsync();
     }
@@ -705,8 +704,8 @@ public class SpellingAnalyzerTests
             [*.cs]
             dotnet_diagnostic.STAN1004.exclusions_file = custom\my-exclusions.txt
             """;
-        context.TestState.AnalyzerConfigFiles.Add((EditorConfigFilePath, editorconfig));
-        context.TestState.Sources.Add((TestSourceFilePath, CodeWithExcludedTypo));
+        context.TestState.AnalyzerConfigFiles.Add((TestConstants.EditorConfigFilePath, editorconfig));
+        context.TestState.Sources.Add((TestConstants.TestSourceFilePath, CodeWithExcludedTypo));
 
         await context.RunAsync();
     }

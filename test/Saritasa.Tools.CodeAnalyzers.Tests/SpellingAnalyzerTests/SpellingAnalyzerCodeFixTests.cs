@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Saritasa.Tools.CodeAnalyzers.Analyzers;
 using Saritasa.Tools.CodeAnalyzers.CodeFixProviders;
+using Saritasa.Tools.CodeAnalyzers.Tests.Helpers;
 
 namespace Saritasa.Tools.CodeAnalyzers.Tests.SpellingAnalyzerTests;
 
@@ -14,10 +15,6 @@ public class SpellingAnalyzerCodeFixTests
 {
     private const string DefaultExclusionsFile = "dictionaries/spell-checker-exclusions.txt";
     private const string CustomExclusionsFile = "custom/project-terms.txt";
-
-    private const string TestSourceFilePath = "/src/Test0.cs";
-
-    private const string EditorConfigFilePath = "/src/.editorconfig";
     private const string CustomExclusionsEditorConfig =
         $"""
         [*.cs]
@@ -229,11 +226,11 @@ public class SpellingAnalyzerCodeFixTests
         {
             ReferenceAssemblies = ReferenceAssemblies.Net.Net60,
         };
-        test.TestState.Sources.Add((TestSourceFilePath, CodeWithTypo));
-        test.FixedState.Sources.Add((TestSourceFilePath, CodeWithTypoFixed));
+        test.TestState.Sources.Add((TestConstants.TestSourceFilePath, CodeWithTypo));
+        test.FixedState.Sources.Add((TestConstants.TestSourceFilePath, CodeWithTypoFixed));
 
-        test.TestState.AnalyzerConfigFiles.Add((EditorConfigFilePath, CustomExclusionsEditorConfig));
-        test.FixedState.AnalyzerConfigFiles.Add((EditorConfigFilePath, CustomExclusionsEditorConfig));
+        test.TestState.AnalyzerConfigFiles.Add((TestConstants.EditorConfigFilePath, CustomExclusionsEditorConfig));
+        test.FixedState.AnalyzerConfigFiles.Add((TestConstants.EditorConfigFilePath, CustomExclusionsEditorConfig));
 
         test.TestState.AdditionalFiles.Add((CustomExclusionsFile, string.Empty));
         test.FixedState.AdditionalFiles.Add((CustomExclusionsFile, "typoo\n"));
@@ -252,11 +249,11 @@ public class SpellingAnalyzerCodeFixTests
         {
             ReferenceAssemblies = ReferenceAssemblies.Net.Net60,
         };
-        test.TestState.Sources.Add((TestSourceFilePath, CodeWithTypo));
-        test.FixedState.Sources.Add((TestSourceFilePath, CodeWithTypoFixed));
+        test.TestState.Sources.Add((TestConstants.TestSourceFilePath, CodeWithTypo));
+        test.FixedState.Sources.Add((TestConstants.TestSourceFilePath, CodeWithTypoFixed));
 
-        test.TestState.AnalyzerConfigFiles.Add((EditorConfigFilePath, CustomExclusionsEditorConfig));
-        test.FixedState.AnalyzerConfigFiles.Add((EditorConfigFilePath, CustomExclusionsEditorConfig));
+        test.TestState.AnalyzerConfigFiles.Add((TestConstants.EditorConfigFilePath, CustomExclusionsEditorConfig));
+        test.FixedState.AnalyzerConfigFiles.Add((TestConstants.EditorConfigFilePath, CustomExclusionsEditorConfig));
 
         const string registeredPath = $"dictionaries/{CustomExclusionsFile}";
 
@@ -279,11 +276,11 @@ public class SpellingAnalyzerCodeFixTests
             NumberOfIncrementalIterations = 0,
         };
 
-        test.TestState.Sources.Add((TestSourceFilePath, CodeWithTypo));
-        test.FixedState.Sources.Add((TestSourceFilePath, CodeWithTypo));
+        test.TestState.Sources.Add((TestConstants.TestSourceFilePath, CodeWithTypo));
+        test.FixedState.Sources.Add((TestConstants.TestSourceFilePath, CodeWithTypo));
 
-        test.TestState.AnalyzerConfigFiles.Add((EditorConfigFilePath, CustomExclusionsEditorConfig));
-        test.FixedState.AnalyzerConfigFiles.Add((EditorConfigFilePath, CustomExclusionsEditorConfig));
+        test.TestState.AnalyzerConfigFiles.Add((TestConstants.EditorConfigFilePath, CustomExclusionsEditorConfig));
+        test.FixedState.AnalyzerConfigFiles.Add((TestConstants.EditorConfigFilePath, CustomExclusionsEditorConfig));
 
         await test.RunAsync();
     }
