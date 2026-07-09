@@ -161,12 +161,16 @@ public static class SpellChecker
 
     private static bool MatchesExclusionsPath(string pathInAdditionalFiles, string configuredPath)
     {
-        const char forwardSlash = '/';
-        const char backslash = '\\';
+        var additionalFilesPath = NormalizePath(pathInAdditionalFiles);
+        var configuredExclusionsPath = NormalizePath(configuredPath);
 
-        return string.Equals(pathInAdditionalFiles, configuredPath, StringComparison.OrdinalIgnoreCase)
-            || pathInAdditionalFiles.EndsWith(configuredPath.Replace(forwardSlash, backslash), StringComparison.OrdinalIgnoreCase)
-            || pathInAdditionalFiles.EndsWith(configuredPath.Replace(backslash, forwardSlash), StringComparison.OrdinalIgnoreCase);
+        return string.Equals(additionalFilesPath, configuredExclusionsPath, StringComparison.OrdinalIgnoreCase)
+            || additionalFilesPath.EndsWith(configuredExclusionsPath, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static string NormalizePath(string path)
+    {
+        return path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
     }
 
     /// <summary>
