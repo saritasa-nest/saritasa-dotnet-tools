@@ -132,7 +132,7 @@ public sealed class SpellingCodeFixProvider : CodeFixProvider
 
     private static bool ContainsWord(string content, string word)
     {
-        var lines = content.Split(["\r\n", "\n"], StringSplitOptions.None);
+        var lines = content.Split([CrlfNewLine, CrNewLine, LfNewLine], StringSplitOptions.None);
         foreach (var line in lines)
         {
             var trimmed = line.Trim();
