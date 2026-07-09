@@ -61,7 +61,7 @@ public class SpellingAnalyzerCodeFixTests
     {
         var test = CreateTest();
         test.TestState.AdditionalFiles.Add((DefaultExclusionsFile, string.Empty));
-        test.FixedState.AdditionalFiles.Add((DefaultExclusionsFile, "typoo\r"));
+        test.FixedState.AdditionalFiles.Add((DefaultExclusionsFile, "typoo\n"));
 
         await test.RunAsync();
     }
@@ -128,11 +128,14 @@ public class SpellingAnalyzerCodeFixTests
             }
             """;
 
-        var test = CreateTest();
-        test.TestCode = codeWithUpperTypo;
-        test.FixedCode = codeWithUpperTypoFixed;
+        var test = new CSharpCodeFixTest<SpellingAnalyzer, SpellingCodeFixProvider, DefaultVerifier>
+        {
+            ReferenceAssemblies = ReferenceAssemblies.Net.Net60,
+            TestCode = codeWithUpperTypo,
+            FixedCode = codeWithUpperTypoFixed,
+        };
         test.TestState.AdditionalFiles.Add((DefaultExclusionsFile, string.Empty));
-        test.FixedState.AdditionalFiles.Add((DefaultExclusionsFile, "typoo\r"));
+        test.FixedState.AdditionalFiles.Add((DefaultExclusionsFile, "typoo\n"));
 
         await test.RunAsync();
     }
@@ -224,7 +227,7 @@ public class SpellingAnalyzerCodeFixTests
         test.FixedState.AnalyzerConfigFiles.Add(("/.editorconfig", editorconfig));
 
         test.TestState.AdditionalFiles.Add((CustomExclusionsFile, string.Empty));
-        test.FixedState.AdditionalFiles.Add((CustomExclusionsFile, "typoo\r"));
+        test.FixedState.AdditionalFiles.Add((CustomExclusionsFile, "typoo\n"));
 
         await test.RunAsync();
     }
@@ -249,7 +252,7 @@ public class SpellingAnalyzerCodeFixTests
         const string registeredPath = $"dictionaries/{CustomExclusionsFile}";
 
         test.TestState.AdditionalFiles.Add((registeredPath, string.Empty));
-        test.FixedState.AdditionalFiles.Add((registeredPath, "typoo\r"));
+        test.FixedState.AdditionalFiles.Add((registeredPath, "typoo\n"));
 
         await test.RunAsync();
     }

@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using System.Composition;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
@@ -16,6 +16,9 @@ namespace Saritasa.Tools.CodeAnalyzers.CodeFixProviders;
 public sealed class SpellingCodeFixProvider : CodeFixProvider
 {
     private const string ExclusionsFileName = "exclusions.txt";
+    private const string CrlfNewLine = "\r\n";
+    private const string CrNewLine = "\r";
+    private const string LfNewLine = "\n";
 
     /// <inheritdoc />
     public override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(SpellingAnalyzer.DiagnosticId);
@@ -114,20 +117,17 @@ public sealed class SpellingCodeFixProvider : CodeFixProvider
 
     private static string GetLineSeparator(string content)
     {
-        const string crlfNewLine = "\r\n";
-        if (content.Contains(crlfNewLine, StringComparison.Ordinal))
+        if (content.Contains(CrlfNewLine, StringComparison.Ordinal))
         {
-            return crlfNewLine;
+            return CrlfNewLine;
         }
 
-        const string lfNewLine = "\n";
-        if (content.Contains(lfNewLine, StringComparison.Ordinal))
+        if (content.Contains(CrNewLine, StringComparison.Ordinal))
         {
-            return lfNewLine;
+            return CrNewLine;
         }
 
-        const string crNewLine = "\r";
-        return crNewLine;
+        return LfNewLine;
     }
 
     private static bool ContainsWord(string content, string word)
