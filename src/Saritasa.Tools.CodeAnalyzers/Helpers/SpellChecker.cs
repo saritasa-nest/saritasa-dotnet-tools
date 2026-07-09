@@ -40,13 +40,14 @@ public static class SpellChecker
     /// Creates word list from packaged dictionary files and optional additional files.
     /// </summary>
     /// <param name="options">Analyzer options that provide editorconfig values and additional files.</param>
+    /// <param name="syntaxTrees">Syntax trees to get editorconfig files for.</param>
     /// <returns>Word list.</returns>
-    public static WordList CreateWordList(AnalyzerOptions options)
+    public static WordList CreateWordList(AnalyzerOptions options, IEnumerable<SyntaxTree> syntaxTrees)
     {
         var wordList = CreateWordListFromEmbeddedResources();
 
         AddGeneralExclusions(wordList);
-        AddUserExclusions(options, wordList);
+        AddUserExclusions(options, syntaxTrees, wordList);
 
         return wordList;
     }
@@ -104,9 +105,9 @@ public static class SpellChecker
     private static bool IsDictionaryHandled(string name) =>
         handledDictionaryFiles.Any(handledFile => name.EndsWith(handledFile, StringComparison.OrdinalIgnoreCase));
 
-    private static void AddUserExclusions(AnalyzerOptions options, WordList wordList)
+    private static void AddUserExclusions(AnalyzerOptions options, IEnumerable<SyntaxTree> syntaxTrees, WordList wordList)
     {
-        var text = TryGetUserExclusionsFile(options)?.GetText();
+        var text = TryGetUserExclusionsFile(options, syntaxTrees)?.GetText();
         if (text is null)
         {
             return;
@@ -126,19 +127,36 @@ public static class SpellChecker
     /// Finds the user exclusions file by the path configured in .editorconfig or by the default file name.
     /// </summary>
     /// <param name="options">Analyzer options.</param>
+    /// <param name="syntaxTrees">
+    /// Syntax trees to get configured exclusions path from syntax tree's related .editorconfig.
+    /// </param>
     /// <returns>Additional text for exclusions file, or <c>null</c> if not found.</returns>
-    internal static AdditionalText? TryGetUserExclusionsFile(AnalyzerOptions options)
+    internal static AdditionalText? TryGetUserExclusionsFile(AnalyzerOptions options, IEnumerable<SyntaxTree> syntaxTrees)
     {
-        var globalOptions = options.AnalyzerConfigOptionsProvider.GlobalOptions;
-        if (globalOptions.TryGetValue(ExclusionsFileOptionName, out var configuredPath)
-            && !string.IsNullOrWhiteSpace(configuredPath))
+        var configuredPath = TryGetExclusionsFilePath(options, syntaxTrees);
+        if (!string.IsNullOrWhiteSpace(configuredPath))
         {
             return options.AdditionalFiles
-                .FirstOrDefault(f => MatchesExclusionsPath(f.Path, configuredPath));
+                .FirstOrDefault(f => MatchesExclusionsPath(f.Path, configuredPath!));
         }
 
         return options.AdditionalFiles
             .FirstOrDefault(file => file.Path.EndsWith(DefaultUserExclusionsFileName, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static string? TryGetExclusionsFilePath(AnalyzerOptions options, IEnumerable<SyntaxTree> syntaxTrees)
+    {
+        foreach (var tree in syntaxTrees)
+        {
+            var configOptions = options.AnalyzerConfigOptionsProvider.GetOptions(tree);
+            if (configOptions.TryGetValue(ExclusionsFileOptionName, out var exclusionsFilePath)
+                && !string.IsNullOrWhiteSpace(exclusionsFilePath))
+            {
+                return exclusionsFilePath;
+            }
+        }
+
+        return null;
     }
 
     private static bool MatchesExclusionsPath(string pathInAdditionalFiles, string configuredPath)

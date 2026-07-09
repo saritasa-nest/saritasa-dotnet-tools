@@ -49,7 +49,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
 
         context.RegisterCompilationStartAction(compilationContext =>
         {
-            var wordList = SpellChecker.CreateWordList(compilationContext.Options);
+            var wordList = SpellChecker.CreateWordList(compilationContext.Options, compilationContext.Compilation.SyntaxTrees);
             var namesRegex = SpellChecker.BuildNamesRegex(wordList);
             var compilation = compilationContext.Compilation;
 

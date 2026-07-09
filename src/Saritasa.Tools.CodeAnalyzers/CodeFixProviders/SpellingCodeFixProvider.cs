@@ -33,25 +33,26 @@ public sealed class SpellingCodeFixProvider : CodeFixProvider
     public override FixAllProvider? GetFixAllProvider() => null;
 
     /// <inheritdoc />
-    public override Task RegisterCodeFixesAsync(CodeFixContext context)
+    public override async Task RegisterCodeFixesAsync(CodeFixContext context)
     {
         var diagnostic = context.Diagnostics.FirstOrDefault(d => d.Id == SpellingAnalyzer.DiagnosticId);
         if (diagnostic is null)
         {
-            return Task.CompletedTask;
+            return;
         }
 
         if (!diagnostic.Properties.TryGetValue(SpellingAnalyzer.DiagnosticPropertyWord, out var word) ||
             string.IsNullOrWhiteSpace(word))
         {
-            return Task.CompletedTask;
+            return;
         }
 
+        var syntaxTree = await context.Document.GetSyntaxTreeAsync();
         var exclusions = GetExclusions(
-            context.Document.Project.Solution, context.Document.Project.AnalyzerOptions);
+            context.Document.Project.Solution, context.Document.Project.AnalyzerOptions, syntaxTree);
         if (exclusions is null)
         {
-            return Task.CompletedTask;
+            return;
         }
 
         var title = $"Add '{word}' to exclusions";
@@ -62,15 +63,14 @@ public sealed class SpellingCodeFixProvider : CodeFixProvider
                     => AddWordToExclusions(context.Document.Project.Solution, exclusions, word!, cancellationToken),
                 equivalenceKey: title),
             diagnostic);
-
-        return Task.CompletedTask;
     }
 
-    private static TextDocument? GetExclusions(Solution solution, AnalyzerOptions options)
+    private static TextDocument? GetExclusions(Solution solution, AnalyzerOptions options, SyntaxTree? syntaxTree)
     {
         // We can only apply a fix if exclusions file is included as an AdditionalFile in the solution.
         // (Roslyn code fix cannot reliably create arbitrary new files on disk.)
-        var exclusionsFile = SpellChecker.TryGetUserExclusionsFile(options);
+        var syntaxTrees = syntaxTree is not null ? [syntaxTree] : Enumerable.Empty<SyntaxTree>();
+        var exclusionsFile = SpellChecker.TryGetUserExclusionsFile(options, syntaxTrees);
         if (exclusionsFile is null)
         {
             return null;

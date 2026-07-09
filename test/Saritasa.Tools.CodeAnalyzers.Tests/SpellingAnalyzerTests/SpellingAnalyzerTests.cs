@@ -11,6 +11,24 @@ namespace Saritasa.Tools.CodeAnalyzers.Tests.SpellingAnalyzerTests;
 [TestClass]
 public class SpellingAnalyzerTests
 {
+    private const string EditorConfigFilePath = "/src/.editorconfig";
+    private const string TestSourceFilePath = "/src/Test0.cs";
+    private const string CustomUserExclusionsFilePath = "custom/my-exclusions.txt";
+    private const string CodeWithExcludedTypo =
+        /* lang=c# */
+        """
+        namespace TestApplication
+        {
+            class TestClass
+            {
+                public void TestMethod()
+                {
+                    var test = "typoo";
+                }
+            }
+        }
+        """;
+
     private readonly CSharpAnalyzerTest<SpellingAnalyzer, DefaultVerifier> context;
 
     /// <summary>
@@ -630,20 +648,7 @@ public class SpellingAnalyzerTests
     {
         context.TestState.AdditionalFiles.Add(("dictionaries/spell-checker-exclusions.txt", "typoo"));
 
-        context.TestCode =
-            /* lang=c# */
-            """
-            namespace TestApplication
-            {
-                class TestClass
-                {
-                    public void TestMethod()
-                    {
-                        var test = "typoo";
-                    }
-                }
-            }
-            """;
+        context.TestCode = CodeWithExcludedTypo;
 
         await context.RunAsync();
     }
@@ -654,30 +659,15 @@ public class SpellingAnalyzerTests
     [TestMethod]
     public async Task WordInUserExclusions_FileFromEditorconfig_EqualPaths_ShouldNotProduceWarning()
     {
-        const string userExclusionsPath = "custom/my-exclusions.txt";
-        context.TestState.AdditionalFiles.Add((userExclusionsPath, "typoo"));
+        context.TestState.AdditionalFiles.Add((CustomUserExclusionsFilePath, "typoo"));
 
         const string editorconfig =
             $"""
-            is_global = true
-            dotnet_diagnostic.STAN1004.exclusions_file = {userExclusionsPath}
-            """;
-        context.TestState.AnalyzerConfigFiles.Add(("/.editorconfig", editorconfig));
-
-        context.TestCode =
-            /* lang=c# */
-            """
-            namespace TestApplication
-            {
-                class TestClass
-                {
-                    public void TestMethod()
-                    {
-                        var test = "typoo";
-                    }
-                }
-            }
-            """;
+             [*.cs]
+             dotnet_diagnostic.STAN1004.exclusions_file = {CustomUserExclusionsFilePath}
+             """;
+        context.TestState.AnalyzerConfigFiles.Add((EditorConfigFilePath, editorconfig));
+        context.TestState.Sources.Add((TestSourceFilePath, CodeWithExcludedTypo));
 
         await context.RunAsync();
     }
@@ -688,30 +678,15 @@ public class SpellingAnalyzerTests
     [TestMethod]
     public async Task WordInUserExclusions_FileFromEditorconfig_DifferentPaths_ShouldNotProduceWarning()
     {
-        const string userExclusionsPath = "custom/my-exclusions.txt";
-        context.TestState.AdditionalFiles.Add(($"dictionaries/{userExclusionsPath}", "typoo"));
+        context.TestState.AdditionalFiles.Add(($"dictionaries/{CustomUserExclusionsFilePath}", "typoo"));
 
         const string editorconfig =
             $"""
-            is_global = true
-            dotnet_diagnostic.STAN1004.exclusions_file = {userExclusionsPath}
-            """;
-        context.TestState.AnalyzerConfigFiles.Add(("/.editorconfig", editorconfig));
-
-        context.TestCode =
-            /* lang=c# */
-            """
-            namespace TestApplication
-            {
-                class TestClass
-                {
-                    public void TestMethod()
-                    {
-                        var test = "typoo";
-                    }
-                }
-            }
-            """;
+             [*.cs]
+             dotnet_diagnostic.STAN1004.exclusions_file = {CustomUserExclusionsFilePath}
+             """;
+        context.TestState.AnalyzerConfigFiles.Add((EditorConfigFilePath, editorconfig));
+        context.TestState.Sources.Add((TestSourceFilePath, CodeWithExcludedTypo));
 
         await context.RunAsync();
     }
@@ -723,29 +698,15 @@ public class SpellingAnalyzerTests
     [TestMethod]
     public async Task WordInUserExclusions_FileFromEditorconfig_InconsistentSeparators_ShouldNotProduceWarning()
     {
-        context.TestState.AdditionalFiles.Add(("custom/my-exclusions.txt", "typoo"));
+        context.TestState.AdditionalFiles.Add((CustomUserExclusionsFilePath, "typoo"));
 
         const string editorconfig =
             """
-            is_global = true
+            [*.cs]
             dotnet_diagnostic.STAN1004.exclusions_file = custom\my-exclusions.txt
             """;
-        context.TestState.AnalyzerConfigFiles.Add(("/.editorconfig", editorconfig));
-
-        context.TestCode =
-            /* lang=c# */
-            """
-            namespace TestApplication
-            {
-                class TestClass
-                {
-                    public void TestMethod()
-                    {
-                        var test = "typoo";
-                    }
-                }
-            }
-            """;
+        context.TestState.AnalyzerConfigFiles.Add((EditorConfigFilePath, editorconfig));
+        context.TestState.Sources.Add((TestSourceFilePath, CodeWithExcludedTypo));
 
         await context.RunAsync();
     }

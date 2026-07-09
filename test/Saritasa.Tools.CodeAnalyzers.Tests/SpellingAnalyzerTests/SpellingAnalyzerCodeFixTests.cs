@@ -15,6 +15,15 @@ public class SpellingAnalyzerCodeFixTests
     private const string DefaultExclusionsFile = "dictionaries/spell-checker-exclusions.txt";
     private const string CustomExclusionsFile = "custom/project-terms.txt";
 
+    private const string TestSourceFilePath = "/src/Test0.cs";
+
+    private const string EditorConfigFilePath = "/src/.editorconfig";
+    private const string CustomExclusionsEditorConfig =
+        $"""
+        [*.cs]
+        dotnet_diagnostic.STAN1004.exclusions_file = {CustomExclusionsFile}
+        """;
+
     private CSharpCodeFixTest<SpellingAnalyzer, SpellingCodeFixProvider, DefaultVerifier> CreateTest()
         => new()
         {
@@ -216,15 +225,15 @@ public class SpellingAnalyzerCodeFixTests
     [TestMethod]
     public async Task AddWord_CustomExclusionsFileFromEditorconfig_EqualPaths_WordAppended()
     {
-        var test = CreateTest();
+        var test = new CSharpCodeFixTest<SpellingAnalyzer, SpellingCodeFixProvider, DefaultVerifier>
+        {
+            ReferenceAssemblies = ReferenceAssemblies.Net.Net60,
+        };
+        test.TestState.Sources.Add((TestSourceFilePath, CodeWithTypo));
+        test.FixedState.Sources.Add((TestSourceFilePath, CodeWithTypoFixed));
 
-        const string editorconfig =
-            $"""
-            is_global = true
-            dotnet_diagnostic.STAN1004.exclusions_file = {CustomExclusionsFile}
-            """;
-        test.TestState.AnalyzerConfigFiles.Add(("/.editorconfig", editorconfig));
-        test.FixedState.AnalyzerConfigFiles.Add(("/.editorconfig", editorconfig));
+        test.TestState.AnalyzerConfigFiles.Add((EditorConfigFilePath, CustomExclusionsEditorConfig));
+        test.FixedState.AnalyzerConfigFiles.Add((EditorConfigFilePath, CustomExclusionsEditorConfig));
 
         test.TestState.AdditionalFiles.Add((CustomExclusionsFile, string.Empty));
         test.FixedState.AdditionalFiles.Add((CustomExclusionsFile, "typoo\n"));
@@ -239,15 +248,15 @@ public class SpellingAnalyzerCodeFixTests
     [TestMethod]
     public async Task AddWord_CustomExclusionsFileFromEditorconfig_DifferentPaths_WordAppended()
     {
-        var test = CreateTest();
+        var test = new CSharpCodeFixTest<SpellingAnalyzer, SpellingCodeFixProvider, DefaultVerifier>
+        {
+            ReferenceAssemblies = ReferenceAssemblies.Net.Net60,
+        };
+        test.TestState.Sources.Add((TestSourceFilePath, CodeWithTypo));
+        test.FixedState.Sources.Add((TestSourceFilePath, CodeWithTypoFixed));
 
-        const string editorconfig =
-            $"""
-            is_global = true
-            dotnet_diagnostic.STAN1004.exclusions_file = {CustomExclusionsFile}
-            """;
-        test.TestState.AnalyzerConfigFiles.Add(("/.editorconfig", editorconfig));
-        test.FixedState.AnalyzerConfigFiles.Add(("/.editorconfig", editorconfig));
+        test.TestState.AnalyzerConfigFiles.Add((EditorConfigFilePath, CustomExclusionsEditorConfig));
+        test.FixedState.AnalyzerConfigFiles.Add((EditorConfigFilePath, CustomExclusionsEditorConfig));
 
         const string registeredPath = $"dictionaries/{CustomExclusionsFile}";
 
@@ -266,19 +275,15 @@ public class SpellingAnalyzerCodeFixTests
         var test = new CSharpCodeFixTest<SpellingAnalyzer, SpellingCodeFixProvider, DefaultVerifier>
         {
             ReferenceAssemblies = ReferenceAssemblies.Net.Net60,
-            TestCode = CodeWithTypo,
-            FixedCode = CodeWithTypo,
             NumberOfFixAllIterations = 0,
             NumberOfIncrementalIterations = 0,
         };
 
-        const string editorconfig =
-            $"""
-            is_global = true
-            dotnet_diagnostic.STAN1004.exclusions_file = {CustomExclusionsFile}
-            """;
-        test.TestState.AnalyzerConfigFiles.Add(("/.editorconfig", editorconfig));
-        test.FixedState.AnalyzerConfigFiles.Add(("/.editorconfig", editorconfig));
+        test.TestState.Sources.Add((TestSourceFilePath, CodeWithTypo));
+        test.FixedState.Sources.Add((TestSourceFilePath, CodeWithTypo));
+
+        test.TestState.AnalyzerConfigFiles.Add((EditorConfigFilePath, CustomExclusionsEditorConfig));
+        test.FixedState.AnalyzerConfigFiles.Add((EditorConfigFilePath, CustomExclusionsEditorConfig));
 
         await test.RunAsync();
     }
