@@ -1,7 +1,7 @@
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.CodeAnalysis.Text;
 using WeCantSpell.Hunspell;
 
 namespace Saritasa.Tools.CodeAnalyzers.Helpers;
@@ -18,7 +18,7 @@ public static class SpellChecker
     /// <summary>
     /// Default user exclusions file name. Used when not configured via <see cref="ExclusionsFileOptionName"/>.
     /// </summary>
-    public const string DefaultUserExclusionsFileName = "spell-checker-exclusions.txt";
+    private const string DefaultUserExclusionsFileName = "spell-checker-exclusions.txt";
 
     /// <summary>
     /// The .editorconfig option name that specifies a custom path to the exclusions file.
@@ -106,8 +106,7 @@ public static class SpellChecker
 
     private static void AddUserExclusions(AnalyzerOptions options, WordList wordList)
     {
-        var text = TryGetUserExclusionsText(options);
-
+        var text = TryGetUserExclusionsFile(options)?.GetText();
         if (text is null)
         {
             return;
@@ -123,22 +122,33 @@ public static class SpellChecker
         }
     }
 
-    private static SourceText? TryGetUserExclusionsText(AnalyzerOptions options)
+    /// <summary>
+    /// Finds the user exclusions file by the path configured in .editorconfig or by the default file name.
+    /// </summary>
+    /// <param name="options">Analyzer options.</param>
+    /// <returns>Additional text for exclusions file, or <c>null</c> if not found.</returns>
+    internal static AdditionalText? TryGetUserExclusionsFile(AnalyzerOptions options)
     {
         var globalOptions = options.AnalyzerConfigOptionsProvider.GlobalOptions;
         if (globalOptions.TryGetValue(ExclusionsFileOptionName, out var configuredPath)
             && !string.IsNullOrWhiteSpace(configuredPath))
         {
-            var userExclusionsFile = options.AdditionalFiles
-                .FirstOrDefault(f => string.Equals(f.Path, configuredPath, StringComparison.OrdinalIgnoreCase)
-                    || f.Path.EndsWith(configuredPath.Replace('/', '\\'), StringComparison.OrdinalIgnoreCase)
-                    || f.Path.EndsWith(configuredPath.Replace('\\', '/'), StringComparison.OrdinalIgnoreCase));
-            return userExclusionsFile?.GetText();
+            return options.AdditionalFiles
+                .FirstOrDefault(f => MatchesExclusionsPath(f.Path, configuredPath));
         }
 
-        var defaultUserExclusionsFile = options.AdditionalFiles
+        return options.AdditionalFiles
             .FirstOrDefault(file => file.Path.EndsWith(DefaultUserExclusionsFileName, StringComparison.OrdinalIgnoreCase));
-        return defaultUserExclusionsFile?.GetText();
+    }
+
+    private static bool MatchesExclusionsPath(string pathInAdditionalFiles, string configuredPath)
+    {
+        const char forwardSlash = '/';
+        const char backslash = '\\';
+
+        return string.Equals(pathInAdditionalFiles, configuredPath, StringComparison.OrdinalIgnoreCase)
+            || pathInAdditionalFiles.EndsWith(configuredPath.Replace(forwardSlash, backslash), StringComparison.OrdinalIgnoreCase)
+            || pathInAdditionalFiles.EndsWith(configuredPath.Replace(backslash, forwardSlash), StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>

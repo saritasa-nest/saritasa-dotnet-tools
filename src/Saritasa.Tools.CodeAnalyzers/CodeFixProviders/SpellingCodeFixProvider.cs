@@ -3,6 +3,7 @@ using System.Composition;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
+using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
 using Saritasa.Tools.CodeAnalyzers.Analyzers;
 using Saritasa.Tools.CodeAnalyzers.Helpers;
@@ -47,7 +48,7 @@ public sealed class SpellingCodeFixProvider : CodeFixProvider
         }
 
         var exclusions = GetExclusions(
-            context.Document.Project.Solution, context.Document.Project.AnalyzerOptions.AdditionalFiles);
+            context.Document.Project.Solution, context.Document.Project.AnalyzerOptions);
         if (exclusions is null)
         {
             return Task.CompletedTask;
@@ -65,24 +66,19 @@ public sealed class SpellingCodeFixProvider : CodeFixProvider
         return Task.CompletedTask;
     }
 
-    private static TextDocument? GetExclusions(Solution solution, ImmutableArray<AdditionalText> additionalFiles)
+    private static TextDocument? GetExclusions(Solution solution, AnalyzerOptions options)
     {
-        // We can only apply a fix if exclusions.txt is included as an AdditionalFile in the solution.
+        // We can only apply a fix if exclusions file is included as an AdditionalFile in the solution.
         // (Roslyn code fix cannot reliably create arbitrary new files on disk.)
-        var exclusionsPath = additionalFiles
-            .Select(additionalText => additionalText.Path)
-            .FirstOrDefault(path =>
-                !string.IsNullOrWhiteSpace(path) &&
-                path.EndsWith(SpellChecker.DefaultUserExclusionsFileName, StringComparison.OrdinalIgnoreCase));
-
-        if (string.IsNullOrWhiteSpace(exclusionsPath))
+        var exclusionsFile = SpellChecker.TryGetUserExclusionsFile(options);
+        if (exclusionsFile is null)
         {
             return null;
         }
 
         return solution.Projects
             .SelectMany(project => project.AdditionalDocuments)
-            .FirstOrDefault(document => string.Equals(document.FilePath, exclusionsPath, StringComparison.OrdinalIgnoreCase));
+            .FirstOrDefault(document => string.Equals(document.FilePath, exclusionsFile.Path, StringComparison.OrdinalIgnoreCase));
     }
 
     private static async Task<Solution> AddWordToExclusions(
