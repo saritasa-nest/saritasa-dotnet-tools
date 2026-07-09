@@ -659,9 +659,9 @@ public class SpellingAnalyzerTests
 
         const string editorconfig =
             $"""
-             is_global = true
-             dotnet_diagnostic.STAN1004.exclusions_file = {userExclusionsPath}
-             """;
+            is_global = true
+            dotnet_diagnostic.STAN1004.exclusions_file = {userExclusionsPath}
+            """;
         context.TestState.AnalyzerConfigFiles.Add(("/.editorconfig", editorconfig));
 
         context.TestCode =

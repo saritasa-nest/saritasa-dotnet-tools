@@ -220,9 +220,9 @@ public class SpellingAnalyzerCodeFixTests
 
         const string editorconfig =
             $"""
-             is_global = true
-             dotnet_diagnostic.STAN1004.exclusions_file = {CustomExclusionsFile}
-             """;
+            is_global = true
+            dotnet_diagnostic.STAN1004.exclusions_file = {CustomExclusionsFile}
+            """;
         test.TestState.AnalyzerConfigFiles.Add(("/.editorconfig", editorconfig));
         test.FixedState.AnalyzerConfigFiles.Add(("/.editorconfig", editorconfig));
 
@@ -243,9 +243,9 @@ public class SpellingAnalyzerCodeFixTests
 
         const string editorconfig =
             $"""
-             is_global = true
-             dotnet_diagnostic.STAN1004.exclusions_file = {CustomExclusionsFile}
-             """;
+            is_global = true
+            dotnet_diagnostic.STAN1004.exclusions_file = {CustomExclusionsFile}
+            """;
         test.TestState.AnalyzerConfigFiles.Add(("/.editorconfig", editorconfig));
         test.FixedState.AnalyzerConfigFiles.Add(("/.editorconfig", editorconfig));
 
@@ -274,9 +274,9 @@ public class SpellingAnalyzerCodeFixTests
 
         const string editorconfig =
             $"""
-             is_global = true
-             dotnet_diagnostic.STAN1004.exclusions_file = {CustomExclusionsFile}
-             """;
+            is_global = true
+            dotnet_diagnostic.STAN1004.exclusions_file = {CustomExclusionsFile}
+            """;
         test.TestState.AnalyzerConfigFiles.Add(("/.editorconfig", editorconfig));
         test.FixedState.AnalyzerConfigFiles.Add(("/.editorconfig", editorconfig));
 
