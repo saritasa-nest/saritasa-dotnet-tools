@@ -14,7 +14,11 @@ public static class SpellChecker
     private const string DefaultDicFileName = "en-us.dic";
     private const string DefaultAffFileName = "en-us.aff";
     private const string TechNamesFileName = "tech.names.txt";
-    private const string UserExclusionsFileName = "spell-checker-exclusions.txt";
+
+    /// <summary>
+    /// Default user exclusions file name. Used when not configured via <see cref="ExclusionsFileOptionName"/>.
+    /// </summary>
+    public const string DefaultUserExclusionsFileName = "spell-checker-exclusions.txt";
 
     /// <summary>
     /// The .editorconfig option name that specifies a custom path to the exclusions file.
@@ -29,7 +33,7 @@ public static class SpellChecker
         DefaultDicFileName,
         DefaultAffFileName,
         TechNamesFileName,
-        UserExclusionsFileName
+        DefaultUserExclusionsFileName
     ];
 
     /// <summary>
@@ -133,7 +137,7 @@ public static class SpellChecker
         }
 
         var defaultUserExclusionsFile = options.AdditionalFiles
-            .FirstOrDefault(file => file.Path.EndsWith(UserExclusionsFileName, StringComparison.OrdinalIgnoreCase));
+            .FirstOrDefault(file => file.Path.EndsWith(DefaultUserExclusionsFileName, StringComparison.OrdinalIgnoreCase));
         return defaultUserExclusionsFile?.GetText();
     }
 

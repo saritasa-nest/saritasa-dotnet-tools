@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Text;
 using Saritasa.Tools.CodeAnalyzers.Analyzers;
+using Saritasa.Tools.CodeAnalyzers.Helpers;
 
 namespace Saritasa.Tools.CodeAnalyzers.CodeFixProviders;
 
@@ -15,7 +16,6 @@ namespace Saritasa.Tools.CodeAnalyzers.CodeFixProviders;
 [Shared]
 public sealed class SpellingCodeFixProvider : CodeFixProvider
 {
-    private const string ExclusionsFileName = "exclusions.txt";
     private const string CrlfNewLine = "\r\n";
     private const string CrNewLine = "\r";
     private const string LfNewLine = "\n";
@@ -73,7 +73,7 @@ public sealed class SpellingCodeFixProvider : CodeFixProvider
             .Select(additionalText => additionalText.Path)
             .FirstOrDefault(path =>
                 !string.IsNullOrWhiteSpace(path) &&
-                path.EndsWith(ExclusionsFileName, StringComparison.OrdinalIgnoreCase));
+                path.EndsWith(SpellChecker.DefaultUserExclusionsFileName, StringComparison.OrdinalIgnoreCase));
 
         if (string.IsNullOrWhiteSpace(exclusionsPath))
         {
