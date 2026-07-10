@@ -49,10 +49,10 @@ Package Preparation
 NuGet package upload
 --------
 
-**1.** Build the library, test it, and prepare NuGet packages. 
+**1.** Build the library, test it, and prepare NuGet packages.
 
     ./build.ps1
-    
+
 > Read an output logs if something went wrong.
 
 **2.** Watch an output `nupkg` files in the executable directory.
@@ -60,6 +60,10 @@ NuGet package upload
 **3.** Request [Saritasa](https://www.nuget.org/profiles/Saritasa) profile access.
 
 **4.** [Upload](https://www.nuget.org/packages/manage/upload) NuGet package co authored with [Saritasa](https://www.nuget.org/profiles/Saritasa).
+
+Code Analyzers
+--------
+Please see [installation guide](src/Saritasa.Tools.CodeAnalyzers/INSTALL.md) of code analyzers.
 
 Contributors
 ------------

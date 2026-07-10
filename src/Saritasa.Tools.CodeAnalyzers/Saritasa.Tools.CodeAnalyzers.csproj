@@ -21,11 +21,57 @@
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all"/>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" PrivateAssets="all"/>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.8.0" PrivateAssets="all"/>
+    <PackageReference Include="WeCantSpell.Hunspell" Version="7.0.1" GeneratePathProperty="true" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
     <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
     <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <EnableDictionaryDownload>true</EnableDictionaryDownload>
+    <DicUrl>https://raw.githubusercontent.com/wooorm/dictionaries/main/dictionaries/en/index.dic</DicUrl>
+    <AffUrl>https://raw.githubusercontent.com/wooorm/dictionaries/main/dictionaries/en/index.aff</AffUrl>
+    <DictionaryDir>Dictionaries</DictionaryDir>
+    <DicFileName>en-us.dic</DicFileName>
+    <AffFileName>en-us.aff</AffFileName>
+  </PropertyGroup>
+
+  <Target Name="DownloadDictionaries" BeforeTargets="BeforeBuild" Condition="'$(EnableDictionaryDownload)' == 'true'">
+    <Message Text="Downloading en-us Hunspell dictionaries..." Importance="high" />
+
+    <MakeDir Directories="$(DictionaryDir)" Condition="!Exists('$(DictionaryDir)')" />
+
+    <DownloadFile SourceUrl="$(DicUrl)"
+                  DestinationFolder="$(DictionaryDir)"
+                  DestinationFileName="$(DicFileName)"
+                  SkipUnchangedFiles="true" />
+
+    <DownloadFile SourceUrl="$(AffUrl)"
+                  DestinationFolder="$(DictionaryDir)"
+                  DestinationFileName="$(AffFileName)"
+                  SkipUnchangedFiles="true" />
+  </Target>
+
+  <ItemGroup>
+    <EmbeddedResource Include="$(DictionaryDir)\$(DicFileName)" Condition="'$(EnableDictionaryDownload)' == 'true'" />
+    <EmbeddedResource Include="$(DictionaryDir)\$(AffFileName)" Condition="'$(EnableDictionaryDownload)' == 'true'" />
+    <EmbeddedResource Include="$(DictionaryDir)\general exclusions\**\*" />
+  </ItemGroup>
+
+  <Target Name="CopyWeCantSpellHunspell" AfterTargets="Build">
+    <PropertyGroup>
+      <_HunspellDll>$(PKGWeCantSpell_Hunspell)\lib\netstandard2.0\WeCantSpell.Hunspell.dll</_HunspellDll>
+    </PropertyGroup>
+
+    <Copy SourceFiles="$(_HunspellDll)"
+          DestinationFolder="$(OutputPath)"
+          SkipUnchangedFiles="true"
+          Condition="Exists('$(_HunspellDll)')" />
+
+    <Error Text="WeCantSpell.Hunspell.dll not found at '$(_HunspellDll)'. Ensure restore succeeded and the package contains lib/netstandard2.0 assets."
+           Condition="!Exists('$(_HunspellDll)')" />
+  </Target>
 
 </Project>
