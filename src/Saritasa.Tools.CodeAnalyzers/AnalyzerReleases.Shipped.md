@@ -16,3 +16,4 @@ STAN1001 | Style    | Warning | STAN1001_LineLengthAnalyzer
 STAN1002 | Spelling | Warning | STAN1002_ExceptionMessageDotAnalyzer
 STAN1003 | Naming   | Warning | STAN1003_SingularTypeNameAnalyzer
 STAN1004 | Spelling | Warning | STAN1004_SpellingAnalyzer
+STAN1005 | Style    | Warning | STAN1004_EarlyExitAnalyzer

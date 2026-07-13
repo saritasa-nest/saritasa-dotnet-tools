@@ -36,6 +36,9 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         isEnabledByDefault: true,
         description: description);
 
+    /// <summary>
+    /// Diagnostic property name that contains the word that was found to have a typo.
+    /// </summary>
     internal const string DiagnosticPropertyWord = "word";
 
     /// <inheritdoc />
@@ -226,8 +229,8 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
     /// <returns>
     /// Text with ignored parts masked. For example, this sentence:
     /// <c>This GUID 1b6cdb5b-8449-4d8e-ad3b-6b3dd8f4158d is ignored.</c>
-    /// will become:
-    /// <c>This GUID                                      is ignored.</c>
+    /// Will become:
+    /// <c>This GUID                                      is ignored.</c>.
     /// </returns>
     /// <remarks>
     /// Note that we replace ignored letters with spaces,
