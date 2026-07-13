@@ -22,7 +22,7 @@ public static class SpellChecker
 
     /// <summary>
     /// The .editorconfig option name that specifies a custom path to the exclusions file.
-    /// Example: <c>dotnet_diagnostic.STAN1004.exclusions_file = path/to/exclusions.txt</c>
+    /// Example: <c>dotnet_diagnostic.STAN1004.exclusions_file = path/to/exclusions.txt</c>.
     /// </summary>
     private const string ExclusionsFileOptionName = "dotnet_diagnostic.STAN1004.exclusions_file";
 
