@@ -79,7 +79,10 @@ jobs:
       # BenchmarkDotNet to raise the process priority for more stable measurements.
       - name: Run PR Benchmarks
         run: |
-          sudo -E dotnet run --no-launch-profile -c Release --project ${{ env.PATH_BENCHMARKS_PROJECT }} -- --artifacts ${{ env.DIR_TARGET_REPORTS }} --testProjectPath ${{ env.TEST_PROJECT_FOLDER }}/${{ env.PATH_TO_TEST_SOLUTION }}
+          sudo -E dotnet run --no-launch-profile -c Release \
+            --project ${{ env.PATH_BENCHMARKS_PROJECT }} -- \
+            --artifacts ${{ env.DIR_TARGET_REPORTS }} \
+            --testProjectPath ${{ env.TEST_PROJECT_FOLDER }}/${{ env.PATH_TO_TEST_SOLUTION }}
 
       # Swap the Saritasa.Tools.CodeAnalyzers code to the base branch while keeping the test project intact.
       # The directory is removed first to ensure files added in the PR (not present in base) are deleted.
@@ -94,13 +97,23 @@ jobs:
       # Benchmark the base branch with the same test project for a fair comparison.
       - name: Run Base Benchmarks
         run: |
-          sudo -E dotnet run --no-launch-profile -c Release --project ${{ env.PATH_BENCHMARKS_PROJECT }} -- --artifacts ${{ env.DIR_BASELINE_REPORTS }} --testProjectPath ${{ env.TEST_PROJECT_FOLDER }}/${{ env.PATH_TO_TEST_SOLUTION }}
+          sudo -E dotnet run --no-launch-profile -c Release \
+            --project ${{ env.PATH_BENCHMARKS_PROJECT }} -- \
+            --artifacts ${{ env.DIR_BASELINE_REPORTS }} \
+            --testProjectPath ${{ env.TEST_PROJECT_FOLDER }}/${{ env.PATH_TO_TEST_SOLUTION }}
 
       - name: Install lib for benchmarks comparison
         run: sudo -E dotnet tool install --global PowerUtils.BenchmarkDotnet.Reporter
 
       - name: Run benchmarks compare
-        run: pbreporter compare -b ${{ env.DIR_BASELINE_REPORTS }}/results -t ${{ env.DIR_TARGET_REPORTS }}/results -f markdown -tm ${{ env.THRESHOLD_MEAN }} -ta ${{ env.THRESHOLD_ALLOCATION }} -ft -fw
+        run: |
+          pbreporter compare \
+            -b ${{ env.DIR_BASELINE_REPORTS }}/results \
+            -t ${{ env.DIR_TARGET_REPORTS }}/results \
+            -f markdown \
+            -tm ${{ env.THRESHOLD_MEAN }} \
+            -ta ${{ env.THRESHOLD_ALLOCATION }} \
+            -ft -fw
 
       - name: Publish benchmark report in Summary
         run: cat ${{ env.PATH_REPORT_RESULT }} > $GITHUB_STEP_SUMMARY
