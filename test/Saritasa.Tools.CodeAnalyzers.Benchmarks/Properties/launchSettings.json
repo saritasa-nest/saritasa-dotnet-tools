@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Saritasa.Tools.CodeAnalyzers.Benchmarks": {
+      "workingDirectory": "$(ProjectDir)",
+      "commandName": "Project",
+      "commandLineArgs": "--testProjectPath \"$(SolutionDir)Saritasa.Tools.sln\" --artifacts artifacts"
+    }
+  }
+}

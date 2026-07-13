@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -78,36 +78,49 @@ public sealed class SingularTypeNameAnalyzer : DiagnosticAnalyzer
 
         context.RegisterCompilationStartAction(compilationContext =>
         {
-            var userAllowedWords = GetUserAllowedPluralWords(compilationContext.Options);
-
             compilationContext.RegisterSymbolAction(
-                symbolContext => AnalyzeNamedType(symbolContext, userAllowedWords),
+                symbolContext => AnalyzeNamedType(symbolContext, compilationContext.Options),
                 SymbolKind.NamedType);
         });
     }
 
-    private static ImmutableHashSet<string> GetUserAllowedPluralWords(AnalyzerOptions analyzerOptions)
+    private static ImmutableHashSet<string> GetUserAllowedPluralWords(
+        AnalyzerOptions analyzerOptions,
+        IEnumerable<SyntaxTree> syntaxTrees)
     {
-        var options = analyzerOptions.AnalyzerConfigOptionsProvider.GlobalOptions;
-        if (!options.TryGetValue(AllowedPluralWordsOptionName, out var rawValue) || string.IsNullOrWhiteSpace(rawValue))
+        var userAllowedWords = ImmutableHashSet.CreateBuilder<string>(StringComparer.Ordinal);
+
+        foreach (var tree in syntaxTrees.Distinct())
         {
-            return ImmutableHashSet<string>.Empty;
+            var configOptions = analyzerOptions.AnalyzerConfigOptionsProvider.GetOptions(tree);
+            if (!configOptions.TryGetValue(AllowedPluralWordsOptionName, out var rawValue)
+                || string.IsNullOrWhiteSpace(rawValue))
+            {
+                continue;
+            }
+
+            foreach (var word in rawValue
+                         .Split(',')
+                         .Select(w => w.Trim())
+                         .Where(w => w.Length > 0))
+            {
+                userAllowedWords.Add(word);
+            }
         }
 
-        var words = rawValue
-            .Split(',')
-            .Select(w => w.Trim())
-            .Where(w => w.Length > 0);
-
-        return ImmutableHashSet.CreateRange(StringComparer.Ordinal, words);
+        return userAllowedWords.ToImmutable();
     }
 
-    private static void AnalyzeNamedType(SymbolAnalysisContext context, ImmutableHashSet<string> userAllowedWords)
+    private static void AnalyzeNamedType(SymbolAnalysisContext context, AnalyzerOptions analyzerOptions)
     {
         if (context.Symbol is not INamedTypeSymbol typeSymbol || !typeKindsToAnalyze.Contains(typeSymbol.TypeKind))
         {
             return;
         }
+
+        var userAllowedWords = GetUserAllowedPluralWords(
+            analyzerOptions,
+            typeSymbol.DeclaringSyntaxReferences.Select(reference => reference.SyntaxTree));
 
         var name = typeSymbol.Name;
 

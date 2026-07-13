@@ -2,6 +2,7 @@ using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Saritasa.Tools.CodeAnalyzers.Analyzers;
+using Saritasa.Tools.CodeAnalyzers.Tests.Helpers;
 
 namespace Saritasa.Tools.CodeAnalyzers.Tests.SingularTypeNameAnalyzerTests;
 
@@ -120,15 +121,15 @@ public class SingularTypeNameAnalyzerTests
     {
         var test = new CSharpAnalyzerTest<SingularTypeNameAnalyzer, DefaultVerifier>
         {
-            TestCode = "class UsersController { }",
             ReferenceAssemblies = ReferenceAssemblies.Net.Net60,
         };
+        test.TestState.Sources.Add((TestConstants.TestSourceFilePath, "class UsersController { }"));
 
         const string editorconfigWithUserAllowedWords = """
-                                                        is_global = true
-                                                        dotnet_diagnostic.STAN1003.allowed_plural_words = Users
-                                                        """;
-        test.TestState.AnalyzerConfigFiles.Add(("/.editorconfig", editorconfigWithUserAllowedWords));
+            [*.cs]
+            dotnet_diagnostic.STAN1003.allowed_plural_words = Users
+            """;
+        test.TestState.AnalyzerConfigFiles.Add((TestConstants.EditorConfigFilePath, editorconfigWithUserAllowedWords));
 
         await test.RunAsync();
     }
@@ -141,16 +142,16 @@ public class SingularTypeNameAnalyzerTests
     {
         var test = new CSharpAnalyzerTest<SingularTypeNameAnalyzer, DefaultVerifier>
         {
-            TestCode = "class AccountsService { }",
             ReferenceAssemblies = ReferenceAssemblies.Net.Net60,
         };
+        test.TestState.Sources.Add((TestConstants.TestSourceFilePath, "class AccountsService { }"));
 
         const string editorconfigWithUserAllowedWords =
             """
-            is_global = true
+            [*.cs]
             dotnet_diagnostic.STAN1003.allowed_plural_words = Accounts, Items
             """;
-        test.TestState.AnalyzerConfigFiles.Add(("/.editorconfig", editorconfigWithUserAllowedWords));
+        test.TestState.AnalyzerConfigFiles.Add((TestConstants.EditorConfigFilePath, editorconfigWithUserAllowedWords));
 
         await test.RunAsync();
     }
@@ -163,16 +164,16 @@ public class SingularTypeNameAnalyzerTests
     {
         var test = new CSharpAnalyzerTest<SingularTypeNameAnalyzer, DefaultVerifier>
         {
-            TestCode = "class [|UsersController|] { }",
             ReferenceAssemblies = ReferenceAssemblies.Net.Net60,
         };
+        test.TestState.Sources.Add((TestConstants.TestSourceFilePath, "class [|UsersController|] { }"));
 
         const string editorconfigWithUserAllowedWords =
             """
-            is_global = true
+            [*.cs]
             dotnet_diagnostic.STAN1003.allowed_plural_words = Accounts
             """;
-        test.TestState.AnalyzerConfigFiles.Add(("/.editorconfig", editorconfigWithUserAllowedWords));
+        test.TestState.AnalyzerConfigFiles.Add((TestConstants.EditorConfigFilePath, editorconfigWithUserAllowedWords));
 
         await test.RunAsync();
     }

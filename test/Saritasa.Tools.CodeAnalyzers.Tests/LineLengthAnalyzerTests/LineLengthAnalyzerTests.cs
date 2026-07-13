@@ -2,6 +2,7 @@ using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Saritasa.Tools.CodeAnalyzers.Analyzers;
+using Saritasa.Tools.CodeAnalyzers.Tests.Helpers;
 
 namespace Saritasa.Tools.CodeAnalyzers.Tests.LineLengthAnalyzerTests;
 
@@ -34,8 +35,6 @@ public class LineLengthAnalyzerTests
             /* lang=c# */
             """
             using System;
-            using System.Threading;
-            using System.Threading.Tasks;
 
             namespace TestApplication
             {
@@ -49,6 +48,35 @@ public class LineLengthAnalyzerTests
     }
 
     /// <summary>
+    /// Validates that long line produces warning when maximum length is configured via .editorconfig.
+    /// </summary>
+    [TestMethod]
+    public async Task Line_IsTooLong_WithConfiguredMaxLineLength_ShouldProduceWarning()
+    {
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+            [|  class ClassWithVeryVeryVeryLongName|]
+                {}
+            }
+            """;
+        context.TestState.Sources.Add((TestConstants.TestSourceFilePath, sourceCode));
+
+        const string editorconfigWithMaxLineLength =
+            """
+            [*.cs]
+            max_line_length = 35
+            """;
+        context.TestState.AnalyzerConfigFiles.Add((TestConstants.EditorConfigFilePath, editorconfigWithMaxLineLength));
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
     /// Validates that short line does not produce warning.
     /// </summary>
     [TestMethod]
@@ -58,8 +86,6 @@ public class LineLengthAnalyzerTests
             /* lang=c# */
             """
             using System;
-            using System.Threading;
-            using System.Threading.Tasks;
 
             namespace TestApplication
             {
