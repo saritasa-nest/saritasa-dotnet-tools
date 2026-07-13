@@ -22,7 +22,8 @@ Add a package as a reference.
 | [STAN1001](#stan1001-line-length) | Line exceeds maximum length | Warning | Style |
 | [STAN1002](#stan1002-exception-message-dot) | Exception message should end with a dot | Warning | Spelling |
 | [STAN1003](#stan1003-singular-type-name) | Type names should use singular nouns | Warning | Naming |
-| [STAN1004](#stan1004-early-exit) | Use early return instead of else after return | Warning | Style |
+| [STAN1004](#stan1004-spelling) | Word '{0}' has a typo | Warning | Spelling |
+| [STAN1005](#stan1005-early-exit) | Use early return instead of else after return | Warning | Style |
 
 ---
 
@@ -123,7 +124,75 @@ public class SettingsController : ControllerBase { }
 
 ---
 
-### STAN1004: Early exit
+### STAN1004: Spelling
+
+Triggered when a word in an **identifier**, **string literal**, or **comment** is not found in the built-in English dictionary or the configured exclusions list. Uses [Hunspell](https://hunspell.github.io/) under the hood.
+
+The analyzer checks:
+- Identifiers (class names, method names, variable names, etc.)
+- String literals (regular, interpolated, raw)
+- Single-line and multi-line comments
+- XML documentation comments (`///`)
+
+The following are automatically ignored: GUIDs, URLs, hex values, file paths, and format strings (e.g. `{0}`).
+
+#### Excluding words
+
+Words that are valid for your project can be excluded by adding them (one per line) to an exclusions file.
+
+By default the analyzer looks for a file named `spell-checker-exclusions.txt` registered as an `AdditionalFiles` entry. Add the following to `Directory.Build.props`:
+
+```xml
+<ItemGroup>
+  <AdditionalFiles Include="$(MSBuildThisFileDirectory)dictionaries/spell-checker-exclusions.txt" />
+</ItemGroup>
+```
+
+You can choose a different file path and tell the analyzer about it via `.editorconfig`:
+
+```ini
+[*.cs]
+dotnet_diagnostic.STAN1004.exclusions_file = dictionaries/spell-checker-exclusions.txt
+```
+
+A **code fix** is available: applying it appends the flagged word to the exclusions file automatically.
+
+#### Code causing a warning
+
+```csharp
+// "typoo" is not a valid English word
+
+var typoo = "It's string literal with a typoo."; // identifier and string both warned
+
+// It's single line comment with a typoo.
+
+/// <summary>
+/// Method with a typoo.
+/// </summary>
+public void MethodWithTypoo() { }
+```
+
+#### Code causing no warning
+
+```csharp
+// Correct spelling
+
+var typo = "It's string literal without a typo.";
+
+// It's single line comment without a typo.
+
+/// <summary>
+/// Correct method name.
+/// </summary>
+public void MethodWithCorrectName() { }
+
+// Words in 'spell-checker-exclusions.txt' are also allowed
+var linq = "linq"; // "linq" is in the built-in general exclusions list
+```
+
+---
+
+### STAN1005: Early exit
 
 Triggered when an `else` block follows an `if` branch that already exits (via `return` or `throw`). The `else` is unnecessary in that case and should be removed to flatten the control flow.
 

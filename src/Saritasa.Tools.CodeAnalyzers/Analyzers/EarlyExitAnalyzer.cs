@@ -15,7 +15,7 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class EarlyExitAnalyzer : DiagnosticAnalyzer
 {
-    private const string DiagnosticId = "STAN1004";
+    private const string DiagnosticId = "STAN1005";
     private const string Category = "Style";
 
     private static readonly LocalizableString Title = "Use early return instead of else after return";
