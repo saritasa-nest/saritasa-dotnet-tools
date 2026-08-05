@@ -5,10 +5,10 @@ The tool contains C# code analyzers to prevent specific issues that might occur 
 
 ## How to setup:
 
-Add a package as a reference.
+Add a package as a reference. See the [latest version on NuGet](https://www.nuget.org/packages/Saritasa.Tools.CodeAnalyzers).
 
 ```xml
-<PackageReference Include="Saritasa.Tools.CodeAnalyzers" Version="0.1.0">
+<PackageReference Include="Saritasa.Tools.CodeAnalyzers" Version="0.2.0">
   <PrivateAssets>all</PrivateAssets>
   <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
 </PackageReference>
