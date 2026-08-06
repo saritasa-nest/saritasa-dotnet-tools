@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
+using Saritasa.Tools.CodeAnalyzers.Helpers;
 
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers;
 
@@ -169,7 +170,7 @@ public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
         // We cannot analyze method results.
         if (value is IInvocationOperation invocation)
         {
-            if (IsStringFormat(invocation.TargetMethod))
+            if (invocation.TargetMethod.IsStringFormat())
             {
                 var formatArg = invocation.Arguments.FirstOrDefault(a => a.Parameter?.Name == "format");
                 if (formatArg?.Value.ConstantValue is { HasValue: true, Value: string format })
@@ -225,8 +226,4 @@ public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
         return false;
     }
 
-    private static bool IsStringFormat(IMethodSymbol method)
-    {
-        return method.ContainingType.SpecialType == SpecialType.System_String && method.Name == "Format";
-    }
 }

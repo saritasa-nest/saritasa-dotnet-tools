@@ -1144,4 +1144,42 @@ public class ExceptionMessageDotAnalyzerTests
         // Assert
         await context.RunAsync();
     }
+
+    /// <summary>
+    /// Validates that a custom Format method with same signature as string.Format does not produce a warning.
+    /// </summary>
+    [TestMethod]
+    public async Task ExceptionMessage_CustomFormatMethod_ShouldNotProduceWarning()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(int id)
+                    {
+                        throw new ArgumentException(Formatter.Format("Error {0}", id));
+                    }
+                }
+
+                static class Formatter
+                {
+                    public static string Format(string format, object arg0) => format;
+                }
+            }
+            """;
+
+        // Act
+        context.TestCode = sourceCode;
+
+        // Assert
+        await context.RunAsync();
+    }
 }

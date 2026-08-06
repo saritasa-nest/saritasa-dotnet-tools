@@ -6,6 +6,7 @@ using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Saritasa.Tools.CodeAnalyzers.Analyzers;
+using Saritasa.Tools.CodeAnalyzers.Helpers;
 
 namespace Saritasa.Tools.CodeAnalyzers.CodeFixProviders;
 
@@ -47,7 +48,9 @@ public sealed class ExceptionMessageDotCodeFixProvider : CodeFixProvider
             node = argument.Expression;
         }
 
-        if (node is not ExpressionSyntax expression || !CanAppendDot(expression))
+        var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken);
+
+        if (node is not ExpressionSyntax expression || !CanAppendDot(expression, semanticModel))
         {
             return;
         }
@@ -71,7 +74,8 @@ public sealed class ExceptionMessageDotCodeFixProvider : CodeFixProvider
             return document;
         }
 
-        var newExpression = AppendDot(expression);
+        var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
+        var newExpression = AppendDot(expression, semanticModel);
         if (newExpression is null)
         {
             return document;
@@ -81,7 +85,7 @@ public sealed class ExceptionMessageDotCodeFixProvider : CodeFixProvider
         return document.WithSyntaxRoot(newRoot);
     }
 
-    private static bool CanAppendDot(ExpressionSyntax expression)
+    private static bool CanAppendDot(ExpressionSyntax expression, SemanticModel? semanticModel)
     {
         return expression switch
         {
@@ -89,21 +93,21 @@ public sealed class ExceptionMessageDotCodeFixProvider : CodeFixProvider
                 => true,
             InterpolatedStringExpressionSyntax
                 => true,
-            InvocationExpressionSyntax invocation when IsStringFormatInvocation(invocation)
+            InvocationExpressionSyntax invocation when IsStringFormatInvocation(invocation, semanticModel)
                 => true,
             ConditionalExpressionSyntax conditional
-                => CanAppendDot(conditional.WhenTrue) && CanAppendDot(conditional.WhenFalse),
+                => CanAppendDot(conditional.WhenTrue, semanticModel) && CanAppendDot(conditional.WhenFalse, semanticModel),
             BinaryExpressionSyntax binary when binary.IsKind(SyntaxKind.CoalesceExpression)
-                => CanAppendDot(binary.Right),
+                => CanAppendDot(binary.Right, semanticModel),
             BinaryExpressionSyntax binary when binary.IsKind(SyntaxKind.AddExpression)
-                => CanAppendDot(GetRightmostOperand(binary)),
+                => CanAppendDot(GetRightmostOperand(binary), semanticModel),
             SwitchExpressionSyntax switchExpr
-                => switchExpr.Arms.All(a => CanAppendDot(a.Expression)),
+                => switchExpr.Arms.All(a => CanAppendDot(a.Expression, semanticModel)),
             _ => false
         };
     }
 
-    private static ExpressionSyntax? AppendDot(ExpressionSyntax expression)
+    private static ExpressionSyntax? AppendDot(ExpressionSyntax expression, SemanticModel? semanticModel)
     {
         return expression switch
         {
@@ -111,16 +115,16 @@ public sealed class ExceptionMessageDotCodeFixProvider : CodeFixProvider
                 => AppendDotToStringLiteral(literal),
             InterpolatedStringExpressionSyntax interpolated
                 => AppendDotToInterpolatedString(interpolated),
-            InvocationExpressionSyntax invocation when IsStringFormatInvocation(invocation)
+            InvocationExpressionSyntax invocation when IsStringFormatInvocation(invocation, semanticModel)
                 => AppendDotToFormatString(invocation),
             ConditionalExpressionSyntax conditional
-                => AppendDotToConditional(conditional),
+                => AppendDotToConditional(conditional, semanticModel),
             BinaryExpressionSyntax binary when binary.IsKind(SyntaxKind.CoalesceExpression)
-                => AppendDotToCoalesce(binary),
+                => AppendDotToCoalesce(binary, semanticModel),
             BinaryExpressionSyntax binary when binary.IsKind(SyntaxKind.AddExpression)
-                => AppendDotToBinaryAdd(binary),
+                => AppendDotToBinaryAdd(binary, semanticModel),
             SwitchExpressionSyntax switchExpr
-                => AppendDotToSwitchExpression(switchExpr),
+                => AppendDotToSwitchExpression(switchExpr, semanticModel),
             _ => null
         };
     }
@@ -177,10 +181,10 @@ public sealed class ExceptionMessageDotCodeFixProvider : CodeFixProvider
         return invocation;
     }
 
-    private static ExpressionSyntax? AppendDotToConditional(ConditionalExpressionSyntax conditional)
+    private static ExpressionSyntax? AppendDotToConditional(ConditionalExpressionSyntax conditional, SemanticModel? semanticModel)
     {
-        var trueExpr = AppendDot(conditional.WhenTrue);
-        var falseExpr = AppendDot(conditional.WhenFalse);
+        var trueExpr = AppendDot(conditional.WhenTrue, semanticModel);
+        var falseExpr = AppendDot(conditional.WhenFalse, semanticModel);
         if (trueExpr is null || falseExpr is null)
         {
             return null;
@@ -189,9 +193,9 @@ public sealed class ExceptionMessageDotCodeFixProvider : CodeFixProvider
         return conditional.WithWhenTrue(trueExpr).WithWhenFalse(falseExpr);
     }
 
-    private static ExpressionSyntax? AppendDotToCoalesce(BinaryExpressionSyntax binary)
+    private static ExpressionSyntax? AppendDotToCoalesce(BinaryExpressionSyntax binary, SemanticModel? semanticModel)
     {
-        var fixedRight = AppendDot(binary.Right);
+        var fixedRight = AppendDot(binary.Right, semanticModel);
         if (fixedRight is null)
         {
             return null;
@@ -200,10 +204,10 @@ public sealed class ExceptionMessageDotCodeFixProvider : CodeFixProvider
         return binary.WithRight(fixedRight);
     }
 
-    private static ExpressionSyntax? AppendDotToBinaryAdd(BinaryExpressionSyntax binary)
+    private static ExpressionSyntax? AppendDotToBinaryAdd(BinaryExpressionSyntax binary, SemanticModel? semanticModel)
     {
         var rightmost = GetRightmostOperand(binary);
-        var fixedRight = AppendDot(rightmost);
+        var fixedRight = AppendDot(rightmost, semanticModel);
         if (fixedRight is null)
         {
             return null;
@@ -212,12 +216,12 @@ public sealed class ExceptionMessageDotCodeFixProvider : CodeFixProvider
         return binary.ReplaceNode(rightmost, fixedRight);
     }
 
-    private static ExpressionSyntax? AppendDotToSwitchExpression(SwitchExpressionSyntax switchExpr)
+    private static ExpressionSyntax? AppendDotToSwitchExpression(SwitchExpressionSyntax switchExpr, SemanticModel? semanticModel)
     {
         var newArms = new List<SwitchExpressionArmSyntax>();
         foreach (var arm in switchExpr.Arms)
         {
-            var fixedValue = AppendDot(arm.Expression);
+            var fixedValue = AppendDot(arm.Expression, semanticModel);
             if (fixedValue is null)
             {
                 return null;
@@ -240,7 +244,7 @@ public sealed class ExceptionMessageDotCodeFixProvider : CodeFixProvider
         return current.Right;
     }
 
-    private static bool IsStringFormatInvocation(InvocationExpressionSyntax invocation)
+    private static bool IsStringFormatInvocation(InvocationExpressionSyntax invocation, SemanticModel? semanticModel)
     {
         if (invocation.ArgumentList.Arguments.Count == 0)
         {
@@ -248,18 +252,22 @@ public sealed class ExceptionMessageDotCodeFixProvider : CodeFixProvider
         }
 
         var firstArg = invocation.ArgumentList.Arguments[0];
-        return firstArg.Expression is LiteralExpressionSyntax literal
-            && literal.IsKind(SyntaxKind.StringLiteralExpression)
-            && GetMethodName(invocation) == "Format";
-    }
-
-    private static string? GetMethodName(InvocationExpressionSyntax invocation)
-    {
-        return invocation.Expression switch
+        if (firstArg.Expression is not LiteralExpressionSyntax literal
+            || !literal.IsKind(SyntaxKind.StringLiteralExpression))
         {
-            MemberAccessExpressionSyntax memberAccess => memberAccess.Name.Identifier.ValueText,
-            IdentifierNameSyntax identifier => identifier.Identifier.ValueText,
-            _ => null
-        };
+            return false;
+        }
+
+        if (semanticModel is null)
+        {
+            return false;
+        }
+
+        if (semanticModel.GetSymbolInfo(invocation).Symbol is not IMethodSymbol method)
+        {
+            return false;
+        }
+
+        return method.IsStringFormat();
     }
 }
