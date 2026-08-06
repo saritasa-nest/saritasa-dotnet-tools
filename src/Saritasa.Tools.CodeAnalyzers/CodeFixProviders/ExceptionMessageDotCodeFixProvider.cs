@@ -1,0 +1,265 @@
+using System.Collections.Immutable;
+using System.Composition;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CodeActions;
+using Microsoft.CodeAnalysis.CodeFixes;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Saritasa.Tools.CodeAnalyzers.Analyzers;
+
+namespace Saritasa.Tools.CodeAnalyzers.CodeFixProviders;
+
+/// <summary>
+/// Code fix for <see cref="ExceptionMessageDotAnalyzer"/> that appends a dot to the exception message.
+/// </summary>
+[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(ExceptionMessageDotCodeFixProvider))]
+[Shared]
+public sealed class ExceptionMessageDotCodeFixProvider : CodeFixProvider
+{
+    private const string Title = "Append dot to exception message";
+
+    /// <inheritdoc />
+    public override ImmutableArray<string> FixableDiagnosticIds
+        => ImmutableArray.Create(ExceptionMessageDotAnalyzer.DiagnosticId);
+
+    /// <inheritdoc />
+    public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
+
+    /// <inheritdoc />
+    public override async Task RegisterCodeFixesAsync(CodeFixContext context)
+    {
+        var diagnostic = context.Diagnostics.FirstOrDefault(d => d.Id == ExceptionMessageDotAnalyzer.DiagnosticId);
+        if (diagnostic is null)
+        {
+            return;
+        }
+
+        var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken);
+        if (root is null)
+        {
+            return;
+        }
+
+        var node = root.FindNode(diagnostic.Location.SourceSpan, getInnermostNodeForTie: true);
+
+        if (node is ArgumentSyntax argument)
+        {
+            node = argument.Expression;
+        }
+
+        if (node is not ExpressionSyntax expression || !CanAppendDot(expression))
+        {
+            return;
+        }
+
+        context.RegisterCodeFix(
+            CodeAction.Create(
+                Title,
+                cancellationToken => AddDot(context.Document, expression, cancellationToken),
+                equivalenceKey: Title),
+            diagnostic);
+    }
+
+    private static async Task<Document> AddDot(
+        Document document,
+        ExpressionSyntax expression,
+        CancellationToken cancellationToken)
+    {
+        var root = await document.GetSyntaxRootAsync(cancellationToken);
+        if (root is null)
+        {
+            return document;
+        }
+
+        var newExpression = AppendDot(expression);
+        if (newExpression is null)
+        {
+            return document;
+        }
+
+        var newRoot = root.ReplaceNode(expression, newExpression);
+        return document.WithSyntaxRoot(newRoot);
+    }
+
+    private static bool CanAppendDot(ExpressionSyntax expression)
+    {
+        return expression switch
+        {
+            LiteralExpressionSyntax literal when literal.IsKind(SyntaxKind.StringLiteralExpression)
+                => true,
+            InterpolatedStringExpressionSyntax
+                => true,
+            InvocationExpressionSyntax invocation when IsStringFormatInvocation(invocation)
+                => true,
+            ConditionalExpressionSyntax conditional
+                => CanAppendDot(conditional.WhenTrue) && CanAppendDot(conditional.WhenFalse),
+            BinaryExpressionSyntax binary when binary.IsKind(SyntaxKind.CoalesceExpression)
+                => CanAppendDot(binary.Right),
+            BinaryExpressionSyntax binary when binary.IsKind(SyntaxKind.AddExpression)
+                => CanAppendDot(GetRightmostOperand(binary)),
+            SwitchExpressionSyntax switchExpr
+                => switchExpr.Arms.All(a => CanAppendDot(a.Expression)),
+            _ => false
+        };
+    }
+
+    private static ExpressionSyntax? AppendDot(ExpressionSyntax expression)
+    {
+        return expression switch
+        {
+            LiteralExpressionSyntax literal when literal.IsKind(SyntaxKind.StringLiteralExpression)
+                => AppendDotToStringLiteral(literal),
+            InterpolatedStringExpressionSyntax interpolated
+                => AppendDotToInterpolatedString(interpolated),
+            InvocationExpressionSyntax invocation when IsStringFormatInvocation(invocation)
+                => AppendDotToFormatString(invocation),
+            ConditionalExpressionSyntax conditional
+                => AppendDotToConditional(conditional),
+            BinaryExpressionSyntax binary when binary.IsKind(SyntaxKind.CoalesceExpression)
+                => AppendDotToCoalesce(binary),
+            BinaryExpressionSyntax binary when binary.IsKind(SyntaxKind.AddExpression)
+                => AppendDotToBinaryAdd(binary),
+            SwitchExpressionSyntax switchExpr
+                => AppendDotToSwitchExpression(switchExpr),
+            _ => null
+        };
+    }
+
+    private static LiteralExpressionSyntax AppendDotToStringLiteral(LiteralExpressionSyntax literal)
+    {
+        var oldToken = literal.Token;
+        var oldText = oldToken.Text;
+        var newText = oldText.Substring(0, oldText.Length - 1) + "." + oldText[oldText.Length - 1];
+        var newToken = SyntaxFactory.Token(
+            oldToken.LeadingTrivia,
+            SyntaxKind.StringLiteralToken,
+            newText,
+            oldToken.ValueText + ".",
+            oldToken.TrailingTrivia);
+        return literal.WithToken(newToken);
+    }
+
+    private static InterpolatedStringExpressionSyntax AppendDotToInterpolatedString(
+        InterpolatedStringExpressionSyntax interpolated)
+    {
+        var contents = interpolated.Contents;
+
+        if (contents.Count > 0 && contents[contents.Count - 1] is InterpolatedStringTextSyntax lastText)
+        {
+            var oldToken = lastText.TextToken;
+            var newToken = SyntaxFactory.Token(
+                oldToken.LeadingTrivia,
+                SyntaxKind.InterpolatedStringTextToken,
+                oldToken.Text + ".",
+                oldToken.ValueText + ".",
+                oldToken.TrailingTrivia);
+            return interpolated.WithContents(contents.Replace(lastText, lastText.WithTextToken(newToken)));
+        }
+
+        var dotText = SyntaxFactory.InterpolatedStringText(
+            SyntaxFactory.Token(SyntaxTriviaList.Empty, SyntaxKind.InterpolatedStringTextToken, ".", ".", SyntaxTriviaList.Empty));
+        return interpolated.WithContents(contents.Add(dotText));
+    }
+
+    private static InvocationExpressionSyntax AppendDotToFormatString(InvocationExpressionSyntax invocation)
+    {
+        if (invocation.ArgumentList.Arguments.Count == 0)
+        {
+            return invocation;
+        }
+
+        var firstArg = invocation.ArgumentList.Arguments[0];
+        if (firstArg.Expression is LiteralExpressionSyntax literal)
+        {
+            return invocation.ReplaceNode(literal, AppendDotToStringLiteral(literal));
+        }
+
+        return invocation;
+    }
+
+    private static ExpressionSyntax? AppendDotToConditional(ConditionalExpressionSyntax conditional)
+    {
+        var trueExpr = AppendDot(conditional.WhenTrue);
+        var falseExpr = AppendDot(conditional.WhenFalse);
+        if (trueExpr is null || falseExpr is null)
+        {
+            return null;
+        }
+
+        return conditional.WithWhenTrue(trueExpr).WithWhenFalse(falseExpr);
+    }
+
+    private static ExpressionSyntax? AppendDotToCoalesce(BinaryExpressionSyntax binary)
+    {
+        var fixedRight = AppendDot(binary.Right);
+        if (fixedRight is null)
+        {
+            return null;
+        }
+
+        return binary.WithRight(fixedRight);
+    }
+
+    private static ExpressionSyntax? AppendDotToBinaryAdd(BinaryExpressionSyntax binary)
+    {
+        var rightmost = GetRightmostOperand(binary);
+        var fixedRight = AppendDot(rightmost);
+        if (fixedRight is null)
+        {
+            return null;
+        }
+
+        return binary.ReplaceNode(rightmost, fixedRight);
+    }
+
+    private static ExpressionSyntax? AppendDotToSwitchExpression(SwitchExpressionSyntax switchExpr)
+    {
+        var newArms = new List<SwitchExpressionArmSyntax>();
+        foreach (var arm in switchExpr.Arms)
+        {
+            var fixedValue = AppendDot(arm.Expression);
+            if (fixedValue is null)
+            {
+                return null;
+            }
+
+            newArms.Add(arm.WithExpression(fixedValue));
+        }
+
+        return switchExpr.WithArms(SyntaxFactory.SeparatedList(newArms));
+    }
+
+    private static ExpressionSyntax GetRightmostOperand(BinaryExpressionSyntax binary)
+    {
+        var current = binary;
+        while (current.Right is BinaryExpressionSyntax rightBinary && rightBinary.IsKind(SyntaxKind.AddExpression))
+        {
+            current = rightBinary;
+        }
+
+        return current.Right;
+    }
+
+    private static bool IsStringFormatInvocation(InvocationExpressionSyntax invocation)
+    {
+        if (invocation.ArgumentList.Arguments.Count == 0)
+        {
+            return false;
+        }
+
+        var firstArg = invocation.ArgumentList.Arguments[0];
+        return firstArg.Expression is LiteralExpressionSyntax literal
+            && literal.IsKind(SyntaxKind.StringLiteralExpression)
+            && GetMethodName(invocation) == "Format";
+    }
+
+    private static string? GetMethodName(InvocationExpressionSyntax invocation)
+    {
+        return invocation.Expression switch
+        {
+            MemberAccessExpressionSyntax memberAccess => memberAccess.Name.Identifier.ValueText,
+            IdentifierNameSyntax identifier => identifier.Identifier.ValueText,
+            _ => null
+        };
+    }
+}

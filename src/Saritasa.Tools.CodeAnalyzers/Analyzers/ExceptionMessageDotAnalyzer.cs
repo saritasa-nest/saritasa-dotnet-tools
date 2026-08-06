@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
@@ -15,7 +15,10 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
 {
-    private const string DiagnosticId = "STAN1002";
+    /// <summary>
+    /// The diagnostic ID for the exception message dot analyzer.
+    /// </summary>
+    public const string DiagnosticId = "STAN1002";
     private const string Category = "Spelling";
 
     private static readonly LocalizableString title = "Exception message should end with a dot";
