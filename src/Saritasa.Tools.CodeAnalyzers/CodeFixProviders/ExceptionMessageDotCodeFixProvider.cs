@@ -18,6 +18,7 @@ namespace Saritasa.Tools.CodeAnalyzers.CodeFixProviders;
 public sealed class ExceptionMessageDotCodeFixProvider : CodeFixProvider
 {
     private const string Title = "Append dot to exception message";
+    private const string Dot = ".";
 
     /// <inheritdoc />
     public override ImmutableArray<string> FixableDiagnosticIds
@@ -119,7 +120,7 @@ public sealed class ExceptionMessageDotCodeFixProvider : CodeFixProvider
 
         var trimmed = oldValueText.TrimEnd();
         var trailingWhitespace = oldValueText.Substring(trimmed.Length);
-        var newValueText = trimmed + "." + trailingWhitespace;
+        var newValueText = trimmed + Dot + trailingWhitespace;
         var newText = oldToken.Text.Replace(oldValueText, newValueText);
         var newToken = SyntaxFactory.Token(
             oldToken.LeadingTrivia,
@@ -141,7 +142,7 @@ public sealed class ExceptionMessageDotCodeFixProvider : CodeFixProvider
             var oldValueText = oldToken.ValueText;
             var trimmed = oldValueText.TrimEnd();
             var trailingWhitespace = oldValueText.Substring(trimmed.Length);
-            var newValueText = trimmed + "." + trailingWhitespace;
+            var newValueText = trimmed + Dot + trailingWhitespace;
             var newText = oldToken.Text.Replace(oldValueText, newValueText);
             var newToken = SyntaxFactory.Token(
                 oldToken.LeadingTrivia,
@@ -153,7 +154,7 @@ public sealed class ExceptionMessageDotCodeFixProvider : CodeFixProvider
         }
 
         var dotText = SyntaxFactory.InterpolatedStringText(
-            SyntaxFactory.Token(SyntaxTriviaList.Empty, SyntaxKind.InterpolatedStringTextToken, ".", ".", SyntaxTriviaList.Empty));
+            SyntaxFactory.Token(SyntaxTriviaList.Empty, SyntaxKind.InterpolatedStringTextToken, Dot, Dot, SyntaxTriviaList.Empty));
         return interpolated.WithContents(contents.Add(dotText));
     }
 
