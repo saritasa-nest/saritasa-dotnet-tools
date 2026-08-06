@@ -132,13 +132,20 @@ public sealed class ExceptionMessageDotCodeFixProvider : CodeFixProvider
     private static LiteralExpressionSyntax AppendDotToStringLiteral(LiteralExpressionSyntax literal)
     {
         var oldToken = literal.Token;
-        var oldText = oldToken.Text;
-        var newText = oldText.Substring(0, oldText.Length - 1) + "." + oldText[oldText.Length - 1];
+        var oldValueText = oldToken.ValueText;
+
+        if (oldValueText.Length == 0)
+        {
+            return literal;
+        }
+
+        var newValueText = oldValueText + ".";
+        var newText = oldToken.Text.Replace(oldValueText, newValueText);
         var newToken = SyntaxFactory.Token(
             oldToken.LeadingTrivia,
-            SyntaxKind.StringLiteralToken,
+            oldToken.Kind(),
             newText,
-            oldToken.ValueText + ".",
+            newValueText,
             oldToken.TrailingTrivia);
         return literal.WithToken(newToken);
     }
