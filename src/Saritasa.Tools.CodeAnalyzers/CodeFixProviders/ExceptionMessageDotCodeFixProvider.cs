@@ -50,7 +50,7 @@ public sealed class ExceptionMessageDotCodeFixProvider : CodeFixProvider
 
         var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken);
 
-        if (node is not ExpressionSyntax expression || !CanAppendDot(expression, semanticModel))
+        if (node is not ExpressionSyntax expression || AppendDot(expression, semanticModel) is null)
         {
             return;
         }
@@ -83,28 +83,6 @@ public sealed class ExceptionMessageDotCodeFixProvider : CodeFixProvider
 
         var newRoot = root.ReplaceNode(expression, newExpression);
         return document.WithSyntaxRoot(newRoot);
-    }
-
-    private static bool CanAppendDot(ExpressionSyntax expression, SemanticModel? semanticModel)
-    {
-        return expression switch
-        {
-            LiteralExpressionSyntax literal when literal.IsKind(SyntaxKind.StringLiteralExpression)
-                => true,
-            InterpolatedStringExpressionSyntax
-                => true,
-            InvocationExpressionSyntax invocation when IsStringFormatInvocation(invocation, semanticModel)
-                => true,
-            ConditionalExpressionSyntax conditional
-                => CanAppendDot(conditional.WhenTrue, semanticModel) && CanAppendDot(conditional.WhenFalse, semanticModel),
-            BinaryExpressionSyntax binary when binary.IsKind(SyntaxKind.CoalesceExpression)
-                => CanAppendDot(binary.Right, semanticModel),
-            BinaryExpressionSyntax binary when binary.IsKind(SyntaxKind.AddExpression)
-                => CanAppendDot(GetRightmostOperand(binary), semanticModel),
-            SwitchExpressionSyntax switchExpr
-                => switchExpr.Arms.All(a => CanAppendDot(a.Expression, semanticModel)),
-            _ => false
-        };
     }
 
     private static ExpressionSyntax? AppendDot(ExpressionSyntax expression, SemanticModel? semanticModel)
