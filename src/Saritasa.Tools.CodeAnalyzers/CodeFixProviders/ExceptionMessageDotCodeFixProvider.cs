@@ -117,7 +117,9 @@ public sealed class ExceptionMessageDotCodeFixProvider : CodeFixProvider
             return literal;
         }
 
-        var newValueText = oldValueText + ".";
+        var trimmed = oldValueText.TrimEnd();
+        var trailingWhitespace = oldValueText.Substring(trimmed.Length);
+        var newValueText = trimmed + "." + trailingWhitespace;
         var newText = oldToken.Text.Replace(oldValueText, newValueText);
         var newToken = SyntaxFactory.Token(
             oldToken.LeadingTrivia,
@@ -136,11 +138,16 @@ public sealed class ExceptionMessageDotCodeFixProvider : CodeFixProvider
         if (contents.Count > 0 && contents[contents.Count - 1] is InterpolatedStringTextSyntax lastText)
         {
             var oldToken = lastText.TextToken;
+            var oldValueText = oldToken.ValueText;
+            var trimmed = oldValueText.TrimEnd();
+            var trailingWhitespace = oldValueText.Substring(trimmed.Length);
+            var newValueText = trimmed + "." + trailingWhitespace;
+            var newText = oldToken.Text.Replace(oldValueText, newValueText);
             var newToken = SyntaxFactory.Token(
                 oldToken.LeadingTrivia,
                 SyntaxKind.InterpolatedStringTextToken,
-                oldToken.Text + ".",
-                oldToken.ValueText + ".",
+                newText,
+                newValueText,
                 oldToken.TrailingTrivia);
             return interpolated.WithContents(contents.Replace(lastText, lastText.WithTextToken(newToken)));
         }
