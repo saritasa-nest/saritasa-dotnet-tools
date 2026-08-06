@@ -8,7 +8,7 @@ The tool contains C# code analyzers to prevent specific issues that might occur 
 Add a package as a reference. See the [latest version on NuGet](https://www.nuget.org/packages/Saritasa.Tools.CodeAnalyzers).
 
 ```xml
-<PackageReference Include="Saritasa.Tools.CodeAnalyzers" Version="0.2.0">
+<PackageReference Include="Saritasa.Tools.CodeAnalyzers" Version="0.2.1">
   <PrivateAssets>all</PrivateAssets>
   <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
 </PackageReference>
