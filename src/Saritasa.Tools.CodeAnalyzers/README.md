@@ -57,7 +57,7 @@ public class TestRequestHandler : IRequestHandler<TestRequest, int>
 
 Triggered when a source line exceeds the configured maximum length. Keeping lines short improves readability and avoids horizontal scrolling.
 
-The default limit is **130 characters**, following the [Saritasa C# style guide](https://wiki.saritasa.rocks/dotnet/development/c-sharp-style-guide/#code-lines).
+The default limit is **130 characters**.
 
 #### Code causing a warning
 
@@ -79,7 +79,7 @@ public void SomeMethod(
 
 ### STAN1002: Exception message dot
 
-Triggered when an exception is created with a `message` argument that does not end with a dot (`.`). This enforces consistent punctuation in exception messages, following the [Saritasa C# style guide](https://wiki.saritasa.rocks/dotnet/development/c-sharp-style-guide/#english-spelling).
+Triggered when an exception is created with a `message` argument that does not end with a dot (`.`). This enforces consistent punctuation in exception messages.
 
 #### Code causing a warning
 
@@ -97,7 +97,7 @@ throw new InvalidOperationException("Something went wrong.");
 
 ### STAN1003: Singular type name
 
-Triggered when a class or interface name used as a `Controller` or `Service` contains a plural noun (e.g. `UsersController`). Type names should use singular forms, following the [Saritasa C# style guide](https://wiki.saritasa.rocks/dotnet/development/c-sharp-style-guide/#naming).
+Triggered when a class or interface name used as a `Controller` or `Service` contains a plural noun (e.g. `UsersController`). Type names should use singular forms.
 
 Certain words are allowed to remain plural by default: `News`, `Settings`, `Options`, `Analytics`, `Physics`, `Mathematics`, `Statics`, `Dynamics`, `Glass`, `Class`, `Gas`, `Bus`, `Cors`, `Status`.
 
