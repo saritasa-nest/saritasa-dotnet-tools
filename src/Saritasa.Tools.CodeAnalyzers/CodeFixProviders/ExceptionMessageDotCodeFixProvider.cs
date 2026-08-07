@@ -119,6 +119,11 @@ public sealed class ExceptionMessageDotCodeFixProvider : CodeFixProvider
         }
 
         var trimmed = oldValueText.TrimEnd();
+        if (trimmed.EndsWith(Dot))
+        {
+            return literal;
+        }
+
         var trailingWhitespace = oldValueText.Substring(trimmed.Length);
         var newValueText = trimmed + Dot + trailingWhitespace;
         var newText = oldToken.Text.Replace(oldValueText, newValueText);
@@ -141,6 +146,11 @@ public sealed class ExceptionMessageDotCodeFixProvider : CodeFixProvider
             var oldToken = lastText.TextToken;
             var oldValueText = oldToken.ValueText;
             var trimmed = oldValueText.TrimEnd();
+            if (trimmed.EndsWith(Dot))
+            {
+                return interpolated;
+            }
+
             var trailingWhitespace = oldValueText.Substring(trimmed.Length);
             var newValueText = trimmed + Dot + trailingWhitespace;
             var newText = oldToken.Text.Replace(oldValueText, newValueText);
