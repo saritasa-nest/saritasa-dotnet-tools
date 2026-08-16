@@ -6,8 +6,12 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Services;
 internal static class NavigationInclncludeRulesProvider
 {
     private const string Category = "Usage";
+
     public const string RuleIncl1Id = "INCL001";
     public const string RuleIncl2Id = "INCL002";
+    public const string RuleIncl3Id = "INCL003";
+
+    #region INCL001
 
     private static readonly LocalizableString titleIncl1 =
         "Method parameter should require a navigation property";
@@ -27,6 +31,10 @@ internal static class NavigationInclncludeRulesProvider
         DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
         description: descriptionIncl1);
+
+    #endregion
+
+    #region INCL002
 
     private static readonly LocalizableString titleIncl2 =
         "Local variable does not set the required navigation property";
@@ -49,7 +57,35 @@ internal static class NavigationInclncludeRulesProvider
         isEnabledByDefault: true,
         description: descriptionIncl2);
 
-    public static readonly ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics = ImmutableArray.Create(ruleIncl1, ruleIncl2);
+    #endregion
+
+    #region INCL003
+
+    private static readonly LocalizableString titleIncl3 =
+        "Method declares [Includes] but return value does not load the required navigation property";
+
+    private static readonly LocalizableString messageFormatIncl3 =
+        "Method declares [Includes(\"{0}\")] but the returned value does not load navigation property '{0}'; " +
+        "add .Include(x => x.{0}) to the query, set the property in an object initializer, or remove [Includes(\"{0}\")]";
+
+    private static readonly LocalizableString descriptionIncl3 =
+        "A method annotated with [Includes(\"PropertyName\")] promises its return value has the named navigation " +
+        "property loaded. The analyzer verifies this by checking the return expression for .Include(), an object " +
+        "initializer that sets the property, or a source method annotated with [Includes].";
+
+    private static readonly DiagnosticDescriptor ruleIncl3 = new(
+        RuleIncl3Id,
+        titleIncl3,
+        messageFormatIncl3,
+        Category,
+        DiagnosticSeverity.Warning,
+        isEnabledByDefault: true,
+        description: descriptionIncl3);
+
+    #endregion
+
+    public static readonly ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =
+        ImmutableArray.Create(ruleIncl1, ruleIncl2, ruleIncl3);
 
     public static DiagnosticDescriptor GetDiagnosticDescriptor(string ruleId)
     {
@@ -57,6 +93,7 @@ internal static class NavigationInclncludeRulesProvider
         {
             RuleIncl1Id => ruleIncl1,
             RuleIncl2Id => ruleIncl2,
+            RuleIncl3Id => ruleIncl3,
             _ => throw new ArgumentException("Unknown diagnostic rule id: " + ruleId)
         };
     }

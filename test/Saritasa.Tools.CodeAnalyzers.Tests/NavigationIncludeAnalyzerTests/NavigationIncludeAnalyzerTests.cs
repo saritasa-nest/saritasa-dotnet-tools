@@ -85,14 +85,14 @@ public class NavigationIncludeAnalyzerTests
     /// INCL001 is reported when a method accesses a [TrackIncludeRequired] property directly without declaring [IncludeRequired].
     /// </summary>
     [TestMethod]
-    public async Task DirectPropertyAccess_WithoutIncludeRequired_ReportsIncl001()
+    public async Task DirectPropertyAccess_WithoutIncludeRequired_ReportsIncl1()
     {
         const string sourceCode = Preamble +
             /* lang=c# */
             """
                 class TestClass
                 {
-                    void SetTimezone_Nocheck(User user, string timezone)
+                    void SetTimezone_NoCheck(User user, string timezone)
                     {
                         // INCL001: navigation property is required, but not checked. Use IncludeRequiredAttribute
                         {|INCL001:user.Profile|}.Timezone = timezone;
@@ -108,7 +108,7 @@ public class NavigationIncludeAnalyzerTests
     /// No warning is produced when a method declares [IncludeRequired] for the parameter it accesses the navigation property on.
     /// </summary>
     [TestMethod]
-    public async Task DirectPropertyAccess_WithIncludeRequired_NoWarning()
+    public async Task DirectPropertyAccess_WithIncludeRequired_NoIncl1()
     {
         const string sourceCode = Preamble +
             /* lang=c# */
@@ -132,7 +132,7 @@ public class NavigationIncludeAnalyzerTests
     /// INCL001 is reported when a method passes its own parameter to a callee that has [IncludeRequired], but the caller does not declare the same requirement.
     /// </summary>
     [TestMethod]
-    public async Task ParameterPropagation_WithoutIncludeRequired_ReportsIncl001()
+    public async Task ParameterPropagation_WithoutIncludeRequired_ReportsIncl1()
     {
         const string sourceCode = Preamble +
             /* lang=c# */
@@ -167,7 +167,7 @@ public class NavigationIncludeAnalyzerTests
     /// No warning is produced when both the caller and the callee declare [IncludeRequired] for the propagated parameter.
     /// </summary>
     [TestMethod]
-    public async Task ParameterPropagation_WithIncludeRequired_NoWarning()
+    public async Task ParameterPropagation_WithIncludeRequired_NoIncl1()
     {
         const string sourceCode = Preamble +
             /* lang=c# */
@@ -204,7 +204,7 @@ public class NavigationIncludeAnalyzerTests
     /// INCL002: local variable obtained from a query without .Include() triggers the warning.
     /// </summary>
     [TestMethod]
-    public async Task Handle_QueryMissingInclude_Warns()
+    public async Task Handle_QueryMissingInclude_ReportsIncl2()
     {
         var sourceCode = Preamble +
             /* lang=c# */
@@ -239,7 +239,7 @@ public class NavigationIncludeAnalyzerTests
     /// No INCL002: local variable obtained from a query that includes .Include(u => u.Profile).
     /// </summary>
     [TestMethod]
-    public async Task Handle_QueryWithInclude_NoWarn()
+    public async Task Handle_QueryWithInclude_NoIncl2()
     {
         var sourceCode = Preamble +
             /* lang=c# */
@@ -274,7 +274,7 @@ public class NavigationIncludeAnalyzerTests
     /// INCL002: local variable created via object initializer without the required property triggers the warning.
     /// </summary>
     [TestMethod]
-    public async Task Handle2_ObjectInitMissingProperty_Warns()
+    public async Task Handle2_ObjectInitMissingProperty_ReportsIncl2()
     {
         var sourceCode = Preamble +
             /* lang=c# */
@@ -311,7 +311,7 @@ public class NavigationIncludeAnalyzerTests
     /// No INCL002: local variable created via object initializer that sets the required property.
     /// </summary>
     [TestMethod]
-    public async Task Handle2_ObjectInitWithProperty_NoWarn()
+    public async Task Handle2_ObjectInitWithProperty_NoIncl2()
     {
         var sourceCode = Preamble +
             /* lang=c# */
@@ -347,7 +347,7 @@ public class NavigationIncludeAnalyzerTests
     /// INCL002: local variable obtained from a method that does not carry [Includes] triggers the warning.
     /// </summary>
     [TestMethod]
-    public async Task Handle3_SourceMethodMissingIncludesAttr_Warns()
+    public async Task Handle3_SourceMethodMissingIncludesAttr_ReportsIncl2()
     {
         var sourceCode = Preamble +
             /* lang=c# */
@@ -389,7 +389,7 @@ public class NavigationIncludeAnalyzerTests
     /// No INCL002: local variable obtained from a method decorated with [Includes(nameof(User.Profile)].
     /// </summary>
     [TestMethod]
-    public async Task Handle3_SourceMethodWithIncludesAttr_NoWarn()
+    public async Task Handle3_SourceMethodWithIncludesAttr_NoIncl2()
     {
         var sourceCode = Preamble +
             /* lang=c# */
@@ -418,6 +418,134 @@ public class NavigationIncludeAnalyzerTests
                     void UpdateUserProfile(User user, SaveUserDto dto)
                     {
                         user.Profile.Timezone = dto.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyCS.VerifyAnalyzerAsync(sourceCode);
+    }
+
+    #endregion
+
+    #region INCL003
+
+    /// <summary>
+    /// INCL003: method declares [Includes(nameof(User.Profile))] but returns a query result
+    /// without .Include(u => u.Profile).
+    /// </summary>
+    [TestMethod]
+    public async Task GetUser_QueryMissingInclude_ReportsIncl3()
+    {
+        var sourceCode = Preamble +
+             /* lang=c# */
+             """
+
+                 class TestClass
+                 {
+                     private DbQuery<User> _users;
+
+                     [Includes(nameof(User.Profile))]
+                     async Task<User> GetUser(int id)
+                     {
+                         // INCL003: the method has Includes attribute for User.Profile, but Profile is not Included in the query.
+                         {|INCL003:return await _users
+                             //.Include(u => u.Profile) // Uncommenting this line would fix the INCL003 warning.
+                             .FirstOrDefaultAsync(u => u.Id == id);|}
+                     }
+                 }
+             }
+             """;
+
+        await VerifyCS.VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No INCL003: method declares [Includes(nameof(User.Profile))] and the query includes
+    /// .Include(u => u.Profile).
+    /// </summary>
+    [TestMethod]
+    public async Task GetUser_QueryWithInclude_NoIncl3()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                class TestClass
+                {
+                    private DbQuery<User> _users;
+
+                    [Includes("Profile")]
+                    async Task<User> GetUser(int id)
+                    {
+                        // No INCL003: Profile is loaded via .Include().
+                        return await _users
+                            .Include(u => u.Profile)
+                            .FirstOrDefaultAsync(u => u.Id == id);
+                    }
+                }
+            }
+            """;
+
+        await VerifyCS.VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// INCL003: method declares [Includes(nameof(User.Profile))] but the created object does not
+    /// set Profile in the object initializer.
+    /// </summary>
+    [TestMethod]
+    public async Task CreateUser_ObjectInitMissingProfile_ReportsIncl3()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                class TestClass
+                {
+                    [Includes(nameof(User.Profile))]
+                    User CreateUser(SaveUserDto dto)
+                    {
+                        // INCL003: the method has Includes attribute for User.Profile, but Profile is not set.
+                        var user = new User
+                        {
+                            Id = dto.Id,
+                            Organization = dto.Organization,
+                            //Profile = new UserProfile{ Timezone = dto.Timezone } // Uncommenting this line would fix the INCL003 warning.
+                        };
+                        {|INCL003:return user;|}
+                    }
+                }
+            }
+            """;
+
+        await VerifyCS.VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No INCL003: method declares [Includes(nameof(User.Profile))] and the created object sets
+    /// Profile in the object initializer.
+    /// </summary>
+    [TestMethod]
+    public async Task CreateUser_ObjectInitWithProfile_NoIncl3()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                class TestClass
+                {
+                    [Includes(nameof(User.Profile))]
+                    User CreateUser(SaveUserDto dto)
+                    {
+                        // No INCL003: Profile is set in the object initializer.
+                        var user = new User
+                        {
+                            Id = dto.Id,
+                            Organization = dto.Organization,
+                            Profile = new UserProfile { Timezone = dto.Timezone },
+                        };
+                        return user;
                     }
                 }
             }

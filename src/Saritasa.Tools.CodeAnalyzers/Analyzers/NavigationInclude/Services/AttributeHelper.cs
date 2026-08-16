@@ -76,7 +76,7 @@ public class AttributeHelper
         return false;
     }
 
-    private static bool TryGetIncludesArg(AttributeData attr, out string? propertyName)
+    public static bool TryGetIncludesArg(AttributeData attr, out string? propertyName)
     {
         propertyName = null;
 

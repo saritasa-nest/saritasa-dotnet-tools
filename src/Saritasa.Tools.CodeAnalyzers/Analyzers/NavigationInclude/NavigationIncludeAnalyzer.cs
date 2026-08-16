@@ -20,5 +20,6 @@ public sealed class NavigationIncludeAnalyzer : DiagnosticAnalyzer
 
         context.RegisterOperationAction(PropertyReferenceHandler.Analyze, OperationKind.PropertyReference);
         context.RegisterOperationAction(InvocationHandler.Analyze, OperationKind.Invocation);
+        context.RegisterOperationAction(ReturnHandler.Analyze, OperationKind.Return);
     }
 }
