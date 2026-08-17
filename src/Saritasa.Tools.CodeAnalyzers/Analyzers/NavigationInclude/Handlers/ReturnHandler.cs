@@ -1,12 +1,21 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
+using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Attributes;
 using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Services;
 
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Handlers;
 
+/// <summary>
+/// Reports INCL003 when a <see cref="IncludesAttribute"/>-annotated method's return value
+/// does not load the promised navigation property.
+/// </summary>
 internal static class ReturnHandler
 {
+    /// <summary>
+    /// Analyzes a return operation and reports INCL003 if applicable.
+    /// </summary>
+    /// <param name="context">Operation analysis context.</param>
     public static void Analyze(OperationAnalysisContext context)
     {
         if (context.Operation is not IReturnOperation returnOp)
@@ -43,7 +52,7 @@ internal static class ReturnHandler
             {
                 context.ReportDiagnostic(
                     Diagnostic.Create(
-                        NavigationInclncludeRulesProvider.GetDiagnosticDescriptor(NavigationInclncludeRulesProvider.RuleIncl3Id),
+                        NavigationIncludeRulesProvider.GetDiagnosticDescriptor(NavigationIncludeRulesProvider.RuleIncl3Id),
                         returnOp.Syntax.GetLocation(),
                         propertyName));
             }

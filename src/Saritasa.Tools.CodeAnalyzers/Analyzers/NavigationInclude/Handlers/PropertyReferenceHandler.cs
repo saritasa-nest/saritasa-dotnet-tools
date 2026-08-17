@@ -1,12 +1,21 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
+using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Attributes;
 using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Services;
 
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Handlers;
 
+/// <summary>
+/// Reports INCL001 when a method accesses a <see cref="TrackIncludeRequiredAttribute"/>
+/// property without declaring <see cref="IncludeRequiredAttribute"/>.
+/// </summary>
 internal static class PropertyReferenceHandler
 {
+    /// <summary>
+    /// Analyzes a property reference operation and reports INCL001 if applicable.
+    /// </summary>
+    /// <param name="context">Operation analysis context.</param>
     public static void Analyze(OperationAnalysisContext context)
     {
         if (context.Operation is not IPropertyReferenceOperation propRef)
@@ -51,7 +60,7 @@ internal static class PropertyReferenceHandler
 
         context.ReportDiagnostic(
             Diagnostic.Create(
-                NavigationInclncludeRulesProvider.GetDiagnosticDescriptor(NavigationInclncludeRulesProvider.RuleIncl1Id),
+                NavigationIncludeRulesProvider.GetDiagnosticDescriptor(NavigationIncludeRulesProvider.RuleIncl1Id),
                 propRef.Syntax.GetLocation(),
                 typeName,
                 propertyName,

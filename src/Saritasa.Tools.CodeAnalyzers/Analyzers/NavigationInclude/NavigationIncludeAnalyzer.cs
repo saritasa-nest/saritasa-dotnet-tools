@@ -6,11 +6,14 @@ using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Services;
 
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude;
 
+/// <summary>
+/// Roslyn diagnostic analyzer that enforces navigation-property include rules (INCL001–INCL003).
+/// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class NavigationIncludeAnalyzer : DiagnosticAnalyzer
 {
     /// <inheritdoc />
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => NavigationInclncludeRulesProvider.SupportedDiagnostics;
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => NavigationIncludeRulesProvider.SupportedDiagnostics;
 
     /// <inheritdoc />
     public override void Initialize(AnalysisContext context)

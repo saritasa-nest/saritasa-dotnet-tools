@@ -1,23 +1,25 @@
 ﻿namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Attributes;
 
 /// <summary>
-/// Declares that a method requires a specific navigation property to be loaded for one
-/// of its parameters. Paired with <see cref="TrackIncludeRequiredAttribute"/> on the
-/// property: any method that receives an entity with such a property and accesses it
-/// (directly or by passing the parameter to a callee) must carry this attribute.
+/// Declares that the named method parameter must have the named navigation property loaded before the method is called.
+/// Can be applied multiple times to cover multiple parameters or properties.
 /// </summary>
-/// <remarks>
-/// The analyzer uses this attribute to propagate the include requirement up the call
-/// chain (INCL001) and to verify that local variables are properly loaded before being
-/// passed to such methods (INCL002).
-/// </remarks>
 /// <example>
+/// Single requirement
 /// <code>
 /// [IncludeRequired(nameof(user), nameof(User.Profile))]
-/// public void SetTimezone(User user, string timezone)
+/// void SetTimezone(User user, string timezone)
 /// {
 ///     user.Profile.Timezone = timezone;
 /// }
+/// </code>
+/// </example>
+/// <example>
+/// Stacked — both Profile and Address must be loaded
+/// <code>
+/// [IncludeRequired(nameof(user), nameof(User.Profile))]
+/// [IncludeRequired(nameof(user), nameof(User.Address))]
+/// void UpdateUser(User user, UserDto dto) { ... }
 /// </code>
 /// </example>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
@@ -36,10 +38,10 @@ public class IncludeRequiredAttribute : Attribute
     public string IncludedProperty { get; }
 
     /// <summary>
-    /// Constructor.
+    /// Initializes the attribute with the parameter name and the navigation property name to require.
     /// </summary>
-    /// <param name="param">Name of parameter.</param>
-    /// <param name="includedProperty">Included property.</param>
+    /// <param name="param">Name of the method parameter (case-sensitive, must match exactly).</param>
+    /// <param name="includedProperty">Name of the navigation property that must be loaded (case-sensitive, must match exactly).</param>
     public IncludeRequiredAttribute(string param, string includedProperty)
     {
         Param = param;

@@ -3,8 +3,16 @@ using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Attributes;
 
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Services;
 
+/// <summary>
+/// Provides helpers for reading NavigationInclude-related attributes from Roslyn symbols.
+/// </summary>
 public class AttributeHelper
 {
+    /// <summary>
+    /// Returns true if symbol is decorated with <see cref="TrackIncludeRequiredAttribute"/>.
+    /// </summary>
+    /// <param name="symbol">The symbol to inspect.</param>
+    /// <returns>True if the attribute is present; otherwise false.</returns>
     public static bool HasTrackIncludeRequiredAttribute(ISymbol symbol)
     {
         return symbol
@@ -15,35 +23,49 @@ public class AttributeHelper
                 StringComparison.Ordinal));
     }
 
+    /// <summary>
+    /// Attempts to extract the parameter name and property name from an <see cref="IncludeRequiredAttribute"/>.
+    /// </summary>
+    /// <param name="attribute">The attribute data to inspect.</param>
+    /// <param name="param">Receives the first constructor argument.</param>
+    /// <param name="includedProperty">Receives the second constructor argument.</param>
+    /// <returns>True if the attribute matches and both arguments are non-null.</returns>
     public static bool TryGetIncludeRequiredArgs(
-        AttributeData attr,
-        out string? paramName,
-        out string? propertyName)
+        AttributeData attribute,
+        out string? param,
+        out string? includedProperty)
     {
-        paramName = null;
-        propertyName = null;
+        param = null;
+        includedProperty = null;
 
-        var name = attr.AttributeClass?.Name;
+        var name = attribute.AttributeClass?.Name;
         if (!string.Equals(name, nameof(IncludeRequiredAttribute), StringComparison.Ordinal))
         {
             return false;
         }
 
-        if (attr.ConstructorArguments.Length < 2)
+        if (attribute.ConstructorArguments.Length < 2)
         {
             return false;
         }
 
-        paramName = attr.ConstructorArguments[0].Value as string;
-        propertyName = attr.ConstructorArguments[1].Value as string;
+        param = attribute.ConstructorArguments[0].Value as string;
+        includedProperty = attribute.ConstructorArguments[1].Value as string;
 
-        return paramName is not null && propertyName is not null;
+        return param is not null && includedProperty is not null;
     }
 
+    /// <summary>
+    /// Returns true if method declares <see cref="IncludeRequiredAttribute"/>.
+    /// </summary>
+    /// <param name="method">The method to inspect.</param>
+    /// <param name="param">The parameter name to match.</param>
+    /// <param name="includedProperty">The included property name to match.</param>
+    /// <returns>True if a matching attribute is found; otherwise false.</returns>
     public static bool MethodHasIncludeRequiredAttribute(
         IMethodSymbol method,
-        string paramName,
-        string propertyName)
+        string param,
+        string includedProperty)
     {
         foreach (var attr in method.GetAttributes())
         {
@@ -52,8 +74,8 @@ public class AttributeHelper
                 continue;
             }
 
-            if (string.Equals(attrParamName, paramName, StringComparison.Ordinal) &&
-                string.Equals(attrPropertyName, propertyName, StringComparison.Ordinal))
+            if (string.Equals(attrParamName, param, StringComparison.Ordinal) &&
+                string.Equals(attrPropertyName, includedProperty, StringComparison.Ordinal))
             {
                 return true;
             }
@@ -62,12 +84,18 @@ public class AttributeHelper
         return false;
     }
 
-    public static bool MethodHasIncludesAttribute(IMethodSymbol method, string propertyName)
+    /// <summary>
+    /// Returns true if method declares <see cref="IncludesAttribute"/>.
+    /// </summary>
+    /// <param name="method">The method to inspect.</param>
+    /// <param name="includedProperty">The property name to match.</param>
+    /// <returns>True if a matching attribute is found; otherwise false.</returns>
+    public static bool MethodHasIncludesAttribute(IMethodSymbol method, string includedProperty)
     {
         foreach (var attr in method.GetAttributes())
         {
             if (TryGetIncludesArg(attr, out var attrPropertyName) &&
-                string.Equals(attrPropertyName, propertyName, StringComparison.Ordinal))
+                string.Equals(attrPropertyName, includedProperty, StringComparison.Ordinal))
             {
                 return true;
             }
@@ -76,22 +104,28 @@ public class AttributeHelper
         return false;
     }
 
-    public static bool TryGetIncludesArg(AttributeData attr, out string? propertyName)
+    /// <summary>
+    /// Attempts to extract the property name from an <see cref="IncludesAttribute"/>.
+    /// </summary>
+    /// <param name="attribute">The attribute data to inspect.</param>
+    /// <param name="includedProperty">Receives the first constructor argument.</param>
+    /// <returns>True if the attribute matches and its argument is non-null.</returns>
+    public static bool TryGetIncludesArg(AttributeData attribute, out string? includedProperty)
     {
-        propertyName = null;
+        includedProperty = null;
 
-        var name = attr.AttributeClass?.Name;
+        var name = attribute.AttributeClass?.Name;
         if (!string.Equals(name, nameof(IncludesAttribute), StringComparison.Ordinal))
         {
             return false;
         }
 
-        if (attr.ConstructorArguments.Length < 1)
+        if (attribute.ConstructorArguments.Length < 1)
         {
             return false;
         }
 
-        propertyName = attr.ConstructorArguments[0].Value as string;
-        return propertyName is not null;
+        includedProperty = attribute.ConstructorArguments[0].Value as string;
+        return includedProperty is not null;
     }
 }

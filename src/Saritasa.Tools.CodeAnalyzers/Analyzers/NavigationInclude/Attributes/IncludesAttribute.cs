@@ -1,17 +1,27 @@
 ﻿namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Attributes;
 
 /// <summary>
-/// Declares that a method guarantees a specific navigation property is loaded on its
-/// return value. Paired with <see cref="IncludeRequiredAttribute"/>: when a caller
-/// receives the return value and passes it to a method with
-/// <c>[IncludeRequired(param, propertyName)]</c>, the analyzer treats the value as
-/// already having the property loaded (suppressing INCL002).
+/// Promises that the method's return value has the named navigation property loaded.
+/// Can be applied multiple times to cover multiple properties.
 /// </summary>
-/// <remarks>
-/// The <c>NavigationIncludeAnalyzer</c> also enforces this contract: if the method body
-/// returns a value that does not load the declared property via <c>.Include()</c>, an
-/// object initializer, or another <c>[Includes]</c> method, INCL003 is reported.
-/// </remarks>
+/// <example>
+/// <code>
+/// [Includes(nameof(User.Profile)]
+/// async Task&lt;User&gt; GetUser(int id)
+/// {
+///     return await _dbContext.Users
+///         .Include(u =&gt; u.Profile)
+///         .FirstOrDefaultAsync(u =&gt; u.Id == id);
+/// }
+///
+/// // Callers can now use GetUser without INCL002 warnings
+/// async Task Handle(SaveUserDto dto)
+/// {
+///     var user = await GetUser(dto.Id);
+///     SetTimezone(user, dto.Timezone);  // no warning
+/// }
+/// </code>
+/// </example>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
 public class IncludesAttribute : Attribute
 {
@@ -22,11 +32,9 @@ public class IncludesAttribute : Attribute
     public string IncludedProperty { get; }
 
     /// <summary>
-    /// Constructor.
+    /// Initializes the attribute with the name of the navigation property guaranteed to be loaded.
     /// </summary>
-    /// <param name="includedProperty">
-    /// Name of the navigation property guaranteed to be loaded on the return value.
-    /// </param>
+    /// <param name="includedProperty">Name of the navigation property loaded on the return value (case-sensitive, must match exactly).</param>
     public IncludesAttribute(string includedProperty)
     {
         IncludedProperty = includedProperty;

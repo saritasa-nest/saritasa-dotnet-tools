@@ -24,6 +24,9 @@ Add a package as a reference.
 | [STAN1003](#stan1003-singular-type-name) | Type names should use singular nouns | Warning | Naming |
 | [STAN1004](#stan1004-spelling) | Word '{0}' has a typo | Warning | Spelling |
 | [STAN1005](#stan1005-early-exit) | Use early return instead of else after return | Warning | Style |
+| [INCL001](#incl001-navigation-property-not-checked) | Method parameter should require a navigation property | Warning | Usage |
+| [INCL002](#incl002-local-variable-missing-include) | Local variable does not set the required navigation property | Warning | Usage |
+| [INCL003](#incl003-includes-promise-not-fulfilled) | Method declares [Includes] but return value does not load the required navigation property | Warning | Usage |
 
 ---
 
@@ -241,4 +244,283 @@ else
     return "false";
 }
 return "other";
+```
+
+---
+
+### Navigation Include attributes
+
+Three attributes control which navigation properties are tracked and how inclusion requirements are communicated between methods.
+
+| Attribute | Target | Purpose |
+|-----------|--------|---------|
+| `[TrackIncludeRequired]` | Property | Marks a navigation property as requiring explicit loading. Only properties with this attribute are checked by INCL rules. |
+| `[IncludeRequired("param", "Property")]` | Method | Declares that the named parameter must have the named property loaded before the method is called. Repeatable. |
+| `[Includes("Property")]` | Method | Promises that the method's return value has the named property loaded. Repeatable. |
+
+Example model used in the sections below:
+
+```csharp
+class User
+{
+    public Organization Organization { get; set; }
+
+    [TrackIncludeRequired]  // Only Profile is tracked, Organization produces no diagnostics.
+    public UserProfile Profile { get; set; }
+}
+```
+
+---
+
+### INCL001: Navigation property not checked
+
+Triggered when a method directly accesses a `[TrackIncludeRequired]` property on a parameter, or passes a parameter to a method that requires it via `[IncludeRequired]`, without declaring a matching `[IncludeRequired]` on the current method.
+
+#### Code causing a warning
+
+```csharp
+void SetTimezone(User user, string timezone)
+{
+    // INCL001: Profile has [TrackIncludeRequired] but no [IncludeRequired(nameof(user), nameof(User.Profile))] on this method
+    user.Profile.Timezone = timezone;
+}
+```
+
+#### Or
+
+```csharp
+ // Uncommenting this line will fix the INCL001 warning.
+// [IncludeRequired(nameof(user), nameof(User.Profile))]
+void UpdateUserProfile(User user, SaveUserDto dto)
+{
+    // Does not produce INCL001 because Organization has no [TrackIncludeRequired] attribute.
+    user.Organization = dto.Organization;
+    // INCL001: the called method captures the `user` argument and has [IncludeRequired] attribute.
+    // Use IncludeRequiredAttribute on the current method as well.
+    SetTimezone(user, dto.Timezone);
+}
+
+[IncludeRequired(nameof(user), nameof(User.Profile))]
+void SetTimezone(User user, string timezone)
+{
+    // Does not produce INCL001 because the method has [IncludeRequired] attribute.
+    user.Profile.Timezone = timezone;
+}
+```
+
+#### Fixed
+
+```csharp
+[IncludeRequired(nameof(user), nameof(User.Profile))]
+void UpdateUserProfile(User entity, SaveUserDto dto)
+{
+    user.Organization = dto.Organization;
+    SetTimezone(entity, dto.Timezone);
+}
+
+[IncludeRequired(nameof(user), nameof(User.Profile))]
+void SetTimezone(User user, string timezone)
+{
+    user.Profile.Timezone = timezone;
+}
+```
+
+---
+
+### INCL002: Local variable missing include
+
+Triggered when a local variable is passed to a method that requires a navigation property via `[IncludeRequired]`, but the variable was neither loaded with `.Include()`, set in an object initializer, nor returned from a method annotated with `[Includes]`.
+
+#### Code causing a warning
+
+```csharp
+[IncludeRequired(nameof(user), nameof(User.Profile))]
+void UpdateUserProfile(User entity, SaveUserDto dto)
+{
+    user.Organization = dto.Organization;
+    SetTimezone(entity, dto.Timezone);
+}
+
+async Task Handle(SaveUserDto dto)
+{
+    var user = await _dbContext.Users
+        //.Include(u => u.Profile) // Uncommenting this line would fix the INCL002 warning.
+        .FirstOrDefaultAsync(u => u.Id == dto.Id);
+    // INCL002: the called method requires User.Profile, but it is not Included in the query.
+    UpdateUserProfile(user, dto);
+}
+```
+
+#### Fixed
+
+```csharp
+[IncludeRequired(nameof(user), nameof(User.Profile))]
+void UpdateUserProfile(User entity, SaveUserDto dto)
+{
+    user.Organization = dto.Organization;
+    SetTimezone(entity, dto.Timezone);
+}
+
+async Task Handle(SaveUserDto dto)
+{
+    var user = await _dbContext.Users
+        .Include(u => u.Profile) // Load the property directly.
+        .FirstOrDefaultAsync(u => u.Id == dto.Id);
+
+    UpdateUserProfile(user, dto);
+}
+```
+
+#### Code causing a warning
+
+```csharp
+[IncludeRequired(nameof(user), nameof(User.Profile))]
+void UpdateUserProfile(User entity, SaveUserDto dto)
+{
+    user.Organization = dto.Organization;
+    SetTimezone(entity, dto.Timezone);
+}
+
+async Task Handle2(SaveUserDto dto)
+{
+    var user = new User
+    {
+        Id = dto.Id,
+        Organization = dto.Organization,
+        //Profile = new UserProfile { Timezone = dto.Timezone } // Uncommenting this line would fix the INCL002 warning.
+    };
+    // INCL002: the called method requires User.Profile, but it is not set.
+    UpdateUserProfile(user, dto);
+}
+
+```
+
+#### Fixed
+
+```csharp
+[IncludeRequired(nameof(user), nameof(User.Profile))]
+void UpdateUserProfile(User entity, SaveUserDto dto)
+{
+    user.Organization = dto.Organization;
+    SetTimezone(entity, dto.Timezone);
+}
+
+async Task Handle2(SaveUserDto dto)
+{
+    var user = new User
+    {
+        Id = dto.Id,
+        Organization = dto.Organization,
+        Profile = new UserProfile { Timezone = dto.Timezone } // Load the property directly.
+    };
+
+    UpdateUserProfile(user, dto);
+}
+```
+
+#### Code causing a warning
+
+```csharp
+[IncludeRequired(nameof(user), nameof(User.Profile))]
+void UpdateUserProfile(User entity, SaveUserDto dto)
+{
+    user.Organization = dto.Organization;
+    SetTimezone(entity, dto.Timezone);
+}
+
+async Task Handle3(SaveUserDto dto)
+{
+    var user = await GetUser(dto.Id);
+    // INCL002: the called method requires User.Profile, but it is not checked.
+    UpdateUserProfile(user, dto);
+}
+// [Includes(nameof(User.Profile))] // Uncommenting this line would fix the INCL002 warning.
+async Task<User> GetUser(int id)
+{
+    return _dbContext.Users
+        .Include(u => u.Profile)
+        .FirstOrDefault(u => u.Id == id);
+}
+```
+
+#### Fixed
+
+```csharp
+// Fix 2: annotate the source method with [Includes]
+[Includes(nameof(User.Profile))]
+async Task<User> GetUser(int id)
+{
+    return _dbContext.Users
+        .Include(u => u.Profile)
+        .FirstOrDefault(u => u.Id == id);
+}
+
+async Task Handle3(SaveUserDto dto)
+{
+    var user = await GetUser(dto.Id); // [Includes(nameof(User.Profile))] satisfies the requirement.
+    UpdateUserProfile(user, dto);
+}
+```
+
+---
+
+### INCL003: \[Includes\] promise not fulfilled
+
+Triggered when a method annotated with `[Includes("Property")]` returns a value that does not load the named property via `.Include()`, an object initializer, or a source method annotated with `[Includes]`.
+
+#### Code causing a warning
+
+```csharp
+[Includes(nameof(User.Profile))]
+async Task<User> GetUser(int id)
+{
+   // INCL003: the method has [Includes] attribute for User.Profile, but Profile is not Included in the query.
+    return _dbContext.Users
+        //.Include(u => u.Profile) // Uncommenting this line would fix the INCL003 warning.
+        .FirstOrDefault(u => u.Id == id);
+}
+```
+
+#### Fixed
+
+```csharp
+[Includes(nameof(User.Profile))]
+async Task<User> GetUser(int id)
+{
+    return _dbContext.Users
+        .Include(u => u.Profile) // Load the property directly.
+        .FirstOrDefault(u => u.Id == id);
+}
+```
+
+#### Code causing a warning
+
+```csharp
+[Includes(nameof(User.Profile))]
+async Task<User> CreateUser(SaveUserDto dto)
+{
+    // INCL003: the method has [Includes] attribute for User.Profile, but Profile is not set.
+    var user = new User
+    {
+        Id = dto.Id,
+        Organization = dto.Organization,
+        //Profile = new UserProfile { Timezone = dto.Timezone } // Uncommenting this line would fix the INCL003 warning.
+    };
+    return user;
+}
+```
+
+#### Fixed
+
+```csharp
+[Includes(nameof(User.Profile))]
+Task<User> CreateUser(SaveUserDto dto)
+{
+    var user = new User
+    {
+        Id = dto.Id,
+        Profile = new UserProfile { Timezone = dto.Timezone }, // Load the property directly.
+    };
+    return Task.FromResult(user);
+}
 ```

@@ -1,24 +1,18 @@
 ﻿namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Attributes;
 
 /// <summary>
-/// Marks a navigation property as one that must be explicitly loaded (e.g. via
-/// <c>.Include()</c>) before it is accessed. Applying this attribute triggers the
-/// <c>NavigationIncludeAnalyzer</c>: any method that touches the property through a
-/// parameter must declare <see cref="IncludeRequiredAttribute"/> for that parameter.
+/// Marks a navigation property as requiring explicit loading via <c>.Include()</c>.
+/// Methods that access it must declare <c>[IncludeRequired]</c>.
 /// </summary>
-/// <remarks>
-/// Place this attribute on navigation properties of entity classes to enforce at
-/// compile time that callers load them before use, preventing
-/// </remarks>
 /// <example>
+/// Only properties that need tracking should be annotated — untracked properties produce no diagnostics:
 /// <code>
-/// public class User
+/// class User
 /// {
-///     public int Id { get; set; }
+///     public Organization Organization { get; set; } // not tracked
 ///
-///     /// Navigation property — must be loaded explicitly before access.
 ///     [TrackIncludeRequired]
-///     public UserProfile Profile { get; set; }
+///     public UserProfile Profile { get; set; } // tracked — callers must ensure it is loaded
 /// }
 /// </code>
 /// </example>

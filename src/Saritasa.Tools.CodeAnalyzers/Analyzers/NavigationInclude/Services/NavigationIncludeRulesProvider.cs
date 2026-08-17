@@ -3,12 +3,26 @@ using Microsoft.CodeAnalysis;
 
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Services;
 
-internal static class NavigationInclncludeRulesProvider
+/// <summary>
+/// Provides <see cref="DiagnosticDescriptor"/> definitions and identifiers for the <see cref="NavigationIncludeAnalyzer"/> rules.
+/// </summary>
+internal static class NavigationIncludeRulesProvider
 {
     private const string Category = "Usage";
 
+    /// <summary>
+    /// Diagnostic identifier for INCL001.
+    /// </summary>
     public const string RuleIncl1Id = "INCL001";
+
+    /// <summary>
+    /// Diagnostic identifier for INCL002.
+    /// </summary>
     public const string RuleIncl2Id = "INCL002";
+
+    /// <summary>
+    /// Diagnostic identifier for INCL003.
+    /// </summary>
     public const string RuleIncl3Id = "INCL003";
 
     #region INCL001
@@ -84,9 +98,18 @@ internal static class NavigationInclncludeRulesProvider
 
     #endregion
 
+    /// <summary>
+    /// All diagnostic descriptors registered by this analyzer.
+    /// </summary>
     public static readonly ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =
         ImmutableArray.Create(ruleIncl1, ruleIncl2, ruleIncl3);
 
+
+    /// <summary>
+    /// Returns the diagnostic descriptor for the given rule id.
+    /// </summary>
+    /// <param name="ruleId">Rule id.</param>
+    /// <returns>Diagnostic descriptor.</returns>
     public static DiagnosticDescriptor GetDiagnosticDescriptor(string ruleId)
     {
         return ruleId switch
