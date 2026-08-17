@@ -1,18 +1,17 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Saritasa.Tools.CodeAnalyzers.Helpers;
+﻿using Saritasa.Tools.CodeAnalyzers.Helpers;
+using Xunit;
 
 namespace Saritasa.Tools.CodeAnalyzers.Tests.Helpers.StringHelperTests;
 
 /// <summary>
 /// Tests for <see cref="StringHelper.IsCamelCaseWord"/>.
 /// </summary>
-[TestClass]
 public class IsCamelCaseWordTests
 {
     /// <summary>
     /// Test that camelCase words are correctly identified.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IsCamelCaseWord_CamelCaseWord_ReturnsTrue()
     {
         // Arrange
@@ -22,13 +21,13 @@ public class IsCamelCaseWordTests
         var isCamelCase = StringHelper.IsCamelCaseWord(word);
 
         // Assert
-        Assert.IsTrue(isCamelCase);
+        Assert.True(isCamelCase);
     }
 
     /// <summary>
     /// Test that PascalCase words are correctly identified.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IsCamelCaseWord_PascalCaseWord_ReturnsTrue()
     {
         // Arrange
@@ -38,13 +37,13 @@ public class IsCamelCaseWordTests
         var isCamelCase = StringHelper.IsCamelCaseWord(word);
 
         // Assert
-        Assert.IsTrue(isCamelCase);
+        Assert.True(isCamelCase);
     }
 
     /// <summary>
     /// Test that all lowercase words are not identified as camelCase.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IsCamelCaseWord_AllLowercase_ReturnsFalse()
     {
         // Arrange
@@ -54,13 +53,13 @@ public class IsCamelCaseWordTests
         var isCamelCase = StringHelper.IsCamelCaseWord(word);
 
         // Assert
-        Assert.IsFalse(isCamelCase);
+        Assert.False(isCamelCase);
     }
 
     /// <summary>
     /// Test that all uppercase words are not identified as camelCase.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IsCamelCaseWord_AllUppercase_ReturnsFalse()
     {
         // Arrange
@@ -70,13 +69,13 @@ public class IsCamelCaseWordTests
         var isCamelCase = StringHelper.IsCamelCaseWord(word);
 
         // Assert
-        Assert.IsFalse(isCamelCase);
+        Assert.False(isCamelCase);
     }
 
     /// <summary>
     /// Test that words with numbers are not identified as camelCase.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IsCamelCaseWord_WordWithNumbers_ReturnsFalse()
     {
         // Arrange
@@ -86,13 +85,13 @@ public class IsCamelCaseWordTests
         var isCamelCase = StringHelper.IsCamelCaseWord(word);
 
         // Assert
-        Assert.IsFalse(isCamelCase);
+        Assert.False(isCamelCase);
     }
 
     /// <summary>
     /// Test that words with special characters are not identified as camelCase.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IsCamelCaseWord_WordWithSpecialCharacters_ReturnsFalse()
     {
         // Arrange
@@ -102,13 +101,13 @@ public class IsCamelCaseWordTests
         var isCamelCase = StringHelper.IsCamelCaseWord(word);
 
         // Assert
-        Assert.IsFalse(isCamelCase);
+        Assert.False(isCamelCase);
     }
 
     /// <summary>
     /// Test that single letter words are not identified as camelCase.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IsCamelCaseWord_SingleLetter_ReturnsFalse()
     {
         // Arrange
@@ -118,13 +117,13 @@ public class IsCamelCaseWordTests
         var isCamelCase = StringHelper.IsCamelCaseWord(word);
 
         // Assert
-        Assert.IsFalse(isCamelCase);
+        Assert.False(isCamelCase);
     }
 
     /// <summary>
     /// Test that empty strings are not identified as camelCase.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IsCamelCaseWord_EmptyString_ReturnsFalse()
     {
         // Arrange
@@ -134,13 +133,13 @@ public class IsCamelCaseWordTests
         var isCamelCase = StringHelper.IsCamelCaseWord(word);
 
         // Assert
-        Assert.IsFalse(isCamelCase);
+        Assert.False(isCamelCase);
     }
 
     /// <summary>
     /// Test that words with multiple uppercase letters are correctly identified as camelCase.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IsCamelCaseWord_MultipleUppercase_ReturnsTrue()
     {
         // Arrange
@@ -150,13 +149,13 @@ public class IsCamelCaseWordTests
         var isCamelCase = StringHelper.IsCamelCaseWord(word);
 
         // Assert
-        Assert.IsTrue(isCamelCase);
+        Assert.True(isCamelCase);
     }
 
     /// <summary>
     /// Test that two-letter camelCase words are correctly identified.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IsCamelCaseWord_TwoLetterCamelCase_ReturnsTrue()
     {
         // Arrange
@@ -166,13 +165,13 @@ public class IsCamelCaseWordTests
         var isCamelCase = StringHelper.IsCamelCaseWord(word);
 
         // Assert
-        Assert.IsTrue(isCamelCase);
+        Assert.True(isCamelCase);
     }
 
     /// <summary>
     /// Test that two-letter PascalCase words are correctly identified.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IsCamelCaseWord_TwoLetterPascalCase_ReturnsTrue()
     {
         // Arrange
@@ -182,13 +181,13 @@ public class IsCamelCaseWordTests
         var isCamelCase = StringHelper.IsCamelCaseWord(word);
 
         // Assert
-        Assert.IsTrue(isCamelCase);
+        Assert.True(isCamelCase);
     }
 
     /// <summary>
     /// Test that words with spaces are not identified as camelCase.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IsCamelCaseWord_WordWithSpaces_ReturnsFalse()
     {
         // Arrange
@@ -198,13 +197,13 @@ public class IsCamelCaseWordTests
         var isCamelCase = StringHelper.IsCamelCaseWord(word);
 
         // Assert
-        Assert.IsFalse(isCamelCase);
+        Assert.False(isCamelCase);
     }
 
     /// <summary>
     /// Test that words with hyphens are not identified as camelCase.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IsCamelCaseWord_WordWithHyphens_ReturnsFalse()
     {
         // Arrange
@@ -214,13 +213,13 @@ public class IsCamelCaseWordTests
         var isCamelCase = StringHelper.IsCamelCaseWord(word);
 
         // Assert
-        Assert.IsFalse(isCamelCase);
+        Assert.False(isCamelCase);
     }
 
     /// <summary>
     /// Test that complex camelCase identifiers are correctly identified.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IsCamelCaseWord_ComplexCamelCase_ReturnsTrue()
     {
         // Arrange
@@ -230,6 +229,6 @@ public class IsCamelCaseWordTests
         var isCamelCase = StringHelper.IsCamelCaseWord(word);
 
         // Assert
-        Assert.IsTrue(isCamelCase);
+        Assert.True(isCamelCase);
     }
 }

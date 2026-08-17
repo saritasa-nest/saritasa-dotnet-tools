@@ -1,17 +1,14 @@
-using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude;
-using VerifyCS = Saritasa.Tools.CodeAnalyzers.Tests.Verifiers.CSharpAnalyzerVerifier<
-    Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.NavigationIncludeAnalyzer>;
+using Xunit;
 
 namespace Saritasa.Tools.CodeAnalyzers.Tests.NavigationIncludeAnalyzerTests;
 
 /// <summary>
 /// Tests for <see cref="NavigationIncludeAnalyzer"/>.
 /// </summary>
-[TestClass]
 public class NavigationIncludeAnalyzerTests
 {
     private const string Preamble =
@@ -56,14 +53,15 @@ public class NavigationIncludeAnalyzerTests
         """;
 
     private static readonly ReferenceAssemblies References = new ReferenceAssemblies(
-        "net8.0",
-        new PackageIdentity("Microsoft.NETCore.App.Ref", "8.0.0"),
-        System.IO.Path.Combine("ref", "net8.0"))
-        .AddPackages(ImmutableArray.Create(new PackageIdentity("Microsoft.EntityFrameworkCore", "9.0.6")));
+            "net10.0",
+            new PackageIdentity("Microsoft.NETCore.App.Ref", "10.0.0"),
+            Path.Combine("ref", "net10.0")
+        )
+        .AddPackages([new PackageIdentity("Microsoft.EntityFrameworkCore", "10.0.11")]);
 
     private static async Task VerifyAnalyzerAsync(string source)
     {
-        var test = new VerifyCS.Test
+        var test = new CSharpAnalyzerTest<NavigationIncludeAnalyzer, DefaultVerifier>
         {
             TestCode = source,
             ReferenceAssemblies = References
@@ -78,7 +76,7 @@ public class NavigationIncludeAnalyzerTests
     /// <summary>
     /// INCL001 is reported when a method accesses a [TrackIncludeRequired] property directly without declaring [IncludeRequired].
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task DirectPropertyAccess_WithoutIncludeRequired_ReportsIncl1()
     {
         const string sourceCode = Preamble +
@@ -101,7 +99,7 @@ public class NavigationIncludeAnalyzerTests
     /// <summary>
     /// No warning is produced when a method declares [IncludeRequired] for the parameter it accesses the navigation property on.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task DirectPropertyAccess_WithIncludeRequired_NoIncl1()
     {
         const string sourceCode = Preamble +
@@ -125,7 +123,7 @@ public class NavigationIncludeAnalyzerTests
     /// <summary>
     /// INCL001 is reported when a method passes its own parameter to a callee that has [IncludeRequired], but the caller does not declare the same requirement.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task ParameterPropagation_WithoutIncludeRequired_ReportsIncl1()
     {
         const string sourceCode = Preamble +
@@ -160,7 +158,7 @@ public class NavigationIncludeAnalyzerTests
     /// <summary>
     /// No warning is produced when both the caller and the callee declare [IncludeRequired] for the propagated parameter.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task ParameterPropagation_WithIncludeRequired_NoIncl1()
     {
         const string sourceCode = Preamble +
@@ -197,7 +195,7 @@ public class NavigationIncludeAnalyzerTests
     /// <summary>
     /// INCL002: local variable obtained from a query without .Include() triggers the warning.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Handle_QueryMissingInclude_ReportsIncl2()
     {
         var sourceCode = Preamble +
@@ -230,7 +228,7 @@ public class NavigationIncludeAnalyzerTests
     /// <summary>
     /// No INCL002: local variable obtained from a query that includes .Include(u => u.Profile).
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Handle_QueryWithInclude_NoIncl2()
     {
         var sourceCode = Preamble +
@@ -263,7 +261,7 @@ public class NavigationIncludeAnalyzerTests
     /// <summary>
     /// INCL002: local variable created via object initializer without the required property triggers the warning.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Handle2_ObjectInitMissingProperty_ReportsIncl2()
     {
         var sourceCode = Preamble +
@@ -300,7 +298,7 @@ public class NavigationIncludeAnalyzerTests
     /// <summary>
     /// No INCL002: local variable created via object initializer that sets the required property.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Handle2_ObjectInitWithProperty_NoIncl2()
     {
         var sourceCode = Preamble +
@@ -336,7 +334,7 @@ public class NavigationIncludeAnalyzerTests
     /// <summary>
     /// INCL002: local variable obtained from a method that does not carry [Includes] triggers the warning.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Handle3_SourceMethodMissingIncludesAttr_ReportsIncl2()
     {
         var sourceCode = Preamble +
@@ -376,7 +374,7 @@ public class NavigationIncludeAnalyzerTests
     /// <summary>
     /// No INCL002: local variable obtained from a method decorated with [Includes(nameof(User.Profile)].
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Handle3_SourceMethodWithIncludesAttr_NoIncl2()
     {
         var sourceCode = Preamble +
@@ -420,7 +418,7 @@ public class NavigationIncludeAnalyzerTests
     /// INCL003: method declares [Includes(nameof(User.Profile))] but returns a query result
     /// without .Include(u => u.Profile).
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GetUser_QueryMissingInclude_ReportsIncl3()
     {
         var sourceCode = Preamble +
@@ -448,7 +446,7 @@ public class NavigationIncludeAnalyzerTests
     /// No INCL003: method declares [Includes(nameof(User.Profile))] and the query includes
     /// .Include(u => u.Profile).
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GetUser_QueryWithInclude_NoIncl3()
     {
         var sourceCode = Preamble +
@@ -476,7 +474,7 @@ public class NavigationIncludeAnalyzerTests
     /// INCL003: method declares [Includes(nameof(User.Profile))] but the created object does not
     /// set Profile in the object initializer.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task CreateUser_ObjectInitMissingProfile_ReportsIncl3()
     {
         var sourceCode = Preamble +
@@ -508,7 +506,7 @@ public class NavigationIncludeAnalyzerTests
     /// No INCL003: method declares [Includes(nameof(User.Profile))] and the created object sets
     /// Profile in the object initializer.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task CreateUser_ObjectInitWithProfile_NoIncl3()
     {
         var sourceCode = Preamble +

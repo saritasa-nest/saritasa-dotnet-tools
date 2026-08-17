@@ -1,15 +1,14 @@
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Saritasa.Tools.CodeAnalyzers.Analyzers;
 using Saritasa.Tools.CodeAnalyzers.Tests.Helpers;
+using Xunit;
 
 namespace Saritasa.Tools.CodeAnalyzers.Tests.SpellingAnalyzerTests;
 
 /// <summary>
 /// Tests for <see cref="SpellingAnalyzer"/>.
 /// </summary>
-[TestClass]
 public class SpellingAnalyzerTests
 {
     private const string CustomUserExclusionsFilePath = "custom/my-exclusions.txt";
@@ -44,7 +43,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies single word string literal produces a warning when it contains a typo.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task StringLiteral_SingleWord_WithTypo_ShouldProduceWarning()
     {
         context.TestCode =
@@ -68,7 +67,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies single word string literal does not produce a warning when it is correct.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task StringLiteral_SingleWord_WithoutTypo_ShouldNotProduceWarning()
     {
         context.TestCode =
@@ -92,7 +91,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies sentence string literal produces a warning when it contains a typo.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task StringLiteral_Sentence_WithTypo_ShouldProduceWarning()
     {
         context.TestCode =
@@ -116,7 +115,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies sentence string literal does not produce a warning when it is correct.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task StringLiteral_Sentence_WithoutTypo_ShouldNotProduceWarning()
     {
         context.TestCode =
@@ -140,7 +139,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies interpolated string produces a warning when it contains a typo.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task InterpolatedString_WithTypo_ShouldProduceWarning()
     {
         context.TestCode =
@@ -165,7 +164,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies interpolated string does not produce a warning when it is correct.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task InterpolatedString_WithoutTypo_ShouldNotProduceWarning()
     {
         context.TestCode =
@@ -190,7 +189,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies single raw string produces a warning when it contains a typo.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task SingleRawString_WithTypo_ShouldProduceWarning()
     {
         context.TestCode =
@@ -214,7 +213,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies single raw string does not produce a warning when it is correct.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task SingleRawString_WithoutTypo_ShouldNotProduceWarning()
     {
         context.TestCode =
@@ -238,7 +237,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies multiline raw string produces a warning when it contains a typo.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task MultilineRawString_WithTypo_ShouldProduceWarning()
     {
         context.TestCode =
@@ -266,7 +265,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies multiline raw string does not produce a warning when it is correct.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task MultilineRawString_WithoutTypo_ShouldNotProduceWarning()
     {
         context.TestCode =
@@ -294,7 +293,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies identifier produces a warning when it contains a typo.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Identifier_WithTypo_ShouldProduceWarning()
     {
         context.TestCode =
@@ -318,7 +317,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies identifier does not produce a warning when it is correct.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Identifier_WithoutTypo_ShouldNotProduceWarning()
     {
         context.TestCode =
@@ -342,7 +341,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies single line comment produces a warning when it contains a typo.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Comment_SingleLine_WithTypo_ShouldProduceWarning()
     {
         context.TestCode =
@@ -366,7 +365,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies single line comment does not produce a warning when it is correct.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Comment_SingleLine_WithoutTypo_ShouldNotProduceWarning()
     {
         context.TestCode =
@@ -390,7 +389,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies multi line comment produces a warning when it contains a typo.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Comment_MultiLine_WithTypo_ShouldProduceWarning()
     {
         context.TestCode =
@@ -416,7 +415,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies multi line comment does not produce a warning when it is correct.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Comment_MultiLine_WithoutTypo_ShouldNotProduceWarning()
     {
         context.TestCode =
@@ -442,7 +441,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies documentation produces a warning when it contains a typo.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Documentation_WithTypo_ShouldProduceWarning()
     {
         context.TestCode =
@@ -468,7 +467,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies documentation does not produce a warning when it is correct.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Documentation_WithoutTypo_ShouldNotProduceWarning()
     {
         context.TestCode =
@@ -498,7 +497,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies documentation comment (/** ... */ form) produces a warning when it contains a typo.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Documentation_Classic_WithTypo_ShouldProduceWarning()
     {
         context.TestCode =
@@ -524,7 +523,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies documentation (/** ... */ form) does not produce a warning when it is correct.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Documentation_Classic_WithoutTypo_ShouldNotProduceWarning()
     {
         context.TestCode =
@@ -550,7 +549,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies class name produces a warning when it contains a typo.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Class_WithTypo_ShouldProduceWarning()
     {
         context.TestCode =
@@ -573,7 +572,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies class name does not produce a warning when it is correct.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Class_WithoutTypo_ShouldNotProduceWarning()
     {
         context.TestCode =
@@ -596,7 +595,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies method name produces a warning when it contains a typo.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Method_WithTypo_ShouldProduceWarning()
     {
         context.TestCode =
@@ -619,7 +618,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies method name does not produce a warning when it is correct.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Method_WithoutTypo_ShouldNotProduceWarning()
     {
         context.TestCode =
@@ -642,7 +641,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies word in user exclusions does not produce a warning when using the default file is used.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task WordInUserExclusions_DefaultFile_ShouldNotProduceWarning()
     {
         context.TestState.AdditionalFiles.Add(("dictionaries/spell-checker-exclusions.txt", "typoo"));
@@ -655,7 +654,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies word in user exclusions does not produce a warning when the same paths are used for file in .editorconfig.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task WordInUserExclusions_FileFromEditorconfig_EqualPaths_ShouldNotProduceWarning()
     {
         context.TestState.AdditionalFiles.Add((CustomUserExclusionsFilePath, "typoo"));
@@ -674,7 +673,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies word in user exclusions does not produce a warning when the different paths are used for file in .editorconfig.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task WordInUserExclusions_FileFromEditorconfig_DifferentPaths_ShouldNotProduceWarning()
     {
         context.TestState.AdditionalFiles.Add(($"dictionaries/{CustomUserExclusionsFilePath}", "typoo"));
@@ -694,7 +693,7 @@ public class SpellingAnalyzerTests
     /// Verifies word in user exclusions does not produce a warning
     /// when inconsistent separators are used for paths.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task WordInUserExclusions_FileFromEditorconfig_InconsistentSeparators_ShouldNotProduceWarning()
     {
         context.TestState.AdditionalFiles.Add((CustomUserExclusionsFilePath, "typoo"));
@@ -713,7 +712,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies word in general exclusions does not produce a warning.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task WordInGeneralExclusions_ShouldNotProduceWarning()
     {
         context.TestCode =
@@ -737,7 +736,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies <see cref="Guid"/> string does not produce a warning.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Guid_String_ShouldNotProduceWarning()
     {
         context.TestCode =
@@ -764,7 +763,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies <see cref="Guid"/> comment does not produce a warning.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Guid_Comment_ShouldNotProduceWarning()
     {
         context.TestCode =
@@ -789,7 +788,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies external method call is excluded from analysis.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task ExternalMethodCall_WithTypo_ShouldNotProduceWarning()
     {
         context.TestCode =
@@ -816,7 +815,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies user method call produces a warning.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task UserMethodCall_WithTypo_ShouldProduceWarning()
     {
         context.TestCode =
@@ -844,7 +843,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies word without typo but with possession apostrophe does not produce a warning.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Comment_WithApostrophe_WithoutTypo_ShouldNotProduceWarning()
     {
         context.TestCode =
@@ -868,7 +867,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies string with typo and apostrophe produces a warning.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task String_WithApostrophe_WithTypo_ShouldProduceWarning()
     {
         context.TestCode =
@@ -892,7 +891,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies string without typo but with apostrophe does not produce a warning.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task StringWithApostrophe_WithoutTypo_ShouldNotProduceWarning()
     {
         context.TestCode =
@@ -916,7 +915,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies URL in sentence is excluded from analysis.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task String_WithUrl_ShouldNotProduceWarning()
     {
         context.TestCode =
@@ -940,7 +939,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies URL in comment is excluded from analysis.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Comment_WithUrl_ShouldNotProduceWarning()
     {
         context.TestCode =
@@ -964,7 +963,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies URL in documentation is excluded from analysis.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Documentation_WithUrl_ShouldNotProduceWarning()
     {
         context.TestCode =
@@ -991,7 +990,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies format string is excluded from analysis.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Comment_Format_ShouldNotProduceWarning()
     {
         context.TestCode =
@@ -1020,7 +1019,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies file path is excluded from analysis.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Comment_FilePath_ShouldNotProduceWarning()
     {
         context.TestCode =
@@ -1051,7 +1050,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies that file path typo after produces a warning.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Comment_FilePath_TypoAfterFilePath_ShouldProduceWarning()
     {
         context.TestCode =
@@ -1077,7 +1076,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies hex is excluded from analysis.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Comment_Hex_ShouldNotProduceWarning()
     {
         context.TestCode =
@@ -1106,7 +1105,7 @@ public class SpellingAnalyzerTests
     /// <summary>
     /// Verifies that name in camelCase does not produce a warning.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Name_ShouldNotProduceWarning()
     {
         context.TestCode =
@@ -1135,7 +1134,7 @@ public class SpellingAnalyzerTests
     /// Verifies that name in regular words does not produce a warning.
     /// We have name "Suse" and "devopsUsers" has it as "sUse". We check that in this case we do not mask the name.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Name_ContainedInRegularWord_ShouldNotProduceWarning()
     {
         context.TestCode =
@@ -1162,7 +1161,7 @@ public class SpellingAnalyzerTests
     /// <remarks>
     /// We have name "Hangfire" in the dictionary, so when we use "hangfire" in identifier it should not produce warning.
     /// </remarks>
-    [TestMethod]
+    [Fact]
     public async Task Name_WithDifferentFirstLetterCase_ShouldNotProduceWarning()
     {
         context.TestCode =
@@ -1195,7 +1194,7 @@ public class SpellingAnalyzerTests
     /// Word "Monday" stored with upper-case first letter.
     /// When split from "mondayDate", the segment "monday" must still pass the check.
     /// </remarks>
-    [TestMethod]
+    [Fact]
     public async Task Identifier_DictionaryWordStartWithUpperCase_ShouldNotProduceWarning()
     {
         context.TestCode =

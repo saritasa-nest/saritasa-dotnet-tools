@@ -1,59 +1,72 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using VerifyCS = Saritasa.Tools.CodeAnalyzers.Tests.Verifiers.CSharpCodeFixVerifier<
-    Saritasa.Tools.CodeAnalyzers.Analyzers.RequestHandlersAnalyzer,
-    Saritasa.Tools.CodeAnalyzers.CodeFixProviders.RequestHandlersCodeFixProvider>;
+﻿using System.Collections.Immutable;
+using Microsoft.CodeAnalysis.CSharp.Testing;
+using Microsoft.CodeAnalysis.Testing;
+using Xunit;
 
 namespace Saritasa.Tools.CodeAnalyzers.Tests.RequestHandlersAnalyzer;
 
 /// <summary>
 /// Request handlers analyzer tests.
 /// </summary>
-[TestClass]
 public class RequestHandlersAnalyzerTests
 {
+    private static readonly ReferenceAssemblies References = new ReferenceAssemblies(
+            "net6.0",
+            new PackageIdentity("Microsoft.NETCore.App.Ref", "6.0.0"),
+            Path.Combine("ref", "net6.0"))
+        .AddPackages(
+            new[]
+            {
+                new PackageIdentity("MediatR", "12.1.1")
+            }.ToImmutableArray());
+
+    private static async Task VerifyAnalyzerAsync(string source)
+    {
+        var test = new CSharpAnalyzerTest<Analyzers.RequestHandlersAnalyzer, DefaultVerifier>
+        {
+            TestCode = source,
+            ReferenceAssemblies = References
+        };
+        await test.RunAsync(CancellationToken.None);
+    }
+
     /// <summary>
     /// Request handler analyzer test.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task DiagnosticCode_ClassWithRequestHandlerWithoutReturnType_DiagnosticWarning()
     {
-        var diagnosticArgument = "TestRequestHandler";
-        var sourceCode = $@"
+        var sourceCode =
+            /* lang=c# */
+            """
                 using System;
                 using MediatR;
                 using System.Threading;
                 using System.Threading.Tasks;
 
                 namespace TestApplication
-                {{
-                    class TestRequest : IRequest {{ }}
-                    class {diagnosticArgument} : IRequestHandler<TestRequest>
-                    {{
+                {
+                    class TestRequest : IRequest { }
+                    class [|TestRequestHandler|] : IRequestHandler<TestRequest>
+                    {
                         public Task Handle(TestRequest request, CancellationToken cancellationToken)
                              => throw new NotImplementedException();
-                    }}
-                }}";
+                    }
+                }
+            """;
 
-        await new RequestHandlersAnalyzerTestsHelper
-        {
-            TestCode = sourceCode,
-            ExpectedDiagnostics =
-            {
-                VerifyCS.Diagnostic(Analyzers.RequestHandlersAnalyzer.DiagnosticId)
-                    .WithSeverity(Microsoft.CodeAnalysis.DiagnosticSeverity.Warning)
-                    .WithSpan(10, 27, 10, 27 + diagnosticArgument.Length)
-                    .WithArguments(diagnosticArgument)
-            }
-        }.RunAsync();
+        await VerifyAnalyzerAsync(sourceCode);
     }
 
     /// <summary>
     /// Request handler analyzer test.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task DiagnosticCode_ClassWithRequestHandlerAndReturnType_NoDiagnostic()
     {
-        const string sourceCode = @"
+        var sourceCode =
+            /* lang=c# */
+            """
                 using System;
                 using MediatR;
                 using System.Threading;
@@ -67,31 +80,29 @@ public class RequestHandlersAnalyzerTests
                         public Task<int> Handle(TestRequest request, CancellationToken cancellationToken)
                              => throw new NotImplementedException();
                     }
-                }";
+                }
+            """;
 
-        await new RequestHandlersAnalyzerTestsHelper
-        {
-            TestCode = sourceCode
-        }.RunAsync();
+        await VerifyAnalyzerAsync(sourceCode);
     }
 
     /// <summary>
     /// Request handler analyzer test.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task DiagnosticCode_ClassWithoutRequestHandler_NoDiagnostic()
     {
-        const string sourceCode = @"
+        const string sourceCode =
+            /* lang=c# */
+            """
                 namespace TestApplication
                 {
                     class TestClass
                     {
                     }
-                }";
+                }
+            """;
 
-        await new RequestHandlersAnalyzerTestsHelper
-        {
-            TestCode = sourceCode
-        }.RunAsync();
+        await VerifyAnalyzerAsync(sourceCode);
     }
 }

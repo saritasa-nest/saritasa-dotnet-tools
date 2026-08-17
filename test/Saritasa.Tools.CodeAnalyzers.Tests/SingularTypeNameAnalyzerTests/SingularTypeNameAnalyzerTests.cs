@@ -1,15 +1,14 @@
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Saritasa.Tools.CodeAnalyzers.Analyzers;
 using Saritasa.Tools.CodeAnalyzers.Tests.Helpers;
+using Xunit;
 
 namespace Saritasa.Tools.CodeAnalyzers.Tests.SingularTypeNameAnalyzerTests;
 
 /// <summary>
 /// Tests for <see cref="SingularTypeNameAnalyzer"/>.
 /// </summary>
-[TestClass]
 public class SingularTypeNameAnalyzerTests
 {
     private readonly CSharpAnalyzerTest<SingularTypeNameAnalyzer, DefaultVerifier> context;
@@ -28,7 +27,7 @@ public class SingularTypeNameAnalyzerTests
     /// <summary>
     /// Validates case when class name contains plural word.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Class_WithPluralWord_ShouldProduceWarning()
     {
         context.TestCode = "class [|UsersController|] { }";
@@ -39,7 +38,7 @@ public class SingularTypeNameAnalyzerTests
     /// <summary>
     /// Validates case when interface name contains plural word.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Interface_WithPluralWord_ShouldProduceWarning()
     {
         context.TestCode = "interface [|IUsersController|] { }";
@@ -50,7 +49,7 @@ public class SingularTypeNameAnalyzerTests
     /// <summary>
     /// Validates case when class name contains plural word but does not have keyword.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Class_WithPluralWord_WithoutKeyword_ShouldNotProduceWarning()
     {
         context.TestCode = "class UsersExtensions { }";
@@ -61,7 +60,7 @@ public class SingularTypeNameAnalyzerTests
     /// <summary>
     /// Validates case when class name contains multiple words including plural word.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Class_MultipleWords_WithPluralWord_ShouldProduceWarning()
     {
         context.TestCode = "class [|ProjectQualifiedSpecificationsController|] { }";
@@ -72,7 +71,7 @@ public class SingularTypeNameAnalyzerTests
     /// <summary>
     /// Validates case when class name starts and ends with plural word.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Class_WithMultiplePluralWords_ShouldProduceWarning()
     {
         context.TestCode = "class [|ProjectsExtensionsController|] { }";
@@ -83,7 +82,7 @@ public class SingularTypeNameAnalyzerTests
     /// <summary>
     /// Validates case when class name contains allowed plural word.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Class_WithAllowedPluralWord_ShouldNotProduceWarning()
     {
         context.TestCode = "class NewsController { }";
@@ -94,7 +93,7 @@ public class SingularTypeNameAnalyzerTests
     /// <summary>
     /// Validates case when class name contains singular word.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Class_WithSingularWord_ShouldNotProduceWarning()
     {
         context.TestCode = "class UserController { }";
@@ -105,7 +104,7 @@ public class SingularTypeNameAnalyzerTests
     /// <summary>
     /// Validates case when class name contains multiple words without plural ones.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Class_MultipleSingularWords_ShouldNotProduceWarning()
     {
         context.TestCode = "class ProjectQualifiedSpecificationController { }";
@@ -116,7 +115,7 @@ public class SingularTypeNameAnalyzerTests
     /// <summary>
     /// Validates case when class name contains plural word that is allowed by user via .editorconfig.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Class_WithUserAllowedPluralWord_ShouldNotProduceWarning()
     {
         var test = new CSharpAnalyzerTest<SingularTypeNameAnalyzer, DefaultVerifier>
@@ -137,7 +136,7 @@ public class SingularTypeNameAnalyzerTests
     /// <summary>
     /// Validates case when class name contains plural word that is allowed by user via .editorconfig (multiple words).
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Class_WithMultipleUserAllowedPluralWords_ShouldNotProduceWarning()
     {
         var test = new CSharpAnalyzerTest<SingularTypeNameAnalyzer, DefaultVerifier>
@@ -159,7 +158,7 @@ public class SingularTypeNameAnalyzerTests
     /// <summary>
     /// Validates case when class name contains plural word that is NOT in the user allowed list.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Class_WithPluralWordNotInUserAllowedList_ShouldProduceWarning()
     {
         var test = new CSharpAnalyzerTest<SingularTypeNameAnalyzer, DefaultVerifier>
