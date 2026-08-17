@@ -69,7 +69,6 @@ internal static class NavigationPropertyLoadChecker
         return InvocationChainContainsInclude(initializer, propertyName);
     }
 
-    // TODO
     /// <summary>
     /// Walks the method-call chain checking for a .Include() call or an <see cref="IncludesAttribute"/>-annotated method for property name.
     /// </summary>
@@ -85,6 +84,13 @@ internal static class NavigationPropertyLoadChecker
             if (current is IAwaitOperation awaitOp)
             {
                 current = awaitOp.Operation;
+                continue;
+            }
+
+            // Unwrap implicit conversions in the receiver chain, e.g. IIncludableQueryable<T,P> → IQueryable<T>.
+            if (current is IConversionOperation convOp && convOp.IsImplicit)
+            {
+                current = convOp.Operand;
                 continue;
             }
 
@@ -117,7 +123,6 @@ internal static class NavigationPropertyLoadChecker
         return false;
     }
 
-    // TODO
     /// <summary>
     /// Returns true if invocation is a .Include() call whose lambda accesses property name.
     /// </summary>
@@ -127,6 +132,13 @@ internal static class NavigationPropertyLoadChecker
     private static bool IsIncludeCallForProperty(IInvocationOperation invocation, string propertyName)
     {
         if (!string.Equals(invocation.TargetMethod.Name, "Include", StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        // Only EF Core's Include counts, not arbitrary methods named Include.
+        if (invocation.TargetMethod.ContainingType.ToDisplayString() !=
+            "Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions")
         {
             return false;
         }
@@ -150,11 +162,23 @@ internal static class NavigationPropertyLoadChecker
     /// <returns>True if the lambda accesses the property; otherwise false.</returns>
     private static bool LambdaAccessesProperty(IOperation operation, string propertyName)
     {
-        // Roslyn wraps lambdas passed as arguments in IDelegateCreationOperation; unwrap to reach the lambda body.
-        if (operation is IDelegateCreationOperation delegateCreation)
+        // Unwrap any nesting of IDelegateCreationOperation / IConversionOperation to reach the anonymous function.
+        bool unwrapped;
+        do
         {
-            operation = delegateCreation.Target;
+            unwrapped = false;
+            if (operation is IDelegateCreationOperation delegateCreation)
+            {
+                operation = delegateCreation.Target;
+                unwrapped = true;
+            }
+            else if (operation is IConversionOperation conversion)
+            {
+                operation = conversion.Operand;
+                unwrapped = true;
+            }
         }
+        while (unwrapped);
 
         if (operation is IAnonymousFunctionOperation lambda)
         {

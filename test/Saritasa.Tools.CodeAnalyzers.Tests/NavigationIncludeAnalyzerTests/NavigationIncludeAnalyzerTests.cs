@@ -1,4 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Immutable;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Testing;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude;
 using VerifyCS = Saritasa.Tools.CodeAnalyzers.Tests.Verifiers.CSharpAnalyzerVerifier<
     Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.NavigationIncludeAnalyzer>;
@@ -16,41 +19,14 @@ public class NavigationIncludeAnalyzerTests
         """
         using System;
         using System.Threading.Tasks;
+        using Microsoft.EntityFrameworkCore;
+        using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Attributes;
 
         namespace TestApplication
         {
-            [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-            public class IncludeRequiredAttribute : Attribute
+            public class AppDbContext : DbContext
             {
-                public IncludeRequiredAttribute(string paramName, string propertyName)
-                {
-                }
-            }
-
-            [AttributeUsage(AttributeTargets.Property)]
-            public class TrackIncludeRequiredAttribute : Attribute
-            {
-                public TrackIncludeRequiredAttribute()
-                {
-                }
-            }
-
-            [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-            public class IncludesAttribute : Attribute
-            {
-                public string IncludedProperty { get; }
-
-                public IncludesAttribute(string includedProperty)
-                {
-                    IncludedProperty = includedProperty;
-                }
-            }
-
-            class DbQuery<T>
-            {
-                public DbQuery<T> Include<TProperty>(Func<T, TProperty> nav) => this;
-                public T FirstOrDefault(Func<T, bool> predicate) => default;
-                public Task<T> FirstOrDefaultAsync(Func<T, bool> predicate) => Task.FromResult(default(T));
+                public DbSet<User> Users { get; set; }
             }
 
             public class Organization
@@ -79,6 +55,24 @@ public class NavigationIncludeAnalyzerTests
             }
         """;
 
+    private static readonly ReferenceAssemblies References = new ReferenceAssemblies(
+        "net8.0",
+        new PackageIdentity("Microsoft.NETCore.App.Ref", "8.0.0"),
+        System.IO.Path.Combine("ref", "net8.0"))
+        .AddPackages(ImmutableArray.Create(new PackageIdentity("Microsoft.EntityFrameworkCore", "9.0.6")));
+
+    private static async Task VerifyAnalyzerAsync(string source)
+    {
+        var test = new VerifyCS.Test
+        {
+            TestCode = source,
+            ReferenceAssemblies = References
+        };
+        test.TestState.AdditionalReferences.Add(
+            MetadataReference.CreateFromFile(typeof(NavigationIncludeAnalyzer).Assembly.Location));
+        await test.RunAsync(CancellationToken.None);
+    }
+
     #region INCL001
 
     /// <summary>
@@ -101,7 +95,7 @@ public class NavigationIncludeAnalyzerTests
             }
             """;
 
-        await VerifyCS.VerifyAnalyzerAsync(sourceCode);
+        await VerifyAnalyzerAsync(sourceCode);
     }
 
     /// <summary>
@@ -125,7 +119,7 @@ public class NavigationIncludeAnalyzerTests
             }
             """;
 
-        await VerifyCS.VerifyAnalyzerAsync(sourceCode);
+        await VerifyAnalyzerAsync(sourceCode);
     }
 
     /// <summary>
@@ -160,7 +154,7 @@ public class NavigationIncludeAnalyzerTests
             }
             """;
 
-        await VerifyCS.VerifyAnalyzerAsync(sourceCode);
+        await VerifyAnalyzerAsync(sourceCode);
     }
 
     /// <summary>
@@ -193,7 +187,7 @@ public class NavigationIncludeAnalyzerTests
             }
             """;
 
-        await VerifyCS.VerifyAnalyzerAsync(sourceCode);
+        await VerifyAnalyzerAsync(sourceCode);
     }
 
     #endregion
@@ -209,13 +203,11 @@ public class NavigationIncludeAnalyzerTests
         var sourceCode = Preamble +
             /* lang=c# */
             """
-                class TestClass
+                class TestClass(AppDbContext dbContext)
                 {
-                    private DbQuery<User> _users;
-
                     async Task Handle(SaveUserDto dto)
                     {
-                        var user = await _users
+                        var user = await dbContext.Users
                             //.Include(u => u.Profile) // Uncommenting this line would fix the INCL002 warning.
                             .FirstOrDefaultAsync(u => u.Id == dto.Id);
 
@@ -232,7 +224,7 @@ public class NavigationIncludeAnalyzerTests
             }
             """;
 
-        await VerifyCS.VerifyAnalyzerAsync(sourceCode);
+        await VerifyAnalyzerAsync(sourceCode);
     }
 
     /// <summary>
@@ -245,13 +237,11 @@ public class NavigationIncludeAnalyzerTests
             /* lang=c# */
             """
 
-                class TestClass
+                class TestClass(AppDbContext dbContext)
                 {
-                    private DbQuery<User> _users;
-
                     async Task Handle(SaveUserDto dto)
                     {
-                        var user = await _users
+                        var user = await dbContext.Users
                             .Include(u => u.Profile)
                             .FirstOrDefaultAsync(u => u.Id == dto.Id);
                         // No INCL002: Profile is loaded via .Include().
@@ -267,7 +257,7 @@ public class NavigationIncludeAnalyzerTests
             }
             """;
 
-        await VerifyCS.VerifyAnalyzerAsync(sourceCode);
+        await VerifyAnalyzerAsync(sourceCode);
     }
 
     /// <summary>
@@ -304,7 +294,7 @@ public class NavigationIncludeAnalyzerTests
             }
             """;
 
-        await VerifyCS.VerifyAnalyzerAsync(sourceCode);
+        await VerifyAnalyzerAsync(sourceCode);
     }
 
     /// <summary>
@@ -340,7 +330,7 @@ public class NavigationIncludeAnalyzerTests
             }
             """;
 
-        await VerifyCS.VerifyAnalyzerAsync(sourceCode);
+        await VerifyAnalyzerAsync(sourceCode);
     }
 
     /// <summary>
@@ -353,13 +343,11 @@ public class NavigationIncludeAnalyzerTests
             /* lang=c# */
             """
 
-                class TestClass
+                class TestClass(AppDbContext dbContext)
                 {
-                    private DbQuery<User> _users;
-
                     async Task Handle3(SaveUserDto dto)
                     {
-                        // GetUser has no [Includes(nameof(User.Profile))] – INCL002 expected.
+                        // GetUser has no [Includes(nameof(User.Profile))] � INCL002 expected.
                         var user = await GetUser(dto.Id);
                         // INCL002: the called method requires User.Profile, but it is not checked.
                         {|INCL002:UpdateUserProfile(user, dto)|};
@@ -368,7 +356,7 @@ public class NavigationIncludeAnalyzerTests
                     // [Includes(nameof(User.Profile))] // Uncommenting would fix the warning.
                     async Task<User> GetUser(int id)
                     {
-                        return await _users
+                        return await dbContext.Users
                             .Include(u => u.Profile)
                             .FirstOrDefaultAsync(u => u.Id == id);
                     }
@@ -382,7 +370,7 @@ public class NavigationIncludeAnalyzerTests
             }
             """;
 
-        await VerifyCS.VerifyAnalyzerAsync(sourceCode);
+        await VerifyAnalyzerAsync(sourceCode);
     }
 
     /// <summary>
@@ -395,10 +383,8 @@ public class NavigationIncludeAnalyzerTests
             /* lang=c# */
             """
 
-                class TestClass
+                class TestClass(AppDbContext dbContext)
                 {
-                    private DbQuery<User> _users;
-
                     async Task Handle3(SaveUserDto dto)
                     {
                         var user = await GetUser(dto.Id);
@@ -409,7 +395,7 @@ public class NavigationIncludeAnalyzerTests
                     [Includes(nameof(User.Profile))]
                     async Task<User> GetUser(int id)
                     {
-                        return await _users
+                        return await dbContext.Users
                             .Include(u => u.Profile)
                             .FirstOrDefaultAsync(u => u.Id == id);
                     }
@@ -423,7 +409,7 @@ public class NavigationIncludeAnalyzerTests
             }
             """;
 
-        await VerifyCS.VerifyAnalyzerAsync(sourceCode);
+        await VerifyAnalyzerAsync(sourceCode);
     }
 
     #endregion
@@ -441,15 +427,13 @@ public class NavigationIncludeAnalyzerTests
              /* lang=c# */
              """
 
-                 class TestClass
+                 class TestClass(AppDbContext dbContext)
                  {
-                     private DbQuery<User> _users;
-
                      [Includes(nameof(User.Profile))]
                      async Task<User> GetUser(int id)
                      {
                          // INCL003: the method has Includes attribute for User.Profile, but Profile is not Included in the query.
-                         {|INCL003:return await _users
+                         {|INCL003:return await dbContext.Users
                              //.Include(u => u.Profile) // Uncommenting this line would fix the INCL003 warning.
                              .FirstOrDefaultAsync(u => u.Id == id);|}
                      }
@@ -457,7 +441,7 @@ public class NavigationIncludeAnalyzerTests
              }
              """;
 
-        await VerifyCS.VerifyAnalyzerAsync(sourceCode);
+        await VerifyAnalyzerAsync(sourceCode);
     }
 
     /// <summary>
@@ -471,15 +455,13 @@ public class NavigationIncludeAnalyzerTests
             /* lang=c# */
             """
 
-                class TestClass
+                class TestClass(AppDbContext dbContext)
                 {
-                    private DbQuery<User> _users;
-
                     [Includes("Profile")]
                     async Task<User> GetUser(int id)
                     {
                         // No INCL003: Profile is loaded via .Include().
-                        return await _users
+                        return await dbContext.Users
                             .Include(u => u.Profile)
                             .FirstOrDefaultAsync(u => u.Id == id);
                     }
@@ -487,7 +469,7 @@ public class NavigationIncludeAnalyzerTests
             }
             """;
 
-        await VerifyCS.VerifyAnalyzerAsync(sourceCode);
+        await VerifyAnalyzerAsync(sourceCode);
     }
 
     /// <summary>
@@ -519,7 +501,7 @@ public class NavigationIncludeAnalyzerTests
             }
             """;
 
-        await VerifyCS.VerifyAnalyzerAsync(sourceCode);
+        await VerifyAnalyzerAsync(sourceCode);
     }
 
     /// <summary>
@@ -551,7 +533,7 @@ public class NavigationIncludeAnalyzerTests
             }
             """;
 
-        await VerifyCS.VerifyAnalyzerAsync(sourceCode);
+        await VerifyAnalyzerAsync(sourceCode);
     }
 
     #endregion
