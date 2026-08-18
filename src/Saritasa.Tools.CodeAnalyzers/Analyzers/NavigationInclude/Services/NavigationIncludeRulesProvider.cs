@@ -104,7 +104,6 @@ internal static class NavigationIncludeRulesProvider
     public static readonly ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =
         ImmutableArray.Create(ruleIncl1, ruleIncl2, ruleIncl3);
 
-
     /// <summary>
     /// Returns the diagnostic descriptor for the given rule id.
     /// </summary>

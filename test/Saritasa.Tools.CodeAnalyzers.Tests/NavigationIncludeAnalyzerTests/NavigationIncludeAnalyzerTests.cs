@@ -166,8 +166,7 @@ public class NavigationIncludeAnalyzerTests
             """
                 class TestClass
                 {
-                    // Uncommenting this line will fix the INCL001 warning.
-                    [IncludeRequired(nameof(user), nameof(@User.Profile))]
+                    [IncludeRequired(nameof(user), nameof(User.Profile))]
                     void UpdateUserProfile(User user, SaveUserDto dto)
                     {
                         // Does not produce INCL001 because Organization has no TrackIncludeRequired attribute.
@@ -175,7 +174,7 @@ public class NavigationIncludeAnalyzerTests
                         SetTimezone(user, dto.Timezone);
                     }
 
-                    [IncludeRequired(nameof(user), nameof(@User.Profile))]
+                    [IncludeRequired(nameof(user), nameof(User.Profile))]
                     void SetTimezone(User user, string timezone)
                     {
                         // Does not produce INCL001 because the method has IncludeRequired attribute.
@@ -345,7 +344,7 @@ public class NavigationIncludeAnalyzerTests
                 {
                     async Task Handle3(SaveUserDto dto)
                     {
-                        // GetUser has no [Includes(nameof(User.Profile))] � INCL002 expected.
+                        // GetUser has no [Includes(nameof(User.Profile))].
                         var user = await GetUser(dto.Id);
                         // INCL002: the called method requires User.Profile, but it is not checked.
                         {|INCL002:UpdateUserProfile(user, dto)|};
@@ -455,7 +454,7 @@ public class NavigationIncludeAnalyzerTests
 
                 class TestClass(AppDbContext dbContext)
                 {
-                    [Includes("Profile")]
+                    [Includes(nameof(User.Profile))]
                     async Task<User> GetUser(int id)
                     {
                         // No INCL003: Profile is loaded via .Include().

@@ -5,7 +5,7 @@
 /// Can be applied multiple times to cover multiple parameters or properties.
 /// </summary>
 /// <example>
-/// Single requirement
+/// Single requirement.
 /// <code>
 /// [IncludeRequired(nameof(user), nameof(User.Profile))]
 /// void SetTimezone(User user, string timezone)
@@ -15,7 +15,7 @@
 /// </code>
 /// </example>
 /// <example>
-/// Stacked — both Profile and Address must be loaded
+/// Stacked — both Profile and Address must be loaded.
 /// <code>
 /// [IncludeRequired(nameof(user), nameof(User.Profile))]
 /// [IncludeRequired(nameof(user), nameof(User.Address))]

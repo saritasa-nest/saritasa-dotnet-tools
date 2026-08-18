@@ -21,7 +21,7 @@ public class SplitByNonLettersTests
         var result = StringHelper.SplitByNonLetters(text).ToList();
 
         // Assert
-        Assert.Equal(1, result.Count);
+        Assert.Single(result);
 
         Assert.Equal("hello", result[0].Word);
         Assert.Equal(0, result[0].Offset);
@@ -84,7 +84,7 @@ public class SplitByNonLettersTests
         var result = StringHelper.SplitByNonLetters(text).ToList();
 
         // Assert
-        Assert.Equal(0, result.Count);
+        Assert.Empty(result);
     }
 
     /// <summary>
@@ -100,7 +100,7 @@ public class SplitByNonLettersTests
         var result = StringHelper.SplitByNonLetters(text).ToList();
 
         // Assert
-        Assert.Equal(0, result.Count);
+        Assert.Empty(result);
     }
 
     /// <summary>
@@ -116,7 +116,7 @@ public class SplitByNonLettersTests
         var result = StringHelper.SplitByNonLetters(text).ToList();
 
         // Assert
-        Assert.Equal(1, result.Count);
+        Assert.Single(result);
 
         Assert.Equal("hello", result[0].Word);
         Assert.Equal(2, result[0].Offset);
@@ -135,7 +135,7 @@ public class SplitByNonLettersTests
         var result = StringHelper.SplitByNonLetters(text).ToList();
 
         // Assert
-        Assert.Equal(1, result.Count);
+        Assert.Single(result);
 
         Assert.Equal("hello", result[0].Word);
         Assert.Equal(0, result[0].Offset);

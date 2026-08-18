@@ -117,7 +117,7 @@ public class SplitCamelCaseTests
         var result = StringHelper.SplitCamelCase(word, baseOffset).ToList();
 
         // Assert
-        Assert.Equal(1, result.Count);
+        Assert.Single(result);
 
         Assert.Equal("word", result[0].Word);
         Assert.Equal(0, result[0].Offset);
@@ -160,7 +160,7 @@ public class SplitCamelCaseTests
         var result = StringHelper.SplitCamelCase(word, baseOffset).ToList();
 
         // Assert
-        Assert.Equal(0, result.Count);
+        Assert.Empty(result);
     }
 
     /// <summary>
