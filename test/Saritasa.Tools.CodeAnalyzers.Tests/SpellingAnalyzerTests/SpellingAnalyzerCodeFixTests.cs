@@ -1,16 +1,15 @@
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Saritasa.Tools.CodeAnalyzers.Analyzers;
 using Saritasa.Tools.CodeAnalyzers.CodeFixProviders;
 using Saritasa.Tools.CodeAnalyzers.Tests.Helpers;
+using Xunit;
 
 namespace Saritasa.Tools.CodeAnalyzers.Tests.SpellingAnalyzerTests;
 
 /// <summary>
 /// Tests for <see cref="SpellingCodeFixProvider"/>.
 /// </summary>
-[TestClass]
 public class SpellingAnalyzerCodeFixTests
 {
     private const string DefaultExclusionsFile = "dictionaries/spell-checker-exclusions.txt";
@@ -62,7 +61,7 @@ public class SpellingAnalyzerCodeFixTests
     /// <summary>
     /// Verifies that a misspelled word is appended to an empty exclusions file.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task AddWord_EmptyExclusionsFile_WordAppended()
     {
         var test = CreateTest();
@@ -75,7 +74,7 @@ public class SpellingAnalyzerCodeFixTests
     /// <summary>
     /// Verifies that a misspelled word is appended when the exclusions file already ends with a newline.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task AddWord_FileEndsWithNewline_WordAppendedWithoutBlankLine()
     {
         var test = CreateTest();
@@ -88,7 +87,7 @@ public class SpellingAnalyzerCodeFixTests
     /// <summary>
     /// Verifies that a newline is inserted before the word when the exclusions file does not end with one.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task AddWord_FileDoesNotEndWithNewline_NewlineInsertedBeforeWord()
     {
         var test = CreateTest();
@@ -101,7 +100,7 @@ public class SpellingAnalyzerCodeFixTests
     /// <summary>
     /// Verifies that the word is stored in lowercase even when the diagnostic reports it in uppercase.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task AddWord_WordStoredAsLowercase()
     {
         const string codeWithUpperTypo =
@@ -149,7 +148,7 @@ public class SpellingAnalyzerCodeFixTests
     /// <summary>
     /// Verifies that CRLF is used when the existing file content uses CRLF.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task AddWord_FileUsesCrlf_AppendedWithCrlf()
     {
         var test = CreateTest();
@@ -162,7 +161,7 @@ public class SpellingAnalyzerCodeFixTests
     /// <summary>
     /// Verifies that LF is used when the existing file content uses LF.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task AddWord_FileUsesLf_AppendedWithLf()
     {
         var test = CreateTest();
@@ -175,7 +174,7 @@ public class SpellingAnalyzerCodeFixTests
     /// <summary>
     /// Verifies that LF is used as a fallback when the file content has no recognizable line separator.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task AddWord_FileHasNoLineSeparator_AppendedWithLfFallback()
     {
         var test = CreateTest();
@@ -188,7 +187,7 @@ public class SpellingAnalyzerCodeFixTests
     /// <summary>
     /// Verifies that a word is appended when a similar but distinct word already exists (substring check).
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task AddWord_SimilarWordExists_WordStillAppended()
     {
         var test = CreateTest();
@@ -201,7 +200,7 @@ public class SpellingAnalyzerCodeFixTests
     /// <summary>
     /// Verifies that no code fix is offered when no exclusions file is present in AdditionalFiles.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task NoFix_NoExclusionsFileInAdditionalFiles()
     {
         var test = new CSharpCodeFixTest<SpellingAnalyzer, SpellingCodeFixProvider, DefaultVerifier>
@@ -219,7 +218,7 @@ public class SpellingAnalyzerCodeFixTests
     /// <summary>
     /// Verifies that the fix targets the exclusions file configured in .editorconfig (exact path match).
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task AddWord_CustomExclusionsFileFromEditorconfig_EqualPaths_WordAppended()
     {
         var test = new CSharpCodeFixTest<SpellingAnalyzer, SpellingCodeFixProvider, DefaultVerifier>
@@ -242,7 +241,7 @@ public class SpellingAnalyzerCodeFixTests
     /// Verifies that the fix targets the exclusions file configured in .editorconfig
     /// when the file is registered under a longer path that ends with the configured relative path.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task AddWord_CustomExclusionsFileFromEditorconfig_DifferentPaths_WordAppended()
     {
         var test = new CSharpCodeFixTest<SpellingAnalyzer, SpellingCodeFixProvider, DefaultVerifier>
@@ -266,7 +265,7 @@ public class SpellingAnalyzerCodeFixTests
     /// <summary>
     /// Verifies that no code fix is offered when the path in .editorconfig does not match any AdditionalFile.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task NoFix_CustomExclusionsFileConfiguredButNotInAdditionalFiles()
     {
         var test = new CSharpCodeFixTest<SpellingAnalyzer, SpellingCodeFixProvider, DefaultVerifier>

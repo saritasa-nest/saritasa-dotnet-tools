@@ -1,4 +1,4 @@
-using Microsoft.CodeAnalysis.CSharp.Testing;
+using Microsoft.CodeAnalysis.Testing;
 
 namespace Saritasa.Tools.CodeAnalyzers.Tests.Helpers;
 
@@ -9,7 +9,7 @@ public static class TestConstants
 {
     /// <summary>
     /// File path for test file.
-    /// We might need it instead of <see cref="CSharpAnalyzerTest{TAnalyzer,TVerifier}.TestCode"/> when .editorconfig is involved.
+    /// We might need it instead of <see cref="AnalyzerTest{TVerifier}.TestCode"/> when .editorconfig is involved.
     /// Because .editorconfig and test file must be in the same directory.
     /// </summary>
     public const string TestSourceFilePath = "/src/Test0.cs";
