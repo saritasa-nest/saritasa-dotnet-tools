@@ -14,6 +14,8 @@ Add a package as a reference. See the [latest version on NuGet](https://www.nuge
 </PackageReference>
 ```
 
+If your project uses a [global package reference](https://learn.microsoft.com/en-us/nuget/consume-packages/central-package-management#global-package-references) (`GlobalPackageReference` in `Directory.Packages.props`) and you need to use attributes such as `[TrackIncludeRequired]`, `[IncludeRequired]`, or `[Includes]` from this package in your code, you still need to add a regular `PackageReference` to the project. Global package references are designed for analyzers and don't include compile-time assets (the `lib` assembly), so the attributes won't be available for direct use in code without an explicit `PackageReference`.
+
 ## Analyzers
 
 | ID | Title | Severity | Category |
