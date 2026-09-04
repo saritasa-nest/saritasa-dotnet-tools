@@ -1,4 +1,4 @@
-﻿namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Attributes;
+﻿namespace Saritasa.Tools.CodeAnalyzers.Abstractions.NavigationInclude.Attributes;
 
 /// <summary>
 /// Marks a navigation property as requiring explicit loading via <c>.Include()</c>.

@@ -1,4 +1,4 @@
-﻿namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Attributes;
+﻿namespace Saritasa.Tools.CodeAnalyzers.Abstractions.NavigationInclude.Attributes;
 
 /// <summary>
 /// Declares that the named method parameter must have the named navigation property loaded before the method is called.

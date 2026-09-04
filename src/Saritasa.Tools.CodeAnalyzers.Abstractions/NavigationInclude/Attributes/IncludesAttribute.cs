@@ -1,4 +1,4 @@
-﻿namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Attributes;
+﻿namespace Saritasa.Tools.CodeAnalyzers.Abstractions.NavigationInclude.Attributes;
 
 /// <summary>
 /// Promises that the method's return value has the named navigation property loaded.
