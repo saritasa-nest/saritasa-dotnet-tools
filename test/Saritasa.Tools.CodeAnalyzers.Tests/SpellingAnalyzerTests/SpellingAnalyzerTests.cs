@@ -1,4 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Testing;
+using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
 using Saritasa.Tools.CodeAnalyzers.Analyzers;
 using Saritasa.Tools.CodeAnalyzers.Tests.Helpers;
@@ -775,6 +775,56 @@ public class SpellingAnalyzerTests
                     public void TestMethod()
                     {
                         // The typoo's result was invalid.
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies word in general exclusions used in its plural form does not produce a warning.
+    /// </summary>
+    [Fact]
+    public async Task WordInGeneralExclusions_PluralForm_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        // The validators returned invalid results.
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies word in user exclusions used in its plural form does not produce a warning.
+    /// </summary>
+    [Fact]
+    public async Task WordInUserExclusions_PluralForm_ShouldNotProduceWarning()
+    {
+        context.TestState.AdditionalFiles.Add(("dictionaries/spell-checker-exclusions.txt", "typoo"));
+
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        // The typoos returned invalid results.
                     }
                 }
             }

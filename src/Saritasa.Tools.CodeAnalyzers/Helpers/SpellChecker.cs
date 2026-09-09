@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -27,10 +27,18 @@ public static class SpellChecker
     private const string ExclusionsFileOptionName = "dotnet_diagnostic.STAN1004.exclusions_file";
 
     /// <summary>
-    /// Hunspell affix flag that allows a word to take the possessive <c>'s</c> suffix (see <c>SFX M</c> in en-us.aff).
+    /// Hunspell affix flag that allows a word to take the possessive <c>'s</c> suffix (<c>SFX M</c> in en-us.aff).
     /// Applied to excluded words so they are recognized in possessive form, e.g. <c>validator's</c>.
     /// </summary>
-    private static readonly FlagSet possessiveFlag = FlagSet.Create(new FlagValue('M'));
+    private static readonly FlagValue possessiveFlag = new('M');
+
+    /// <summary>
+    /// Hunspell affix flag that allows a word to take the regular plural suffix (<c>SFX S</c> in en-us.aff).
+    /// Applied to excluded words so they are recognized in plural form, e.g. <c>validators</c>.
+    /// </summary>
+    private static readonly FlagValue pluralFlag = new('S');
+
+    private static readonly FlagSet exclusionFlags = FlagSet.Create(possessiveFlag, pluralFlag);
 
     private static readonly Assembly assembly = typeof(SpellChecker).Assembly;
 
@@ -110,7 +118,7 @@ public static class SpellChecker
 
     private static void AddExcludedWord(WordList wordList, string word)
     {
-        wordList.Add(word, possessiveFlag, MorphSet.Empty, WordEntryOptions.None);
+        wordList.Add(word, exclusionFlags, MorphSet.Empty, WordEntryOptions.None);
     }
 
     private static bool IsDictionaryHandled(string name) =>
