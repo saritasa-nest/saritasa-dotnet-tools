@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -25,6 +25,12 @@ public static class SpellChecker
     /// Example: <c>dotnet_diagnostic.STAN1004.exclusions_file = path/to/exclusions.txt</c>.
     /// </summary>
     private const string ExclusionsFileOptionName = "dotnet_diagnostic.STAN1004.exclusions_file";
+
+    /// <summary>
+    /// Hunspell affix flag that allows a word to take the possessive <c>'s</c> suffix (see <c>SFX M</c> in en-us.aff).
+    /// Applied to excluded words so they are recognized in possessive form, e.g. <c>validator's</c>.
+    /// </summary>
+    private static readonly FlagSet possessiveFlag = FlagSet.Create(new FlagValue('M'));
 
     private static readonly Assembly assembly = typeof(SpellChecker).Assembly;
 
@@ -96,10 +102,15 @@ public static class SpellChecker
                 var word = line.Trim();
                 if (!string.IsNullOrWhiteSpace(word))
                 {
-                    wordList.Add(word);
+                    AddExcludedWord(wordList, word);
                 }
             }
         }
+    }
+
+    private static void AddExcludedWord(WordList wordList, string word)
+    {
+        wordList.Add(word, possessiveFlag, MorphSet.Empty, WordEntryOptions.None);
     }
 
     private static bool IsDictionaryHandled(string name) =>
@@ -118,7 +129,7 @@ public static class SpellChecker
             var word = line.ToString().Trim();
             if (!string.IsNullOrWhiteSpace(word))
             {
-                wordList.Add(word);
+                AddExcludedWord(wordList, word);
             }
         }
     }
@@ -229,7 +240,7 @@ public static class SpellChecker
             else
             {
                 // When name does not have camelCase we check it as usual.
-                wordList.Add(name);
+                AddExcludedWord(wordList, name);
             }
         }
 

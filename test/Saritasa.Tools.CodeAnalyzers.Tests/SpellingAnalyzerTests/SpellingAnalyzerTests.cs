@@ -1,4 +1,4 @@
-using Microsoft.CodeAnalysis.CSharp.Testing;
+﻿using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
 using Saritasa.Tools.CodeAnalyzers.Analyzers;
 using Saritasa.Tools.CodeAnalyzers.Tests.Helpers;
@@ -725,6 +725,56 @@ public class SpellingAnalyzerTests
                     public void TestMethod()
                     {
                         var test = "linq";
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies word in general exclusions used with a possessive noun form does not produce a warning.
+    /// </summary>
+    [Fact]
+    public async Task WordInGeneralExclusions_PossessiveForm_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        // The validator's result was invalid.
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies word in user exclusions used with a possessive noun form does not produce a warning.
+    /// </summary>
+    [Fact]
+    public async Task WordInUserExclusions_PossessiveForm_ShouldNotProduceWarning()
+    {
+        context.TestState.AdditionalFiles.Add(("dictionaries/spell-checker-exclusions.txt", "typoo"));
+
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        // The typoo's result was invalid.
                     }
                 }
             }
