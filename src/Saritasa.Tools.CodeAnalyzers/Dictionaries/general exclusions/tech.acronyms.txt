@@ -54,6 +54,7 @@ cqrs
 cqs
 crc
 crlf
+crm
 csc
 csdl
 csrf
@@ -253,6 +254,7 @@ oltp
 oop
 ordbms
 orm
+otlp
 os
 oss
 owin

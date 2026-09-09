@@ -16,6 +16,7 @@ nameof
 dotnet
 storages
 nullable
+nullability
 struct
 structs
 yaml
@@ -25,7 +26,11 @@ boolean
 booleans
 getter
 setter
+comment
+uncomment
 init
+inline
+inlining
 backend
 frontend
 comparer
@@ -85,6 +90,9 @@ changelogs
 initializer
 initializers
 readonly
+recurse
+recursion
+recursive
 downloader
 namespace
 autocomplete
@@ -93,3 +101,17 @@ unix
 cron
 parser
 parsers
+schema
+schemas
+deserialize
+deserialization
+deserialized
+deserializer
+deserializers
+deserializes
+serialize
+serialization
+serialized
+serializer
+serializers
+serializes
