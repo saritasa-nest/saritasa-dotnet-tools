@@ -1,3 +1,4 @@
+aabb
 aad
 abnf
 acpi
@@ -29,11 +30,13 @@ bgra
 bios
 bof
 bom
+bpmn
 bsd
 bson
 bstr
 cad
 ccsid
+cdata
 cdn
 cgi
 cil
@@ -54,6 +57,7 @@ cqrs
 cqs
 crc
 crlf
+crm
 csc
 csdl
 csrf
@@ -70,6 +74,7 @@ dbo
 ddl
 ddos
 ddr
+dfs
 dgml
 dhcp
 dkim
@@ -200,6 +205,7 @@ mac
 mapi
 mbcs
 mbps
+mdi
 mdn
 mef
 mfa
@@ -253,6 +259,7 @@ oltp
 oop
 ordbms
 orm
+otlp
 os
 oss
 owin

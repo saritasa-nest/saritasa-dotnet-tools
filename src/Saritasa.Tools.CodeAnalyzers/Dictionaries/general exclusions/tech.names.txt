@@ -105,6 +105,7 @@ Hastlayer
 HSQLDB
 HTML
 IBM
+iCalendar
 ICSharpCode
 Informix
 Intacept
