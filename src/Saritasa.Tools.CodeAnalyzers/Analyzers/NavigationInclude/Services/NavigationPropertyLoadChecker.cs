@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Operations;
-using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Attributes;
+using Saritasa.Tools.CodeAnalyzers.Abstractions.NavigationInclude.Attributes;
 
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Services;
 

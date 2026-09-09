@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
+using Saritasa.Tools.CodeAnalyzers.Abstractions.NavigationInclude.Attributes;
 using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude;
 using Xunit;
 
@@ -17,7 +18,7 @@ public class NavigationIncludeAnalyzerTests
         using System;
         using System.Threading.Tasks;
         using Microsoft.EntityFrameworkCore;
-        using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Attributes;
+        using Saritasa.Tools.CodeAnalyzers.Abstractions.NavigationInclude.Attributes;
 
         namespace TestApplication
         {
@@ -68,6 +69,8 @@ public class NavigationIncludeAnalyzerTests
         };
         test.TestState.AdditionalReferences.Add(
             MetadataReference.CreateFromFile(typeof(NavigationIncludeAnalyzer).Assembly.Location));
+        test.TestState.AdditionalReferences.Add(
+            MetadataReference.CreateFromFile(typeof(TrackIncludeRequiredAttribute).Assembly.Location));
         await test.RunAsync(CancellationToken.None);
     }
 
