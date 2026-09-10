@@ -10,11 +10,22 @@
     <DevelopmentDependency>true</DevelopmentDependency>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Saritasa.Tools.CodeAnalyzers.Abstractions\Saritasa.Tools.CodeAnalyzers.Abstractions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+
+    <None Include="$(OutputPath)\Saritasa.Tools.CodeAnalyzers.Abstractions.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+
+    <None Include="$(OutputPath)\Saritasa.Tools.CodeAnalyzers.Abstractions.dll" Pack="true" PackagePath="lib\netstandard2.0" Visible="true" />
+
     <None Update="tools\*.ps1" CopyToOutputDirectory="Always"  Pack="true"  PackagePath="tools"  />
+    <None Include="README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
   <ItemGroup>

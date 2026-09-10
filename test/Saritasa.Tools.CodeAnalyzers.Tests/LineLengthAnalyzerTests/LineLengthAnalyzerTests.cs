@@ -1,15 +1,14 @@
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Saritasa.Tools.CodeAnalyzers.Analyzers;
 using Saritasa.Tools.CodeAnalyzers.Tests.Helpers;
+using Xunit;
 
 namespace Saritasa.Tools.CodeAnalyzers.Tests.LineLengthAnalyzerTests;
 
 /// <summary>
 /// Tests for <see cref="LineLengthAnalyzer"/>.
 /// </summary>
-[TestClass]
 public class LineLengthAnalyzerTests
 {
     private readonly CSharpAnalyzerTest<LineLengthAnalyzer, DefaultVerifier> context;
@@ -28,7 +27,7 @@ public class LineLengthAnalyzerTests
     /// <summary>
     /// Validates that long line produces warning.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Line_IsTooLong_ShouldProduceWarning()
     {
         const string sourceCode =
@@ -50,7 +49,7 @@ public class LineLengthAnalyzerTests
     /// <summary>
     /// Validates that long line produces warning when maximum length is configured via .editorconfig.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Line_IsTooLong_WithConfiguredMaxLineLength_ShouldProduceWarning()
     {
         const string sourceCode =
@@ -79,7 +78,7 @@ public class LineLengthAnalyzerTests
     /// <summary>
     /// Validates that short line does not produce warning.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Line_Short_ShouldNotProduceWarning()
     {
         const string sourceCode =
