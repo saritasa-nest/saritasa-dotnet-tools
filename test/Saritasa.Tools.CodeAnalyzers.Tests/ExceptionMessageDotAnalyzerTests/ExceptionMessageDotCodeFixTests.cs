@@ -1,15 +1,14 @@
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Saritasa.Tools.CodeAnalyzers.Analyzers;
 using Saritasa.Tools.CodeAnalyzers.CodeFixProviders;
+using Xunit;
 
 namespace Saritasa.Tools.CodeAnalyzers.Tests.ExceptionMessageDotAnalyzerTests;
 
 /// <summary>
 /// Tests for <see cref="ExceptionMessageDotCodeFixProvider"/>.
 /// </summary>
-[TestClass]
 public class ExceptionMessageDotCodeFixTests
 {
     private CSharpCodeFixTest<ExceptionMessageDotAnalyzer, ExceptionMessageDotCodeFixProvider, DefaultVerifier> CreateTest(
@@ -27,7 +26,7 @@ public class ExceptionMessageDotCodeFixTests
     /// <summary>
     /// Verifies that the code fix appends a dot to a simple string literal exception message.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task CodeFix_StringLiteral_AppendsDot()
     {
         // Arrange
@@ -75,7 +74,7 @@ public class ExceptionMessageDotCodeFixTests
     /// <summary>
     /// Verifies that the code fix inserts a dot before trailing whitespace in the exception message.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task CodeFix_StringLiteral_TrailingWhitespace_InsertsDotBeforeWhitespace()
     {
         // Arrange
@@ -123,7 +122,7 @@ public class ExceptionMessageDotCodeFixTests
     /// <summary>
     /// Verifies that the code fix appends a dot to a raw string literal exception message.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task CodeFix_RawStringLiteral_AppendsDot()
     {
         // Arrange
@@ -171,7 +170,7 @@ public class ExceptionMessageDotCodeFixTests
     /// <summary>
     /// Verifies that the code fix appends a dot to an interpolated string exception message.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task CodeFix_InterpolatedString_AppendsDot()
     {
         // Arrange
@@ -221,7 +220,7 @@ public class ExceptionMessageDotCodeFixTests
     /// <summary>
     /// Verifies that the code fix appends a dot to the last text part of an interpolated string.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task CodeFix_InterpolatedString_EndsWithText_AppendsDotToText()
     {
         // Arrange
@@ -271,7 +270,7 @@ public class ExceptionMessageDotCodeFixTests
     /// <summary>
     /// Verifies that the code fix appends a dot when an interpolated string ends with an interpolation.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task CodeFix_InterpolatedString_EndsWithInterpolation_AppendsDot()
     {
         // Arrange
@@ -323,7 +322,7 @@ public class ExceptionMessageDotCodeFixTests
     /// <summary>
     /// Verifies that the code fix appends a dot to the format string in a string.Format call.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task CodeFix_StringFormat_AppendsDotToFormatString()
     {
         // Arrange
@@ -371,7 +370,7 @@ public class ExceptionMessageDotCodeFixTests
     /// <summary>
     /// Verifies that the code fix appends a dot to both branches of a ternary operator.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task CodeFix_TernaryOperator_AppendsDotToBothBranches()
     {
         // Arrange
@@ -419,7 +418,7 @@ public class ExceptionMessageDotCodeFixTests
     /// <summary>
     /// Verifies that the code fix appends a dot only to the branch missing a dot in a ternary operator.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task CodeFix_TernaryOperator_MixedDot_AppendsDotOnlyToMissingBranch()
     {
         // Arrange
@@ -467,7 +466,7 @@ public class ExceptionMessageDotCodeFixTests
     /// <summary>
     /// Verifies that the code fix appends a dot only to the branch missing a dot in a reversed mixed ternary operator.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task CodeFix_TernaryOperator_MixedDotReversed_AppendsDotOnlyToMissingBranch()
     {
         // Arrange
@@ -515,7 +514,7 @@ public class ExceptionMessageDotCodeFixTests
     /// <summary>
     /// Verifies that the code fix appends a dot to the right side of a null coalescing operator.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task CodeFix_NullCoalescing_AppendsDotToRightSide()
     {
         // Arrange
@@ -563,7 +562,7 @@ public class ExceptionMessageDotCodeFixTests
     /// <summary>
     /// Verifies that the code fix appends a dot to all arms of a switch expression.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task CodeFix_SwitchExpression_AppendsDotToAllArms()
     {
         // Arrange
@@ -619,7 +618,7 @@ public class ExceptionMessageDotCodeFixTests
     /// <summary>
     /// Verifies that the code fix appends a dot only to the arm missing a dot in a switch expression.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task CodeFix_SwitchExpression_MixedDot_AppendsDotOnlyToMissingArm()
     {
         // Arrange
@@ -675,7 +674,7 @@ public class ExceptionMessageDotCodeFixTests
     /// <summary>
     /// Verifies that the code fix appends a dot only to the arm missing a dot in a reversed mixed switch expression.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task CodeFix_SwitchExpression_MixedDotReversed_AppendsDotOnlyToMissingArm()
     {
         // Arrange
@@ -731,7 +730,7 @@ public class ExceptionMessageDotCodeFixTests
     /// <summary>
     /// Verifies that the code fix appends a dot to the rightmost string literal in a binary concatenation.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task CodeFix_BinaryOperation_AppendsDotToRightmostLiteral()
     {
         // Arrange
@@ -781,7 +780,7 @@ public class ExceptionMessageDotCodeFixTests
     /// <summary>
     /// Verifies that the code fix appends a dot to the rightmost literal in a nested binary concatenation.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task CodeFix_NestedBinaryOperation_AppendsDotToRightmostLiteral()
     {
         // Arrange
@@ -831,7 +830,7 @@ public class ExceptionMessageDotCodeFixTests
     /// <summary>
     /// Verifies that the code fix appends a dot in a base constructor call.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task CodeFix_BaseConstructor_AppendsDot()
     {
         // Arrange
@@ -877,7 +876,7 @@ public class ExceptionMessageDotCodeFixTests
     /// <summary>
     /// Verifies that the code fix appends a dot to the message in a multi-argument exception constructor.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task CodeFix_MultiArgConstructor_AppendsDot()
     {
         // Arrange
@@ -925,7 +924,7 @@ public class ExceptionMessageDotCodeFixTests
     /// <summary>
     /// Verifies that the code fix appends a dot to the message in an exception constructor with paramName and message.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task CodeFix_ParamNameAndMessage_AppendsDot()
     {
         // Arrange
@@ -973,7 +972,7 @@ public class ExceptionMessageDotCodeFixTests
     /// <summary>
     /// Verifies that a base constructor call with both a message and an inner exception appends a dot to the message.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task CodeFix_BaseConstructorMultiArg_AppendsDotToMessage()
     {
         // Arrange
@@ -1019,7 +1018,7 @@ public class ExceptionMessageDotCodeFixTests
     /// <summary>
     /// Verifies that fix all applies the code fix to every diagnostic in the document at once.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task CodeFix_FixAll_MultipleDiagnosticsInDocument_AppendsDotToAll()
     {
         // Arrange

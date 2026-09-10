@@ -84,7 +84,7 @@ public class ExceptionMessageDotAnalyzerTests
     /// <summary>
     /// Validates that an exception message with trailing whitespace after a dot does not produce a warning.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task ExceptionMessage_TrailingWhitespaceAfterDot_ShouldNotProduceWarning()
     {
         // Arrange
@@ -117,7 +117,7 @@ public class ExceptionMessageDotAnalyzerTests
     /// <summary>
     /// Validates that an empty exception message produces a warning.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task ExceptionMessage_EmptyString_ShouldProduceWarning()
     {
         // Arrange
@@ -392,7 +392,7 @@ public class ExceptionMessageDotAnalyzerTests
     /// <summary>
     /// Validates that a ternary operator with mixed dot presence produces a warning.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task ExceptionMessage_TernaryOperator_MixedDot_ShouldProduceWarning()
     {
         // Arrange
@@ -425,7 +425,7 @@ public class ExceptionMessageDotAnalyzerTests
     /// <summary>
     /// Validates that a ternary operator with reversed mixed dot presence produces a warning.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task ExceptionMessage_TernaryOperator_MixedDotReversed_ShouldProduceWarning()
     {
         // Arrange
@@ -582,7 +582,7 @@ public class ExceptionMessageDotAnalyzerTests
     /// <summary>
     /// Validates that a switch expression with mixed dot presence produces a warning.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task ExceptionMessage_SwitchExpression_MixedDot_ShouldProduceWarning()
     {
         // Arrange
@@ -619,7 +619,7 @@ public class ExceptionMessageDotAnalyzerTests
     /// <summary>
     /// Validates that a switch expression with reversed mixed dot presence produces a warning.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task ExceptionMessage_SwitchExpression_MixedDotReversed_ShouldProduceWarning()
     {
         // Arrange
@@ -716,7 +716,7 @@ public class ExceptionMessageDotAnalyzerTests
     /// <summary>
     /// Validates that nested binary concatenation without a dot produces a warning.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task ExceptionMessage_NestedBinaryOperation_WithoutDot_ShouldProduceWarning()
     {
         // Arrange
@@ -957,7 +957,7 @@ public class ExceptionMessageDotAnalyzerTests
     /// <summary>
     /// Validates that a multi-argument exception constructor with message without dot produces a warning.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task ExceptionMessage_MultiArgConstructor_WithoutDot_ShouldProduceWarning()
     {
         // Arrange
@@ -990,7 +990,7 @@ public class ExceptionMessageDotAnalyzerTests
     /// <summary>
     /// Validates that exception constructor with non-message parameter name does not produce a warning.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task ExceptionMessage_NonMessageParameter_ShouldNotProduceWarning()
     {
         // Arrange
@@ -1023,7 +1023,7 @@ public class ExceptionMessageDotAnalyzerTests
     /// <summary>
     /// Validates that exception constructor with both paramName and message parameters produces a warning when message lacks a dot.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task ExceptionMessage_ParamNameAndMessage_WithoutDot_ShouldProduceWarning()
     {
         // Arrange
@@ -1114,7 +1114,7 @@ public class ExceptionMessageDotAnalyzerTests
     /// <summary>
     /// Validates that string.Format with non-constant format argument does not produce a warning.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task ExceptionMessage_StringFormat_NonConstantFormat_ShouldNotProduceWarning()
     {
         // Arrange
@@ -1147,7 +1147,7 @@ public class ExceptionMessageDotAnalyzerTests
     /// <summary>
     /// Validates that a custom Format method with same signature as string.Format does not produce a warning.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task ExceptionMessage_CustomFormatMethod_ShouldNotProduceWarning()
     {
         // Arrange
