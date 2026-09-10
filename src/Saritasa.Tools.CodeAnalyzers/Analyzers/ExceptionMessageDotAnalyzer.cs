@@ -208,7 +208,17 @@ public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
 
     private static bool IsStringType(ITypeSymbol? type) => type?.SpecialType == SpecialType.System_String;
 
-    private static bool EndsWithDot(string value) => value.TrimEnd().EndsWith(".", StringComparison.Ordinal);
+    private static bool EndsWithDot(string value)
+    {
+        var trimmed = value.TrimEnd();
+
+        if (trimmed.Length == 0)
+        {
+            return true;
+        }
+
+        return trimmed.EndsWith(".", StringComparison.Ordinal);
+    }
 
     private static bool DerivesFromException(ITypeSymbol type, INamedTypeSymbol exceptionType)
     {

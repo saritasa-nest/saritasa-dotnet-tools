@@ -1562,4 +1562,35 @@ public class ExceptionMessageDotCodeFixTests
         // Assert
         await test.RunAsync();
     }
+
+    /// <summary>
+    /// Verifies that an empty string exception message is not flagged, so no code fix is offered for it.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_EmptyString_NoDiagnosticReported()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        throw new ArgumentException("");
+                    }
+                }
+            }
+            """;
+
+        // Act
+        var test = CreateTest(sourceCode, sourceCode);
+
+        // Assert
+        await test.RunAsync();
+    }
 }

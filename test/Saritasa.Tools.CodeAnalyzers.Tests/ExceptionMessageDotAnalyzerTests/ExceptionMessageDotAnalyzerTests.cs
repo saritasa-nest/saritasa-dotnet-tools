@@ -115,10 +115,11 @@ public class ExceptionMessageDotAnalyzerTests
     }
 
     /// <summary>
-    /// Validates that an empty exception message produces a warning.
+    /// Validates that an empty exception message does not produce a warning, since it has no phrasing
+    /// to be consistent with.
     /// </summary>
     [Fact]
-    public async Task ExceptionMessage_EmptyString_ShouldProduceWarning()
+    public async Task ExceptionMessage_EmptyString_ShouldNotProduceWarning()
     {
         // Arrange
         const string sourceCode =
@@ -134,7 +135,7 @@ public class ExceptionMessageDotAnalyzerTests
                 {
                     public void TestMethod()
                     {
-                        throw new ArgumentException([|""|]);
+                        throw new ArgumentException("");
                     }
                 }
             }
