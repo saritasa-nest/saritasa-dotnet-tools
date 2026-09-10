@@ -1400,7 +1400,7 @@ public class ExceptionMessageDotCodeFixTests
                     public void TestMethod()
                     {
                         const string test = "test";
-                        throw new ArgumentException($"\"Error\" {test} without \"dot\".");
+                        throw new ArgumentException($"\"Error\" {test} without dot.");
                     }
                 }
             }

@@ -140,22 +140,61 @@ public sealed class ExceptionMessageDotCodeFixProvider : CodeFixProvider
 
     private static SyntaxToken? AppendDotToToken(SyntaxToken oldToken, SyntaxKind tokenKind)
     {
-        var oldValueText = oldToken.ValueText;
-        var trimmed = oldValueText.TrimEnd();
-        if (trimmed.EndsWith(Dot))
+        if (oldToken.ValueText.TrimEnd().EndsWith(Dot, StringComparison.Ordinal))
         {
             return null;
         }
 
-        var trailingWhitespace = oldValueText.Substring(trimmed.Length);
-        var newValueText = trimmed + Dot + trailingWhitespace;
-        var newText = oldToken.Text.Replace(oldValueText, newValueText);
+        var newValueText = InsertDotBeforeTrailingWhitespace(oldToken.ValueText);
+
+        var rawText = oldToken.Text;
+        var (prefixLength, suffixLength) = GetDelimiterLengths(rawText, tokenKind);
+        var prefix = rawText.Substring(0, prefixLength);
+        var suffix = rawText.Substring(rawText.Length - suffixLength);
+        var content = rawText.Substring(prefixLength, rawText.Length - prefixLength - suffixLength);
+        var newText = prefix + InsertDotBeforeTrailingWhitespace(content) + suffix;
+
         return SyntaxFactory.Token(
             oldToken.LeadingTrivia,
             tokenKind,
             newText,
             newValueText,
             oldToken.TrailingTrivia);
+    }
+
+    private static string InsertDotBeforeTrailingWhitespace(string text)
+    {
+        var trimmed = text.TrimEnd();
+        var trailingWhitespace = text.Substring(trimmed.Length);
+        return trimmed + Dot + trailingWhitespace;
+    }
+
+    private static (int PrefixLength, int SuffixLength) GetDelimiterLengths(string rawText, SyntaxKind tokenKind)
+    {
+        if (tokenKind == SyntaxKind.InterpolatedStringTextToken)
+        {
+            return (0, 0);
+        }
+
+        const string rawStringPrefix = "\"\"\"";
+        if (rawText.StartsWith(rawStringPrefix, StringComparison.Ordinal))
+        {
+            var length = 0;
+            while (length < rawText.Length && rawText[length] == '"')
+            {
+                length++;
+            }
+
+            return (length, length);
+        }
+
+        const string verbatimStringPrefix = "@\"";
+        if (rawText.StartsWith(verbatimStringPrefix, StringComparison.Ordinal))
+        {
+            return (2, 1);
+        }
+
+        return (1, 1);
     }
 
     private static InvocationExpressionSyntax AppendDotToFormatString(InvocationExpressionSyntax invocation)

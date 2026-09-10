@@ -235,5 +235,4 @@ public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
 
         return false;
     }
-
 }
