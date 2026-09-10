@@ -111,29 +111,13 @@ public sealed class ExceptionMessageDotCodeFixProvider : CodeFixProvider
     private static LiteralExpressionSyntax AppendDotToStringLiteral(LiteralExpressionSyntax literal)
     {
         var oldToken = literal.Token;
-        var oldValueText = oldToken.ValueText;
-
-        if (oldValueText.Length == 0)
+        if (oldToken.ValueText.Length == 0)
         {
             return literal;
         }
 
-        var trimmed = oldValueText.TrimEnd();
-        if (trimmed.EndsWith(Dot))
-        {
-            return literal;
-        }
-
-        var trailingWhitespace = oldValueText.Substring(trimmed.Length);
-        var newValueText = trimmed + Dot + trailingWhitespace;
-        var newText = oldToken.Text.Replace(oldValueText, newValueText);
-        var newToken = SyntaxFactory.Token(
-            oldToken.LeadingTrivia,
-            oldToken.Kind(),
-            newText,
-            newValueText,
-            oldToken.TrailingTrivia);
-        return literal.WithToken(newToken);
+        var newToken = AppendDotToToken(oldToken, oldToken.Kind());
+        return newToken is null ? literal : literal.WithToken(newToken.Value);
     }
 
     private static InterpolatedStringExpressionSyntax AppendDotToInterpolatedString(
@@ -143,29 +127,35 @@ public sealed class ExceptionMessageDotCodeFixProvider : CodeFixProvider
 
         if (contents.Count > 0 && contents[contents.Count - 1] is InterpolatedStringTextSyntax lastText)
         {
-            var oldToken = lastText.TextToken;
-            var oldValueText = oldToken.ValueText;
-            var trimmed = oldValueText.TrimEnd();
-            if (trimmed.EndsWith(Dot))
-            {
-                return interpolated;
-            }
-
-            var trailingWhitespace = oldValueText.Substring(trimmed.Length);
-            var newValueText = trimmed + Dot + trailingWhitespace;
-            var newText = oldToken.Text.Replace(oldValueText, newValueText);
-            var newToken = SyntaxFactory.Token(
-                oldToken.LeadingTrivia,
-                SyntaxKind.InterpolatedStringTextToken,
-                newText,
-                newValueText,
-                oldToken.TrailingTrivia);
-            return interpolated.WithContents(contents.Replace(lastText, lastText.WithTextToken(newToken)));
+            var newToken = AppendDotToToken(lastText.TextToken, SyntaxKind.InterpolatedStringTextToken);
+            return newToken is null
+                ? interpolated
+                : interpolated.WithContents(contents.Replace(lastText, lastText.WithTextToken(newToken.Value)));
         }
 
         var dotText = SyntaxFactory.InterpolatedStringText(
             SyntaxFactory.Token(SyntaxTriviaList.Empty, SyntaxKind.InterpolatedStringTextToken, Dot, Dot, SyntaxTriviaList.Empty));
         return interpolated.WithContents(contents.Add(dotText));
+    }
+
+    private static SyntaxToken? AppendDotToToken(SyntaxToken oldToken, SyntaxKind tokenKind)
+    {
+        var oldValueText = oldToken.ValueText;
+        var trimmed = oldValueText.TrimEnd();
+        if (trimmed.EndsWith(Dot))
+        {
+            return null;
+        }
+
+        var trailingWhitespace = oldValueText.Substring(trimmed.Length);
+        var newValueText = trimmed + Dot + trailingWhitespace;
+        var newText = oldToken.Text.Replace(oldValueText, newValueText);
+        return SyntaxFactory.Token(
+            oldToken.LeadingTrivia,
+            tokenKind,
+            newText,
+            newValueText,
+            oldToken.TrailingTrivia);
     }
 
     private static InvocationExpressionSyntax AppendDotToFormatString(InvocationExpressionSyntax invocation)
