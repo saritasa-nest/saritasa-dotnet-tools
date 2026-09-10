@@ -8,7 +8,7 @@ The tool contains C# code analyzers to prevent specific issues that might occur 
 Add a package as a reference. See the [latest version on NuGet](https://www.nuget.org/packages/Saritasa.Tools.CodeAnalyzers).
 
 ```xml
-<PackageReference Include="Saritasa.Tools.CodeAnalyzers" Version="0.2.1">
+<PackageReference Include="Saritasa.Tools.CodeAnalyzers" Version="0.2.2">
   <PrivateAssets>all</PrivateAssets>
   <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
 </PackageReference>
@@ -97,6 +97,10 @@ throw new InvalidOperationException("Something went wrong");
 ```csharp
 throw new InvalidOperationException("Something went wrong.");
 ```
+
+#### Code fix
+
+A code fix is available: applying it appends a dot to the exception message. You can use this for fixing all warnings at once.
 
 ---
 
