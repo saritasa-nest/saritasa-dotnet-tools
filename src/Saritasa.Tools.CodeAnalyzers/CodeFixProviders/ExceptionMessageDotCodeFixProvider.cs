@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Operations;
 using Saritasa.Tools.CodeAnalyzers.Analyzers;
 using Saritasa.Tools.CodeAnalyzers.Helpers;
 
@@ -95,7 +96,7 @@ public sealed class ExceptionMessageDotCodeFixProvider : CodeFixProvider
             InterpolatedStringExpressionSyntax interpolated
                 => AppendDotToInterpolatedString(interpolated),
             InvocationExpressionSyntax invocation when IsStringFormatInvocation(invocation, semanticModel)
-                => AppendDotToFormatString(invocation),
+                => AppendDotToFormatString(invocation, semanticModel),
             ConditionalExpressionSyntax conditional
                 => AppendDotToConditional(conditional, semanticModel),
             BinaryExpressionSyntax binary when binary.IsKind(SyntaxKind.CoalesceExpression)
@@ -197,20 +198,27 @@ public sealed class ExceptionMessageDotCodeFixProvider : CodeFixProvider
         return (1, 1);
     }
 
-    private static InvocationExpressionSyntax AppendDotToFormatString(InvocationExpressionSyntax invocation)
+    private static InvocationExpressionSyntax AppendDotToFormatString(
+        InvocationExpressionSyntax invocation,
+        SemanticModel? semanticModel)
     {
-        if (invocation.ArgumentList.Arguments.Count == 0)
-        {
-            return invocation;
-        }
-
-        var firstArg = invocation.ArgumentList.Arguments[0];
-        if (firstArg.Expression is LiteralExpressionSyntax literal)
+        if (GetFormatArgument(invocation, semanticModel)?.Expression is LiteralExpressionSyntax literal)
         {
             return invocation.ReplaceNode(literal, AppendDotToStringLiteral(literal));
         }
 
         return invocation;
+    }
+
+    private static ArgumentSyntax? GetFormatArgument(InvocationExpressionSyntax invocation, SemanticModel? semanticModel)
+    {
+        if (semanticModel?.GetOperation(invocation) is not IInvocationOperation operation)
+        {
+            return null;
+        }
+
+        var formatArgument = operation.Arguments.FirstOrDefault(a => a.Parameter?.Name == "format");
+        return formatArgument?.Syntax as ArgumentSyntax;
     }
 
     private static ExpressionSyntax? AppendDotToConditional(ConditionalExpressionSyntax conditional, SemanticModel? semanticModel)
@@ -278,28 +286,12 @@ public sealed class ExceptionMessageDotCodeFixProvider : CodeFixProvider
 
     private static bool IsStringFormatInvocation(InvocationExpressionSyntax invocation, SemanticModel? semanticModel)
     {
-        if (invocation.ArgumentList.Arguments.Count == 0)
+        if (semanticModel?.GetSymbolInfo(invocation).Symbol is not IMethodSymbol method || !method.IsStringFormat())
         {
             return false;
         }
 
-        var firstArg = invocation.ArgumentList.Arguments[0];
-        if (firstArg.Expression is not LiteralExpressionSyntax literal
-            || !literal.IsKind(SyntaxKind.StringLiteralExpression))
-        {
-            return false;
-        }
-
-        if (semanticModel is null)
-        {
-            return false;
-        }
-
-        if (semanticModel.GetSymbolInfo(invocation).Symbol is not IMethodSymbol method)
-        {
-            return false;
-        }
-
-        return method.IsStringFormat();
+        return GetFormatArgument(invocation, semanticModel)?.Expression is LiteralExpressionSyntax literal
+            && literal.IsKind(SyntaxKind.StringLiteralExpression);
     }
 }

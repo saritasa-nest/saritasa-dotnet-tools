@@ -368,6 +368,58 @@ public class ExceptionMessageDotCodeFixTests
     }
 
     /// <summary>
+    /// Verifies that the code fix appends a dot to the format string in a string.Format call
+    /// that uses the (IFormatProvider, string, object[]) overload, where the format argument
+    /// is not at position 0.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_StringFormat_WithFormatProvider_AppendsDotToFormatString()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Globalization;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(int id)
+                    {
+                        throw new ArgumentException([|string.Format(CultureInfo.InvariantCulture, "Error {0}", id)|]);
+                    }
+                }
+            }
+            """;
+
+        const string fixedCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Globalization;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(int id)
+                    {
+                        throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "Error {0}.", id));
+                    }
+                }
+            }
+            """;
+
+        // Act
+        var test = CreateTest(sourceCode, fixedCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+
+    /// <summary>
     /// Verifies that the code fix appends a dot to both branches of a ternary operator.
     /// </summary>
     [Fact]
