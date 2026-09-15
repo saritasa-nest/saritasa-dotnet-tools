@@ -258,7 +258,7 @@ Three attributes control which navigation properties are tracked and how inclusi
 |-----------|--------|---------|
 | `[TrackIncludeRequired]` | Property | Marks a navigation property as requiring explicit loading. Only properties with this attribute are checked by INCL rules. |
 | `[IncludeRequired("param", "Property")]` | Method | Declares that the named parameter must have the named property loaded before the method is called. Repeatable. |
-| `[Includes("Property")]` | Method | Promises that the method's return value has the named property loaded. Repeatable. |
+| `[Includes("Property")]` | Method | Promises that the method's return value has the named property loaded. Repeatable. Set `Verify = false` to skip the INCL003 check of the method body. |
 
 Example model used in the sections below:
 
@@ -332,6 +332,8 @@ void SetTimezone(User user, string timezone)
 ### INCL002: Local variable missing include
 
 Triggered when a local variable is passed to a method that requires a navigation property via `[IncludeRequired]`, but the variable was neither loaded with `.Include()`, set in an object initializer, nor returned from a method annotated with `[Includes]`.
+
+The analyzer checks the value the variable has at the point of the call. It follows reassignments, `if`/`else` branches (the property must be loaded on every branch), intermediate query variables (`var query = ...Include(...); var user = await query.FirstAsync();`), `foreach` loops over included collections and LINQ lambdas such as `users.Select(u => ...)`. Reassignments inside loop bodies are not tracked yet.
 
 #### Code causing a warning
 
@@ -524,5 +526,17 @@ Task<User> CreateUser(SaveUserDto dto)
         Profile = new UserProfile { Timezone = dto.Timezone }, // Load the property directly.
     };
     return Task.FromResult(user);
+}
+```
+
+#### Disabling verification
+
+When the analyzer cannot follow how the method loads the property (for example, includes are built dynamically or loaded by a helper), set `Verify = false`. INCL003 is not reported for the method, and callers still rely on the promise.
+
+```csharp
+[Includes(nameof(User.Profile), Verify = false)]
+Task<User> GetUser(int id)
+{
+    return _repository.GetWithIncludesAsync(id, IncludeProfile); // No INCL003.
 }
 ```

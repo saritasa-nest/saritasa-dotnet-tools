@@ -16,6 +16,7 @@ public class NavigationIncludeAnalyzerTests
         /* lang=c# */
         """
         using System;
+        using System.Linq;
         using System.Threading.Tasks;
         using Microsoft.EntityFrameworkCore;
         using Saritasa.Tools.CodeAnalyzers.Abstractions.NavigationInclude.Attributes;
@@ -528,6 +529,469 @@ public class NavigationIncludeAnalyzerTests
                             Profile = new UserProfile { Timezone = dto.Timezone },
                         };
                         return user;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No INCL003: verification of the [Includes] promise is disabled with Verify = false.
+    /// </summary>
+    [Fact]
+    public async Task GetUser_VerifyDisabled_NoIncl3()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                class TestClass(AppDbContext dbContext)
+                {
+                    [Includes(nameof(User.Profile), Verify = false)]
+                    async Task<User> GetUser(int id)
+                    {
+                        return await dbContext.Users.FirstOrDefaultAsync(u => u.Id == id);
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// INCL003: Verify = true (the default) keeps the verification enabled.
+    /// </summary>
+    [Fact]
+    public async Task GetUser_VerifyEnabledExplicitly_ReportsIncl3()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                class TestClass(AppDbContext dbContext)
+                {
+                    [Includes(nameof(User.Profile), Verify = true)]
+                    async Task<User> GetUser(int id)
+                    {
+                        {|INCL003:return await dbContext.Users.FirstOrDefaultAsync(u => u.Id == id);|}
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No INCL002: callers still rely on an [Includes] promise whose verification is disabled.
+    /// </summary>
+    [Fact]
+    public async Task Handle_SourceMethodWithUnverifiedIncludes_NoIncl2()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task Handle(SaveUserDto dto)
+                    {
+                        var user = await GetUser(dto.Id);
+                        UpdateUserProfile(user, dto);
+                    }
+
+                    [Includes(nameof(User.Profile), Verify = false)]
+                    async Task<User> GetUser(int id)
+                    {
+                        return await dbContext.Users.FirstOrDefaultAsync(u => u.Id == id);
+                    }
+
+                    [IncludeRequired(nameof(user), nameof(User.Profile))]
+                    void UpdateUserProfile(User user, SaveUserDto dto)
+                    {
+                        user.Profile.Timezone = dto.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    #endregion
+
+    #region Flow analysis
+
+    /// <summary>
+    /// INCL002: a local reassigned to a query without .Include() after an initial included
+    /// declaration loses its tracked navigation property.
+    /// </summary>
+    [Fact]
+    public async Task Reassignment_ToQueryMissingInclude_ReportsIncl2()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task Handle(SaveUserDto dto)
+                    {
+                        var user = await dbContext.Users
+                            .Include(u => u.Profile)
+                            .FirstOrDefaultAsync(u => u.Id == dto.Id);
+
+                        // Reassigning drops the previously tracked Profile include.
+                        user = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == dto.Id + 1);
+
+                        // INCL002: user was reassigned to a value that does not load Profile.
+                        {|INCL002:UpdateUserProfile(user, dto)|};
+                    }
+
+                    [IncludeRequired(nameof(user), nameof(User.Profile))]
+                    void UpdateUserProfile(User user, SaveUserDto dto)
+                    {
+                        user.Profile.Timezone = dto.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No INCL002: a local first declared without the required include is reassigned to a
+    /// query that does include it.
+    /// </summary>
+    [Fact]
+    public async Task Reassignment_ToQueryWithInclude_NoIncl2()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task Handle(SaveUserDto dto)
+                    {
+                        var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == dto.Id);
+
+                        // Reassigning to a query with Include now satisfies the requirement.
+                        user = await dbContext.Users
+                            .Include(u => u.Profile)
+                            .FirstOrDefaultAsync(u => u.Id == dto.Id + 1);
+
+                        UpdateUserProfile(user, dto);
+                    }
+
+                    [IncludeRequired(nameof(user), nameof(User.Profile))]
+                    void UpdateUserProfile(User user, SaveUserDto dto)
+                    {
+                        user.Profile.Timezone = dto.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No INCL002: both branches of an if/else assign a value that loads the required
+    /// property, so the merged state after the if still has it.
+    /// </summary>
+    [Fact]
+    public async Task IfElse_BothBranchesInclude_NoIncl2()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task Handle(SaveUserDto dto, bool flag)
+                    {
+                        User user;
+                        if (flag)
+                        {
+                            user = await dbContext.Users
+                                .Include(u => u.Profile)
+                                .FirstOrDefaultAsync(u => u.Id == dto.Id);
+                        }
+                        else
+                        {
+                            user = await dbContext.Users
+                                .Include(u => u.Profile)
+                                .FirstOrDefaultAsync(u => u.Id == dto.Id + 1);
+                        }
+
+                        UpdateUserProfile(user, dto);
+                    }
+
+                    [IncludeRequired(nameof(user), nameof(User.Profile))]
+                    void UpdateUserProfile(User user, SaveUserDto dto)
+                    {
+                        user.Profile.Timezone = dto.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// INCL002: only one branch of an if/else loads the required property, so the merged
+    /// state after the if cannot guarantee it.
+    /// </summary>
+    [Fact]
+    public async Task IfElse_OnlyOneBranchIncludes_ReportsIncl2()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task Handle(SaveUserDto dto, bool flag)
+                    {
+                        User user;
+                        if (flag)
+                        {
+                            user = await dbContext.Users
+                                .Include(u => u.Profile)
+                                .FirstOrDefaultAsync(u => u.Id == dto.Id);
+                        }
+                        else
+                        {
+                            user = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == dto.Id + 1);
+                        }
+
+                        // INCL002: Profile is only guaranteed loaded on one of the two branches.
+                        {|INCL002:UpdateUserProfile(user, dto)|};
+                    }
+
+                    [IncludeRequired(nameof(user), nameof(User.Profile))]
+                    void UpdateUserProfile(User user, SaveUserDto dto)
+                    {
+                        user.Profile.Timezone = dto.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No INCL002: the include is tracked through an intermediate query variable before the
+    /// final local is materialized (multi-hop propagation).
+    /// </summary>
+    [Fact]
+    public async Task MultiHopPropagation_ThroughIntermediateQuery_NoIncl2()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task Handle(SaveUserDto dto)
+                    {
+                        var query = dbContext.Users.Include(u => u.Profile);
+                        var user = await query.FirstOrDefaultAsync(u => u.Id == dto.Id);
+
+                        UpdateUserProfile(user, dto);
+                    }
+
+                    [IncludeRequired(nameof(user), nameof(User.Profile))]
+                    void UpdateUserProfile(User user, SaveUserDto dto)
+                    {
+                        user.Profile.Timezone = dto.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No INCL002: a query variable reassigned several times keeps the include added earlier.
+    /// </summary>
+    [Fact]
+    public async Task QueryReassignedSeveralTimes_IncludeKept_NoIncl2()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task Handle(SaveUserDto dto, bool onlyActive)
+                    {
+                        var query = dbContext.Users.AsQueryable();
+                        query = query.Include(u => u.Profile);
+                        if (onlyActive)
+                        {
+                            query = query.Where(u => u.Id > 0);
+                        }
+                        query = query.OrderBy(u => u.Id);
+
+                        var user = await query.FirstAsync();
+                        UpdateUserProfile(user, dto);
+                    }
+
+                    [IncludeRequired(nameof(user), nameof(User.Profile))]
+                    void UpdateUserProfile(User user, SaveUserDto dto)
+                    {
+                        user.Profile.Timezone = dto.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// INCL002: a query variable gets the include only in one branch, so after the branch
+    /// and further reassignments the include is not guaranteed.
+    /// </summary>
+    [Fact]
+    public async Task QueryReassignedSeveralTimes_IncludeOnlyInBranch_ReportsIncl2()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task Handle(SaveUserDto dto, bool withProfile)
+                    {
+                        var query = dbContext.Users.AsQueryable();
+                        if (withProfile)
+                        {
+                            query = query.Include(u => u.Profile);
+                        }
+                        query = query.Where(u => u.Id > 0);
+
+                        var user = await query.FirstAsync();
+                        {|INCL002:UpdateUserProfile(user, dto)|};
+                    }
+
+                    [IncludeRequired(nameof(user), nameof(User.Profile))]
+                    void UpdateUserProfile(User user, SaveUserDto dto)
+                    {
+                        user.Profile.Timezone = dto.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No INCL002: iterating a collection loaded via .Include() seeds the foreach loop
+    /// variable with the same tracked navigation property.
+    /// </summary>
+    [Fact]
+    public async Task ForEach_OverIncludedCollection_NoIncl2()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task Handle(SaveUserDto dto)
+                    {
+                        var users = await dbContext.Users
+                            .Include(u => u.Profile)
+                            .ToListAsync();
+
+                        foreach (var user in users)
+                        {
+                            UpdateUserProfile(user, dto);
+                        }
+                    }
+
+                    [IncludeRequired(nameof(user), nameof(User.Profile))]
+                    void UpdateUserProfile(User user, SaveUserDto dto)
+                    {
+                        user.Profile.Timezone = dto.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No INCL002: a LINQ .Select() lambda parameter inherits the tracked navigation
+    /// property of the source collection it iterates.
+    /// </summary>
+    [Fact]
+    public async Task LinqSelect_OverIncludedCollection_NoIncl2()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task Handle(SaveUserDto dto)
+                    {
+                        var users = await dbContext.Users
+                            .Include(u => u.Profile)
+                            .ToListAsync();
+
+                        var timezones = users.Select(u => GetTimezone(u, dto)).ToList();
+                    }
+
+                    [IncludeRequired(nameof(user), nameof(User.Profile))]
+                    string GetTimezone(User user, SaveUserDto dto)
+                    {
+                        return user.Profile.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// INCL002: a LINQ .Select() lambda parameter over a collection that was not loaded with
+    /// .Include() still triggers the diagnostic.
+    /// </summary>
+    [Fact]
+    public async Task LinqSelect_OverNonIncludedCollection_ReportsIncl2()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task Handle(SaveUserDto dto)
+                    {
+                        var users = await dbContext.Users.ToListAsync();
+
+                        // INCL002: users were loaded without .Include(u => u.Profile).
+                        var timezones = users.Select(u => {|INCL002:GetTimezone(u, dto)|}).ToList();
+                    }
+
+                    [IncludeRequired(nameof(user), nameof(User.Profile))]
+                    string GetTimezone(User user, SaveUserDto dto)
+                    {
+                        return user.Profile.Timezone;
                     }
                 }
             }

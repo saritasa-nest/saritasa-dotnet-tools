@@ -85,23 +85,22 @@ public class AttributeHelper
     }
 
     /// <summary>
-    /// Returns true if method declares <see cref="IncludesAttribute"/>.
+    /// Returns false if the <see cref="IncludesAttribute"/> is declared with <c>Verify = false</c>.
     /// </summary>
-    /// <param name="method">The method to inspect.</param>
-    /// <param name="includedProperty">The property name to match.</param>
-    /// <returns>True if a matching attribute is found; otherwise false.</returns>
-    public static bool MethodHasIncludesAttribute(IMethodSymbol method, string includedProperty)
+    /// <param name="attribute">The <see cref="IncludesAttribute"/> data.</param>
+    /// <returns>True if the analyzer should verify the method's return value.</returns>
+    public static bool IsIncludesVerificationEnabled(AttributeData attribute)
     {
-        foreach (var attr in method.GetAttributes())
+        foreach (var namedArgument in attribute.NamedArguments)
         {
-            if (TryGetIncludesArg(attr, out var attrPropertyName) &&
-                string.Equals(attrPropertyName, includedProperty, StringComparison.Ordinal))
+            if (string.Equals(namedArgument.Key, nameof(IncludesAttribute.Verify), StringComparison.Ordinal) &&
+                namedArgument.Value.Value is false)
             {
-                return true;
+                return false;
             }
         }
 
-        return false;
+        return true;
     }
 
     /// <summary>

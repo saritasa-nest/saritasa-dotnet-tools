@@ -21,8 +21,10 @@ public sealed class NavigationIncludeAnalyzer : DiagnosticAnalyzer
         context.EnableConcurrentExecution();
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
 
+        // INCL001 for direct access (user.Profile): one operation is enough.
         context.RegisterOperationAction(PropertyReferenceHandler.Analyze, OperationKind.PropertyReference);
-        context.RegisterOperationAction(InvocationHandler.Analyze, OperationKind.Invocation);
-        context.RegisterOperationAction(ReturnHandler.Analyze, OperationKind.Return);
+
+        // INCL001 at call sites, INCL002, INCL003: need the whole method body (control flow graph).
+        context.RegisterOperationBlockAction(IncludeFlowHandler.Analyze);
     }
 }
