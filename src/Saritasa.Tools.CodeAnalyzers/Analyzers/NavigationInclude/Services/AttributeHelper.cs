@@ -56,6 +56,39 @@ public class AttributeHelper
     }
 
     /// <summary>
+    /// Returns (parameter, property) of every <see cref="IncludeRequiredAttribute"/> of the method.
+    /// </summary>
+    /// <param name="method">The method to inspect.</param>
+    /// <returns>Pairs of parameter name and required property name.</returns>
+    public static IEnumerable<(string Parameter, string Property)> GetIncludeRequirements(IMethodSymbol method)
+    {
+        foreach (var attribute in method.GetAttributes())
+        {
+            if (TryGetIncludeRequiredArgs(attribute, out var parameter, out var includedProperty))
+            {
+                yield return (parameter!, includedProperty!);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Returns the properties of every <see cref="IncludesAttribute"/> of the method,
+    /// except those declared with <c>Verify = false</c>.
+    /// </summary>
+    /// <param name="method">The method to inspect.</param>
+    /// <returns>Property names the returned value must have loaded.</returns>
+    public static IEnumerable<string> GetVerifiedIncludes(IMethodSymbol method)
+    {
+        foreach (var attribute in method.GetAttributes())
+        {
+            if (TryGetIncludesArg(attribute, out var includedProperty) && IsIncludesVerificationEnabled(attribute))
+            {
+                yield return includedProperty!;
+            }
+        }
+    }
+
+    /// <summary>
     /// Returns true if method declares <see cref="IncludeRequiredAttribute"/>.
     /// </summary>
     /// <param name="method">The method to inspect.</param>
@@ -75,6 +108,26 @@ public class AttributeHelper
             }
 
             if (string.Equals(attrParamName, param, StringComparison.Ordinal) &&
+                string.Equals(attrPropertyName, includedProperty, StringComparison.Ordinal))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Returns true if method declares <see cref="IncludesAttribute"/> for the property.
+    /// </summary>
+    /// <param name="method">The method to inspect.</param>
+    /// <param name="includedProperty">The property name to match.</param>
+    /// <returns>True if a matching attribute is found; otherwise false.</returns>
+    public static bool MethodHasIncludesAttribute(IMethodSymbol method, string includedProperty)
+    {
+        foreach (var attr in method.GetAttributes())
+        {
+            if (TryGetIncludesArg(attr, out var attrPropertyName) &&
                 string.Equals(attrPropertyName, includedProperty, StringComparison.Ordinal))
             {
                 return true;

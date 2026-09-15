@@ -16,6 +16,7 @@ public class NavigationIncludeAnalyzerTests
         /* lang=c# */
         """
         using System;
+        using System.Collections.Generic;
         using System.Linq;
         using System.Threading.Tasks;
         using Microsoft.EntityFrameworkCore;
@@ -998,6 +999,194 @@ public class NavigationIncludeAnalyzerTests
             """;
 
         await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No INCL002: a variable loaded with .Include() before a loop keeps it inside the loop.
+    /// </summary>
+    [Fact]
+    public async Task Loop_IncludedBeforeLoop_NoIncl2()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task Handle(SaveUserDto dto, int count)
+                    {
+                        var user = await dbContext.Users.Include(u => u.Profile).FirstAsync();
+                        for (var i = 0; i < count; i++)
+                        {
+                            UpdateUserProfile(user, dto);
+                        }
+                    }
+
+                    [IncludeRequired(nameof(user), nameof(User.Profile))]
+                    void UpdateUserProfile(User user, SaveUserDto dto)
+                    {
+                        user.Profile.Timezone = dto.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// INCL002: the variable is reassigned at the end of the loop body, so the next iteration
+    /// calls the method with a value that does not load Profile.
+    /// </summary>
+    [Fact]
+    public async Task Loop_ReassignedAtEndOfLoopBody_ReportsIncl2()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task Handle(SaveUserDto dto, int count)
+                    {
+                        var user = await dbContext.Users.Include(u => u.Profile).FirstAsync();
+                        for (var i = 0; i < count; i++)
+                        {
+                            {|INCL002:UpdateUserProfile(user, dto)|};
+                            user = await dbContext.Users.FirstAsync();
+                        }
+                    }
+
+                    [IncludeRequired(nameof(user), nameof(User.Profile))]
+                    void UpdateUserProfile(User user, SaveUserDto dto)
+                    {
+                        user.Profile.Timezone = dto.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    #endregion
+
+    #region Dictionaries
+
+    /// <summary>
+    /// Wraps the body of a Handle method that works with a dictionary of users.
+    /// </summary>
+    private static string DictionarySource(string handleBody) => Preamble +
+        $$"""
+
+            class TestClass(AppDbContext dbContext)
+            {
+                async Task Handle(SaveUserDto dto)
+                {
+        {{handleBody}}
+                }
+
+                [IncludeRequired(nameof(user), nameof(User.Profile))]
+                void UpdateUserProfile(User user, SaveUserDto dto)
+                {
+                    user.Profile.Timezone = dto.Timezone;
+                }
+            }
+        }
+        """;
+
+    /// <summary>
+    /// No INCL002: an element read by key from a dictionary built from an included query.
+    /// </summary>
+    [Fact]
+    public async Task Dictionary_IndexerOverIncludedQuery_NoIncl2()
+    {
+        await VerifyAnalyzerAsync(DictionarySource(
+            """
+                        var users = await dbContext.Users.Include(u => u.Profile).ToDictionaryAsync(u => u.Id);
+                        UpdateUserProfile(users[dto.Id], dto);
+                        var user = users[dto.Id];
+                        UpdateUserProfile(user, dto);
+            """));
+    }
+
+    /// <summary>
+    /// INCL002: the dictionary is built from a query without .Include().
+    /// </summary>
+    [Fact]
+    public async Task Dictionary_IndexerOverNonIncludedQuery_ReportsIncl2()
+    {
+        await VerifyAnalyzerAsync(DictionarySource(
+            """
+                        var users = await dbContext.Users.ToDictionaryAsync(u => u.Id);
+                        var user = users[dto.Id];
+                        {|INCL002:UpdateUserProfile(user, dto)|};
+            """));
+    }
+
+    /// <summary>
+    /// No INCL002: TryGetValue, GetValueOrDefault, Values and foreach over pairs of an included dictionary.
+    /// </summary>
+    [Fact]
+    public async Task Dictionary_AllReadsOverIncludedQuery_NoIncl2()
+    {
+        await VerifyAnalyzerAsync(DictionarySource(
+            """
+                        var users = await dbContext.Users.Include(u => u.Profile).ToDictionaryAsync(u => u.Id);
+                        if (users.TryGetValue(dto.Id, out var found))
+                        {
+                            UpdateUserProfile(found, dto);
+                        }
+
+                        var user = users.GetValueOrDefault(dto.Id);
+                        UpdateUserProfile(user, dto);
+
+                        foreach (var value in users.Values)
+                        {
+                            UpdateUserProfile(value, dto);
+                        }
+
+                        foreach (var pair in users)
+                        {
+                            UpdateUserProfile(pair.Value, dto);
+                        }
+
+                        foreach (var (id, deconstructed) in users)
+                        {
+                            UpdateUserProfile(deconstructed, dto);
+                        }
+            """));
+    }
+
+    /// <summary>
+    /// INCL002: TryGetValue over a dictionary built from a query without .Include().
+    /// </summary>
+    [Fact]
+    public async Task Dictionary_TryGetValueOverNonIncludedQuery_ReportsIncl2()
+    {
+        await VerifyAnalyzerAsync(DictionarySource(
+            """
+                        var users = await dbContext.Users.ToDictionaryAsync(u => u.Id);
+                        if (users.TryGetValue(dto.Id, out var found))
+                        {
+                            {|INCL002:UpdateUserProfile(found, dto)|};
+                        }
+            """));
+    }
+
+    /// <summary>
+    /// INCL002: an element selector stores other objects in the dictionary, not the included entities.
+    /// </summary>
+    [Fact]
+    public async Task Dictionary_WithElementSelector_ReportsIncl2()
+    {
+        await VerifyAnalyzerAsync(DictionarySource(
+            """
+                        var users = await dbContext.Users.Include(u => u.Profile)
+                            .ToDictionaryAsync(u => u.Id, u => new User { Id = u.Id });
+                        var user = users[dto.Id];
+                        {|INCL002:UpdateUserProfile(user, dto)|};
+            """));
     }
 
     #endregion

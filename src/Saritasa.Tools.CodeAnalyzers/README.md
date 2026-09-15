@@ -333,7 +333,7 @@ void SetTimezone(User user, string timezone)
 
 Triggered when a local variable is passed to a method that requires a navigation property via `[IncludeRequired]`, but the variable was neither loaded with `.Include()`, set in an object initializer, nor returned from a method annotated with `[Includes]`.
 
-The analyzer checks the value the variable has at the point of the call. It follows reassignments, `if`/`else` branches (the property must be loaded on every branch), intermediate query variables (`var query = ...Include(...); var user = await query.FirstAsync();`), `foreach` loops over included collections and LINQ lambdas such as `users.Select(u => ...)`. Reassignments inside loop bodies are not tracked yet.
+The analyzer checks the value the variable has at the point of the call. It follows reassignments, `if`/`else` branches (the property must be loaded on every branch), intermediate query variables (`var query = ...Include(...); var user = await query.FirstAsync();`), `foreach` loops over included collections, reassignments inside loops, LINQ lambdas such as `users.Select(u => ...)`, and dictionaries built with `ToDictionary(u => u.Id)` / `ToDictionaryAsync(u => u.Id)` (read via `dictionary[id]`, `TryGetValue`, `GetValueOrDefault`, `Values` or `foreach`). A dictionary built with an element selector (`ToDictionary(u => u.Id, u => ...)`) stores other objects, so its values are not considered loaded.
 
 #### Code causing a warning
 

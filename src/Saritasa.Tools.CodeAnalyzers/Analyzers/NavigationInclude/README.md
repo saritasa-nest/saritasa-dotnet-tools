@@ -4,118 +4,104 @@ For rule descriptions and attribute usage, see the [package README](../../README
 
 ## The approach
 
-All rules except "direct property access" ask one question:
+The rules check values at two kinds of places:
 
-> **Is the navigation property loaded for this value at this exact point of the method?**
-
-| Rule | Value checked |
+| Place | Rule |
 |---|---|
-| INCL001 | the method's own parameter, passed to an `[IncludeRequired]` method |
-| INCL002 | a local (or LINQ lambda parameter), passed to an `[IncludeRequired]` method |
-| INCL003 | the value returned from an `[Includes]` method (skipped with `Verify = false`) |
+| a call of an `[IncludeRequired(param, Property)]` method | INCL001 if the argument is the method's own parameter, INCL002 if it is a local or a LINQ lambda parameter |
+| a `return` of an `[Includes(Property)]` method | INCL003 (skipped with `Verify = false`) |
 
-INCL001 for direct access (`user.Profile` inside a method) needs no flow and is handled by `PropertyReferenceHandler`.
+INCL001 for direct access (`user.Profile` inside a method) is simpler and handled by `PropertyReferenceHandler`.
 
-To answer the question, the analyzer keeps a table **variable → loaded navigation properties**
-(`LoadedProperties`) and updates it statement by statement:
+At each place the analyzer asks one question: **is `Property` loaded in this value here?** It answers the
+same way a person reads code. It **looks backward** from the place for where the variable got its value:
 
 ```csharp
-var user = await db.Users.Include(u => u.Profile).FirstAsync();  // user → [Profile]
-user = await db.Users.FirstAsync();                              // user → []   (replaced)
-UpdateUserProfile(user, dto);                                    // needs Profile → INCL002
+var user = await db.Users.Include(u => u.Profile).FirstAsync();
+user = await db.Users.FirstAsync();          // ② last assignment: no Include → not loaded
+UpdateUserProfile(user, dto);                // ① start here, look up for "user = ..."
 ```
 
-Branches are handled with Roslyn's **control flow graph**: the method split into straight-line blocks connected
-by jumps. Roslyn builds it for us, so `if`, `switch`, `?:`, `??`, `try` and `foreach` need no special code.
-When several blocks jump into one block, a property stays loaded only if it is loaded in all of them:
+When several paths lead to the place, the property must be loaded on **every** path. The paths come from
+Roslyn's **control flow graph**: the method split into blocks connected by jumps. Roslyn builds it, so `if`,
+`switch`, `?:`, `??`, loops, `try` and `foreach` need no special code.
 
 ```mermaid
-flowchart TD
-    B1["if (flag)"] -- true --> B2["user = ...Include(Profile)...<br/>end: user → [Profile]"]
-    B1 -- false --> B3["user = ... (no Include)<br/>end: user → []"]
-    B2 --> B4["start: user → []<br/>UpdateUserProfile(user)"]
-    B3 --> B4
-    B4 -.-> R["INCL002"]
-    style R fill:#f8d7da,stroke:#c00
+flowchart BT
+    C["UpdateUserProfile(user)<br/>① look up both incoming paths"] --> A["user = ...Include(Profile)...<br/>② loaded"]
+    C --> B["user = ... (no Include)<br/>③ not loaded → INCL002"]
+    A --> I["if (flag)"]
+    B --> I
 ```
 
 ## How it works
 
-```mermaid
-flowchart TD
-    H["IncludeFlowHandler<br/>1. get the graph of the method"] --> C["BlockStartCalculator<br/>2. table at the start of each block"]
-    H --> K["IncludeRulesChecker<br/>3. walk each block and check the rules"]
-    C --> S["StatementEffects<br/>how a statement changes the table"]
-    K --> S
-    S --> E["ExpressionLoadedProperties<br/>loaded properties of an expression"]
-    K --> E
-```
+There is one black box: **`LoadedPropertySearch.IsLoaded(value, property, position)` → true / false.**
+
+`position` (`CodePosition`) is the statement that contains the value: graph + block + statement index. The
+search moves the position backward; its only changing state is the set of blocks already searched.
+
+`IncludeFlowHandler` maps statements to diagnostics and reports them at the end:
 
 ```text
-IncludeFlowHandler.Analyze(method):
-    graph = Roslyn.GetControlFlowGraph(method body)
-    IncludeRulesChecker.CheckGraph(graph, table from [IncludeRequired] on parameters)
-
-IncludeRulesChecker.CheckGraph(graph, tableAtStart):
-    tablesAtBlockStart = BlockStartCalculator.CalculateTableAtStartOfEachBlock(graph, tableAtStart)
-    for each block:
-        table = tablesAtBlockStart[block]
-        for each statement in block:
-            CheckStatement(statement, table)          // INCL001 / INCL002, lambdas
-            table = StatementEffects.UpdateTableForStatement(statement, table)
-        if block ends with "return value":
-            CheckReturnedValue(value, table)          // INCL003
-
-BlockStartCalculator.CalculateTableAtStartOfEachBlock(graph, tableAtStart):
-    for each block in order:
-        start = KeepOnlyWhatAllTablesAgreeOn(end tables of blocks jumping here)
-        end   = UpdateTableForStatement for every statement, starting from start
+statements = FlowGraph.ForMethod(body).GetStatements()   // also lambdas and local functions
+diagnostics = for each statement:
+    calls of an [IncludeRequired(param, P)] method where not IsLoaded(argument for param, P) → INCL001 / INCL002
+    "return value" of an [Includes(P)] method where not IsLoaded(value, P)                   → INCL003
+report diagnostics
 ```
 
-| Class | Responsibility |
+Inside the black box:
+
+```text
+IsLoaded(value):
+    variable (user, query, u)     → look backward for the variable (below)
+    x.Include(u => u.P)           → true
+    x.Where / OrderBy / First / ToList / Include(other) / ... → IsLoaded(x)
+    x.ToDictionary(u => u.Id)     → IsLoaded(x)   (with an element selector: false)
+    x[key], x.Values, pair.Value, x.GetValueOrDefault(key) → IsLoaded(x)
+    await x, casts                → IsLoaded(x)
+    method with [Includes(P)]     → true
+    anything else                 → false
+
+look backward for variable, starting before the statement that uses it:
+    go up through the statements of the block:
+        "variable = expr"         → answer is IsLoaded(expr)
+        "variable.P = expr"       → true
+        "var (id, variable) = expr" → IsLoaded(expr)
+        "d.TryGetValue(key, out variable)" → IsLoaded(d)   (the if condition is searched too)
+    reached the top of the block:
+        start of the method       → true only for a parameter with [IncludeRequired(param, P)]
+        start of a lambda         → u of users.Select(u => ...): IsLoaded(users); other variables: continue
+                                    looking before the statement that creates the lambda
+        block already searched    → true (a loop came back; this path adds nothing new)
+        otherwise                 → continue in every block that jumps here; all must be true
+```
+
+The "block already searched" rule is what makes loops work. The search goes around the loop once, sees every
+assignment in the loop body, and stops.
+
+## Files
+
+| File | Responsibility |
 |---|---|
-| `LoadedProperties` | The table. Immutable; `SetProperties`, `AddProperty`, `KeepOnlyWhatAllTablesAgreeOn`. |
-| `StatementEffects` | The only place the table changes (see below). |
-| `ExpressionLoadedProperties` | Loaded properties of an expression; only reads the table. |
-| `BlockStartCalculator` | Table at the start of every block. |
-| `IncludeRulesChecker` | Walks the blocks, reports diagnostics, analyzes lambdas. |
-| `IncludeFlowHandler` | Entry point; also analyzes local functions with their own attributes. |
+| `Handlers/IncludeFlowHandler.cs` | Finds places to check, reports diagnostics. |
+| `Flow/LoadedPropertySearch.cs` | The black box `IsLoaded`. |
+| `Flow/VariableAssignment.cs` | Mapper: what a statement assigns to a variable (`user = value`, `user.Profile = value`, deconstruction, `out`). |
+| `Flow/FlowGraph.cs` | One graph (method, local function or lambda); for a lambda, where it is created. Lists statements. |
+| `Flow/CodePosition.cs` | A statement in a graph: block + index. Lists the statements before it. |
+| `Flow/LinqMethods.cs` | Facts about LINQ/EF methods: which keep entities, which pass elements to lambdas, `Include` parsing. |
+| `Handlers/PropertyReferenceHandler.cs` | INCL001 for direct `param.Profile` access. |
 
-**How a statement changes the table** (`StatementEffects`):
+## What the compiler rewrites for us
 
-| Statement | Effect |
-|---|---|
-| `x = expr` / `var x = expr` | `x → properties of expr` (replaces the old value) |
-| `x.Profile = expr` | adds `Profile` to `x` |
-| compiler temporary `#1 = expr` | `#1 → properties of expr` |
+The graph contains simplified code. Two constructs look different from the source:
 
-**Loaded properties of an expression** (`ExpressionLoadedProperties`):
+| Source | In the graph | Why it works |
+|---|---|---|
+| `new User { Profile = p }` | `#1 = new User(); #1.Profile = p; user = #1` | backward search for `#1` finds `#1.Profile = p` |
+| `foreach (var user in users)` | `#1 = users.GetEnumerator(); ... user = #1.Current` | `Current` and `GetEnumerator` pass through to `users` |
+| `flag ? a : b`, `a ?? b` | two blocks assign `#1`, then they merge | both paths are searched |
 
-| Expression | Result |
-|---|---|
-| variable | its row in the table |
-| `src.Include(u => u.Profile)` | properties of `src` + `Profile` |
-| `Where`, `OrderBy`, `Skip`, `Take`, `AsNoTracking`, `First…`, `ToList…` (sync or async) | properties of `src` |
-| `await x`, casts | properties of `x` |
-| method with `[Includes("X")]` | `[X]` |
-| `Select`, unknown methods, `dbContext.Users`, fields | `[]` |
-
-**Lambdas** have their own graph and are checked with `CheckGraph` too. They start with the table of the place
-where they are created. For `users.Select(u => ...)`, `u` gets the properties of `users`.
-
-**What the compiler rewrites for us** (why no special code is needed):
-
-| Code | In the graph |
-|---|---|
-| `new User { Profile = p }` | `#1 = new User(); #1.Profile = p; user = #1` |
-| `foreach (var user in users)` | `#1 = users.GetEnumerator(); user = #1.Current` |
-| `flag ? a : b`, `a ?? b` | two blocks assign `#1`, then the blocks merge |
-
-## Loops (not supported yet)
-
-A loop jumps from its end back to its start. `BlockStartCalculator` makes a single pass in block order and ignores
-these backward jumps, so a loop body is analyzed as if it runs once. A reassignment at the end of a loop body is
-not seen at the start of the next iteration.
-
-To add loop support, repeat the pass in `BlockStartCalculator.CalculateTableAtStartOfEachBlock` until no table at
-a block end changes. Tables only lose properties when blocks merge, so the repetition always stops.
+`#1` is a temporary variable the compiler creates (`IFlowCaptureOperation`). The search treats it like any other
+variable.
