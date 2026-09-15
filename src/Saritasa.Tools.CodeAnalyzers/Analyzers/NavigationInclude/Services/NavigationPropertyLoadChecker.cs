@@ -41,6 +41,15 @@ internal static class NavigationPropertyLoadChecker
             return declarator.Initializer?.Value;
         }
 
+        // foreach (var item in collection) declares item via LoopControlVariable instead of a
+        // regular declarator; treat the collection expression as the item's initializer.
+        if (node is IForEachLoopOperation forEachLoop &&
+            forEachLoop.LoopControlVariable is IVariableDeclaratorOperation loopDeclarator &&
+            SymbolEqualityComparer.Default.Equals(loopDeclarator.Symbol, target))
+        {
+            return forEachLoop.Collection;
+        }
+
         foreach (var child in node.ChildOperations)
         {
             var result = FindDeclaratorInitializer(child, target);
@@ -64,6 +73,20 @@ internal static class NavigationPropertyLoadChecker
         if (initializer is IObjectCreationOperation objCreation)
         {
             return ObjectInitializerSetsProperty(objCreation, propertyName);
+        }
+
+        // Both branches of a conditional initializer must load the property.
+        if (initializer is IConditionalOperation conditional)
+        {
+            return InitializerHasInclude(conditional.WhenTrue, propertyName) &&
+                conditional.WhenFalse is not null &&
+                InitializerHasInclude(conditional.WhenFalse, propertyName);
+        }
+
+        // Field mutations are not tracked across the type, so trust the field is managed correctly.
+        if (initializer is IFieldReferenceOperation)
+        {
+            return true;
         }
 
         return InvocationChainContainsInclude(initializer, propertyName);
@@ -91,6 +114,13 @@ internal static class NavigationPropertyLoadChecker
             if (current is IConversionOperation convOp && convOp.IsImplicit)
             {
                 current = convOp.Operand;
+                continue;
+            }
+
+            // Resolve intermediate local variables, e.g. a query split into `usersQuery` and `user`.
+            if (current is ILocalReferenceOperation localRefOp)
+            {
+                current = FindLocalInitializer(localRefOp);
                 continue;
             }
 
