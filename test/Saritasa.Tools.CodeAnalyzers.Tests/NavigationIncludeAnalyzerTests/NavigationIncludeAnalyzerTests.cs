@@ -124,6 +124,29 @@ public class NavigationIncludeAnalyzerTests
     }
 
     /// <summary>
+    /// No warning is produced for the nullable parameter it accesses the navigation property on.
+    /// </summary>
+    [Fact]
+    public async Task DirectNullablePropertyAccess_WithoutIncludeRequired_NoIncl1()
+    {
+        const string sourceCode = Preamble +
+              /* lang=c# */
+              """
+                  class TestClass
+                  {
+                      void SetTimezone(User user)
+                      {
+                          // Does not produce INCL001 because the user has nullable check.
+                          var timezone = user?.Profile.Timezone;
+                      }
+                  }
+              }
+              """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
     /// INCL001 is reported when a method passes its own parameter to a callee that has [IncludeRequired], but the caller does not declare the same requirement.
     /// </summary>
     [Fact]
@@ -223,6 +246,41 @@ public class NavigationIncludeAnalyzerTests
                 }
             }
             """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No INCL002: local variable uses in foreach and obtained from a query that includes .Include(u => u.Profile).
+    /// </summary>
+    [Fact]
+    public async Task Handle_QueryMissingIncludeForEach_NoIncl2()
+    {
+        var sourceCode = Preamble +
+             /* lang=c# */
+             """
+                 class TestClass(AppDbContext dbContext)
+                 {
+                     async Task Handle(SaveUserDto dto)
+                     {
+                         var users = await dbContext.Users
+                             .Include(u => u.Profile)
+                             .ToListAsync();
+
+                         foreach (var user in users)
+                         {
+                            UpdateUserProfile(user, dto);
+                         }
+                     }
+
+                     [IncludeRequired(nameof(user), nameof(User.Profile))]
+                     void UpdateUserProfile(User user, SaveUserDto dto)
+                     {
+                         user.Profile.Timezone = dto.Timezone;
+                     }
+                 }
+             }
+             """;
 
         await VerifyAnalyzerAsync(sourceCode);
     }
@@ -408,6 +466,124 @@ public class NavigationIncludeAnalyzerTests
                 }
             }
             """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No INCL002: local variable obtained from a conditional initialization methods decorated with [Includes(nameof(User.Profile)].
+    /// </summary>
+    [Fact]
+    public async Task Handle3_ConditionalInitializationForSourceMethodWithIncludesAttr_NoIncl2()
+    {
+        var sourceCode = Preamble +
+             /* lang=c# */
+             """
+
+                 class TestClass(AppDbContext dbContext)
+                 {
+                     async Task Handle3(SaveUserDto dto, bool isCached)
+                     {
+                         var user = isCached
+                             ? await GetCachedUser(dto.Id)
+                             : await GetUser(dto.Id);
+
+                         UpdateUserProfile(user, dto);
+                     }
+
+                     [Includes(nameof(User.Profile))]
+                     async Task<User> GetUser(int id)
+                     {
+                         return await dbContext.Users
+                             .Include(u => u.Profile)
+                             .FirstOrDefaultAsync(u => u.Id == id);
+                     }
+
+                     [Includes(nameof(User.Profile))]
+                     async Task<User> GetCachedUser(int id)
+                     {
+                         return await dbContext.Users
+                             .Include(u => u.Profile)
+                             .FirstOrDefaultAsync(u => u.Id == id);
+                     }
+
+                     [IncludeRequired(nameof(user), nameof(User.Profile))]
+                     void UpdateUserProfile(User user, SaveUserDto dto)
+                     {
+                         user.Profile.Timezone = dto.Timezone;
+                     }
+                 }
+             }
+             """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No INCL002: local variable obtained from a split query methods.
+    /// </summary>
+    [Fact]
+    public async Task Handle3_SplitQuerySourceMethod_NoIncl2()
+    {
+        var sourceCode = Preamble +
+             /* lang=c# */
+             """
+
+                 class TestClass(AppDbContext dbContext)
+                 {
+                     async Task Handle3(SaveUserDto dto, int id)
+                     {
+                         var usersQuery = dbContext.Users
+                             .Include(u => u.Profile);
+
+                         var user = await usersQuery
+                             .FirstOrDefaultAsync(u => u.Id == id);
+
+                         UpdateUserProfile(user, dto);
+                     }
+
+                     [IncludeRequired(nameof(user), nameof(User.Profile))]
+                     void UpdateUserProfile(User user, SaveUserDto dto)
+                     {
+                         user.Profile.Timezone = dto.Timezone;
+                     }
+                 }
+             }
+             """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No INCL003: cached field obtained from a method decorated with [Includes(nameof(User.Profile)].
+    /// </summary>
+    [Fact]
+    public async Task Handle3_SourceMethodWithCache_NoIncl3()
+    {
+        var sourceCode = Preamble +
+             /* lang=c# */
+             """
+
+                 class TestClass(AppDbContext dbContext)
+                 {
+                     private bool isUserInCache = false;
+                     private User cachedUser;
+
+                     [Includes(nameof(User.Profile))]
+                     async Task<User> GetUser(int id)
+                     {
+                         if (isUserInCache)
+                         {
+                             return cachedUser;
+                         }
+
+                         return await dbContext.Users
+                             .Include(u => u.Profile)
+                             .FirstOrDefaultAsync(u => u.Id == id);
+                     }
+                 }
+             }
+             """;
 
         await VerifyAnalyzerAsync(sourceCode);
     }
