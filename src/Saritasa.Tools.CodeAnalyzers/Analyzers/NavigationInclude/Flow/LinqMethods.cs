@@ -23,12 +23,36 @@ internal static class LinqMethods
     /// The "Async" suffix is ignored.
     /// </summary>
     private static readonly ImmutableHashSet<string> methodsKeepingSourceEntities = ImmutableHashSet.Create(
-        "Include", "ThenInclude",
-        "Where", "OrderBy", "OrderByDescending", "ThenBy", "ThenByDescending", "Skip", "Take", "Distinct", "Reverse",
-        "AsEnumerable", "AsQueryable", "AsNoTracking", "AsNoTrackingWithIdentityResolution", "AsTracking",
-        "AsSplitQuery", "AsSingleQuery",
-        "First", "FirstOrDefault", "Single", "SingleOrDefault", "Last", "LastOrDefault",
-        "ElementAt", "ElementAtOrDefault", "ToList", "ToArray", "ToHashSet", "ToDictionary");
+        "Include",
+        "ThenInclude",
+        "Where",
+        "OrderBy",
+        "OrderByDescending",
+        "ThenBy",
+        "ThenByDescending",
+        "Skip",
+        "Take",
+        "Distinct",
+        "Reverse",
+        "AsEnumerable",
+        "AsQueryable",
+        "AsNoTracking",
+        "AsNoTrackingWithIdentityResolution",
+        "AsTracking",
+        "AsSplitQuery",
+        "AsSingleQuery",
+        "First",
+        "FirstOrDefault",
+        "Single",
+        "SingleOrDefault",
+        "Last",
+        "LastOrDefault",
+        "ElementAt",
+        "ElementAtOrDefault",
+        "ToList",
+        "ToArray",
+        "ToHashSet",
+        "ToDictionary");
 
     /// <summary>
     /// Methods that pass each element of the source to their lambda: <c>users.Select(u =&gt; ...)</c>.

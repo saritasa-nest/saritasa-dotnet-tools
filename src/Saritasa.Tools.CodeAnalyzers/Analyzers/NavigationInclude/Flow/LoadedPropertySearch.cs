@@ -122,8 +122,60 @@ internal sealed class LoadedPropertySearch
             return true;
         }
 
+        if (position.Block.Predecessors.IsEmpty)
+        {
+            return IsLoadedAtHandlerStart(variable, position);
+        }
+
         return position.Block.Predecessors.All(incomingJump =>
             IsLoadedInVariable(variable, CodePosition.EndOfBlock(position.FlowGraph, incomingJump.Source)));
+    }
+
+    /// <summary>
+    /// The search reached the start of a catch, filter or finally block. The graph has no jumps for exceptions:
+    /// an exception can leave the try block after any statement, so the property must be loaded before
+    /// the try block and after every statement in it.
+    /// </summary>
+    private bool IsLoadedAtHandlerStart(object variable, CodePosition position)
+    {
+        var tryRegion = FindTryRegion(position.Block);
+        if (tryRegion is null)
+        {
+            // No known way to get here: not loaded.
+            return false;
+        }
+
+        return Enumerable
+            .Range(tryRegion.FirstBlockOrdinal, tryRegion.LastBlockOrdinal - tryRegion.FirstBlockOrdinal + 1)
+            .Select(ordinal => position.FlowGraph.Graph.Blocks[ordinal])
+            .SelectMany(block => Enumerable
+                .Range(0, block.Operations.Length + 2)
+                .Select(statementIndex => new CodePosition(position.FlowGraph, block, statementIndex)))
+            .All(tryPosition => IsLoadedInVariable(variable, tryPosition));
+    }
+
+    /// <summary>
+    /// For the first block of a catch, filter or finally: the try region it handles. Null for other blocks.
+    /// </summary>
+    /// <remarks>
+    /// "try/catch" is a TryAndCatch region with nested Try and Catch regions; "catch when" wraps the handler
+    /// into FilterAndHandler; "try/finally" is TryAndFinally. The try region is always the first nested region.
+    /// </remarks>
+    private static ControlFlowRegion? FindTryRegion(BasicBlock block)
+    {
+        var region = block.EnclosingRegion;
+        while (region.EnclosingRegion is { } parent && region.FirstBlockOrdinal == block.Ordinal)
+        {
+            if (parent.Kind is ControlFlowRegionKind.TryAndCatch or ControlFlowRegionKind.TryAndFinally &&
+                parent.NestedRegions[0] != region)
+            {
+                return parent.NestedRegions[0];
+            }
+
+            region = parent;
+        }
+
+        return null;
     }
 
     /// <summary>

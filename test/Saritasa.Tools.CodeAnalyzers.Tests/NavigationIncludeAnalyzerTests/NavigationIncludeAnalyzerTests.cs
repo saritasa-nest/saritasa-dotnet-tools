@@ -1071,12 +1071,10 @@ public class NavigationIncludeAnalyzerTests
 
     #endregion
 
-    #region Dictionaries
-
     /// <summary>
-    /// Wraps the body of a Handle method that works with a dictionary of users.
+    /// Wraps the body of a Handle method that calls UpdateUserProfile.
     /// </summary>
-    private static string DictionarySource(string handleBody) => Preamble +
+    private static string HandleSource(string handleBody) => Preamble +
         $$"""
 
             class TestClass(AppDbContext dbContext)
@@ -1095,13 +1093,244 @@ public class NavigationIncludeAnalyzerTests
         }
         """;
 
+    #region Try, catch and finally
+
+    /// <summary>
+    /// INCL002: inside a catch block the collection may hold the value from before the try
+    /// or from the try; neither query includes Profile.
+    /// </summary>
+    [Fact]
+    public async Task TryCatch_ForEachInCatchOverNonIncludedCollection_ReportsIncl2()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task Handle(SaveUserDto dto)
+                    {
+                        var users = await dbContext.Users
+                            .Where(u => u.Id == dto.Id)
+                            .ToListAsync();
+
+                        try
+                        {
+                            users = await dbContext.Users
+                                .Where(u => u.Id == dto.Id)
+                                .ToListAsync();
+                        }
+                        catch (Exception)
+                        {
+                            foreach (var user in users)
+                            {
+                                {|INCL002:UpdateUserProfile(user, dto)|};
+                            }
+                        }
+
+                        await dbContext.SaveChangesAsync();
+                    }
+
+                    [IncludeRequired(nameof(user), nameof(User.Profile))]
+                    void UpdateUserProfile(User user, SaveUserDto dto)
+                    {
+                        user.Profile.Timezone = dto.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No INCL002: loaded before the try block and not changed in it.
+    /// </summary>
+    [Fact]
+    public async Task TryCatch_IncludedBeforeTry_NoIncl2()
+    {
+        await VerifyAnalyzerAsync(HandleSource(
+            """
+                        var user = await dbContext.Users.Include(u => u.Profile).FirstAsync();
+                        try
+                        {
+                            await dbContext.SaveChangesAsync();
+                        }
+                        catch (Exception)
+                        {
+                            UpdateUserProfile(user, dto);
+                        }
+            """));
+    }
+
+    /// <summary>
+    /// INCL002: loaded before the try block, but the try block may reassign it without .Include() before throwing.
+    /// </summary>
+    [Fact]
+    public async Task TryCatch_ReassignedInTryWithoutInclude_ReportsIncl2()
+    {
+        await VerifyAnalyzerAsync(HandleSource(
+            """
+                        var user = await dbContext.Users.Include(u => u.Profile).FirstAsync();
+                        try
+                        {
+                            user = await dbContext.Users.FirstAsync();
+                            await dbContext.SaveChangesAsync();
+                        }
+                        catch (Exception)
+                        {
+                            {|INCL002:UpdateUserProfile(user, dto)|};
+                        }
+            """));
+    }
+
+    /// <summary>
+    /// INCL002: the try block loads the property, but an exception can happen before the assignment.
+    /// </summary>
+    [Fact]
+    public async Task TryCatch_IncludedOnlyInTry_ReportsIncl2()
+    {
+        await VerifyAnalyzerAsync(HandleSource(
+            """
+                        var user = await dbContext.Users.FirstAsync();
+                        try
+                        {
+                            user = await dbContext.Users.Include(u => u.Profile).FirstAsync();
+                        }
+                        catch (Exception)
+                        {
+                            {|INCL002:UpdateUserProfile(user, dto)|};
+                        }
+            """));
+    }
+
+    /// <summary>
+    /// No INCL002: an exception filter ("catch when") gets the same values as a catch block.
+    /// </summary>
+    [Fact]
+    public async Task TryCatch_FilteredCatchIncludedBeforeTry_NoIncl2()
+    {
+        await VerifyAnalyzerAsync(HandleSource(
+            """
+                        var user = await dbContext.Users.Include(u => u.Profile).FirstAsync();
+                        try
+                        {
+                            user = await dbContext.Users.Include(u => u.Profile).LastAsync();
+                        }
+                        catch (Exception exception) when (exception is InvalidOperationException)
+                        {
+                            UpdateUserProfile(user, dto);
+                        }
+            """));
+    }
+
+    /// <summary>
+    /// No INCL002: every value the finally block can see loads the property.
+    /// </summary>
+    [Fact]
+    public async Task TryFinally_IncludedBeforeAndInTry_NoIncl2()
+    {
+        await VerifyAnalyzerAsync(HandleSource(
+            """
+                        var user = await dbContext.Users.Include(u => u.Profile).FirstAsync();
+                        try
+                        {
+                            user = await dbContext.Users.Include(u => u.Profile).LastAsync();
+                        }
+                        finally
+                        {
+                            UpdateUserProfile(user, dto);
+                        }
+            """));
+    }
+
+    /// <summary>
+    /// INCL002: the finally block runs after the catch block, which reassigns the value without .Include().
+    /// </summary>
+    [Fact]
+    public async Task TryCatchFinally_ReassignedInCatch_ReportsIncl2()
+    {
+        await VerifyAnalyzerAsync(HandleSource(
+            """
+                        var user = await dbContext.Users.Include(u => u.Profile).FirstAsync();
+                        try
+                        {
+                            await dbContext.SaveChangesAsync();
+                        }
+                        catch (Exception)
+                        {
+                            user = await dbContext.Users.FirstAsync();
+                        }
+                        finally
+                        {
+                            {|INCL002:UpdateUserProfile(user, dto)|};
+                        }
+            """));
+    }
+
+    /// <summary>
+    /// No INCL002: a try/catch inside a loop; the search must stop when it comes back around the loop.
+    /// </summary>
+    [Fact]
+    public async Task TryCatch_InsideLoop_NoIncl2()
+    {
+        await VerifyAnalyzerAsync(HandleSource(
+            """
+                        var user = await dbContext.Users.Include(u => u.Profile).FirstAsync();
+                        for (var i = 0; i < 3; i++)
+                        {
+                            try
+                            {
+                                await dbContext.SaveChangesAsync();
+                            }
+                            catch (Exception)
+                            {
+                                UpdateUserProfile(user, dto);
+                                user = await dbContext.Users.Include(u => u.Profile).FirstAsync();
+                            }
+                        }
+            """));
+    }
+
+    /// <summary>
+    /// INCL002: nested try blocks; the outer catch can see the value assigned in the inner catch.
+    /// </summary>
+    [Fact]
+    public async Task TryCatch_NestedReassignedInInnerCatch_ReportsIncl2()
+    {
+        await VerifyAnalyzerAsync(HandleSource(
+            """
+                        var user = await dbContext.Users.Include(u => u.Profile).FirstAsync();
+                        try
+                        {
+                            try
+                            {
+                                await dbContext.SaveChangesAsync();
+                            }
+                            catch (InvalidOperationException)
+                            {
+                                user = await dbContext.Users.FirstAsync();
+                                throw;
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            {|INCL002:UpdateUserProfile(user, dto)|};
+                        }
+            """));
+    }
+
+    #endregion
+
+    #region Dictionaries
+
     /// <summary>
     /// No INCL002: an element read by key from a dictionary built from an included query.
     /// </summary>
     [Fact]
     public async Task Dictionary_IndexerOverIncludedQuery_NoIncl2()
     {
-        await VerifyAnalyzerAsync(DictionarySource(
+        await VerifyAnalyzerAsync(HandleSource(
             """
                         var users = await dbContext.Users.Include(u => u.Profile).ToDictionaryAsync(u => u.Id);
                         UpdateUserProfile(users[dto.Id], dto);
@@ -1116,7 +1345,7 @@ public class NavigationIncludeAnalyzerTests
     [Fact]
     public async Task Dictionary_IndexerOverNonIncludedQuery_ReportsIncl2()
     {
-        await VerifyAnalyzerAsync(DictionarySource(
+        await VerifyAnalyzerAsync(HandleSource(
             """
                         var users = await dbContext.Users.ToDictionaryAsync(u => u.Id);
                         var user = users[dto.Id];
@@ -1130,7 +1359,7 @@ public class NavigationIncludeAnalyzerTests
     [Fact]
     public async Task Dictionary_AllReadsOverIncludedQuery_NoIncl2()
     {
-        await VerifyAnalyzerAsync(DictionarySource(
+        await VerifyAnalyzerAsync(HandleSource(
             """
                         var users = await dbContext.Users.Include(u => u.Profile).ToDictionaryAsync(u => u.Id);
                         if (users.TryGetValue(dto.Id, out var found))
@@ -1164,7 +1393,7 @@ public class NavigationIncludeAnalyzerTests
     [Fact]
     public async Task Dictionary_TryGetValueOverNonIncludedQuery_ReportsIncl2()
     {
-        await VerifyAnalyzerAsync(DictionarySource(
+        await VerifyAnalyzerAsync(HandleSource(
             """
                         var users = await dbContext.Users.ToDictionaryAsync(u => u.Id);
                         if (users.TryGetValue(dto.Id, out var found))
@@ -1180,7 +1409,7 @@ public class NavigationIncludeAnalyzerTests
     [Fact]
     public async Task Dictionary_WithElementSelector_ReportsIncl2()
     {
-        await VerifyAnalyzerAsync(DictionarySource(
+        await VerifyAnalyzerAsync(HandleSource(
             """
                         var users = await dbContext.Users.Include(u => u.Profile)
                             .ToDictionaryAsync(u => u.Id, u => new User { Id = u.Id });

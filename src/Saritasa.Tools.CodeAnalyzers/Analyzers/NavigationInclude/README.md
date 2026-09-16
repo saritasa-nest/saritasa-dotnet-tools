@@ -75,11 +75,17 @@ look backward for variable, starting before the statement that uses it:
         start of a lambda         → u of users.Select(u => ...): IsLoaded(users); other variables: continue
                                     looking before the statement that creates the lambda
         block already searched    → true (a loop came back; this path adds nothing new)
+        start of catch / finally  → before the try and after every statement in it; all must be true
         otherwise                 → continue in every block that jumps here; all must be true
 ```
 
 The "block already searched" rule is what makes loops work. The search goes around the loop once, sees every
 assignment in the loop body, and stops.
+
+The graph has no jumps for exceptions: the first block of a `catch`, `catch when` filter or `finally` has no
+incoming jumps. An exception can leave the `try` block after any statement, so the search continues from the
+start of the `try` block and from the end of every statement inside it (for `finally` after `try/catch`, the
+`catch` blocks are included too).
 
 ## Files
 
