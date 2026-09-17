@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Saritasa.Tools.CodeAnalyzers.Abstractions.NavigationInclude.Attributes;
+using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Entities;
 
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Services;
 
@@ -32,27 +33,28 @@ public class AttributeHelper
     /// <returns>True if the attribute matches and both arguments are non-null.</returns>
     public static bool TryGetIncludeRequiredArgs(
         AttributeData attribute,
-        out string? param,
-        out string? includedProperty)
+        out string param,
+        out string includedProperty)
     {
-        param = null;
-        includedProperty = null;
-
         var name = attribute.AttributeClass?.Name;
         if (!string.Equals(name, nameof(IncludeRequiredAttribute), StringComparison.Ordinal))
         {
+            param = string.Empty;
+            includedProperty = string.Empty;
             return false;
         }
 
         if (attribute.ConstructorArguments.Length < 2)
         {
+            param = string.Empty;
+            includedProperty = string.Empty;
             return false;
         }
 
-        param = attribute.ConstructorArguments[0].Value as string;
-        includedProperty = attribute.ConstructorArguments[1].Value as string;
+        param = attribute.ConstructorArguments[0].Value as string ?? string.Empty;
+        includedProperty = attribute.ConstructorArguments[1].Value as string ?? string.Empty;
 
-        return param is not null && includedProperty is not null;
+        return param != string.Empty && includedProperty != string.Empty;
     }
 
     /// <summary>
@@ -60,13 +62,13 @@ public class AttributeHelper
     /// </summary>
     /// <param name="method">The method to inspect.</param>
     /// <returns>Pairs of parameter name and required property name.</returns>
-    public static IEnumerable<(string Parameter, string Property)> GetIncludeRequirements(IMethodSymbol method)
+    public static IEnumerable<IncludeRequirement> GetIncludeRequirements(IMethodSymbol method)
     {
         foreach (var attribute in method.GetAttributes())
         {
             if (TryGetIncludeRequiredArgs(attribute, out var parameter, out var includedProperty))
             {
-                yield return (parameter!, includedProperty!);
+                yield return new IncludeRequirement(parameter, includedProperty);
             }
         }
     }
@@ -77,7 +79,7 @@ public class AttributeHelper
     /// </summary>
     /// <param name="method">The method to inspect.</param>
     /// <returns>Property names the returned value must have loaded.</returns>
-    public static IEnumerable<string> GetVerifiedIncludes(IMethodSymbol method)
+    public static IEnumerable<string> GetNotVerifiedIncludes(IMethodSymbol method)
     {
         foreach (var attribute in method.GetAttributes())
         {

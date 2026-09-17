@@ -2,6 +2,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
+using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Entities;
 using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Flow;
 using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Services;
 
@@ -31,10 +32,10 @@ internal static class IncludeFlowHandler
             return;
         }
 
-        var diagnostics = FlowGraph
-            .ForMethod(context.GetControlFlowGraph(body), method)
+        var diagnostics = new MethodFlowGraph(context.GetControlFlowGraph(body), method)
             .GetStatements(context.CancellationToken)
-            .SelectMany(position => FindCallDiagnostics(position).Concat(FindReturnDiagnostics(position)));
+            .SelectMany(position =>
+                GetMethodCallDiagnostics(position).Concat(GetReturnDiagnostics(position)));
 
         foreach (var diagnostic in diagnostics)
         {
@@ -46,37 +47,68 @@ internal static class IncludeFlowHandler
     /// INCL001 / INCL002: for each [IncludeRequired(parameter, property)] of a called method,
     /// the passed value must have the property loaded.
     /// </summary>
-    private static IEnumerable<Diagnostic> FindCallDiagnostics(CodePosition statementPosition)
+    private static IEnumerable<Diagnostic> GetMethodCallDiagnostics(CodePosition statementPosition)
     {
         var methodCalls = statementPosition.Statement
-            !.DescendantsAndSelf()
+            .DescendantsAndSelf()
             .OfType<IInvocationOperation>();
+
+        var diagnostics = Enumerable.Empty<Diagnostic>();
 
         foreach (var call in methodCalls)
         {
             var methodIncludeRequirements = AttributeHelper.GetIncludeRequirements(call.TargetMethod);
-            foreach (var (parameterName, propertyToInclude) in methodIncludeRequirements)
+
+            var methodCallDiagnostics = ValidateIncludeRequirements(
+                call,
+                statementPosition,
+                methodIncludeRequirements);
+
+            diagnostics = diagnostics.Union(methodCallDiagnostics);
+        }
+
+        return diagnostics;
+    }
+
+    private static IEnumerable<Diagnostic> ValidateIncludeRequirements(
+        IInvocationOperation call,
+        CodePosition callStatement,
+        IEnumerable<IncludeRequirement> methodIncludeRequirements)
+    {
+        foreach (var includeRequirement in methodIncludeRequirements)
+        {
+            var argument = call.Arguments.FirstOrDefault(argument =>
             {
-                var argument = call.Arguments.FirstOrDefault(a => a.Parameter?.Name == parameterName);
-                if (argument is null)
-                {
-                    continue;
-                }
+                var parameterName = argument.Parameter?.Name;
+                return parameterName == includeRequirement.ParameterName;
+            });
 
-                var passedValue = LoadedPropertySearch.SkipConversions(argument.Value)!;
-                var ruleId = ChooseRule(passedValue, statementPosition.FlowGraph);
-                if (ruleId is null || LoadedPropertySearch.IsLoaded(passedValue, propertyToInclude, statementPosition))
-                {
-                    continue;
-                }
-
-                yield return Diagnostic.Create(
-                    NavigationIncludeRulesProvider.GetDiagnosticDescriptor(ruleId),
-                    call.Syntax.GetLocation(),
-                    passedValue.Type?.Name,
-                    propertyToInclude,
-                    passedValue.Syntax.ToString());
+            if (argument is null)
+            {
+                // Argument is not passed yet for this parameter.
+                continue;
             }
+
+            // "Process(user)" with a parameter of a base type, interface or nullable type wraps the local into
+            // a conversion. ChooseRule matches the local itself, and the diagnostic reports its own type.
+            var unwrappedValue = RoslynHelper.SkipWrappers(argument.Value);
+
+            var ruleId = MapArgumentToDiagnostic(
+                unwrappedValue,
+                includeRequirement.NavigationProperty,
+                callStatement);
+
+            if (ruleId is null)
+            {
+                continue;
+            }
+
+            yield return Diagnostic.Create(
+                NavigationIncludeRulesProvider.GetDiagnosticDescriptor(ruleId),
+                call.Syntax.GetLocation(),
+                unwrappedValue.Type?.Name,
+                includeRequirement.NavigationProperty,
+                unwrappedValue.Syntax.ToString());
         }
     }
 
@@ -84,59 +116,89 @@ internal static class IncludeFlowHandler
     /// INCL003: for each [Includes(property)] of the method, the returned value must have the property loaded,
     /// unless the attribute is declared with <c>Verify = false</c>.
     /// </summary>
-    private static IEnumerable<Diagnostic> FindReturnDiagnostics(CodePosition position)
+    private static IEnumerable<Diagnostic> GetReturnDiagnostics(CodePosition position)
     {
         if (!position.IsReturnFromMethod)
         {
             yield break;
         }
 
-        var returnedValue = position.Statement!;
+        var returnedValue = position.Statement;
 
-        // The graph keeps only the returned expression; report on the whole "return ...;" statement.
-        var location = (returnedValue.Syntax.Parent as ReturnStatementSyntax ?? returnedValue.Syntax).GetLocation();
-
-        foreach (var property in AttributeHelper.GetVerifiedIncludes(position.FlowGraph.Method))
+        foreach (var property in AttributeHelper.GetNotVerifiedIncludes(position.FlowGraph.Method))
         {
-            if (!LoadedPropertySearch.IsLoaded(returnedValue, property, position))
+            if (LoadedPropertySearch.IsLoaded(returnedValue, property, position))
             {
-                yield return Diagnostic.Create(
-                    NavigationIncludeRulesProvider.GetDiagnosticDescriptor(NavigationIncludeRulesProvider.RuleIncl3Id),
-                    location,
-                    property);
+                continue;
             }
+
+            // The graph keeps only the returned expression; report on the whole "return ...;" statement.
+            var location = (returnedValue.Syntax.Parent as ReturnStatementSyntax ?? returnedValue.Syntax).GetLocation();
+
+            yield return Diagnostic.Create(
+                NavigationIncludeRulesProvider.GetDiagnosticDescriptor(
+                    NavigationIncludeRulesProvider.Incl3IdMethodResultDoesntIncludeNavigationProperty),
+                location,
+                property);
         }
     }
 
-    /// <summary>
-    /// INCL001 for a method parameter (fix: declare [IncludeRequired] on the method),
-    /// INCL002 for a local or a LINQ lambda parameter (fix: include the property),
-    /// null for values that are not checked (fields, method calls, other lambda parameters).
-    /// </summary>
-    private static string? ChooseRule(IOperation passedValue, FlowGraph flowGraph)
-        => passedValue switch
+    private static string? MapArgumentToDiagnostic(
+        IOperation methodArgument,
+        string navigationPropertyName,
+        CodePosition methodCallStatement)
+        => methodArgument switch
         {
-            ILocalReferenceOperation => NavigationIncludeRulesProvider.RuleIncl2Id,
+            // Argument value is local reference. Try detect .Include().
+            ILocalReferenceOperation when LoadedPropertySearch.IsLoaded(methodArgument, navigationPropertyName, methodCallStatement)
+                => NavigationIncludeRulesProvider.Incl2IdArgumentDoesntIncludeNavigationProperty,
 
-            IParameterReferenceOperation { Parameter.ContainingSymbol: IMethodSymbol { MethodKind: not MethodKind.AnonymousFunction } }
-                => NavigationIncludeRulesProvider.RuleIncl1Id,
+            // Argument value is parameter of parent method. Include is out of scope of this method. Ask to add [IncludeRequired]
+            IParameterReferenceOperation parameterReference
+                when IsMethodParameter(parameterReference.Parameter)
+                => NavigationIncludeRulesProvider.Incl1IdAddIncludeRequiredForParameter,
 
-            // u of users.Select(u => ...).
-            IParameterReferenceOperation { Parameter: { Ordinal: 0 } parameter }
-                when flowGraph.FindLambda(parameter.ContainingSymbol) is { } lambda &&
-                     LinqMethods.GetElementSource(lambda) is not null
-                => NavigationIncludeRulesProvider.RuleIncl2Id,
+            // Argument value is lambda parameter (u of users.Select(u => ...)). Try detect .Include().
+            IParameterReferenceOperation referenceToLambdaParameter when
+                IsLinqLambdaParameter(referenceToLambdaParameter.Parameter, methodCallStatement.FlowGraph) &&
+                LoadedPropertySearch.IsLoaded(methodArgument, navigationPropertyName, methodCallStatement)
+                => NavigationIncludeRulesProvider.Incl2IdArgumentDoesntIncludeNavigationProperty,
 
             _ => null,
         };
+
+    private static bool IsMethodParameter(IParameterSymbol parameterSymbol)
+        => parameterSymbol is
+        {
+            ContainingSymbol: IMethodSymbol
+            {
+                MethodKind: not MethodKind.AnonymousFunction
+            }
+        };
+
+    private static bool IsLinqLambdaParameter(
+        IParameterSymbol lambdaParameter,
+        IFlowGraph methodFlowGraph)
+    {
+        var lambdaInMethod = methodFlowGraph.FindLambda(lambdaParameter.ContainingSymbol);
+        if (lambdaInMethod is null)
+        {
+            return false;
+        }
+
+        return LinqMethods.GetContainer(lambdaInMethod) is not null;
+    }
 
     /// <summary>
     /// Returns the block that belongs to the method or constructor body.
     /// Other blocks (attribute arguments, parameter default values) have no control flow to analyze.
     /// </summary>
     private static IOperation? FindMethodBody(OperationBlockAnalysisContext context)
-        => context.OperationBlocks.FirstOrDefault(block => GetRoot(block) is IMethodBodyOperation or IConstructorBodyOperation);
+        => context.OperationBlocks.FirstOrDefault(block =>
+            GetRoot(block) is IMethodBodyOperation or IConstructorBodyOperation);
 
-    private static IOperation GetRoot(IOperation operation)
-        => operation.Parent is null ? operation : GetRoot(operation.Parent);
+    private static IOperation GetRoot(IOperation operation) =>
+        operation.Parent is null
+            ? operation
+            : GetRoot(operation.Parent);
 }

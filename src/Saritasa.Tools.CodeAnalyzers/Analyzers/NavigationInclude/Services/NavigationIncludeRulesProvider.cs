@@ -13,17 +13,17 @@ internal static class NavigationIncludeRulesProvider
     /// <summary>
     /// Diagnostic identifier for INCL001.
     /// </summary>
-    public const string RuleIncl1Id = "INCL001";
+    public const string Incl1IdAddIncludeRequiredForParameter = "INCL001";
 
     /// <summary>
     /// Diagnostic identifier for INCL002.
     /// </summary>
-    public const string RuleIncl2Id = "INCL002";
+    public const string Incl2IdArgumentDoesntIncludeNavigationProperty = "INCL002";
 
     /// <summary>
     /// Diagnostic identifier for INCL003.
     /// </summary>
-    public const string RuleIncl3Id = "INCL003";
+    public const string Incl3IdMethodResultDoesntIncludeNavigationProperty = "INCL003";
 
     #region INCL001
 
@@ -38,7 +38,7 @@ internal static class NavigationIncludeRulesProvider
         "method that accesses them directly or propagates them to callee methods.";
 
     private static readonly DiagnosticDescriptor ruleIncl1 = new(
-        RuleIncl1Id,
+        Incl1IdAddIncludeRequiredForParameter,
         titleIncl1,
         messageFormatIncl1,
         Category,
@@ -63,7 +63,7 @@ internal static class NavigationIncludeRulesProvider
         "a method decorated with [Includes(\"PropertyName\")].";
 
     private static readonly DiagnosticDescriptor ruleIncl2 = new(
-        RuleIncl2Id,
+        Incl2IdArgumentDoesntIncludeNavigationProperty,
         titleIncl2,
         messageFormatIncl2,
         Category,
@@ -88,7 +88,7 @@ internal static class NavigationIncludeRulesProvider
         "initializer that sets the property, or a source method annotated with [Includes].";
 
     private static readonly DiagnosticDescriptor ruleIncl3 = new(
-        RuleIncl3Id,
+        Incl3IdMethodResultDoesntIncludeNavigationProperty,
         titleIncl3,
         messageFormatIncl3,
         Category,
@@ -113,9 +113,9 @@ internal static class NavigationIncludeRulesProvider
     {
         return ruleId switch
         {
-            RuleIncl1Id => ruleIncl1,
-            RuleIncl2Id => ruleIncl2,
-            RuleIncl3Id => ruleIncl3,
+            Incl1IdAddIncludeRequiredForParameter => ruleIncl1,
+            Incl2IdArgumentDoesntIncludeNavigationProperty => ruleIncl2,
+            Incl3IdMethodResultDoesntIncludeNavigationProperty => ruleIncl3,
             _ => throw new ArgumentException("Unknown diagnostic rule id: " + ruleId)
         };
     }

@@ -92,7 +92,7 @@ internal static class LinqMethods
     /// </summary>
     /// <param name="lambda">Lambda.</param>
     /// <returns>Source or null.</returns>
-    public static IOperation? GetElementSource(IFlowAnonymousFunctionOperation lambda)
+    public static IOperation? GetContainer(IFlowAnonymousFunctionOperation lambda)
     {
         var parent = lambda.Parent;
         while (parent is IConversionOperation or IDelegateCreationOperation)

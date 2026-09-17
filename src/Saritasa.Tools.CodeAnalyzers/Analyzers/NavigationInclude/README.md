@@ -44,7 +44,7 @@ search moves the position backward; its only changing state is the set of blocks
 `IncludeFlowHandler` maps statements to diagnostics and reports them at the end:
 
 ```text
-statements = FlowGraph.ForMethod(body).GetStatements()   // also lambdas and local functions
+statements = new MethodFlowGraph(body).GetStatements()   // also lambdas and local functions
 diagnostics = for each statement:
     calls of an [IncludeRequired(param, P)] method where not IsLoaded(argument for param, P) → INCL001 / INCL002
     "return value" of an [Includes(P)] method where not IsLoaded(value, P)                   → INCL003
@@ -94,7 +94,8 @@ start of the `try` block and from the end of every statement inside it (for `fin
 | `Handlers/IncludeFlowHandler.cs` | Finds places to check, reports diagnostics. |
 | `Flow/LoadedPropertySearch.cs` | The black box `IsLoaded`. |
 | `Flow/VariableAssignment.cs` | Mapper: what a statement assigns to a variable (`user = value`, `user.Profile = value`, deconstruction, `out`). |
-| `Flow/FlowGraph.cs` | One graph (method, local function or lambda); for a lambda, where it is created. Lists statements. |
+| `Flow/IFlowGraph.cs` | One graph: `MethodFlowGraph` (method, local function) or `LambdaFlowGraph` (lambda and where it is created). |
+| `Flow/FlowGraphExtensions.cs` | Lists the statements of a graph and of the lambdas and local functions inside it. |
 | `Flow/CodePosition.cs` | A statement in a graph: block + index. Lists the statements before it. |
 | `Flow/LinqMethods.cs` | Facts about LINQ/EF methods: which keep entities, which pass elements to lambdas, `Include` parsing. |
 | `Handlers/PropertyReferenceHandler.cs` | INCL001 for direct `param.Profile` access. |

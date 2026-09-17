@@ -23,7 +23,7 @@ internal sealed class LoadedPropertySearch
     /// </summary>
     private readonly HashSet<(BasicBlock Block, object Variable)> searchedBlocks = new();
 
-    private LoadedPropertySearch(string property)
+    public LoadedPropertySearch(string property)
     {
         this.property = property;
     }
@@ -39,34 +39,28 @@ internal sealed class LoadedPropertySearch
         => new LoadedPropertySearch(property).IsLoadedInValue(value, position);
 
     /// <summary>
-    /// Removes casts and delegate wrappers around an operation.
-    /// </summary>
-    /// <param name="operation">Operation.</param>
-    /// <returns>Operation without wrappers.</returns>
-    public static IOperation? SkipConversions(IOperation? operation)
-        => operation switch
-        {
-            IConversionOperation conversion => SkipConversions(conversion.Operand),
-            IDelegateCreationOperation delegateCreation => SkipConversions(delegateCreation.Target),
-            _ => operation,
-        };
-
-    /// <summary>
     /// Checks a value. All parts of the value belong to the same statement, so the position stays the same.
     /// </summary>
-    private bool IsLoadedInValue(IOperation? value, CodePosition position)
+    private bool IsLoadedInValue(IOperation value, CodePosition position)
     {
-        value = SkipConversions(value);
-        if (value is IAwaitOperation awaitOperation)
-        {
-            value = SkipConversions(awaitOperation.Operation);
-        }
+        // Values come with implicit conversions: "IEnumerable<User> users = query.ToList()",
+        // "list.Where(...)" (the list is converted to IEnumerable<User>). Without skipping them a call or
+        // a property below is not recognized.
+        value = RoslynHelper.SkipWrappers(value);
 
         return value switch
         {
+            // local refs, parameters, lowered operators, out vars
             _ when VariableAssignment.Of(value) is { } variable => IsLoadedInVariable(variable, position),
+
+            // await GetUserAsync(): the entities come from the awaited value.
+            IAwaitOperation awaitOperation => IsLoadedInValue(awaitOperation.Operation, position),
+
+            // Indexers, Enumerator properties
             IPropertyReferenceOperation propertyReference when ReturnsElements(propertyReference.Property)
                 => IsLoadedInValue(propertyReference.Instance, position),
+
+            // Method result
             IInvocationOperation call => IsLoadedInCallResult(call, position),
 
             // dbContext.Users, new User(), null, fields: not loaded.
@@ -87,13 +81,29 @@ internal sealed class LoadedPropertySearch
     }
 
     /// <summary>
-    /// Looks backward from the position for the last assignment of the variable on every path.
+    /// Looks backward from the statement for the last assignment of the variable on every path.
+    /// The statement itself is not checked.
     /// </summary>
     private bool IsLoadedInVariable(object variable, CodePosition position)
+        => IsLoadedInVariable(variable, position.FlowGraph, position.Block, position.StatementsBefore());
+
+    /// <summary>
+    /// Looks for the last assignment of the variable in the given statements of the block, then in the blocks
+    /// that jump to it.
+    /// </summary>
+    /// <param name="variable">Variable.</param>
+    /// <param name="flowGraph">Graph the block belongs to.</param>
+    /// <param name="block">Block.</param>
+    /// <param name="statementsToCheck">Statements of the block to check, the nearest first.</param>
+    private bool IsLoadedInVariable(
+        object variable,
+        IFlowGraph flowGraph,
+        BasicBlock block,
+        IEnumerable<CodePosition> statementsToCheck)
     {
-        foreach (var previous in position.StatementsBefore())
+        foreach (var previous in statementsToCheck)
         {
-            var assignment = VariableAssignment.Find(previous.Statement!, variable);
+            var assignment = VariableAssignment.Find(previous.Statement, variable);
             if (assignment is null)
             {
                 continue;
@@ -105,30 +115,39 @@ internal sealed class LoadedPropertySearch
                 return IsLoadedInValue(assignment.Value, previous);
             }
 
-            // "user.Profile = value". Other properties do not matter, keep looking.
+            // "user.Profile = value". Someone set property which requires include manually.
             if (assignment.PropertyName == property)
             {
                 return true;
             }
         }
 
-        if (position.Block.Kind == BasicBlockKind.Entry)
+        if (block.Kind == BasicBlockKind.Entry)
         {
-            return IsLoadedAtGraphStart(variable, position.FlowGraph);
+            return IsLoadedAtGraphStart(variable, flowGraph);
         }
 
-        if (!searchedBlocks.Add((position.Block, variable)))
+        if (!searchedBlocks.Add((block, variable)))
         {
             return true;
         }
 
-        if (position.Block.Predecessors.IsEmpty)
+        // The first block of a catch, filter or finally is entered from the try block, and may also have jumps
+        // from inside the handler (a loop at its start).
+        var tryRegion = FindTryRegion(block);
+        if (tryRegion is null && block.Predecessors.IsEmpty)
         {
-            return IsLoadedAtHandlerStart(variable, position);
+            // No known way to get here: not loaded.
+            return false;
         }
 
-        return position.Block.Predecessors.All(incomingJump =>
-            IsLoadedInVariable(variable, CodePosition.EndOfBlock(position.FlowGraph, incomingJump.Source)));
+        // A jump leaves the source block after all its statements, so all of them are checked.
+        return block.Predecessors.All(incomingJump => IsLoadedInVariable(
+                   variable,
+                   flowGraph,
+                   incomingJump.Source,
+                   CodePosition.AllInBlock(flowGraph, incomingJump.Source).Reverse())) &&
+               (tryRegion is null || IsLoadedInTryRegion(variable, tryRegion, flowGraph));
     }
 
     /// <summary>
@@ -136,23 +155,19 @@ internal sealed class LoadedPropertySearch
     /// an exception can leave the try block after any statement, so the property must be loaded before
     /// the try block and after every statement in it.
     /// </summary>
-    private bool IsLoadedAtHandlerStart(object variable, CodePosition position)
-    {
-        var tryRegion = FindTryRegion(position.Block);
-        if (tryRegion is null)
-        {
-            // No known way to get here: not loaded.
-            return false;
-        }
-
-        return Enumerable
+    private bool IsLoadedInTryRegion(object variable, ControlFlowRegion tryRegion, IFlowGraph flowGraph)
+        => Enumerable
             .Range(tryRegion.FirstBlockOrdinal, tryRegion.LastBlockOrdinal - tryRegion.FirstBlockOrdinal + 1)
-            .Select(ordinal => position.FlowGraph.Graph.Blocks[ordinal])
-            .SelectMany(block => Enumerable
-                .Range(0, block.Operations.Length + 2)
-                .Select(statementIndex => new CodePosition(position.FlowGraph, block, statementIndex)))
-            .All(tryPosition => IsLoadedInVariable(variable, tryPosition));
-    }
+            .Select(ordinal => flowGraph.Graph.Blocks[ordinal])
+            .All(block =>
+            {
+                var statements = CodePosition.AllInBlock(flowGraph, block).ToList();
+
+                // Count 0: the exception is thrown before the block's first statement; count N: after statement N.
+                return Enumerable
+                    .Range(0, statements.Count + 1)
+                    .All(count => IsLoadedInVariable(variable, flowGraph, block, statements.Take(count).Reverse()));
+            });
 
     /// <summary>
     /// For the first block of a catch, filter or finally: the try region it handles. Null for other blocks.
@@ -181,9 +196,9 @@ internal sealed class LoadedPropertySearch
     /// <summary>
     /// The search reached the start of a method, local function or lambda without finding an assignment.
     /// </summary>
-    private bool IsLoadedAtGraphStart(object variable, FlowGraph flowGraph)
+    private bool IsLoadedAtGraphStart(object variable, IFlowGraph flowGraph)
     {
-        if (flowGraph.Lambda is null || flowGraph.LambdaCreatedAt is null)
+        if (flowGraph is not LambdaFlowGraph lambdaGraph)
         {
             // A method parameter is loaded if the method requires it with [IncludeRequired].
             return variable is IParameterSymbol { ContainingSymbol: IMethodSymbol method } parameter &&
@@ -191,17 +206,17 @@ internal sealed class LoadedPropertySearch
         }
 
         if (variable is IParameterSymbol lambdaParameter &&
-            SymbolEqualityComparer.Default.Equals(lambdaParameter.ContainingSymbol, flowGraph.Lambda.Symbol))
+            SymbolEqualityComparer.Default.Equals(lambdaParameter.ContainingSymbol, lambdaGraph.Lambda.Symbol))
         {
             // users.Select(u => ...): u is an element of users. Parameters of other lambdas are unknown.
-            var elementSource = LinqMethods.GetElementSource(flowGraph.Lambda);
+            var elementSource = LinqMethods.GetContainer(lambdaGraph.Lambda);
             return lambdaParameter.Ordinal == 0 &&
                    elementSource is not null &&
-                   IsLoadedInValue(elementSource, flowGraph.LambdaCreatedAt);
+                   IsLoadedInValue(elementSource, lambdaGraph.CreatedAt);
         }
 
         // A variable captured by the lambda: continue before the statement that creates the lambda.
-        return IsLoadedInVariable(variable, flowGraph.LambdaCreatedAt);
+        return IsLoadedInVariable(variable, lambdaGraph.CreatedAt);
     }
 
     /// <summary>
@@ -212,8 +227,8 @@ internal sealed class LoadedPropertySearch
         => call.TargetMethod.Name switch
         {
             // foreach is rewritten by the compiler to "enumerator = collection.GetEnumerator()".
-            "GetEnumerator" or "GetAsyncEnumerator" => call.Instance,
 
+            "GetEnumerator" or "GetAsyncEnumerator" => call.Instance,
             // dictionary.GetValueOrDefault(id): an extension method, the dictionary is the first argument.
             "GetValueOrDefault" => LinqMethods.GetSource(call),
 

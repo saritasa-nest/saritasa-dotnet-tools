@@ -60,7 +60,7 @@ internal static class PropertyReferenceHandler
 
         context.ReportDiagnostic(
             Diagnostic.Create(
-                NavigationIncludeRulesProvider.GetDiagnosticDescriptor(NavigationIncludeRulesProvider.RuleIncl1Id),
+                NavigationIncludeRulesProvider.GetDiagnosticDescriptor(NavigationIncludeRulesProvider.Incl1IdAddIncludeRequiredForParameter),
                 propRef.Syntax.GetLocation(),
                 typeName,
                 propertyName,

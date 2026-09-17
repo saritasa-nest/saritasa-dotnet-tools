@@ -1320,6 +1320,79 @@ public class NavigationIncludeAnalyzerTests
             """));
     }
 
+    /// <summary>
+    /// INCL002: the catch block starts with a loop, so its first block has a jump from the end of the loop;
+    /// the try block must still be searched.
+    /// </summary>
+    [Fact]
+    public async Task TryCatch_LoopAtCatchStartReassignedInTry_ReportsIncl2()
+    {
+        await VerifyAnalyzerAsync(HandleSource(
+            """
+                        var user = await dbContext.Users.Include(u => u.Profile).FirstAsync();
+                        try
+                        {
+                            user = await dbContext.Users.FirstAsync();
+                            await dbContext.SaveChangesAsync();
+                        }
+                        catch
+                        {
+                            while (dto.Id > 0)
+                            {
+                                {|INCL002:UpdateUserProfile(user, dto)|};
+                            }
+                        }
+            """));
+    }
+
+    /// <summary>
+    /// INCL002: the finally block starts with a loop, so its first block has a jump from the end of the loop;
+    /// the try block must still be searched.
+    /// </summary>
+    [Fact]
+    public async Task TryFinally_LoopAtFinallyStartReassignedInTry_ReportsIncl2()
+    {
+        await VerifyAnalyzerAsync(HandleSource(
+            """
+                        var user = await dbContext.Users.Include(u => u.Profile).FirstAsync();
+                        try
+                        {
+                            user = await dbContext.Users.FirstAsync();
+                        }
+                        finally
+                        {
+                            do
+                            {
+                                {|INCL002:UpdateUserProfile(user, dto)|};
+                            }
+                            while (dto.Id > 0);
+                        }
+            """));
+    }
+
+    /// <summary>
+    /// No INCL002: the catch block starts with a loop; loaded before the try block and not changed in it.
+    /// </summary>
+    [Fact]
+    public async Task TryCatch_LoopAtCatchStartIncludedBeforeTry_NoIncl2()
+    {
+        await VerifyAnalyzerAsync(HandleSource(
+            """
+                        var user = await dbContext.Users.Include(u => u.Profile).FirstAsync();
+                        try
+                        {
+                            await dbContext.SaveChangesAsync();
+                        }
+                        catch
+                        {
+                            while (dto.Id > 0)
+                            {
+                                UpdateUserProfile(user, dto);
+                            }
+                        }
+            """));
+    }
+
     #endregion
 
     #region Dictionaries
