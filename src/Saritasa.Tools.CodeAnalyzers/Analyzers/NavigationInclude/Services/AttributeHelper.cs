@@ -1,64 +1,26 @@
-﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis;
 using Saritasa.Tools.CodeAnalyzers.Abstractions.NavigationInclude.Attributes;
 using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Entities;
 
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Services;
 
 /// <summary>
-/// Provides helpers for reading NavigationInclude-related attributes from Roslyn symbols.
+/// Reads the NavigationInclude attributes of a symbol.
 /// </summary>
-public class AttributeHelper
+internal static class AttributeHelper
 {
     /// <summary>
-    /// Returns true if symbol is decorated with <see cref="TrackIncludeRequiredAttribute"/>.
+    /// Returns true if the symbol is decorated with <see cref="TrackIncludeRequiredAttribute"/>.
     /// </summary>
     /// <param name="symbol">The symbol to inspect.</param>
     /// <returns>True if the attribute is present; otherwise false.</returns>
     public static bool HasTrackIncludeRequiredAttribute(ISymbol symbol)
-    {
-        return symbol
+        => symbol
             .GetAttributes()
-            .Any(a => string.Equals(
-                a.AttributeClass?.Name,
-                nameof(TrackIncludeRequiredAttribute),
-                StringComparison.Ordinal));
-    }
+            .Any(attribute => IsAttribute(attribute, nameof(TrackIncludeRequiredAttribute)));
 
     /// <summary>
-    /// Attempts to extract the parameter name and property name from an <see cref="IncludeRequiredAttribute"/>.
-    /// </summary>
-    /// <param name="attribute">The attribute data to inspect.</param>
-    /// <param name="param">Receives the first constructor argument.</param>
-    /// <param name="includedProperty">Receives the second constructor argument.</param>
-    /// <returns>True if the attribute matches and both arguments are non-null.</returns>
-    public static bool TryGetIncludeRequiredArgs(
-        AttributeData attribute,
-        out string param,
-        out string includedProperty)
-    {
-        var name = attribute.AttributeClass?.Name;
-        if (!string.Equals(name, nameof(IncludeRequiredAttribute), StringComparison.Ordinal))
-        {
-            param = string.Empty;
-            includedProperty = string.Empty;
-            return false;
-        }
-
-        if (attribute.ConstructorArguments.Length < 2)
-        {
-            param = string.Empty;
-            includedProperty = string.Empty;
-            return false;
-        }
-
-        param = attribute.ConstructorArguments[0].Value as string ?? string.Empty;
-        includedProperty = attribute.ConstructorArguments[1].Value as string ?? string.Empty;
-
-        return param != string.Empty && includedProperty != string.Empty;
-    }
-
-    /// <summary>
-    /// Returns (parameter, property) of every <see cref="IncludeRequiredAttribute"/> of the method.
+    /// Returns the parameter and the property of every <see cref="IncludeRequiredAttribute"/> of the method.
     /// </summary>
     /// <param name="method">The method to inspect.</param>
     /// <returns>Pairs of parameter name and required property name.</returns>
@@ -66,32 +28,25 @@ public class AttributeHelper
     {
         foreach (var attribute in method.GetAttributes())
         {
-            if (TryGetIncludeRequiredArgs(attribute, out var parameter, out var includedProperty))
+            if (!IsAttribute(attribute, nameof(IncludeRequiredAttribute)) ||
+                attribute.ConstructorArguments.Length < 2)
             {
-                yield return new IncludeRequirement(parameter, includedProperty);
+                continue;
+            }
+
+            var parameter = attribute.ConstructorArguments[0].Value as string;
+            var property = attribute.ConstructorArguments[1].Value as string;
+
+            if (!string.IsNullOrEmpty(parameter) && !string.IsNullOrEmpty(property))
+            {
+                yield return new IncludeRequirement(parameter!, property!);
             }
         }
     }
 
     /// <summary>
-    /// Returns the properties of every <see cref="IncludesAttribute"/> of the method,
-    /// except those declared with <c>Verify = false</c>.
-    /// </summary>
-    /// <param name="method">The method to inspect.</param>
-    /// <returns>Property names the returned value must have loaded.</returns>
-    public static IEnumerable<string> GetNotVerifiedIncludes(IMethodSymbol method)
-    {
-        foreach (var attribute in method.GetAttributes())
-        {
-            if (TryGetIncludesArg(attribute, out var includedProperty) && IsIncludesVerificationEnabled(attribute))
-            {
-                yield return includedProperty!;
-            }
-        }
-    }
-
-    /// <summary>
-    /// Returns true if method declares <see cref="IncludeRequiredAttribute"/>.
+    /// Returns true if the method asks for the property of the parameter with
+    /// <see cref="IncludeRequiredAttribute"/>.
     /// </summary>
     /// <param name="method">The method to inspect.</param>
     /// <param name="param">The parameter name to match.</param>
@@ -101,85 +56,62 @@ public class AttributeHelper
         IMethodSymbol method,
         string param,
         string includedProperty)
-    {
-        foreach (var attr in method.GetAttributes())
-        {
-            if (!TryGetIncludeRequiredArgs(attr, out var attrParamName, out var attrPropertyName))
-            {
-                continue;
-            }
-
-            if (string.Equals(attrParamName, param, StringComparison.Ordinal) &&
-                string.Equals(attrPropertyName, includedProperty, StringComparison.Ordinal))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
+        => GetIncludeRequirements(method).Any(requirement =>
+            string.Equals(requirement.ParameterName, param, StringComparison.Ordinal) &&
+            string.Equals(requirement.NavigationProperty, includedProperty, StringComparison.Ordinal));
 
     /// <summary>
-    /// Returns true if method declares <see cref="IncludesAttribute"/> for the property.
+    /// Returns true if the method declares <see cref="IncludesAttribute"/> for the property.
     /// </summary>
     /// <param name="method">The method to inspect.</param>
     /// <param name="includedProperty">The property name to match.</param>
     /// <returns>True if a matching attribute is found; otherwise false.</returns>
     public static bool MethodHasIncludesAttribute(IMethodSymbol method, string includedProperty)
+        => GetIncludes(method).Any(include =>
+            string.Equals(include.Property, includedProperty, StringComparison.Ordinal));
+
+    /// <summary>
+    /// Returns the properties of every <see cref="IncludesAttribute"/> of the method that the analyzer must
+    /// check: all of them except those declared with <c>Verify = false</c>.
+    /// </summary>
+    /// <param name="method">The method to inspect.</param>
+    /// <returns>Property names the returned value must have loaded.</returns>
+    public static IEnumerable<string> GetIncludesToVerify(IMethodSymbol method)
+        => GetIncludes(method)
+            .Where(include => include.Verify)
+            .Select(include => include.Property);
+
+    /// <summary>
+    /// Returns the property and the <c>Verify</c> flag of every <see cref="IncludesAttribute"/> of the method.
+    /// </summary>
+    private static IEnumerable<(string Property, bool Verify)> GetIncludes(IMethodSymbol method)
     {
-        foreach (var attr in method.GetAttributes())
+        foreach (var attribute in method.GetAttributes())
         {
-            if (TryGetIncludesArg(attr, out var attrPropertyName) &&
-                string.Equals(attrPropertyName, includedProperty, StringComparison.Ordinal))
+            if (!IsAttribute(attribute, nameof(IncludesAttribute)) ||
+                attribute.ConstructorArguments.Length < 1)
             {
-                return true;
+                continue;
+            }
+
+            if (attribute.ConstructorArguments[0].Value is string property)
+            {
+                yield return (property, IsVerifyEnabled(attribute));
             }
         }
-
-        return false;
     }
 
     /// <summary>
-    /// Returns false if the <see cref="IncludesAttribute"/> is declared with <c>Verify = false</c>.
+    /// Returns false if the attribute is declared with <c>Verify = false</c>.
     /// </summary>
-    /// <param name="attribute">The <see cref="IncludesAttribute"/> data.</param>
-    /// <returns>True if the analyzer should verify the method's return value.</returns>
-    public static bool IsIncludesVerificationEnabled(AttributeData attribute)
-    {
-        foreach (var namedArgument in attribute.NamedArguments)
-        {
-            if (string.Equals(namedArgument.Key, nameof(IncludesAttribute.Verify), StringComparison.Ordinal) &&
-                namedArgument.Value.Value is false)
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
+    private static bool IsVerifyEnabled(AttributeData attribute)
+        => !attribute.NamedArguments.Any(argument =>
+            string.Equals(argument.Key, nameof(IncludesAttribute.Verify), StringComparison.Ordinal) &&
+            argument.Value.Value is false);
 
     /// <summary>
-    /// Attempts to extract the property name from an <see cref="IncludesAttribute"/>.
+    /// Returns true if the attribute is of the type with the name.
     /// </summary>
-    /// <param name="attribute">The attribute data to inspect.</param>
-    /// <param name="includedProperty">Receives the first constructor argument.</param>
-    /// <returns>True if the attribute matches and its argument is non-null.</returns>
-    public static bool TryGetIncludesArg(AttributeData attribute, out string? includedProperty)
-    {
-        includedProperty = null;
-
-        var name = attribute.AttributeClass?.Name;
-        if (!string.Equals(name, nameof(IncludesAttribute), StringComparison.Ordinal))
-        {
-            return false;
-        }
-
-        if (attribute.ConstructorArguments.Length < 1)
-        {
-            return false;
-        }
-
-        includedProperty = attribute.ConstructorArguments[0].Value as string;
-        return includedProperty is not null;
-    }
+    private static bool IsAttribute(AttributeData attribute, string attributeTypeName)
+        => string.Equals(attribute.AttributeClass?.Name, attributeTypeName, StringComparison.Ordinal);
 }
