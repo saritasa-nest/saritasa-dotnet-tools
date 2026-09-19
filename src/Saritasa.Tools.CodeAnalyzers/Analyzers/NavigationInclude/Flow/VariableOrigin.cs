@@ -66,16 +66,16 @@ internal sealed class VariableOrigin
     /// <returns>Origins; never empty.</returns>
     public IEnumerable<Origin> GetOrigins(object variable, CodePosition position)
     {
-        foreach (var previous in position.GetPreviousStatements())
+        var originFromPreviousStatementInBlock = position.GetPreviousStatements()
+            .Select(previous => GetOriginInStatement(previous, variable))
+            .FirstOrDefault(origin => origin is not null);
+        if (originFromPreviousStatementInBlock is not null)
         {
-            if (GetOriginInStatement(previous, variable) is { } assigned)
-            {
-                return [assigned];
-            }
+            return [originFromPreviousStatementInBlock];
         }
 
         // No assignment in this block, so the value was already there when the block started.
-        return GetOriginsBeforeBlock(variable, position.FlowGraph, position.Block);
+        return GetOriginsFromPreviousBlock(variable, position.FlowGraph, position.Block);
     }
 
     /// <summary>
@@ -123,7 +123,7 @@ internal sealed class VariableOrigin
     /// No statement of the block assigns the variable, so its value comes from before the block: from every way
     /// control can enter it.
     /// </summary>
-    private IEnumerable<Origin> GetOriginsBeforeBlock(object variable, FlowGraph flowGraph, BasicBlock block)
+    private IEnumerable<Origin> GetOriginsFromPreviousBlock(object variable, FlowGraph flowGraph, BasicBlock block)
     {
         if (block.Kind == BasicBlockKind.Entry)
         {
@@ -140,7 +140,7 @@ internal sealed class VariableOrigin
         // Unreachable code has no way in, and nothing is known about the variable there.
         return GetWaysIntoBlock(flowGraph, block)
             .SelectMany(wayIn => GetOrigins(variable, wayIn))
-            .DefaultIfEmpty(Origin.NotFound);
+            .DefaultIfEmpty(Origin.Unknown);
     }
 
     /// <summary>
@@ -152,16 +152,17 @@ internal sealed class VariableOrigin
         if (flowGraph.CreationStatement is not { } lambdaCreation)
         {
             // The caller of a method that asks for the property with [IncludeRequired] is the one that loads it.
-            return [HasIncludeRequiredAttribute(variable) ? Origin.Loaded : Origin.NotFound];
+            // A method that does not ask for it is a real answer: nobody loads the property.
+            return [HasIncludeRequiredAttribute(variable) ? Origin.Loaded : Origin.Missing];
         }
 
         if (IsParameterOfMethod(variable, flowGraph.Method))
         {
-            // "users.Select(u => ...)": the first parameter is an element of users. The other parameters
-            // ("Select((u, i) => ...)", lambdas of non-LINQ methods) are unknown.
-            var elements = IsFirstParameter(variable) ? flowGraph.GetLambdaElementsSource() : null;
+            // "users.Select(u => ...)": the first parameter is an element of users. For any other parameter
+            // ("Select((u, i) => ...)", a lambda of a method we cannot read) we cannot tell what it holds.
+            var elements = flowGraph.GetLambdaElementsSource();
 
-            return [Origin.Create(elements, lambdaCreation)];
+            return [IsElementParameter(variable, elements) ? Origin.Create(elements, lambdaCreation) : Origin.Unknown];
         }
 
         // A variable captured by the lambda: keep reading before the statement that creates the lambda.
@@ -242,7 +243,9 @@ internal sealed class VariableOrigin
             null => null,
             { Parent: IInvocationOperation { TargetMethod.Name: "TryGetValue" } call }
                 => Origin.Create(call.Instance, statement),
-            _ => Origin.NotFound,
+
+            // Any other method: we have no idea what it put into the out argument.
+            _ => Origin.Unknown,
         };
     }
 
@@ -262,10 +265,15 @@ internal sealed class VariableOrigin
            SymbolEqualityComparer.Default.Equals(parameter.ContainingSymbol, method);
 
     /// <summary>
-    /// True if the variable is the first parameter of the method that declares it.
+    /// True if the variable is the parameter that receives one element of the collection.
     /// </summary>
-    private static bool IsFirstParameter(object variable)
-        => variable is IParameterSymbol { Ordinal: 0 };
+    /// <remarks>
+    /// It has to be the first parameter: the second one is the index of <c>Select((u, i) =&gt; ...)</c> or an
+    /// element of another collection. Whether the lambda receives elements at all is decided by
+    /// <see cref="EntityFlow.GetContainer"/>, which answers null when it does not.
+    /// </remarks>
+    private static bool IsElementParameter(object variable, IOperation? elements)
+        => elements is not null && variable is IParameterSymbol { Ordinal: 0 };
 
     private static bool AreSame(object? first, object second)
     {

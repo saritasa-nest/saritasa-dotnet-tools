@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.FlowAnalysis;
 using Microsoft.CodeAnalysis.Operations;
+using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Services;
 
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Flow;
 
@@ -21,10 +22,12 @@ internal sealed class FlowGraph
     /// </summary>
     /// <param name="graph">Control flow graph of the body.</param>
     /// <param name="method">Method, constructor or local function.</param>
-    public FlowGraph(ControlFlowGraph graph, IMethodSymbol method)
+    /// <param name="declarations">Every [PreservesIncludes] the compilation can see.</param>
+    public FlowGraph(ControlFlowGraph graph, IMethodSymbol method, IncludeDeclarations declarations)
     {
         Graph = graph;
         Method = method;
+        Declarations = declarations;
     }
 
     private FlowGraph(
@@ -35,6 +38,7 @@ internal sealed class FlowGraph
         Graph = creationStatement.FlowGraph.Graph.GetAnonymousFunctionControlFlowGraph(lambda, cancellationToken);
         Method = lambda.Symbol;
         CreationStatement = creationStatement;
+        Declarations = creationStatement.FlowGraph.Declarations;
         this.lambda = lambda;
     }
 
@@ -53,6 +57,11 @@ internal sealed class FlowGraph
     /// The variables the lambda captures get their values before that statement.
     /// </summary>
     public CodePosition? CreationStatement { get; }
+
+    /// <summary>
+    /// Every [PreservesIncludes] the compilation can see. The same one for every body of a compilation.
+    /// </summary>
+    public IncludeDeclarations Declarations { get; }
 
     /// <summary>
     /// True if the graph is the body of a lambda.
@@ -78,7 +87,8 @@ internal sealed class FlowGraph
         var localFunctionStatements = Graph.LocalFunctions
             .Select(localFunction => new FlowGraph(
                 Graph.GetLocalFunctionControlFlowGraph(localFunction, cancellationToken),
-                localFunction))
+                localFunction,
+                Declarations))
             .SelectMany(localFunctionGraph => localFunctionGraph.GetStatements(cancellationToken));
 
         return ownStatements.Concat(lambdaStatements).Concat(localFunctionStatements);
@@ -110,7 +120,7 @@ internal sealed class FlowGraph
     /// </summary>
     /// <returns>Collection or null.</returns>
     public IOperation? GetLambdaElementsSource()
-        => lambda is null ? null : LinqMethods.GetContainer(lambda);
+        => lambda is null ? null : EntityFlow.GetContainer(lambda);
 
     /// <summary>
     /// The graphs of the lambda bodies the statement creates.

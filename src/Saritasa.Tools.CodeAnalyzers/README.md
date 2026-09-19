@@ -29,6 +29,8 @@ If your project uses a [global package reference](https://learn.microsoft.com/en
 | [INCL001](#incl001-navigation-property-not-checked) | Method parameter should require a navigation property | Warning | Usage |
 | [INCL002](#incl002-local-variable-missing-include) | Local variable does not set the required navigation property | Warning | Usage |
 | [INCL003](#incl003-includes-promise-not-fulfilled) | Method declares [Includes] but return value does not load the required navigation property | Warning | Usage |
+| [INCL004](#incl004-cannot-check-navigation-property) | Cannot check whether the navigation property is loaded | Warning | Usage |
+| [INCL005](#incl005-preservesincludes-names-nothing) | [PreservesIncludes] names a member that does not exist | Warning | Usage |
 
 ---
 
@@ -252,13 +254,14 @@ return "other";
 
 ### Navigation Include attributes
 
-Three attributes control which navigation properties are tracked and how inclusion requirements are communicated between methods.
+Four attributes control which navigation properties are tracked and how inclusion requirements are communicated between methods.
 
 | Attribute | Target | Purpose |
 |-----------|--------|---------|
 | `[TrackIncludeRequired]` | Property | Marks a navigation property as requiring explicit loading. Only properties with this attribute are checked by INCL rules. |
 | `[IncludeRequired("param", "Property")]` | Method | Declares that the named parameter must have the named property loaded before the method is called. Repeatable. |
 | `[Includes("Property")]` | Method | Promises that the method's return value has the named property loaded. Repeatable. Set `Verify = false` to skip the INCL003 check of the method body. |
+| `[PreservesIncludes]` | Method, property, assembly | Says that the member returns the entities it was given, so their includes are kept. On a method, name the parameter the entities come from: `[PreservesIncludes(nameof(query))]`. For a library, put it on your assembly: `[assembly: PreservesIncludes(typeof(Lib.Ext), "Paginate", "query")]`. `System.Linq`, EF Core and the collection types are declared already. |
 
 Example model used in the sections below:
 
@@ -539,4 +542,59 @@ Task<User> GetUser(int id)
 {
     return _repository.GetWithIncludesAsync(id, IncludeProfile); // No INCL003.
 }
+```
+
+---
+
+### INCL004: Cannot check navigation property
+
+Triggered when the analyzer follows a value back to the query it came from and meets a method or property of another library that it does not know. The analyzer follows only members declared with `[PreservesIncludes]`; `System.Linq`, EF Core and the collection types are declared already.
+
+#### Code causing a warning
+
+```csharp
+async Task Handle(SaveUserDto dto)
+{
+    var page = _dbContext.Users
+        .Include(u => u.Profile)
+        .Paginate(1); // A library method: the analyzer does not know it keeps the users.
+
+    // INCL004: the analyzer cannot read SomeLib.PagedResult<T>.Items.
+    UpdateUserProfile(page.Items[0], dto);
+}
+```
+
+#### Fixed
+
+The code fix adds the declarations to `NavigationIncludes.cs` in the project:
+
+```csharp
+[assembly: PreservesIncludes(typeof(SomeLib.QueryExtensions), "Paginate", "query")]
+[assembly: PreservesIncludes(typeof(SomeLib.PagedResult<>), "Items")]
+```
+
+A method in your own project that is not declared gives INCL002 instead, because it can be read and promises nothing. Declare it on the method itself:
+
+```csharp
+[PreservesIncludes(nameof(query))]
+public static IQueryable<User> OnlyActive(this IQueryable<User> query) => query.Where(u => u.IsActive);
+```
+
+---
+
+### INCL005: \[PreservesIncludes\] names nothing
+
+Triggered when an assembly-level `[PreservesIncludes]` names a member or a parameter that does not exist, for example after a library renamed a method. Such a declaration has no effect, so the analyzer would silently stop following the member.
+
+#### Code causing a warning
+
+```csharp
+// INCL005: SomeLib.QueryExtensions has no member "Paginated".
+[assembly: PreservesIncludes(typeof(SomeLib.QueryExtensions), "Paginated", "query")]
+```
+
+#### Fixed
+
+```csharp
+[assembly: PreservesIncludes(typeof(SomeLib.QueryExtensions), "Paginate", "query")]
 ```

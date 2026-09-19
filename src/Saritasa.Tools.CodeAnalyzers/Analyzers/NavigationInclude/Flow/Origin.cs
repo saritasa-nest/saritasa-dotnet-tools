@@ -7,9 +7,11 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Flow;
 /// A place the entities of a value come from: the value itself and the position in the code it is read at.
 /// </summary>
 /// <remarks>
-/// The search traces an origin back to the origins it comes from, until every path ends at <see cref="Loaded"/>
-/// or at <see cref="NotFound"/>. Those two are answers rather than places in the code, so they carry no value:
-/// the search recognizes them before it looks at <see cref="Value"/> or <see cref="Position"/>.
+/// The search traces an origin back to the origins it comes from, until every path ends at one of the three
+/// answers below. Those carry no value of their own: the search recognizes them before it looks at
+/// <see cref="Value"/> or <see cref="Position"/>.
+/// <see cref="Missing"/> and <see cref="Unknown"/> both mean "not loaded", but they are very different to
+/// a reader: one is a mistake in their code, the other is a gap in what the analyzer can read.
 /// </remarks>
 internal sealed class Origin
 {
@@ -27,10 +29,16 @@ internal sealed class Origin
     public static Origin Loaded { get; } = new(null!, null!);
 
     /// <summary>
-    /// The entities come from somewhere the search cannot follow, so the property counts as not loaded:
-    /// "new User()", "dbContext.Users", a field, an out argument of an arbitrary method, unreachable code.
+    /// The search followed the entities to the end and the property is not loaded there: "new User()",
+    /// "dbContext.Users" with no Include, a parameter of a method that does not ask for it.
     /// </summary>
-    public static Origin NotFound { get; } = new(null!, null!);
+    public static Origin Missing { get; } = new(null!, null!);
+
+    /// <summary>
+    /// The search cannot follow the entities any further, so it cannot tell: a method it does not know,
+    /// a field, an out argument of an arbitrary method, unreachable code.
+    /// </summary>
+    public static Origin Unknown { get; } = new(null!, null!);
 
     /// <summary>
     /// The value, without the wrappers that do not change the entities in it.
@@ -43,14 +51,14 @@ internal sealed class Origin
     public CodePosition Position { get; }
 
     /// <summary>
-    /// Creates the origin of a value read at a position, or returns <see cref="NotFound"/> when the value
-    /// is not known.
+    /// Creates the origin of a value read at a position, or returns <see cref="Unknown"/> when there is no
+    /// value to follow.
     /// </summary>
     /// <param name="value">Value.</param>
     /// <param name="position">Position the value is read at.</param>
     /// <returns>Origin.</returns>
     public static Origin Create(IOperation? value, CodePosition position)
-        => value is null ? NotFound : new Origin(RemoveWrappers(value), position);
+        => value is null ? Unknown : new Origin(RemoveWrappers(value), position);
 
     /// <summary>
     /// Removes everything wrapped around a value that does not change the entities in it, so that the call or

@@ -1,0 +1,85 @@
+using Xunit;
+
+namespace Saritasa.Tools.CodeAnalyzers.Tests.NavigationIncludeAnalyzerTests;
+
+/// <summary>
+/// The built-in declarations of System.Linq and EF Core: which operators keep the entities, and which
+/// operators or overloads make new objects instead.
+/// </summary>
+public class QueryOperatorTests : NavigationIncludeTestBase
+{
+    /// <summary>
+    /// No INCL002: a long chain of EF and LINQ query operators keeps the entities, with nothing declared
+    /// by name anywhere in the analyzer.
+    /// </summary>
+    [Fact]
+    public async Task QueryOperatorChain_KeepsIncludes_NoIncl2()
+    {
+        await VerifyAnalyzerAsync(HandleSource(
+            """
+                        var user = await dbContext.Users
+                            .Include(u => u.Profile)
+                            .AsNoTracking()
+                            .Where(u => u.Id == dto.Id)
+                            .OrderBy(u => u.Id)
+                            .ThenBy(u => u.Id)
+                            .Skip(0)
+                            .Take(10)
+                            .Distinct()
+                            .FirstOrDefaultAsync();
+
+                        UpdateUserProfile(user, dto);
+            """));
+    }
+
+    /// <summary>
+    /// No INCL002: the entities survive being materialized into every common collection shape.
+    /// </summary>
+    [Fact]
+    public async Task MaterializingOperators_KeepIncludes_NoIncl2()
+    {
+        await VerifyAnalyzerAsync(HandleSource(
+            """
+                        var list = await dbContext.Users.Include(u => u.Profile).ToListAsync();
+                        var array = list.ToArray();
+                        var set = array.ToHashSet();
+                        var ordered = set.OrderByDescending(u => u.Id).ToList();
+                        var user = ordered.Last();
+
+                        UpdateUserProfile(user, dto);
+            """));
+    }
+
+    /// <summary>
+    /// INCL004: Select hands back whatever its lambda made, not the entities it was given. The analyzer does
+    /// not read the lambda, so it says it cannot tell rather than claiming the property is missing.
+    /// </summary>
+    [Fact]
+    public async Task SelectProjection_DoesNotKeepIncludes_ReportsIncl4()
+    {
+        await VerifyAnalyzerAsync(HandleSource(
+            """
+                        var users = await dbContext.Users.Include(u => u.Profile).ToListAsync();
+                        var managers = users.Select(u => u.Manager).ToList();
+                        var manager = managers[0];
+
+                        {|INCL004:UpdateUserProfile(manager, dto)|};
+            """));
+    }
+
+    /// <summary>
+    /// INCL004: an element selector stores other objects in the dictionary, not the included entities. The
+    /// search does not read the selector, so it cannot say the property is missing, only that it cannot tell.
+    /// </summary>
+    [Fact]
+    public async Task Dictionary_WithElementSelector_ReportsIncl4()
+    {
+        await VerifyAnalyzerAsync(HandleSource(
+            """
+                        var users = await dbContext.Users.Include(u => u.Profile)
+                            .ToDictionaryAsync(u => u.Id, u => new User { Id = u.Id });
+                        var user = users[dto.Id];
+                        {|INCL004:UpdateUserProfile(user, dto)|};
+            """));
+    }
+}

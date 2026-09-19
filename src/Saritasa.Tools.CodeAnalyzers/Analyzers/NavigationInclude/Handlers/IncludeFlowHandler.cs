@@ -18,7 +18,8 @@ internal static class IncludeFlowHandler
     /// Analyzes one method body.
     /// </summary>
     /// <param name="context">Operation block analysis context.</param>
-    public static void Analyze(OperationBlockAnalysisContext context)
+    /// <param name="declarations">Every [PreservesIncludes] the compilation can see.</param>
+    public static void Analyze(OperationBlockAnalysisContext context, IncludeDeclarations declarations)
     {
         if (context.OwningSymbol is not IMethodSymbol method)
         {
@@ -31,7 +32,7 @@ internal static class IncludeFlowHandler
             return;
         }
 
-        var diagnostics = new FlowGraph(context.GetControlFlowGraph(body), method)
+        var diagnostics = new FlowGraph(context.GetControlFlowGraph(body), method, declarations)
             .GetStatements(context.CancellationToken)
             .SelectMany(position =>
                 GetMethodCallDiagnostics(position).Concat(GetReturnDiagnostics(position)));
@@ -85,9 +86,31 @@ internal static class IncludeFlowHandler
             var value = RoslynHelper.SkipWrappers(argument.Value);
 
             var ruleId = GetRuleForArgument(value, callStatement.FlowGraph);
-            if (ruleId is null ||
-                LoadedPropertySearch.IsLoaded(value, requirement.NavigationProperty, callStatement))
+            if (ruleId is null)
             {
+                continue;
+            }
+
+            var answer = LoadedPropertySearch.Check(
+                value,
+                requirement.NavigationProperty,
+                callStatement,
+                out var unknownSource);
+
+            if (answer == Origin.Loaded)
+            {
+                continue;
+            }
+
+            // The search could not read the whole path, so report that instead of a mistake in the code.
+            if (answer == Origin.Unknown)
+            {
+                yield return CannotCheck(
+                    call.Syntax.GetLocation(),
+                    unknownSource,
+                    value,
+                    requirement.NavigationProperty);
+
                 continue;
             }
 
@@ -113,13 +136,21 @@ internal static class IncludeFlowHandler
 
         foreach (var property in AttributeHelper.GetIncludesToVerify(position.FlowGraph.Method))
         {
-            if (LoadedPropertySearch.IsLoaded(returnedValue, property, position))
+            var answer = LoadedPropertySearch.Check(returnedValue, property, position, out var unknownSource);
+            if (answer == Origin.Loaded)
             {
                 continue;
             }
 
             // The graph keeps only the returned expression; report on the whole "return ...;" statement.
             var location = (returnedValue.Syntax.Parent as ReturnStatementSyntax ?? returnedValue.Syntax).GetLocation();
+
+            if (answer == Origin.Unknown)
+            {
+                yield return CannotCheck(location, unknownSource, returnedValue, property);
+
+                continue;
+            }
 
             yield return Diagnostic.Create(
                 NavigationIncludeRulesProvider.GetDiagnosticDescriptor(
@@ -128,6 +159,25 @@ internal static class IncludeFlowHandler
                 property);
         }
     }
+
+    /// <summary>
+    /// INCL004: the search ran into something it cannot read, so it cannot say whether the property is loaded.
+    /// The member that stopped it travels with the diagnostic, so that the code fix can offer to declare it.
+    /// </summary>
+    private static Diagnostic CannotCheck(
+        Location location,
+        IOperation? unknownSource,
+        IOperation value,
+        string property)
+        => Diagnostic.Create(
+            NavigationIncludeRulesProvider.GetDiagnosticDescriptor(
+                NavigationIncludeRulesProvider.Incl4IdCannotCheckNavigationProperty),
+            location,
+            UnreadableMember.GetProperties(unknownSource),
+            UnreadableMember.Describe(unknownSource),
+            value.Type?.Name,
+            property,
+            value.Syntax.ToString());
 
     /// <summary>
     /// The rule to report when the argument does not have the property loaded. Null for an argument nobody can
@@ -170,7 +220,7 @@ internal static class IncludeFlowHandler
             return false;
         }
 
-        return LinqMethods.GetContainer(lambdaInMethod) is not null;
+        return EntityFlow.GetContainer(lambdaInMethod) is not null;
     }
 
     /// <summary>

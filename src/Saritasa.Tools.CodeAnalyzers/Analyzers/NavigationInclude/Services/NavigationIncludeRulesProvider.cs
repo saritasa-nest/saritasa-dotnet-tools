@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Services;
@@ -24,6 +24,16 @@ internal static class NavigationIncludeRulesProvider
     /// Diagnostic identifier for INCL003.
     /// </summary>
     public const string Incl3IdMethodResultDoesntIncludeNavigationProperty = "INCL003";
+
+    /// <summary>
+    /// Diagnostic identifier for INCL004.
+    /// </summary>
+    public const string Incl4IdCannotCheckNavigationProperty = "INCL004";
+
+    /// <summary>
+    /// Diagnostic identifier for INCL005.
+    /// </summary>
+    public const string Incl5IdDeclarationNamesNothing = "INCL005";
 
     #region INCL001
 
@@ -55,7 +65,8 @@ internal static class NavigationIncludeRulesProvider
 
     private static readonly LocalizableString messageFormatIncl2 =
         "Navigation property '{0}.{1}' is not loaded for local variable '{2}'; use .Include(x => x.{1}), " +
-        "set the property in an object initializer, or annotate the source method with [Includes(\"{1}\")]";
+        "set the property in an object initializer, annotate the source method with [Includes(\"{1}\")], " +
+        "or with [PreservesIncludes] if it hands back the entities it was given";
 
     private static readonly LocalizableString descriptionIncl2 =
         "When passing a local variable to a method that requires a navigation property via [IncludeRequired], " +
@@ -98,11 +109,59 @@ internal static class NavigationIncludeRulesProvider
 
     #endregion
 
+    #region INCL004
+
+    private static readonly LocalizableString titleIncl4 =
+        "Cannot check whether the navigation property is loaded";
+
+    private static readonly LocalizableString messageFormatIncl4 =
+        "Cannot check whether navigation property '{1}.{2}' is loaded for '{3}': the analyzer cannot read {0}. " +
+        "Mark it with [PreservesIncludes] if it hands back the entities it was given.";
+
+    private static readonly LocalizableString descriptionIncl4 =
+        "The analyzer follows a value back to the query it came from. When the path goes through a method or a " +
+        "type it cannot read, it cannot say whether the navigation property is loaded. This is not a mistake in " +
+        "the code: it is a gap in what the analyzer knows.";
+
+    private static readonly DiagnosticDescriptor ruleIncl4 = new(
+        Incl4IdCannotCheckNavigationProperty,
+        titleIncl4,
+        messageFormatIncl4,
+        Category,
+        DiagnosticSeverity.Warning,
+        isEnabledByDefault: true,
+        description: descriptionIncl4);
+
+    #endregion
+
+    #region INCL005
+
+    private static readonly LocalizableString titleIncl5 =
+        "[PreservesIncludes] names a member that does not exist";
+
+    private static readonly LocalizableString messageFormatIncl5 =
+        "[PreservesIncludes] names '{0}', which does not exist, so the declaration has no effect";
+
+    private static readonly LocalizableString descriptionIncl5 =
+        "An assembly-level [PreservesIncludes] names a member of another type by string. When that member is " +
+        "renamed or removed, the declaration stops matching anything and the analyzer quietly stops following it.";
+
+    private static readonly DiagnosticDescriptor ruleIncl5 = new(
+        Incl5IdDeclarationNamesNothing,
+        titleIncl5,
+        messageFormatIncl5,
+        Category,
+        DiagnosticSeverity.Warning,
+        isEnabledByDefault: true,
+        description: descriptionIncl5);
+
+    #endregion
+
     /// <summary>
     /// All diagnostic descriptors registered by this analyzer.
     /// </summary>
     public static readonly ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =
-        ImmutableArray.Create(ruleIncl1, ruleIncl2, ruleIncl3);
+        ImmutableArray.Create(ruleIncl1, ruleIncl2, ruleIncl3, ruleIncl4, ruleIncl5);
 
     /// <summary>
     /// Returns the diagnostic descriptor for the given rule id.
@@ -116,6 +175,8 @@ internal static class NavigationIncludeRulesProvider
             Incl1IdAddIncludeRequiredForParameter => ruleIncl1,
             Incl2IdArgumentDoesntIncludeNavigationProperty => ruleIncl2,
             Incl3IdMethodResultDoesntIncludeNavigationProperty => ruleIncl3,
+            Incl4IdCannotCheckNavigationProperty => ruleIncl4,
+            Incl5IdDeclarationNamesNothing => ruleIncl5,
             _ => throw new ArgumentException("Unknown diagnostic rule id: " + ruleId)
         };
     }
