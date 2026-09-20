@@ -15,8 +15,6 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Flow;
 /// </remarks>
 internal sealed class FlowGraph
 {
-    private readonly IFlowAnonymousFunctionOperation? lambda;
-
     /// <summary>
     /// Initializes the graph of a method, constructor or local function body.
     /// </summary>
@@ -39,7 +37,7 @@ internal sealed class FlowGraph
         Method = lambda.Symbol;
         CreationStatement = creationStatement;
         Declarations = creationStatement.FlowGraph.Declarations;
-        this.lambda = lambda;
+        Lambda = lambda;
     }
 
     /// <summary>
@@ -64,9 +62,14 @@ internal sealed class FlowGraph
     public IncludeDeclarations Declarations { get; }
 
     /// <summary>
+    /// The lambda whose body the graph is; null for every other kind of body.
+    /// </summary>
+    public IFlowAnonymousFunctionOperation? Lambda { get; }
+
+    /// <summary>
     /// True if the graph is the body of a lambda.
     /// </summary>
-    public bool IsLambda => lambda is not null;
+    public bool IsLambda => Lambda is not null;
 
     /// <summary>
     /// Returns the reachable statements of the graph and of the lambdas and local functions declared in it.
@@ -101,26 +104,18 @@ internal sealed class FlowGraph
     /// <returns>Lambda or null.</returns>
     public IFlowAnonymousFunctionOperation? FindLambda(ISymbol lambdaSymbol)
     {
-        if (lambda is null || CreationStatement is null)
+        if (Lambda is null || CreationStatement is null)
         {
             // A method, constructor or local function has no lambdas around it.
             return null;
         }
 
-        return SymbolEqualityComparer.Default.Equals(lambda.Symbol, lambdaSymbol)
-            ? lambda
+        return SymbolEqualityComparer.Default.Equals(Lambda.Symbol, lambdaSymbol)
+            ? Lambda
 
             // "users.Select(u => u.Orders.Select(o => u))": continue in the graph that creates this lambda.
             : CreationStatement.FlowGraph.FindLambda(lambdaSymbol);
     }
-
-    /// <summary>
-    /// For the body of <c>users.Select(u =&gt; ...)</c> returns <c>users</c>: the collection whose elements
-    /// the lambda receives. Null for any other body and for a lambda of a non-LINQ method.
-    /// </summary>
-    /// <returns>Collection or null.</returns>
-    public IOperation? GetLambdaElementsSource()
-        => lambda is null ? null : EntityFlow.GetContainer(lambda);
 
     /// <summary>
     /// The graphs of the lambda bodies the statement creates.

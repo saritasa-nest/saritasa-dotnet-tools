@@ -62,7 +62,7 @@ internal sealed class IncludeDeclarations
     /// indexer of <c>List&lt;T&gt;</c> and <c>IEnumerable`1</c> covers the <c>GetEnumerator</c> that
     /// <c>foreach</c> calls on any collection.
     /// Select, SelectMany and anything else that makes new objects are left out on purpose. Overloads that make new
-    /// objects are filtered out anyway: see <see cref="Flow.EntityFlow.HandsBackSource"/>.
+    /// objects are filtered out anyway: see <see cref="Flow.Transformation"/>.
     /// </remarks>
     private static IEnumerable<(string Type, string Member)> BuiltInEntries
         => Declare("System.Linq.Enumerable", [.. sequenceOperators, "AsEnumerable", "ToList", "ToArray", "ToHashSet", "ToDictionary"])
@@ -83,11 +83,12 @@ internal sealed class IncludeDeclarations
             .Concat(Declare("System.Collections.IEnumerable", ["GetEnumerator"]))
             .Concat(Declare("System.Collections.IEnumerator", ["Current"]))
 
-            // "users[0]", "users[id]", "users.Values", "pair.Value", "users.GetValueOrDefault(id)".
+            // "users[0]", "users[id]", "users.Values", "pair.Value", "users.GetValueOrDefault(id)",
+            // "users.TryGetValue(id, out var user)".
             .Concat(Declare("System.Collections.Generic.IList`1", ["this[]"]))
             .Concat(Declare("System.Collections.Generic.IReadOnlyList`1", ["this[]"]))
-            .Concat(Declare("System.Collections.Generic.IDictionary`2", ["this[]", "Values"]))
-            .Concat(Declare("System.Collections.Generic.IReadOnlyDictionary`2", ["this[]", "Values"]))
+            .Concat(Declare("System.Collections.Generic.IDictionary`2", ["this[]", "Values", "TryGetValue"]))
+            .Concat(Declare("System.Collections.Generic.IReadOnlyDictionary`2", ["this[]", "Values", "TryGetValue"]))
             .Concat(Declare("System.Collections.Generic.KeyValuePair`2", ["Value"]))
             .Concat(Declare("System.Collections.Generic.CollectionExtensions", ["GetValueOrDefault"]))
             .Concat(Declare("System.Threading.Tasks.Task`1", ["Result"]));

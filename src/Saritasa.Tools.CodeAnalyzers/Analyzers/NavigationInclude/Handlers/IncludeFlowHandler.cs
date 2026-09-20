@@ -9,7 +9,7 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Handlers;
 
 /// <summary>
 /// Finds every call of an [IncludeRequired] method and every return of an [Includes] method,
-/// and asks <see cref="LoadedPropertySearch"/> whether the property is loaded there.
+/// and asks <see cref="IncludeSearch"/> whether the property is loaded there.
 /// Reports INCL001 (call sites), INCL002 and INCL003.
 /// </summary>
 internal static class IncludeFlowHandler
@@ -91,23 +91,18 @@ internal static class IncludeFlowHandler
                 continue;
             }
 
-            var answer = LoadedPropertySearch.Check(
-                value,
-                requirement.NavigationProperty,
-                callStatement,
-                out var unknownSource);
-
-            if (answer == Origin.Loaded)
+            var answer = IncludeSearch.Check(value, requirement.NavigationProperty, callStatement);
+            if (answer.IsLoaded)
             {
                 continue;
             }
 
             // The search could not read the whole path, so report that instead of a mistake in the code.
-            if (answer == Origin.Unknown)
+            if (answer.IsUnknown)
             {
                 yield return CannotCheck(
                     call.Syntax.GetLocation(),
-                    unknownSource,
+                    answer.UnreadableValue,
                     value,
                     requirement.NavigationProperty);
 
@@ -136,8 +131,8 @@ internal static class IncludeFlowHandler
 
         foreach (var property in AttributeHelper.GetIncludesToVerify(position.FlowGraph.Method))
         {
-            var answer = LoadedPropertySearch.Check(returnedValue, property, position, out var unknownSource);
-            if (answer == Origin.Loaded)
+            var answer = IncludeSearch.Check(returnedValue, property, position);
+            if (answer.IsLoaded)
             {
                 continue;
             }
@@ -145,9 +140,9 @@ internal static class IncludeFlowHandler
             // The graph keeps only the returned expression; report on the whole "return ...;" statement.
             var location = (returnedValue.Syntax.Parent as ReturnStatementSyntax ?? returnedValue.Syntax).GetLocation();
 
-            if (answer == Origin.Unknown)
+            if (answer.IsUnknown)
             {
-                yield return CannotCheck(location, unknownSource, returnedValue, property);
+                yield return CannotCheck(location, answer.UnreadableValue, returnedValue, property);
 
                 continue;
             }
@@ -166,15 +161,15 @@ internal static class IncludeFlowHandler
     /// </summary>
     private static Diagnostic CannotCheck(
         Location location,
-        IOperation? unknownSource,
+        IOperation? unreadableValue,
         IOperation value,
         string property)
         => Diagnostic.Create(
             NavigationIncludeRulesProvider.GetDiagnosticDescriptor(
                 NavigationIncludeRulesProvider.Incl4IdCannotCheckNavigationProperty),
             location,
-            UnreadableMember.GetProperties(unknownSource),
-            UnreadableMember.Describe(unknownSource),
+            UnreadableMember.GetProperties(unreadableValue),
+            UnreadableMember.Describe(unreadableValue),
             value.Type?.Name,
             property,
             value.Syntax.ToString());
@@ -220,7 +215,7 @@ internal static class IncludeFlowHandler
             return false;
         }
 
-        return EntityFlow.GetContainer(lambdaInMethod) is not null;
+        return Transformation.FindElementsSource(lambdaInMethod) is not null;
     }
 
     /// <summary>

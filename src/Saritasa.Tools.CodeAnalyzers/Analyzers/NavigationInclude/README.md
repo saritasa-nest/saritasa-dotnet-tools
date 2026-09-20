@@ -1,23 +1,21 @@
 # NavigationInclude analyzer: how it works
 
 This document explains how the NavigationInclude analyzer is built. It is for developers who want to understand
-or change the analyzer. You do not need to know Roslyn. The terms you need are explained in
-[Terms](#terms).
+or change it. You do not need to know Roslyn: the few compiler words it uses are explained where they appear.
 
 If you only want to *use* the analyzer, read the [package README](../../README.md#navigation-include-attributes).
 
 ## Contents
 
 1. [Why this analyzer exists](#why-this-analyzer-exists)
-2. [What the analyzer does](#what-the-analyzer-does)
-3. [Terms](#terms)
-4. [The main idea: read the code backward](#the-main-idea-read-the-code-backward)
-5. [How the search works](#how-the-search-works)
-6. [Two examples, step by step](#two-examples-step-by-step)
-7. [The parts of the code](#the-parts-of-the-code)
-8. [Special cases](#special-cases)
-9. [When the analyzer cannot read the code](#when-the-analyzer-cannot-read-the-code)
-10. [Files](#files)
+2. [What the analyzer checks](#what-the-analyzer-checks)
+3. [How it works: one idea, two jobs](#how-it-works-one-idea-two-jobs)
+4. [Two examples, step by step](#two-examples-step-by-step)
+5. [What the analyzer knows about entities](#what-the-analyzer-knows-about-entities)
+6. [Reading the code: bodies and positions](#reading-the-code-bodies-and-positions)
+7. [Special cases](#special-cases)
+8. [When the analyzer cannot read the code](#when-the-analyzer-cannot-read-the-code)
+9. [Files](#files)
 
 ## Why this analyzer exists
 
@@ -59,205 +57,211 @@ async Task HandleBroken(int id)
 
 This is the example used in the rest of this document.
 
-## What the analyzer does
+## What the analyzer checks
 
-The analyzer checks a value in two kinds of places:
+Two kinds of places, and both ask the same thing about one value:
 
 | Place | What is checked | Rule |
 |---|---|---|
 | a call of a method with `[IncludeRequired(param, Property)]` | the argument for `param` must have `Property` loaded | INCL001 if the argument is a parameter of the current method, INCL002 if it is a local variable or a lambda parameter |
 | a `return` in a method with `[Includes(Property)]` | the returned value must have `Property` loaded | INCL003 (not checked if `Verify = false`) |
 
-Reading `user.Profile` directly inside a method is also INCL001. This case is simple and is handled only by
-`PropertyReferenceHandler`, without any flow analysis. The rest of this document is about the other cases.
+Reading `user.Profile` directly inside a method is also INCL001. That case needs no search at all and is handled
+by `PropertyReferenceHandler` alone. The rest of this document is about the other two.
 
-There is one more result, **INCL004**. It means: *the analyzer could not read the code far enough to decide.*
-It is a warning too, because an unchecked value can hide a real mistake, but it comes with a code fix. See
-[When the analyzer cannot read the code](#when-the-analyzer-cannot-read-the-code).
+Two more results come out of the search itself. **INCL004** means *the analyzer could not read the code far
+enough to decide*; it is a warning with a code fix, see
+[When the analyzer cannot read the code](#when-the-analyzer-cannot-read-the-code). **INCL005** is about the
+declarations themselves: an `[assembly: PreservesIncludes]` that names a member which does not exist.
 
-**INCL005** is about the declarations themselves: an `[assembly: PreservesIncludes]` that names a member which
-does not exist.
+## How it works: one idea, two jobs
 
-## Terms
+### The idea
 
-| Term | Meaning |
-|---|---|
-| **Entity** | An object that represents a database row, for example `User`. |
-| **Navigation property** | A property of an entity that points to related data, for example `user.Profile`. |
-| **Loaded** | The navigation property is filled with data, so it is safe to use. |
-| **Roslyn** | The C# compiler as a library. An analyzer is a plugin that runs inside the compiler and receives the code as objects, not as text. |
-| **Operation** | The Roslyn object for one piece of code: a call, an assignment, a variable, and so on. |
-| **Block** | A group of statements that always run one after another, with no branch inside. |
-| **Control flow graph** | Roslyn's picture of one method: blocks connected by arrows. An arrow means "this block can run after that one". An `if` gives a block with two arrows going out. |
-
-## The main idea: read the code backward
-
-At each checked place, the analyzer asks one question:
+At each checked place the analyzer asks:
 
 > **Is the property loaded in this value, at this point of the code?**
 
-A value does not say by itself whether its property is loaded. To find out, the analyzer does what a person
-does when reading the code: it goes **backward** and looks for the place where the value was created.
+A value does not say by itself whether its property is loaded, so the analyzer does what a person does when
+reading code: it goes **backward**, to the place where the value was made.
 
 ```csharp
 var user = await db.Users.Include(u => u.Profile).FirstAsync();
-user = await db.Users.FirstAsync();          // ② the LAST assignment has no Include → not loaded
+user = await db.Users.FirstAsync();          // ② the last write has no Include → not loaded
 UpdateUserProfile(user, dto);                // ① start here, look up for "user = ..."
 ```
 
-Sometimes several paths lead to the same place, for example after an `if`. Then the property must be loaded
-on **every** path. Roslyn's control flow graph gives these paths, so the analyzer needs no special code for
-`if`, `switch`, `?:`, `??`, loops, `try` or `foreach`.
+Sometimes several paths lead to the same place, for example after an `if`. Then the property must be loaded on
+**every** path. The paths come from Roslyn's *control flow graph* — its picture of a method as blocks of
+statements connected by arrows — so the analyzer needs no special code for `if`, `switch`, `?:`, `??`, loops,
+`try` or `foreach`.
 
-```mermaid
-flowchart BT
-    C["UpdateUserProfile(user)<br/>① look up both paths that lead here"] --> A["user = ...Include(Profile)...<br/>② loaded"]
-    C --> B["user = ... (no Include)<br/>③ not loaded → INCL002"]
-    A --> I["if (flag)"]
-    B --> I
-```
+### The four words the code is built from
 
-## How the search works
-
-### One function answers the question
-
-The search is one function: `LoadedPropertySearch.Check(value, property, position)`. It returns one of three
-answers:
-
-| Answer | Meaning | Result for the user |
+| Word | Meaning | File |
 |---|---|---|
-| `Loaded` | The property is loaded. | nothing |
-| `Missing` | The analyzer followed the value to its start and the property is not there. | warning (INCL001 / 002 / 003) |
-| `Unknown` | The analyzer reached code it cannot read, so it cannot tell. | warning with a code fix (INCL004) |
+| **Value** | a place where entities sit: a variable, a parameter, an argument or the result of an expression, together with the position in the code where it is read | `Flow/Value.cs` |
+| **Answer** | what the search decided: `Loaded`, `NotLoaded` or `Unknown` | `Flow/Answer.cs` |
+| **Write** | one thing found above a variable: `Written`, `MemberWritten`, `OutArgument`, `MethodParameter`, `LambdaParameter`, `NothingNew`, `NeverWritten`, `Unreadable` | `Flow/Write.cs` |
+| **Transformation** | a member that hands back the entities it was given: `Where`, `ToList`, `Items`, an indexer | `Flow/Transformation.cs` |
 
-`Missing` is a mistake in the user's code. `Unknown` is a limit of the analyzer. They must not be mixed, because
-a wrong warning is worse than no warning.
+A value is a question and an answer is a decision, and the code never mixes the two. A write is a fact about the
+code and never a decision.
 
-`IncludeFlowHandler` is the code that calls `Check`. In pseudo-code:
+### The two jobs
 
-```text
-for each statement in the method (lambdas and local functions included):
-    if it calls a method with [IncludeRequired(param, P)]:
-        answer = Check(argument for param, P)
-    if it returns from a method with [Includes(P)]:
-        answer = Check(returned value, P)
+The search itself is one function, `IncludeSearch.Check(value, property, position)`, and two classes share the
+work behind it:
 
-    answer is Missing  → report INCL001 / INCL002 / INCL003
-    answer is Unknown  → report INCL004
-```
+| Class | Its question | What it knows | What it never does |
+|---|---|---|---|
+| `IncludeSearch` | does this value have the include? | `Include`, declarations, the three answers | read blocks or statements |
+| `Walker` | where was this variable written? | statements, blocks, `if`, loops, `try`, lambdas | decide anything |
 
-### A step of the search: `Origin`
+The Walker reports writes, `IncludeSearch` says what they mean, and only `IncludeSearch` calls the Walker,
+never the other way round. Only the Walker needs memory: it remembers the blocks it has already read, which is
+what stops a loop from walking forever.
 
-Inside `Check`, everything is built from one small idea. An **origin** is:
-
-> a value **plus** the position in the code where this value is read.
-
-The search does not ask "is the property loaded?" about the value directly. It asks a simpler question again
-and again: **"where do the entities in this value come from?"** Each answer is a new origin, closer to the
-start. The search repeats until it reaches a place where the answer is known:
+The whole search is these two jobs calling each other back:
 
 ```text
-Check(origin):
-    if the origin is Loaded, Missing or Unknown → that is the answer
-    otherwise → find the origins it comes from and check each of them;
-                every one must be Loaded, and the first one that is not gives the answer
+Check(value):
+    IncludeSearch reads the value
+        it was made from another value  → start again with that one
+        it is a variable                → ask the Walker where it was written
+                                          the Walker reports one write per path
+                                          IncludeSearch reads each write, and gets
+                                          an answer or a new value to start again with
+        anything else                   → an answer
+
+    every path must end at Loaded
 ```
 
-`Loaded`, `Missing` and `Unknown` are also origins. They are the three places where the search stops.
+### What IncludeSearch does
 
-### The four questions
-
-"Where does this come from?" has only four forms. Each answer either ends the search or asks one of the four
-questions again about a new value:
+It has two questions: what a value is, and what a write of the Walker means. Both end at an answer, or at a
+new value to start again with. The tables under the diagrams say which code each label stands for.
 
 ```mermaid
 flowchart TD
-    START(["Check(value, P, position)"]) --> VALUE
-
-    VALUE{"1. What is this value?"}
-    VARIABLE{"2. It is a variable.<br/>Is there an assignment above?"}
-    BLOCK{"3. Nothing more in this block.<br/>How can the code enter it?"}
-    BODY{"4. This is the start of a method<br/>or lambda. Whose body is it?"}
+    VALUE{"What is this value?"}
+    SOURCE["its source<br/>→ start again with it"]
+    WRITES["ask the Walker,<br/>then read every write"]
+    MEANS{"What does this write mean?"}
     LOADED(["Loaded"])
-    NOTFOUND(["Missing / Unknown"])
+    NOTLOADED(["NotLoaded"])
+    UNKNOWN(["Unknown"])
 
-    VALUE -->|"x.Include(u => u.P)"| LOADED
-    VALUE -->|"a call of a method with [Includes(P)]"| LOADED
-    VALUE -->|"a member declared with [PreservesIncludes]:<br/>x.Where(...), x.ToList(), x.Current, an indexer<br/>→ ask again about x"| VALUE
-    VALUE -->|"an array element x[i]<br/>→ ask again about x"| VALUE
-    VALUE -->|"a local variable, a parameter"| VARIABLE
-    VALUE -->|"new User(), db.Users, a field,<br/>a call nobody declared"| NOTFOUND
+    VALUE -->|"an Include for P"| LOADED
+    VALUE -->|"a declared member"| SOURCE
+    VALUE -->|"new User(), db.Users"| NOTLOADED
+    VALUE -->|"undeclared, our code"| NOTLOADED
+    VALUE -->|"undeclared, a library"| UNKNOWN
+    VALUE -->|"a variable"| WRITES
 
-    VARIABLE -->|"user.P = expr"| LOADED
-    VARIABLE -->|"user = expr → ask again about expr"| VALUE
-    VARIABLE -->|"user.Other = expr → keep looking up"| VARIABLE
-    VARIABLE -->|"nothing left in this block"| BLOCK
+    WRITES --> MEANS
+    MEANS -->|"MemberWritten<br/>NothingNew<br/>a required parameter"| LOADED
+    MEANS -->|"Written<br/>OutArgument<br/>LambdaParameter"| SOURCE
+    MEANS -->|"a plain parameter<br/>NeverWritten"| NOTLOADED
+    MEANS -->|"Unreadable"| UNKNOWN
 
-    BLOCK -->|"a loop came back to a block<br/>we already read"| LOADED
-    BLOCK -->|"from every block that jumps here<br/>(for catch/finally: from inside the try)"| VARIABLE
-    BLOCK -->|"it is the first block of the body"| BODY
-    BLOCK -->|"no block jumps here (unreachable code)"| NOTFOUND
-
-    BODY -->|"a method, and its parameter has<br/>[IncludeRequired(param, P)]"| LOADED
-    BODY -->|"a method, and it has no such attribute"| NOTFOUND
-    BODY -->|"a lambda, and this is the u of<br/>users.Select(u => ...) → ask about users"| VALUE
-    BODY -->|"a lambda, and this is a variable<br/>from the outer method → keep looking up there"| VARIABLE
-    BODY -->|"a lambda, any other parameter"| NOTFOUND
+    SOURCE --> VALUE
 ```
 
-Two rules are not visible in the diagram:
+### How the Walker finds the writes
 
-1. When a step gives **several** origins (for example, the two ways into a block after an `if`), **every one**
-   of them must end at `Loaded`.
-2. A dead end is never "nothing". It is always `Missing` or `Unknown`. This is why "all of them must be
-   loaded" works: a path that leads nowhere cannot silently disappear from the check.
+It only reads code. Every arrow that ends in a box is a write it reports, and `IncludeSearch` is the one that
+says what the write means. "Read every way in" means every block that jumps here, and for a `catch` or a
+`finally` every place inside the `try` as well.
 
-### Five ways to end at `Loaded`
+```mermaid
+flowchart TD
+    BLOCK{"Is there a write above,<br/>in this block?"}
+    WAYSIN{"How can the code<br/>enter this block?"}
+    BODY{"Whose body is it?"}
 
-| Ending | Example |
-|---|---|
-| an `Include()` for the property | `db.Users.Include(u => u.Profile)` |
-| a method that promises it | `[Includes("Profile")] Task<User> GetUser()` |
-| the property is set by hand | `user.Profile = profile;` or `new User { Profile = p }` |
-| a parameter that the method requires loaded | `[IncludeRequired(nameof(user), "Profile")] void Update(User user)` |
-| a loop that returned to a block already read | `while (…) { … }` — this path adds nothing new |
+    BLOCK -->|"user = expr"| WRITTEN["Written"]
+    BLOCK -->|"user.Profile = expr"| MEMBER["MemberWritten"]
+    BLOCK -->|"f(out var user)"| OUT["OutArgument"]
+    BLOCK -->|"nothing here"| WAYSIN
 
-### Five ways to end at `Missing` or `Unknown`
+    WAYSIN -->|"read every way in"| BLOCK
+    WAYSIN -->|"a loop came back"| NOTHING["NothingNew"]
+    WAYSIN -->|"no way in"| UNREADABLE["Unreadable"]
+    WAYSIN -->|"the body starts"| BODY
 
-| Ending | Example |
-|---|---|
-| a value the search cannot follow | `new User()`, `db.Users`, a field, an unknown method call |
-| a method parameter without the attribute | reported as INCL001 and asks the user to add `[IncludeRequired]` |
-| a lambda parameter that is not a LINQ element | `Select((u, i) => …)`, a lambda passed to a method that is not LINQ |
-| an `out` argument of an unknown method | `Compute(out var user)` (but `d.TryGetValue(k, out var user)` follows `d`) |
-| unreachable code | no block jumps there |
+    BODY -->|"a method parameter"| PARAMETER["MethodParameter"]
+    BODY -->|"a lambda parameter"| LAMBDA["LambdaParameter"]
+    BODY -->|"captured: read outside"| BLOCK
+    BODY -->|"nothing wrote it"| NEVER["NeverWritten"]
+```
+
+Two rules are in neither diagram:
+
+1. When a step gives **several** values (the two ways into a block after an `if`, or two sources of one call),
+   **every one** of them must end at `Loaded`. The first one that does not gives the answer.
+2. A dead end is never "nothing". It is always `NotLoaded` or `Unknown`, so a path that leads nowhere cannot
+   silently disappear from the check.
+
+### Where each path ends
+
+| Ending | Answer | Example |
+|---|---|---|
+| an `Include()` for the property | `Loaded` | `db.Users.Include(u => u.Profile)` |
+| a method that promises it | `Loaded` | `[Includes("Profile")] Task<User> GetUser()` |
+| the property is set by hand | `Loaded` | `user.Profile = profile;` or `new User { Profile = p }` |
+| a parameter the method requires loaded | `Loaded` | `[IncludeRequired(nameof(user), "Profile")] void Update(User user)` |
+| a loop that came back to a block already read | `Loaded` | `while (…) { … }` — this path adds nothing new |
+| a value the search can read to its start | `NotLoaded` | `new User()`, `db.Users`, a method of this project that promises nothing |
+| a method parameter without the attribute | `NotLoaded` | reported as INCL001, which asks for `[IncludeRequired]` |
+| unreachable code | `Unknown` | no block jumps there |
+| a call nobody declared, in another assembly | `Unknown` | `query.Paginate(1)` from a library |
+| a lambda parameter that is not a LINQ element | `Unknown` | `Select((u, i) => …)`, a lambda given to a method that is not LINQ |
+| an `out` argument of a method nobody declared | `Unknown` | `Compute(out var user)`, while `d.TryGetValue(k, out var user)` follows `d`, because `TryGetValue` is declared |
+
+`NotLoaded` is a mistake in the user's code and `Unknown` is a limit of the analyzer. They must not be mixed,
+because a wrong warning is worse than no warning.
+
+### What the Walker reports
+
+For one statement it returns a write, or nothing, which means "this statement says nothing, keep reading
+upward":
+
+| Statement | Write | What `IncludeSearch` makes of it |
+|---|---|---|
+| `user = expr`, `var user = expr` | `Written(expr)` | read `expr` |
+| `user.Profile = expr` | `MemberWritten` | `Loaded` |
+| `user.Other = expr` | none | keep reading upward |
+| `var (id, user) = pair` | `Written(pair)` | read `pair` |
+| `d.TryGetValue(key, out var user)` | `OutArgument(the call)` | read the call's source, if it is declared |
+| does not touch the variable | none | keep reading upward |
+
+At the start of a body it reports `MethodParameter` or `LambdaParameter` instead, and around a loop
+`NothingNew`. A "variable" here is a local, a parameter or a temporary the compiler made (`#1`), see
+[Special cases](#special-cases).
 
 ## Two examples, step by step
 
 ### Example 1: a straight line
-
-The example from the beginning of this document:
 
 ```csharp
 var user = await db.Users.Include(u => u.Profile).FirstAsync(u => u.Id == id);
 UpdateProfile(user, "UTC");          // ← the analyzer checks this argument
 ```
 
-Each step is one "where does this come from?":
-
 ```text
-Origin( user , before "UpdateProfile(user, …)" )
-      user is a variable → look up for its last assignment → "var user = await …"
-Origin( db.Users.Include(u => u.Profile).FirstAsync(…) , before "var user = …" )
-      "await" is removed when the origin is created
-      FirstAsync returns the same entities that it was called on → look at the source
-Origin( db.Users.Include(u => u.Profile) , before "var user = …" )
+Value( user , before "UpdateProfile(user, …)" )
+      a variable → the Walker reports the write "var user = await …"
+Value( db.Users.Include(u => u.Profile).FirstAsync(…) , before "var user = …" )
+      "await" is removed when the value is created
+      FirstAsync is declared: it hands back the entities it was called on → look at the source
+Value( db.Users.Include(u => u.Profile) , before "var user = …" )
       Include names Profile
-Origin.Loaded                                    → nothing is reported
+Answer.Loaded                                    → nothing is reported
 ```
 
-If the first line is `var user = await db.Users.FirstAsync(...)`, the last two steps become
-`Origin( db.Users , … )` → `Missing`, and the analyzer reports INCL002.
+Without the `Include`, the last two steps become `Value( db.Users , … )` → `NotLoaded`, and the analyzer reports
+INCL002.
 
 ### Example 2: a branch
 
@@ -275,158 +279,115 @@ Here the search must check two paths, and they give different answers:
 ```
 
 ```text
-① Origin( user , before line 8 )
-     a variable → read the block upward → line 7 assigns it
+① Value( user , before line 8 )
+     a variable → the Walker reads the block upward → line 7 writes it
 
-② Origin( query.FirstAsync() , before line 7 )     "await" is removed
-     FirstAsync returns the same entities → look at the source
+② Value( query.FirstAsync() , before line 7 )     "await" is removed
+     FirstAsync hands back the same entities → look at the source
 
-③ Origin( query , before line 7 )
+③ Value( query , before line 7 )
      a variable again → nothing above line 7 in this block
-     → there are two ways into the block, and BOTH must end at Loaded:
+     → the Walker reports one write per way into the block, and BOTH must end at Loaded:
 
      ├─ way A — from the end of the "if" body
-     │  ④ Origin( query.Include(u => u.Profile) , before line 4 )
-     │       Include names Profile
-     │  ⑤ Origin.Loaded                                                          ✓
+     │  ④ Value( query.Include(u => u.Profile) , before line 4 )
+     │  ⑤ Answer.Loaded                                                          ✓
      │
      └─ way B — from the block before the "if"
-        ⑥ Origin( db.Users.AsQueryable() , before line 1 )
-             AsQueryable returns the same entities → look at the source
-        ⑦ Origin( db.Users , before line 1 )
-             a DbSet property — the search has no rule for it
-        ⑧ Origin.Missing                                                         ✗
+        ⑥ Value( db.Users.AsQueryable() , before line 1 )
+             AsQueryable hands back the same entities → look at the source
+        ⑦ Value( db.Users , before line 1 )
+             a DbSet property — no declaration describes it
+        ⑧ Answer.NotLoaded                                                       ✗
 
 Every way must be Loaded → the answer is not Loaded → INCL002 on line 8
 ```
 
-Notice that an origin has two parts, and the steps change them differently:
+A value has two parts, and the two jobs change them differently:
 
-- **②→③ and ⑥→⑦ change only the value.** The position stays the same. The search only removes one call from
-  the chain (`.FirstAsync()`, `.AsQueryable()`). This is done by `ExpressionOrigin`.
-- **①→②, ③→④ and ③→⑥ also change the position.** The search moves to another statement, another block, or out
-  of a lambda. This happens only when the value is a *variable*, and it is done by `VariableOrigin`.
+- **②→③ and ⑥→⑦ change only the value.** The position stays the same, because one call is removed from the
+  chain. This is `IncludeSearch` reading an expression.
+- **①→②, ③→④ and ③→⑥ also change the position.** The search moves to another statement, another block or out of
+  a lambda. This happens only for a variable, and it is the `Walker`.
 
-This is why the code has two separate files for the two kinds of steps. Only the variable steps need memory
-(the blocks that were already read), so only `VariableOrigin` has it.
+### Example 3: a value made of many steps
 
-## The parts of the code
-
-Each part below is used by the search described above. The example is the one from the beginning of this
-document.
-
-### The body and the position
-
-#### `FlowGraph`: one body that is analyzed
-
-A method, constructor, local function or lambda, with its control flow graph from Roslyn. It is the unit that
-the analyzer walks through.
-
-A lambda that becomes a delegate is the difficult case. It has its own graph, and the statement that creates the
-lambda contains only a reference to it. `FlowGraph.CreationStatement` is the way back: it is the statement that
-created the lambda (and `null` for every other kind of body). It lets the search follow a variable, captured by
-a lambda, out to the method around it:
+One value can be a whole chain. Here every kind of step appears once:
 
 ```csharp
-var users = await db.Users.Include(u => u.Profile).ToListAsync();
-var timezones = users.Select(u => GetTimezone(u, dto)).ToList();
-//                          └─ this lambda has its own FlowGraph. Its CreationStatement is the line
-//                             "var timezones = …", and from there "u" is followed back to "users".
+1   var page = await db.Users.Include(u => u.Profile).Paginate(1);
+2   foreach (var user in page.Items)
+3   {
+4       UpdateProfile(user, "UTC");     // [IncludeRequired(nameof(user), "Profile")]
+5   }
 ```
 
-Lambdas such as `u => u.Profile` in `Include(...)` are different. They are passed to `IQueryable` as *expression
-trees*, which are data and not code, so Roslyn gives them no graph. `Include` is read directly from the syntax
-of the lambda.
+`Paginate` is a library method, declared once for the solution, and `Items` is its property:
 
-#### `CodePosition`: a point in the execution
+```csharp
+[assembly: PreservesIncludes(typeof(SomeLib.QueryExtensions), "Paginate", "query")]
+[assembly: PreservesIncludes(typeof(SomeLib.PagedResult<>), "Items")]
+```
 
-A graph, a block, and the number of statements of this block that have already run.
+```text
+① Value( user , before line 4 )
+     a variable → the Walker finds what "foreach" became: "user = #1.Current"
 
-| Member | Meaning |
-|---|---|
-| `Statement` | the statement that runs next (`null` at the end of a block) |
-| `GetPreviousStatements()` | the statements that have already run, the nearest first |
+② Value( #1.Current , inside the loop )
+     Current is declared on IEnumerator<T> → look at the object it is read on
 
-One position answers two questions: "which statement is this?" and "what was assigned before it?". A backward
-search needs both. In the example, the position of the call is "one statement into the block with the body of
-`Handle`". Its `Statement` is `UpdateProfile(user, "UTC")`, and `GetPreviousStatements()` gives the line
-`var user = ...`.
+③ Value( #1 , inside the loop )
+     a temporary, still a variable → the Walker finds "#1 = page.Items.GetEnumerator()"
 
-### The search
+④ Value( page.Items.GetEnumerator() , before the loop )
+     GetEnumerator is declared on IEnumerable<T> → look at the source
 
-#### `LoadedPropertySearch`: the rule
+⑤ Value( page.Items , before the loop )
+     Items is declared on PagedResult<T> → look at the object it is read on
 
-The only class that decides. It has one public method, `Check(value, property, position)`. It repeats the
-question "where does this come from?" until every path ends at an answer. To get the next origins it asks one of
-the two classes below.
+⑥ Value( page , before the loop )
+     a variable again → line 1 writes it
 
-#### `Origin`: a value and a position
+⑦ Value( db.Users.Include(u => u.Profile).Paginate(1) , before line 1 )
+     "await" is removed; Paginate is declared with the parameter "query"
+     → look at the argument passed for that parameter, not at the result
 
-The value and the position where it is read, or one of the three answers `Loaded`, `Missing`, `Unknown`.
-`Origin.Create` removes casts, delegate wrappers and `await` from the value, so no other code has to handle them.
+⑧ Value( db.Users.Include(u => u.Profile) , before line 1 )
+⑨ Answer.Loaded                                                              ✓
+```
 
-#### `VariableOrigin`: where the value of a variable comes from
+Steps ②, ④, ⑤ and ⑦ are transformations, ①, ③ and ⑥ are the Walker, and nothing in this chain needed a rule of
+its own: `foreach`, the enumerator, the indexer-like property and the library method are all declarations.
 
-The part that moves the position. A variable gets its value from the last assignment before the place where it is
-read. That assignment can be in another block, in another body, or on several paths.
+If the `Items` declaration were missing, step ⑤ would end at `Unknown` and the analyzer would report INCL004 on
+line 4, with a code fix that writes that declaration.
 
-For one statement, it returns an `Origin`, or `null`, which means "this statement says nothing, keep reading
-upward":
+## What the analyzer knows about entities
 
-| Statement | Origin for the variable |
-|---|---|
-| `user = expr`, `var user = expr` | `expr`, read at this statement |
-| `user.Profile = expr` | `Origin.Loaded` |
-| `user.Other = expr` | none, keep reading upward |
-| `var (id, user) = pair` | `pair` |
-| `d.TryGetValue(key, out var user)` | `d` |
-| `Compute(out var user)` | `Origin.Unknown`, nothing is known about an unknown `out` |
-| does not touch the variable | none, keep reading upward |
-
-`GetRelatedVariable` does the opposite: it finds the variable that an operation reads. A "variable" here is a
-local variable, a parameter, or a temporary variable made by the compiler (`#1`). See
-[Special cases](#special-cases).
-
-#### `ExpressionOrigin`: where the entities of an expression come from
-
-The part that changes only the value. `x.Include(u => u.P)` gives `Loaded`. A method or property declared with
-`[PreservesIncludes]` gives the value its entities come from: `x.Where(...)`, `x.ToList()`, `x.Current` and an
-indexer all give `x`. An array element `x[i]` gives `x` too. Everything else gives:
-
-- `Missing`, if the method is in the user's own code. A method with neither `[Includes]` nor
-  `[PreservesIncludes]` promises nothing, so it loads nothing.
-- `Unknown`, if the method is from another assembly. The analyzer cannot read it.
-
-These rules need only the expression, so they never move the position. Reading a variable is also an
-expression, but it is the only one that cannot be answered on the spot, so it lives in `VariableOrigin`.
-
-### What the analyzer knows about entities
-
-#### `IncludeDeclarations`: the only place that decides what is followed
+### `IncludeDeclarations`: the only place that decides what is followed
 
 A method or a property is followed **only if it is declared** with `[PreservesIncludes]`. There is no guessing
-from types, and no special code for `System.Linq` or EF. A declaration comes from one of three places, and all of
-them are used the same way:
+from types and no special code for `System.Linq` or EF Core. A declaration comes from one of three places, and
+all of them are used the same way:
 
 | Where | Example |
 |---|---|
 | on the member itself | `[PreservesIncludes(nameof(query))] PagedResult<User> Paginate(IQueryable<User> query)` |
 | on an assembly: the project or anything it references | `[assembly: PreservesIncludes(typeof(SomeLib.Ext), "Paginate")]` |
-| built into the analyzer | `Where`, `ToListAsync`, `Include`, `GetEnumerator`, `Current`, indexers, ... |
+| built into the analyzer | `Where`, `ToListAsync`, `Include`, `GetEnumerator`, `Current`, `TryGetValue`, indexers, … |
 
 The built-in list is in `IncludeDeclarations.cs`. It names types by string, so the analyzer does not depend on
-EF Core. A line for a type that the project does not use simply matches nothing.
-
-A declaration on an interface covers every class that implements it. So `IEnumerable<T>.GetEnumerator` covers the
-`GetEnumerator` that `foreach` calls on a `List`, and `IList<T>` covers the indexer of `List<T>`.
+EF Core, and a line for a type the project does not use simply matches nothing. A declaration on an interface
+covers every class that implements it, so `IEnumerable<T>.GetEnumerator` covers the `GetEnumerator` that
+`foreach` calls on a `List`, and `IList<T>` covers the indexer of `List<T>`.
 
 `Select` and `SelectMany` are **not** declared. They make new objects, so their result has no includes.
 
-#### `EntityFlow`: the two questions a declaration cannot answer
+### `Transformation`: the two questions a declaration cannot answer
 
-**1. Is this overload the right one?** A declaration names a method, not one overload. So each call is checked
-against the method's own declaration: if the result is built from type parameters, one of them must come from the
-source.
+**1. Is this overload the right one?** A declaration names a method, not one overload, so each call is checked
+against the method's own declaration: if the result is built from type parameters, one of them must come from
+the source.
 
 | Call | Declared result | Followed? |
 |---|---|---|
@@ -438,68 +399,91 @@ This also protects against a wrong declaration: even if someone declares `Select
 `TResult`, so it is never followed.
 
 **2. Does this lambda receive the elements of the source?** In `users.Select(u => ...)` the question is whether
-`u` is an element of `users`. This is not "where does a result come from", so a declaration cannot say it. The
+`u` is an element of `users`. This is not "where does a result come from", so no declaration can say it. The
 first parameter of the lambda must be the source's own type parameter: `Select` passes `TSource` and qualifies,
 the result selector of `GroupBy` passes `TKey` and does not.
 
-#### `EfIncludes`: the only code that knows Entity Framework
+Both answers are read from how the member itself is declared, so they work the same for `System.Linq`, EF Core
+and a project's own methods. They live with the rest of `Transformation`, which is the only file that reads
+declarations.
 
-All other rules answer "do the entities pass through this call?". A declaration can say that. This rule must
-answer a different question: "which property was added?".
+### `EfIncludes`: the only code that knows Entity Framework
+
+Every other rule answers "do the entities pass through this call?", which a declaration can say. This one
+answers a different question, "which property was added?", and no general rule can do that:
 
 ```csharp
 query.Include(u => u.Profile)   // the analyzer must read the name "Profile" from the lambda
 ```
 
-No general rule can do this, so it is in its own small file.
+It stays a transformation as well: `Include(u => u.Orders)` does not load `Profile`, and the search keeps
+walking back through it.
 
-### Where the rule is applied
+## Reading the code: bodies and positions
 
-`IncludeFlowHandler` goes through every statement of a body, finds the two kinds of places to check, calls
-`Check`, and reports the result. `PropertyReferenceHandler` reports the simple INCL001 case (`user.Profile` read
-directly), which needs no flow analysis.
+`FlowGraph` is one body being analyzed — a method, constructor, local function or lambda — with its control
+flow graph from Roslyn. `IncludeFlowHandler` walks its statements, finds the places to check and reports the
+results.
+
+A lambda that becomes a delegate is the difficult case. It has a graph of its own, and the statement that
+creates it holds only a reference. `FlowGraph.CreationStatement` is the way back, so a variable captured by a
+lambda can be followed out into the method around it:
+
+```csharp
+var users = await db.Users.Include(u => u.Profile).ToListAsync();
+var timezones = users.Select(u => GetTimezone(u, dto)).ToList();
+//                          └─ this lambda has its own FlowGraph. Its CreationStatement is the line
+//                             "var timezones = …", and from there "u" is followed back to "users".
+```
+
+Lambdas such as `u => u.Profile` inside `Include(...)` are different: they are passed to `IQueryable` as
+expression trees, which are data and not code, so Roslyn gives them no graph. `Include` is read from the syntax
+of the lambda instead.
+
+`CodePosition` is a point in execution: a graph, a block, and the number of statements of that block that have
+already run. One position answers both questions a backward search needs — `Statement` is the statement that
+runs next, and `GetPreviousStatements()` gives the ones that already ran, the nearest first.
 
 ## Special cases
 
 ### What the compiler rewrites
 
-The control flow graph contains simplified code. Three constructs look different from the source:
+The control flow graph holds simplified code. Three constructs look different from the source:
 
 | Source | In the graph | Why the search still works |
 |---|---|---|
-| `new User { Profile = p }` | `#1 = new User(); #1.Profile = p; user = #1` | the backward search for `#1` finds `#1.Profile = p` |
-| `foreach (var user in users)` | `#1 = users.GetEnumerator(); ... user = #1.Current` | `GetEnumerator` and `Current` are built-in declarations, so they pass through to `users`. Over an array, the old non-generic `IEnumerator` is used, and it is declared too. |
-| `flag ? a : b`, `a ?? b` | two blocks assign `#1`, then they join | both paths are searched |
+| `new User { Profile = p }` | `#1 = new User(); #1.Profile = p; user = #1` | walking back for `#1` finds `#1.Profile = p` |
+| `foreach (var user in users)` | `#1 = users.GetEnumerator(); … user = #1.Current` | `GetEnumerator` and `Current` are declared, so they pass through to `users`. Over an array the old non-generic `IEnumerator` is used, and it is declared too. |
+| `flag ? a : b`, `a ?? b` | two blocks write `#1`, then they join | both paths are searched |
 
-`#1` is a temporary variable that the compiler creates (`IFlowCaptureOperation`). The search treats it as any
-other variable.
+`#1` is a temporary variable the compiler creates. The Walker treats it as any other variable.
 
 ### Loops
 
-A loop goes back to a block that was already read. The search remembers the blocks it has read. When it comes
-back to one, it stops and counts this path as `Loaded`, because it adds nothing new. So the search goes around a
-loop once, reads every assignment in the loop body, and stops.
+A loop goes back to a block that was already read. The Walker remembers the blocks it has read; when it comes
+back to one it reports `NothingNew`, and the search counts that path as `Loaded` because it adds nothing. So
+the search goes around a loop once, reads every write in the loop body, and stops.
 
 ### Exceptions
 
 The graph has no jumps for exceptions. The first block of a `catch`, a `catch when` filter or a `finally` has no
-incoming jumps, so it looks unreachable. But an exception can leave the `try` block after any statement. So
-**every place inside the `try`** counts as a way into the handler. For a `finally` after `try/catch`, the `catch`
-blocks are included too. This is the only reason why `GetWaysIntoBlock` does more than `block.Predecessors`.
+incoming jumps, so it looks unreachable. But an exception can leave the `try` block after any statement, so
+**every place inside the `try`** counts as a way into the handler. For a `finally` after `try/catch`, the
+`catch` blocks are included too. This is the only reason the Walker does more than `block.Predecessors`.
 
 ## When the analyzer cannot read the code
 
 The analyzer follows only declared members. `System.Linq`, EF Core and the collection types are declared in the
-analyzer, so they work without any setup. Anything else has to be declared by the project:
+analyzer, so they work with no setup. Anything else has to be declared by the project:
 
 ```csharp
 var page = query.Paginate(1);   // a library method: nobody declared it
 var user = page.Items[0];       // a library property: nobody declared it
 ```
 
-For a library, the analyzer reports **INCL004**: it cannot read the code. For a method in the project's own code
-it reports **INCL002** instead, because the method can be read and it promises nothing. In both cases the fix is
-`[PreservesIncludes]`, which means "this method or property returns the entities that it was given":
+For a library, the analyzer reports **INCL004**: it cannot read the code. For a method in the project's own
+code it reports **INCL002** instead, because that method can be read and it promises nothing. In both cases the
+fix is `[PreservesIncludes]`, which means "this member returns the entities that it was given":
 
 ```csharp
 [PreservesIncludes(nameof(query))]                      // on a method: names the parameter
@@ -509,25 +493,23 @@ public PagedResult<User> Paginate(IQueryable<User> query, int page)
 public List<T> Items { get; set; }
 ```
 
-For a library that the project does not own, the attribute goes on the assembly:
+For a library the project does not own, the attribute goes on the assembly, before the namespace:
 
 ```csharp
 [assembly: PreservesIncludes(typeof(SomeLib.QueryExtensions), "Paginate", "query")]
 [assembly: PreservesIncludes(typeof(SomeLib.PagedResult<>), "Items")]
 ```
 
-Assembly attributes must be written **before** the namespace. They are read from the project itself and from every
-project and package that references it, so a shared project can declare a library once for the whole solution.
+Assembly attributes are read from the project itself and from every project and package it references, so a
+shared project can declare a library once for the whole solution. If such a declaration names a member or a
+parameter that does not exist, for example after the library renamed a method, the analyzer reports **INCL005**;
+without it the declaration would silently stop working.
 
-If such a declaration names a member or parameter that does not exist, for example after the library renamed a
-method, the analyzer reports **INCL005**. Without it the declaration would silently stop working.
+Users do not have to write these by hand. The code fix for INCL004 offers them and creates the file
+`NavigationIncludes.cs` if the project has none yet, the way Visual Studio uses `GlobalSuppressions.cs`.
 
-Users do not have to write these by hand. The code fix for INCL004 offers them, and creates the file
-`NavigationIncludes.cs` if the project has no such file yet (Visual Studio does the same with
-`GlobalSuppressions.cs`).
-
-The attribute does not say *which* property is loaded. It only says **where the entities come from**. The search
-then continues from there.
+The attribute does not say *which* property is loaded. It only says **where the entities come from**, and the
+search continues from there.
 
 ## Files
 
@@ -537,18 +519,19 @@ then continues from there.
 | `Handlers/IncludeFlowHandler.cs` | Finds the places to check, calls `Check`, reports INCL001 – INCL004. |
 | `Handlers/DeclarationHandler.cs` | INCL005: an `[assembly: PreservesIncludes]` that names nothing. |
 | `Handlers/PropertyReferenceHandler.cs` | INCL001 for direct `param.Profile` access, without flow analysis. |
-| `Flow/LoadedPropertySearch.cs` | `Check`: repeats "where does this come from?" until every path ends at an answer. |
-| `Flow/Origin.cs` | A value and a position, or one of the answers `Loaded` / `Missing` / `Unknown`. |
+| `Flow/IncludeSearch.cs` | The only class that decides. `Check`: reads a value, asks the Walker, joins the paths. |
+| `Flow/Value.cs` | What the search looks at: an expression and the position it is read at. |
+| `Flow/Answer.cs` | What the search decided: `Loaded` / `NotLoaded` / `Unknown`. |
+| `Flow/Walker.cs` | Where a variable was written: the backward walk through statements, blocks and bodies. |
+| `Flow/Write.cs` | One thing the Walker found. A fact about the code, never a decision. |
+| `Flow/Transformation.cs` | Which members hand back the entities they were given, and where from. The only file that reads declarations. |
 | `Flow/CodePosition.cs` | A point in execution: graph + block + number of statements already run. |
-| `Flow/FlowGraph.cs` | One body and its control flow graph. Lists its statements, including lambdas and local functions. |
-| `Flow/VariableOrigin.cs` | Where a variable gets its value: the backward walk through statements, blocks and bodies. |
-| `Flow/ExpressionOrigin.cs` | Where an expression gets its entities: `Include`, declared members, array elements. |
-| `Flow/EntityFlow.cs` | The two questions a declaration cannot answer: the right overload, and lambda elements. |
+| `Flow/FlowGraph.cs` | One body and its control flow graph. Lists its statements, lambdas and local functions included. |
 | `Flow/EfIncludes.cs` | The only rule that knows EF: reads the property name from `Include(u => u.Profile)`. |
-| `Flow/RoslynHelper.cs` | Removes the conversion and delegate wrappers that Roslyn puts around values. |
-| `Services/IncludeDeclarations.cs` | All `[PreservesIncludes]` that the compilation can see, including the built-in ones for `System.Linq`, EF Core and collections. The only place that decides what is followed. |
+| `Flow/RoslynHelper.cs` | Removes the conversion and delegate wrappers Roslyn puts around values. |
+| `Services/IncludeDeclarations.cs` | All `[PreservesIncludes]` the compilation can see, the built-in ones included. The only place that decides what is followed. |
 | `Services/UnreadableMember.cs` | The member that stopped the search. INCL004 carries it for the code fix. |
-| `CodeFixes/PreservesIncludesCodeFixProvider.cs` | The code fix for INCL004: writes a `[PreservesIncludes]` declaration. |
 | `Services/AttributeHelper.cs` | Reads `[IncludeRequired]`, `[Includes]` and `[TrackIncludeRequired]` from symbols. |
 | `Services/NavigationIncludeRulesProvider.cs` | The diagnostic descriptors and their ids. |
+| `CodeFixes/PreservesIncludesCodeFixProvider.cs` | The code fix for INCL004: writes a `[PreservesIncludes]` declaration. |
 | `Entities/IncludeRequirement.cs` | One `[IncludeRequired(parameter, property)]` pair. |
