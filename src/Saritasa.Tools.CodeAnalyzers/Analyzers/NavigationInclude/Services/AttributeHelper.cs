@@ -12,8 +12,8 @@ internal static class AttributeHelper
     /// <summary>
     /// Returns true if the symbol is decorated with <see cref="TrackIncludeRequiredAttribute"/>.
     /// </summary>
-    /// <param name="symbol">The symbol to inspect.</param>
-    /// <returns>True if the attribute is present; otherwise false.</returns>
+    /// <param name="symbol">Symbol.</param>
+    /// <returns>True if the symbol has the attribute.</returns>
     public static bool HasTrackIncludeRequiredAttribute(ISymbol symbol)
         => symbol
             .GetAttributes()
@@ -22,8 +22,8 @@ internal static class AttributeHelper
     /// <summary>
     /// Returns the parameter and the property of every <see cref="IncludeRequiredAttribute"/> of the method.
     /// </summary>
-    /// <param name="method">The method to inspect.</param>
-    /// <returns>Pairs of parameter name and required property name.</returns>
+    /// <param name="method">Method.</param>
+    /// <returns>Requirements.</returns>
     public static IEnumerable<IncludeRequirement> GetIncludeRequirements(IMethodSymbol method)
     {
         foreach (var attribute in method.GetAttributes())
@@ -48,10 +48,10 @@ internal static class AttributeHelper
     /// Returns true if the method asks for the property of the parameter with
     /// <see cref="IncludeRequiredAttribute"/>.
     /// </summary>
-    /// <param name="method">The method to inspect.</param>
-    /// <param name="param">The parameter name to match.</param>
-    /// <param name="includedProperty">The included property name to match.</param>
-    /// <returns>True if a matching attribute is found; otherwise false.</returns>
+    /// <param name="method">Method.</param>
+    /// <param name="param">Parameter name.</param>
+    /// <param name="includedProperty">Navigation property name.</param>
+    /// <returns>True if the method asks for the property.</returns>
     public static bool MethodHasIncludeRequiredAttribute(
         IMethodSymbol method,
         string param,
@@ -63,9 +63,9 @@ internal static class AttributeHelper
     /// <summary>
     /// Returns true if the method declares <see cref="IncludesAttribute"/> for the property.
     /// </summary>
-    /// <param name="method">The method to inspect.</param>
-    /// <param name="includedProperty">The property name to match.</param>
-    /// <returns>True if a matching attribute is found; otherwise false.</returns>
+    /// <param name="method">Method.</param>
+    /// <param name="includedProperty">Navigation property name.</param>
+    /// <returns>True if the method promises the property.</returns>
     public static bool MethodHasIncludesAttribute(IMethodSymbol method, string includedProperty)
         => GetIncludes(method).Any(include =>
             string.Equals(include.Property, includedProperty, StringComparison.Ordinal));
@@ -74,8 +74,8 @@ internal static class AttributeHelper
     /// Returns the properties of every <see cref="IncludesAttribute"/> of the method that the analyzer must
     /// check: all of them except those declared with <c>Verify = false</c>.
     /// </summary>
-    /// <param name="method">The method to inspect.</param>
-    /// <returns>Property names the returned value must have loaded.</returns>
+    /// <param name="method">Method.</param>
+    /// <returns>Navigation property names.</returns>
     public static IEnumerable<string> GetIncludesToVerify(IMethodSymbol method)
         => GetIncludes(method)
             .Where(include => include.Verify)

@@ -8,12 +8,11 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Flow;
 /// Answers one question: where was this variable written, above the place it is read.
 /// </summary>
 /// <remarks>
-/// The walker reads code and decides nothing. It reports what it found as <see cref="Write"/>s, and
-/// <see cref="IncludeSearch"/> says what that means for the navigation property. The one thing it is told is
-/// the name of the property, because "user.Profile = x" is a write to the variable and any other property
-/// is not; it still does not know what finding that write means.
-/// A variable here is a local, a parameter or a compiler temporary (<see cref="CaptureId"/>),
-/// see <see cref="GetVariable"/>.
+/// The walker reads code and decides nothing: it reports <see cref="Write"/>s, and <see cref="IncludeSearch"/>
+/// says what they mean. It is told the name of the property only because "user.Profile = x" is a write to the
+/// variable while any other property is not.
+/// A variable is a local, a parameter or a compiler temporary (<see cref="CaptureId"/>), see
+/// <see cref="GetVariable"/>.
 /// </remarks>
 internal sealed class Walker
 {

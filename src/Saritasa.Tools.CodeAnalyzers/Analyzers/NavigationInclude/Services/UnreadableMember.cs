@@ -28,8 +28,8 @@ internal static class UnreadableMember
     /// <summary>
     /// Returns how to name the member in a message, e.g. "SomeLib.QueryExtensions.Paginate".
     /// </summary>
-    /// <param name="unknownSource">Value the search could not follow.</param>
-    /// <returns>Name of the member, or "the value" when there is nothing to name.</returns>
+    /// <param name="unknownSource">The value the search could not read.</param>
+    /// <returns>Name for the message.</returns>
     public static string Describe(IOperation? unknownSource)
     {
         if (FindMember(unknownSource) is not { } member)
@@ -46,8 +46,8 @@ internal static class UnreadableMember
     /// Returns what the code fix needs to write a declaration for the member, and an empty set when the search
     /// stopped at something no declaration can describe.
     /// </summary>
-    /// <param name="unknownSource">Value the search could not follow.</param>
-    /// <returns>Properties for the diagnostic.</returns>
+    /// <param name="unknownSource">The value the search could not read.</param>
+    /// <returns>Properties for the code fix.</returns>
     public static ImmutableDictionary<string, string?> GetProperties(IOperation? unknownSource)
     {
         if (FindMember(unknownSource) is not { ContainingType: { } containingType } member)

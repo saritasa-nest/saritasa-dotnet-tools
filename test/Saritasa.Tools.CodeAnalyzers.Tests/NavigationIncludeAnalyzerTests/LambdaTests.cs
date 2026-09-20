@@ -124,6 +124,122 @@ public class LambdaTests : NavigationIncludeTestBase
     }
 
     /// <summary>
+    /// No INCL002: the lambda runs over a whole chain of calls, and every one of them is declared to hand the
+    /// entities on, so the search reads the chain back to the Include.
+    /// </summary>
+    [Fact]
+    public async Task LinqChain_BeforeLambda_NoIncl2()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task Handle(SaveUserDto dto)
+                    {
+                        var timezones = dbContext.Users
+                            .Include(u => u.Profile)
+                            .Where(u => u.Id > 0)
+                            .OrderBy(u => u.Id)
+                            .ToList()
+                            .Select(u => GetTimezone(u, dto))
+                            .ToList();
+                    }
+
+                    [IncludeRequired(nameof(user), nameof(User.Profile))]
+                    string GetTimezone(User user, SaveUserDto dto)
+                    {
+                        return user.Profile.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// INCL002: one call in the chain before the lambda promises nothing, so the Include before it is not
+    /// enough. The method is in the project's own code, where a missing promise is a real answer.
+    /// </summary>
+    [Fact]
+    public async Task UndeclaredCallInChain_BeforeLambda_ReportsIncl2()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                static class UserQueries
+                {
+                    public static IEnumerable<User> Newest(this IEnumerable<User> users) => users;
+                }
+
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task Handle(SaveUserDto dto)
+                    {
+                        var timezones = dbContext.Users
+                            .Include(u => u.Profile)
+                            .ToList()
+                            .Newest()
+                            .Select(u => {|INCL002:GetTimezone(u, dto)|})
+                            .ToList();
+                    }
+
+                    [IncludeRequired(nameof(user), nameof(User.Profile))]
+                    string GetTimezone(User user, SaveUserDto dto)
+                    {
+                        return user.Profile.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No INCL002: the second parameter of a GroupBy result selector is the group, which is declared
+    /// IEnumerable&lt;TSource&gt; and therefore filled from the source collection.
+    /// </summary>
+    [Fact]
+    public async Task GroupByResultSelector_GroupIsFilledFromSource_NoIncl2()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task Handle(SaveUserDto dto)
+                    {
+                        var users = await dbContext.Users
+                            .Include(u => u.Profile)
+                            .ToListAsync();
+
+                        var timezones = users
+                            .GroupBy(u => u.Manager, (manager, group) =>
+                            {
+                                var first = group.First();
+                                return GetTimezone(first, dto);
+                            })
+                            .ToList();
+                    }
+
+                    [IncludeRequired(nameof(user), nameof(User.Profile))]
+                    string GetTimezone(User user, SaveUserDto dto)
+                    {
+                        return user.Profile.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
     /// INCL004: the first parameter of a GroupBy result selector is the key, not an element of the source.
     /// Including Profile on the source says nothing about the key, even when the key is a User as well. The
     /// search cannot tell what the key holds, so it reports that rather than claiming the property is missing.

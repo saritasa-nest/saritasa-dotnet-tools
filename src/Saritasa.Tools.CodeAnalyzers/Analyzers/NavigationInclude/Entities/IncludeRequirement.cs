@@ -8,6 +8,8 @@ internal class IncludeRequirement
     /// <summary>
     /// Constructor.
     /// </summary>
+    /// <param name="parameterName">Name of the parameter.</param>
+    /// <param name="navigationProperty">Required navigation property.</param>
     public IncludeRequirement(string parameterName, string navigationProperty)
     {
         ParameterName = parameterName;

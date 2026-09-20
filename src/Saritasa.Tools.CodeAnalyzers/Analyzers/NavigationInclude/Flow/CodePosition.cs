@@ -8,10 +8,9 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Flow;
 /// <see cref="Block"/> have already run, the rest have not.
 /// </summary>
 /// <remarks>
-/// <see cref="Statement"/> is the statement that runs next and <see cref="GetPreviousStatements"/> the ones that
-/// already ran, so the same position answers both "which statement is this?" and "what was assigned before it?".
-/// The last statement of a block is its branch value (an if/while condition or a returned value); after it the
-/// position is the end of the block, where nothing runs next.
+/// <see cref="Statement"/> runs next and <see cref="GetPreviousStatements"/> already ran, so one position
+/// answers both "which statement is this?" and "what was written before it?". The last statement of a block is
+/// its branch value (an if/while condition or a returned value); after it comes the end of the block.
 /// </remarks>
 internal sealed class CodePosition
 {

@@ -8,13 +8,11 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Flow;
 /// Answers one question: "is the navigation property loaded in this value?".
 /// </summary>
 /// <remarks>
-/// A value never says by itself whether the property is loaded, so the search reads it, and where the value
-/// comes from another one it reads that one too, the same way a person reads code backwards. Reading a
-/// variable is the only case it cannot do alone: it asks the <see cref="Walker"/> where the variable was
-/// written, and decides what those writes mean.
-/// When several paths lead to the same place, the property must be loaded on every one of them.
-/// A call or a property is followed only when it is declared with [PreservesIncludes], built in or written by
-/// the project. To teach the search a new member, declare it rather than adding a case here.
+/// A value never says by itself whether the property is loaded, so the search reads it, and where it was made
+/// from another value it reads that one too, the way a person reads code backwards. Reading a variable is the
+/// only case it cannot do alone: it asks the <see cref="Walker"/> and decides what the writes mean. When
+/// several paths lead to the same place, every one of them must be loaded.
+/// To teach the search a new member, declare it with [PreservesIncludes] rather than adding a case here.
 /// </remarks>
 internal sealed class IncludeSearch
 {
@@ -33,21 +31,14 @@ internal sealed class IncludeSearch
     /// <param name="value">Value, e.g. a call argument or a returned expression.</param>
     /// <param name="property">Navigation property name.</param>
     /// <param name="position">Position of the statement that contains the value.</param>
-    /// <returns>
-    /// <see cref="Answer.Loaded"/> when the property is loaded on every path, <see cref="Answer.NotLoaded"/>
-    /// when a path was followed to the end without it, and <see cref="Answer.Unknown"/> when a path ran into
-    /// something the search cannot read.
-    /// </returns>
+    /// <returns>Answer for the value.</returns>
     public static Answer Check(IOperation value, string property, CodePosition position)
         => new IncludeSearch(property).Search(Value.Create(value, position));
 
     /// <summary>
-    /// Reads one value, and names it when it turns out to be the one that stopped the search.
+    /// Reads one value, and names it when it turns out to be the one that stopped the search. The value named
+    /// is the deepest one, because only the first frame that sees Unknown has nothing to name yet.
     /// </summary>
-    /// <remarks>
-    /// The value named is the deepest one, because the answer travels back out of the recursion and only the
-    /// first frame that sees it has nothing to name yet.
-    /// </remarks>
     private Answer Search(Value value)
     {
         var answer = ReadValue(value);
@@ -79,9 +70,9 @@ internal sealed class IncludeSearch
             IInvocationOperation call when LoadsProperty(call)
                 => Answer.Loaded,
 
-            // A method declared with [PreservesIncludes]: "query.Where(...)", "users.ToList()",
-            // "query.Paginate(1)". The declaration says where its entities come from.
-            IInvocationOperation call when Transformation.FindCallSource(call, value.Position) is { } source
+            // A move that keeps the same entities: "query.Where(...)", "users.ToList()", "users[0]",
+            // "page.Items", "query.Paginate(1)". It says which value they came from.
+            _ when Transformation.FindSource(value) is { } source
                 => Search(source, value.Position),
 
             // A call nobody declared. In our own code that is a real answer: the method promises nothing with
@@ -89,15 +80,6 @@ internal sealed class IncludeSearch
             // simply cannot see.
             IInvocationOperation call
                 => IsOurOwnCode(call.TargetMethod, value.Position) ? Answer.NotLoaded : Answer.Unknown(),
-
-            // A property declared with [PreservesIncludes]: "users[0]", "enumerator.Current", "pair.Value",
-            // "page.Items". It hands back entities of the object it is read on.
-            IPropertyReferenceOperation reference when Transformation.PassesEntitiesOn(reference.Property, value.Position)
-                => Search(reference.Instance, value.Position),
-
-            // "users[0]" of an array. Not a property in Roslyn, so no declaration can describe it.
-            IArrayElementReferenceOperation element
-                => Search(element.ArrayReference, value.Position),
 
             // "new User()": it was just made, so nothing is loaded on it.
             IObjectCreationOperation
@@ -150,13 +132,10 @@ internal sealed class IncludeSearch
         };
 
     /// <summary>
-    /// Every path must have the property loaded.
+    /// Every path must have the property loaded. The first path that is not loaded is the answer, so the
+    /// search reads no more code than it has to, and a path it cannot read hides a later one it could have
+    /// answered: a suggestion instead of a warning, which is the safe way round.
     /// </summary>
-    /// <remarks>
-    /// The first path that is not loaded is the answer, so the search reads no more of the code than it has
-    /// to. That also means a path it cannot read hides a later path it could have answered, which is the safe
-    /// way round: a suggestion is shown instead of a warning.
-    /// </remarks>
     private static Answer JoinPaths(IEnumerable<Answer> answers)
     {
         foreach (var answer in answers)
@@ -176,25 +155,19 @@ internal sealed class IncludeSearch
     /// anything into the out argument, so we cannot tell.
     /// </summary>
     private Answer ReadOutArgumentCall(Value call)
-    {
-        var source = call.Operation is IInvocationOperation invocation
-            ? Transformation.FindCallSource(invocation, call.Position)
-            : null;
-
-        return source is null ? Answer.Unknown() : Search(source, call.Position);
-    }
+        => Transformation.FindSource(call) is { } source
+            ? Search(source, call.Position)
+            : Answer.Unknown();
 
     /// <summary>
-    /// "users.Select(u =&gt; ...)": the first parameter is an element of users. For any other parameter
-    /// ("Select((u, i) =&gt; ...)", a lambda of a method we cannot read) we cannot tell what it holds.
+    /// "users.Select(u =&gt; ...)": the parameter is filled from users. For a parameter filled from something
+    /// else ("Select((u, i) =&gt; ...)") or a lambda of a method we cannot read, we cannot tell what it holds.
     /// </summary>
     private Answer ReadLambdaElements(Write.LambdaParameter lambda)
     {
-        var elements = Transformation.FindElementsSource(lambda.Lambda);
+        var elements = LambdaSource.FindCollection(lambda.Lambda, lambda.Parameter.Ordinal);
 
-        return elements is not null && lambda.Parameter.Ordinal == 0
-            ? Search(elements, lambda.Creation)
-            : Answer.Unknown();
+        return elements is not null ? Search(elements, lambda.Creation) : Answer.Unknown();
     }
 
     /// <summary>

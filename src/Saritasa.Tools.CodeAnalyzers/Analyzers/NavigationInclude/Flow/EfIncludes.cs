@@ -20,7 +20,7 @@ internal static class EfIncludes
     /// null for other calls. Filtered includes such as <c>u =&gt; u.Orders.Where(...)</c> are not recognized.
     /// </summary>
     /// <param name="call">Method call.</param>
-    /// <returns>Included property name or null.</returns>
+    /// <returns>Property name or null.</returns>
     public static string? GetIncludedProperty(IInvocationOperation call)
     {
         var method = call.TargetMethod;

@@ -7,10 +7,8 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Services;
 /// Every [PreservesIncludes] the compilation can see, ready to look up by member.
 /// </summary>
 /// <remarks>
-/// This is the only place that decides which members pass entities on. A declaration comes from one of three
-/// places, and all of them are treated the same:
-/// the member itself, an <c>[assembly: PreservesIncludes]</c> in the project or in anything it references, and
-/// the built-in list below for System.Linq, EF Core and the collection types.
+/// A declaration comes from one of three places, treated the same: the member itself, an
+/// <c>[assembly: PreservesIncludes]</c> in the project or anything it references, and the built-in list below.
 /// Reading the references is the expensive part, so this is built once per compilation.
 /// </remarks>
 internal sealed class IncludeDeclarations
@@ -53,16 +51,12 @@ internal sealed class IncludeDeclarations
     /// The declarations that ship with the analyzer: the metadata name of the declaring type and the member name.
     /// </summary>
     /// <remarks>
-    /// Each line means exactly what <c>[assembly: PreservesIncludes(typeof(Type), "Member")]</c> means: the member
-    /// hands back the entities of the value it is used on. They go through the same lookup as a project's own
-    /// declarations, so nothing about Microsoft's methods is special in the search.
-    /// Types are named by their metadata name rather than with typeof, so the analyzer needs no reference to EF Core.
-    /// A line whose type the project does not reference simply matches nothing.
-    /// A member declared on an interface also covers the classes implementing it, so <c>IList`1</c> covers the
-    /// indexer of <c>List&lt;T&gt;</c> and <c>IEnumerable`1</c> covers the <c>GetEnumerator</c> that
-    /// <c>foreach</c> calls on any collection.
-    /// Select, SelectMany and anything else that makes new objects are left out on purpose. Overloads that make new
-    /// objects are filtered out anyway: see <see cref="Flow.Transformation"/>.
+    /// Each line means what <c>[assembly: PreservesIncludes(typeof(Type), "Member")]</c> means and goes through
+    /// the same lookup, so nothing about Microsoft's methods is special. Types are named by metadata name, so
+    /// the analyzer needs no reference to EF Core, and a line whose type the project does not use matches
+    /// nothing. A member declared on an interface covers the classes implementing it, so <c>IList`1</c> covers
+    /// the indexer of <c>List&lt;T&gt;</c>. Select and anything else that makes new objects is left out on
+    /// purpose, see <see cref="Flow.Transformation"/>.
     /// </remarks>
     private static IEnumerable<(string Type, string Member)> BuiltInEntries
         => Declare("System.Linq.Enumerable", [.. sequenceOperators, "AsEnumerable", "ToList", "ToArray", "ToHashSet", "ToDictionary"])

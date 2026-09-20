@@ -103,7 +103,7 @@ statements connected by arrows — so the analyzer needs no special code for `if
 | **Value** | a place where entities sit: a variable, a parameter, an argument or the result of an expression, together with the position in the code where it is read | `Flow/Value.cs` |
 | **Answer** | what the search decided: `Loaded`, `NotLoaded` or `Unknown` | `Flow/Answer.cs` |
 | **Write** | one thing found above a variable: `Written`, `MemberWritten`, `OutArgument`, `MethodParameter`, `LambdaParameter`, `NothingNew`, `NeverWritten`, `Unreadable` | `Flow/Write.cs` |
-| **Transformation** | a member that hands back the entities it was given: `Where`, `ToList`, `Items`, an indexer | `Flow/Transformation.cs` |
+| **Transformation** | a move from one value to another that keeps the same entities: `Where`, `ToList`, `page.Items`, an indexer | `Flow/Transformation.cs` |
 
 A value is a question and an answer is a decision, and the code never mixes the two. A write is a fact about the
 code and never a decision.
@@ -383,9 +383,25 @@ covers every class that implements it, so `IEnumerable<T>.GetEnumerator` covers 
 
 `Select` and `SelectMany` are **not** declared. They make new objects, so their result has no includes.
 
-### `Transformation`: the two questions a declaration cannot answer
+### `Transformation`: may the entities move, and where from?
 
-**1. Is this overload the right one?** A declaration names a method, not one overload, so each call is checked
+Every step that is not an `Include` and not a variable asks this one question, and the answer is the value on
+the other side of the move. The shape of the move does not matter:
+
+| Move | Example |
+|---|---|
+| collection to collection | `query.Where(...)`, `users.ToList()` |
+| collection to one value | `users.First()`, `users[0]`, `enumerator.Current` |
+| one value to collection | `page.Items` |
+| one value to another | `pair.Value`, `task.Result` |
+
+All four are the same thing to the search: the entities on both sides are the same ones, so it keeps walking.
+The move is permitted by a declaration, with one exception — an array element, `users[0]` over `User[]`, has no
+member in Roslyn for a declaration to name, and there is only one value it can come from.
+
+One question is left that a declaration cannot answer.
+
+**Is this overload the right one?** A declaration names a method, not one overload, so each call is checked
 against the method's own declaration: if the result is built from type parameters, one of them must come from
 the source.
 
@@ -398,14 +414,26 @@ the source.
 This also protects against a wrong declaration: even if someone declares `Select`, its result is built from
 `TResult`, so it is never followed.
 
-**2. Does this lambda receive the elements of the source?** In `users.Select(u => ...)` the question is whether
-`u` is an element of `users`. This is not "where does a result come from", so no declaration can say it. The
-first parameter of the lambda must be the source's own type parameter: `Select` passes `TSource` and qualifies,
-the result selector of `GroupBy` passes `TKey` and does not.
+This is read from how the member itself is declared, so it works the same for `System.Linq`, EF Core and a
+project's own methods.
 
-Both answers are read from how the member itself is declared, so they work the same for `System.Linq`, EF Core
-and a project's own methods. They live with the rest of `Transformation`, which is the only file that reads
-declarations.
+### `LambdaSource`: where a lambda parameter is filled from
+
+In `users.Select(u => ...)` the question is whether `u` is filled from `users`. This is a different question:
+a declaration says where a *result* comes from, while this is about what goes *in*, so no declaration can
+answer it. The analyzer reads the delegate the lambda is passed to, one parameter at a time, and asks whether
+that parameter's declared type is one of the types inside the collection.
+
+| Lambda | Parameter | Declared as | Filled from the collection? |
+|---|---|---|---|
+| `Select(u => …)` | `u` | `TSource` | yes |
+| `Select((u, i) => …)` | `i` | `int` | no |
+| `GroupBy(k, (manager, group) => …)` | `manager` | `TKey` | no |
+| `GroupBy(k, (manager, group) => …)` | `group` | `IEnumerable<TSource>` | yes |
+| `ForEachItem(this IEnumerable<T>, Action<T>)` | `item` | `T` | yes |
+
+Nothing here depends on the position of the parameter, so a project's own method reads the same way as a LINQ
+operator.
 
 ### `EfIncludes`: the only code that knows Entity Framework
 
@@ -524,11 +552,12 @@ search continues from there.
 | `Flow/Answer.cs` | What the search decided: `Loaded` / `NotLoaded` / `Unknown`. |
 | `Flow/Walker.cs` | Where a variable was written: the backward walk through statements, blocks and bodies. |
 | `Flow/Write.cs` | One thing the Walker found. A fact about the code, never a decision. |
-| `Flow/Transformation.cs` | Which members hand back the entities they were given, and where from. The only file that reads declarations. |
+| `Flow/Transformation.cs` | May the entities move out of this value, and which value did they come from. The only file that reads declarations. |
+| `Flow/LambdaSource.cs` | Which collection a lambda parameter is filled from. |
 | `Flow/CodePosition.cs` | A point in execution: graph + block + number of statements already run. |
 | `Flow/FlowGraph.cs` | One body and its control flow graph. Lists its statements, lambdas and local functions included. |
 | `Flow/EfIncludes.cs` | The only rule that knows EF: reads the property name from `Include(u => u.Profile)`. |
-| `Flow/RoslynHelper.cs` | Removes the conversion and delegate wrappers Roslyn puts around values. |
+| `Flow/RoslynHelper.cs` | Roslyn details with no meaning of their own: wrappers, the receiver of a call, the types inside a type, a delegate parameter. |
 | `Services/IncludeDeclarations.cs` | All `[PreservesIncludes]` the compilation can see, the built-in ones included. The only place that decides what is followed. |
 | `Services/UnreadableMember.cs` | The member that stopped the search. INCL004 carries it for the code fix. |
 | `Services/AttributeHelper.cs` | Reads `[IncludeRequired]`, `[Includes]` and `[TrackIncludeRequired]` from symbols. |

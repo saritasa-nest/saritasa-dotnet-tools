@@ -7,9 +7,8 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Flow;
 /// A place where entities sit: an expression, together with the position in the code it is read at.
 /// </summary>
 /// <remarks>
-/// A value is what the search looks at, and never what it decided, see <see cref="Answer"/>.
-/// The same expression read at two positions is two values, because a variable can hold different things
-/// at different lines.
+/// A value is what the search looks at, never what it decided, see <see cref="Answer"/>. The same expression
+/// read at two positions is two values, because a variable can hold different things at different lines.
 /// </remarks>
 internal sealed class Value
 {
@@ -40,12 +39,9 @@ internal sealed class Value
 
     /// <summary>
     /// Removes everything wrapped around an expression that does not change the entities in it, so that the
-    /// call or the property below it is recognized.
+    /// call or the property below it is recognized: implicit conversions ("IEnumerable&lt;User&gt; users =
+    /// query.ToList()") and "await".
     /// </summary>
-    /// <remarks>
-    /// Values come with implicit conversions: "IEnumerable&lt;User&gt; users = query.ToList()",
-    /// "list.Where(...)" (the list is converted to IEnumerable&lt;User&gt;).
-    /// </remarks>
     private static IOperation RemoveWrappers(IOperation operation)
         => RoslynHelper.SkipWrappers(operation) switch
         {

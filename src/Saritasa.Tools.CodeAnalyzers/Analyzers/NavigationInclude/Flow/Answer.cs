@@ -6,10 +6,10 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Flow;
 /// What the search decided about a value: the navigation property is loaded, it is not, or we cannot tell.
 /// </summary>
 /// <remarks>
-/// An answer ends the search, while a <see cref="Value"/> continues it. Keeping the two apart is the point:
-/// a reader always knows whether a thing is a question or a decision.
-/// <see cref="NotLoaded"/> and <see cref="Unknown"/> both mean the property is not there, but they are very
-/// different to a developer: one is a mistake in their code, the other is a gap in what the analyzer can read.
+/// An answer ends the search, while a <see cref="Value"/> continues it, so a reader always knows whether a
+/// thing is a question or a decision. <see cref="NotLoaded"/> and <see cref="Unknown"/> both mean the property
+/// is not there, but one is a mistake in the developer's code and the other a gap in what the analyzer can
+/// read, so they must not be mixed.
 /// </remarks>
 internal sealed class Answer
 {

@@ -215,7 +215,7 @@ internal static class IncludeFlowHandler
             return false;
         }
 
-        return Transformation.FindElementsSource(lambdaInMethod) is not null;
+        return LambdaSource.FindCollection(lambdaInMethod, lambdaParameter.Ordinal) is not null;
     }
 
     /// <summary>
