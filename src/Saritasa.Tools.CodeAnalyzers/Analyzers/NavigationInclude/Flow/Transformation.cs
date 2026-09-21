@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.FlowAnalysis;
 using Microsoft.CodeAnalysis.Operations;
 
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Flow;
@@ -8,13 +9,18 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Flow;
 /// <c>users.ToList()</c>, <c>users[0]</c>, <c>page.Items</c>, <c>query.Paginate(1)</c>.
 /// </summary>
 /// <remarks>
-/// The search asks one thing here: may the entities have come out of this member, and out of which value?
+/// The search asks one thing here: may the entities of this place have been somewhere else before, and where?
 /// The shape of the move does not matter. A collection can become another collection (<c>Where</c>), a
 /// collection can become one element (<c>First</c>, <c>users[0]</c>), and one value can become a collection
 /// (<c>page.Items</c>). What matters is that the entities on both sides are the same ones.
-/// The move is permitted by a [PreservesIncludes] declaration, written on the member, on an assembly or built
-/// in; nothing is guessed. What a declaration cannot say is read from the member's own declaration, see
-/// <see cref="KeepsEntities"/>.
+/// A call moves entities in two directions, and both are the same move read from a different place of it:
+/// out of the call into its result (<c>users.ToList()</c>), and into the call's own lambda
+/// (<c>users.Select(u =&gt; ...)</c>, where <c>u</c> is filled from <c>users</c>). One
+/// <see cref="FindSource(Value)"/> answers the first, the other answers the second.
+/// A move out of a member is permitted by a [PreservesIncludes] declaration, written on the member, on an
+/// assembly or built in; nothing is guessed. A move into a lambda needs no declaration, because it is written
+/// in the method's own signature. What a declaration cannot say is read the same way, see
+/// <see cref="KeepsEntities"/> and <see cref="ComesFromCollection"/>.
 /// </remarks>
 internal static class Transformation
 {
@@ -33,18 +39,71 @@ internal static class Transformation
                 => GetCallSource(call, parameterName),
 
             // "users[0]", "enumerator.Current", "pair.Value", "page.Items": the entities come from the object
-            // the property is read on.
+            // the property is read on. Returns users/enumerator/pair/page
             IPropertyReferenceOperation reference
                 when FindDeclaredParameter(reference.Property, value.Position) is not null
                 => reference.Instance,
 
             // "users[0]" of an array. Roslyn has no member here, so no declaration can describe it, and there
-            // is only one value the element can come from.
+            // is only one value the element can come from. Returns users
             IArrayElementReferenceOperation element
                 => element.ArrayReference,
 
             _ => null,
         };
+
+    /// <summary>
+    /// The collection a lambda parameter is filled from: for the <c>u</c> of <c>users.Select(u =&gt; ...)</c>,
+    /// the value <c>users</c>. Null when the parameter holds something else, such as the index of
+    /// <c>Select((u, i) =&gt; ...)</c> or the key of <c>GroupBy</c>, or when the lambda is not passed to a call.
+    /// </summary>
+    /// <param name="lambda">Lambda the parameter belongs to.</param>
+    /// <param name="parameterOrdinal">Position of the parameter in the lambda.</param>
+    /// <returns>Source or null.</returns>
+    public static IOperation? FindSource(IFlowAnonymousFunctionOperation lambda, int parameterOrdinal)
+    {
+        var parent = lambda.Parent;
+        while (parent is IConversionOperation or IDelegateCreationOperation)
+        {
+            parent = parent.Parent;
+        }
+
+        if (parent is IArgumentOperation { Parameter: { } lambdaArgument, Parent: IInvocationOperation call } &&
+            ComesFromCollection(lambdaArgument, call.TargetMethod, parameterOrdinal))
+        {
+            return RoslynHelper.GetReceiver(call);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// True if the lambda parameter at this position is filled from the value the method is called on.
+    /// </summary>
+    /// <remarks>
+    /// No declaration is needed here, because the method's own signature says it. <c>Select</c> declares its
+    /// selector <c>Func&lt;TSource, TResult&gt;</c>, so the parameter is an element; <c>Select((u, i) =&gt;
+    /// ...)</c> declares <c>Func&lt;TSource, int, TResult&gt;</c>, so the second one is not. The result
+    /// selector of <c>GroupBy</c> is <c>Func&lt;TKey, IEnumerable&lt;TSource&gt;, TResult&gt;</c>: the key is
+    /// not filled from the collection, the group is. A project's own
+    /// <c>ForEachItem(this IEnumerable&lt;T&gt;, Action&lt;T&gt;)</c> reads the same way.
+    /// </remarks>
+    private static bool ComesFromCollection(IParameterSymbol lambdaArgument, IMethodSymbol method, int ordinal)
+    {
+        var definition = method.OriginalDefinition;
+        if (definition.Parameters.Length <= lambdaArgument.Ordinal ||
+            RoslynHelper.GetReceiverType(definition) is not { } collection)
+        {
+            return false;
+        }
+
+        var declaredType = RoslynHelper.GetLambdaParameterType(
+            definition.Parameters[lambdaArgument.Ordinal].Type,
+            ordinal);
+
+        return declaredType is not null &&
+               RoslynHelper.GetTypesInside(collection, withInterfaces: true).Contains(declaredType);
+    }
 
     /// <summary>
     /// The declared parameter the entities come from, and null when the move is not permitted: nobody declared

@@ -97,6 +97,58 @@ public class PreservesIncludesTests : NavigationIncludeTestBase
     }
 
     /// <summary>
+    /// No INCL002: an instance method of a custom collection hands back the entities of the object it is
+    /// called on, the same way an extension method does with the value in front of the dot.
+    /// </summary>
+    [Fact]
+    public async Task PreservesIncludes_OnInstanceMethodOfOwnCollection_NoIncl2()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                public class UserBatch
+                {
+                    private readonly List<User> items = new();
+
+                    [PreservesIncludes]
+                    public List<User> GetItems() => items;
+
+                    [PreservesIncludes]
+                    public User GetFirst() => items[0];
+                }
+
+                static class QueryableExtensions
+                {
+                    [PreservesIncludes(nameof(query))]
+                    public static UserBatch ToBatch(this IQueryable<User> query) => null;
+                }
+
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task Handle(SaveUserDto dto)
+                    {
+                        var batch = dbContext.Users
+                            .Include(u => u.Profile)
+                            .ToBatch();
+
+                        UpdateUserProfile(batch.GetItems()[0], dto);
+                        UpdateUserProfile(batch.GetFirst(), dto);
+                    }
+
+                    [IncludeRequired(nameof(user), nameof(User.Profile))]
+                    void UpdateUserProfile(User user, SaveUserDto dto)
+                    {
+                        user.Profile.Timezone = dto.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
     /// INCL002: the declarations only say where the entities come from, so a query without the include is
     /// still reported through them.
     /// </summary>

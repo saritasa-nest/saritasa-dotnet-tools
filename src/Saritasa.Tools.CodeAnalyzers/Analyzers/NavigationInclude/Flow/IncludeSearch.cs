@@ -120,7 +120,7 @@ internal sealed class IncludeSearch
                 => IsRequiredFromCaller(parameter.Parameter) ? Answer.Loaded : Answer.NotLoaded,
 
             // "users.Select(u => ...)": the parameter holds an element of users.
-            Write.LambdaParameter lambda => ReadLambdaElements(lambda),
+            Write.LambdaParameter lambda => ReadLambdaSource(lambda),
 
             // A loop came back to a place the search already read, so this path adds nothing new.
             Write.NothingNew => Answer.Loaded,
@@ -163,12 +163,8 @@ internal sealed class IncludeSearch
     /// "users.Select(u =&gt; ...)": the parameter is filled from users. For a parameter filled from something
     /// else ("Select((u, i) =&gt; ...)") or a lambda of a method we cannot read, we cannot tell what it holds.
     /// </summary>
-    private Answer ReadLambdaElements(Write.LambdaParameter lambda)
-    {
-        var elements = LambdaSource.FindCollection(lambda.Lambda, lambda.Parameter.Ordinal);
-
-        return elements is not null ? Search(elements, lambda.Creation) : Answer.Unknown();
-    }
+    private Answer ReadLambdaSource(Write.LambdaParameter lambda)
+        => Search(Transformation.FindSource(lambda.Lambda, lambda.Parameter.Ordinal), lambda.Creation);
 
     /// <summary>
     /// True if the parameter's method asks for the property with [IncludeRequired], which makes the caller of

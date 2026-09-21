@@ -464,9 +464,11 @@ var timezones = users.Select(u => GetTimezone(u, dto)).ToList();
 //                             "var timezones = …", and from there "u" is followed back to "users".
 ```
 
-Lambdas such as `u => u.Profile` inside `Include(...)` are different: they are passed to `IQueryable` as
-expression trees, which are data and not code, so Roslyn gives them no graph. `Include` is read from the syntax
-of the lambda instead.
+A lambda passed to `IQueryable` becomes an expression tree, which is data rather than code, but it still has a
+graph and is still searched. Its parameter is declared `Expression<Func<TSource, TResult>>`, and the search
+reads through the expression to the same `TSource`, so `u` in `query.Select(u => ...)` is filled from `query`.
+`Include(u => u.Profile)` is the one lambda read from syntax instead, because there the analyzer needs the
+property name and not the entities.
 
 `CodePosition` is a point in execution: a graph, a block, and the number of statements of that block that have
 already run. One position answers both questions a backward search needs — `Statement` is the statement that

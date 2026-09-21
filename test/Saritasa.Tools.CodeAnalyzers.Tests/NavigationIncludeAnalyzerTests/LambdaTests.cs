@@ -200,6 +200,71 @@ public class LambdaTests : NavigationIncludeTestBase
     }
 
     /// <summary>
+    /// No INCL002 inside a lambda that becomes an expression tree. The parameter of an IQueryable operator is
+    /// declared Expression&lt;Func&lt;TSource, TResult&gt;&gt;, and the search reads through the expression to
+    /// the same TSource, so u is filled from the query.
+    /// </summary>
+    [Fact]
+    public async Task QueryableLambda_OverIncludedQuery_NoIncl2()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task Handle(SaveUserDto dto)
+                    {
+                        var timezones = await dbContext.Users
+                            .Include(u => u.Profile)
+                            .Select(u => GetTimezone(u, dto))
+                            .ToListAsync();
+                    }
+
+                    [IncludeRequired(nameof(user), nameof(User.Profile))]
+                    string GetTimezone(User user, SaveUserDto dto)
+                    {
+                        return user.Profile.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// INCL002: the same expression tree over a query without the Include.
+    /// </summary>
+    [Fact]
+    public async Task QueryableLambda_OverNonIncludedQuery_ReportsIncl2()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task Handle(SaveUserDto dto)
+                    {
+                        var timezones = await dbContext.Users
+                            .Select(u => {|INCL002:GetTimezone(u, dto)|})
+                            .ToListAsync();
+                    }
+
+                    [IncludeRequired(nameof(user), nameof(User.Profile))]
+                    string GetTimezone(User user, SaveUserDto dto)
+                    {
+                        return user.Profile.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
     /// No INCL002: the second parameter of a GroupBy result selector is the group, which is declared
     /// IEnumerable&lt;TSource&gt; and therefore filled from the source collection.
     /// </summary>
