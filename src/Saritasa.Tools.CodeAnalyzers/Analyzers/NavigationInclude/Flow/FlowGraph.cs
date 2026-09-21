@@ -20,7 +20,7 @@ internal sealed class FlowGraph
     /// </summary>
     /// <param name="graph">Control flow graph of the body.</param>
     /// <param name="method">Method, constructor or local function.</param>
-    /// <param name="declarations">Every [PreservesIncludes] the compilation can see.</param>
+    /// <param name="declarations">Every [PassesIncludes] the compilation can see.</param>
     public FlowGraph(ControlFlowGraph graph, IMethodSymbol method, IncludeDeclarations declarations)
     {
         Graph = graph;
@@ -57,7 +57,7 @@ internal sealed class FlowGraph
     public CodePosition? CreationStatement { get; }
 
     /// <summary>
-    /// Every [PreservesIncludes] the compilation can see. The same one for every body of a compilation.
+    /// Every [PassesIncludes] the compilation can see. The same one for every body of a compilation.
     /// </summary>
     public IncludeDeclarations Declarations { get; }
 

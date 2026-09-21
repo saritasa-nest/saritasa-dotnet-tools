@@ -82,4 +82,35 @@ public class QueryOperatorTests : NavigationIncludeTestBase
                         {|INCL004:UpdateUserProfile(user, dto)|};
             """));
     }
+
+    /// <summary>
+    /// INCL004: "Max(selector)" hands back whatever the selector returned, not an element, so the entities of
+    /// the source say nothing about it. The overload is excluded by the name of its selector parameter, which
+    /// is the only thing that separates it from "Max(comparer)" — both take two arguments.
+    /// </summary>
+    [Fact]
+    public async Task MaxWithSelector_DoesNotKeepIncludes_ReportsIncl4()
+    {
+        await VerifyAnalyzerAsync(HandleSource(
+            """
+                        var users = await dbContext.Users.Include(u => u.Profile).ToListAsync();
+                        var user = users.Max(u => u.Manager);
+                        {|INCL004:UpdateUserProfile(user, dto)|};
+            """));
+    }
+
+    /// <summary>
+    /// No INCL002: "MaxBy(keySelector)" hands back an element, so it keeps the entities even though it takes
+    /// a selector of its own.
+    /// </summary>
+    [Fact]
+    public async Task MaxByKeySelector_KeepsIncludes_NoIncl2()
+    {
+        await VerifyAnalyzerAsync(HandleSource(
+            """
+                        var users = await dbContext.Users.Include(u => u.Profile).ToListAsync();
+                        var user = users.MaxBy(u => u.Id);
+                        UpdateUserProfile(user, dto);
+            """));
+    }
 }

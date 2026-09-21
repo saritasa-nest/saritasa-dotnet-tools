@@ -18,7 +18,7 @@ internal static class IncludeFlowHandler
     /// Analyzes one method body.
     /// </summary>
     /// <param name="context">Operation block analysis context.</param>
-    /// <param name="declarations">Every [PreservesIncludes] the compilation can see.</param>
+    /// <param name="declarations">Every [PassesIncludes] the compilation can see.</param>
     public static void Analyze(OperationBlockAnalysisContext context, IncludeDeclarations declarations)
     {
         if (context.OwningSymbol is not IMethodSymbol method)
@@ -215,7 +215,10 @@ internal static class IncludeFlowHandler
             return false;
         }
 
-        return Transformation.FindSource(lambdaInMethod, lambdaParameter.Ordinal) is not null;
+        return Bridge.FindSource(
+            lambdaInMethod,
+            lambdaParameter.Ordinal,
+            methodFlowGraph.Declarations) is not null;
     }
 
     /// <summary>

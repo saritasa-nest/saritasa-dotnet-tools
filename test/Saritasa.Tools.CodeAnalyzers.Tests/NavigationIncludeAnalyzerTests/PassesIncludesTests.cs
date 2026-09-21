@@ -3,17 +3,17 @@ using Xunit;
 namespace Saritasa.Tools.CodeAnalyzers.Tests.NavigationIncludeAnalyzerTests;
 
 /// <summary>
-/// [PreservesIncludes]: declaring on a member or on the assembly which members hand back the entities they were
+/// [PassesIncludes]: declaring on a member or on the assembly which members hand back the entities they were
 /// given, and INCL005 for a declaration that names nothing.
 /// </summary>
-public class PreservesIncludesTests : NavigationIncludeTestBase
+public class PassesIncludesTests : NavigationIncludeTestBase
 {
     /// <summary>
     /// No INCL002: a project's own IQueryable extension keeps the includes once it is declared with
-    /// [PreservesIncludes], exactly like the built-in declarations of System.Linq and EF Core.
+    /// [PassesIncludes], exactly like the built-in declarations of System.Linq and EF Core.
     /// </summary>
     [Fact]
-    public async Task PreservesIncludes_WithoutParameterName_NoIncl2()
+    public async Task PassesIncludes_WithoutParameterName_NoIncl2()
     {
         var sourceCode = Preamble +
             /* lang=c# */
@@ -21,7 +21,7 @@ public class PreservesIncludesTests : NavigationIncludeTestBase
 
                 static class QueryableExtensions
                 {
-                    [PreservesIncludes]
+                    [PassesIncludes]
                     public static IQueryable<User> OnlyActive(this IQueryable<User> query) => query;
                 }
 
@@ -54,21 +54,25 @@ public class PreservesIncludesTests : NavigationIncludeTestBase
     /// property say where their entities come from, so the includes are followed through both.
     /// </summary>
     [Fact]
-    public async Task PreservesIncludes_OnOwnMethodAndProperty_NoIncl2()
+    public async Task PassesIncludes_OnOwnMethod_NoIncl2()
     {
         var sourceCode = Preamble +
             /* lang=c# */
             """
 
-                public class PagedResult<T>
+                public class PagedResult<T> : IEnumerable<T>
                 {
-                    [PreservesIncludes]
                     public List<T> Items { get; set; }
+
+                    public IEnumerator<T> GetEnumerator() => Items.GetEnumerator();
+
+                    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+                        => GetEnumerator();
                 }
 
                 static class QueryableExtensions
                 {
-                    [PreservesIncludes(nameof(query))]
+                    [PassesIncludes(nameof(query))]
                     public static PagedResult<User> Paginate(this IQueryable<User> query, int page) => null;
                 }
 
@@ -80,7 +84,7 @@ public class PreservesIncludesTests : NavigationIncludeTestBase
                             .Include(u => u.Profile)
                             .Paginate(1);
 
-                        var user = page.Items[0];
+                        var user = page.First();
                         UpdateUserProfile(user, dto);
                     }
 
@@ -101,7 +105,7 @@ public class PreservesIncludesTests : NavigationIncludeTestBase
     /// called on, the same way an extension method does with the value in front of the dot.
     /// </summary>
     [Fact]
-    public async Task PreservesIncludes_OnInstanceMethodOfOwnCollection_NoIncl2()
+    public async Task PassesIncludes_OnInstanceMethodOfOwnCollection_NoIncl2()
     {
         var sourceCode = Preamble +
             /* lang=c# */
@@ -111,16 +115,16 @@ public class PreservesIncludesTests : NavigationIncludeTestBase
                 {
                     private readonly List<User> items = new();
 
-                    [PreservesIncludes]
+                    [PassesIncludes]
                     public List<User> GetItems() => items;
 
-                    [PreservesIncludes]
+                    [PassesIncludes]
                     public User GetFirst() => items[0];
                 }
 
                 static class QueryableExtensions
                 {
-                    [PreservesIncludes(nameof(query))]
+                    [PassesIncludes(nameof(query))]
                     public static UserBatch ToBatch(this IQueryable<User> query) => null;
                 }
 
@@ -153,21 +157,25 @@ public class PreservesIncludesTests : NavigationIncludeTestBase
     /// still reported through them.
     /// </summary>
     [Fact]
-    public async Task PreservesIncludes_OverNonIncludedQuery_ReportsIncl2()
+    public async Task PassesIncludes_OverNonIncludedQuery_ReportsIncl2()
     {
         var sourceCode = Preamble +
             /* lang=c# */
             """
 
-                public class PagedResult<T>
+                public class PagedResult<T> : IEnumerable<T>
                 {
-                    [PreservesIncludes]
                     public List<T> Items { get; set; }
+
+                    public IEnumerator<T> GetEnumerator() => Items.GetEnumerator();
+
+                    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+                        => GetEnumerator();
                 }
 
                 static class QueryableExtensions
                 {
-                    [PreservesIncludes(nameof(query))]
+                    [PassesIncludes(nameof(query))]
                     public static PagedResult<User> Paginate(this IQueryable<User> query, int page) => null;
                 }
 
@@ -177,7 +185,7 @@ public class PreservesIncludesTests : NavigationIncludeTestBase
                     {
                         var page = dbContext.Users.Paginate(1);
 
-                        var user = page.Items[0];
+                        var user = page.First();
                         {|INCL002:UpdateUserProfile(user, dto)|};
                     }
 
@@ -198,19 +206,23 @@ public class PreservesIncludesTests : NavigationIncludeTestBase
     /// describe a library the project does not own.
     /// </summary>
     [Fact]
-    public async Task PreservesIncludes_DeclaredOnAssembly_NoIncl2()
+    public async Task PassesIncludes_DeclaredOnAssembly_NoIncl2()
     {
         var sourceCode = PreambleWithAssemblyAttributes(
             """
-            [assembly: PreservesIncludes(typeof(TestApplication.QueryableExtensions), "Paginate", "query")]
-            [assembly: PreservesIncludes(typeof(TestApplication.PagedResult<>), "Items")]
+            [assembly: PassesIncludes(typeof(TestApplication.QueryableExtensions), "Paginate", "query")]
             """) +
             /* lang=c# */
             """
 
-                public class PagedResult<T>
+                public class PagedResult<T> : IEnumerable<T>
                 {
                     public List<T> Items { get; set; }
+
+                    public IEnumerator<T> GetEnumerator() => Items.GetEnumerator();
+
+                    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+                        => GetEnumerator();
                 }
 
                 static class QueryableExtensions
@@ -226,7 +238,7 @@ public class PreservesIncludesTests : NavigationIncludeTestBase
                             .Include(u => u.Profile)
                             .Paginate(1);
 
-                        var user = page.Items[0];
+                        var user = page.First();
                         UpdateUserProfile(user, dto);
                     }
 
@@ -291,7 +303,7 @@ public class PreservesIncludesTests : NavigationIncludeTestBase
     {
         var sourceCode = PreambleWithAssemblyAttributes(
             """
-            [assembly: {|INCL005:PreservesIncludes(typeof(TestApplication.QueryableExtensions), "Paginated")|}]
+            [assembly: {|INCL005:PassesIncludes(typeof(TestApplication.QueryableExtensions), "Paginated")|}]
             """) +
             /* lang=c# */
             """
@@ -314,7 +326,7 @@ public class PreservesIncludesTests : NavigationIncludeTestBase
     {
         var sourceCode = PreambleWithAssemblyAttributes(
             """
-            [assembly: {|INCL005:PreservesIncludes(typeof(TestApplication.QueryableExtensions), "Paginate", "source")|}]
+            [assembly: {|INCL005:PassesIncludes(typeof(TestApplication.QueryableExtensions), "Paginate", "source")|}]
             """) +
             /* lang=c# */
             """

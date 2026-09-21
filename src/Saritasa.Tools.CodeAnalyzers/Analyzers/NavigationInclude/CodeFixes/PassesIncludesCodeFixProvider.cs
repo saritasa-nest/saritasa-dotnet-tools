@@ -10,16 +10,16 @@ using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Services;
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.CodeFixes;
 
 /// <summary>
-/// Offers to declare the member that stopped the search, so that INCL004 can be answered.
+/// Offers to declare the method that stopped the search, so that INCL004 can be answered.
 /// </summary>
 /// <remarks>
-/// The declaration is written on the project's own assembly, which is the only way to describe a member of a
+/// The declaration is written on the project's own assembly, which is the only way to describe a method of a
 /// library the project does not own. It goes into a file of its own, the way Visual Studio keeps suppressions
 /// in "GlobalSuppressions.cs".
 /// </remarks>
-[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(PreservesIncludesCodeFixProvider))]
+[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(PassesIncludesCodeFixProvider))]
 [Shared]
-public sealed class PreservesIncludesCodeFixProvider : CodeFixProvider
+public sealed class PassesIncludesCodeFixProvider : CodeFixProvider
 {
     private const string DeclarationsFileName = "NavigationIncludes.cs";
 
@@ -39,9 +39,9 @@ public sealed class PreservesIncludesCodeFixProvider : CodeFixProvider
         foreach (var diagnostic in context.Diagnostics)
         {
             if (!diagnostic.Properties.TryGetValue(UnreadableMember.TypeKey, out var typeName) ||
-                !diagnostic.Properties.TryGetValue(UnreadableMember.MemberKey, out var memberName) ||
+                !diagnostic.Properties.TryGetValue(UnreadableMember.MethodKey, out var methodName) ||
                 string.IsNullOrEmpty(typeName) ||
-                string.IsNullOrEmpty(memberName))
+                string.IsNullOrEmpty(methodName))
             {
                 continue;
             }
@@ -49,8 +49,8 @@ public sealed class PreservesIncludesCodeFixProvider : CodeFixProvider
             diagnostic.Properties.TryGetValue(UnreadableMember.ParameterKey, out var parameterName);
 
             var title = string.IsNullOrEmpty(parameterName)
-                ? $"Mark {memberName} as handing back the entities it holds"
-                : $"Mark {memberName} as handing back the entities of '{parameterName}'";
+                ? $"Mark {methodName} as handing back the entities it holds"
+                : $"Mark {methodName} as handing back the entities of '{parameterName}'";
 
             context.RegisterCodeFix(
                 CodeAction.Create(
@@ -58,10 +58,10 @@ public sealed class PreservesIncludesCodeFixProvider : CodeFixProvider
                     cancellationToken => AddDeclarationAsync(
                         context.Document.Project,
                         typeName!,
-                        memberName!,
+                        methodName!,
                         parameterName,
                         cancellationToken),
-                    equivalenceKey: typeName + "." + memberName),
+                    equivalenceKey: typeName + "." + methodName),
                 diagnostic);
         }
 
@@ -74,11 +74,11 @@ public sealed class PreservesIncludesCodeFixProvider : CodeFixProvider
     private static async Task<Solution> AddDeclarationAsync(
         Project project,
         string typeName,
-        string memberName,
+        string methodName,
         string? parameterName,
         CancellationToken cancellationToken)
     {
-        var declaration = BuildDeclaration(typeName, memberName, parameterName);
+        var declaration = BuildDeclaration(typeName, methodName, parameterName);
         var existing = FindDeclarationsDocument(project);
 
         if (existing is null)
@@ -114,18 +114,18 @@ public sealed class PreservesIncludesCodeFixProvider : CodeFixProvider
 
     /// <summary>
     /// Builds the assembly attribute line, e.g.
-    /// <c>[assembly: PreservesIncludes(typeof(SomeLib.Ext), "Paginate", "query")]</c>.
+    /// <c>[assembly: PassesIncludes(typeof(SomeLib.Ext), "Paginate", "query")]</c>.
     /// </summary>
-    private static string BuildDeclaration(string typeName, string memberName, string? parameterName)
+    private static string BuildDeclaration(string typeName, string methodName, string? parameterName)
     {
-        var arguments = "typeof(" + typeName + "), \"" + memberName + "\"";
+        var arguments = "typeof(" + typeName + "), \"" + methodName + "\"";
 
         if (!string.IsNullOrEmpty(parameterName))
         {
             arguments += ", \"" + parameterName + "\"";
         }
 
-        return "[assembly: PreservesIncludes(" + arguments + ")]";
+        return "[assembly: PassesIncludes(" + arguments + ")]";
     }
 
     /// <summary>

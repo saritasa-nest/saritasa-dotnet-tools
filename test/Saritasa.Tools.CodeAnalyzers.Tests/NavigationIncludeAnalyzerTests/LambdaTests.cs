@@ -87,6 +87,7 @@ public class LambdaTests : NavigationIncludeTestBase
 
                 static class EnumerableExtensions
                 {
+                    [PassesIncludes(ToLambda = nameof(action))]
                     public static void ForEachItem<T>(this IEnumerable<T> items, Action<T> action)
                     {
                         foreach (var item in items)

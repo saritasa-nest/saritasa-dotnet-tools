@@ -25,12 +25,12 @@ public sealed class NavigationIncludeAnalyzer : DiagnosticAnalyzer
         // INCL001 for direct access (user.Profile): one operation is enough.
         context.RegisterOperationAction(PropertyReferenceHandler.Analyze, OperationKind.PropertyReference);
 
-        // INCL005: an [assembly: PreservesIncludes] that names nothing.
+        // INCL005: an [assembly: PassesIncludes] that names nothing.
         context.RegisterSyntaxNodeAction(DeclarationHandler.Analyze, SyntaxKind.Attribute);
 
         context.RegisterCompilationStartAction(compilationStart =>
         {
-            // Reading [PreservesIncludes] out of every referenced assembly is the expensive part, so it is
+            // Reading [PassesIncludes] out of every referenced assembly is the expensive part, so it is
             // done once here and handed to every method body of the compilation.
             var declarations = IncludeDeclarations.Read(compilationStart.Compilation);
 

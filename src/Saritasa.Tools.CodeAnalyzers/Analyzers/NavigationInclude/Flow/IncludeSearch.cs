@@ -12,7 +12,7 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Flow;
 /// from another value it reads that one too, the way a person reads code backwards. Reading a variable is the
 /// only case it cannot do alone: it asks the <see cref="Walker"/> and decides what the writes mean. When
 /// several paths lead to the same place, every one of them must be loaded.
-/// To teach the search a new member, declare it with [PreservesIncludes] rather than adding a case here.
+/// To teach the search a new method, declare it with [PassesIncludes] rather than adding a case here.
 /// </remarks>
 internal sealed class IncludeSearch
 {
@@ -72,18 +72,20 @@ internal sealed class IncludeSearch
 
             // A move that keeps the same entities: "query.Where(...)", "users.ToList()", "users[0]",
             // "page.Items", "query.Paginate(1)". It says which value they came from.
-            _ when Transformation.FindSource(value) is { } source
+            _ when Bridge.FindSource(value) is { } source
                 => Search(source, value.Position),
 
             // A call nobody declared. In our own code that is a real answer: the method promises nothing with
-            // [Includes] or [PreservesIncludes], so nothing loads the property. In someone else's code we
+            // [Includes] or [PassesIncludes], so nothing loads the property. In someone else's code we
             // simply cannot see.
             IInvocationOperation call
                 => IsOurOwnCode(call.TargetMethod, value.Position) ? Answer.NotLoaded : Answer.Unknown(),
 
-            // "new User()": it was just made, so nothing is loaded on it.
-            IObjectCreationOperation
-                => Answer.NotLoaded,
+            // "new User()": a fresh entity definitely has nothing loaded on it. "new List<User>()" is a
+            // different claim: a fresh container says nothing about what is put into it later, and the analyzer
+            // does not follow mutation, so the honest answer there is that we cannot tell.
+            IObjectCreationOperation creation
+                => IsContainer(creation.Type) ? Answer.Unknown() : Answer.NotLoaded,
 
             // "dbContext.Users": the query starts here and no Include was put on it.
             IPropertyReferenceOperation reference when IsEntitySet(reference.Property.Type)
@@ -155,7 +157,7 @@ internal sealed class IncludeSearch
     /// anything into the out argument, so we cannot tell.
     /// </summary>
     private Answer ReadOutArgumentCall(Value call)
-        => Transformation.FindSource(call) is { } source
+        => Bridge.FindSource(call) is { } source
             ? Search(source, call.Position)
             : Answer.Unknown();
 
@@ -164,7 +166,9 @@ internal sealed class IncludeSearch
     /// else ("Select((u, i) =&gt; ...)") or a lambda of a method we cannot read, we cannot tell what it holds.
     /// </summary>
     private Answer ReadLambdaSource(Write.LambdaParameter lambda)
-        => Search(Transformation.FindSource(lambda.Lambda, lambda.Parameter.Ordinal), lambda.Creation);
+        => Search(
+            Bridge.FindSource(lambda.Lambda, lambda.Parameter.Ordinal, lambda.Creation.FlowGraph.Declarations),
+            lambda.Creation);
 
     /// <summary>
     /// True if the parameter's method asks for the property with [IncludeRequired], which makes the caller of
@@ -190,6 +194,17 @@ internal sealed class IncludeSearch
         => SymbolEqualityComparer.Default.Equals(
             method.ContainingAssembly,
             position.FlowGraph.Method.ContainingAssembly);
+
+    /// <summary>
+    /// True for a type that holds other objects, such as "List&lt;User&gt;". A fresh one says nothing about
+    /// what is put into it afterwards, while a fresh entity definitely has nothing loaded.
+    /// </summary>
+    private static bool IsContainer(ITypeSymbol? type)
+        => type is not null &&
+           type.SpecialType != SpecialType.System_String &&
+           (type.SpecialType == SpecialType.System_Collections_IEnumerable ||
+            type.AllInterfaces.Any(implemented =>
+                implemented.SpecialType == SpecialType.System_Collections_IEnumerable));
 
     /// <summary>
     /// True for the "DbSet&lt;User&gt;" of a context property, where a query starts.

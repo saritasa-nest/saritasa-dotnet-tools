@@ -72,7 +72,7 @@ by `PropertyReferenceHandler` alone. The rest of this document is about the othe
 Two more results come out of the search itself. **INCL004** means *the analyzer could not read the code far
 enough to decide*; it is a warning with a code fix, see
 [When the analyzer cannot read the code](#when-the-analyzer-cannot-read-the-code). **INCL005** is about the
-declarations themselves: an `[assembly: PreservesIncludes]` that names a member which does not exist.
+declarations themselves: an `[assembly: PassesIncludes]` that names a member which does not exist.
 
 ## How it works: one idea, two jobs
 
@@ -103,7 +103,7 @@ statements connected by arrows — so the analyzer needs no special code for `if
 | **Value** | a place where entities sit: a variable, a parameter, an argument or the result of an expression, together with the position in the code where it is read | `Flow/Value.cs` |
 | **Answer** | what the search decided: `Loaded`, `NotLoaded` or `Unknown` | `Flow/Answer.cs` |
 | **Write** | one thing found above a variable: `Written`, `MemberWritten`, `OutArgument`, `MethodParameter`, `LambdaParameter`, `NothingNew`, `NeverWritten`, `Unreadable` | `Flow/Write.cs` |
-| **Transformation** | a move from one value to another that keeps the same entities: `Where`, `ToList`, `page.Items`, an indexer | `Flow/Transformation.cs` |
+| **Bridge** | a move from one value to another that keeps the same entities: `Where`, `ToList`, `page.Items`, an indexer | `Flow/Bridge.cs` |
 
 A value is a question and an answer is a decision, and the code never mixes the two. A write is a fact about the
 code and never a decision.
@@ -325,8 +325,8 @@ One value can be a whole chain. Here every kind of step appears once:
 `Paginate` is a library method, declared once for the solution, and `Items` is its property:
 
 ```csharp
-[assembly: PreservesIncludes(typeof(SomeLib.QueryExtensions), "Paginate", "query")]
-[assembly: PreservesIncludes(typeof(SomeLib.PagedResult<>), "Items")]
+[assembly: PassesIncludes(typeof(SomeLib.QueryExtensions), "Paginate", "query")]
+[assembly: PassesIncludes(typeof(SomeLib.PagedResult<>), "Items")]
 ```
 
 ```text
@@ -366,14 +366,14 @@ line 4, with a code fix that writes that declaration.
 
 ### `IncludeDeclarations`: the only place that decides what is followed
 
-A method or a property is followed **only if it is declared** with `[PreservesIncludes]`. There is no guessing
+A method or a property is followed **only if it is declared** with `[PassesIncludes]`. There is no guessing
 from types and no special code for `System.Linq` or EF Core. A declaration comes from one of three places, and
 all of them are used the same way:
 
 | Where | Example |
 |---|---|
-| on the member itself | `[PreservesIncludes(nameof(query))] PagedResult<User> Paginate(IQueryable<User> query)` |
-| on an assembly: the project or anything it references | `[assembly: PreservesIncludes(typeof(SomeLib.Ext), "Paginate")]` |
+| on the member itself | `[PassesIncludes(nameof(query))] PagedResult<User> Paginate(IQueryable<User> query)` |
+| on an assembly: the project or anything it references | `[assembly: PassesIncludes(typeof(SomeLib.Ext), "Paginate")]` |
 | built into the analyzer | `Where`, `ToListAsync`, `Include`, `GetEnumerator`, `Current`, `TryGetValue`, indexers, … |
 
 The built-in list is in `IncludeDeclarations.cs`. It names types by string, so the analyzer does not depend on
@@ -383,7 +383,7 @@ covers every class that implements it, so `IEnumerable<T>.GetEnumerator` covers 
 
 `Select` and `SelectMany` are **not** declared. They make new objects, so their result has no includes.
 
-### `Transformation`: may the entities move, and where from?
+### `Bridge`: may the entities move, and where from?
 
 Every step that is not an `Include` and not a variable asks this one question, and the answer is the value on
 the other side of the move. The shape of the move does not matter:
@@ -513,21 +513,21 @@ var user = page.Items[0];       // a library property: nobody declared it
 
 For a library, the analyzer reports **INCL004**: it cannot read the code. For a method in the project's own
 code it reports **INCL002** instead, because that method can be read and it promises nothing. In both cases the
-fix is `[PreservesIncludes]`, which means "this member returns the entities that it was given":
+fix is `[PassesIncludes]`, which means "this member returns the entities that it was given":
 
 ```csharp
-[PreservesIncludes(nameof(query))]                      // on a method: names the parameter
+[PassesIncludes(nameof(query))]                      // on a method: names the parameter
 public PagedResult<User> Paginate(IQueryable<User> query, int page)
 
-[PreservesIncludes]                                     // on a property: the object it belongs to
+[PassesIncludes]                                     // on a property: the object it belongs to
 public List<T> Items { get; set; }
 ```
 
 For a library the project does not own, the attribute goes on the assembly, before the namespace:
 
 ```csharp
-[assembly: PreservesIncludes(typeof(SomeLib.QueryExtensions), "Paginate", "query")]
-[assembly: PreservesIncludes(typeof(SomeLib.PagedResult<>), "Items")]
+[assembly: PassesIncludes(typeof(SomeLib.QueryExtensions), "Paginate", "query")]
+[assembly: PassesIncludes(typeof(SomeLib.PagedResult<>), "Items")]
 ```
 
 Assembly attributes are read from the project itself and from every project and package it references, so a
@@ -547,22 +547,22 @@ search continues from there.
 |---|---|
 | `NavigationIncludeAnalyzer.cs` | Registers the three handlers in Roslyn. |
 | `Handlers/IncludeFlowHandler.cs` | Finds the places to check, calls `Check`, reports INCL001 – INCL004. |
-| `Handlers/DeclarationHandler.cs` | INCL005: an `[assembly: PreservesIncludes]` that names nothing. |
+| `Handlers/DeclarationHandler.cs` | INCL005: an `[assembly: PassesIncludes]` that names nothing. |
 | `Handlers/PropertyReferenceHandler.cs` | INCL001 for direct `param.Profile` access, without flow analysis. |
 | `Flow/IncludeSearch.cs` | The only class that decides. `Check`: reads a value, asks the Walker, joins the paths. |
 | `Flow/Value.cs` | What the search looks at: an expression and the position it is read at. |
 | `Flow/Answer.cs` | What the search decided: `Loaded` / `NotLoaded` / `Unknown`. |
 | `Flow/Walker.cs` | Where a variable was written: the backward walk through statements, blocks and bodies. |
 | `Flow/Write.cs` | One thing the Walker found. A fact about the code, never a decision. |
-| `Flow/Transformation.cs` | May the entities move out of this value, and which value did they come from. The only file that reads declarations. |
+| `Flow/Bridge.cs` | May the entities move out of this value, and which value did they come from. The only file that reads declarations. |
 | `Flow/LambdaSource.cs` | Which collection a lambda parameter is filled from. |
 | `Flow/CodePosition.cs` | A point in execution: graph + block + number of statements already run. |
 | `Flow/FlowGraph.cs` | One body and its control flow graph. Lists its statements, lambdas and local functions included. |
 | `Flow/EfIncludes.cs` | The only rule that knows EF: reads the property name from `Include(u => u.Profile)`. |
 | `Flow/RoslynHelper.cs` | Roslyn details with no meaning of their own: wrappers, the receiver of a call, the types inside a type, a delegate parameter. |
-| `Services/IncludeDeclarations.cs` | All `[PreservesIncludes]` the compilation can see, the built-in ones included. The only place that decides what is followed. |
+| `Services/IncludeDeclarations.cs` | All `[PassesIncludes]` the compilation can see, the built-in ones included. The only place that decides what is followed. |
 | `Services/UnreadableMember.cs` | The member that stopped the search. INCL004 carries it for the code fix. |
 | `Services/AttributeHelper.cs` | Reads `[IncludeRequired]`, `[Includes]` and `[TrackIncludeRequired]` from symbols. |
 | `Services/NavigationIncludeRulesProvider.cs` | The diagnostic descriptors and their ids. |
-| `CodeFixes/PreservesIncludesCodeFixProvider.cs` | The code fix for INCL004: writes a `[PreservesIncludes]` declaration. |
+| `CodeFixes/PassesIncludesCodeFixProvider.cs` | The code fix for INCL004: writes a `[PassesIncludes]` declaration. |
 | `Entities/IncludeRequirement.cs` | One `[IncludeRequired(parameter, property)]` pair. |

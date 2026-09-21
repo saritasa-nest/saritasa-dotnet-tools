@@ -7,9 +7,9 @@ using Xunit;
 namespace Saritasa.Tools.CodeAnalyzers.Tests.NavigationIncludeAnalyzerTests;
 
 /// <summary>
-/// Tests for <see cref="PreservesIncludesCodeFixProvider"/>.
+/// Tests for <see cref="PassesIncludesCodeFixProvider"/>.
 /// </summary>
-public class PreservesIncludesCodeFixTests : NavigationIncludeTestBase
+public class PassesIncludesCodeFixTests : NavigationIncludeTestBase
 {
     private const string Source =
         /* lang=c# */
@@ -40,24 +40,13 @@ public class PreservesIncludesCodeFixTests : NavigationIncludeTestBase
                 public UserProfile Profile { get; set; }
             }
 
-            public class PagedResult<T>
-            {
-                public List<T> Items { get; set; }
-            }
-
-            public static class QueryableExtensions
-            {
-                // Declared already, so the only thing left for the fix to add is the property.
-                [PreservesIncludes(nameof(query))]
-                public static PagedResult<User> Paginate(this IQueryable<User> query, int page) => null;
-            }
-
             class TestClass(AppDbContext dbContext)
             {
                 void Handle()
                 {
-                    var page = dbContext.Users.Include(u => u.Profile).Paginate(1);
-                    var user = page.Items[0];
+                    // Enumerable.Chunk is not in the built-in list, so the search cannot read past it.
+                    var batches = dbContext.Users.Include(u => u.Profile).ToList().Chunk(10);
+                    var user = batches.First()[0];
                     {|INCL004:UpdateUserProfile(user)|};
                 }
 
@@ -71,21 +60,21 @@ public class PreservesIncludesCodeFixTests : NavigationIncludeTestBase
         """;
 
     /// <summary>
-    /// The fix writes the declaration for the member that stopped the search into a new file, the way Visual
+    /// The fix writes the declaration for the method that stopped the search into a new file, the way Visual
     /// Studio keeps suppressions in a file of their own.
     /// </summary>
     [Fact]
-    public async Task CannotCheck_OverUnreadableProperty_AddsDeclarationFile()
+    public async Task CannotCheck_OverUndeclaredMethod_AddsDeclarationFile()
     {
         const string expectedFile =
             /* lang=c# */
             """
             using Saritasa.Tools.CodeAnalyzers.Abstractions.NavigationInclude.Attributes;
 
-            [assembly: PreservesIncludes(typeof(TestApplication.PagedResult<>), "Items")]
+            [assembly: PassesIncludes(typeof(System.Linq.Enumerable), "Chunk", "source")]
             """;
 
-        var test = new CSharpCodeFixTest<NavigationIncludeAnalyzer, PreservesIncludesCodeFixProvider, DefaultVerifier>
+        var test = new CSharpCodeFixTest<NavigationIncludeAnalyzer, PassesIncludesCodeFixProvider, DefaultVerifier>
         {
             ReferenceAssemblies = References,
             TestCode = Source,

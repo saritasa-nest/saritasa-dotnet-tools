@@ -16,9 +16,9 @@ internal static class UnreadableMember
     public const string TypeKey = "UnreadableType";
 
     /// <summary>
-    /// Key of the member name on the diagnostic.
+    /// Key of the method name on the diagnostic.
     /// </summary>
-    public const string MemberKey = "UnreadableMember";
+    public const string MethodKey = "UnreadableMethod";
 
     /// <summary>
     /// Key of the parameter the entities would come from, empty for a property or an instance method.
@@ -43,22 +43,23 @@ internal static class UnreadableMember
     }
 
     /// <summary>
-    /// Returns what the code fix needs to write a declaration for the member, and an empty set when the search
-    /// stopped at something no declaration can describe.
+    /// Returns what the code fix needs to write a declaration for the method, and an empty set when the search
+    /// stopped at something no declaration can describe, such as a property.
     /// </summary>
     /// <param name="unknownSource">The value the search could not read.</param>
     /// <returns>Properties for the code fix.</returns>
     public static ImmutableDictionary<string, string?> GetProperties(IOperation? unknownSource)
     {
-        if (FindMember(unknownSource) is not { ContainingType: { } containingType } member)
+        // Only a method can be declared, so a search that stopped at a property offers no fix.
+        if (FindMember(unknownSource) is not IMethodSymbol { ContainingType: { } containingType } method)
         {
             return ImmutableDictionary<string, string?>.Empty;
         }
 
         return ImmutableDictionary<string, string?>.Empty
             .Add(TypeKey, GetUnboundTypeName(containingType))
-            .Add(MemberKey, member.Name)
-            .Add(ParameterKey, GetSourceParameterName(member));
+            .Add(MethodKey, method.Name)
+            .Add(ParameterKey, GetSourceParameterName(method));
     }
 
     /// <summary>
@@ -94,8 +95,8 @@ internal static class UnreadableMember
     /// The parameter a declaration would name. An extension method takes its source as the first parameter;
     /// anything else takes it from the object it is called on, which a declaration writes as no parameter.
     /// </summary>
-    private static string GetSourceParameterName(ISymbol member)
-        => member is IMethodSymbol { IsExtensionMethod: true } method && method.Parameters.Length > 0
+    private static string GetSourceParameterName(IMethodSymbol method)
+        => method is { IsExtensionMethod: true, Parameters.Length: > 0 }
             ? method.Parameters[0].Name
             : string.Empty;
 }

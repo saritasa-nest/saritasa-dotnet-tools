@@ -8,12 +8,12 @@ using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Services;
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Handlers;
 
 /// <summary>
-/// Reports INCL005 when an <c>[assembly: PreservesIncludes]</c> names a member or a parameter that does not exist.
+/// Reports INCL005 when an <c>[assembly: PassesIncludes]</c> names a method or a parameter that does not exist.
 /// </summary>
 /// <remarks>
-/// Declarations are the only way the search learns that a member passes entities on, so a broken one does not
-/// fail loudly: the member is simply not followed any more. That happens quietly after a library renames a
-/// method, which is why it is reported. A declaration written on the member itself cannot go wrong this way,
+/// Declarations are the only way the search learns that a method passes entities on, so a broken one does not
+/// fail loudly: the method is simply not followed any more. That happens quietly after a library renames a
+/// method, which is why it is reported. A declaration written on the method itself cannot go wrong this way,
 /// since it names its parameter with nameof.
 /// </remarks>
 internal static class DeclarationHandler
@@ -27,14 +27,14 @@ internal static class DeclarationHandler
         var attribute = (AttributeSyntax)context.Node;
 
         if (!IsOnAssembly(attribute) ||
-            !IsPreservesIncludes(attribute, context) ||
-            ReadNamedMember(attribute, context) is not { } named ||
-            NamedMemberExists(named.Type, named.Member, named.Parameter))
+            !IsPassesIncludes(attribute, context) ||
+            ReadNamedMethod(attribute, context) is not { } named ||
+            NamedMethodExists(named.Type, named.Method, named.Parameter))
         {
             return;
         }
 
-        var description = named.Type.ToDisplayString() + "." + named.Member +
+        var description = named.Type.ToDisplayString() + "." + named.Method +
                           (string.IsNullOrEmpty(named.Parameter) ? string.Empty : "(" + named.Parameter + ")");
 
         context.ReportDiagnostic(Diagnostic.Create(
@@ -45,24 +45,24 @@ internal static class DeclarationHandler
     }
 
     /// <summary>
-    /// True for an attribute written as <c>[assembly: ...]</c>. Only those name someone else's member by string.
+    /// True for an attribute written as <c>[assembly: ...]</c>. Only those name someone else's method by string.
     /// </summary>
     private static bool IsOnAssembly(AttributeSyntax attribute)
         => attribute.Parent is AttributeListSyntax { Target.Identifier.RawKind: (int)SyntaxKind.AssemblyKeyword };
 
     /// <summary>
-    /// True if the attribute is [PreservesIncludes], and not some other assembly attribute.
+    /// True if the attribute is [PassesIncludes], and not some other assembly attribute.
     /// </summary>
-    private static bool IsPreservesIncludes(AttributeSyntax attribute, SyntaxNodeAnalysisContext context)
+    private static bool IsPassesIncludes(AttributeSyntax attribute, SyntaxNodeAnalysisContext context)
         => context.SemanticModel.GetSymbolInfo(attribute, context.CancellationToken).Symbol is IMethodSymbol constructor &&
-           constructor.ContainingType.Name == nameof(PreservesIncludesAttribute);
+           constructor.ContainingType.Name == nameof(PassesIncludesAttribute);
 
     /// <summary>
     /// Reads what the declaration names, e.g. (QueryExtensions, "Paginate", "query") from
-    /// <c>[assembly: PreservesIncludes(typeof(QueryExtensions), "Paginate", "query")]</c>. Null when the attribute
+    /// <c>[assembly: PassesIncludes(typeof(QueryExtensions), "Paginate", "query")]</c>. Null when the attribute
     /// is not written in that form, for example while it is still being typed.
     /// </summary>
-    private static (INamedTypeSymbol Type, string Member, string? Parameter)? ReadNamedMember(
+    private static (INamedTypeSymbol Type, string Method, string? Parameter)? ReadNamedMethod(
         AttributeSyntax attribute,
         SyntaxNodeAnalysisContext context)
     {
@@ -73,15 +73,15 @@ internal static class DeclarationHandler
         }
 
         var type = GetTypeOfArgument(context, arguments[0]);
-        var member = GetString(context, arguments[1]);
-        if (type is null || member is null)
+        var method = GetString(context, arguments[1]);
+        if (type is null || method is null)
         {
             return null;
         }
 
         var parameter = arguments.Count > 2 ? GetString(context, arguments[2]) : null;
 
-        return (type, member, parameter);
+        return (type, method, parameter);
     }
 
     /// <summary>
@@ -93,27 +93,26 @@ internal static class DeclarationHandler
             : null;
 
     /// <summary>
-    /// True if the type has the member and, when a parameter is named, a method with that name has it.
+    /// True if the type has the method and, when a parameter is named, a method with that name has it.
     /// </summary>
-    private static bool NamedMemberExists(INamedTypeSymbol type, string member, string? parameter)
+    private static bool NamedMethodExists(INamedTypeSymbol type, string method, string? parameter)
     {
-        var members = FindMembers(type, member).ToList();
+        var candidates = FindMethods(type, method).ToList();
 
         if (string.IsNullOrEmpty(parameter))
         {
-            return members.Count > 0;
+            return candidates.Count > 0;
         }
 
-        return members
-            .OfType<IMethodSymbol>()
-            .Any(method => method.Parameters.Any(candidate => candidate.Name == parameter));
+        return candidates.Any(candidate =>
+            candidate.Parameters.Any(parameter1 => parameter1.Name == parameter));
     }
 
     /// <summary>
-    /// Members with the name on the type, on its base types and on its interfaces, the same places a declaration
-    /// is matched against. An indexer can be named "this[]" or "Item".
+    /// Methods with the name on the type, on its base types and on its interfaces, the same places a declaration
+    /// is matched against. Only methods, because a declaration cannot describe a property.
     /// </summary>
-    private static IEnumerable<ISymbol> FindMembers(INamedTypeSymbol type, string memberName)
+    private static IEnumerable<IMethodSymbol> FindMethods(INamedTypeSymbol type, string methodName)
     {
         // "typeof(PagedResult<>)" is an unbound generic type, which has no members of its own; its definition has.
         type = type.OriginalDefinition;
@@ -128,7 +127,8 @@ internal static class DeclarationHandler
 
         return types
             .SelectMany(candidate => candidate.GetMembers())
-            .Where(member => member.Name == memberName || member.MetadataName == memberName);
+            .OfType<IMethodSymbol>()
+            .Where(candidate => candidate.Name == methodName || candidate.MetadataName == methodName);
     }
 
     private static string? GetString(SyntaxNodeAnalysisContext context, AttributeArgumentSyntax argument)

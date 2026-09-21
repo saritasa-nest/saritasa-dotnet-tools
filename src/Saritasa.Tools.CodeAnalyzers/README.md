@@ -30,7 +30,7 @@ If your project uses a [global package reference](https://learn.microsoft.com/en
 | [INCL002](#incl002-local-variable-missing-include) | Local variable does not set the required navigation property | Warning | Usage |
 | [INCL003](#incl003-includes-promise-not-fulfilled) | Method declares [Includes] but return value does not load the required navigation property | Warning | Usage |
 | [INCL004](#incl004-cannot-check-navigation-property) | Cannot check whether the navigation property is loaded | Warning | Usage |
-| [INCL005](#incl005-preservesincludes-names-nothing) | [PreservesIncludes] names a member that does not exist | Warning | Usage |
+| [INCL005](#incl005-preservesincludes-names-nothing) | [PassesIncludes] names a member that does not exist | Warning | Usage |
 
 ---
 
@@ -261,7 +261,7 @@ Four attributes control which navigation properties are tracked and how inclusio
 | `[TrackIncludeRequired]` | Property | Marks a navigation property as requiring explicit loading. Only properties with this attribute are checked by INCL rules. |
 | `[IncludeRequired("param", "Property")]` | Method | Declares that the named parameter must have the named property loaded before the method is called. Repeatable. |
 | `[Includes("Property")]` | Method | Promises that the method's return value has the named property loaded. Repeatable. Set `Verify = false` to skip the INCL003 check of the method body. |
-| `[PreservesIncludes]` | Method, property, assembly | Says that the member returns the entities it was given, so their includes are kept. On a method, name the parameter the entities come from: `[PreservesIncludes(nameof(query))]`. For a library, put it on your assembly: `[assembly: PreservesIncludes(typeof(Lib.Ext), "Paginate", "query")]`. `System.Linq`, EF Core and the collection types are declared already. |
+| `[PassesIncludes]` | Method, property, assembly | Says that the member returns the entities it was given, so their includes are kept. On a method, name the parameter the entities come from: `[PassesIncludes(nameof(query))]`. For a library, put it on your assembly: `[assembly: PassesIncludes(typeof(Lib.Ext), "Paginate", "query")]`. `System.Linq`, EF Core and the collection types are declared already. |
 
 Example model used in the sections below:
 
@@ -548,7 +548,7 @@ Task<User> GetUser(int id)
 
 ### INCL004: Cannot check navigation property
 
-Triggered when the analyzer follows a value back to the query it came from and meets a method or property of another library that it does not know. The analyzer follows only members declared with `[PreservesIncludes]`; `System.Linq`, EF Core and the collection types are declared already.
+Triggered when the analyzer follows a value back to the query it came from and meets a method or property of another library that it does not know. The analyzer follows only members declared with `[PassesIncludes]`; `System.Linq`, EF Core and the collection types are declared already.
 
 #### Code causing a warning
 
@@ -569,32 +569,32 @@ async Task Handle(SaveUserDto dto)
 The code fix adds the declarations to `NavigationIncludes.cs` in the project:
 
 ```csharp
-[assembly: PreservesIncludes(typeof(SomeLib.QueryExtensions), "Paginate", "query")]
-[assembly: PreservesIncludes(typeof(SomeLib.PagedResult<>), "Items")]
+[assembly: PassesIncludes(typeof(SomeLib.QueryExtensions), "Paginate", "query")]
+[assembly: PassesIncludes(typeof(SomeLib.PagedResult<>), "Items")]
 ```
 
 A method in your own project that is not declared gives INCL002 instead, because it can be read and promises nothing. Declare it on the method itself:
 
 ```csharp
-[PreservesIncludes(nameof(query))]
+[PassesIncludes(nameof(query))]
 public static IQueryable<User> OnlyActive(this IQueryable<User> query) => query.Where(u => u.IsActive);
 ```
 
 ---
 
-### INCL005: \[PreservesIncludes\] names nothing
+### INCL005: \[PassesIncludes\] names nothing
 
-Triggered when an assembly-level `[PreservesIncludes]` names a member or a parameter that does not exist, for example after a library renamed a method. Such a declaration has no effect, so the analyzer would silently stop following the member.
+Triggered when an assembly-level `[PassesIncludes]` names a member or a parameter that does not exist, for example after a library renamed a method. Such a declaration has no effect, so the analyzer would silently stop following the member.
 
 #### Code causing a warning
 
 ```csharp
 // INCL005: SomeLib.QueryExtensions has no member "Paginated".
-[assembly: PreservesIncludes(typeof(SomeLib.QueryExtensions), "Paginated", "query")]
+[assembly: PassesIncludes(typeof(SomeLib.QueryExtensions), "Paginated", "query")]
 ```
 
 #### Fixed
 
 ```csharp
-[assembly: PreservesIncludes(typeof(SomeLib.QueryExtensions), "Paginate", "query")]
+[assembly: PassesIncludes(typeof(SomeLib.QueryExtensions), "Paginate", "query")]
 ```
