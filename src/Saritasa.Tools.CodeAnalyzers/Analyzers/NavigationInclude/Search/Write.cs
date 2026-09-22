@@ -21,23 +21,16 @@ internal abstract class Write
         /// <summary>
         /// Initializes the write.
         /// </summary>
-        /// <param name="value">The value the variable got.</param>
+        /// <param name="value">The value that was assigned.</param>
         public Written(Value value)
         {
             Value = value;
         }
 
         /// <summary>
-        /// The value the variable got.
+        /// The value that was assigned.
         /// </summary>
         public Value Value { get; }
-    }
-
-    /// <summary>
-    /// "user.Profile = x": the navigation property the search looks for was written on the variable itself.
-    /// </summary>
-    public sealed class MemberWritten : Write
-    {
     }
 
     /// <summary>

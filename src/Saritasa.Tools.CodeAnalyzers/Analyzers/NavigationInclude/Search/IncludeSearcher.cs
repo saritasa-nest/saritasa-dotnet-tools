@@ -23,7 +23,7 @@ internal sealed class IncludeSearcher
     private IncludeSearcher(string property)
     {
         this.property = property;
-        walker = new WritesWalker(property);
+        walker = new WritesWalker();
     }
 
     /// <summary>
@@ -99,7 +99,10 @@ internal sealed class IncludeSearcher
     /// The answer for a variable: every write the walker finds must have the property loaded.
     /// </summary>
     private Answer ReadWrites(object variable, CodePosition position)
-        => JoinPaths(walker.FindWrites(variable, position).Select(ReadWrite));
+        => JoinPaths(
+            walker.FindWrites(variable, position)
+                .Select(ReadWrite)
+            );
 
     /// <summary>
     /// What one write of the walker means for the navigation property.
@@ -109,9 +112,6 @@ internal sealed class IncludeSearcher
         {
             // "user = x": read the value the variable got.
             Write.Written written => Search(written.Value),
-
-            // "user.Profile = x": somebody loaded the property by hand.
-            Write.MemberWritten => Answer.Loaded,
 
             // "dictionary.TryGetValue(id, out var user)".
             Write.OutArgument outArgument => ReadOutArgumentSource(outArgument),

@@ -9,27 +9,18 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Search;
 /// </summary>
 /// <remarks>
 /// The walker reads code and decides nothing: it reports <see cref="Write"/>s, and
-/// <see cref="IncludeSearcher"/> says what they mean. It knows the property name only because
-/// "user.Profile = x" is a write to the variable while any other property is not.
+/// <see cref="IncludeSearcher"/> says what they mean. It has no notion of navigation properties at all —
+/// finding whether an <c>Include</c> happened is <see cref="IncludeSearcher"/>'s job, not the job of tracing
+/// where a variable was written, so a write to a property of the variable (<c>user.Profile = x</c>, whichever
+/// property) is not a write to the variable and says nothing; the walk keeps reading upward past it.
 /// A variable is a local, a parameter or a compiler temporary, see <see cref="GetVariable"/>.
 /// </remarks>
 internal sealed class WritesWalker
 {
-    private readonly string property;
-
     /// <summary>
     /// Blocks already read for a variable. Without this the walk would circle a loop forever.
     /// </summary>
     private readonly HashSet<(BasicBlock Block, object Variable)> visitedBlocks = new();
-
-    /// <summary>
-    /// Initializes the walk.
-    /// </summary>
-    /// <param name="property">Navigation property the search is looking for.</param>
-    public WritesWalker(string property)
-    {
-        this.property = property;
-    }
 
     /// <summary>
     /// Returns the local, parameter or compiler temporary the expression reads; null for anything else.
@@ -96,11 +87,6 @@ internal sealed class WritesWalker
             ISimpleAssignmentOperation assignment when WritesVariable(assignment, variable)
                 => new Write.Written(Value.Create(assignment.Value, statement)),
 
-            // "user.Profile = ..." (the compiler also rewrites "new User { Profile = ... }" into this form).
-            // Another property says nothing, so the walk keeps reading upward.
-            ISimpleAssignmentOperation assignment when WritesPropertyOfVariable(assignment, variable)
-                => new Write.MemberWritten(),
-
             // "#1 = ...": a temporary value the compiler creates for ?:, ??, object initializers and foreach.
             IFlowCaptureOperation capture when AreSame(capture.Id, variable)
                 => new Write.Written(Value.Create(capture.Value, statement)),
@@ -118,14 +104,6 @@ internal sealed class WritesWalker
     /// </summary>
     private static bool WritesVariable(ISimpleAssignmentOperation assignment, object variable)
         => AreSame(GetVariable(assignment.Target), variable);
-
-    /// <summary>
-    /// True for "user.Profile = ...", where the property the search looks for is assigned on the variable.
-    /// </summary>
-    private bool WritesPropertyOfVariable(ISimpleAssignmentOperation assignment, object variable)
-        => assignment.Target is IPropertyReferenceOperation reference &&
-           AreSame(GetVariable(reference.Instance), variable) &&
-           reference.Property.Name == property;
 
     /// <summary>
     /// True for "var (id, user) = pair", where the variable is one of the parts.

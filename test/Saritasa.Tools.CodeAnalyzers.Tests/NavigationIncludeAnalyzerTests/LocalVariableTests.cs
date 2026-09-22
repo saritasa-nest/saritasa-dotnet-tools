@@ -42,6 +42,43 @@ public class LocalVariableTests : NavigationIncludeTestBase
     }
 
     /// <summary>
+    /// INCL002: a navigation property assigned by hand is not a write the search follows. Finding whether an
+    /// Include happened is the analyzer's whole concern, not whether the property currently holds a value, so
+    /// even assigning something that would itself count as loaded — a freshly constructed object — does not
+    /// satisfy the requirement: the walk skips the assignment and keeps looking for how "user" was sourced,
+    /// which here is a query without Include.
+    /// </summary>
+    [Fact]
+    public async Task Handle_MemberAssignedByHand_ReportsIncl2()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task Handle(SaveUserDto dto)
+                    {
+                        var user = await dbContext.Users
+                            .FirstOrDefaultAsync(u => u.Id == dto.Id);
+                        user.Profile = new UserProfile { Timezone = dto.Timezone };
+
+                        // INCL002: the assignment is not followed; the query never Included Profile.
+                        {|INCL002:UpdateUserProfile(user, dto)|};
+                    }
+
+                    [IncludeRequired(nameof(user), nameof(User.Profile))]
+                    void UpdateUserProfile(User user, SaveUserDto dto)
+                    {
+                        user.Profile.Timezone = dto.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
     /// No INCL002: local variable obtained from a query that includes .Include(u => u.Profile).
     /// </summary>
     [Fact]

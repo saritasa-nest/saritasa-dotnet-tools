@@ -102,7 +102,7 @@ statements connected by arrows — so the analyzer needs no special code for `if
 |---|---|---|
 | **Value** | a place where entities sit: a variable, a parameter, an argument or the result of an expression, together with the position in the code where it is read | `Search/Value.cs` |
 | **Answer** | what the search decided: `Loaded`, `NotLoaded` or `Unknown` | `Search/Answer.cs` |
-| **Write** | one thing found above a variable: `Written`, `MemberWritten`, `OutArgument`, `MethodParameter`, `LambdaParameter`, `NothingNew`, `NeverWritten`, `Unreadable` | `Search/Write.cs` |
+| **Write** | one thing found above a variable: `Written`, `OutArgument`, `MethodParameter`, `LambdaParameter`, `NothingNew`, `NeverWritten`, `Unreadable` | `Search/Write.cs` |
 | **Bridge** | a declared move from one value to another that keeps the same entities: `Where`, `ToList`, `page.Items`, an indexer. It has a direction, because the search reads backwards | `Bridging/Bridge.cs` |
 
 A value is a question and an answer is a decision, and the code never mixes the two. A write is a fact about the
@@ -161,7 +161,7 @@ flowchart TD
     VALUE -->|"a variable"| WRITES
 
     WRITES --> MEANS
-    MEANS -->|"MemberWritten<br/>NothingNew<br/>a required parameter"| LOADED
+    MEANS -->|"NothingNew<br/>a required parameter"| LOADED
     MEANS -->|"Written<br/>OutArgument<br/>LambdaParameter"| SOURCE
     MEANS -->|"a plain parameter<br/>NeverWritten"| NOTLOADED
     MEANS -->|"Unreadable"| UNKNOWN
@@ -182,9 +182,8 @@ flowchart TD
     BODY{"Whose body is it?"}
 
     BLOCK -->|"user = expr"| WRITTEN["Written"]
-    BLOCK -->|"user.Profile = expr"| MEMBER["MemberWritten"]
     BLOCK -->|"f(out var user)"| OUT["OutArgument"]
-    BLOCK -->|"nothing here"| WAYSIN
+    BLOCK -->|"nothing here, incl. user.Profile = expr"| WAYSIN
 
     WAYSIN -->|"read every way in"| BLOCK
     WAYSIN -->|"a loop came back"| NOTHING["NothingNew"]
@@ -210,7 +209,6 @@ Two rules are in neither diagram:
 |---|---|---|
 | an `Include()` for the property | `Loaded` | `db.Users.Include(u => u.Profile)` |
 | a method that promises it | `Loaded` | `[Includes("Profile")] Task<User> GetUser()` |
-| the property is set by hand | `Loaded` | `user.Profile = profile;` or `new User { Profile = p }` |
 | a parameter the method requires loaded | `Loaded` | `[IncludeRequired(nameof(user), "Profile")] void Update(User user)` |
 | a loop that came back to a block already read | `Loaded` | `while (…) { … }` — this path adds nothing new |
 | a freshly constructed object | `Loaded` | `new User()`, `new List<User>()` — it was not sourced from a query, so there was no Include to miss |
@@ -232,7 +230,7 @@ upward":
 | Statement | Write | What `IncludeSearcher` makes of it |
 |---|---|---|
 | `user = expr`, `var user = expr` | `Written(expr)` | read `expr` |
-| `user.Profile = expr` | `MemberWritten` | `Loaded` |
+| `user.Profile = expr` | none | keep reading upward — finding whether an Include happened is the search's job, not this |
 | `user.Other = expr` | none | keep reading upward |
 | `var (id, user) = pair` | `Written(pair)` | read `pair` |
 | `d.TryGetValue(key, out var user)` | `OutArgument(the call)` | read the call's source, if it is declared |
@@ -503,7 +501,7 @@ The control flow graph holds simplified code. Three constructs look different fr
 
 | Source | In the graph | Why the search still works |
 |---|---|---|
-| `new User { Profile = p }` | `#1 = new User(); #1.Profile = p; user = #1` | walking back for `#1` finds `#1.Profile = p` |
+| `new User { Profile = p }` | `#1 = new User(); #1.Profile = p; user = #1` | `#1.Profile = p` is skipped; walking back for `#1` reaches the fresh `new User()` |
 | `foreach (var user in users)` | `#1 = users.GetEnumerator(); … user = #1.Current` | `GetEnumerator` and `Current` are declared, so they pass through to `users`. Over an array the old non-generic `IEnumerator` is used, and it is declared too. |
 | `flag ? a : b`, `a ?? b` | two blocks write `#1`, then they join | both paths are searched |
 
