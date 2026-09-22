@@ -1,15 +1,17 @@
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
-using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Flow;
-using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Services;
+using Microsoft.CodeAnalysis;
+using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Bridging;
+using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Requirements;
+using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Roslyn;
+using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Search;
 
-namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Handlers;
+namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Rules;
 
 /// <summary>
 /// Finds every call of an [IncludeRequired] method and every return of an [Includes] method,
-/// and asks <see cref="IncludeSearch"/> whether the property is loaded there.
+/// and asks <see cref="IncludeSearcher"/> whether the property is loaded there.
 /// Reports INCL001 (call sites), INCL002 and INCL003.
 /// </summary>
 internal static class IncludeFlowHandler
@@ -18,8 +20,8 @@ internal static class IncludeFlowHandler
     /// Analyzes one method body.
     /// </summary>
     /// <param name="context">Operation block analysis context.</param>
-    /// <param name="declarations">Every [PassesIncludes] the compilation can see.</param>
-    public static void Analyze(OperationBlockAnalysisContext context, IncludeDeclarations declarations)
+    /// <param name="bridges">Every bridge the compilation can see.</param>
+    public static void Analyze(OperationBlockAnalysisContext context, Bridges bridges)
     {
         if (context.OwningSymbol is not IMethodSymbol method)
         {
@@ -32,7 +34,7 @@ internal static class IncludeFlowHandler
             return;
         }
 
-        var diagnostics = new FlowGraph(context.GetControlFlowGraph(body), method, declarations)
+        var diagnostics = new FlowGraph(context.GetControlFlowGraph(body), method, bridges)
             .GetStatements(context.CancellationToken)
             .SelectMany(position =>
                 GetMethodCallDiagnostics(position).Concat(GetReturnDiagnostics(position)));
@@ -70,7 +72,7 @@ internal static class IncludeFlowHandler
         IInvocationOperation call,
         CodePosition callStatement)
     {
-        foreach (var requirement in AttributeHelper.GetIncludeRequirements(call.TargetMethod))
+        foreach (var requirement in AttributeReader.GetIncludeRequirements(call.TargetMethod))
         {
             var argument = call.Arguments.FirstOrDefault(argument =>
                 argument.Parameter?.Name == requirement.ParameterName);
@@ -83,7 +85,7 @@ internal static class IncludeFlowHandler
 
             // "Process(user)" with a parameter of a base type, interface or nullable type wraps the local into
             // a conversion. The rule matches the local itself, and the diagnostic reports its own type.
-            var value = RoslynHelper.SkipWrappers(argument.Value);
+            var value = RoslynReader.SkipWrappers(argument.Value);
 
             var ruleId = GetRuleForArgument(value, callStatement.FlowGraph);
             if (ruleId is null)
@@ -91,7 +93,7 @@ internal static class IncludeFlowHandler
                 continue;
             }
 
-            var answer = IncludeSearch.Check(value, requirement.NavigationProperty, callStatement);
+            var answer = IncludeSearcher.Check(value, requirement.NavigationProperty, callStatement);
             if (answer.IsLoaded)
             {
                 continue;
@@ -129,9 +131,9 @@ internal static class IncludeFlowHandler
             yield break;
         }
 
-        foreach (var property in AttributeHelper.GetIncludesToVerify(position.FlowGraph.Method))
+        foreach (var property in AttributeReader.GetIncludesToVerify(position.FlowGraph.Method))
         {
-            var answer = IncludeSearch.Check(returnedValue, property, position);
+            var answer = IncludeSearcher.Check(returnedValue, property, position);
             if (answer.IsLoaded)
             {
                 continue;
@@ -215,10 +217,10 @@ internal static class IncludeFlowHandler
             return false;
         }
 
-        return Bridge.FindSource(
+        return BridgeCrosser.FromLambdaParameter(
             lambdaInMethod,
             lambdaParameter.Ordinal,
-            methodFlowGraph.Declarations) is not null;
+            methodFlowGraph.Bridges) is not null;
     }
 
     /// <summary>

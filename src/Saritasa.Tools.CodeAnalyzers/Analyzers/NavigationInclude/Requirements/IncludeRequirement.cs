@@ -1,4 +1,4 @@
-namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Entities;
+namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Requirements;
 
 /// <summary>
 /// Describes a parameter which requires including a navigation property from argument prior to passing.

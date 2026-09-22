@@ -1,14 +1,15 @@
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Operations;
+using Microsoft.CodeAnalysis;
+using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Roslyn;
 
-namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Flow;
+namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Search;
 
 /// <summary>
 /// A place where entities sit: an expression, together with the position in the code it is read at.
 /// </summary>
 /// <remarks>
 /// A value is what the search looks at, never what it decided, see <see cref="Answer"/>. The same expression
-/// read at two positions is two values, because a variable can hold different things at different lines.
+/// read at two positions is two values: a variable holds different things at different lines.
 /// </remarks>
 internal sealed class Value
 {
@@ -43,7 +44,7 @@ internal sealed class Value
     /// query.ToList()") and "await".
     /// </summary>
     private static IOperation RemoveWrappers(IOperation operation)
-        => RoslynHelper.SkipWrappers(operation) switch
+        => RoslynReader.SkipWrappers(operation) switch
         {
             // "await GetUserAsync()": the entities are the ones of the awaited value.
             IAwaitOperation awaited => RemoveWrappers(awaited.Operation),

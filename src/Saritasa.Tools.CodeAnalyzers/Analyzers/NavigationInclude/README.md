@@ -72,7 +72,7 @@ by `PropertyReferenceHandler` alone. The rest of this document is about the othe
 Two more results come out of the search itself. **INCL004** means *the analyzer could not read the code far
 enough to decide*; it is a warning with a code fix, see
 [When the analyzer cannot read the code](#when-the-analyzer-cannot-read-the-code). **INCL005** is about the
-declarations themselves: an `[assembly: PassesIncludes]` that names a member which does not exist.
+the bridges themselves: an `[assembly: PassesIncludes]` that names a member which does not exist.
 
 ## How it works: one idea, two jobs
 
@@ -100,53 +100,53 @@ statements connected by arrows — so the analyzer needs no special code for `if
 
 | Word | Meaning | File |
 |---|---|---|
-| **Value** | a place where entities sit: a variable, a parameter, an argument or the result of an expression, together with the position in the code where it is read | `Flow/Value.cs` |
-| **Answer** | what the search decided: `Loaded`, `NotLoaded` or `Unknown` | `Flow/Answer.cs` |
-| **Write** | one thing found above a variable: `Written`, `MemberWritten`, `OutArgument`, `MethodParameter`, `LambdaParameter`, `NothingNew`, `NeverWritten`, `Unreadable` | `Flow/Write.cs` |
-| **Bridge** | a move from one value to another that keeps the same entities: `Where`, `ToList`, `page.Items`, an indexer | `Flow/Bridge.cs` |
+| **Value** | a place where entities sit: a variable, a parameter, an argument or the result of an expression, together with the position in the code where it is read | `Search/Value.cs` |
+| **Answer** | what the search decided: `Loaded`, `NotLoaded` or `Unknown` | `Search/Answer.cs` |
+| **Write** | one thing found above a variable: `Written`, `MemberWritten`, `OutArgument`, `MethodParameter`, `LambdaParameter`, `NothingNew`, `NeverWritten`, `Unreadable` | `Search/Write.cs` |
+| **Bridge** | a declared move from one value to another that keeps the same entities: `Where`, `ToList`, `page.Items`, an indexer. It has a direction, because the search reads backwards | `Bridging/Bridge.cs` |
 
 A value is a question and an answer is a decision, and the code never mixes the two. A write is a fact about the
 code and never a decision.
 
 ### The two jobs
 
-The search itself is one function, `IncludeSearch.Check(value, property, position)`, and two classes share the
+The search itself is one function, `IncludeSearcher.Check(value, property, position)`, and two classes share the
 work behind it:
 
 | Class | Its question | What it knows | What it never does |
 |---|---|---|---|
-| `IncludeSearch` | does this value have the include? | `Include`, declarations, the three answers | read blocks or statements |
-| `Walker` | where was this variable written? | statements, blocks, `if`, loops, `try`, lambdas | decide anything |
+| `IncludeSearcher` | does this value have the include? | `Include`, bridges, the three answers | read blocks or statements |
+| `WritesWalker` | where was this variable written? | statements, blocks, `if`, loops, `try`, lambdas | decide anything |
 
-The Walker reports writes, `IncludeSearch` says what they mean, and only `IncludeSearch` calls the Walker,
-never the other way round. Only the Walker needs memory: it remembers the blocks it has already read, which is
+The walker reports writes, `IncludeSearcher` says what they mean, and only `IncludeSearcher` calls the walker,
+never the other way round. Only the walker needs memory: it remembers the blocks it has already read, which is
 what stops a loop from walking forever.
 
 The whole search is these two jobs calling each other back:
 
 ```text
 Check(value):
-    IncludeSearch reads the value
+    IncludeSearcher reads the value
         it was made from another value  → start again with that one
-        it is a variable                → ask the Walker where it was written
-                                          the Walker reports one write per path
-                                          IncludeSearch reads each write, and gets
+        it is a variable                → ask the walker where it was written
+                                          the walker reports one write per path
+                                          IncludeSearcher reads each write, and gets
                                           an answer or a new value to start again with
         anything else                   → an answer
 
     every path must end at Loaded
 ```
 
-### What IncludeSearch does
+### What IncludeSearcher does
 
-It has two questions: what a value is, and what a write of the Walker means. Both end at an answer, or at a
+It has two questions: what a value is, and what a write of the walker means. Both end at an answer, or at a
 new value to start again with. The tables under the diagrams say which code each label stands for.
 
 ```mermaid
 flowchart TD
     VALUE{"What is this value?"}
     SOURCE["its source<br/>→ start again with it"]
-    WRITES["ask the Walker,<br/>then read every write"]
+    WRITES["ask the walker,<br/>then read every write"]
     MEANS{"What does this write mean?"}
     LOADED(["Loaded"])
     NOTLOADED(["NotLoaded"])
@@ -168,9 +168,9 @@ flowchart TD
     SOURCE --> VALUE
 ```
 
-### How the Walker finds the writes
+### How the walker finds the writes
 
-It only reads code. Every arrow that ends in a box is a write it reports, and `IncludeSearch` is the one that
+It only reads code. Every arrow that ends in a box is a write it reports, and `IncludeSearcher` is the one that
 says what the write means. "Read every way in" means every block that jumps here, and for a `catch` or a
 `finally` every place inside the `try` as well.
 
@@ -222,12 +222,12 @@ Two rules are in neither diagram:
 `NotLoaded` is a mistake in the user's code and `Unknown` is a limit of the analyzer. They must not be mixed,
 because a wrong warning is worse than no warning.
 
-### What the Walker reports
+### What the walker reports
 
 For one statement it returns a write, or nothing, which means "this statement says nothing, keep reading
 upward":
 
-| Statement | Write | What `IncludeSearch` makes of it |
+| Statement | Write | What `IncludeSearcher` makes of it |
 |---|---|---|
 | `user = expr`, `var user = expr` | `Written(expr)` | read `expr` |
 | `user.Profile = expr` | `MemberWritten` | `Loaded` |
@@ -251,10 +251,10 @@ UpdateProfile(user, "UTC");          // ← the analyzer checks this argument
 
 ```text
 Value( user , before "UpdateProfile(user, …)" )
-      a variable → the Walker reports the write "var user = await …"
+      a variable → the walker reports the write "var user = await …"
 Value( db.Users.Include(u => u.Profile).FirstAsync(…) , before "var user = …" )
       "await" is removed when the value is created
-      FirstAsync is declared: it hands back the entities it was called on → look at the source
+      FirstAsync has a bridge: it hands back the entities it was called on → look at the source
 Value( db.Users.Include(u => u.Profile) , before "var user = …" )
       Include names Profile
 Answer.Loaded                                    → nothing is reported
@@ -280,14 +280,14 @@ Here the search must check two paths, and they give different answers:
 
 ```text
 ① Value( user , before line 8 )
-     a variable → the Walker reads the block upward → line 7 writes it
+     a variable → the walker reads the block upward → line 7 writes it
 
 ② Value( query.FirstAsync() , before line 7 )     "await" is removed
      FirstAsync hands back the same entities → look at the source
 
 ③ Value( query , before line 7 )
      a variable again → nothing above line 7 in this block
-     → the Walker reports one write per way into the block, and BOTH must end at Loaded:
+     → the walker reports one write per way into the block, and BOTH must end at Loaded:
 
      ├─ way A — from the end of the "if" body
      │  ④ Value( query.Include(u => u.Profile) , before line 4 )
@@ -297,7 +297,7 @@ Here the search must check two paths, and they give different answers:
         ⑥ Value( db.Users.AsQueryable() , before line 1 )
              AsQueryable hands back the same entities → look at the source
         ⑦ Value( db.Users , before line 1 )
-             a DbSet property — no declaration describes it
+             a DbSet property — no bridge describes it
         ⑧ Answer.NotLoaded                                                       ✗
 
 Every way must be Loaded → the answer is not Loaded → INCL002 on line 8
@@ -306,9 +306,9 @@ Every way must be Loaded → the answer is not Loaded → INCL002 on line 8
 A value has two parts, and the two jobs change them differently:
 
 - **②→③ and ⑥→⑦ change only the value.** The position stays the same, because one call is removed from the
-  chain. This is `IncludeSearch` reading an expression.
+  chain. This is `IncludeSearcher` reading an expression.
 - **①→②, ③→④ and ③→⑥ also change the position.** The search moves to another statement, another block or out of
-  a lambda. This happens only for a variable, and it is the `Walker`.
+  a lambda. This happens only for a variable, and it is the `WritesWalker`.
 
 ### Example 3: a value made of many steps
 
@@ -331,13 +331,13 @@ One value can be a whole chain. Here every kind of step appears once:
 
 ```text
 ① Value( user , before line 4 )
-     a variable → the Walker finds what "foreach" became: "user = #1.Current"
+     a variable → the walker finds what "foreach" became: "user = #1.Current"
 
 ② Value( #1.Current , inside the loop )
      Current is declared on IEnumerator<T> → look at the object it is read on
 
 ③ Value( #1 , inside the loop )
-     a temporary, still a variable → the Walker finds "#1 = page.Items.GetEnumerator()"
+     a temporary, still a variable → the walker finds "#1 = page.Items.GetEnumerator()"
 
 ④ Value( page.Items.GetEnumerator() , before the loop )
      GetEnumerator is declared on IEnumerable<T> → look at the source
@@ -356,37 +356,58 @@ One value can be a whole chain. Here every kind of step appears once:
 ⑨ Answer.Loaded                                                              ✓
 ```
 
-Steps ②, ④, ⑤ and ⑦ are transformations, ①, ③ and ⑥ are the Walker, and nothing in this chain needed a rule of
-its own: `foreach`, the enumerator, the indexer-like property and the library method are all declarations.
+Steps ②, ④, ⑤ and ⑦ are transformations, ①, ③ and ⑥ are the walker, and nothing in this chain needed a rule of
+its own: `foreach`, the enumerator, the indexer-like property and the library method are all bridges.
 
-If the `Items` declaration were missing, step ⑤ would end at `Unknown` and the analyzer would report INCL004 on
-line 4, with a code fix that writes that declaration.
+If the `Items` bridge were missing, step ⑤ would end at `Unknown` and the analyzer would report INCL004 on
+line 4, with a code fix that writes it.
 
 ## What the analyzer knows about entities
 
-### `IncludeDeclarations`: the only place that decides what is followed
+### `Bridges`: the only place that decides what is followed
 
-A method or a property is followed **only if it is declared** with `[PassesIncludes]`. There is no guessing
-from types and no special code for `System.Linq` or EF Core. A declaration comes from one of three places, and
-all of them are used the same way:
+A member is followed **only if a bridge is declared for it**. There is no guessing from types and no special
+code for `System.Linq` or EF Core. A bridge comes from one of three places, and all of them are used the same
+way:
 
 | Where | Example |
 |---|---|
 | on the member itself | `[PassesIncludes(nameof(query))] PagedResult<User> Paginate(IQueryable<User> query)` |
 | on an assembly: the project or anything it references | `[assembly: PassesIncludes(typeof(SomeLib.Ext), "Paginate")]` |
-| built into the analyzer | `Where`, `ToListAsync`, `Include`, `GetEnumerator`, `Current`, `TryGetValue`, indexers, … |
+| built into the analyzer | `Where`, `ToListAsync`, `Include`, `GetEnumerator`, `Current`, `TryGetValue`, indexers, ... |
 
-The built-in list is in `IncludeDeclarations.cs`. It names types by string, so the analyzer does not depend on
-EF Core, and a line for a type the project does not use simply matches nothing. A declaration on an interface
-covers every class that implements it, so `IEnumerable<T>.GetEnumerator` covers the `GetEnumerator` that
-`foreach` calls on a `List`, and `IList<T>` covers the indexer of `List<T>`.
+The built-in list is in `BuiltInBridges.cs`, one line per member. It names types by string, so the analyzer
+does not depend on EF Core, and a line for a type the project does not use simply matches nothing. A bridge on
+an interface covers every class that implements it, so `IEnumerable<T>.GetEnumerator` covers the
+`GetEnumerator` that `foreach` calls on a `List`, and `IList<T>` covers the indexer of `List<T>`.
 
-`Select` and `SelectMany` are **not** declared. They make new objects, so their result has no includes.
+`Select` and `SelectMany` have no result bridge. They make new objects, so their result has no includes.
 
-### `Bridge`: may the entities move, and where from?
+### A bridge has a direction
 
-Every step that is not an `Include` and not a variable asks this one question, and the answer is the value on
-the other side of the move. The shape of the move does not matter:
+The search reads **backwards**, so every bridge runs from something a member hands back to one of its inputs.
+A member hands something back in exactly three ways, and each is a bridge of its own:
+
+`Bridge` is one type with three cases, the same shape as `Write`:
+
+| Case | Runs from | Example | Written as |
+|---|---|---|---|
+| `Bridge.FromResult` | the value the member handed back | `users.ToList()`, `page.Items`, `users[0]` | `Result(LinqEnumerable, "Where")` |
+| `Bridge.FromLambdaParameter` | a parameter of a callback it calls | the `u` of `users.Select(u => ...)` | `Lambda(LinqEnumerable, "Where", "predicate")` |
+| `Bridge.FromOutArgument` | an out argument it wrote | the `user` of `d.TryGetValue(k, out var user)` | `Out(IDictionary, "TryGetValue", "value")` |
+
+Each case carries only what it needs — the callback case knows which parameter takes the callback and the
+position inside it, the out case knows the out parameter, the result case needs neither.
+
+Where a bridge **lands** is the line's source: empty means the value the member was used on, otherwise the
+parameter named. So `Result(LinqEnumerable, "Where")` lands on the receiver, and
+`[assembly: PassesIncludes(typeof(Ext), "Paginate", "query")]` lands on the argument passed for `query`.
+
+One method can carry two bridges — `Where` has a `FromResult` line and a `FromLambdaParameter` line — and they
+stay separate lines, because they run from different places to different places.
+
+`BridgeCrosser` is the only place that walks bridges, with one method per case, and `Bridges` is the only place
+that looks them up, with one finder per case. The shape of the move does not matter to either:
 
 | Move | Example |
 |---|---|
@@ -396,48 +417,46 @@ the other side of the move. The shape of the move does not matter:
 | one value to another | `pair.Value`, `task.Result` |
 
 All four are the same thing to the search: the entities on both sides are the same ones, so it keeps walking.
-The move is permitted by a declaration, with one exception — an array element, `users[0]` over `User[]`, has no
-member in Roslyn for a declaration to name, and there is only one value it can come from.
+Every move needs a bridge, with one exception — an array element, `users[0]` over `User[]`, has no member in
+Roslyn for a line to name, and there is only one value it can come from.
 
-One question is left that a declaration cannot answer.
+### Overloads that disagree
 
-**Is this overload the right one?** A declaration names a method, not one overload, so each call is checked
-against the method's own declaration: if the result is built from type parameters, one of them must come from
-the source.
+A line names a member, and a member can be several overloads that do different things. `Enumerable.Min` hands
+back an element, except in the overload that takes a `selector`, which hands back whatever the selector
+returned. Counting parameters cannot separate them — `Min(source, comparer)` and `Min(source, selector)` both
+take two — so the overload is excluded by the name of the parameter that makes the difference:
 
-| Call | Declared result | Followed? |
-|---|---|---|
-| `users.ToDictionary(u => u.Id)` | `Dictionary<TKey, TSource>` | yes, `TSource` comes from `users` |
-| `users.ToDictionary(u => u.Id, u => u.Name)` | `Dictionary<TKey, TElement>` | no, the values are names |
-| `query.Paginate(1)` | `PagedResult<User>` | yes, nothing to compare, so the declaration is trusted |
+```csharp
+ResultExceptOverloadWith(LinqEnumerable, "Min", "selector"),
+```
 
-This also protects against a wrong declaration: even if someone declares `Select`, its result is built from
-`TResult`, so it is never followed.
+Three members need this: `Min`, `Max` and `ToDictionary`. Renaming a public parameter of the BCL is a
+source-breaking change, because callers can pass arguments by name, so the name is safe to lean on. What a
+name cannot see is a future overload that projects under some other parameter name, which would silently widen
+the line — this is the only place in the subsystem where a string failing to match makes the analyzer *more*
+permissive rather than less.
 
-This is read from how the member itself is declared, so it works the same for `System.Linq`, EF Core and a
-project's own methods.
+### Where a lambda parameter is filled from
 
-### `LambdaSource`: where a lambda parameter is filled from
+In `users.Select(u => ...)` the question is whether `u` is filled from `users`. That is the
+`FromLambdaParameter` direction, and it is a line like any other: it names the parameter that takes the
+callback, and the position inside that callback.
 
-In `users.Select(u => ...)` the question is whether `u` is filled from `users`. This is a different question:
-a declaration says where a *result* comes from, while this is about what goes *in*, so no declaration can
-answer it. The analyzer reads the delegate the lambda is passed to, one parameter at a time, and asks whether
-that parameter's declared type is one of the types inside the collection.
+| Lambda | Line |
+|---|---|
+| `Select(u => ...)`, `u` is the element | `Lambda(LinqEnumerable, "Select", "selector")` |
+| `Select((u, i) => ...)`, `i` is not | no line, so `i` is not followed |
+| `GroupBy(k, (key, group) => ...)`, `group` is at position 1 | `Lambda(LinqEnumerable, "GroupBy", "resultSelector", lambdaParameter: 1)` |
+| `Join(..., (outer, inner) => ...)`, `inner` comes from the other collection | `Lambda(LinqEnumerable, "Join", "resultSelector", lambdaParameter: 1, source: "inner")` |
+| your own `ForEachItem(this IEnumerable<T>, Action<T>)` | `[PassesIncludes(ToCallback = nameof(action))]` |
 
-| Lambda | Parameter | Declared as | Filled from the collection? |
-|---|---|---|---|
-| `Select(u => …)` | `u` | `TSource` | yes |
-| `Select((u, i) => …)` | `i` | `int` | no |
-| `GroupBy(k, (manager, group) => …)` | `manager` | `TKey` | no |
-| `GroupBy(k, (manager, group) => …)` | `group` | `IEnumerable<TSource>` | yes |
-| `ForEachItem(this IEnumerable<T>, Action<T>)` | `item` | `T` | yes |
+Nothing is inferred from the delegate's type: a parameter nobody named is not followed, which is why the search
+stops at the `i` of `Select((u, i) => ...)`.
 
-Nothing here depends on the position of the parameter, so a project's own method reads the same way as a LINQ
-operator.
+### `EfIncludeReader`: the only code that knows Entity Framework
 
-### `EfIncludes`: the only code that knows Entity Framework
-
-Every other rule answers "do the entities pass through this call?", which a declaration can say. This one
+Every other rule answers "do the entities pass through this call?", which a bridge can say. This one
 answers a different question, "which property was added?", and no general rule can do that:
 
 ```csharp
@@ -486,11 +505,11 @@ The control flow graph holds simplified code. Three constructs look different fr
 | `foreach (var user in users)` | `#1 = users.GetEnumerator(); … user = #1.Current` | `GetEnumerator` and `Current` are declared, so they pass through to `users`. Over an array the old non-generic `IEnumerator` is used, and it is declared too. |
 | `flag ? a : b`, `a ?? b` | two blocks write `#1`, then they join | both paths are searched |
 
-`#1` is a temporary variable the compiler creates. The Walker treats it as any other variable.
+`#1` is a temporary variable the compiler creates. The walker treats it as any other variable.
 
 ### Loops
 
-A loop goes back to a block that was already read. The Walker remembers the blocks it has read; when it comes
+A loop goes back to a block that was already read. The walker remembers the blocks it has read; when it comes
 back to one it reports `NothingNew`, and the search counts that path as `Loaded` because it adds nothing. So
 the search goes around a loop once, reads every write in the loop body, and stops.
 
@@ -499,11 +518,11 @@ the search goes around a loop once, reads every write in the loop body, and stop
 The graph has no jumps for exceptions. The first block of a `catch`, a `catch when` filter or a `finally` has no
 incoming jumps, so it looks unreachable. But an exception can leave the `try` block after any statement, so
 **every place inside the `try`** counts as a way into the handler. For a `finally` after `try/catch`, the
-`catch` blocks are included too. This is the only reason the Walker does more than `block.Predecessors`.
+`catch` blocks are included too. This is the only reason the walker does more than `block.Predecessors`.
 
 ## When the analyzer cannot read the code
 
-The analyzer follows only declared members. `System.Linq`, EF Core and the collection types are declared in the
+The analyzer follows only members a bridge is declared for. `System.Linq`, EF Core and the collection types are declared in the
 analyzer, so they work with no setup. Anything else has to be declared by the project:
 
 ```csharp
@@ -531,9 +550,9 @@ For a library the project does not own, the attribute goes on the assembly, befo
 ```
 
 Assembly attributes are read from the project itself and from every project and package it references, so a
-shared project can declare a library once for the whole solution. If such a declaration names a member or a
+shared project can declare a library once for the whole solution. If such an attribute names a member or a
 parameter that does not exist, for example after the library renamed a method, the analyzer reports **INCL005**;
-without it the declaration would silently stop working.
+without it the bridge would silently stop working.
 
 Users do not have to write these by hand. The code fix for INCL004 offers them and creates the file
 `NavigationIncludes.cs` if the project has none yet, the way Visual Studio uses `GlobalSuppressions.cs`.
@@ -543,26 +562,53 @@ search continues from there.
 
 ## Files
 
+The folders are subsystems, each answering one question. A class that mostly *does* something is named for the
+job it does — `IncludeSearcher`, `WritesWalker`, `BridgeCrosser`, `EfIncludeReader` — and a class that mostly
+*is* something keeps a plain noun: `Value`, `Write`, `Answer`, `Bridge`.
+
+**`Search/` — is the property loaded in this value?**
+
+| File | What it does |
+|---|---|
+| `IncludeSearcher.cs` | The only class that decides. `Check`: reads a value, asks the walker, joins the paths. |
+| `WritesWalker.cs` | Where a variable was written: the backward walk through statements, blocks and bodies. |
+| `Write.cs` | One thing the walker found. A fact about the code, never a decision. |
+| `Value.cs` | What the search looks at: an expression and the position it is read at. |
+| `Answer.cs` | What the search decided: `Loaded` / `NotLoaded` / `Unknown`. |
+| `CodePosition.cs` | A point in execution: graph + block + number of statements already run. |
+| `FlowGraph.cs` | One body and its control flow graph. Lists its statements, lambdas and local functions included. |
+
+**`Bridging/` — may the entities move, and where from?**
+
+| File | What it does |
+|---|---|
+| `Bridge.cs` | One declared move of entities: `FromResult`, `FromLambdaParameter` or `FromOutArgument`. |
+| `Bridges.cs` | Every bridge the compilation can see, the built-in ones included, and the lookups over them. The only place that decides what is followed. |
+| `BuiltInBridges.cs` | The catalogue: one line per member of `System.Linq`, EF Core and the collection types that the search may cross. |
+| `BridgeCrosser.cs` | Which value the entities came from, one method per bridge case. The only file that walks bridges. |
+
+**`Rules/` — what do we report?**
+
+| File | What it does |
+|---|---|
+| `IncludeFlowHandler.cs` | Finds the places to check, calls `Check`, reports INCL001 – INCL004. |
+| `PropertyReferenceHandler.cs` | INCL001 for direct `param.Profile` access, without flow analysis. |
+| `BridgeAttributeHandler.cs` | INCL005: an `[assembly: PassesIncludes]` that names nothing. |
+| `NavigationIncludeRulesProvider.cs` | The diagnostic descriptors and their ids. |
+| `UnreadableMember.cs` | The member that stopped the search. INCL004 carries it for the code fix. |
+
+**`Requirements/` — what did the author ask for?**
+
+| File | What it does |
+|---|---|
+| `AttributeReader.cs` | Reads `[IncludeRequired]`, `[Includes]` and `[TrackIncludeRequired]` from symbols. |
+| `IncludeRequirement.cs` | One `[IncludeRequired(parameter, property)]` pair. |
+
+**The rest**
+
 | File | What it does |
 |---|---|
 | `NavigationIncludeAnalyzer.cs` | Registers the three handlers in Roslyn. |
-| `Handlers/IncludeFlowHandler.cs` | Finds the places to check, calls `Check`, reports INCL001 – INCL004. |
-| `Handlers/DeclarationHandler.cs` | INCL005: an `[assembly: PassesIncludes]` that names nothing. |
-| `Handlers/PropertyReferenceHandler.cs` | INCL001 for direct `param.Profile` access, without flow analysis. |
-| `Flow/IncludeSearch.cs` | The only class that decides. `Check`: reads a value, asks the Walker, joins the paths. |
-| `Flow/Value.cs` | What the search looks at: an expression and the position it is read at. |
-| `Flow/Answer.cs` | What the search decided: `Loaded` / `NotLoaded` / `Unknown`. |
-| `Flow/Walker.cs` | Where a variable was written: the backward walk through statements, blocks and bodies. |
-| `Flow/Write.cs` | One thing the Walker found. A fact about the code, never a decision. |
-| `Flow/Bridge.cs` | May the entities move out of this value, and which value did they come from. The only file that reads declarations. |
-| `Flow/LambdaSource.cs` | Which collection a lambda parameter is filled from. |
-| `Flow/CodePosition.cs` | A point in execution: graph + block + number of statements already run. |
-| `Flow/FlowGraph.cs` | One body and its control flow graph. Lists its statements, lambdas and local functions included. |
-| `Flow/EfIncludes.cs` | The only rule that knows EF: reads the property name from `Include(u => u.Profile)`. |
-| `Flow/RoslynHelper.cs` | Roslyn details with no meaning of their own: wrappers, the receiver of a call, the types inside a type, a delegate parameter. |
-| `Services/IncludeDeclarations.cs` | All `[PassesIncludes]` the compilation can see, the built-in ones included. The only place that decides what is followed. |
-| `Services/UnreadableMember.cs` | The member that stopped the search. INCL004 carries it for the code fix. |
-| `Services/AttributeHelper.cs` | Reads `[IncludeRequired]`, `[Includes]` and `[TrackIncludeRequired]` from symbols. |
-| `Services/NavigationIncludeRulesProvider.cs` | The diagnostic descriptors and their ids. |
-| `CodeFixes/PassesIncludesCodeFixProvider.cs` | The code fix for INCL004: writes a `[PassesIncludes]` declaration. |
-| `Entities/IncludeRequirement.cs` | One `[IncludeRequired(parameter, property)]` pair. |
+| `EntityFramework/EfIncludeReader.cs` | The only rule that knows EF: reads the property name from `Include(u => u.Profile)`. |
+| `Roslyn/RoslynReader.cs` | Roslyn details with no meaning of their own: wrappers, the receiver of a call, the types inside a type, a delegate parameter. |
+| `CodeFixes/PassesIncludesCodeFixProvider.cs` | The code fix for INCL004: writes a `[PassesIncludes]` attribute. |

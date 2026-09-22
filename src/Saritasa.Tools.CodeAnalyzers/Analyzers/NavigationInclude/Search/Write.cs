@@ -1,21 +1,20 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.FlowAnalysis;
 
-namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Flow;
+namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Search;
 
 /// <summary>
-/// One thing the <see cref="Walker"/> found above the place a variable is read: what gave the variable its
-/// value, or why nothing did.
+/// One thing the <see cref="WritesWalker"/> found above a variable: what gave it its value, or why nothing
+/// did.
 /// </summary>
 /// <remarks>
-/// A write is a fact about the code and never a decision. What it means for the navigation property is decided
-/// by <see cref="IncludeSearch"/>, which is why nothing here says "loaded".
+/// A write is a fact about the code, never a decision, which is why nothing here says "loaded".
+/// <see cref="IncludeSearcher"/> decides what it means.
 /// </remarks>
 internal abstract class Write
 {
     /// <summary>
-    /// "user = x", "var user = x", "#1 = x" and "var (id, user) = pair": the variable got the value of
-    /// an expression.
+    /// "user = x", "#1 = x", "var (id, user) = pair": the variable got the value of an expression.
     /// </summary>
     public sealed class Written : Write
     {
@@ -50,20 +49,26 @@ internal abstract class Write
         /// Initializes the write.
         /// </summary>
         /// <param name="call">The call that wrote the out argument.</param>
-        public OutArgument(Value call)
+        /// <param name="parameterName">The out parameter the variable was passed for.</param>
+        public OutArgument(Value call, string parameterName)
         {
             Call = call;
+            ParameterName = parameterName;
         }
 
         /// <summary>
         /// The call that wrote the out argument.
         /// </summary>
         public Value Call { get; }
+
+        /// <summary>
+        /// The out parameter the variable was passed for: the bridge to look up.
+        /// </summary>
+        public string ParameterName { get; }
     }
 
     /// <summary>
-    /// The walk reached the start of a method, constructor or local function, so the variable is a parameter
-    /// and the caller is the one that fills it.
+    /// The walk reached the start of a body, so the variable is a parameter the caller fills.
     /// </summary>
     public sealed class MethodParameter : Write
     {

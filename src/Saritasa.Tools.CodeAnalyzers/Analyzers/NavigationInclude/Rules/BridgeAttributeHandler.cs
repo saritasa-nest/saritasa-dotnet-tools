@@ -1,22 +1,21 @@
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis;
 using Saritasa.Tools.CodeAnalyzers.Abstractions.NavigationInclude.Attributes;
-using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Services;
+using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Search;
 
-namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Handlers;
+namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Rules;
 
 /// <summary>
 /// Reports INCL005 when an <c>[assembly: PassesIncludes]</c> names a method or a parameter that does not exist.
 /// </summary>
 /// <remarks>
-/// Declarations are the only way the search learns that a method passes entities on, so a broken one does not
-/// fail loudly: the method is simply not followed any more. That happens quietly after a library renames a
-/// method, which is why it is reported. A declaration written on the method itself cannot go wrong this way,
-/// since it names its parameter with nameof.
+/// A broken bridge does not fail loudly: the method is simply not followed any more, which is what happens
+/// after a library renames something. A bridge written on the method itself cannot go wrong this way, since
+/// it names its parameter with nameof.
 /// </remarks>
-internal static class DeclarationHandler
+internal static class BridgeAttributeHandler
 {
     /// <summary>
     /// Checks one attribute.
@@ -39,7 +38,7 @@ internal static class DeclarationHandler
 
         context.ReportDiagnostic(Diagnostic.Create(
             NavigationIncludeRulesProvider.GetDiagnosticDescriptor(
-                NavigationIncludeRulesProvider.Incl5IdDeclarationNamesNothing),
+                NavigationIncludeRulesProvider.Incl5IdBridgeNamesNothing),
             attribute.GetLocation(),
             description));
     }
@@ -109,8 +108,8 @@ internal static class DeclarationHandler
     }
 
     /// <summary>
-    /// Methods with the name on the type, on its base types and on its interfaces, the same places a declaration
-    /// is matched against. Only methods, because a declaration cannot describe a property.
+    /// Methods with the name on the type, on its base types and on its interfaces, the same places a bridge
+    /// is matched against. Only methods, because the attribute cannot describe a property.
     /// </summary>
     private static IEnumerable<IMethodSymbol> FindMethods(INamedTypeSymbol type, string methodName)
     {

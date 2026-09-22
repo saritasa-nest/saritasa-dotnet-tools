@@ -1,10 +1,10 @@
-﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
+using Microsoft.CodeAnalysis;
 using Saritasa.Tools.CodeAnalyzers.Abstractions.NavigationInclude.Attributes;
-using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Services;
+using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Requirements;
 
-namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Handlers;
+namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Rules;
 
 /// <summary>
 /// Reports INCL001 when a method accesses a <see cref="TrackIncludeRequiredAttribute"/>
@@ -24,7 +24,7 @@ internal static class PropertyReferenceHandler
         }
 
         // We only care about navigation properties explicitly marked for tracking.
-        if (!AttributeHelper.HasTrackIncludeRequiredAttribute(propRef.Property))
+        if (!AttributeReader.HasTrackIncludeRequiredAttribute(propRef.Property))
         {
             return;
         }
@@ -53,7 +53,7 @@ internal static class PropertyReferenceHandler
         var propertyName = propRef.Property.Name;
         var typeName = propRef.Property.ContainingType.Name;
 
-        if (AttributeHelper.MethodHasIncludeRequiredAttribute(containingMethod, paramName, propertyName))
+        if (AttributeReader.MethodHasIncludeRequiredAttribute(containingMethod, paramName, propertyName))
         {
             return;
         }

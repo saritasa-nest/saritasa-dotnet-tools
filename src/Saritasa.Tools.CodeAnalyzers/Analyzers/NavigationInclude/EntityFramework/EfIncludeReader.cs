@@ -1,17 +1,18 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
+using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Search;
 
-namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Flow;
+namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.EntityFramework;
 
 /// <summary>
 /// The one piece of Entity Framework knowledge the analyzer needs.
 /// </summary>
 /// <remarks>
-/// Every other rule answers "do the entities pass through?", which can be read from any method's declaration.
-/// This one answers "which property was added?", and no general rule can do that: it has to know EF's
-/// <c>Include</c>. It lives alone here so that nobody mistakes it for a general rule.
+/// Every other rule answers "do the entities pass through?". This one answers "which property was added?",
+/// which no general rule can do: it has to know EF's <c>Include</c>. It lives alone so nobody mistakes it for
+/// a general rule.
 /// </remarks>
-internal static class EfIncludes
+internal static class EfIncludeReader
 {
     private const string QueryableExtensions = "Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions";
 

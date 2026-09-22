@@ -1,11 +1,11 @@
-using System.Collections.Immutable;
-using System.Composition;
-using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Services;
+using Microsoft.CodeAnalysis;
+using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Rules;
+using System.Collections.Immutable;
+using System.Composition;
 
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.CodeFixes;
 
@@ -13,7 +13,7 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.CodeFixes;
 /// Offers to declare the method that stopped the search, so that INCL004 can be answered.
 /// </summary>
 /// <remarks>
-/// The declaration is written on the project's own assembly, which is the only way to describe a method of a
+/// The bridge is written on the project's own assembly, which is the only way to describe a method of a
 /// library the project does not own. It goes into a file of its own, the way Visual Studio keeps suppressions
 /// in "GlobalSuppressions.cs".
 /// </remarks>
@@ -21,7 +21,7 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.CodeFixes;
 [Shared]
 public sealed class PassesIncludesCodeFixProvider : CodeFixProvider
 {
-    private const string DeclarationsFileName = "NavigationIncludes.cs";
+    private const string BridgesFileName = "NavigationIncludes.cs";
 
     private const string AttributesNamespace =
         "Saritasa.Tools.CodeAnalyzers.Abstractions.NavigationInclude.Attributes";
@@ -55,7 +55,7 @@ public sealed class PassesIncludesCodeFixProvider : CodeFixProvider
             context.RegisterCodeFix(
                 CodeAction.Create(
                     title,
-                    cancellationToken => AddDeclarationAsync(
+                    cancellationToken => AddBridgeAsync(
                         context.Document.Project,
                         typeName!,
                         methodName!,
@@ -69,28 +69,28 @@ public sealed class PassesIncludesCodeFixProvider : CodeFixProvider
     }
 
     /// <summary>
-    /// Adds the declaration to the project's declarations file, creating the file when there is none yet.
+    /// Adds the bridge to the project's bridges file, creating the file when there is none yet.
     /// </summary>
-    private static async Task<Solution> AddDeclarationAsync(
+    private static async Task<Solution> AddBridgeAsync(
         Project project,
         string typeName,
         string methodName,
         string? parameterName,
         CancellationToken cancellationToken)
     {
-        var declaration = BuildDeclaration(typeName, methodName, parameterName);
-        var existing = FindDeclarationsDocument(project);
+        var bridge = BuildBridge(typeName, methodName, parameterName);
+        var existing = FindBridgesDocument(project);
 
         if (existing is null)
         {
             // Built through the syntax API rather than as text, so that the line breaks are the ones Roslyn
             // writes everywhere else. Analyzers may not read Environment.NewLine.
             var newFile = SyntaxFactory
-                .ParseCompilationUnit("using " + AttributesNamespace + ";\n" + declaration)
+                .ParseCompilationUnit("using " + AttributesNamespace + ";\n" + bridge)
                 .NormalizeWhitespace();
 
             return project
-                .AddDocument(DeclarationsFileName, newFile)
+                .AddDocument(BridgesFileName, newFile)
                 .Project
                 .Solution;
         }
@@ -102,7 +102,7 @@ public sealed class PassesIncludesCodeFixProvider : CodeFixProvider
         }
 
         var added = SyntaxFactory
-            .ParseCompilationUnit(declaration)
+            .ParseCompilationUnit(bridge)
             .AttributeLists
             .Select(list => list.WithTrailingTrivia(SyntaxFactory.ElasticCarriageReturnLineFeed));
 
@@ -116,7 +116,7 @@ public sealed class PassesIncludesCodeFixProvider : CodeFixProvider
     /// Builds the assembly attribute line, e.g.
     /// <c>[assembly: PassesIncludes(typeof(SomeLib.Ext), "Paginate", "query")]</c>.
     /// </summary>
-    private static string BuildDeclaration(string typeName, string methodName, string? parameterName)
+    private static string BuildBridge(string typeName, string methodName, string? parameterName)
     {
         var arguments = "typeof(" + typeName + "), \"" + methodName + "\"";
 
@@ -129,9 +129,9 @@ public sealed class PassesIncludesCodeFixProvider : CodeFixProvider
     }
 
     /// <summary>
-    /// The file this project already keeps its declarations in, or null when there is none.
+    /// The file this project already keeps its bridges in, or null when there is none.
     /// </summary>
-    private static Document? FindDeclarationsDocument(Project project)
+    private static Document? FindBridgesDocument(Project project)
         => project.Documents.FirstOrDefault(document =>
-            string.Equals(document.Name, DeclarationsFileName, StringComparison.Ordinal));
+            string.Equals(document.Name, BridgesFileName, StringComparison.Ordinal));
 }

@@ -4,15 +4,12 @@ namespace Saritasa.Tools.CodeAnalyzers.Abstractions.NavigationInclude.Attributes
 /// Declares where a method's entities come from, so the analyzer can follow an <c>.Include()</c> across it.
 /// </summary>
 /// <remarks>
-/// The analyzer answers "was this navigation property loaded?" by reading backwards from where the property is
-/// used to the query that loaded it. It does not read method bodies — a library has none available, and reading
-/// yours would be too slow — so at every call it has to be told whether the entities coming out are the ones
-/// that went in. Without that the trail stops at the call and you get INCL004, "cannot check".
-/// A declaration says nothing about which navigation property is loaded, only where the entities travelled,
-/// which is why one declaration covers every property.
-/// Declarations read in the direction the entities travel: <see cref="From"/> names the value holding them, and
-/// they arrive either at the method's result or, when <see cref="ToLambda"/> is set, at a parameter of a lambda
-/// the method calls.
+/// The analyzer reads backwards from where a navigation property is used to the query that loaded it, and it
+/// does not read method bodies. So at every call it has to be told whether the entities coming out are the
+/// ones that went in; without that the trail stops and you get INCL004, "cannot check".
+/// It says nothing about which property is loaded, only where the entities travelled, which is why one
+/// attribute covers every property. <see cref="From"/> names the value holding them, and they arrive at the
+/// result, or at a callback parameter when <see cref="ToCallback"/> is set.
 /// </remarks>
 /// <example>
 /// The result holds the entities of a parameter:
@@ -29,9 +26,9 @@ namespace Saritasa.Tools.CodeAnalyzers.Abstractions.NavigationInclude.Attributes
 /// </code>
 /// </example>
 /// <example>
-/// A lambda the method calls is handed elements of the object it is called on:
+/// A callback the method calls is handed elements of the object it is called on:
 /// <code>
-/// [PassesIncludes(ToLambda = nameof(action))]
+/// [PassesIncludes(ToCallback = nameof(action))]
 /// public static void ForEachItem&lt;T&gt;(this IEnumerable&lt;T&gt; items, Action&lt;T&gt; action) { ... }
 /// </code>
 /// </example>
@@ -40,8 +37,8 @@ namespace Saritasa.Tools.CodeAnalyzers.Abstractions.NavigationInclude.Attributes
 /// <code>
 /// [assembly: PassesIncludes(typeof(SomeLib.QueryExtensions), "Paginate", "query")]
 /// </code>
-/// A declaration is picked up from the project it is written in and from every project and package that
-/// references it, so a shared project can declare it once for a whole solution.
+/// The attribute is picked up from the project it is written in and from every project and package that
+/// references it, so a shared project can declare a bridge once for a whole solution.
 /// </example>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Assembly, AllowMultiple = true)]
 public class PassesIncludesAttribute : Attribute
@@ -105,14 +102,14 @@ public class PassesIncludesAttribute : Attribute
     public string? From { get; }
 
     /// <summary>
-    /// Name of the parameter that takes the lambda, when the declaration describes what that lambda is called
-    /// with instead of what the method returns. Null for an ordinary result declaration.
+    /// Name of the parameter that takes the callback, when the entities arrive at what that callback is called
+    /// with instead of at what the method returns. Null when they arrive at the result.
     /// </summary>
-    public string? ToLambda { get; set; }
+    public string? ToCallback { get; set; }
 
     /// <summary>
-    /// Position of the lambda's own parameter the entities arrive at. Zero by default, which is the element
+    /// Position of the callback's own parameter the entities arrive at. Zero by default, which is the element
     /// parameter of every single-parameter callback such as <c>Action&lt;T&gt;</c>.
     /// </summary>
-    public int ToLambdaParameter { get; set; }
+    public int ToCallbackParameter { get; set; }
 }

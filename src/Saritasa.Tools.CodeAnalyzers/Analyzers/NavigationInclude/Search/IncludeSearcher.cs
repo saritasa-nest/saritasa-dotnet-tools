@@ -1,28 +1,29 @@
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Operations;
-using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Services;
+using Microsoft.CodeAnalysis;
+using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Bridging;
+using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.EntityFramework;
+using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Requirements;
 
-namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Flow;
+namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Search;
 
 /// <summary>
 /// Answers one question: "is the navigation property loaded in this value?".
 /// </summary>
 /// <remarks>
-/// A value never says by itself whether the property is loaded, so the search reads it, and where it was made
-/// from another value it reads that one too, the way a person reads code backwards. Reading a variable is the
-/// only case it cannot do alone: it asks the <see cref="Walker"/> and decides what the writes mean. When
-/// several paths lead to the same place, every one of them must be loaded.
+/// A value never says by itself whether the property is loaded, so the search reads backwards through the
+/// values it was made from. A variable is the one case it cannot do alone: it asks the
+/// <see cref="WritesWalker"/> and decides what the writes mean. Where several paths meet, all must be loaded.
 /// To teach the search a new method, declare it with [PassesIncludes] rather than adding a case here.
 /// </remarks>
-internal sealed class IncludeSearch
+internal sealed class IncludeSearcher
 {
     private readonly string property;
-    private readonly Walker walker;
+    private readonly WritesWalker walker;
 
-    private IncludeSearch(string property)
+    private IncludeSearcher(string property)
     {
         this.property = property;
-        walker = new Walker(property);
+        walker = new WritesWalker(property);
     }
 
     /// <summary>
@@ -33,11 +34,11 @@ internal sealed class IncludeSearch
     /// <param name="position">Position of the statement that contains the value.</param>
     /// <returns>Answer for the value.</returns>
     public static Answer Check(IOperation value, string property, CodePosition position)
-        => new IncludeSearch(property).Search(Value.Create(value, position));
+        => new IncludeSearcher(property).Search(Value.Create(value, position));
 
     /// <summary>
-    /// Reads one value, and names it when it turns out to be the one that stopped the search. The value named
-    /// is the deepest one, because only the first frame that sees Unknown has nothing to name yet.
+    /// Reads one value, and names it if it is the one that stopped the search. The deepest value wins, since
+    /// only the first frame to see Unknown has nothing to name yet.
     /// </summary>
     private Answer Search(Value value)
     {
@@ -63,7 +64,7 @@ internal sealed class IncludeSearch
         {
             // "user", "users", "out var user", "#1": reading a variable is the only expression whose answer
             // depends on what ran before it, so it is the only one the walker has to follow.
-            _ when Walker.GetVariable(value.Operation) is { } variable
+            _ when WritesWalker.GetVariable(value.Operation) is { } variable
                 => ReadWrites(variable, value.Position),
 
             // "query.Include(u => u.Profile)", a call of a method declared with [Includes("Profile")].
@@ -72,7 +73,7 @@ internal sealed class IncludeSearch
 
             // A move that keeps the same entities: "query.Where(...)", "users.ToList()", "users[0]",
             // "page.Items", "query.Paginate(1)". It says which value they came from.
-            _ when Bridge.FindSource(value) is { } source
+            _ when BridgeCrosser.FromValue(value) is { } source
                 => Search(source, value.Position),
 
             // A call nobody declared. In our own code that is a real answer: the method promises nothing with
@@ -114,7 +115,7 @@ internal sealed class IncludeSearch
             Write.MemberWritten => Answer.Loaded,
 
             // "dictionary.TryGetValue(id, out var user)".
-            Write.OutArgument outArgument => ReadOutArgumentCall(outArgument.Call),
+            Write.OutArgument outArgument => ReadOutArgumentSource(outArgument),
 
             // The caller of a method that asks for the property with [IncludeRequired] is the one that loads
             // it. A method that does not ask for it is a real answer: nobody loads the property.
@@ -134,9 +135,8 @@ internal sealed class IncludeSearch
         };
 
     /// <summary>
-    /// Every path must have the property loaded. The first path that is not loaded is the answer, so the
-    /// search reads no more code than it has to, and a path it cannot read hides a later one it could have
-    /// answered: a suggestion instead of a warning, which is the safe way round.
+    /// Every path must be loaded, and the first that is not is the answer. An unreadable path therefore
+    /// hides a later definite one: a suggestion instead of a warning, which is the safe way round.
     /// </summary>
     private static Answer JoinPaths(IEnumerable<Answer> answers)
     {
@@ -152,43 +152,52 @@ internal sealed class IncludeSearch
     }
 
     /// <summary>
-    /// "dictionary.TryGetValue(id, out var user)": user is a value of the dictionary, because the declaration
-    /// of TryGetValue says the entities come from the dictionary. A method nobody declared could have put
-    /// anything into the out argument, so we cannot tell.
+    /// "dictionary.TryGetValue(id, out var user)": the bridge says user comes from the dictionary. A method
+    /// nobody declared could have put anything there, so we cannot tell.
     /// </summary>
-    private Answer ReadOutArgumentCall(Value call)
-        => Bridge.FindSource(call) is { } source
+    private Answer ReadOutArgumentSource(Write.OutArgument outArgument)
+    {
+        var call = outArgument.Call;
+
+        if (call.Operation is not IInvocationOperation invocation)
+        {
+            return Answer.Unknown();
+        }
+
+        return BridgeCrosser.FromOutArgument(
+            invocation,
+            outArgument.ParameterName,
+            call.Position.FlowGraph.Bridges) is { } source
             ? Search(source, call.Position)
             : Answer.Unknown();
+    }
 
     /// <summary>
-    /// "users.Select(u =&gt; ...)": the parameter is filled from users. For a parameter filled from something
-    /// else ("Select((u, i) =&gt; ...)") or a lambda of a method we cannot read, we cannot tell what it holds.
+    /// "users.Select(u =&gt; ...)": the parameter is filled from users. For anything else, such as the index
+    /// of "Select((u, i) =&gt; ...)", we cannot tell what it holds.
     /// </summary>
     private Answer ReadLambdaSource(Write.LambdaParameter lambda)
         => Search(
-            Bridge.FindSource(lambda.Lambda, lambda.Parameter.Ordinal, lambda.Creation.FlowGraph.Declarations),
+            BridgeCrosser.FromLambdaParameter(lambda.Lambda, lambda.Parameter.Ordinal, lambda.Creation.FlowGraph.Bridges),
             lambda.Creation);
 
     /// <summary>
-    /// True if the parameter's method asks for the property with [IncludeRequired], which makes the caller of
-    /// that method responsible for loading it.
+    /// True if the method asks for the property with [IncludeRequired], making its caller responsible.
     /// </summary>
     private bool IsRequiredFromCaller(IParameterSymbol parameter)
         => parameter.ContainingSymbol is IMethodSymbol method &&
-           AttributeHelper.MethodHasIncludeRequiredAttribute(method, parameter.Name, property);
+           AttributeReader.MethodHasIncludeRequiredAttribute(method, parameter.Name, property);
 
     /// <summary>
     /// True if the call loads the property itself: <c>query.Include(u =&gt; u.Profile)</c> or a call of a method
     /// declared with <c>[Includes("Profile")]</c>.
     /// </summary>
     private bool LoadsProperty(IInvocationOperation call)
-        => AttributeHelper.MethodHasIncludesAttribute(call.TargetMethod, property) ||
-           EfIncludes.GetIncludedProperty(call) == property;
+        => AttributeReader.MethodHasIncludesAttribute(call.TargetMethod, property) ||
+           EfIncludeReader.GetIncludedProperty(call) == property;
 
     /// <summary>
-    /// True if the method is declared in the assembly being compiled, where the developer can read it and put
-    /// [Includes] on it. A method from anywhere else cannot be read or annotated.
+    /// True if the method is in the assembly being compiled, where it can be read and annotated.
     /// </summary>
     private static bool IsOurOwnCode(IMethodSymbol method, CodePosition position)
         => SymbolEqualityComparer.Default.Equals(
@@ -197,7 +206,7 @@ internal sealed class IncludeSearch
 
     /// <summary>
     /// True for a type that holds other objects, such as "List&lt;User&gt;". A fresh one says nothing about
-    /// what is put into it afterwards, while a fresh entity definitely has nothing loaded.
+    /// what is put into it later, while a fresh entity definitely has nothing loaded.
     /// </summary>
     private static bool IsContainer(ITypeSymbol? type)
         => type is not null &&

@@ -1,9 +1,9 @@
-using System.Collections.Immutable;
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Handlers;
-using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Services;
+using Microsoft.CodeAnalysis;
+using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Bridging;
+using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Rules;
+using System.Collections.Immutable;
 
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude;
 
@@ -26,17 +26,17 @@ public sealed class NavigationIncludeAnalyzer : DiagnosticAnalyzer
         context.RegisterOperationAction(PropertyReferenceHandler.Analyze, OperationKind.PropertyReference);
 
         // INCL005: an [assembly: PassesIncludes] that names nothing.
-        context.RegisterSyntaxNodeAction(DeclarationHandler.Analyze, SyntaxKind.Attribute);
+        context.RegisterSyntaxNodeAction(BridgeAttributeHandler.Analyze, SyntaxKind.Attribute);
 
         context.RegisterCompilationStartAction(compilationStart =>
         {
             // Reading [PassesIncludes] out of every referenced assembly is the expensive part, so it is
             // done once here and handed to every method body of the compilation.
-            var declarations = IncludeDeclarations.Read(compilationStart.Compilation);
+            var bridges = Bridges.Read(compilationStart.Compilation);
 
             // INCL001 at call sites, INCL002, INCL003, INCL004: need the whole method body (control flow graph).
             compilationStart.RegisterOperationBlockAction(
-                blockContext => IncludeFlowHandler.Analyze(blockContext, declarations));
+                blockContext => IncludeFlowHandler.Analyze(blockContext, bridges));
         });
     }
 }

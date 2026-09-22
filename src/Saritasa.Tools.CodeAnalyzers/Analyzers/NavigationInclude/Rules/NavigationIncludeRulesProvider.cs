@@ -1,7 +1,7 @@
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 
-namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Services;
+namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Rules;
 
 /// <summary>
 /// Provides <see cref="DiagnosticDescriptor"/> definitions and identifiers for the <see cref="NavigationIncludeAnalyzer"/> rules.
@@ -33,7 +33,7 @@ internal static class NavigationIncludeRulesProvider
     /// <summary>
     /// Diagnostic identifier for INCL005.
     /// </summary>
-    public const string Incl5IdDeclarationNamesNothing = "INCL005";
+    public const string Incl5IdBridgeNamesNothing = "INCL005";
 
     #region INCL001
 
@@ -147,7 +147,7 @@ internal static class NavigationIncludeRulesProvider
         "renamed or removed, the declaration stops matching anything and the analyzer quietly stops following it.";
 
     private static readonly DiagnosticDescriptor ruleIncl5 = new(
-        Incl5IdDeclarationNamesNothing,
+        Incl5IdBridgeNamesNothing,
         titleIncl5,
         messageFormatIncl5,
         Category,
@@ -176,7 +176,7 @@ internal static class NavigationIncludeRulesProvider
             Incl2IdArgumentDoesntIncludeNavigationProperty => ruleIncl2,
             Incl3IdMethodResultDoesntIncludeNavigationProperty => ruleIncl3,
             Incl4IdCannotCheckNavigationProperty => ruleIncl4,
-            Incl5IdDeclarationNamesNothing => ruleIncl5,
+            Incl5IdBridgeNamesNothing => ruleIncl5,
             _ => throw new ArgumentException("Unknown diagnostic rule id: " + ruleId)
         };
     }

@@ -1,9 +1,9 @@
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.FlowAnalysis;
 using Microsoft.CodeAnalysis.Operations;
-using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Services;
+using Microsoft.CodeAnalysis;
+using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Bridging;
 
-namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Flow;
+namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Search;
 
 /// <summary>
 /// One body being analyzed — a method, a constructor, a local function or a lambda — together with its control
@@ -20,12 +20,12 @@ internal sealed class FlowGraph
     /// </summary>
     /// <param name="graph">Control flow graph of the body.</param>
     /// <param name="method">Method, constructor or local function.</param>
-    /// <param name="declarations">Every [PassesIncludes] the compilation can see.</param>
-    public FlowGraph(ControlFlowGraph graph, IMethodSymbol method, IncludeDeclarations declarations)
+    /// <param name="bridges">Every bridge the compilation can see.</param>
+    public FlowGraph(ControlFlowGraph graph, IMethodSymbol method, Bridges bridges)
     {
         Graph = graph;
         Method = method;
-        Declarations = declarations;
+        Bridges = bridges;
     }
 
     private FlowGraph(
@@ -36,7 +36,7 @@ internal sealed class FlowGraph
         Graph = creationStatement.FlowGraph.Graph.GetAnonymousFunctionControlFlowGraph(lambda, cancellationToken);
         Method = lambda.Symbol;
         CreationStatement = creationStatement;
-        Declarations = creationStatement.FlowGraph.Declarations;
+        Bridges = creationStatement.FlowGraph.Bridges;
         Lambda = lambda;
     }
 
@@ -57,9 +57,9 @@ internal sealed class FlowGraph
     public CodePosition? CreationStatement { get; }
 
     /// <summary>
-    /// Every [PassesIncludes] the compilation can see. The same one for every body of a compilation.
+    /// Every bridge the compilation can see. The same one for every body of a compilation.
     /// </summary>
-    public IncludeDeclarations Declarations { get; }
+    public Bridges Bridges { get; }
 
     /// <summary>
     /// The lambda whose body the graph is; null for every other kind of body.
@@ -91,7 +91,7 @@ internal sealed class FlowGraph
             .Select(localFunction => new FlowGraph(
                 Graph.GetLocalFunctionControlFlowGraph(localFunction, cancellationToken),
                 localFunction,
-                Declarations))
+                Bridges))
             .SelectMany(localFunctionGraph => localFunctionGraph.GetStatements(cancellationToken));
 
         return ownStatements.Concat(lambdaStatements).Concat(localFunctionStatements);

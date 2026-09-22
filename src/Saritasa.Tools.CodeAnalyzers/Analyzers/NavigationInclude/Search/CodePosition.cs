@@ -1,7 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.FlowAnalysis;
 
-namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Flow;
+namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Search;
 
 /// <summary>
 /// A point in execution inside a block: the first <see cref="StatementIndex"/> statements of
@@ -9,8 +9,8 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Flow;
 /// </summary>
 /// <remarks>
 /// <see cref="Statement"/> runs next and <see cref="GetPreviousStatements"/> already ran, so one position
-/// answers both "which statement is this?" and "what was written before it?". The last statement of a block is
-/// its branch value (an if/while condition or a returned value); after it comes the end of the block.
+/// answers both "which statement is this?" and "what was written before it?". A block's last statement is its
+/// branch value: an if/while condition or a returned value.
 /// </remarks>
 internal sealed class CodePosition
 {

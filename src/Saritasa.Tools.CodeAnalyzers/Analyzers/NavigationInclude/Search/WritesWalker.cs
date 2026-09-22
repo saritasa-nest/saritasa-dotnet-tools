@@ -2,25 +2,23 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.FlowAnalysis;
 using Microsoft.CodeAnalysis.Operations;
 
-namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Flow;
+namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Search;
 
 /// <summary>
 /// Answers one question: where was this variable written, above the place it is read.
 /// </summary>
 /// <remarks>
-/// The walker reads code and decides nothing: it reports <see cref="Write"/>s, and <see cref="IncludeSearch"/>
-/// says what they mean. It is told the name of the property only because "user.Profile = x" is a write to the
-/// variable while any other property is not.
-/// A variable is a local, a parameter or a compiler temporary (<see cref="CaptureId"/>), see
-/// <see cref="GetVariable"/>.
+/// The walker reads code and decides nothing: it reports <see cref="Write"/>s, and
+/// <see cref="IncludeSearcher"/> says what they mean. It knows the property name only because
+/// "user.Profile = x" is a write to the variable while any other property is not.
+/// A variable is a local, a parameter or a compiler temporary, see <see cref="GetVariable"/>.
 /// </remarks>
-internal sealed class Walker
+internal sealed class WritesWalker
 {
     private readonly string property;
 
     /// <summary>
-    /// Blocks already read for a variable. Around a loop the walk comes back to the same block; that path adds
-    /// nothing new, and without this set the walk would never stop.
+    /// Blocks already read for a variable. Without this the walk would circle a loop forever.
     /// </summary>
     private readonly HashSet<(BasicBlock Block, object Variable)> visitedBlocks = new();
 
@@ -28,7 +26,7 @@ internal sealed class Walker
     /// Initializes the walk.
     /// </summary>
     /// <param name="property">Navigation property the search is looking for.</param>
-    public Walker(string property)
+    public WritesWalker(string property)
     {
         this.property = property;
     }
@@ -152,7 +150,8 @@ internal sealed class Walker
         return outArgument switch
         {
             null => null,
-            { Parent: IInvocationOperation call } => new Write.OutArgument(Value.Create(call, statement)),
+            { Parameter: { } parameter, Parent: IInvocationOperation call }
+                => new Write.OutArgument(Value.Create(call, statement), parameter.Name),
 
             // An out argument of something that is not a call: there is nothing to follow.
             _ => new Write.Unreadable(),
@@ -160,8 +159,7 @@ internal sealed class Walker
     }
 
     /// <summary>
-    /// No statement of the block writes the variable, so its value comes from before the block: from every way
-    /// control can enter it.
+    /// No statement of the block writes the variable, so it comes from every way control can enter the block.
     /// </summary>
     private IEnumerable<Write> FindWritesBeforeBlock(object variable, FlowGraph flowGraph, BasicBlock block)
     {
@@ -183,8 +181,7 @@ internal sealed class Walker
     }
 
     /// <summary>
-    /// Nothing inside the body of the method, local function or lambda writes the variable, so its value comes
-    /// from outside: it is a parameter, or a variable a lambda captured.
+    /// Nothing in the body writes the variable, so it comes from outside: a parameter, or a capture.
     /// </summary>
     private IEnumerable<Write> FindWritesBeforeBody(object variable, FlowGraph flowGraph)
     {
@@ -211,12 +208,12 @@ internal sealed class Walker
         => !visitedBlocks.Add((block, variable));
 
     /// <summary>
-    /// Places control can enter the block from: the end of every block that jumps to it and, for the first block
-    /// of a catch, filter or finally, every place of the try block it handles.
+    /// Where control can enter the block: every block that jumps to it and, for the first block of a catch,
+    /// filter or finally, every place of the try it handles.
     /// </summary>
     /// <remarks>
-    /// The graph has no jumps for exceptions, so a handler looks unreachable. An exception can leave the try block
-    /// after any of its statements, which is why every place of it is a way into the handler.
+    /// The graph has no jumps for exceptions, so a handler looks unreachable; an exception can leave the try
+    /// after any statement, so every place in it is a way in.
     /// </remarks>
     private static IEnumerable<CodePosition> FindWaysIntoBlock(FlowGraph flowGraph, BasicBlock block)
     {
@@ -244,8 +241,8 @@ internal sealed class Walker
     /// For the first block of a catch, filter or finally: the try region it handles. Null for other blocks.
     /// </summary>
     /// <remarks>
-    /// "try/catch" is a TryAndCatch region with nested Try and Catch regions; "catch when" wraps the handler
-    /// into FilterAndHandler; "try/finally" is TryAndFinally. The try region is always the first nested region.
+    /// "try/catch" is TryAndCatch, "catch when" wraps the handler into FilterAndHandler, "try/finally" is
+    /// TryAndFinally. The try region is always the first nested one.
     /// </remarks>
     private static ControlFlowRegion? FindHandledTryRegion(BasicBlock block)
     {

@@ -1,13 +1,13 @@
 using Microsoft.CodeAnalysis;
 using Saritasa.Tools.CodeAnalyzers.Abstractions.NavigationInclude.Attributes;
-using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Entities;
+using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Search;
 
-namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Services;
+namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Requirements;
 
 /// <summary>
 /// Reads the NavigationInclude attributes of a symbol.
 /// </summary>
-internal static class AttributeHelper
+internal static class AttributeReader
 {
     /// <summary>
     /// Returns true if the symbol is decorated with <see cref="TrackIncludeRequiredAttribute"/>.

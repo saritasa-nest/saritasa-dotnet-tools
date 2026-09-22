@@ -1,12 +1,13 @@
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Operations;
+using Microsoft.CodeAnalysis;
+using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Search;
 
-namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Flow;
+namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Roslyn;
 
 /// <summary>
 /// Batch of functions which hides roslyn details.
 /// </summary>
-internal static class RoslynHelper
+internal static class RoslynReader
 {
     /// <summary>
     /// Removes conversion and delegate creation wrappers around an operation.
@@ -41,5 +42,4 @@ internal static class RoslynHelper
 
         return null;
     }
-
 }

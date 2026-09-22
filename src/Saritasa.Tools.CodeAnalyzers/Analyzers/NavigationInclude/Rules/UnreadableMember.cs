@@ -2,7 +2,7 @@ using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Operations;
 
-namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Services;
+namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Rules;
 
 /// <summary>
 /// The member that stopped the search, carried on an INCL004 diagnostic so that the code fix can offer to
