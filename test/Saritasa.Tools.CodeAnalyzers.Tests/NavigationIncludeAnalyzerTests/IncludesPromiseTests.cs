@@ -64,11 +64,13 @@ public class IncludesPromiseTests : NavigationIncludeTestBase
     }
 
     /// <summary>
-    /// INCL003: method declares [Includes(nameof(User.Profile))] but the created object does not
-    /// set Profile in the object initializer.
+    /// No INCL003: the returned object was not sourced from a query, so there was no Include to miss for any
+    /// property, including one the method's own [Includes] names. The analyzer no longer checks that an
+    /// [Includes] promise is actually kept when the method just constructs a fresh entity; that check is the
+    /// accepted trade-off of treating construction as satisfying the requirement.
     /// </summary>
     [Fact]
-    public async Task CreateUser_ObjectInitMissingProfile_ReportsIncl3()
+    public async Task CreateUser_ObjectInitLeavesProfileUnset_NoIncl3()
     {
         var sourceCode = Preamble +
             /* lang=c# */
@@ -79,14 +81,12 @@ public class IncludesPromiseTests : NavigationIncludeTestBase
                     [Includes(nameof(User.Profile))]
                     User CreateUser(SaveUserDto dto)
                     {
-                        // INCL003: the method has Includes attribute for User.Profile, but Profile is not set.
                         var user = new User
                         {
                             Id = dto.Id,
                             Organization = dto.Organization,
-                            //Profile = new UserProfile{ Timezone = dto.Timezone } // Uncommenting this line would fix the INCL003 warning.
                         };
-                        {|INCL003:return user;|}
+                        return user;
                     }
                 }
             }

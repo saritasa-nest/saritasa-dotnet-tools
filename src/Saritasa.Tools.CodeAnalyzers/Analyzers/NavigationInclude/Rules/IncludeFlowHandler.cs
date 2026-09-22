@@ -83,8 +83,6 @@ internal static class IncludeFlowHandler
                 continue;
             }
 
-            // "Process(user)" with a parameter of a base type, interface or nullable type wraps the local into
-            // a conversion. The rule matches the local itself, and the diagnostic reports its own type.
             var value = RoslynReader.SkipWrappers(argument.Value);
 
             var ruleId = GetRuleForArgument(value, callStatement.FlowGraph);

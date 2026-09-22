@@ -82,11 +82,10 @@ internal sealed class IncludeSearcher
             IInvocationOperation call
                 => IsOurOwnCode(call.TargetMethod, value.Position) ? Answer.NotLoaded : Answer.Unknown(),
 
-            // "new User()": a fresh entity definitely has nothing loaded on it. "new List<User>()" is a
-            // different claim: a fresh container says nothing about what is put into it later, and the analyzer
-            // does not follow mutation, so the honest answer there is that we cannot tell.
-            IObjectCreationOperation creation
-                => IsContainer(creation.Type) ? Answer.Unknown() : Answer.NotLoaded,
+            // "new User()", "new List<User>()": nothing here was sourced from a query, so there was no Include
+            // to miss — Include simply does not apply, which this treats as satisfied rather than a violation.
+            IObjectCreationOperation
+                => Answer.Loaded,
 
             // "dbContext.Users": the query starts here and no Include was put on it.
             IPropertyReferenceOperation reference when IsEntitySet(reference.Property.Type)
@@ -203,17 +202,6 @@ internal sealed class IncludeSearcher
         => SymbolEqualityComparer.Default.Equals(
             method.ContainingAssembly,
             position.FlowGraph.Method.ContainingAssembly);
-
-    /// <summary>
-    /// True for a type that holds other objects, such as "List&lt;User&gt;". A fresh one says nothing about
-    /// what is put into it later, while a fresh entity definitely has nothing loaded.
-    /// </summary>
-    private static bool IsContainer(ITypeSymbol? type)
-        => type is not null &&
-           type.SpecialType != SpecialType.System_String &&
-           (type.SpecialType == SpecialType.System_Collections_IEnumerable ||
-            type.AllInterfaces.Any(implemented =>
-                implemented.SpecialType == SpecialType.System_Collections_IEnumerable));
 
     /// <summary>
     /// True for the "DbSet&lt;User&gt;" of a context property, where a query starts.

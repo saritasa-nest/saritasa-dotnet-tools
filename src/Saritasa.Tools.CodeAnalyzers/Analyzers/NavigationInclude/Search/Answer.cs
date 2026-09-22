@@ -21,13 +21,14 @@ internal sealed class Answer
 
     /// <summary>
     /// The property is loaded on every path: the value comes from ".Include(...)", from a method declared with
-    /// [Includes], someone assigned the property by hand, or the method asks for it with [IncludeRequired].
+    /// [Includes], someone assigned the property by hand, the entity was freshly constructed, or the method
+    /// asks for it with [IncludeRequired].
     /// </summary>
     public static Answer Loaded { get; } = new(isLoaded: true, isUnknown: false, unreadableValue: null);
 
     /// <summary>
-    /// The search followed the entities to the end and the property is not loaded there: "new User()",
-    /// "dbContext.Users" with no Include, a parameter of a method that does not ask for it.
+    /// The search followed the entities to the end and the property is not loaded there: "dbContext.Users"
+    /// with no Include, a parameter of a method that does not ask for it.
     /// </summary>
     public static Answer NotLoaded { get; } = new(isLoaded: false, isUnknown: false, unreadableValue: null);
 

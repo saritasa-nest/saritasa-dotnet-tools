@@ -3,7 +3,8 @@ using Xunit;
 namespace Saritasa.Tools.CodeAnalyzers.Tests.NavigationIncludeAnalyzerTests;
 
 /// <summary>
-/// INCL002: the basic ways a local variable gets its value: a query, an object initializer and a method.
+/// INCL002: the basic ways a local variable gets its value: a query, a fresh entity, an object initializer and
+/// a method.
 /// </summary>
 public class LocalVariableTests : NavigationIncludeTestBase
 {
@@ -74,10 +75,12 @@ public class LocalVariableTests : NavigationIncludeTestBase
     }
 
     /// <summary>
-    /// INCL002: local variable created via object initializer without the required property triggers the warning.
+    /// No INCL002: local variable created via object initializer that leaves the required property unset. The
+    /// entity was not sourced from a query, so there was no Include to miss for any property, including this
+    /// one — the same reasoning as a bare <c>new User()</c>, regardless of which other properties are set.
     /// </summary>
     [Fact]
-    public async Task Handle2_ObjectInitMissingProperty_ReportsIncl2()
+    public async Task Handle2_ObjectInitLeavesPropertyUnset_NoIncl2()
     {
         var sourceCode = Preamble +
             /* lang=c# */
@@ -91,11 +94,10 @@ public class LocalVariableTests : NavigationIncludeTestBase
                         {
                             Id = dto.Id,
                             Organization = dto.Organization,
-                            //Profile = new UserProfile { Timezone = dto.Timezone } // Uncommenting this line would fix the INCL002 warning
                         };
 
-                        // INCL002: the called method requires User.Profile, but it is not set.
-                        {|INCL002:UpdateUserProfile(user, dto)|};
+                        // No INCL002: the entity was not sourced from a query.
+                        UpdateUserProfile(user, dto);
                     }
 
                     [IncludeRequired(nameof(user), nameof(User.Profile))]
@@ -131,6 +133,39 @@ public class LocalVariableTests : NavigationIncludeTestBase
                             Profile = new UserProfile { Timezone = dto.Timezone },
                         };
                         // No INCL002: Profile is set in the object initializer.
+                        UpdateUserProfile(user, dto);
+                    }
+
+                    [IncludeRequired(nameof(user), nameof(User.Profile))]
+                    void UpdateUserProfile(User user, SaveUserDto dto)
+                    {
+                        user.Profile.Timezone = dto.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No INCL002: a freshly constructed entity was not sourced from a query, so there is no Include to have
+    /// missed. The analyzer does not follow a property set afterward by an opaque mapper or builder; that is
+    /// the accepted blind spot of treating construction itself as satisfying the requirement.
+    /// </summary>
+    [Fact]
+    public async Task Handle2_FreshEntity_NoIncl2()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                class TestClass
+                {
+                    async Task Handle2(SaveUserDto dto)
+                    {
+                        var user = new User();
+                        // No INCL002: the entity was not sourced from a query.
                         UpdateUserProfile(user, dto);
                     }
 

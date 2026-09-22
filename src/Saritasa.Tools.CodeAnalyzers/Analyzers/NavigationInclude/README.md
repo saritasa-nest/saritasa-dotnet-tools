@@ -154,7 +154,8 @@ flowchart TD
 
     VALUE -->|"an Include for P"| LOADED
     VALUE -->|"a declared member"| SOURCE
-    VALUE -->|"new User(), db.Users"| NOTLOADED
+    VALUE -->|"new User()"| LOADED
+    VALUE -->|"db.Users"| NOTLOADED
     VALUE -->|"undeclared, our code"| NOTLOADED
     VALUE -->|"undeclared, a library"| UNKNOWN
     VALUE -->|"a variable"| WRITES
@@ -212,7 +213,8 @@ Two rules are in neither diagram:
 | the property is set by hand | `Loaded` | `user.Profile = profile;` or `new User { Profile = p }` |
 | a parameter the method requires loaded | `Loaded` | `[IncludeRequired(nameof(user), "Profile")] void Update(User user)` |
 | a loop that came back to a block already read | `Loaded` | `while (…) { … }` — this path adds nothing new |
-| a value the search can read to its start | `NotLoaded` | `new User()`, `db.Users`, a method of this project that promises nothing |
+| a freshly constructed object | `Loaded` | `new User()`, `new List<User>()` — it was not sourced from a query, so there was no Include to miss |
+| a value the search can read to its start | `NotLoaded` | `db.Users`, a method of this project that promises nothing |
 | a method parameter without the attribute | `NotLoaded` | reported as INCL001, which asks for `[IncludeRequired]` |
 | unreachable code | `Unknown` | no block jumps there |
 | a call nobody declared, in another assembly | `Unknown` | `query.Paginate(1)` from a library |
