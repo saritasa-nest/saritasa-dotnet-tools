@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Net.Mail;
 using System.Threading;
 using System.Threading.Tasks;
@@ -87,7 +86,6 @@ public class SmtpClientEmailSender : EmailSender, IDisposable
     public SmtpClientEmailSender()
     {
         Client = new SmtpClient();
-        Client.SendCompleted += OnEmailSent;
     }
 
     /// <summary>
@@ -102,7 +100,6 @@ public class SmtpClientEmailSender : EmailSender, IDisposable
         }
 
         Client = smtpClient;
-        Client.SendCompleted += OnEmailSent;
     }
 
     /// <summary>
@@ -116,12 +113,6 @@ public class SmtpClientEmailSender : EmailSender, IDisposable
         lastSendTime -= minDelay;
     }
 
-    private void OnEmailSent(object sender, AsyncCompletedEventArgs args)
-    {
-        // The callback is called before the task.
-        isBusy = false;
-        ProcessInternal();
-    }
 
     /// <inheritdoc />
     protected override Task Process(MailMessage message, IDictionary<string, object>? data)
@@ -138,14 +129,7 @@ public class SmtpClientEmailSender : EmailSender, IDisposable
             throw new EmailQueueExceededException(MaxQueueSize);
         }
 
-        if (UseSyncMode)
-        {
-            ProcessInternalSync();
-        }
-        else
-        {
-            ProcessInternal();
-        }
+        ProcessInternal();
 
         return messageTask.TaskCompletionSource.Task;
     }
@@ -158,123 +142,116 @@ public class SmtpClientEmailSender : EmailSender, IDisposable
     /// <returns>Async task operation.</returns>
     internal Task SendAsyncInternal(MailMessage message, IDictionary<string, object>? data) => Process(message, data);
 
-    private bool isDelayScheduled;
-
+    /// <summary>
+    /// Starts the single queue worker when no worker is already active.
+    /// </summary>
     private void ProcessInternal()
     {
-        /*
-         * Lock should be used since there possible race condition when we check isBusy field
-         * and set it to true. If another thread sends email and isBusy is true then no need to
-         * actually call Client.SendMailAsync() since it means that OnEmailSent will be called later and
-         * ProcessInternal will be called anyway. Because actual email sending can be delayed we return
-         * to user our own Task and sync its status with one that is returned by Client.SendMailAsync()
-         * call.
-         * */
         lock (@lock)
         {
-            if (isBusy || ScheduleDelay())
+            if (isBusy)
             {
                 return;
             }
 
-            if (queue.TryDequeue(out var messageTask))
-            {
-                isBusy = true;
-                try
-                {
-                    lastSendTime = DateTime.Now;
-                    Client.SendMailAsync(messageTask.MailMessage).ContinueWith(t =>
-                    {
-                        // Sync current task status (from email) with one that is waited by user.
-                        if (t.IsFaulted)
-                        {
-                            if (t.Exception?.InnerExceptions != null)
-                            {
-                                messageTask.TaskCompletionSource.SetException(t.Exception.InnerExceptions);
-                            }
-                            else
-                            {
-                                messageTask.TaskCompletionSource.SetException(
-                                    new InvalidOperationException("Unexpected exception."));
-                            }
-                        }
-                        else if (t.IsCanceled)
-                        {
-                            messageTask.TaskCompletionSource.SetCanceled();
-                        }
-                        else if (t.IsCompleted)
-                        {
-                            messageTask.TaskCompletionSource.SetResult(true);
-                        }
-                    })
-                    .ConfigureAwait(false);
-                }
-                catch (Exception)
-                {
-                    isBusy = false;
-                }
-            }
+            isBusy = true;
         }
-    }
 
-    private void ProcessInternalSync()
-    {
-        lock (@lock)
-        {
-            if (isBusy || ScheduleDelay())
-            {
-                return;
-            }
-
-            if (queue.TryDequeue(out var messageTask))
-            {
-                isBusy = true;
-                lastSendTime = DateTime.Now;
-                try
-                {
-                    Client.Send(messageTask.MailMessage);
-                    messageTask.TaskCompletionSource.SetResult(true);
-                }
-                catch (Exception ex)
-                {
-                    messageTask.TaskCompletionSource.SetException(ex);
-                }
-                finally
-                {
-                    isBusy = false;
-                }
-            }
-        }
+        // Claim worker ownership under the lock, but run all SMTP operations outside it.
+        _ = ProcessQueueAsync();
     }
 
     /// <summary>
-    /// Schedule delay between emails send.
+    /// Pumps queued messages sequentially and completes each caller task from the
+    /// terminal state of its SMTP operation.
     /// </summary>
-    /// <returns>Delay is scheduled and no need to do email send.</returns>
-    private bool ScheduleDelay()
+    private async Task ProcessQueueAsync()
     {
-        if (MinDelay == TimeSpan.Zero)
+        try
         {
-            return false;
-        }
-        var diff = DateTime.Now - lastSendTime;
-        if (diff <= MinDelay)
-        {
-            if (isDelayScheduled)
+            while (true)
             {
-                return true;
-            }
-            isDelayScheduled = true;
-            Task.Delay(MinDelay - diff, CancellationToken.None)
-                .ContinueWith(t =>
+                // The worker owns queue progression until it observes an empty queue.
+                MailMessageWithTaskSource messageTask;
+                TimeSpan delay;
+
+                lock (@lock)
                 {
-                    isDelayScheduled = false;
-                    OnEmailSent(this, null!);
-                }, CancellationToken.None)
-                .ConfigureAwait(false);
-            return true;
+                    // Check this under the same lock used by ProcessInternal so a newly
+                    // enqueued message cannot be missed while the worker is shutting down.
+                    if (queue.IsEmpty)
+                    {
+                        return;
+                    }
+
+                    // Throttle send starts so MinDelay is measured between message starts.
+                    delay = MinDelay - (DateTime.Now - lastSendTime);
+                    if (delay <= TimeSpan.Zero)
+                    {
+                        queue.TryDequeue(out messageTask);
+                        lastSendTime = DateTime.Now;
+                    }
+                    else
+                    {
+                        messageTask = default;
+                        // Keep the message queued while waiting; this worker remains the only pump.
+                    }
+                }
+
+                // Never hold the sender lock while waiting for the throttle interval.
+                if (delay > TimeSpan.Zero)
+                {
+                    await Task.Delay(delay, CancellationToken.None).ConfigureAwait(false);
+                    continue;
+                }
+
+                // SendMailAsync may fail synchronously before returning its task, so the call
+                // must remain inside the same exception handling as asynchronous failures.
+                try
+                {
+                    if (UseSyncMode)
+                    {
+                        Client.Send(messageTask.MailMessage);
+                    }
+                    else
+                    {
+                        await Client.SendMailAsync(messageTask.MailMessage).ConfigureAwait(false);
+                    }
+
+                    // Complete the caller's task before advancing to the next queued message.
+                    messageTask.TaskCompletionSource.TrySetResult(true);
+                }
+                catch (OperationCanceledException)
+                {
+                    messageTask.TaskCompletionSource.TrySetCanceled();
+                }
+                catch (Exception ex)
+                {
+                    messageTask.TaskCompletionSource.TrySetException(ex);
+                }
+            }
         }
-        return false;
+        finally
+        {
+            bool restartWorker;
+            // A producer may enqueue after the loop's empty-queue check. Recheck under the
+            // lock before releasing ownership so that message cannot leave the queue stalled.
+            lock (@lock)
+            {
+                isBusy = false;
+                restartWorker = !queue.IsEmpty;
+                if (restartWorker)
+                {
+                    isBusy = true;
+                }
+            }
+
+            // Restart only when a producer won the race to enqueue during worker shutdown.
+            if (restartWorker)
+            {
+                _ = ProcessQueueAsync();
+            }
+        }
     }
 
     #region Dispose
@@ -298,7 +275,6 @@ public class SmtpClientEmailSender : EmailSender, IDisposable
         {
             if (disposing)
             {
-                Client.SendCompleted -= OnEmailSent;
                 Client.Dispose();
             }
             disposed = true;

@@ -1,4 +1,7 @@
-﻿2.1.0 [2020-05-29]
+﻿2.2.0 [2026-09-22]
+[*] Fix SmtpClientEmailSender queue stalls and swallowed send exceptions.
+
+2.1.0 [2020-05-29]
 [-] Drop support for net452.
 [+] Add netstandard 2.1 support.
 [+] The package is built with nullable reference type annotations.
