@@ -125,7 +125,7 @@ public class LambdaTests : NavigationIncludeTestBase
     }
 
     /// <summary>
-    /// No INCL002: the lambda runs over a whole chain of calls, and every one of them is declared to hand the
+    /// No INCL002: the lambda runs over a whole chain of calls, and every one of them is annotated to hand the
     /// entities on, so the search reads the chain back to the Include.
     /// </summary>
     [Fact]
@@ -165,7 +165,7 @@ public class LambdaTests : NavigationIncludeTestBase
     /// enough. The method is in the project's own code, where a missing promise is a real answer.
     /// </summary>
     [Fact]
-    public async Task UndeclaredCallInChain_BeforeLambda_ReportsIncl2()
+    public async Task UnannotatedCallInChain_BeforeLambda_ReportsIncl2()
     {
         var sourceCode = Preamble +
             /* lang=c# */
@@ -202,7 +202,7 @@ public class LambdaTests : NavigationIncludeTestBase
 
     /// <summary>
     /// No INCL002 inside a lambda that becomes an expression tree. The parameter of an IQueryable operator is
-    /// declared Expression&lt;Func&lt;TSource, TResult&gt;&gt;, and the search reads through the expression to
+    /// typed Expression&lt;Func&lt;TSource, TResult&gt;&gt;, and the search reads through the expression to
     /// the same TSource, so u is filled from the query.
     /// </summary>
     [Fact]
@@ -266,7 +266,7 @@ public class LambdaTests : NavigationIncludeTestBase
     }
 
     /// <summary>
-    /// No INCL002: the second parameter of a GroupBy result selector is the group, which is declared
+    /// No INCL002: the second parameter of a GroupBy result selector is the group, which is annotated
     /// IEnumerable&lt;TSource&gt; and therefore filled from the source collection.
     /// </summary>
     [Fact]

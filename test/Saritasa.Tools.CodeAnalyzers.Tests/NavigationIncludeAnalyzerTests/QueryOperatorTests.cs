@@ -3,13 +3,13 @@ using Xunit;
 namespace Saritasa.Tools.CodeAnalyzers.Tests.NavigationIncludeAnalyzerTests;
 
 /// <summary>
-/// The built-in declarations of System.Linq and EF Core: which operators keep the entities, and which
+/// The built-in annotations of System.Linq and EF Core: which operators keep the entities, and which
 /// operators or overloads make new objects instead.
 /// </summary>
 public class QueryOperatorTests : NavigationIncludeTestBase
 {
     /// <summary>
-    /// No INCL002: a long chain of EF and LINQ query operators keeps the entities, with nothing declared
+    /// No INCL002: a long chain of EF and LINQ query operators keeps the entities, with nothing annotated
     /// by name anywhere in the analyzer.
     /// </summary>
     [Fact]
@@ -180,12 +180,12 @@ public class QueryOperatorTests : NavigationIncludeTestBase
     }
 
     /// <summary>
-    /// No INCL002: "DefaultIfEmpty(defaultValue)" can hand back the value it was given, but that value is
-    /// the caller's own object rather than something a query loaded, so it is nothing an Include was meant
-    /// to fill.
+    /// No INCL002: "DefaultIfEmpty(defaultValue)" is crossed whichever overload is used. The value argument
+    /// is a second place the entities could come from, and it is not followed — the accepted hole of leaving
+    /// this member on one line, rather than anything the analyzer worked out about the value.
     /// </summary>
     [Fact]
-    public async Task DefaultIfEmptyWithValue_KeepsIncludes_NoIncl2()
+    public async Task DefaultIfEmptyWithValue_ValueArgumentNotFollowed_NoIncl2()
     {
         await VerifyAnalyzerAsync(HandleSource(
             """

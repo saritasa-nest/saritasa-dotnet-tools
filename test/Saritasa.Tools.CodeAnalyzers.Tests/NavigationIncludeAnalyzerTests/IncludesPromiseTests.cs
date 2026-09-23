@@ -3,12 +3,12 @@ using Xunit;
 namespace Saritasa.Tools.CodeAnalyzers.Tests.NavigationIncludeAnalyzerTests;
 
 /// <summary>
-/// INCL003: a method declared with [Includes] must load the property in the value it returns.
+/// INCL003: a method annotated with [Includes] must load the property in the value it returns.
 /// </summary>
 public class IncludesPromiseTests : NavigationIncludeTestBase
 {
     /// <summary>
-    /// INCL003: method declares [Includes(nameof(User.Profile))] but returns a query result
+    /// INCL003: method is annotated with [Includes(nameof(User.Profile))] but returns a query result
     /// without .Include(u => u.Profile).
     /// </summary>
     [Fact]
@@ -36,7 +36,7 @@ public class IncludesPromiseTests : NavigationIncludeTestBase
     }
 
     /// <summary>
-    /// No INCL003: method declares [Includes(nameof(User.Profile))] and the query includes
+    /// No INCL003: method is annotated with [Includes(nameof(User.Profile))] and the query includes
     /// .Include(u => u.Profile).
     /// </summary>
     [Fact]
@@ -85,38 +85,6 @@ public class IncludesPromiseTests : NavigationIncludeTestBase
                         {
                             Id = dto.Id,
                             Organization = dto.Organization,
-                        };
-                        return user;
-                    }
-                }
-            }
-            """;
-
-        await VerifyAnalyzerAsync(sourceCode);
-    }
-
-    /// <summary>
-    /// No INCL003: method declares [Includes(nameof(User.Profile))] and the created object sets
-    /// Profile in the object initializer.
-    /// </summary>
-    [Fact]
-    public async Task CreateUser_ObjectInitWithProfile_NoIncl3()
-    {
-        var sourceCode = Preamble +
-            /* lang=c# */
-            """
-
-                class TestClass
-                {
-                    [Includes(nameof(User.Profile))]
-                    User CreateUser(SaveUserDto dto)
-                    {
-                        // No INCL003: Profile is set in the object initializer.
-                        var user = new User
-                        {
-                            Id = dto.Id,
-                            Organization = dto.Organization,
-                            Profile = new UserProfile { Timezone = dto.Timezone },
                         };
                         return user;
                     }

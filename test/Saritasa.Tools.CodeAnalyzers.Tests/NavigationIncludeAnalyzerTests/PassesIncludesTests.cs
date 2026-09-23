@@ -3,14 +3,14 @@ using Xunit;
 namespace Saritasa.Tools.CodeAnalyzers.Tests.NavigationIncludeAnalyzerTests;
 
 /// <summary>
-/// [PassesIncludes]: declaring on a member or on the assembly which members hand back the entities they were
-/// given, and INCL005 for a declaration that names nothing.
+/// [PassesIncludes]: annotating on a member or on the assembly which members hand back the entities they were
+/// given, and INCL005 for an annotation that names nothing.
 /// </summary>
 public class PassesIncludesTests : NavigationIncludeTestBase
 {
     /// <summary>
-    /// No INCL002: a project's own IQueryable extension keeps the includes once it is declared with
-    /// [PassesIncludes], exactly like the built-in declarations of System.Linq and EF Core.
+    /// No INCL002: a project's own IQueryable extension keeps the includes once it is annotated with
+    /// [PassesIncludes], exactly like the built-in annotations of System.Linq and EF Core.
     /// </summary>
     [Fact]
     public async Task PassesIncludes_WithoutParameterName_NoIncl2()
@@ -50,8 +50,8 @@ public class PassesIncludesTests : NavigationIncludeTestBase
     }
 
     /// <summary>
-    /// No INCL002: a container that is not a collection cannot be read by the analyzer, but the method and the
-    /// property say where their entities come from, so the includes are followed through both.
+    /// No INCL002: a container of the project's own carries the includes, as long as it is one the analyzer
+    /// can read. PagedResult implements IEnumerable, so First() and the rest are already annotated for it.
     /// </summary>
     [Fact]
     public async Task PassesIncludes_OnOwnMethod_NoIncl2()
@@ -101,8 +101,8 @@ public class PassesIncludesTests : NavigationIncludeTestBase
     }
 
     /// <summary>
-    /// INCL006: an instance method cannot be declared with [PassesIncludes]. It could change what it was
-    /// called on, or hand back something it built from a field, and the declaration would look the same, so
+    /// INCL006: an instance method cannot be annotated with [PassesIncludes]. It could change what it was
+    /// called on, or hand back something it built from a field, and the annotation would look the same, so
     /// the promise is one the analyzer has no way to hold it to.
     /// </summary>
     [Fact]
@@ -140,6 +140,59 @@ public class PassesIncludesTests : NavigationIncludeTestBase
                 {
                     [{|INCL006:PassesIncludes(nameof(users))|}]
                     public static IEnumerable<Organization> GetOrganizations(IEnumerable<User> users) => null;
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// INCL006: the rules apply to a callback annotation as well. The end is the callback parameter at the
+    /// named position, so a callback handed something other than an element is rejected like any other
+    /// annotation that changes the entity.
+    /// </summary>
+    [Fact]
+    public async Task PassesIncludes_ToCallbackOfDifferentEntity_ReportsIncl6()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                static class QueryableExtensions
+                {
+                    [{|INCL006:PassesIncludes(nameof(users), ToCallback = nameof(action))|}]
+                    public static void ForEachOrganization(
+                        IEnumerable<User> users,
+                        Action<Organization> action)
+                    {
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No INCL006: the same shape with the callback handed an element of the collection, and the position
+    /// named because it is not the first parameter.
+    /// </summary>
+    [Fact]
+    public async Task PassesIncludes_ToCallbackAtPosition_NoIncl6()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                static class QueryableExtensions
+                {
+                    [PassesIncludes(nameof(users), ToCallback = nameof(action), ToCallbackParameter = 1)]
+                    public static void ForEachWithIndex(
+                        IEnumerable<User> users,
+                        Action<int, User> action)
+                    {
+                    }
                 }
             }
             """;
@@ -207,7 +260,7 @@ public class PassesIncludesTests : NavigationIncludeTestBase
     }
 
     /// <summary>
-    /// INCL002: the declarations only say where the entities come from, so a query without the include is
+    /// INCL002: the annotations only say where the entities come from, so a query without the include is
     /// still reported through them.
     /// </summary>
     [Fact]
@@ -256,11 +309,11 @@ public class PassesIncludesTests : NavigationIncludeTestBase
     }
 
     /// <summary>
-    /// No INCL002: the same thing declared on the assembly instead of the members, which is the only way to
+    /// No INCL002: the same thing annotated on the assembly instead of the members, which is the only way to
     /// describe a library the project does not own.
     /// </summary>
     [Fact]
-    public async Task PassesIncludes_DeclaredOnAssembly_NoIncl2()
+    public async Task PassesIncludes_AnnotatedOnAssembly_NoIncl2()
     {
         var sourceCode = PreambleWithAssemblyAttributes(
             """
@@ -309,11 +362,11 @@ public class PassesIncludesTests : NavigationIncludeTestBase
     }
 
     /// <summary>
-    /// INCL002: a project's own extension that nobody declared is not followed. It is our own code, so the answer
+    /// INCL002: a project's own extension that nothing annotates is not followed. It is our own code, so the answer
     /// is a real one: nothing promises the property is loaded.
     /// </summary>
     [Fact]
-    public async Task UndeclaredOwnExtension_NotFollowed_ReportsIncl2()
+    public async Task UnannotatedOwnExtension_NotFollowed_ReportsIncl2()
     {
         var sourceCode = Preamble +
             /* lang=c# */
@@ -349,11 +402,11 @@ public class PassesIncludesTests : NavigationIncludeTestBase
     }
 
     /// <summary>
-    /// INCL005: a declaration naming a method that does not exist, e.g. after the library renamed it, is reported
+    /// INCL005: an annotation naming a method that does not exist, e.g. after the library renamed it, is reported
     /// instead of silently doing nothing.
     /// </summary>
     [Fact]
-    public async Task Declaration_OfMissingMember_ReportsIncl5()
+    public async Task Annotation_OfMissingMember_ReportsIncl5()
     {
         var sourceCode = PreambleWithAssemblyAttributes(
             """
@@ -374,10 +427,10 @@ public class PassesIncludesTests : NavigationIncludeTestBase
 
     /// <summary>
     /// INCL006: the assembly form names a member by string, so it speaks for every overload at once. When not
-    /// one of them is a method the rules allow, the declaration cannot do anything and is reported.
+    /// one of them is a method the rules allow, the annotation cannot do anything and is reported.
     /// </summary>
     [Fact]
-    public async Task PassesIncludes_DeclaredOnAssemblyForInstanceMethod_ReportsIncl6()
+    public async Task PassesIncludes_AnnotatedOnAssemblyForInstanceMethod_ReportsIncl6()
     {
         var sourceCode = PreambleWithAssemblyAttributes(
             """
@@ -399,10 +452,10 @@ public class PassesIncludesTests : NavigationIncludeTestBase
     }
 
     /// <summary>
-    /// INCL005: the member exists, but it has no parameter with the declared name.
+    /// INCL005: the member exists, but it has no parameter with the annotated name.
     /// </summary>
     [Fact]
-    public async Task Declaration_OfMissingParameter_ReportsIncl5()
+    public async Task Annotation_OfMissingParameter_ReportsIncl5()
     {
         var sourceCode = PreambleWithAssemblyAttributes(
             """

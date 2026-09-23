@@ -62,7 +62,7 @@ public class CollectionTests : NavigationIncludeTestBase
 
     /// <summary>
     /// No INCL002: an array element comes from the array. Array indexing is not a property in Roslyn, so it has a
-    /// rule of its own rather than a declaration.
+    /// rule of its own rather than an annotation.
     /// </summary>
     [Fact]
     public async Task ArrayElement_OverIncludedQuery_NoIncl2()

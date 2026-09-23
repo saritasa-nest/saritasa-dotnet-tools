@@ -3,13 +3,13 @@ using Xunit;
 namespace Saritasa.Tools.CodeAnalyzers.Tests.NavigationIncludeAnalyzerTests;
 
 /// <summary>
-/// INCL001: a method that uses a tracked property of its parameter, or passes the parameter on, must declare
+/// INCL001: a method that uses a tracked property of its parameter, or passes the parameter on, must be annotated with
 /// [IncludeRequired].
 /// </summary>
 public class IncludeRequiredTests : NavigationIncludeTestBase
 {
     /// <summary>
-    /// INCL001 is reported when a method accesses a [TrackIncludeRequired] property directly without declaring [IncludeRequired].
+    /// INCL001 is reported when a method accesses a [TrackIncludeRequired] property directly without [IncludeRequired].
     /// </summary>
     [Fact]
     public async Task DirectPropertyAccess_WithoutIncludeRequired_ReportsIncl1()
@@ -32,7 +32,7 @@ public class IncludeRequiredTests : NavigationIncludeTestBase
     }
 
     /// <summary>
-    /// No warning is produced when a method declares [IncludeRequired] for the parameter it accesses the navigation property on.
+    /// No warning is produced when a method is annotated with [IncludeRequired] for the parameter it accesses the navigation property on.
     /// </summary>
     [Fact]
     public async Task DirectPropertyAccess_WithIncludeRequired_NoIncl1()
@@ -56,7 +56,7 @@ public class IncludeRequiredTests : NavigationIncludeTestBase
     }
 
     /// <summary>
-    /// INCL001 is reported when a method passes its own parameter to a callee that has [IncludeRequired], but the caller does not declare the same requirement.
+    /// INCL001 is reported when a method passes its own parameter to a callee that has [IncludeRequired], but the caller is not annotated with the same requirement.
     /// </summary>
     [Fact]
     public async Task ParameterPropagation_WithoutIncludeRequired_ReportsIncl1()
@@ -91,7 +91,7 @@ public class IncludeRequiredTests : NavigationIncludeTestBase
     }
 
     /// <summary>
-    /// No warning is produced when both the caller and the callee declare [IncludeRequired] for the propagated parameter.
+    /// No warning is produced when both the caller and the callee are annotated with [IncludeRequired] for the propagated parameter.
     /// </summary>
     [Fact]
     public async Task ParameterPropagation_WithIncludeRequired_NoIncl1()

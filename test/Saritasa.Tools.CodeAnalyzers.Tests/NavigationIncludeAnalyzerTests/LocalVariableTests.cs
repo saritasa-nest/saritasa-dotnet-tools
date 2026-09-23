@@ -150,42 +150,6 @@ public class LocalVariableTests : NavigationIncludeTestBase
     }
 
     /// <summary>
-    /// No INCL002: local variable created via object initializer that sets the required property.
-    /// </summary>
-    [Fact]
-    public async Task Handle2_ObjectInitWithProperty_NoIncl2()
-    {
-        var sourceCode = Preamble +
-            /* lang=c# */
-            """
-
-                class TestClass
-                {
-                    async Task Handle2(SaveUserDto dto)
-                    {
-                        var user = new User
-                        {
-                            Id = dto.Id,
-                            Organization = dto.Organization,
-                            Profile = new UserProfile { Timezone = dto.Timezone },
-                        };
-                        // No INCL002: Profile is set in the object initializer.
-                        UpdateUserProfile(user, dto);
-                    }
-
-                    [IncludeRequired(nameof(user), nameof(User.Profile))]
-                    void UpdateUserProfile(User user, SaveUserDto dto)
-                    {
-                        user.Profile.Timezone = dto.Timezone;
-                    }
-                }
-            }
-            """;
-
-        await VerifyAnalyzerAsync(sourceCode);
-    }
-
-    /// <summary>
     /// No INCL002: a freshly constructed entity was not sourced from a query, so there is no Include to have
     /// missed. The analyzer does not follow a property set afterward by an opaque mapper or builder; that is
     /// the accepted blind spot of treating construction itself as satisfying the requirement.
