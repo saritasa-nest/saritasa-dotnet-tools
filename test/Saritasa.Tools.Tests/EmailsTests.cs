@@ -107,6 +107,32 @@ public class EmailsTests
     }
 
     [Fact]
+    public async Task SmtpClientEmailSender_QueueFull_RejectsWithoutSending()
+    {
+        await using var smtpServer = new LocalSmtpServer(delayFirstAcceptedMessage: true);
+        using var sender = new SmtpClientEmailSender(CreateSmtpClient(smtpServer))
+        {
+            MaxQueueSize = 1,
+            UseSyncMode = true
+        };
+
+        var firstTask = Task.Run(() => sender.SendAsync(CreateMessage("first")));
+        await smtpServer.FirstAcceptedMessage.WaitAsync(TestTimeout);
+
+        var secondTask = sender.SendAsync(CreateMessage("second"));
+        await Assert.ThrowsAsync<EmailQueueExceededException>(
+            () => sender.SendAsync(CreateMessage("rejected")));
+
+        smtpServer.ReleaseFirstAcceptedMessage();
+        await firstTask.WaitAsync(TestTimeout);
+        await secondTask.WaitAsync(TestTimeout);
+
+        Assert.Equal(2, smtpServer.Messages.Count);
+        Assert.Contains("Subject: first", smtpServer.Messages[0]);
+        Assert.Contains("Subject: second", smtpServer.Messages[1]);
+    }
+
+    [Fact]
     public async Task SmtpClientEmailSender_SynchronousValidationFailure_FaultsAndContinuesQueue()
     {
         await using var smtpServer = new LocalSmtpServer(delayFirstAcceptedMessage: true);

@@ -121,11 +121,16 @@ public class SmtpClientEmailSender : EmailSender, IDisposable
             throw new ObjectDisposedException(null);
         }
 
-        var messageTask = new MailMessageWithTaskSource(message);
-        queue.Enqueue(messageTask);
-        if (queue.Count > MaxQueueSize)
+        MailMessageWithTaskSource messageTask;
+        lock (@lock)
         {
-            throw new EmailQueueExceededException(MaxQueueSize);
+            if (queue.Count >= MaxQueueSize)
+            {
+                throw new EmailQueueExceededException(MaxQueueSize);
+            }
+
+            messageTask = new MailMessageWithTaskSource(message);
+            queue.Enqueue(messageTask);
         }
 
         ProcessInternal();
@@ -194,7 +199,10 @@ public class SmtpClientEmailSender : EmailSender, IDisposable
 
                 if (delay > TimeSpan.Zero)
                 {
-                    await Task.Delay(delay, CancellationToken.None).ConfigureAwait(false);
+                    // Task.Delay cannot represent arbitrarily long waits; recheck the remaining
+                    // interval after a bounded wait instead of repeatedly faulting the worker.
+                    await Task.Delay(delay > TimeSpan.FromDays(1) ? TimeSpan.FromDays(1) : delay,
+                        CancellationToken.None).ConfigureAwait(false);
                     continue;
                 }
 
