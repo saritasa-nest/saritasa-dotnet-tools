@@ -113,7 +113,6 @@ public class SmtpClientEmailSender : EmailSender, IDisposable
         lastSendTime -= minDelay;
     }
 
-
     /// <inheritdoc />
     protected override Task Process(MailMessage message, IDictionary<string, object>? data)
     {
@@ -175,30 +174,24 @@ public class SmtpClientEmailSender : EmailSender, IDisposable
                 MailMessageWithTaskSource messageTask;
                 TimeSpan delay;
 
-                lock (@lock)
+                if (queue.IsEmpty)
                 {
-                    // Check this under the same lock used by ProcessInternal so a newly
-                    // enqueued message cannot be missed while the worker is shutting down.
-                    if (queue.IsEmpty)
-                    {
-                        return;
-                    }
-
-                    // Throttle send starts so MinDelay is measured between message starts.
-                    delay = MinDelay - (DateTime.Now - lastSendTime);
-                    if (delay <= TimeSpan.Zero)
-                    {
-                        queue.TryDequeue(out messageTask);
-                        lastSendTime = DateTime.Now;
-                    }
-                    else
-                    {
-                        messageTask = default;
-                        // Keep the message queued while waiting; this worker remains the only pump.
-                    }
+                    return;
                 }
 
-                // Never hold the sender lock while waiting for the throttle interval.
+                // Throttle send starts so MinDelay is measured between message starts.
+                delay = MinDelay - (DateTime.Now - lastSendTime);
+                if (delay <= TimeSpan.Zero)
+                {
+                    queue.TryDequeue(out messageTask);
+                    lastSendTime = DateTime.Now;
+                }
+                else
+                {
+                    messageTask = default;
+                    // Keep the message queued while waiting; this worker remains the only pump.
+                }
+
                 if (delay > TimeSpan.Zero)
                 {
                     await Task.Delay(delay, CancellationToken.None).ConfigureAwait(false);
