@@ -1,6 +1,4 @@
 using Microsoft.CodeAnalysis;
-using Saritasa.Tools.CodeAnalyzers.Abstractions.NavigationInclude.Attributes;
-using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Search;
 
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Bridging;
 
@@ -8,27 +6,37 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Bridging;
 /// Every <see cref="Bridge"/> the compilation can see, ready to look up by member.
 /// </summary>
 /// <remarks>
-/// A bridge comes from one of three places, treated the same: the member itself, an
-/// <c>[assembly: PassesIncludes]</c> the compilation can see, and <see cref="BuiltInBridges"/>. Reading the
-/// references is the expensive part, so this is built once per compilation; attributes on the member itself
-/// are read per lookup, since pre-reading them would mean walking every referenced assembly.
-/// Nothing here is inferred. A member nobody declared is not followed.
+/// A bridge comes from one of three places: <see cref="BuiltInBridges"/>, an
+/// <c>[assembly: PassesIncludes]</c>, and the member itself. Reading the references is the expensive part,
+/// so the first two are read once per compilation and the third per lookup.
+/// They are kept apart because they may not say the same things: only a built-in line names overloads or
+/// speaks for a property, and only a built-in line describes a method that is not static, see
+/// <see cref="CustomBridgeRules"/>. Nothing here is inferred; a member nobody declared is not followed.
+/// A lookup asks with the end the search stands on and gets back the ends to move to. Two of them mean the
+/// entities could have come from either place, as for <c>first.Concat(second)</c>.
 /// </remarks>
 internal sealed class Bridges
 {
     /// <summary>
     /// Nothing is declared anywhere. Used where a compilation is not available.
     /// </summary>
-    public static readonly Bridges None = new([]);
+    public static readonly Bridges None = new([], []);
 
     /// <summary>
-    /// Grouped by member name, so a lookup only compares types for members with the right name.
+    /// The built-in table, with every declaring type looked up in the compilation, grouped by member name so
+    /// that a lookup only compares types for members with the right name.
     /// </summary>
-    private readonly ILookup<string, DeclaredBridge> bridges;
+    private readonly ILookup<string, ResolvedBuiltIn> builtIn;
 
-    private Bridges(IEnumerable<DeclaredBridge> bridges)
+    /// <summary>
+    /// What assembly attributes declared, grouped the same way.
+    /// </summary>
+    private readonly ILookup<string, CustomBridge> custom;
+
+    private Bridges(IEnumerable<ResolvedBuiltIn> builtIn, IEnumerable<CustomBridge> custom)
     {
-        this.bridges = bridges.ToLookup(declared => declared.Bridge.MemberName, StringComparer.Ordinal);
+        this.builtIn = builtIn.ToLookup(resolved => resolved.Bridge.MemberName, StringComparer.Ordinal);
+        this.custom = custom.ToLookup(bridge => bridge.MemberName, StringComparer.Ordinal);
     }
 
     /// <summary>
@@ -39,95 +47,67 @@ internal sealed class Bridges
     public static Bridges Read(Compilation compilation)
     {
         var builtIn = BuiltInBridges.All
-            .SelectMany(line => compilation
-                .GetTypesByMetadataName(line.DeclaringType)
-                .Select(type => new DeclaredBridge(type, line.Bridge, isBuiltIn: true)));
+            .SelectMany(bridge => compilation
+                .GetTypesByMetadataName(bridge.DeclaringType)
+                .Select(type => new ResolvedBuiltIn(type, bridge)));
 
-        var written = new[] { compilation.Assembly }
+        var custom = new[] { compilation.Assembly }
             .Concat(compilation.SourceModule.ReferencedAssemblySymbols)
             .SelectMany(assembly => assembly.GetAttributes())
-            .Select(ReadAssemblyAttribute)
-            .OfType<DeclaredBridge>();
+            .Select(PassesIncludesReader.ReadAssemblyAttribute)
+            .OfType<CustomBridge>();
 
-        return new Bridges(builtIn.Concat(written));
+        return new Bridges(builtIn, custom);
     }
 
     /// <summary>
-    /// Where a bridge out of this member's result lands, or null when no bridge runs from there.
+    /// Where a bridge out of this member's result lands.
     /// </summary>
     /// <param name="member">Method or property the search is standing on.</param>
-    /// <returns>Parameter name, an empty string, or null.</returns>
-    public string? FindFromResult(ISymbol member)
-        => Find(member, bridge => bridge is Bridge.FromResult);
+    /// <returns>Ends to move to. Empty when no bridge runs from there.</returns>
+    public IReadOnlyList<BridgeEnd> FindFromResult(ISymbol member)
+        => Find(member, from: new BridgeEnd.Result());
 
     /// <summary>
-    /// Where a bridge out of a callback's parameter lands, or null when no bridge runs from there.
+    /// Where a bridge out of something passed to this method lands. One question covers an out argument and
+    /// a callback parameter alike, since a parameter is never both.
     /// </summary>
-    /// <param name="method">Method the callback is passed to.</param>
-    /// <param name="callback">Name of the method parameter that takes the callback.</param>
-    /// <param name="parameter">Position of the callback's own parameter.</param>
-    /// <returns>Parameter name, an empty string, or null.</returns>
-    public string? FindFromLambdaParameter(IMethodSymbol method, string callback, int parameter)
-        => Find(
-            method,
-            bridge => bridge is Bridge.FromLambdaParameter lambda &&
-                      string.Equals(lambda.Callback, callback, StringComparison.Ordinal) &&
-                      lambda.Parameter == parameter);
+    /// <param name="method">Method the entities were passed to.</param>
+    /// <param name="parameterName">Name of the parameter they arrived through.</param>
+    /// <param name="lambdaPosition">Position inside the callback, when the parameter takes one.</param>
+    /// <returns>Ends to move to. Empty when no bridge runs from there.</returns>
+    public IReadOnlyList<BridgeEnd> FindFromParameter(
+        IMethodSymbol method,
+        string parameterName,
+        int lambdaPosition = 0)
+        => Find(method, new BridgeEnd.Parameter(parameterName, lambdaPosition));
 
     /// <summary>
-    /// Where a bridge out of an out argument lands, or null when no bridge runs from there.
+    /// True when both ends mean the same place at a call.
     /// </summary>
-    /// <param name="method">Method that wrote the out argument.</param>
-    /// <param name="parameter">Name of the out parameter.</param>
-    /// <returns>Parameter name, an empty string, or null.</returns>
-    public string? FindFromOutArgument(IMethodSymbol method, string parameter)
-        => Find(
-            method,
-            bridge => bridge is Bridge.FromOutArgument outArgument &&
-                      string.Equals(outArgument.Parameter, parameter, StringComparison.Ordinal));
-
-    /// <summary>
-    /// The first bridge of this member the search is asking for, written on the member or in the table.
-    /// </summary>
-    private string? Find(ISymbol member, Func<Bridge, bool> isTheOneWanted)
-    {
-        var definition = member.OriginalDefinition;
-
-        foreach (var attribute in definition.GetAttributes())
+    private static bool SameEnd(BridgeEnd left, BridgeEnd right)
+        => (left, right) switch
         {
-            if (ReadMemberAttribute(attribute, definition.Name) is { } written && isTheOneWanted(written))
-            {
-                return written.Source;
-            }
-        }
-
-        // An indexer is named "this[]" in C# and "Item" in metadata.
-        var candidates = bridges[definition.Name].Concat(
-            definition.MetadataName == definition.Name ? [] : bridges[definition.MetadataName]);
-
-        foreach (var declared in candidates)
-        {
-            var bridge = declared.Bridge;
-
-            // An assembly attribute naming a property is ignored, so every property bridge is verifiable.
-            if (!isTheOneWanted(bridge) ||
-                (!declared.IsBuiltIn && definition is IPropertySymbol) ||
-                bridge.ExcludesOverloadOf(definition) ||
-                !IsDeclaredBy(definition, declared.Type))
-            {
-                continue;
-            }
-
-            return bridge.Source;
-        }
-
-        return null;
-    }
+            (BridgeEnd.Result, BridgeEnd.Result) => true,
+            (BridgeEnd.Instance, BridgeEnd.Instance) => true,
+            (BridgeEnd.Parameter first, BridgeEnd.Parameter second)
+                => string.Equals(first.Name, second.Name, StringComparison.Ordinal) &&
+                   first.LambdaPosition == second.LambdaPosition,
+            _ => false,
+        };
 
     /// <summary>
-    /// True if the symbol is declared by the type, or by one deriving from it or implementing it. A name on
-    /// an implementing type is enough: "foreach" over a List calls List's own GetEnumerator, not the
-    /// interface method, and it still has to count as IEnumerable's.
+    /// True if the member is one of the overloads the line does not describe.
+    /// </summary>
+    private static bool ExcludesOverloadOf(BuiltInBridge bridge, ISymbol member)
+        => member is IMethodSymbol method &&
+           bridge.ExcludeOverloadsWithParameters.Any(excluded =>
+               method.Parameters.Any(parameter =>
+                   string.Equals(parameter.Name, excluded, StringComparison.Ordinal)));
+
+    /// <summary>
+    /// True if the symbol is declared by the type, or by one deriving from it or implementing it: "foreach"
+    /// over a List calls the List method, and it still has to count as the IEnumerable one.
     /// </summary>
     private static bool IsDeclaredBy(ISymbol symbol, INamedTypeSymbol declaringType)
     {
@@ -150,72 +130,101 @@ internal sealed class Bridges
     }
 
     /// <summary>
-    /// A [PassesIncludes] written on the member itself, which names its own parameters with nameof.
+    /// Everything declared under the member's name.
     /// </summary>
-    private static Bridge? ReadMemberAttribute(AttributeData attribute, string memberName)
-        => IsPassesIncludes(attribute)
-            ? CreateBridge(memberName, GetStringArgument(attribute, 0) ?? string.Empty, attribute)
-            : null;
+    /// <remarks>
+    /// An indexer is named "this[]" in C# and "Item" in metadata, so both spellings are asked for.
+    /// </remarks>
+    private static IEnumerable<T> GetCandidates<T>(ILookup<string, T> declared, ISymbol definition)
+        => declared[definition.Name].Concat(
+            definition.MetadataName == definition.Name
+                ? []
+                : declared[definition.MetadataName]);
 
     /// <summary>
-    /// An <c>[assembly: PassesIncludes(typeof(SomeType), "Member", "source")]</c>, which names someone else's
-    /// member by string.
+    /// Every bridge of this member running from the given end, from the first place that declares any. The
+    /// member itself has the last word, then the built-in table, then an assembly attribute.
     /// </summary>
-    private static DeclaredBridge? ReadAssemblyAttribute(AttributeData attribute)
+    private IReadOnlyList<BridgeEnd> Find(ISymbol member, BridgeEnd from)
     {
-        if (!IsPassesIncludes(attribute) ||
-            attribute.ConstructorArguments.Length < 2 ||
-            attribute.ConstructorArguments[0].Value is not INamedTypeSymbol declaringType ||
-            GetStringArgument(attribute, 1) is not { } memberName)
+        var definition = member.OriginalDefinition;
+
+        var written = Collect(
+            definition.GetAttributes()
+                .Select(PassesIncludesReader.ReadMemberAttribute)
+                .OfType<Bridge>()
+                .Where(bridge => IsAllowedToDeclare(definition, bridge)),
+            from);
+
+        if (written.Count > 0)
         {
-            return null;
+            return written;
         }
 
-        var bridge = CreateBridge(memberName, GetStringArgument(attribute, 2) ?? string.Empty, attribute);
+        var declared = FindBuiltIn(definition, from);
 
-        return new DeclaredBridge(declaringType.OriginalDefinition, bridge, isBuiltIn: false);
+        return declared.Count > 0 ? declared : FindCustom(definition, from);
     }
 
     /// <summary>
-    /// The attribute can describe a result or a callback; it has no way to name an out parameter.
+    /// The same, among the bridges that ship with the analyzer.
     /// </summary>
-    private static Bridge CreateBridge(string memberName, string source, AttributeData attribute)
-        => GetNamedArgument(attribute, nameof(PassesIncludesAttribute.ToCallback)) is string callback
-            ? new Bridge.FromLambdaParameter(
-                memberName,
-                source,
-                callback,
-                GetNamedArgument(attribute, nameof(PassesIncludesAttribute.ToCallbackParameter)) as int? ?? 0)
-            : new Bridge.FromResult(memberName, source);
-
-    private static bool IsPassesIncludes(AttributeData attribute)
-        => string.Equals(
-            attribute.AttributeClass?.Name,
-            nameof(PassesIncludesAttribute),
-            StringComparison.Ordinal);
-
-    private static object? GetNamedArgument(AttributeData attribute, string name)
-        => attribute.NamedArguments
-            .FirstOrDefault(argument => string.Equals(argument.Key, name, StringComparison.Ordinal))
-            .Value.Value;
-
-    private static string? GetStringArgument(AttributeData attribute, int index)
-        => attribute.ConstructorArguments.Length > index
-            ? attribute.ConstructorArguments[index].Value as string
-            : null;
+    private IReadOnlyList<BridgeEnd> FindBuiltIn(ISymbol definition, BridgeEnd from)
+        => Collect(
+            GetCandidates(builtIn, definition)
+                .Where(resolved =>
+                    !ExcludesOverloadOf(resolved.Bridge, definition) &&
+                    IsDeclaredBy(definition, resolved.Type))
+                .Select(resolved => resolved.Bridge.Bridge),
+            from);
 
     /// <summary>
-    /// A bridge together with the type it was declared on, once that type is resolved against the compilation.
-    /// The declaring type is the only thing a built-in line and an assembly attribute say differently, so it
-    /// is the only thing kept beside the bridge itself.
+    /// The same, among the bridges declared by an assembly attribute.
     /// </summary>
-    private sealed class DeclaredBridge
+    private IReadOnlyList<BridgeEnd> FindCustom(ISymbol definition, BridgeEnd from)
+        => Collect(
+            GetCandidates(custom, definition)
+                .Where(declared => IsDeclaredBy(definition, declared.DeclaringType))
+                .Select(declared => declared.Bridge)
+                .Where(bridge => IsAllowedToDeclare(definition, bridge)),
+            from);
+
+    /// <summary>
+    /// True when a bridge somebody wrote may be used for this member. Only a method: a property named by
+    /// string is ignored, so that every property bridge is one we can verify by reading it. What the rules
+    /// refuse is ignored here and reported as INCL006 where it was written.
+    /// </summary>
+    private static bool IsAllowedToDeclare(ISymbol definition, Bridge bridge)
+        => definition is IMethodSymbol method && CustomBridgeRules.IsAllowed(method, bridge, out _);
+
+    /// <summary>
+    /// The ends the given bridges land on, counting each place once. A Dictionary is both an IDictionary and
+    /// an IReadOnlyDictionary, so its TryGetValue matches two lines that mean the same one place.
+    /// </summary>
+    private static IReadOnlyList<BridgeEnd> Collect(IEnumerable<Bridge> bridges, BridgeEnd from)
     {
-        public DeclaredBridge(INamedTypeSymbol type, Bridge bridge, bool isBuiltIn)
+        var ends = new List<BridgeEnd>();
+
+        foreach (var bridge in bridges)
+        {
+            if (SameEnd(bridge.From, from) && !ends.Any(end => SameEnd(end, bridge.To)))
+            {
+                ends.Add(bridge.To);
+            }
+        }
+
+        return ends;
+    }
+
+    /// <summary>
+    /// One <see cref="BuiltInBridge"/> whose declaring type has been looked up in the compilation.
+    /// </summary>
+    private sealed class ResolvedBuiltIn
+    {
+        public ResolvedBuiltIn(INamedTypeSymbol type, BuiltInBridge bridge)
         {
             Type = type;
             Bridge = bridge;
-            IsBuiltIn = isBuiltIn;
         }
 
         /// <summary>
@@ -224,13 +233,8 @@ internal sealed class Bridges
         public INamedTypeSymbol Type { get; }
 
         /// <summary>
-        /// The bridge itself.
+        /// The line itself: the member, the move, and which overloads it describes.
         /// </summary>
-        public Bridge Bridge { get; }
-
-        /// <summary>
-        /// True for a line that ships with the analyzer rather than one somebody wrote.
-        /// </summary>
-        public bool IsBuiltIn { get; }
+        public BuiltInBridge Bridge { get; }
     }
 }

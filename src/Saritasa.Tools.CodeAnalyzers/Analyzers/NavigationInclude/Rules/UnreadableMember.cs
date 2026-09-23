@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Operations;
+using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Bridging;
 
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Rules;
 
@@ -43,15 +44,27 @@ internal static class UnreadableMember
     }
 
     /// <summary>
-    /// Returns what the code fix needs to write a declaration for the method, and an empty set when the search
-    /// stopped at something no declaration can describe, such as a property.
+    /// Returns what the code fix needs to write a declaration for the method, and an empty set when there is
+    /// no declaration worth offering.
     /// </summary>
+    /// <remarks>
+    /// Three cases where a fix would not help: a property, which no declaration can describe; a method the
+    /// rules would refuse, which swaps this warning for an INCL006; and a member the built-in table leaves
+    /// off on purpose, where declaring it from outside would quietly undo that decision.
+    /// </remarks>
     /// <param name="unknownSource">The value the search could not read.</param>
     /// <returns>Properties for the code fix.</returns>
     public static ImmutableDictionary<string, string?> GetProperties(IOperation? unknownSource)
     {
-        // Only a method can be declared, so a search that stopped at a property offers no fix.
-        if (FindMember(unknownSource) is not IMethodSymbol { ContainingType: { } containingType } method)
+        if (FindMember(unknownSource) is not IMethodSymbol { ContainingType: { } containingType } method ||
+            BuiltInBridges.IsLeftOutOnPurpose(GetMetadataName(containingType), method.Name))
+        {
+            return ImmutableDictionary<string, string?>.Empty;
+        }
+
+        var parameterName = GetSourceParameterName(method);
+
+        if (!CustomBridgeRules.IsAllowed(method, BuildBridge(parameterName), out _))
         {
             return ImmutableDictionary<string, string?>.Empty;
         }
@@ -59,12 +72,30 @@ internal static class UnreadableMember
         return ImmutableDictionary<string, string?>.Empty
             .Add(TypeKey, GetUnboundTypeName(containingType))
             .Add(MethodKey, method.Name)
-            .Add(ParameterKey, GetSourceParameterName(method));
+            .Add(ParameterKey, parameterName);
     }
 
     /// <summary>
-    /// The name to write inside "typeof(...)". A generic type has to be written unbound there, as
-    /// <c>PagedResult&lt;&gt;</c> rather than <c>PagedResult&lt;T&gt;</c>.
+    /// The bridge the code fix would write: out of the result, into the named parameter or the instance.
+    /// </summary>
+    private static Bridge BuildBridge(string parameterName)
+        => new(
+            new BridgeEnd.Result(),
+            parameterName.Length == 0
+                ? new BridgeEnd.Instance()
+                : new BridgeEnd.Parameter(parameterName));
+
+    /// <summary>
+    /// Namespace and metadata name of the type, spelled the way <see cref="BuiltInBridges"/> spells one.
+    /// </summary>
+    private static string GetMetadataName(INamedTypeSymbol type)
+        => type.ContainingNamespace is { IsGlobalNamespace: false } containing
+            ? containing.ToDisplayString() + "." + type.OriginalDefinition.MetadataName
+            : type.OriginalDefinition.MetadataName;
+
+    /// <summary>
+    /// The name to write inside "typeof(...)", unbound: <c>PagedResult&lt;&gt;</c>, not
+    /// <c>PagedResult&lt;T&gt;</c>.
     /// </summary>
     private static string GetUnboundTypeName(INamedTypeSymbol type)
     {
@@ -92,8 +123,7 @@ internal static class UnreadableMember
         };
 
     /// <summary>
-    /// The parameter a declaration would name. An extension method takes its source as the first parameter;
-    /// anything else takes it from the object it is called on, which a declaration writes as no parameter.
+    /// The parameter a declaration would name: the first one for an extension method, none otherwise.
     /// </summary>
     private static string GetSourceParameterName(IMethodSymbol method)
         => method is { IsExtensionMethod: true, Parameters.Length: > 0 }

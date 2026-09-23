@@ -8,7 +8,7 @@ using System.Collections.Immutable;
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude;
 
 /// <summary>
-/// Roslyn diagnostic analyzer that enforces navigation-property include rules (INCL001-INCL005).
+/// Roslyn diagnostic analyzer that enforces navigation-property include rules (INCL001-INCL006).
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class NavigationIncludeAnalyzer : DiagnosticAnalyzer
@@ -26,6 +26,7 @@ public sealed class NavigationIncludeAnalyzer : DiagnosticAnalyzer
         context.RegisterOperationAction(PropertyReferenceHandler.Analyze, OperationKind.PropertyReference);
 
         // INCL005: an [assembly: PassesIncludes] that names nothing.
+        // INCL006: a [PassesIncludes] that is not allowed on the method it describes.
         context.RegisterSyntaxNodeAction(BridgeAttributeHandler.Analyze, SyntaxKind.Attribute);
 
         context.RegisterCompilationStartAction(compilationStart =>

@@ -113,4 +113,86 @@ public class QueryOperatorTests : NavigationIncludeTestBase
                         UpdateUserProfile(user, dto);
             """));
     }
+
+    /// <summary>
+    /// INCL004: "Concat" hands back the entities of two collections, and the analyzer can follow only one
+    /// value at a time. Saying the property is loaded would mean answering for the second collection without
+    /// having looked at it, so it says it cannot tell.
+    /// </summary>
+    [Fact]
+    public async Task Concat_HasTwoSources_ReportsIncl4()
+    {
+        await VerifyAnalyzerAsync(HandleSource(
+            """
+                        var loaded = await dbContext.Users.Include(u => u.Profile).ToListAsync();
+                        var others = await dbContext.Users.ToListAsync();
+                        var user = loaded.Concat(others).First();
+
+                        {|INCL004:UpdateUserProfile(user, dto)|};
+            """));
+    }
+
+    /// <summary>
+    /// INCL004: the same for "Append", whose second source is one entity rather than a collection.
+    /// </summary>
+    [Fact]
+    public async Task Append_HasTwoSources_ReportsIncl4()
+    {
+        await VerifyAnalyzerAsync(HandleSource(
+            """
+                        var loaded = await dbContext.Users.Include(u => u.Profile).ToListAsync();
+                        var user = loaded.Append(new User()).First();
+
+                        {|INCL004:UpdateUserProfile(user, dto)|};
+            """));
+    }
+
+    /// <summary>
+    /// No INCL002: "Except" is matched against the collection it is given, but the entities that come out are
+    /// the ones it was used on, so there is only one place to look.
+    /// </summary>
+    [Fact]
+    public async Task Except_HasOneSource_KeepsIncludes_NoIncl2()
+    {
+        await VerifyAnalyzerAsync(HandleSource(
+            """
+                        var loaded = await dbContext.Users.Include(u => u.Profile).ToListAsync();
+                        var others = await dbContext.Users.ToListAsync();
+                        var user = loaded.Except(others).First();
+
+                        UpdateUserProfile(user, dto);
+            """));
+    }
+
+    /// <summary>
+    /// No INCL002: "DefaultIfEmpty()" hands back the entities it was given.
+    /// </summary>
+    [Fact]
+    public async Task DefaultIfEmpty_KeepsIncludes_NoIncl2()
+    {
+        await VerifyAnalyzerAsync(HandleSource(
+            """
+                        var loaded = await dbContext.Users.Include(u => u.Profile).ToListAsync();
+                        var user = loaded.DefaultIfEmpty().First();
+
+                        UpdateUserProfile(user, dto);
+            """));
+    }
+
+    /// <summary>
+    /// No INCL002: "DefaultIfEmpty(defaultValue)" can hand back the value it was given, but that value is
+    /// the caller's own object rather than something a query loaded, so it is nothing an Include was meant
+    /// to fill.
+    /// </summary>
+    [Fact]
+    public async Task DefaultIfEmptyWithValue_KeepsIncludes_NoIncl2()
+    {
+        await VerifyAnalyzerAsync(HandleSource(
+            """
+                        var loaded = await dbContext.Users.Include(u => u.Profile).ToListAsync();
+                        var user = loaded.DefaultIfEmpty(new User()).First();
+
+                        UpdateUserProfile(user, dto);
+            """));
+    }
 }

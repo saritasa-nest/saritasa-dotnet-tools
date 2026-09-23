@@ -11,6 +11,54 @@ namespace Saritasa.Tools.CodeAnalyzers.Tests.NavigationIncludeAnalyzerTests;
 /// </summary>
 public class PassesIncludesCodeFixTests : NavigationIncludeTestBase
 {
+    private const string ConcatSource =
+        /* lang=c# */
+        """
+        using System;
+        using System.Collections.Generic;
+        using System.Linq;
+        using System.Threading.Tasks;
+        using Microsoft.EntityFrameworkCore;
+        using Saritasa.Tools.CodeAnalyzers.Abstractions.NavigationInclude.Attributes;
+
+        namespace TestApplication
+        {
+            public class AppDbContext : DbContext
+            {
+                public DbSet<User> Users { get; set; }
+            }
+
+            public class UserProfile
+            {
+                public string Timezone { get; set; }
+            }
+
+            public class User
+            {
+                public int Id { get; set; }
+                [TrackIncludeRequired]
+                public UserProfile Profile { get; set; }
+            }
+
+            class TestClass(AppDbContext dbContext)
+            {
+                void Handle()
+                {
+                    // Concat holds the entities of two collections, so it is left off the built-in list.
+                    var loaded = dbContext.Users.Include(u => u.Profile).ToList();
+                    var user = loaded.Concat(dbContext.Users.ToList()).First();
+                    {|INCL004:UpdateUserProfile(user)|};
+                }
+
+                [IncludeRequired(nameof(user), nameof(User.Profile))]
+                void UpdateUserProfile(User user)
+                {
+                    user.Profile.Timezone = "UTC";
+                }
+            }
+        }
+        """;
+
     private const string Source =
         /* lang=c# */
         """
@@ -83,6 +131,28 @@ public class PassesIncludesCodeFixTests : NavigationIncludeTestBase
 
         test.FixedState.Sources.Add(("NavigationIncludes.cs", expectedFile));
 
+        test.TestState.AdditionalReferences.AddRange(AnalyzerReferences);
+        test.FixedState.AdditionalReferences.AddRange(AnalyzerReferences);
+
+        await test.RunAsync(CancellationToken.None);
+    }
+
+    /// <summary>
+    /// No fix is offered for a member the built-in list leaves off on purpose. Writing the declaration would
+    /// be believed and would answer for the second collection, which nobody looked at.
+    /// </summary>
+    [Fact]
+    public async Task CannotCheck_OverMemberLeftOutOnPurpose_OffersNoFix()
+    {
+        var test = new CSharpCodeFixTest<NavigationIncludeAnalyzer, PassesIncludesCodeFixProvider, DefaultVerifier>
+        {
+            ReferenceAssemblies = References,
+            TestCode = ConcatSource,
+            FixedCode = ConcatSource,
+        };
+
+        // Nothing is fixed, so the warning is still there afterwards and the markup describes both states.
+        test.FixedState.MarkupHandling = MarkupMode.Allow;
         test.TestState.AdditionalReferences.AddRange(AnalyzerReferences);
         test.FixedState.AdditionalReferences.AddRange(AnalyzerReferences);
 

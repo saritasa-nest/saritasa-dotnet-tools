@@ -11,51 +11,49 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Bridging;
 /// from — <c>query.Where(...)</c>, <c>users.ToList()</c>, <c>users[0]</c>, <c>page.Items</c>.
 /// </summary>
 /// <remarks>
-/// The shape of the move does not matter, only that the entities on both sides are the same ones. One method
-/// here per bridge kind, all ending in <see cref="GetCallSource"/>.
-/// Nothing is inferred from a signature or a type: what nobody declared is not crossed.
+/// One method per shape the search can be standing on, all landing through <see cref="GetCallSource"/>.
+/// There is normally one value on the other side; a member holding the entities of two places gives two.
+/// Nothing is inferred: what nobody declared is not crossed.
 /// </remarks>
 internal static class BridgeCrosser
 {
     /// <summary>
-    /// The value the entities came from, or null when the move out of this value is not declared or there is
-    /// nothing on the other side of it.
+    /// The values the entities came from. Empty when no bridge runs out of this value.
     /// </summary>
     /// <param name="value">Value the search is reading.</param>
-    /// <returns>Source or null.</returns>
-    public static IOperation? FromValue(Value value)
+    /// <returns>Sources.</returns>
+    public static IReadOnlyList<IOperation> FromValue(Value value)
         => value.Operation switch
         {
             // "query.Where(...)", "users.ToList()", "query.Paginate(1)". Returns query/users
             IInvocationOperation call
-                when value.Position.FlowGraph.Bridges.FindFromResult(call.TargetMethod) is { } from
-                => GetCallSource(call, from),
+                => GetCallSources(value.Position.FlowGraph.Bridges.FindFromResult(call.TargetMethod), call),
 
             // "users[0]", "enumerator.Current", "pair.Value", "page.Items": the entities come from the object
             // the property is read on. Returns users/enumerator/pair/page
             IPropertyReferenceOperation reference
-                when value.Position.FlowGraph.Bridges.FindFromResult(reference.Property) is not null
-                => reference.Instance,
+                when value.Position.FlowGraph.Bridges.FindFromResult(reference.Property)
+                    .Any(to => to is BridgeEnd.Instance)
+                => Single(reference.Instance),
 
             // "users[0]" of an array. Roslyn exposes nothing to name here, so no declaration can describe
             // it, and there is only one value the element can come from. Returns users
             IArrayElementReferenceOperation element
-                => element.ArrayReference,
+                => Single(element.ArrayReference),
 
-            _ => null,
+            _ => [],
         };
 
     /// <summary>
     /// The collection a lambda parameter is filled from: for the <c>u</c> of <c>users.Select(u =&gt; ...)</c>,
-    /// the value <c>users</c>. Null when nobody declared that this parameter is handed an element, as for the
-    /// index of <c>Select((u, i) =&gt; ...)</c> or the key of <c>GroupBy</c>, or when the lambda is not passed
-    /// to a call at all.
+    /// the value <c>users</c>. Empty for a parameter nobody declared, such as the index of
+    /// <c>Select((u, i) =&gt; ...)</c>.
     /// </summary>
     /// <param name="lambda">Lambda the parameter belongs to.</param>
     /// <param name="parameterOrdinal">Position of the parameter in the lambda.</param>
     /// <param name="bridges">Every bridge the compilation can see.</param>
-    /// <returns>Source or null.</returns>
-    public static IOperation? FromLambdaParameter(
+    /// <returns>Sources.</returns>
+    public static IReadOnlyList<IOperation> FromLambdaParameter(
         IFlowAnonymousFunctionOperation lambda,
         int parameterOrdinal,
         Bridges bridges)
@@ -68,43 +66,56 @@ internal static class BridgeCrosser
 
         if (parent is not IArgumentOperation { Parameter: { } lambdaArgument, Parent: IInvocationOperation call })
         {
-            return null;
+            return [];
         }
 
         // The bridge names the callback and the position inside it, so no overload check is needed.
-        return bridges.FindFromLambdaParameter(
-                call.TargetMethod,
-                lambdaArgument.Name,
-                parameterOrdinal) is { } from
-            ? GetCallSource(call, from)
-            : null;
+        return GetCallSources(
+            bridges.FindFromParameter(call.TargetMethod, lambdaArgument.Name, parameterOrdinal),
+            call);
     }
 
     /// <summary>
-    /// The value an out argument's entities came from: for <c>d.TryGetValue(k, out var user)</c>, the
-    /// value <c>d</c>. Null when nobody declared that the method writes entities there.
+    /// The value an out argument came from: for <c>d.TryGetValue(k, out var user)</c>, the value <c>d</c>.
     /// </summary>
     /// <param name="call">Call that wrote the out argument.</param>
     /// <param name="outParameter">Name of the out parameter the entities arrived at.</param>
     /// <param name="bridges">Every bridge the compilation can see.</param>
-    /// <returns>Source or null.</returns>
-    public static IOperation? FromOutArgument(
+    /// <returns>Sources.</returns>
+    public static IReadOnlyList<IOperation> FromOutArgument(
         IInvocationOperation call,
         string outParameter,
         Bridges bridges)
-        => bridges.FindFromOutArgument(call.TargetMethod, outParameter) is { } from
-            ? GetCallSource(call, from)
-            : null;
+        => GetCallSources(bridges.FindFromParameter(call.TargetMethod, outParameter), call);
 
     /// <summary>
-    /// The value a call hands its entities back from.
+    /// The values at the ends the bridges land on, leaving out any that is not there to read.
     /// </summary>
-    /// <remarks>
-    /// Landing on no parameter means the value the method was called on; naming one means the argument
-    /// passed for it.
-    /// </remarks>
-    private static IOperation? GetCallSource(IInvocationOperation call, string parameterName)
-        => parameterName.Length == 0
-            ? RoslynReader.GetReceiver(call)
-            : call.Arguments.FirstOrDefault(argument => argument.Parameter?.Name == parameterName)?.Value;
+    private static IReadOnlyList<IOperation> GetCallSources(
+        IReadOnlyList<BridgeEnd> ends,
+        IInvocationOperation call)
+        => ends.Count == 0
+            ? []
+            : ends.Select(to => GetCallSource(to, call)).OfType<IOperation>().ToList();
+
+    /// <summary>
+    /// The one value there is, or nothing when there is none.
+    /// </summary>
+    private static IReadOnlyList<IOperation> Single(IOperation? source)
+        => source is null ? [] : [source];
+
+    /// <summary>
+    /// The value at the end a bridge lands on: what the method was called on, or the argument for a named
+    /// parameter. A bridge never lands on a result.
+    /// </summary>
+    private static IOperation? GetCallSource(BridgeEnd to, IInvocationOperation call)
+        => to switch
+        {
+            BridgeEnd.Instance => RoslynReader.GetReceiver(call),
+            BridgeEnd.Parameter parameter
+                => call.Arguments
+                    .FirstOrDefault(argument => argument.Parameter?.Name == parameter.Name)
+                    ?.Value,
+            _ => null,
+        };
 }

@@ -31,6 +31,7 @@ If your project uses a [global package reference](https://learn.microsoft.com/en
 | [INCL003](#incl003-includes-promise-not-fulfilled) | Method declares [Includes] but return value does not load the required navigation property | Warning | Usage |
 | [INCL004](#incl004-cannot-check-navigation-property) | Cannot check whether the navigation property is loaded | Warning | Usage |
 | [INCL005](#incl005-preservesincludes-names-nothing) | [PassesIncludes] names a member that does not exist | Warning | Usage |
+| [INCL006](#incl006-passesincludes-is-not-allowed-here) | [PassesIncludes] is not allowed on this method | Warning | Usage |
 
 ---
 
@@ -261,7 +262,10 @@ Four attributes control which navigation properties are tracked and how inclusio
 | `[TrackIncludeRequired]` | Property | Marks a navigation property as requiring explicit loading. Only properties with this attribute are checked by INCL rules. |
 | `[IncludeRequired("param", "Property")]` | Method | Declares that the named parameter must have the named property loaded before the method is called. Repeatable. |
 | `[Includes("Property")]` | Method | Promises that the method's return value has the named property loaded. Repeatable. Set `Verify = false` to skip the INCL003 check of the method body. |
-| `[PassesIncludes]` | Method, property, assembly | Says that the member returns the entities it was given, so their includes are kept. On a method, name the parameter the entities come from: `[PassesIncludes(nameof(query))]`. For a library, put it on your assembly: `[assembly: PassesIncludes(typeof(Lib.Ext), "Paginate", "query")]`. `System.Linq`, EF Core and the collection types are declared already. |
+| `[PassesIncludes]` | Method, assembly | Says that the method hands back the same entity objects it was given, so their includes are kept. Name the parameter they come from: `[PassesIncludes(nameof(query))]`; naming none means the value in front of the dot. For a library, put it on your assembly: `[assembly: PassesIncludes(typeof(Lib.Ext), "Paginate", "query")]`. The method must be **static** and must not change the entity type — see [INCL006](#incl006-passesincludes-is-not-allowed-here). `System.Linq`, EF Core and the collection types are declared already. |
+
+How the analyzer follows a value back to its query is described in the
+[developer documentation](Analyzers/NavigationInclude/README.md).
 
 Example model used in the sections below:
 
@@ -548,7 +552,19 @@ Task<User> GetUser(int id)
 
 ### INCL004: Cannot check navigation property
 
-Triggered when the analyzer follows a value back to the query it came from and meets a method or property of another library that it does not know. The analyzer follows only members declared with `[PassesIncludes]`; `System.Linq`, EF Core and the collection types are declared already.
+Triggered when the analyzer follows a value back to the query it came from and cannot read one of the steps. The analyzer follows only members declared with `[PassesIncludes]`; `System.Linq`, EF Core and the collection types are declared already.
+
+These are the cases it does not follow. All of them give INCL004, never a false pass:
+
+| Not followed | Why |
+|--------------|-----|
+| `Concat`, `Union`, `UnionBy`, `Append`, `Prepend` | the result holds the entities of two collections, and the analyzer follows one value at a time |
+| A property of a library type, such as `page.Items` | a declaration can only describe a method. Make the type enumerable instead |
+| `Cast<T>`, `OfType<T>` | the entity type changes |
+| Entities reached through a navigation property, such as the `f` of `SelectMany(u => u.Friends, (u, f) => ...)` | they came from `u.Friends`, not from the query, and carry different includes |
+
+`Except`, `ExceptBy`, `Intersect` and `IntersectBy` **are** followed: they hand back elements of the
+collection they were used on.
 
 #### Code causing a warning
 
@@ -559,19 +575,20 @@ async Task Handle(SaveUserDto dto)
         .Include(u => u.Profile)
         .Paginate(1); // A library method: the analyzer does not know it keeps the users.
 
-    // INCL004: the analyzer cannot read SomeLib.PagedResult<T>.Items.
-    UpdateUserProfile(page.Items[0], dto);
+    // INCL004: the analyzer cannot read SomeLib.QueryExtensions.Paginate.
+    UpdateUserProfile(page.First(), dto);
 }
 ```
 
 #### Fixed
 
-The code fix adds the declarations to `NavigationIncludes.cs` in the project:
+The code fix adds the declaration to `NavigationIncludes.cs` in the project:
 
 ```csharp
 [assembly: PassesIncludes(typeof(SomeLib.QueryExtensions), "Paginate", "query")]
-[assembly: PassesIncludes(typeof(SomeLib.PagedResult<>), "Items")]
 ```
+
+A declaration can only describe a method. When a library hands its entities back through a property instead, such as `page.Items`, there is nothing to declare and the value cannot be followed. It works when the type is enumerable, because `First()`, `foreach` and the rest are declared already.
 
 A method in your own project that is not declared gives INCL002 instead, because it can be read and promises nothing. Declare it on the method itself:
 
@@ -597,4 +614,53 @@ Triggered when an assembly-level `[PassesIncludes]` names a member or a paramete
 
 ```csharp
 [assembly: PassesIncludes(typeof(SomeLib.QueryExtensions), "Paginate", "query")]
+```
+
+---
+
+### INCL006: \[PassesIncludes\] is not allowed here
+
+Triggered when a `[PassesIncludes]` describes a method it may not describe. The declaration is ignored, and this says so where it is written, rather than leaving it to turn up as an INCL004 in another file.
+
+`[PassesIncludes]` is a promise that the **same entity objects** come out of the method that went into it. Nothing the analyzer reads can check that, so the two shapes where it can quietly be false are not allowed.
+
+**The method must be static.** An instance method can change what it was called on, or hand back something it built from a field, and the declaration would look the same. An extension method counts as static, and the value in front of the dot is its first parameter.
+
+```csharp
+public class UserBatch
+{
+    private readonly List<User> items = new();
+
+    // INCL006: only a static method can be declared to hand back the entities it was given.
+    [PassesIncludes]
+    public List<User> GetItems() => items;
+}
+```
+
+**The entity type must not change.** The container may: `IQueryable<User>` to `List<User>`, to `Task<User>`, to a single `User`.
+
+```csharp
+// INCL006: it would carry entities from 'User' to 'Organization'.
+[PassesIncludes(nameof(users))]
+public static IEnumerable<Organization> GetOrganizations(IEnumerable<User> users) => ...;
+```
+
+A container of your own counts only if the analyzer can read it, which means implementing `IEnumerable<T>`. Without that it cannot be told apart from a declaration pointing at an unrelated entity:
+
+```csharp
+// INCL006: 'UserBatch' is not a collection the analyzer can read.
+public class UserBatch
+{
+    public List<User> Items { get; set; }
+}
+
+// Fixed: now the entities in it can be seen.
+public class UserBatch : IEnumerable<User>
+{
+    public List<User> Items { get; set; }
+
+    public IEnumerator<User> GetEnumerator() => Items.GetEnumerator();
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+}
 ```

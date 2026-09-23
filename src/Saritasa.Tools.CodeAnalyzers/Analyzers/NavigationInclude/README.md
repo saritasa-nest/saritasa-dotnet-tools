@@ -3,7 +3,7 @@
 This document explains how the NavigationInclude analyzer is built. It is for developers who want to understand
 or change it. You do not need to know Roslyn: the few compiler words it uses are explained where they appear.
 
-If you only want to *use* the analyzer, read the [package README](../../README.md#navigation-include-attributes).
+If you only want to *use* the analyzer, read the [package README](../../README.md#navigation-include-analyzer).
 
 ## Contents
 
@@ -11,7 +11,7 @@ If you only want to *use* the analyzer, read the [package README](../../README.m
 2. [What the analyzer checks](#what-the-analyzer-checks)
 3. [How it works: one idea, two jobs](#how-it-works-one-idea-two-jobs)
 4. [Two examples, step by step](#two-examples-step-by-step)
-5. [What the analyzer knows about entities](#what-the-analyzer-knows-about-entities)
+5. [Bridging](#bridging)
 6. [Reading the code: bodies and positions](#reading-the-code-bodies-and-positions)
 7. [Special cases](#special-cases)
 8. [When the analyzer cannot read the code](#when-the-analyzer-cannot-read-the-code)
@@ -69,10 +69,11 @@ Two kinds of places, and both ask the same thing about one value:
 Reading `user.Profile` directly inside a method is also INCL001. That case needs no search at all and is handled
 by `PropertyReferenceHandler` alone. The rest of this document is about the other two.
 
-Two more results come out of the search itself. **INCL004** means *the analyzer could not read the code far
+Three more results come out of the search itself. **INCL004** means *the analyzer could not read the code far
 enough to decide*; it is a warning with a code fix, see
-[When the analyzer cannot read the code](#when-the-analyzer-cannot-read-the-code). **INCL005** is about the
-the bridges themselves: an `[assembly: PassesIncludes]` that names a member which does not exist.
+[When the analyzer cannot read the code](#when-the-analyzer-cannot-read-the-code). **INCL005** and **INCL006**
+are about the bridges themselves: one names a member that does not exist, the other describes a method the
+rules do not allow, see [Bridging](#bridging).
 
 ## How it works: one idea, two jobs
 
@@ -103,7 +104,7 @@ statements connected by arrows — so the analyzer needs no special code for `if
 | **Value** | a place where entities sit: a variable, a parameter, an argument or the result of an expression, together with the position in the code where it is read | `Search/Value.cs` |
 | **Answer** | what the search decided: `Loaded`, `NotLoaded` or `Unknown` | `Search/Answer.cs` |
 | **Write** | one thing found above a variable: `Written`, `OutArgument`, `MethodParameter`, `LambdaParameter`, `NothingNew`, `NeverWritten`, `Unreadable` | `Search/Write.cs` |
-| **Bridge** | a declared move from one value to another that keeps the same entities: `Where`, `ToList`, `page.Items`, an indexer. It has a direction, because the search reads backwards | `Bridging/Bridge.cs` |
+| **Bridge** | a declared move from one value to another that keeps the same entities: `Where`, `ToList`, `page.Items`, an indexer. A pair of `BridgeEnd`s, read backwards | `Bridging/Bridge.cs` |
 
 A value is a question and an answer is a decision, and the code never mixes the two. A write is a fact about the
 code and never a decision.
@@ -362,109 +363,192 @@ its own: `foreach`, the enumerator, the indexer-like property and the library me
 If the `Items` bridge were missing, step ⑤ would end at `Unknown` and the analyzer would report INCL004 on
 line 4, with a code fix that writes it.
 
-## What the analyzer knows about entities
+## Bridging
 
-### `Bridges`: the only place that decides what is followed
+A **bridge** is a declared move of entities across a call: the objects coming out are the same ones that went
+in. It is what lets the search take one more step. A member is followed **only if a bridge is declared for
+it** — there is no guessing from types, and no special code for `System.Linq` or EF Core.
 
-A member is followed **only if a bridge is declared for it**. There is no guessing from types and no special
-code for `System.Linq` or EF Core. A bridge comes from one of three places, and all of them are used the same
-way:
+A bridge says nothing about *which* property is loaded, only where the entities travelled. That is why one
+declaration covers every navigation property.
 
-| Where | Example |
+### The four moves
+
+A call offers three places where entities can sit, so `BridgeEnd` has three cases:
+
+| End | Means |
 |---|---|
-| on the member itself | `[PassesIncludes(nameof(query))] PagedResult<User> Paginate(IQueryable<User> query)` |
-| on an assembly: the project or anything it references | `[assembly: PassesIncludes(typeof(SomeLib.Ext), "Paginate")]` |
-| built into the analyzer | `Where`, `ToListAsync`, `Include`, `GetEnumerator`, `Current`, `TryGetValue`, indexers, ... |
+| `Result` | what the call handed back |
+| `Instance` | what it was used on; for an extension method, its first parameter |
+| `Parameter(name, lambdaPosition)` | something passed to it |
 
-The built-in list is in `BuiltInBridges.cs`, one line per member. It names types by string, so the analyzer
-does not depend on EF Core, and a line for a type the project does not use simply matches nothing. A bridge on
-an interface covers every class that implements it, so `IEnumerable<T>.GetEnumerator` covers the
-`GetEnumerator` that `foreach` calls on a `List`, and `IList<T>` covers the indexer of `List<T>`.
+A `Bridge` is a pair of them, read backwards: `From` is where the search is standing, `To` is where it goes
+next. Only four pairs are meaningful, because the search always stands on a result or on something that
+arrived through a parameter, and only ever moves backwards:
 
-`Select` and `SelectMany` have no result bridge. They make new objects, so their result has no includes.
-
-### A bridge has a direction
-
-The search reads **backwards**, so every bridge runs from something a member hands back to one of its inputs.
-A member hands something back in exactly three ways, and each is a bridge of its own:
-
-`Bridge` is one type with three cases, the same shape as `Write`:
-
-| Case | Runs from | Example | Written as |
+| From | To | Example | Moves to |
 |---|---|---|---|
-| `Bridge.FromResult` | the value the member handed back | `users.ToList()`, `page.Items`, `users[0]` | `Result(LinqEnumerable, "Where")` |
-| `Bridge.FromLambdaParameter` | a parameter of a callback it calls | the `u` of `users.Select(u => ...)` | `Lambda(LinqEnumerable, "Where", "predicate")` |
-| `Bridge.FromOutArgument` | an out argument it wrote | the `user` of `d.TryGetValue(k, out var user)` | `Out(IDictionary, "TryGetValue", "value")` |
+| `Result` | `Instance` | `users.ToList()`, `users[0]`, `page.Items` | `users`, `page` |
+| `Result` | `Parameter` | `Enumerable.ToList(users)` | `users` |
+| `Parameter` | `Instance` | `dict.TryGetValue(id, out var user)` | `dict` |
+| `Parameter` | `Parameter` | `Enumerable.Select(query, selector)` | `query` |
 
-Each case carries only what it needs — the callback case knows which parameter takes the callback and the
-position inside it, the out case knows the out parameter, the result case needs neither.
+`From` is never `Instance` and `To` is never `Result`. Both are asserted in the `Bridge` constructor and
+covered by the built-in table test.
 
-Where a bridge **lands** is the line's source: empty means the value the member was used on, otherwise the
-parameter named. So `Result(LinqEnumerable, "Where")` lands on the receiver, and
-`[assembly: PassesIncludes(typeof(Ext), "Paginate", "query")]` lands on the argument passed for `query`.
+The shape of the move does not matter to the search — collection to collection, collection to one value, one
+value to collection, one value to another are all the same thing. What matters is only that the entities on
+both sides are the same objects.
 
-One method can carry two bridges — `Where` has a `FromResult` line and a `FromLambdaParameter` line — and they
-stay separate lines, because they run from different places to different places.
+### One end for three shapes
 
-`BridgeCrosser` is the only place that walks bridges, with one method per case, and `Bridges` is the only place
-that looks them up, with one finder per case. The shape of the move does not matter to either:
+`Parameter` covers an ordinary argument, an `out` argument the call wrote, and a parameter of a callback the
+call was given. The search only needs to know which parameter the entities travelled through, and a parameter
+is never both an `out` and a callback, so the three cannot collide. `BuiltInBridges` still spells them
+differently, so a reader sees which is which:
 
-| Move | Example |
-|---|---|
-| collection to collection | `query.Where(...)`, `users.ToList()` |
-| collection to one value | `users.First()`, `users[0]`, `enumerator.Current` |
-| one value to collection | `page.Items` |
-| one value to another | `pair.Value`, `task.Result` |
+```csharp
+Declare(type,       member: "Select",      from: Callback("selector"),          to: Instance),
+Declare(type,       member: "Aggregate",   from: Callback("func", position: 1), to: Instance),
+Declare(Dictionary, member: "TryGetValue", from: OutArgument("value"),          to: Instance),
+Declare(type,       member: "Join",        from: Callback("innerKeySelector"),  to: Parameter("inner")),
+```
 
-All four are the same thing to the search: the entities on both sides are the same ones, so it keeps walking.
-Every move needs a bridge, with one exception — an array element, `users[0]` over `User[]`, has no member in
-Roslyn for a line to name, and there is only one value it can come from.
+### Why the lambda position is written down
+
+A callback is handed values from more than one place, and their **types cannot tell them apart**:
+
+| Lambda | Position 0 | Position 1 |
+|---|---|---|
+| `Select(u => ...)` | the element | — |
+| `Select((u, i) => ...)` | the element | an index, not an entity |
+| `GroupBy(k, (key, group) => ...)` | the key | the group |
+| `Aggregate(seed, (acc, u) => ...)` | the accumulator, **same type as the element** | the element |
+| `Join(..., (outer, inner) => ...)` | from the outer collection | from the inner one |
+
+An earlier attempt replaced the position with a type comparison and fell over on `Aggregate` and self-joins,
+where both parameters are the same type. The position is data, not something to infer. Nothing is inferred
+from the delegate type either: a parameter nobody named is not followed, which is why the search stops at the
+`i` of `Select((u, i) => ...)`.
+
+### Built-in bridges
+
+`BuiltInBridges.cs` holds the table, one line per member of `System.Linq`, EF Core and the collection types.
+Each line means exactly what a `[PassesIncludes]` means and goes through the same lookup, so nothing about
+Microsoft's methods is special.
+
+Types are named by metadata string, so the analyzer does not depend on EF Core, and a line for a type the
+project does not use simply matches nothing. A line on an interface covers every class implementing it, so
+`IEnumerable<T>.GetEnumerator` covers the one `foreach` calls on a `List`, and `IList<T>` covers the indexer
+of `List<T>`.
+
+`Enumerable` and `Queryable` declare most operators identically, so those are written once in
+`QueryOperators` and read for both. Keeping two hand-written copies in step is how `Queryable` once came to
+claim a `ToDictionary` it does not have.
+
+`Select` and `SelectMany` have no result line. They make new objects, so their result has no includes.
 
 ### Overloads that disagree
 
-A line names a member, and a member can be several overloads that do different things. `Enumerable.Min` hands
-back an element, except in the overload that takes a `selector`, which hands back whatever the selector
-returned. Counting parameters cannot separate them — `Min(source, comparer)` and `Min(source, selector)` both
-take two — so the overload is excluded by the name of the parameter that makes the difference:
+A line names a member, and a member can be several overloads that do different things:
 
 ```csharp
-ResultExceptOverloadWith(LinqEnumerable, "Min", "selector"),
+users.Min()                  // an element
+users.Min(comparer)          // an element
+users.Min(u => u.Manager)    // whatever the selector returned - which is also a User
 ```
 
-Three members need this: `Min`, `Max` and `ToDictionary`. Renaming a public parameter of the BCL is a
-source-breaking change, because callers can pass arguments by name, so the name is safe to lean on. What a
-name cannot see is a future overload that projects under some other parameter name, which would silently widen
-the line — this is the only place in the subsystem where a string failing to match makes the analyzer *more*
-permissive rather than less.
+Neither the parameter count nor the types can separate them, so the odd ones out are named:
 
-### Where a lambda parameter is filled from
+```csharp
+Declare(type, member: "Min", from: Result, to: Instance, excludeOverloadsWithParameters: ["selector"]),
+```
 
-In `users.Select(u => ...)` the question is whether `u` is filled from `users`. That is the
-`FromLambdaParameter` direction, and it is a line like any other: it names the parameter that takes the
-callback, and the position inside that callback.
+Six members need this: `Min`, `Max`, `ToDictionary` and their EF `Async` twins. Renaming a public BCL
+parameter is source-breaking, because callers may pass by name, so the name is safe to lean on. What a name
+cannot see is a future overload that projects under some other parameter name, which would silently widen the
+line — the only place in the subsystem where a string failing to match makes the analyzer *more* permissive.
 
-| Lambda | Line |
+An entity-type comparison was tried here instead and does not work: `users.Min(u => u.Manager)` hands back a
+`User` just as `users.Min()` does. See `CustomBridgeRules.EntityType`, which is why that code is nested out of
+reach of the table.
+
+### Custom bridges and their rules
+
+Three places declare a bridge, and `Bridges.Find` asks them in order — the member itself has the last word,
+then the built-in table, then an assembly attribute:
+
+| Where | Example |
 |---|---|
-| `Select(u => ...)`, `u` is the element | `Lambda(LinqEnumerable, "Select", "selector")` |
-| `Select((u, i) => ...)`, `i` is not | no line, so `i` is not followed |
-| `GroupBy(k, (key, group) => ...)`, `group` is at position 1 | `Lambda(LinqEnumerable, "GroupBy", "resultSelector", lambdaParameter: 1)` |
-| `Join(..., (outer, inner) => ...)`, `inner` comes from the other collection | `Lambda(LinqEnumerable, "Join", "resultSelector", lambdaParameter: 1, source: "inner")` |
-| your own `ForEachItem(this IEnumerable<T>, Action<T>)` | `[PassesIncludes(ToCallback = nameof(action))]` |
+| on the member | `[PassesIncludes(nameof(query))] static PagedList<User> Paginate(this IQueryable<User> query, int page)` |
+| on an assembly, the project or anything it references | `[assembly: PassesIncludes(typeof(SomeLib.Ext), "Paginate", "query")]` |
+| built into the analyzer | `BuiltInBridges.cs` |
 
-Nothing is inferred from the delegate's type: a parameter nobody named is not followed, which is why the search
-stops at the `i` of `Select((u, i) => ...)`.
+`PassesIncludesReader` turns the attribute into a `Bridge`, so the lookup and the rule that reports INCL006
+cannot read it differently. An assembly attribute names the member by string and so speaks for every overload
+at once; it therefore carries no overload data, and it is ignored for a property, which keeps every property
+bridge one we can verify by reading it.
+
+What somebody writes is a promise the analyzer cannot check, so `CustomBridgeRules` allows only the shapes
+where it cannot quietly be false. Both are reported as **INCL006** and otherwise ignored:
+
+| Rule | Why |
+|---|---|
+| the method must be **static** | an instance method can change what it was called on, or hand back something built from a field, and the declaration would still look right |
+| the **entity type must not change** | otherwise nobody reading the code can say which query a value came from, which is the question the analyzer exists to answer |
+
+The type check strips containers from both sides — `Task`, `Nullable`, arrays, anything enumerable, with
+dictionaries and groupings holding their entities in the last argument — and the leaves must match. A
+container of somebody's own is not on that list, so a bridge into one is rejected: it looks the same as a
+bridge to an unrelated entity, and making it implement `IEnumerable<T>` is what tells the two apart. A type
+that says nothing at all, such as `object` or one that did not compile, is let through.
+
+None of this applies to `BuiltInBridge`, which is ours and is checked by being read. That is why `EntityType`
+is a private class inside `CustomBridgeRules` rather than a type of its own.
+
+### More than one bridge at once
+
+`Bridges.Find` returns **every** matching end, not the first. Equal ends are collapsed, which is not cosmetic:
+a `Dictionary<K,V>` is both an `IDictionary` and an `IReadOnlyDictionary`, so its `TryGetValue` matches two
+lines meaning the same one place.
+
+Two different ends mean the entities could have come from either place. `IncludeSearcher.SearchSources` is the
+only place that decides what that is worth, and today it answers `Unknown`:
+
+```csharp
+private Answer SearchSources(IReadOnlyList<IOperation> sources, CodePosition position)
+    => sources.Count == 1
+        ? Search(sources[0], position)
+        : Answer.Unknown();
+```
+
+When fan-out is implemented — "all of them must be loaded" — that method is the only one that changes.
+
+### What is deliberately not crossed
+
+| Not crossed | Why |
+|---|---|
+| `Concat`, `Union`, `UnionBy`, `Append`, `Prepend` | the result holds the entities of two places, and one line names one. `BuiltInBridges.IsLeftOutOnPurpose` names them, so the INCL004 code fix does not offer to declare them back |
+| `Except`, `ExceptBy`, `Intersect`, `IntersectBy` **are** crossed | they hand back elements of the collection they were used on; what they are given is only matched against, and for the `By` pair it is a list of keys |
+| a property of a library type, such as `page.Items` | an attribute cannot be written on a property, and one naming a property by string is ignored |
+| `Cast<T>`, `OfType<T>` | the entity type changes |
+| the `f` of `SelectMany(u => u.Friends, (u, f) => ...)` | it came from `u.Friends`, not from the query, so it carries different includes. Following it would need to read the lambda's returned value, which is not done |
+
+Two things are not bridges at all, because there is nothing to name: an array element, `users[0]` over
+`User[]`, which Roslyn exposes no member for and which can come from only one value, and `.Include(...)`
+itself.
 
 ### `EfIncludeReader`: the only code that knows Entity Framework
 
-Every other rule answers "do the entities pass through this call?", which a bridge can say. This one
-answers a different question, "which property was added?", and no general rule can do that:
+Every other rule answers "do the entities pass through this call?", which a bridge can say. This one answers
+"which property was added?", and no general rule can do that:
 
 ```csharp
 query.Include(u => u.Profile)   // the analyzer must read the name "Profile" from the lambda
 ```
 
-It stays a transformation as well: `Include(u => u.Orders)` does not load `Profile`, and the search keeps
-walking back through it.
+It is a bridge as well: `Include(u => u.Orders)` does not load `Profile`, so the search keeps walking back
+through it.
 
 ## Reading the code: bodies and positions
 
@@ -535,24 +619,24 @@ code it reports **INCL002** instead, because that method can be read and it prom
 fix is `[PassesIncludes]`, which means "this member returns the entities that it was given":
 
 ```csharp
-[PassesIncludes(nameof(query))]                      // on a method: names the parameter
-public PagedResult<User> Paginate(IQueryable<User> query, int page)
-
-[PassesIncludes]                                     // on a property: the object it belongs to
-public List<T> Items { get; set; }
+[PassesIncludes(nameof(query))]                      // names the parameter the entities come from
+public static PagedResult<User> Paginate(this IQueryable<User> query, int page)
 ```
 
 For a library the project does not own, the attribute goes on the assembly, before the namespace:
 
 ```csharp
 [assembly: PassesIncludes(typeof(SomeLib.QueryExtensions), "Paginate", "query")]
-[assembly: PassesIncludes(typeof(SomeLib.PagedResult<>), "Items")]
 ```
+
+A property cannot be declared this way, so a library that hands its entities back through one, such as
+`page.Items`, cannot be followed unless its type is enumerable.
 
 Assembly attributes are read from the project itself and from every project and package it references, so a
 shared project can declare a library once for the whole solution. If such an attribute names a member or a
 parameter that does not exist, for example after the library renamed a method, the analyzer reports **INCL005**;
-without it the bridge would silently stop working.
+without it the bridge would silently stop working. A declaration the rules do not allow is **INCL006**, and is
+ignored the same way.
 
 Users do not have to write these by hand. The code fix for INCL004 offers them and creates the file
 `NavigationIncludes.cs` if the project has none yet, the way Visual Studio uses `GlobalSuppressions.cs`.
@@ -582,10 +666,15 @@ job it does — `IncludeSearcher`, `WritesWalker`, `BridgeCrosser`, `EfIncludeRe
 
 | File | What it does |
 |---|---|
-| `Bridge.cs` | One declared move of entities: `FromResult`, `FromLambdaParameter` or `FromOutArgument`. |
+| `Bridge.cs` | One declared move of entities: a `From` end and a `To` end, nothing else. |
+| `BridgeEnd.cs` | One side of a move: `Result`, `Instance` or `Parameter(name, lambdaPosition)`. |
 | `Bridges.cs` | Every bridge the compilation can see, the built-in ones included, and the lookups over them. The only place that decides what is followed. |
 | `BuiltInBridges.cs` | The catalogue: one line per member of `System.Linq`, EF Core and the collection types that the search may cross. |
-| `BridgeCrosser.cs` | Which value the entities came from, one method per bridge case. The only file that walks bridges. |
+| `BuiltInBridge.cs` | One line of that catalogue: the member, the move, and which overloads it describes. |
+| `CustomBridge.cs` | One `[assembly: PassesIncludes]`: the member and the move, with the type already resolved. |
+| `CustomBridgeRules.cs` | What a bridge somebody writes may say, and the container table behind the entity-type rule. |
+| `PassesIncludesReader.cs` | The attribute, turned into a `Bridge` once for everyone who reads it. |
+| `BridgeCrosser.cs` | Which values the entities came from, one method per shape the search stands on. The only file that walks bridges. |
 
 **`Rules/` — what do we report?**
 
@@ -593,7 +682,7 @@ job it does — `IncludeSearcher`, `WritesWalker`, `BridgeCrosser`, `EfIncludeRe
 |---|---|
 | `IncludeFlowHandler.cs` | Finds the places to check, calls `Check`, reports INCL001 – INCL004. |
 | `PropertyReferenceHandler.cs` | INCL001 for direct `param.Profile` access, without flow analysis. |
-| `BridgeAttributeHandler.cs` | INCL005: an `[assembly: PassesIncludes]` that names nothing. |
+| `BridgeAttributeHandler.cs` | INCL005 and INCL006: a `[PassesIncludes]` that names nothing, or that the rules do not allow. |
 | `NavigationIncludeRulesProvider.cs` | The diagnostic descriptors and their ids. |
 | `UnreadableMember.cs` | The member that stopped the search. INCL004 carries it for the code fix. |
 

@@ -13,9 +13,8 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.CodeFixes;
 /// Offers to declare the method that stopped the search, so that INCL004 can be answered.
 /// </summary>
 /// <remarks>
-/// The bridge is written on the project's own assembly, which is the only way to describe a method of a
-/// library the project does not own. It goes into a file of its own, the way Visual Studio keeps suppressions
-/// in "GlobalSuppressions.cs".
+/// The bridge goes on the project's own assembly, the only way to describe a library method, and into a file
+/// of its own the way Visual Studio keeps "GlobalSuppressions.cs".
 /// </remarks>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(PassesIncludesCodeFixProvider))]
 [Shared]

@@ -65,16 +65,16 @@ internal sealed class IncludeSearcher
             // "user", "users", "out var user", "#1": reading a variable is the only expression whose answer
             // depends on what ran before it, so it is the only one the walker has to follow.
             _ when WritesWalker.GetVariable(value.Operation) is { } variable
-                => ReadWrites(variable, value.Position),
+                => SearchAnswerInValuesWrites(variable, value.Position),
 
             // "query.Include(u => u.Profile)", a call of a method declared with [Includes("Profile")].
             IInvocationOperation call when LoadsProperty(call)
                 => Answer.Loaded,
 
             // A move that keeps the same entities: "query.Where(...)", "users.ToList()", "users[0]",
-            // "page.Items", "query.Paginate(1)". It says which value they came from.
-            _ when BridgeCrosser.FromValue(value) is { } source
-                => Search(source, value.Position),
+            // "page.Items", "query.Paginate(1)". It says which values they came from.
+            _ when BridgeCrosser.FromValue(value) is { Count: > 0 } sources
+                => SearchSources(sources, value.Position),
 
             // A call nobody declared. In our own code that is a real answer: the method promises nothing with
             // [Includes] or [PassesIncludes], so nothing loads the property. In someone else's code we
@@ -98,7 +98,7 @@ internal sealed class IncludeSearcher
     /// <summary>
     /// The answer for a variable: every write the walker finds must have the property loaded.
     /// </summary>
-    private Answer ReadWrites(object variable, CodePosition position)
+    private Answer SearchAnswerInValuesWrites(object variable, CodePosition position)
         => JoinPaths(
             walker.FindWrites(variable, position)
                 .Select(ReadWrite)
@@ -163,12 +163,9 @@ internal sealed class IncludeSearcher
             return Answer.Unknown();
         }
 
-        return BridgeCrosser.FromOutArgument(
-            invocation,
-            outArgument.ParameterName,
-            call.Position.FlowGraph.Bridges) is { } source
-            ? Search(source, call.Position)
-            : Answer.Unknown();
+        return SearchSources(
+            BridgeCrosser.FromOutArgument(invocation, outArgument.ParameterName, call.Position.FlowGraph.Bridges),
+            call.Position);
     }
 
     /// <summary>
@@ -176,9 +173,21 @@ internal sealed class IncludeSearcher
     /// of "Select((u, i) =&gt; ...)", we cannot tell what it holds.
     /// </summary>
     private Answer ReadLambdaSource(Write.LambdaParameter lambda)
-        => Search(
-            BridgeCrosser.FromLambdaParameter(lambda.Lambda, lambda.Parameter.Ordinal, lambda.Creation.FlowGraph.Bridges),
+        => SearchSources(
+            BridgeCrosser.FromLambdaParameter(
+                lambda.Lambda,
+                lambda.Parameter.Ordinal,
+                lambda.Creation.FlowGraph.Bridges),
             lambda.Creation);
+
+    /// <summary>
+    /// The answer for the values a bridge landed on. Two of them would both have to be loaded, which the
+    /// search cannot say yet, so it says it cannot tell rather than picking one.
+    /// </summary>
+    private Answer SearchSources(IReadOnlyList<IOperation> sources, CodePosition position)
+        => sources.Count == 1
+            ? Search(sources[0], position)
+            : Answer.Unknown();
 
     /// <summary>
     /// True if the method asks for the property with [IncludeRequired], making its caller responsible.

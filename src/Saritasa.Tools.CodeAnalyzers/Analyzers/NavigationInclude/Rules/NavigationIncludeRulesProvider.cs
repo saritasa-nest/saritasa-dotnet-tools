@@ -35,6 +35,11 @@ internal static class NavigationIncludeRulesProvider
     /// </summary>
     public const string Incl5IdBridgeNamesNothing = "INCL005";
 
+    /// <summary>
+    /// Diagnostic identifier for INCL006.
+    /// </summary>
+    public const string Incl6IdBridgeIsNotAllowed = "INCL006";
+
     #region INCL001
 
     private static readonly LocalizableString titleIncl1 =
@@ -157,11 +162,37 @@ internal static class NavigationIncludeRulesProvider
 
     #endregion
 
+    #region INCL006
+
+    private static readonly LocalizableString titleIncl6 =
+        "[PassesIncludes] is not allowed on this method";
+
+    private static readonly LocalizableString messageFormatIncl6 =
+        "[PassesIncludes] on '{0}' is ignored: {1}";
+
+    private static readonly LocalizableString descriptionIncl6 =
+        "A [PassesIncludes] promises that a method hands back the same entity objects it was given. Only a " +
+        "static method can be held to that: an instance method may change what it was called on before " +
+        "handing anything back, and nothing the analyzer reads would say so. A declaration that breaks the " +
+        "rule is ignored rather than trusted, which is reported here so that it is not mistaken for a bridge " +
+        "that works.";
+
+    private static readonly DiagnosticDescriptor ruleIncl6 = new(
+        Incl6IdBridgeIsNotAllowed,
+        titleIncl6,
+        messageFormatIncl6,
+        Category,
+        DiagnosticSeverity.Warning,
+        isEnabledByDefault: true,
+        description: descriptionIncl6);
+
+    #endregion
+
     /// <summary>
     /// All diagnostic descriptors registered by this analyzer.
     /// </summary>
     public static readonly ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =
-        ImmutableArray.Create(ruleIncl1, ruleIncl2, ruleIncl3, ruleIncl4, ruleIncl5);
+        ImmutableArray.Create(ruleIncl1, ruleIncl2, ruleIncl3, ruleIncl4, ruleIncl5, ruleIncl6);
 
     /// <summary>
     /// Returns the diagnostic descriptor for the given rule id.
@@ -177,6 +208,7 @@ internal static class NavigationIncludeRulesProvider
             Incl3IdMethodResultDoesntIncludeNavigationProperty => ruleIncl3,
             Incl4IdCannotCheckNavigationProperty => ruleIncl4,
             Incl5IdBridgeNamesNothing => ruleIncl5,
+            Incl6IdBridgeIsNotAllowed => ruleIncl6,
             _ => throw new ArgumentException("Unknown diagnostic rule id: " + ruleId)
         };
     }

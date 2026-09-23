@@ -8,11 +8,9 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Search;
 /// Answers one question: where was this variable written, above the place it is read.
 /// </summary>
 /// <remarks>
-/// The walker reads code and decides nothing: it reports <see cref="Write"/>s, and
-/// <see cref="IncludeSearcher"/> says what they mean. It has no notion of navigation properties at all —
-/// finding whether an <c>Include</c> happened is <see cref="IncludeSearcher"/>'s job, not the job of tracing
-/// where a variable was written, so a write to a property of the variable (<c>user.Profile = x</c>, whichever
-/// property) is not a write to the variable and says nothing; the walk keeps reading upward past it.
+/// The walker reads code and decides nothing: it reports <see cref="Write"/>s and
+/// <see cref="IncludeSearcher"/> says what they mean. It knows nothing of navigation properties, so
+/// <c>user.Profile = x</c> is not a write to <c>user</c> and the walk reads straight past it.
 /// A variable is a local, a parameter or a compiler temporary, see <see cref="GetVariable"/>.
 /// </remarks>
 internal sealed class WritesWalker
@@ -149,6 +147,7 @@ internal sealed class WritesWalker
 
         if (WasVisitedBefore(block, variable))
         {
+            // Re-enter in a loop body which nohow changes the value.
             return [new Write.NothingNew()];
         }
 
@@ -191,7 +190,7 @@ internal sealed class WritesWalker
     /// </summary>
     /// <remarks>
     /// The graph has no jumps for exceptions, so a handler looks unreachable; an exception can leave the try
-    /// after any statement, so every place in it is a way in.
+    /// anywhere, so every place in it is a way in.
     /// </remarks>
     private static IEnumerable<CodePosition> FindWaysIntoBlock(FlowGraph flowGraph, BasicBlock block)
     {

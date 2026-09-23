@@ -101,11 +101,12 @@ public class PassesIncludesTests : NavigationIncludeTestBase
     }
 
     /// <summary>
-    /// No INCL002: an instance method of a custom collection hands back the entities of the object it is
-    /// called on, the same way an extension method does with the value in front of the dot.
+    /// INCL006: an instance method cannot be declared with [PassesIncludes]. It could change what it was
+    /// called on, or hand back something it built from a field, and the declaration would look the same, so
+    /// the promise is one the analyzer has no way to hold it to.
     /// </summary>
     [Fact]
-    public async Task PassesIncludes_OnInstanceMethodOfOwnCollection_NoIncl2()
+    public async Task PassesIncludes_OnInstanceMethod_ReportsIncl6()
     {
         var sourceCode = Preamble +
             /* lang=c# */
@@ -115,36 +116,89 @@ public class PassesIncludesTests : NavigationIncludeTestBase
                 {
                     private readonly List<User> items = new();
 
-                    [PassesIncludes]
+                    [{|INCL006:PassesIncludes|}]
                     public List<User> GetItems() => items;
+                }
+            }
+            """;
 
-                    [PassesIncludes]
-                    public User GetFirst() => items[0];
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// INCL006: a bridge may carry entities into another container, but not turn them into something else.
+    /// Once entities change type along the way, nothing says any more which query a value came from.
+    /// </summary>
+    [Fact]
+    public async Task PassesIncludes_BetweenDifferentEntities_ReportsIncl6()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                static class QueryableExtensions
+                {
+                    [{|INCL006:PassesIncludes(nameof(users))|}]
+                    public static IEnumerable<Organization> GetOrganizations(IEnumerable<User> users) => null;
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// INCL006: a container of one's own cannot be read, so it looks no different from an unrelated entity
+    /// and a bridge into it is not allowed. Making it enumerable is what tells the two apart.
+    /// </summary>
+    [Fact]
+    public async Task PassesIncludes_IntoUnreadableContainer_ReportsIncl6()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                public class UserBatch
+                {
+                    public List<User> Items { get; set; }
+                }
+
+                static class QueryableExtensions
+                {
+                    [{|INCL006:PassesIncludes(nameof(query))|}]
+                    public static UserBatch ToBatch(this IQueryable<User> query) => null;
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No INCL006: the same container, once it is enumerable, is one the analyzer can read, so the bridge
+    /// into it is allowed.
+    /// </summary>
+    [Fact]
+    public async Task PassesIncludes_IntoEnumerableContainer_NoIncl6()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                public class UserBatch : IEnumerable<User>
+                {
+                    public List<User> Items { get; set; }
+
+                    public IEnumerator<User> GetEnumerator() => Items.GetEnumerator();
+
+                    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+                        => GetEnumerator();
                 }
 
                 static class QueryableExtensions
                 {
                     [PassesIncludes(nameof(query))]
                     public static UserBatch ToBatch(this IQueryable<User> query) => null;
-                }
-
-                class TestClass(AppDbContext dbContext)
-                {
-                    async Task Handle(SaveUserDto dto)
-                    {
-                        var batch = dbContext.Users
-                            .Include(u => u.Profile)
-                            .ToBatch();
-
-                        UpdateUserProfile(batch.GetItems()[0], dto);
-                        UpdateUserProfile(batch.GetFirst(), dto);
-                    }
-
-                    [IncludeRequired(nameof(user), nameof(User.Profile))]
-                    void UpdateUserProfile(User user, SaveUserDto dto)
-                    {
-                        user.Profile.Timezone = dto.Timezone;
-                    }
                 }
             }
             """;
@@ -311,6 +365,32 @@ public class PassesIncludesTests : NavigationIncludeTestBase
                 static class QueryableExtensions
                 {
                     public static IQueryable<User> Paginate(this IQueryable<User> query, int page) => query;
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// INCL006: the assembly form names a member by string, so it speaks for every overload at once. When not
+    /// one of them is a method the rules allow, the declaration cannot do anything and is reported.
+    /// </summary>
+    [Fact]
+    public async Task PassesIncludes_DeclaredOnAssemblyForInstanceMethod_ReportsIncl6()
+    {
+        var sourceCode = PreambleWithAssemblyAttributes(
+            """
+            [assembly: {|INCL006:PassesIncludes(typeof(TestApplication.UserBatch), "GetItems")|}]
+            """) +
+            /* lang=c# */
+            """
+
+                public class UserBatch
+                {
+                    private readonly List<User> items = new();
+
+                    public List<User> GetItems() => items;
                 }
             }
             """;

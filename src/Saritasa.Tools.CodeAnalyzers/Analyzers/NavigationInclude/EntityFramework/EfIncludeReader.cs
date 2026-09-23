@@ -9,8 +9,7 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.EntityFramewo
 /// </summary>
 /// <remarks>
 /// Every other rule answers "do the entities pass through?". This one answers "which property was added?",
-/// which no general rule can do: it has to know EF's <c>Include</c>. It lives alone so nobody mistakes it for
-/// a general rule.
+/// which needs to know EF's <c>Include</c>. It lives alone so nobody takes it for a general rule.
 /// </remarks>
 internal static class EfIncludeReader
 {
