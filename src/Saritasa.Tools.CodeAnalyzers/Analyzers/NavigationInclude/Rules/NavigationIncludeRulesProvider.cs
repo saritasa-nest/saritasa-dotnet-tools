@@ -49,7 +49,7 @@ internal static class NavigationIncludeRulesProvider
         "Navigation property '{0}.{1}' is required, but not checked. Use [IncludeRequired(\"{2}\", \"{1}\")] to this method.";
 
     private static readonly LocalizableString descriptionIncl1 =
-        "Navigation properties marked with [TrackIncludeRequired] must be declared via [IncludeRequired] on every " +
+        "Navigation properties marked with [TrackIncludeRequired] must be annotated via [IncludeRequired] on every " +
         "method that accesses them directly or propagates them to callee methods.";
 
     private static readonly DiagnosticDescriptor ruleIncl1 = new(
@@ -92,10 +92,10 @@ internal static class NavigationIncludeRulesProvider
     #region INCL003
 
     private static readonly LocalizableString titleIncl3 =
-        "Method declares [Includes] but return value does not load the required navigation property";
+        "Method annotates [Includes] but return value does not load the required navigation property";
 
     private static readonly LocalizableString messageFormatIncl3 =
-        "Method declares [Includes(\"{0}\")] but the returned value does not load navigation property '{0}'; " +
+        "Method annotates [Includes(\"{0}\")] but the returned value does not load navigation property '{0}'; " +
         "add .Include(x => x.{0}) to the query, set the property in an object initializer, or remove [Includes(\"{0}\")]";
 
     private static readonly LocalizableString descriptionIncl3 =
@@ -145,11 +145,11 @@ internal static class NavigationIncludeRulesProvider
         "[PassesIncludes] names a method that does not exist";
 
     private static readonly LocalizableString messageFormatIncl5 =
-        "[PassesIncludes] names '{0}', which does not exist, so the declaration has no effect";
+        "[PassesIncludes] names '{0}', which does not exist, so the annotation has no effect";
 
     private static readonly LocalizableString descriptionIncl5 =
         "An assembly-level [PassesIncludes] names a method of another type by string. When that method is " +
-        "renamed or removed, the declaration stops matching anything and the analyzer quietly stops following it.";
+        "renamed or removed, the annotation stops matching anything and the analyzer quietly stops following it.";
 
     private static readonly DiagnosticDescriptor ruleIncl5 = new(
         Incl5IdBridgeNamesNothing,
@@ -173,7 +173,7 @@ internal static class NavigationIncludeRulesProvider
     private static readonly LocalizableString descriptionIncl6 =
         "A [PassesIncludes] promises that a method hands back the same entity objects it was given. Only a " +
         "static method can be held to that: an instance method may change what it was called on before " +
-        "handing anything back, and nothing the analyzer reads would say so. A declaration that breaks the " +
+        "handing anything back, and nothing the analyzer reads would say so. A annotation that breaks the " +
         "rule is ignored rather than trusted, which is reported here so that it is not mistaken for a bridge " +
         "that works.";
 

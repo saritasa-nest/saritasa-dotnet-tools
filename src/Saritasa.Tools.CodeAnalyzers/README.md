@@ -28,7 +28,7 @@ If your project uses a [global package reference](https://learn.microsoft.com/en
 | [STAN1005](#stan1005-early-exit) | Use early return instead of else after return | Warning | Style |
 | [INCL001](#incl001-navigation-property-not-checked) | Method parameter should require a navigation property | Warning | Usage |
 | [INCL002](#incl002-local-variable-missing-include) | Local variable does not set the required navigation property | Warning | Usage |
-| [INCL003](#incl003-includes-promise-not-fulfilled) | Method declares [Includes] but return value does not load the required navigation property | Warning | Usage |
+| [INCL003](#incl003-includes-promise-not-fulfilled) | Method annotates [Includes] but return value does not load the required navigation property | Warning | Usage |
 | [INCL004](#incl004-cannot-check-navigation-property) | Cannot check whether the navigation property is loaded | Warning | Usage |
 | [INCL005](#incl005-preservesincludes-names-nothing) | [PassesIncludes] names a member that does not exist | Warning | Usage |
 | [INCL006](#incl006-passesincludes-is-not-allowed-here) | [PassesIncludes] is not allowed on this method | Warning | Usage |
@@ -37,7 +37,7 @@ If your project uses a [global package reference](https://learn.microsoft.com/en
 
 ### STAN1000: Request handler return type
 
-Triggered when a MediatR `IRequestHandler<TRequest>` implementation does not declare a return type. Handlers should always return a value to maintain a consistent and testable API.
+Triggered when a MediatR `IRequestHandler<TRequest>` implementation does not annotate a return type. Handlers should always return a value to maintain a consistent and testable API.
 
 #### Code causing a warning
 
@@ -260,9 +260,9 @@ Four attributes control which navigation properties are tracked and how inclusio
 | Attribute | Target | Purpose |
 |-----------|--------|---------|
 | `[TrackIncludeRequired]` | Property | Marks a navigation property as requiring explicit loading. Only properties with this attribute are checked by INCL rules. |
-| `[IncludeRequired("param", "Property")]` | Method | Declares that the named parameter must have the named property loaded before the method is called. Repeatable. |
+| `[IncludeRequired("param", "Property")]` | Method | States that the named parameter must have the named property loaded before the method is called. Repeatable. |
 | `[Includes("Property")]` | Method | Promises that the method's return value has the named property loaded. Repeatable. Set `Verify = false` to skip the INCL003 check of the method body. |
-| `[PassesIncludes]` | Method, assembly | Says that the method hands back the same entity objects it was given, so their includes are kept. Name the parameter they come from: `[PassesIncludes(nameof(query))]`; naming none means the value in front of the dot. For a library, put it on your assembly: `[assembly: PassesIncludes(typeof(Lib.Ext), "Paginate", "query")]`. The method must be **static** and must not change the entity type — see [INCL006](#incl006-passesincludes-is-not-allowed-here). `System.Linq`, EF Core and the collection types are declared already. |
+| `[PassesIncludes]` | Method, assembly | Says that the method hands back the same entity objects it was given, so their includes are kept. Name the parameter they come from: `[PassesIncludes(nameof(query))]`; naming none means the value in front of the dot. For a library, put it on your assembly: `[assembly: PassesIncludes(typeof(Lib.Ext), "Paginate", "query")]`. The method must be **static** and must not change the entity type — see [INCL006](#incl006-passesincludes-is-not-allowed-here). `System.Linq`, EF Core and the collection types are annotated already. |
 
 How the analyzer follows a value back to its query is described in the
 [developer documentation](Analyzers/NavigationInclude/README.md).
@@ -283,7 +283,7 @@ class User
 
 ### INCL001: Navigation property not checked
 
-Triggered when a method directly accesses a `[TrackIncludeRequired]` property on a parameter, or passes a parameter to a method that requires it via `[IncludeRequired]`, without declaring a matching `[IncludeRequired]` on the current method.
+Triggered when a method directly accesses a `[TrackIncludeRequired]` property on a parameter, or passes a parameter to a method that requires it via `[IncludeRequired]`, without annotating a matching `[IncludeRequired]` on the current method.
 
 #### Code causing a warning
 
@@ -552,14 +552,14 @@ Task<User> GetUser(int id)
 
 ### INCL004: Cannot check navigation property
 
-Triggered when the analyzer follows a value back to the query it came from and cannot read one of the steps. The analyzer follows only members declared with `[PassesIncludes]`; `System.Linq`, EF Core and the collection types are declared already.
+Triggered when the analyzer follows a value back to the query it came from and cannot read one of the steps. The analyzer follows only members annotated with `[PassesIncludes]`; `System.Linq`, EF Core and the collection types are annotated already.
 
 These are the cases it does not follow. All of them give INCL004, never a false pass:
 
 | Not followed | Why |
 |--------------|-----|
 | `Concat`, `Union`, `UnionBy`, `Append`, `Prepend` | the result holds the entities of two collections, and the analyzer follows one value at a time |
-| A property of a library type, such as `page.Items` | a declaration can only describe a method. Make the type enumerable instead |
+| A property of a library type, such as `page.Items` | an annotation can only describe a method. Make the type enumerable instead |
 | `Cast<T>`, `OfType<T>` | the entity type changes |
 | Entities reached through a navigation property, such as the `f` of `SelectMany(u => u.Friends, (u, f) => ...)` | they came from `u.Friends`, not from the query, and carry different includes |
 
@@ -582,15 +582,15 @@ async Task Handle(SaveUserDto dto)
 
 #### Fixed
 
-The code fix adds the declaration to `NavigationIncludes.cs` in the project:
+The code fix adds the annotation to `NavigationIncludes.cs` in the project:
 
 ```csharp
 [assembly: PassesIncludes(typeof(SomeLib.QueryExtensions), "Paginate", "query")]
 ```
 
-A declaration can only describe a method. When a library hands its entities back through a property instead, such as `page.Items`, there is nothing to declare and the value cannot be followed. It works when the type is enumerable, because `First()`, `foreach` and the rest are declared already.
+An annotation can only describe a method. When a library hands its entities back through a property instead, such as `page.Items`, there is nothing to annotate and the value cannot be followed. It works when the type is enumerable, because `First()`, `foreach` and the rest are annotated already.
 
-A method in your own project that is not declared gives INCL002 instead, because it can be read and promises nothing. Declare it on the method itself:
+A method in your own project that is not annotated gives INCL002 instead, because it can be read and promises nothing. Annotate it on the method itself:
 
 ```csharp
 [PassesIncludes(nameof(query))]
@@ -601,7 +601,7 @@ public static IQueryable<User> OnlyActive(this IQueryable<User> query) => query.
 
 ### INCL005: \[PassesIncludes\] names nothing
 
-Triggered when an assembly-level `[PassesIncludes]` names a member or a parameter that does not exist, for example after a library renamed a method. Such a declaration has no effect, so the analyzer would silently stop following the member.
+Triggered when an assembly-level `[PassesIncludes]` names a member or a parameter that does not exist, for example after a library renamed a method. Such an annotation has no effect, so the analyzer would silently stop following the member.
 
 #### Code causing a warning
 
@@ -620,18 +620,18 @@ Triggered when an assembly-level `[PassesIncludes]` names a member or a paramete
 
 ### INCL006: \[PassesIncludes\] is not allowed here
 
-Triggered when a `[PassesIncludes]` describes a method it may not describe. The declaration is ignored, and this says so where it is written, rather than leaving it to turn up as an INCL004 in another file.
+Triggered when a `[PassesIncludes]` describes a method it may not describe. The annotation is ignored, and this says so where it is written, rather than leaving it to turn up as an INCL004 in another file.
 
 `[PassesIncludes]` is a promise that the **same entity objects** come out of the method that went into it. Nothing the analyzer reads can check that, so the two shapes where it can quietly be false are not allowed.
 
-**The method must be static.** An instance method can change what it was called on, or hand back something it built from a field, and the declaration would look the same. An extension method counts as static, and the value in front of the dot is its first parameter.
+**The method must be static.** An instance method can change what it was called on, or hand back something it built from a field, and the annotation would look the same. An extension method counts as static, and the value in front of the dot is its first parameter.
 
 ```csharp
 public class UserBatch
 {
     private readonly List<User> items = new();
 
-    // INCL006: only a static method can be declared to hand back the entities it was given.
+    // INCL006: only a static method can be annotated to hand back the entities it was given.
     [PassesIncludes]
     public List<User> GetItems() => items;
 }
@@ -645,7 +645,7 @@ public class UserBatch
 public static IEnumerable<Organization> GetOrganizations(IEnumerable<User> users) => ...;
 ```
 
-A container of your own counts only if the analyzer can read it, which means implementing `IEnumerable<T>`. Without that it cannot be told apart from a declaration pointing at an unrelated entity:
+A container of your own counts only if the analyzer can read it, which means implementing `IEnumerable<T>`. Without that it cannot be told apart from an annotation pointing at an unrelated entity:
 
 ```csharp
 // INCL006: 'UserBatch' is not a collection the analyzer can read.

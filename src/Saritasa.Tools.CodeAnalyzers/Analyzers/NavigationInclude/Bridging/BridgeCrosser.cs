@@ -8,12 +8,12 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Bridging;
 
 /// <summary>
 /// Crosses a <see cref="Bridge"/>: from the value the search is standing on to the value the entities came
-/// from — <c>query.Where(...)</c>, <c>users.ToList()</c>, <c>users[0]</c>, <c>page.Items</c>.
+/// from — <c>query.Where(...)</c>, <c>users.ToList()</c>, <c>users[0]</c>, <c>pair.Value</c>.
 /// </summary>
 /// <remarks>
 /// One method per shape the search can be standing on, all landing through <see cref="GetCallSource"/>.
 /// There is normally one value on the other side; a member holding the entities of two places gives two.
-/// Nothing is inferred: what nobody declared is not crossed.
+/// Nothing is inferred: what nobody annotated is not crossed.
 /// </remarks>
 internal static class BridgeCrosser
 {
@@ -29,14 +29,14 @@ internal static class BridgeCrosser
             IInvocationOperation call
                 => GetCallSources(value.Position.FlowGraph.Bridges.FindFromResult(call.TargetMethod), call),
 
-            // "users[0]", "enumerator.Current", "pair.Value", "page.Items": the entities come from the object
+            // "users[0]", "enumerator.Current", "pair.Value", "task.Result": the entities come from the object
             // the property is read on. Returns users/enumerator/pair/page
             IPropertyReferenceOperation reference
                 when value.Position.FlowGraph.Bridges.FindFromResult(reference.Property)
                     .Any(to => to is BridgeEnd.Instance)
                 => Single(reference.Instance),
 
-            // "users[0]" of an array. Roslyn exposes nothing to name here, so no declaration can describe
+            // "users[0]" of an array. Roslyn exposes nothing to name here, so no annotation can describe
             // it, and there is only one value the element can come from. Returns users
             IArrayElementReferenceOperation element
                 => Single(element.ArrayReference),
@@ -46,7 +46,7 @@ internal static class BridgeCrosser
 
     /// <summary>
     /// The collection a lambda parameter is filled from: for the <c>u</c> of <c>users.Select(u =&gt; ...)</c>,
-    /// the value <c>users</c>. Empty for a parameter nobody declared, such as the index of
+    /// the value <c>users</c>. Empty for a parameter nobody annotated, such as the index of
     /// <c>Select((u, i) =&gt; ...)</c>.
     /// </summary>
     /// <param name="lambda">Lambda the parameter belongs to.</param>

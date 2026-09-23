@@ -126,7 +126,7 @@ internal abstract class Write
     }
 
     /// <summary>
-    /// Nothing wrote the variable and nobody fills it from outside, for example a local declared without
+    /// Nothing wrote the variable and nobody fills it from outside, for example a local annotated without
     /// a value on a path that never assigns it.
     /// </summary>
     public sealed class NeverWritten : Write

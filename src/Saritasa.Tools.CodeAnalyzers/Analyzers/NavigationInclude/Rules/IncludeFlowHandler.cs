@@ -61,7 +61,7 @@ internal static class IncludeFlowHandler
             .OfType<IInvocationOperation>()
             .SelectMany(call => GetCallDiagnostics(call, statementPosition))
 
-            // The same requirement declared twice is still one problem.
+            // The same requirement annotated twice is still one problem.
             .Distinct();
     }
 
@@ -120,7 +120,7 @@ internal static class IncludeFlowHandler
 
     /// <summary>
     /// INCL003: for each [Includes(property)] of the method, the returned value must have the property loaded,
-    /// unless the attribute is declared with <c>Verify = false</c>.
+    /// unless the attribute sets <c>Verify = false</c>.
     /// </summary>
     private static IEnumerable<Diagnostic> GetReturnDiagnostics(CodePosition position)
     {
@@ -157,7 +157,7 @@ internal static class IncludeFlowHandler
 
     /// <summary>
     /// INCL004: the search ran into something it cannot read, so it cannot say whether the property is loaded.
-    /// The member that stopped it travels with the diagnostic, so that the code fix can offer to declare it.
+    /// The member that stopped it travels with the diagnostic, so that the code fix can offer to annotate it.
     /// </summary>
     private static Diagnostic CannotCheck(
         Location location,

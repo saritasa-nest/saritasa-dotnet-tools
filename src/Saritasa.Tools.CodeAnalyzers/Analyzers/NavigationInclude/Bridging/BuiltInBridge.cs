@@ -7,7 +7,7 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Bridging;
 /// <remarks>
 /// A bridge is the rule alone, so everything naming the member it is about lives here, overloads included.
 /// The declaring type is a metadata name, so the table can mention types the analyzer has no reference to;
-/// <see cref="Bridges"/> looks it up once. What somebody else declares is a <see cref="CustomBridge"/>.
+/// <see cref="Bridges"/> looks it up once. What somebody else annotates is a <see cref="CustomBridge"/>.
 /// </remarks>
 internal sealed class BuiltInBridge
 {

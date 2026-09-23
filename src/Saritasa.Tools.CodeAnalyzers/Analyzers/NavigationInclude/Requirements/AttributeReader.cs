@@ -61,7 +61,7 @@ internal static class AttributeReader
             string.Equals(requirement.NavigationProperty, includedProperty, StringComparison.Ordinal));
 
     /// <summary>
-    /// Returns true if the method declares <see cref="IncludesAttribute"/> for the property.
+    /// Returns true if the method annotates <see cref="IncludesAttribute"/> for the property.
     /// </summary>
     /// <param name="method">Method.</param>
     /// <param name="includedProperty">Navigation property name.</param>
@@ -72,7 +72,7 @@ internal static class AttributeReader
 
     /// <summary>
     /// Returns the properties of every <see cref="IncludesAttribute"/> of the method that the analyzer must
-    /// check: all of them except those declared with <c>Verify = false</c>.
+    /// check: all of them except those annotated with <c>Verify = false</c>.
     /// </summary>
     /// <param name="method">Method.</param>
     /// <returns>Navigation property names.</returns>
@@ -102,7 +102,7 @@ internal static class AttributeReader
     }
 
     /// <summary>
-    /// Returns false if the attribute is declared with <c>Verify = false</c>.
+    /// Returns false if the attribute sets <c>Verify = false</c>.
     /// </summary>
     private static bool IsVerifyEnabled(AttributeData attribute)
         => !attribute.NamedArguments.Any(argument =>

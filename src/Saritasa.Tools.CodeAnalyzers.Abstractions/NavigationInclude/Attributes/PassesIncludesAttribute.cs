@@ -1,7 +1,7 @@
 namespace Saritasa.Tools.CodeAnalyzers.Abstractions.NavigationInclude.Attributes;
 
 /// <summary>
-/// Declares where a method's entities come from, so the analyzer can follow an <c>.Include()</c> across it.
+/// States where a method's entities come from, so the analyzer can follow an <c>.Include()</c> across it.
 /// </summary>
 /// <remarks>
 /// The analyzer reads backwards from where a navigation property is used to the query that loaded it, and it
@@ -12,10 +12,10 @@ namespace Saritasa.Tools.CodeAnalyzers.Abstractions.NavigationInclude.Attributes
 /// result, or at a callback parameter when <see cref="ToCallback"/> is set.
 /// <para>
 /// <b>What you are promising.</b> That the same entity <i>objects</i> come out that went in — not merely
-/// objects of the same type. Nothing here can check that, so a wrong declaration does not fail loudly: the
+/// objects of the same type. Nothing here can check that, so a wrong annotation does not fail loudly: the
 /// analyzer believes it and stops reporting real mistakes. A method that reads a navigation property and
 /// hands back what it found, such as one returning <c>users.SelectMany(u =&gt; u.Friends)</c>, is a different
-/// set of objects with different includes and must not be declared.
+/// set of objects with different includes and must not be annotated.
 /// </para>
 /// <para>
 /// <b>Two rules, both reported as INCL006 and otherwise ignored.</b>
@@ -23,7 +23,7 @@ namespace Saritasa.Tools.CodeAnalyzers.Abstractions.NavigationInclude.Attributes
 /// <list type="number">
 /// <item><description>
 /// The method must be <b>static</b>. An instance method can change what it was called on, or hand back
-/// something built from a field, and the declaration would look the same. An extension method counts as
+/// something built from a field, and the annotation would look the same. An extension method counts as
 /// static, and the value in front of the dot is simply its first parameter.
 /// </description></item>
 /// <item><description>
@@ -61,14 +61,14 @@ namespace Saritasa.Tools.CodeAnalyzers.Abstractions.NavigationInclude.Attributes
 /// [assembly: PassesIncludes(typeof(SomeLib.QueryExtensions), "Paginate", "query")]
 /// </code>
 /// The attribute is picked up from the project it is written in and from every project and package that
-/// references it, so a shared project can declare a bridge once for a whole solution. It names the method by
+/// references it, so a shared project can annotate a member once for a whole solution. It names the method by
 /// string, so it speaks for every overload of that name at once.
 /// </example>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Assembly, AllowMultiple = true)]
 public class PassesIncludesAttribute : Attribute
 {
     /// <summary>
-    /// Declares that the entities come from the value the extension method was used on, which is its first
+    /// States that the entities come from the value the extension method was used on, which is its first
     /// parameter.
     /// </summary>
     public PassesIncludesAttribute()
@@ -76,7 +76,7 @@ public class PassesIncludesAttribute : Attribute
     }
 
     /// <summary>
-    /// Declares that the entities come from one of the method's parameters.
+    /// States that the entities come from one of the method's parameters.
     /// </summary>
     /// <param name="from">Name of the parameter the entities come from.</param>
     public PassesIncludesAttribute(string from)
@@ -85,7 +85,7 @@ public class PassesIncludesAttribute : Attribute
     }
 
     /// <summary>
-    /// Declares that the entities of a method of another assembly come from the value it was used on.
+    /// States that the entities of a method of another assembly come from the value it was used on.
     /// </summary>
     /// <param name="declaringType">Type that declares the method.</param>
     /// <param name="methodName">Name of the method.</param>
@@ -96,7 +96,7 @@ public class PassesIncludesAttribute : Attribute
     }
 
     /// <summary>
-    /// Declares that the entities of a method of another assembly come from one of its parameters.
+    /// States that the entities of a method of another assembly come from one of its parameters.
     /// </summary>
     /// <param name="declaringType">Type that declares the method.</param>
     /// <param name="methodName">Name of the method.</param>

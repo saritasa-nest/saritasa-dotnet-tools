@@ -13,7 +13,7 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Search;
 /// A value never says by itself whether the property is loaded, so the search reads backwards through the
 /// values it was made from. A variable is the one case it cannot do alone: it asks the
 /// <see cref="WritesWalker"/> and decides what the writes mean. Where several paths meet, all must be loaded.
-/// To teach the search a new method, declare it with [PassesIncludes] rather than adding a case here.
+/// To teach the search a new method, annotate it with [PassesIncludes] rather than adding a case here.
 /// </remarks>
 internal sealed class IncludeSearcher
 {
@@ -67,16 +67,16 @@ internal sealed class IncludeSearcher
             _ when WritesWalker.GetVariable(value.Operation) is { } variable
                 => SearchAnswerInValuesWrites(variable, value.Position),
 
-            // "query.Include(u => u.Profile)", a call of a method declared with [Includes("Profile")].
+            // "query.Include(u => u.Profile)", a call of a method annotated with [Includes("Profile")].
             IInvocationOperation call when LoadsProperty(call)
                 => Answer.Loaded,
 
             // A move that keeps the same entities: "query.Where(...)", "users.ToList()", "users[0]",
-            // "page.Items", "query.Paginate(1)". It says which values they came from.
+            // "pair.Value", "query.Paginate(1)". It says which values they came from.
             _ when BridgeCrosser.FromValue(value) is { Count: > 0 } sources
                 => SearchSources(sources, value.Position),
 
-            // A call nobody declared. In our own code that is a real answer: the method promises nothing with
+            // A call nobody annotated. In our own code that is a real answer: the method promises nothing with
             // [Includes] or [PassesIncludes], so nothing loads the property. In someone else's code we
             // simply cannot see.
             IInvocationOperation call
@@ -152,7 +152,7 @@ internal sealed class IncludeSearcher
 
     /// <summary>
     /// "dictionary.TryGetValue(id, out var user)": the bridge says user comes from the dictionary. A method
-    /// nobody declared could have put anything there, so we cannot tell.
+    /// nobody annotated could have put anything there, so we cannot tell.
     /// </summary>
     private Answer ReadOutArgumentSource(Write.OutArgument outArgument)
     {
@@ -198,7 +198,7 @@ internal sealed class IncludeSearcher
 
     /// <summary>
     /// True if the call loads the property itself: <c>query.Include(u =&gt; u.Profile)</c> or a call of a method
-    /// declared with <c>[Includes("Profile")]</c>.
+    /// annotated with <c>[Includes("Profile")]</c>.
     /// </summary>
     private bool LoadsProperty(IInvocationOperation call)
         => AttributeReader.MethodHasIncludesAttribute(call.TargetMethod, property) ||

@@ -10,7 +10,7 @@ using System.Composition;
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.CodeFixes;
 
 /// <summary>
-/// Offers to declare the method that stopped the search, so that INCL004 can be answered.
+/// Offers to annotate the method that stopped the search, so that INCL004 can be answered.
 /// </summary>
 /// <remarks>
 /// The bridge goes on the project's own assembly, the only way to describe a library method, and into a file

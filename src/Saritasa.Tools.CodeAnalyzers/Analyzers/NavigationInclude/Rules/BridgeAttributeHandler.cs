@@ -64,7 +64,7 @@ internal static class BridgeAttributeHandler
         }
 
         if (FindAttributeData(context.Compilation.Assembly, attribute) is not { } data ||
-            PassesIncludesReader.ReadAssemblyAttribute(data) is not { } declared)
+            PassesIncludesReader.ReadAssemblyAttribute(data) is not { } annotated)
         {
             return;
         }
@@ -74,12 +74,12 @@ internal static class BridgeAttributeHandler
         var methods = FindMethods(named.Type, named.Method).ToList();
 
         if (methods.Count == 0 ||
-            methods.Any(method => CustomBridgeRules.IsAllowed(method, declared.Bridge, out _)))
+            methods.Any(method => CustomBridgeRules.IsAllowed(method, annotated.Bridge, out _)))
         {
             return;
         }
 
-        CustomBridgeRules.IsAllowed(methods[0], declared.Bridge, out var reason);
+        CustomBridgeRules.IsAllowed(methods[0], annotated.Bridge, out var reason);
         Report(context, attribute, NavigationIncludeRulesProvider.Incl6IdBridgeIsNotAllowed, description, reason);
     }
 
@@ -89,8 +89,8 @@ internal static class BridgeAttributeHandler
     /// </summary>
     private static void AnalyzeOnMethod(SyntaxNodeAnalysisContext context, AttributeSyntax attribute)
     {
-        if (attribute.Parent?.Parent is not MethodDeclarationSyntax declaration ||
-            context.SemanticModel.GetDeclaredSymbol(declaration, context.CancellationToken) is not { } method ||
+        if (attribute.Parent?.Parent is not MethodDeclarationSyntax annotation ||
+            context.SemanticModel.GetDeclaredSymbol(annotation, context.CancellationToken) is not { } method ||
             FindAttributeData(method, attribute) is not { } data ||
             PassesIncludesReader.ReadMemberAttribute(data) is not { } bridge ||
             CustomBridgeRules.IsAllowed(method, bridge, out var reason))
@@ -140,7 +140,7 @@ internal static class BridgeAttributeHandler
            constructor.ContainingType.Name == nameof(PassesIncludesAttribute);
 
     /// <summary>
-    /// What the declaration names, e.g. (QueryExtensions, "Paginate", "query"). Null while the attribute is
+    /// What the annotation names, e.g. (QueryExtensions, "Paginate", "query"). Null while the attribute is
     /// still being typed.
     /// </summary>
     private static (INamedTypeSymbol Type, string Method, string? Parameter)? ReadNamedMethod(

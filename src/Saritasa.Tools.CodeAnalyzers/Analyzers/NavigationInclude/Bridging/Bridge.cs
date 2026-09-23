@@ -3,7 +3,7 @@ using System.Diagnostics;
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Bridging;
 
 /// <summary>
-/// One declared move of entities across a call: they sit at <see cref="From"/>, and the same entities came
+/// One annotated move of entities across a call: they sit at <see cref="From"/>, and the same entities came
 /// from <see cref="To"/>.
 /// </summary>
 /// <remarks>

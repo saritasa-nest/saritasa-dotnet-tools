@@ -72,7 +72,7 @@ internal sealed class FlowGraph
     public bool IsLambda => Lambda is not null;
 
     /// <summary>
-    /// Returns the reachable statements of the graph and of the lambdas and local functions declared in it.
+    /// Returns the reachable statements of the graph and of the lambdas and local functions written in it.
     /// If/while conditions and returned values count as statements.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token.</param>

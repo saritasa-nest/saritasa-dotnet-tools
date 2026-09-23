@@ -37,7 +37,7 @@ internal sealed class WritesWalker
             ILocalReferenceOperation local => local.Local,
             IParameterReferenceOperation parameter => parameter.Parameter,
             IFlowCaptureReferenceOperation capture => capture.Id,
-            IDeclarationExpressionOperation declaration => GetVariable(declaration.Expression), // "out var user"
+            IDeclarationExpressionOperation annotation => GetVariable(annotation.Expression), // "out var user"
             _ => null,
         };
     }

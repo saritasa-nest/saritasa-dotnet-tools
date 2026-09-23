@@ -4,7 +4,7 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Bridging;
 
 /// <summary>
 /// One <c>[assembly: PassesIncludes(typeof(SomeType), "Member", "source")]</c>: a <see cref="Bridge"/>
-/// somebody declared for a member of a type they do not own.
+/// somebody wrote for a member of a type they do not own.
 /// </summary>
 /// <remarks>
 /// The type is already a symbol, since the attribute names it with <c>typeof</c>. It names the member by

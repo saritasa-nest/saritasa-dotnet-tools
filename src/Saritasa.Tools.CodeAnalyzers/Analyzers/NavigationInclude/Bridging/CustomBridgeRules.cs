@@ -9,7 +9,7 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Bridging;
 /// A bridge is a promise that the same entity objects come out of a method that went into it. Nothing the
 /// analyzer reads can check that, so the two shapes where it can quietly be false are not allowed at all.
 /// <b>Static.</b> An instance method can change what it was called on, or hand back something built from a
-/// field, and the declaration would still look right. An extension method counts as static, and the value in
+/// field, and the annotation would still look right. An extension method counts as static, and the value in
 /// front of the dot is its first parameter.
 /// <b>Same entity type.</b> A bridge may carry entities into another container but not turn them into
 /// something else; otherwise nobody reading the code can say which query a value came from.
@@ -23,22 +23,22 @@ internal static class CustomBridgeRules
     /// True when the bridge written for this method is allowed.
     /// </summary>
     /// <param name="method">Method the bridge is written for.</param>
-    /// <param name="bridge">What the declaration says.</param>
+    /// <param name="bridge">What the annotation says.</param>
     /// <param name="reason">Why it is not allowed, in a form that finishes "is ignored: ...".</param>
     /// <returns>True when the bridge may be used.</returns>
     public static bool IsAllowed(IMethodSymbol method, Bridge bridge, out string reason)
     {
-        var declaration = GetDeclaration(method);
+        var annotation = GetAsWritten(method);
 
-        if (!declaration.IsStatic)
+        if (!annotation.IsStatic)
         {
-            reason = "only a static method can be declared to hand back the entities it was given";
+            reason = "only a static method can be annotated to hand back the entities it was given";
 
             return false;
         }
 
-        var from = GetEndType(declaration, bridge.From);
-        var to = GetEndType(declaration, bridge.To);
+        var from = GetEndType(annotation, bridge.From);
+        var to = GetEndType(annotation, bridge.To);
 
         if (!EntityType.CarriesSameEntities(from, to))
         {
@@ -55,25 +55,25 @@ internal static class CustomBridgeRules
     }
 
     /// <summary>
-    /// The type of the value at one end of the bridge, as the method declares it, or null where there is
+    /// The type of the value at one end of the bridge, as the method annotates it, or null where there is
     /// nothing to read.
     /// </summary>
     /// <remarks>
-    /// Read from the declaration rather than from a call, so a method is judged on what it promises in
+    /// Read from the annotation rather than from a call, so a method is judged on what it promises in
     /// general and not on what one caller happened to put in it.
     /// </remarks>
-    private static ITypeSymbol? GetEndType(IMethodSymbol declaration, BridgeEnd end)
+    private static ITypeSymbol? GetEndType(IMethodSymbol annotation, BridgeEnd end)
         => end switch
         {
-            BridgeEnd.Result => declaration.ReturnType,
+            BridgeEnd.Result => annotation.ReturnType,
 
             // For a static extension method the value in front of the dot is the first parameter. For any
             // other static method there is nothing in front of the dot at all.
-            BridgeEnd.Instance => declaration.IsExtensionMethod && declaration.Parameters.Length > 0
-                ? declaration.Parameters[0].Type
+            BridgeEnd.Instance => annotation.IsExtensionMethod && annotation.Parameters.Length > 0
+                ? annotation.Parameters[0].Type
                 : null,
 
-            BridgeEnd.Parameter parameter => GetParameterType(declaration, parameter),
+            BridgeEnd.Parameter parameter => GetParameterType(annotation, parameter),
 
             _ => null,
         };
@@ -81,9 +81,9 @@ internal static class CustomBridgeRules
     /// <summary>
     /// The type of a named parameter, or of one parameter of the callback it takes.
     /// </summary>
-    private static ITypeSymbol? GetParameterType(IMethodSymbol declaration, BridgeEnd.Parameter end)
+    private static ITypeSymbol? GetParameterType(IMethodSymbol annotation, BridgeEnd.Parameter end)
     {
-        var parameter = declaration.Parameters
+        var parameter = annotation.Parameters
             .FirstOrDefault(candidate => string.Equals(candidate.Name, end.Name, StringComparison.Ordinal));
 
         if (parameter is null)
@@ -105,7 +105,7 @@ internal static class CustomBridgeRules
     /// The method as it was written. An extension method called with a dot arrives with its first parameter
     /// already taken off.
     /// </summary>
-    private static IMethodSymbol GetDeclaration(IMethodSymbol method)
+    private static IMethodSymbol GetAsWritten(IMethodSymbol method)
         => method.ReducedFrom ?? method;
 
     private static string Describe(ITypeSymbol? type)

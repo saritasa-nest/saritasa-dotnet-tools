@@ -7,7 +7,7 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Rules;
 
 /// <summary>
 /// The member that stopped the search, carried on an INCL004 diagnostic so that the code fix can offer to
-/// declare it and the message can name it.
+/// annotate it and the message can name it.
 /// </summary>
 internal static class UnreadableMember
 {
@@ -44,13 +44,13 @@ internal static class UnreadableMember
     }
 
     /// <summary>
-    /// Returns what the code fix needs to write a declaration for the method, and an empty set when there is
-    /// no declaration worth offering.
+    /// Returns what the code fix needs to write an annotation for the method, and an empty set when there is
+    /// no annotation worth offering.
     /// </summary>
     /// <remarks>
-    /// Three cases where a fix would not help: a property, which no declaration can describe; a method the
+    /// Three cases where a fix would not help: a property, which no annotation can describe; a method the
     /// rules would refuse, which swaps this warning for an INCL006; and a member the built-in table leaves
-    /// off on purpose, where declaring it from outside would quietly undo that decision.
+    /// off on purpose, where annotating it from outside would quietly undo that decision.
     /// </remarks>
     /// <param name="unknownSource">The value the search could not read.</param>
     /// <returns>Properties for the code fix.</returns>
@@ -123,7 +123,7 @@ internal static class UnreadableMember
         };
 
     /// <summary>
-    /// The parameter a declaration would name: the first one for an extension method, none otherwise.
+    /// The parameter an annotation would name: the first one for an extension method, none otherwise.
     /// </summary>
     private static string GetSourceParameterName(IMethodSymbol method)
         => method is { IsExtensionMethod: true, Parameters.Length: > 0 }

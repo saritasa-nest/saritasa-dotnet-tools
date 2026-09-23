@@ -10,7 +10,7 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Bridging;
 /// A line names both ends and reads backwards, the way the search walks: <c>from: Result, to: Instance</c>
 /// says <c>users.ToList()</c> hands back what <c>users</c> held.
 /// A member holding the entities of two places has no line at all, see <see cref="IsLeftOutOnPurpose"/>.
-/// Enumerable and Queryable declare most operators identically, so those are written once in
+/// Enumerable and Queryable spell most operators identically, so those are written once in
 /// <see cref="QueryOperators"/> and read for both; keeping two hand-written copies in step is how Queryable
 /// came to claim a ToDictionary it does not have.
 /// </remarks>
@@ -38,7 +38,7 @@ internal static class BuiltInBridges
     private const string Task = "System.Threading.Tasks.Task`1";
 
     /// <summary>
-    /// The value the member handed back: <c>users.ToList()</c>, <c>page.Items</c>.
+    /// The value the member handed back: <c>users.ToList()</c>, <c>pair.Value</c>.
     /// </summary>
     private static readonly BridgeEnd Result = new BridgeEnd.Result();
 
@@ -139,151 +139,151 @@ internal static class BuiltInBridges
     /// </summary>
     public static IEnumerable<BuiltInBridge> All =>
     [
-        // ----- What Enumerable and Queryable both declare -----
+        // ----- What Enumerable and Queryable both annotate -----
         .. QueryOperators(LinqEnumerable),
         .. QueryOperators(LinqQueryable),
 
         // ----- Only on Enumerable, which is the one that materializes -----
-        Declare(LinqEnumerable, member: "AsEnumerable", from: Result, to: Instance),
-        Declare(LinqEnumerable, member: "ToList", from: Result, to: Instance),
-        Declare(LinqEnumerable, member: "ToArray", from: Result, to: Instance),
-        Declare(LinqEnumerable, member: "ToHashSet", from: Result, to: Instance),
-        Declare(
+        Annotate(LinqEnumerable, member: "AsEnumerable", from: Result, to: Instance),
+        Annotate(LinqEnumerable, member: "ToList", from: Result, to: Instance),
+        Annotate(LinqEnumerable, member: "ToArray", from: Result, to: Instance),
+        Annotate(LinqEnumerable, member: "ToHashSet", from: Result, to: Instance),
+        Annotate(
             LinqEnumerable,
             member: "ToDictionary",
             from: Result,
             to: Instance,
             excludeOverloadsWithParameters: ["elementSelector"]),
-        Declare(LinqEnumerable, member: "ToDictionary", from: Callback("keySelector"), to: Instance),
-        Declare(LinqEnumerable, member: "ToDictionary", from: Callback("elementSelector"), to: Instance),
-        Declare(LinqEnumerable, member: "ToLookup", from: Callback("keySelector"), to: Instance),
-        Declare(LinqEnumerable, member: "ToLookup", from: Callback("elementSelector"), to: Instance),
+        Annotate(LinqEnumerable, member: "ToDictionary", from: Callback("keySelector"), to: Instance),
+        Annotate(LinqEnumerable, member: "ToDictionary", from: Callback("elementSelector"), to: Instance),
+        Annotate(LinqEnumerable, member: "ToLookup", from: Callback("keySelector"), to: Instance),
+        Annotate(LinqEnumerable, member: "ToLookup", from: Callback("elementSelector"), to: Instance),
 
         // Zip is handed a second collection, and the two types name that parameter differently.
-        Declare(
+        Annotate(
             LinqEnumerable,
             member: "Zip",
             from: Callback("resultSelector", position: 1),
             to: Parameter("second")),
 
         // ----- Only on Queryable -----
-        Declare(LinqQueryable, member: "AsQueryable", from: Result, to: Instance),
-        Declare(
+        Annotate(LinqQueryable, member: "AsQueryable", from: Result, to: Instance),
+        Annotate(
             LinqQueryable,
             member: "Zip",
             from: Callback("resultSelector", position: 1),
             to: Parameter("source2")),
 
         // ----- EF Core query operators: the result holds the entities it was given -----
-        Declare(EfQueryable, member: "Include", from: Result, to: Instance),
-        Declare(EfQueryable, member: "ThenInclude", from: Result, to: Instance),
-        Declare(EfQueryable, member: "AsNoTracking", from: Result, to: Instance),
-        Declare(EfQueryable, member: "AsNoTrackingWithIdentityResolution", from: Result, to: Instance),
-        Declare(EfQueryable, member: "AsTracking", from: Result, to: Instance),
-        Declare(EfQueryable, member: "IgnoreQueryFilters", from: Result, to: Instance),
-        Declare(EfQueryable, member: "IgnoreAutoIncludes", from: Result, to: Instance),
-        Declare(EfQueryable, member: "TagWith", from: Result, to: Instance),
-        Declare(EfQueryable, member: "TagWithCallSite", from: Result, to: Instance),
-        Declare(EfQueryable, member: "AsAsyncEnumerable", from: Result, to: Instance),
-        Declare(EfQueryable, member: "FirstAsync", from: Result, to: Instance),
-        Declare(EfQueryable, member: "FirstOrDefaultAsync", from: Result, to: Instance),
-        Declare(EfQueryable, member: "SingleAsync", from: Result, to: Instance),
-        Declare(EfQueryable, member: "SingleOrDefaultAsync", from: Result, to: Instance),
-        Declare(EfQueryable, member: "LastAsync", from: Result, to: Instance),
-        Declare(EfQueryable, member: "LastOrDefaultAsync", from: Result, to: Instance),
-        Declare(EfQueryable, member: "ElementAtAsync", from: Result, to: Instance),
-        Declare(EfQueryable, member: "ElementAtOrDefaultAsync", from: Result, to: Instance),
-        Declare(EfQueryable, member: "ToListAsync", from: Result, to: Instance),
-        Declare(EfQueryable, member: "ToArrayAsync", from: Result, to: Instance),
-        Declare(EfQueryable, member: "ToHashSetAsync", from: Result, to: Instance),
-        Declare(
+        Annotate(EfQueryable, member: "Include", from: Result, to: Instance),
+        Annotate(EfQueryable, member: "ThenInclude", from: Result, to: Instance),
+        Annotate(EfQueryable, member: "AsNoTracking", from: Result, to: Instance),
+        Annotate(EfQueryable, member: "AsNoTrackingWithIdentityResolution", from: Result, to: Instance),
+        Annotate(EfQueryable, member: "AsTracking", from: Result, to: Instance),
+        Annotate(EfQueryable, member: "IgnoreQueryFilters", from: Result, to: Instance),
+        Annotate(EfQueryable, member: "IgnoreAutoIncludes", from: Result, to: Instance),
+        Annotate(EfQueryable, member: "TagWith", from: Result, to: Instance),
+        Annotate(EfQueryable, member: "TagWithCallSite", from: Result, to: Instance),
+        Annotate(EfQueryable, member: "AsAsyncEnumerable", from: Result, to: Instance),
+        Annotate(EfQueryable, member: "FirstAsync", from: Result, to: Instance),
+        Annotate(EfQueryable, member: "FirstOrDefaultAsync", from: Result, to: Instance),
+        Annotate(EfQueryable, member: "SingleAsync", from: Result, to: Instance),
+        Annotate(EfQueryable, member: "SingleOrDefaultAsync", from: Result, to: Instance),
+        Annotate(EfQueryable, member: "LastAsync", from: Result, to: Instance),
+        Annotate(EfQueryable, member: "LastOrDefaultAsync", from: Result, to: Instance),
+        Annotate(EfQueryable, member: "ElementAtAsync", from: Result, to: Instance),
+        Annotate(EfQueryable, member: "ElementAtOrDefaultAsync", from: Result, to: Instance),
+        Annotate(EfQueryable, member: "ToListAsync", from: Result, to: Instance),
+        Annotate(EfQueryable, member: "ToArrayAsync", from: Result, to: Instance),
+        Annotate(EfQueryable, member: "ToHashSetAsync", from: Result, to: Instance),
+        Annotate(
             EfQueryable,
             member: "MinAsync",
             from: Result,
             to: Instance,
             excludeOverloadsWithParameters: ["selector"]),
-        Declare(
+        Annotate(
             EfQueryable,
             member: "MaxAsync",
             from: Result,
             to: Instance,
             excludeOverloadsWithParameters: ["selector"]),
-        Declare(
+        Annotate(
             EfQueryable,
             member: "ToDictionaryAsync",
             from: Result,
             to: Instance,
             excludeOverloadsWithParameters: ["elementSelector"]),
 
-        Declare(EfDbSet, member: "AsAsyncEnumerable", from: Result, to: Instance),
-        Declare(EfDbSet, member: "AsQueryable", from: Result, to: Instance),
+        Annotate(EfDbSet, member: "AsAsyncEnumerable", from: Result, to: Instance),
+        Annotate(EfDbSet, member: "AsQueryable", from: Result, to: Instance),
 
         // Split queries are a relational feature and live in their own assembly and their own type.
-        Declare(EfRelationalQueryable, member: "AsSplitQuery", from: Result, to: Instance),
-        Declare(EfRelationalQueryable, member: "AsSingleQuery", from: Result, to: Instance),
+        Annotate(EfRelationalQueryable, member: "AsSplitQuery", from: Result, to: Instance),
+        Annotate(EfRelationalQueryable, member: "AsSingleQuery", from: Result, to: Instance),
 
         // ----- List has its own methods, which win over the Enumerable ones of the same name -----
-        Declare(GenericList, member: "ToArray", from: Result, to: Instance),
-        Declare(GenericList, member: "Find", from: Result, to: Instance),
-        Declare(GenericList, member: "FindLast", from: Result, to: Instance),
-        Declare(GenericList, member: "FindAll", from: Result, to: Instance),
-        Declare(GenericList, member: "GetRange", from: Result, to: Instance),
-        Declare(GenericList, member: "AsReadOnly", from: Result, to: Instance),
+        Annotate(GenericList, member: "ToArray", from: Result, to: Instance),
+        Annotate(GenericList, member: "Find", from: Result, to: Instance),
+        Annotate(GenericList, member: "FindLast", from: Result, to: Instance),
+        Annotate(GenericList, member: "FindAll", from: Result, to: Instance),
+        Annotate(GenericList, member: "GetRange", from: Result, to: Instance),
+        Annotate(GenericList, member: "AsReadOnly", from: Result, to: Instance),
 
         // ----- "foreach" is rewritten by the compiler into GetEnumerator and Current -----
-        Declare(Enumerable, member: "GetEnumerator", from: Result, to: Instance),
-        Declare(AsyncEnumerable, member: "GetAsyncEnumerator", from: Result, to: Instance),
-        Declare(Enumerator, member: "Current", from: Result, to: Instance),
-        Declare(AsyncEnumerator, member: "Current", from: Result, to: Instance),
+        Annotate(Enumerable, member: "GetEnumerator", from: Result, to: Instance),
+        Annotate(AsyncEnumerable, member: "GetAsyncEnumerator", from: Result, to: Instance),
+        Annotate(Enumerator, member: "Current", from: Result, to: Instance),
+        Annotate(AsyncEnumerator, member: "Current", from: Result, to: Instance),
 
         // "foreach" over an array goes through the old non-generic interfaces.
-        Declare(OldEnumerable, member: "GetEnumerator", from: Result, to: Instance),
-        Declare(OldEnumerator, member: "Current", from: Result, to: Instance),
+        Annotate(OldEnumerable, member: "GetEnumerator", from: Result, to: Instance),
+        Annotate(OldEnumerator, member: "Current", from: Result, to: Instance),
 
         // ----- Reading one entity back out of a collection -----
-        Declare(GenericIList, member: "this[]", from: Result, to: Instance),
-        Declare(ReadOnlyList, member: "this[]", from: Result, to: Instance),
-        Declare(Dictionary, member: "this[]", from: Result, to: Instance),
-        Declare(Dictionary, member: "Values", from: Result, to: Instance),
-        Declare(ReadOnlyDictionary, member: "this[]", from: Result, to: Instance),
-        Declare(ReadOnlyDictionary, member: "Values", from: Result, to: Instance),
-        Declare(KeyValuePair, member: "Value", from: Result, to: Instance),
-        Declare(CollectionExtensions, member: "GetValueOrDefault", from: Result, to: Instance),
-        Declare(Task, member: "Result", from: Result, to: Instance),
+        Annotate(GenericIList, member: "this[]", from: Result, to: Instance),
+        Annotate(ReadOnlyList, member: "this[]", from: Result, to: Instance),
+        Annotate(Dictionary, member: "this[]", from: Result, to: Instance),
+        Annotate(Dictionary, member: "Values", from: Result, to: Instance),
+        Annotate(ReadOnlyDictionary, member: "this[]", from: Result, to: Instance),
+        Annotate(ReadOnlyDictionary, member: "Values", from: Result, to: Instance),
+        Annotate(KeyValuePair, member: "Value", from: Result, to: Instance),
+        Annotate(CollectionExtensions, member: "GetValueOrDefault", from: Result, to: Instance),
+        Annotate(Task, member: "Result", from: Result, to: Instance),
 
         // TryGetValue hands the entity back through its out argument; its result is a bool and holds nothing.
-        Declare(Dictionary, member: "TryGetValue", from: OutArgument("value"), to: Instance),
-        Declare(ReadOnlyDictionary, member: "TryGetValue", from: OutArgument("value"), to: Instance),
+        Annotate(Dictionary, member: "TryGetValue", from: OutArgument("value"), to: Instance),
+        Annotate(ReadOnlyDictionary, member: "TryGetValue", from: OutArgument("value"), to: Instance),
 
         // ----- EF Core: a callback is handed an element -----
-        Declare(EfQueryable, member: "AnyAsync", from: Callback("predicate"), to: Instance),
-        Declare(EfQueryable, member: "AllAsync", from: Callback("predicate"), to: Instance),
-        Declare(EfQueryable, member: "CountAsync", from: Callback("predicate"), to: Instance),
-        Declare(EfQueryable, member: "LongCountAsync", from: Callback("predicate"), to: Instance),
-        Declare(EfQueryable, member: "FirstAsync", from: Callback("predicate"), to: Instance),
-        Declare(EfQueryable, member: "FirstOrDefaultAsync", from: Callback("predicate"), to: Instance),
-        Declare(EfQueryable, member: "LastAsync", from: Callback("predicate"), to: Instance),
-        Declare(EfQueryable, member: "LastOrDefaultAsync", from: Callback("predicate"), to: Instance),
-        Declare(EfQueryable, member: "SingleAsync", from: Callback("predicate"), to: Instance),
-        Declare(EfQueryable, member: "SingleOrDefaultAsync", from: Callback("predicate"), to: Instance),
-        Declare(EfQueryable, member: "MinAsync", from: Callback("selector"), to: Instance),
-        Declare(EfQueryable, member: "MaxAsync", from: Callback("selector"), to: Instance),
-        Declare(EfQueryable, member: "SumAsync", from: Callback("selector"), to: Instance),
-        Declare(EfQueryable, member: "AverageAsync", from: Callback("selector"), to: Instance),
-        Declare(EfQueryable, member: "ToDictionaryAsync", from: Callback("keySelector"), to: Instance),
-        Declare(EfQueryable, member: "ToDictionaryAsync", from: Callback("elementSelector"), to: Instance),
-        Declare(EfQueryable, member: "ForEachAsync", from: Callback("action"), to: Instance),
+        Annotate(EfQueryable, member: "AnyAsync", from: Callback("predicate"), to: Instance),
+        Annotate(EfQueryable, member: "AllAsync", from: Callback("predicate"), to: Instance),
+        Annotate(EfQueryable, member: "CountAsync", from: Callback("predicate"), to: Instance),
+        Annotate(EfQueryable, member: "LongCountAsync", from: Callback("predicate"), to: Instance),
+        Annotate(EfQueryable, member: "FirstAsync", from: Callback("predicate"), to: Instance),
+        Annotate(EfQueryable, member: "FirstOrDefaultAsync", from: Callback("predicate"), to: Instance),
+        Annotate(EfQueryable, member: "LastAsync", from: Callback("predicate"), to: Instance),
+        Annotate(EfQueryable, member: "LastOrDefaultAsync", from: Callback("predicate"), to: Instance),
+        Annotate(EfQueryable, member: "SingleAsync", from: Callback("predicate"), to: Instance),
+        Annotate(EfQueryable, member: "SingleOrDefaultAsync", from: Callback("predicate"), to: Instance),
+        Annotate(EfQueryable, member: "MinAsync", from: Callback("selector"), to: Instance),
+        Annotate(EfQueryable, member: "MaxAsync", from: Callback("selector"), to: Instance),
+        Annotate(EfQueryable, member: "SumAsync", from: Callback("selector"), to: Instance),
+        Annotate(EfQueryable, member: "AverageAsync", from: Callback("selector"), to: Instance),
+        Annotate(EfQueryable, member: "ToDictionaryAsync", from: Callback("keySelector"), to: Instance),
+        Annotate(EfQueryable, member: "ToDictionaryAsync", from: Callback("elementSelector"), to: Instance),
+        Annotate(EfQueryable, member: "ForEachAsync", from: Callback("action"), to: Instance),
 
         // ----- Collections that call you back with an element -----
-        Declare(GenericList, member: "ForEach", from: Callback("action"), to: Instance),
-        Declare(Array, member: "ForEach", from: Callback("action"), to: Parameter("array")),
+        Annotate(GenericList, member: "ForEach", from: Callback("action"), to: Instance),
+        Annotate(Array, member: "ForEach", from: Callback("action"), to: Parameter("array")),
     ];
 
     /// <summary>
     /// True for a member left off the table on purpose, rather than one simply not reached yet.
     /// </summary>
     /// <remarks>
-    /// These hand back the entities of two places at once and one line can name only one. A declaration
+    /// These hand back the entities of two places at once and one line can name only one. A annotation
     /// would be believed and would answer for entities nobody looked at, so nothing offers to write one.
     /// </remarks>
     /// <param name="declaringType">Metadata name of the type that declares the member.</param>
@@ -294,38 +294,38 @@ internal static class BuiltInBridges
            leftOutOnPurpose.Contains(memberName);
 
     /// <summary>
-    /// The operators Enumerable and Queryable declare the same way, read for one of them. Both types spell
+    /// The operators Enumerable and Queryable annotate the same way, read for one of them. Both types spell
     /// these members and their parameters identically, so a line that is right for one is right for the other.
     /// </summary>
     private static IEnumerable<BuiltInBridge> QueryOperators(string type) =>
     [
-        .. SameEntitiesInResult.Select(member => Declare(type, member, from: Result, to: Instance)),
+        .. SameEntitiesInResult.Select(member => Annotate(type, member, from: Result, to: Instance)),
 
         // "Min(selector)" hands back what the selector returned, not an element. The name of that parameter is
         // the only thing separating it from "Min(comparer)", which takes just as many arguments.
-        Declare(type, member: "Min", from: Result, to: Instance, excludeOverloadsWithParameters: ["selector"]),
-        Declare(type, member: "Max", from: Result, to: Instance, excludeOverloadsWithParameters: ["selector"]),
+        Annotate(type, member: "Min", from: Result, to: Instance, excludeOverloadsWithParameters: ["selector"]),
+        Annotate(type, member: "Max", from: Result, to: Instance, excludeOverloadsWithParameters: ["selector"]),
 
         .. ElementInCallback.Select(entry =>
-            Declare(type, entry.Member, from: Callback(entry.Callback), to: Instance)),
+            Annotate(type, entry.Member, from: Callback(entry.Callback), to: Instance)),
 
         // "GroupBy(keySelector, resultSelector)": the group is the second parameter, the key is not an element.
-        Declare(type, member: "GroupBy", from: Callback("resultSelector", position: 1), to: Instance),
+        Annotate(type, member: "GroupBy", from: Callback("resultSelector", position: 1), to: Instance),
 
         // "Aggregate(seed, func)": the element is the second parameter, the accumulator is not.
-        Declare(type, member: "Aggregate", from: Callback("func", position: 1), to: Instance),
+        Annotate(type, member: "Aggregate", from: Callback("func", position: 1), to: Instance),
 
         // Zip and the join operators are given a second collection of their own. Zip's is named differently on
         // each type, so those two lines are in All rather than here.
-        Declare(type, member: "Zip", from: Callback("resultSelector"), to: Instance),
-        Declare(type, member: "Join", from: Callback("outerKeySelector"), to: Instance),
-        Declare(type, member: "Join", from: Callback("innerKeySelector"), to: Parameter("inner")),
-        Declare(type, member: "Join", from: Callback("resultSelector"), to: Instance),
-        Declare(type, member: "Join", from: Callback("resultSelector", position: 1), to: Parameter("inner")),
-        Declare(type, member: "GroupJoin", from: Callback("outerKeySelector"), to: Instance),
-        Declare(type, member: "GroupJoin", from: Callback("innerKeySelector"), to: Parameter("inner")),
-        Declare(type, member: "GroupJoin", from: Callback("resultSelector"), to: Instance),
-        Declare(type, member: "GroupJoin", from: Callback("resultSelector", position: 1), to: Parameter("inner")),
+        Annotate(type, member: "Zip", from: Callback("resultSelector"), to: Instance),
+        Annotate(type, member: "Join", from: Callback("outerKeySelector"), to: Instance),
+        Annotate(type, member: "Join", from: Callback("innerKeySelector"), to: Parameter("inner")),
+        Annotate(type, member: "Join", from: Callback("resultSelector"), to: Instance),
+        Annotate(type, member: "Join", from: Callback("resultSelector", position: 1), to: Parameter("inner")),
+        Annotate(type, member: "GroupJoin", from: Callback("outerKeySelector"), to: Instance),
+        Annotate(type, member: "GroupJoin", from: Callback("innerKeySelector"), to: Parameter("inner")),
+        Annotate(type, member: "GroupJoin", from: Callback("resultSelector"), to: Instance),
+        Annotate(type, member: "GroupJoin", from: Callback("resultSelector", position: 1), to: Parameter("inner")),
     ];
 
     /// <summary>
@@ -337,7 +337,7 @@ internal static class BuiltInBridges
     /// <param name="to">Where the same entities came from.</param>
     /// <param name="excludeOverloadsWithParameters">Parameters of the overloads this line does not describe.</param>
     /// <returns>The record.</returns>
-    private static BuiltInBridge Declare(
+    private static BuiltInBridge Annotate(
         string declaringType,
         string member,
         BridgeEnd from,

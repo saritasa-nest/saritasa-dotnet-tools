@@ -20,7 +20,7 @@ internal sealed class Answer
     }
 
     /// <summary>
-    /// The property is loaded on every path: the value comes from ".Include(...)", from a method declared with
+    /// The property is loaded on every path: the value comes from ".Include(...)", from a method annotated with
     /// [Includes], someone assigned the property by hand, the entity was freshly constructed, or the method
     /// asks for it with [IncludeRequired].
     /// </summary>

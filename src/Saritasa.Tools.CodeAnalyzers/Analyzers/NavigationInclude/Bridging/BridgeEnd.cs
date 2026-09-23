@@ -11,7 +11,7 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Bridging;
 internal abstract class BridgeEnd
 {
     /// <summary>
-    /// What the call handed back: the value of <c>users.ToList()</c>, <c>users[0]</c>, <c>page.Items</c>.
+    /// What the call handed back: the value of <c>users.ToList()</c>, <c>users[0]</c>, <c>task.Result</c>.
     /// </summary>
     /// <remarks>
     /// Only ever the side a bridge runs from. Nothing moves forward into a result.
@@ -21,8 +21,8 @@ internal abstract class BridgeEnd
     }
 
     /// <summary>
-    /// The value the member was used on: the <c>users</c> of <c>users[0]</c>, the <c>page</c> of
-    /// <c>page.Items</c>.
+    /// The value the member was used on: the <c>users</c> of <c>users[0]</c>, the <c>pair</c> of
+    /// <c>pair.Value</c>.
     /// </summary>
     /// <remarks>
     /// Only ever the side a bridge lands on. For an extension method there is no instance of its own: the

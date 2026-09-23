@@ -11,17 +11,12 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Bridging;
 /// so the first two are read once per compilation and the third per lookup.
 /// They are kept apart because they may not say the same things: only a built-in line names overloads or
 /// speaks for a property, and only a built-in line describes a method that is not static, see
-/// <see cref="CustomBridgeRules"/>. Nothing here is inferred; a member nobody declared is not followed.
+/// <see cref="CustomBridgeRules"/>. Nothing here is inferred; a member nobody annotated is not followed.
 /// A lookup asks with the end the search stands on and gets back the ends to move to. Two of them mean the
 /// entities could have come from either place, as for <c>first.Concat(second)</c>.
 /// </remarks>
 internal sealed class Bridges
 {
-    /// <summary>
-    /// Nothing is declared anywhere. Used where a compilation is not available.
-    /// </summary>
-    public static readonly Bridges None = new([], []);
-
     /// <summary>
     /// The built-in table, with every declaring type looked up in the compilation, grouped by member name so
     /// that a lookup only compares types for members with the right name.
@@ -29,7 +24,7 @@ internal sealed class Bridges
     private readonly ILookup<string, ResolvedBuiltIn> builtIn;
 
     /// <summary>
-    /// What assembly attributes declared, grouped the same way.
+    /// What assembly attributes annotated, grouped the same way.
     /// </summary>
     private readonly ILookup<string, CustomBridge> custom;
 
@@ -130,40 +125,40 @@ internal sealed class Bridges
     }
 
     /// <summary>
-    /// Everything declared under the member's name.
+    /// Everything annotated under the member's name.
     /// </summary>
     /// <remarks>
     /// An indexer is named "this[]" in C# and "Item" in metadata, so both spellings are asked for.
     /// </remarks>
-    private static IEnumerable<T> GetCandidates<T>(ILookup<string, T> declared, ISymbol definition)
-        => declared[definition.Name].Concat(
+    private static IEnumerable<T> GetCandidates<T>(ILookup<string, T> annotated, ISymbol definition)
+        => annotated[definition.Name].Concat(
             definition.MetadataName == definition.Name
                 ? []
-                : declared[definition.MetadataName]);
+                : annotated[definition.MetadataName]);
 
     /// <summary>
-    /// Every bridge of this member running from the given end, from the first place that declares any. The
+    /// Every bridge of this member running from the given end, from the first place that annotates any. The
     /// member itself has the last word, then the built-in table, then an assembly attribute.
     /// </summary>
     private IReadOnlyList<BridgeEnd> Find(ISymbol member, BridgeEnd from)
     {
         var definition = member.OriginalDefinition;
 
-        var written = Collect(
+        var custom = Collect(
             definition.GetAttributes()
                 .Select(PassesIncludesReader.ReadMemberAttribute)
                 .OfType<Bridge>()
-                .Where(bridge => IsAllowedToDeclare(definition, bridge)),
+                .Where(bridge => IsAllowedAnnotation(definition, bridge)),
             from);
 
-        if (written.Count > 0)
+        if (custom.Count > 0)
         {
-            return written;
+            return custom;
         }
 
-        var declared = FindBuiltIn(definition, from);
+        var annotated = FindBuiltIn(definition, from);
 
-        return declared.Count > 0 ? declared : FindCustom(definition, from);
+        return annotated.Count > 0 ? annotated : FindAssemblyCustom(definition, from);
     }
 
     /// <summary>
@@ -179,14 +174,14 @@ internal sealed class Bridges
             from);
 
     /// <summary>
-    /// The same, among the bridges declared by an assembly attribute.
+    /// The same, among the bridges annotated by an assembly attribute.
     /// </summary>
-    private IReadOnlyList<BridgeEnd> FindCustom(ISymbol definition, BridgeEnd from)
+    private IReadOnlyList<BridgeEnd> FindAssemblyCustom(ISymbol definition, BridgeEnd from)
         => Collect(
             GetCandidates(custom, definition)
-                .Where(declared => IsDeclaredBy(definition, declared.DeclaringType))
-                .Select(declared => declared.Bridge)
-                .Where(bridge => IsAllowedToDeclare(definition, bridge)),
+                .Where(annotated => IsDeclaredBy(definition, annotated.DeclaringType))
+                .Select(annotated => annotated.Bridge)
+                .Where(bridge => IsAllowedAnnotation(definition, bridge)),
             from);
 
     /// <summary>
@@ -194,7 +189,7 @@ internal sealed class Bridges
     /// string is ignored, so that every property bridge is one we can verify by reading it. What the rules
     /// refuse is ignored here and reported as INCL006 where it was written.
     /// </summary>
-    private static bool IsAllowedToDeclare(ISymbol definition, Bridge bridge)
+    private static bool IsAllowedAnnotation(ISymbol definition, Bridge bridge)
         => definition is IMethodSymbol method && CustomBridgeRules.IsAllowed(method, bridge, out _);
 
     /// <summary>
@@ -228,7 +223,7 @@ internal sealed class Bridges
         }
 
         /// <summary>
-        /// Type the bridge was declared on.
+        /// Type the bridge was annotated on.
         /// </summary>
         public INamedTypeSymbol Type { get; }
 

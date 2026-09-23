@@ -8,7 +8,7 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Rules;
 
 /// <summary>
 /// Reports INCL001 when a method accesses a <see cref="TrackIncludeRequiredAttribute"/>
-/// property without declaring <see cref="IncludeRequiredAttribute"/>.
+/// property without annotating <see cref="IncludeRequiredAttribute"/>.
 /// </summary>
 internal static class PropertyReferenceHandler
 {
