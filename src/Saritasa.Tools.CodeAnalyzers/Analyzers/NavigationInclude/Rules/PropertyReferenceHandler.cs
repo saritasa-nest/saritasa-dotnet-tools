@@ -18,7 +18,7 @@ internal static class PropertyReferenceHandler
     /// <param name="context">Operation analysis context.</param>
     public static void Analyze(OperationAnalysisContext context)
     {
-        if (context.Operation is not IPropertyReferenceOperation propRef)
+        if (!TryGetPropertyReference(context.Operation, out var propRef) || propRef is null)
         {
             return;
         }
@@ -65,5 +65,22 @@ internal static class PropertyReferenceHandler
                 typeName,
                 propertyName,
                 paramName));
+    }
+
+    private static bool TryGetPropertyReference(IOperation operation, out IPropertyReferenceOperation? propertyReference)
+    {
+        while (operation is IConditionalAccessOperation conditionalAccess)
+        {
+            operation = conditionalAccess.WhenNotNull;
+        }
+
+        if (operation is IPropertyReferenceOperation prop)
+        {
+            propertyReference = prop;
+            return true;
+        }
+
+        propertyReference = null;
+        return false;
     }
 }
