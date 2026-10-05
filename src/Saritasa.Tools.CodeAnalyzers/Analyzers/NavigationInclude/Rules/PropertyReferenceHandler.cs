@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Text;
 using Saritasa.Tools.CodeAnalyzers.Abstractions.NavigationInclude.Attributes;
 using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Requirements;
 
@@ -18,7 +19,7 @@ internal static class PropertyReferenceHandler
     /// <param name="context">Operation analysis context.</param>
     public static void Analyze(OperationAnalysisContext context)
     {
-        if (!TryGetPropertyReference(context.Operation, out var propRef) || propRef is null)
+        if (context.Operation is not IPropertyReferenceOperation propRef)
         {
             return;
         }
@@ -29,8 +30,10 @@ internal static class PropertyReferenceHandler
             return;
         }
 
-        // The property must be accessed on a parameter (e.g. "user.Profile").
-        if (propRef.Instance is not IParameterReferenceOperation paramRef)
+        // The property must be accessed on a parameter (e.g. "user.Profile" or "user?.Profile").
+        var conditionalAccess = FindConditionalAccess(propRef.Instance);
+        var referenceInstance = conditionalAccess?.Operation ?? propRef.Instance;
+        if (referenceInstance is not IParameterReferenceOperation paramRef)
         {
             return;
         }
@@ -58,29 +61,52 @@ internal static class PropertyReferenceHandler
             return;
         }
 
+        var diagnosticLocation = conditionalAccess is null
+            ? propRef.Syntax.GetLocation()
+            : GetLocationOfConditionalAccess(propRef, conditionalAccess);
+
         context.ReportDiagnostic(
             Diagnostic.Create(
                 NavigationIncludeRulesProvider.GetDiagnosticDescriptor(NavigationIncludeRulesProvider.Incl1IdAddIncludeRequiredForParameter),
-                propRef.Syntax.GetLocation(),
+                diagnosticLocation,
                 typeName,
                 propertyName,
                 paramName));
     }
 
-    private static bool TryGetPropertyReference(IOperation operation, out IPropertyReferenceOperation? propertyReference)
+    /// <summary>
+    /// Returns the conditional access whose receiver the instance stands for, e.g. the "user?..." of
+    /// "user?.Profile", and null when the instance is not a conditional access placeholder.
+    /// </summary>
+    private static IConditionalAccessOperation? FindConditionalAccess(IOperation? instance)
     {
-        while (operation is IConditionalAccessOperation conditionalAccess)
+        if (instance is not IConditionalAccessInstanceOperation)
         {
-            operation = conditionalAccess.WhenNotNull;
+            return null;
         }
 
-        if (operation is IPropertyReferenceOperation prop)
+        // The placeholder belongs to the nearest conditional access that has it in its WhenNotNull part.
+        var child = instance;
+        for (var parent = instance.Parent; parent is not null; child = parent, parent = parent.Parent)
         {
-            propertyReference = prop;
-            return true;
+            if (parent is IConditionalAccessOperation conditionalAccess && conditionalAccess.WhenNotNull == child)
+            {
+                return conditionalAccess;
+            }
         }
 
-        propertyReference = null;
-        return false;
+        return null;
+    }
+
+    /// <summary>
+    /// Where to report: the property access, which for "user?.Profile" spans from the receiver, since the
+    /// property's own syntax is only ".Profile".
+    /// </summary>
+    private static Location GetLocationOfConditionalAccess(
+        IPropertyReferenceOperation propRef,
+        IConditionalAccessOperation conditionalAccess)
+    {
+        var span = TextSpan.FromBounds(conditionalAccess.Operation.Syntax.SpanStart, propRef.Syntax.Span.End);
+        return Location.Create(propRef.Syntax.SyntaxTree, span);
     }
 }

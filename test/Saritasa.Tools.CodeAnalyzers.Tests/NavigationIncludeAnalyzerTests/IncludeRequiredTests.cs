@@ -40,17 +40,15 @@ public class IncludeRequiredTests : NavigationIncludeTestBase
         const string sourceCode = Preamble +
             /* lang=c# */
             """
-            #pragma warning disable CS0131
                 class TestClass
                 {
-                    void SetTimezone_NoCheck(User user, string timezone)
+                    void ReadTimezone_NoCheck(User user)
                     {
-                        // INCL001: navigation property is required, but not checked. Use IncludeRequiredAttribute
-                        {|INCL001:user.Profile.Timezone|} = timezone;
+                        // INCL001: conditional navigation property is required, but not checked. Use IncludeRequiredAttribute
+                        var timezone = {|INCL001:user?.Profile|}.Timezone;
                     }
                 }
             }
-            #pragma warning restore CS0131
             """;
 
         await VerifyAnalyzerAsync(sourceCode);
