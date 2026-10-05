@@ -87,12 +87,16 @@ internal static class PropertyReferenceHandler
 
         // The placeholder belongs to the nearest conditional access that has it in its WhenNotNull part.
         var child = instance;
-        for (var parent = instance.Parent; parent is not null; child = parent, parent = parent.Parent)
+        var parent = instance.Parent;
+        while (parent is not null)
         {
             if (parent is IConditionalAccessOperation conditionalAccess && conditionalAccess.WhenNotNull == child)
             {
                 return conditionalAccess;
             }
+
+            child = parent;
+            parent = parent.Parent;
         }
 
         return null;
