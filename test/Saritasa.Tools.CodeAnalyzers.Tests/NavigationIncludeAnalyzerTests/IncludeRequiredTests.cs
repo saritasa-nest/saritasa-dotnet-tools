@@ -32,6 +32,29 @@ public class IncludeRequiredTests : NavigationIncludeTestBase
     }
 
     /// <summary>
+    /// INCL001 is reported when a method accesses a [TrackIncludeRequired] property directly without [IncludeRequired].
+    /// </summary>
+    [Fact]
+    public async Task ConditionalPropertyAccess_WithoutIncludeRequired_ReportsIncl1()
+    {
+        const string sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass
+                {
+                    void ReadTimezone_NoCheck(User user)
+                    {
+                        // INCL001: conditional navigation property is required, but not checked. Use IncludeRequiredAttribute
+                        var timezone = {|INCL001:user?.Profile|}.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
     /// No warning is produced when a method is annotated with [IncludeRequired] for the parameter it accesses the navigation property on.
     /// </summary>
     [Fact]
