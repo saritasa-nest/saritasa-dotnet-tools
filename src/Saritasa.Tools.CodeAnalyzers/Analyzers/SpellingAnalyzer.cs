@@ -257,6 +257,9 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         @"(https?://|www\.)[^\s\]\)]+",
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
+    /// <summary>
+    /// Masks URLs, e.g. <c>https://example.com/some/path</c> or <c>www.example.com</c>.
+    /// </summary>
     private static string MaskUrl(string text)
     {
         return urlRegex.Replace(text, ReplaceWithWhitespaces());
@@ -266,6 +269,9 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         "[({]?[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}[)}]?",
         RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
 
+    /// <summary>
+    /// Masks GUIDs, e.g. <c>1b6cdb5b-8449-4d8e-ad3b-6b3dd8f4158d</c> or <c>{1b6cdb5b-8449-4d8e-ad3b-6b3dd8f4158d}</c>.
+    /// </summary>
     private static string MaskGuid(string text)
     {
         return guidRegex.Replace(text, ReplaceWithWhitespaces());
@@ -275,6 +281,9 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         @"(?:0x[0-9a-fA-F]+|#[0-9a-fA-F]+)",
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
+    /// <summary>
+    /// Masks hex values, e.g. <c>0xFF00AA</c> or color codes like <c>#1a2b3c</c>.
+    /// </summary>
     private static string MaskHex(string text)
     {
         return hexRegex.Replace(text, ReplaceWithWhitespaces());
@@ -284,6 +293,10 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         @"(?:^|(?<=\s))[a-zA-Z]:\\(?:[^\r\n\\]*\\)*[^\s\r\n]*|\\\\[^\s\r\n]+|(?:\.\./|\./)(?:[^\s\r\n]+)|/[a-zA-Z][^\s\r\n]*",
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
+    /// <summary>
+    /// Masks file paths, e.g. <c>C:\Projects\app\file.txt</c>, <c>\\server\share</c>, <c>./config/app.json</c>
+    /// or <c>/usr/local/bin</c>.
+    /// </summary>
     private static string MaskFilePath(string text)
     {
         return filePathRegex.Replace(text, ReplaceWithWhitespaces());
@@ -293,6 +306,9 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         @"\b[yMdHhmsfFtKz:/\-_\.]{3,}\b",
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
+    /// <summary>
+    /// Masks date and time format strings, e.g. <c>yyyy-MM-dd</c> or <c>HH:mm:ss</c>.
+    /// </summary>
     private static string MaskFormatString(string text)
     {
         return formatStringRegex.Replace(text, ReplaceWithWhitespaces());
