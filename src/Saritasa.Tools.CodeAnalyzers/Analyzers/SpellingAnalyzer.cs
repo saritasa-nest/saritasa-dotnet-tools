@@ -248,6 +248,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         text = MaskHex(text);
         text = MaskFilePath(text);
         text = MaskFormatString(text);
+        text = MaskAlphanumericToken(text);
 
         return text;
     }
@@ -295,6 +296,19 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
     private static string MaskFormatString(string text)
     {
         return formatStringRegex.Replace(text, ReplaceWithWhitespaces());
+    }
+
+    private static readonly Regex alphanumericTokenRegex = new(
+        @"\b(?=[a-zA-Z0-9]*[a-zA-Z])(?=[a-zA-Z0-9]*[0-9])[a-zA-Z0-9]+\b",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+    /// <summary>
+    /// Masks tokens that mix letters and digits, e.g. identifiers like <c>1234qwer</c> or <c>sha256</c>,
+    /// or hashes like <c>43B3549CD700A288AFEA419C45C9CF2FA97DB3D4522652AE080280114EEAEF24</c>.
+    /// </summary>
+    private static string MaskAlphanumericToken(string text)
+    {
+        return alphanumericTokenRegex.Replace(text, ReplaceWithWhitespaces());
     }
 
     private static MatchEvaluator ReplaceWithWhitespaces() => static match => new string(' ', match.Length);
