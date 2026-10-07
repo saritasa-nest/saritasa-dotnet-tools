@@ -1278,6 +1278,32 @@ public class SpellingAnalyzerTests
     }
 
     /// <summary>
+    /// Verifies that upper case words are excluded from analysis.
+    /// </summary>
+    [Fact]
+    public async Task UpperCase_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    // US RFI AWG XUNIT
+                    private const string Text = "RFI and XUNIT";
+
+                    public void TestMethod()
+                    {
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
     /// Verifies that name in camelCase does not produce a warning.
     /// </summary>
     [Fact]
