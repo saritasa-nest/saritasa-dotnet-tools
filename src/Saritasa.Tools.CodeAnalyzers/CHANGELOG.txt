@@ -10,3 +10,6 @@
 
 0.2.1 [2026-06-08]
 [+] Include README.md with NuGet package
+
+0.2.2 [2026-09-10]
+[+] Add code fix for exception message dot analyzer.

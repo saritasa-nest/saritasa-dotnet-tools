@@ -734,6 +734,106 @@ public class SpellingAnalyzerTests
     }
 
     /// <summary>
+    /// Verifies word in general exclusions used with a possessive noun form does not produce a warning.
+    /// </summary>
+    [Fact]
+    public async Task WordInGeneralExclusions_PossessiveForm_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        // The validator's result was invalid.
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies word in user exclusions used with a possessive noun form does not produce a warning.
+    /// </summary>
+    [Fact]
+    public async Task WordInUserExclusions_PossessiveForm_ShouldNotProduceWarning()
+    {
+        context.TestState.AdditionalFiles.Add(("dictionaries/spell-checker-exclusions.txt", "typoo"));
+
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        // The typoo's result was invalid.
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies word in general exclusions used in its plural form does not produce a warning.
+    /// </summary>
+    [Fact]
+    public async Task WordInGeneralExclusions_PluralForm_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        // The validators returned invalid results.
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies word in user exclusions used in its plural form does not produce a warning.
+    /// </summary>
+    [Fact]
+    public async Task WordInUserExclusions_PluralForm_ShouldNotProduceWarning()
+    {
+        context.TestState.AdditionalFiles.Add(("dictionaries/spell-checker-exclusions.txt", "typoo"));
+
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        // The typoos returned invalid results.
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
     /// Verifies <see cref="Guid"/> string does not produce a warning.
     /// </summary>
     [Fact]
@@ -1092,6 +1192,81 @@ public class SpellingAnalyzerTests
                     // 0x1A3B
                     // #FFAABB
                     // #fff
+                    public void TestMethod()
+                    {
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that a token mixing letters and digits is excluded from analysis.
+    /// </summary>
+    [Fact]
+    public async Task Comment_AlphanumericToken_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    // <c>&lt;@1234qwer|john.smith></c>
+                    // sha256
+                    public void TestMethod()
+                    {
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that a long hash in a comment and in a string literal is excluded from analysis.
+    /// </summary>
+    [Fact]
+    public async Task AlphanumericToken_LongHash_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    // 43B3549CD700A288AFEA419C45C9CF2FA97DB3D4522652AE080280114EEAEF24
+                    private const string Hash = "43B3549CD700A288AFEA419C45C9CF2FA97DB3D4522652AE080280114EEAEF24";
+
+                    public void TestMethod()
+                    {
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that a typo next to an alphanumeric token still produces a warning.
+    /// </summary>
+    [Fact]
+    public async Task Comment_AlphanumericToken_TypoNearby_ShouldProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    // User 1234qwer has a [|typoo|]
                     public void TestMethod()
                     {
                     }

@@ -22,6 +22,13 @@
 /// }
 /// </code>
 /// </example>
+/// <example>
+/// Verification disabled: the analyzer trusts the promise without checking the method body.
+/// <code>
+/// [Includes(nameof(User.Profile), Verify = false)]
+/// Task&lt;User&gt; GetUser(int id) => _repository.GetWithIncludesAsync(id, IncludeProfile);
+/// </code>
+/// </example>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
 public class IncludesAttribute : Attribute
 {
@@ -30,6 +37,12 @@ public class IncludesAttribute : Attribute
     /// Must match the property name exactly (case-sensitive).
     /// </summary>
     public string IncludedProperty { get; }
+
+    /// <summary>
+    /// Whether the analyzer verifies that the method really loads the property (INCL003). Default is true.
+    /// Set to false when the loading logic cannot be followed by the analyzer; callers still rely on the promise.
+    /// </summary>
+    public bool Verify { get; set; } = true;
 
     /// <summary>
     /// Initializes the attribute with the name of the navigation property guaranteed to be loaded.

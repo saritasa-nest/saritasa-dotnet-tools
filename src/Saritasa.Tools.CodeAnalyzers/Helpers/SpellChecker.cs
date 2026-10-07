@@ -26,6 +26,20 @@ public static class SpellChecker
     /// </summary>
     private const string ExclusionsFileOptionName = "dotnet_diagnostic.STAN1004.exclusions_file";
 
+    /// <summary>
+    /// Hunspell affix flag that allows a word to take the possessive <c>'s</c> suffix (<c>SFX M</c> in en-us.aff).
+    /// Applied to excluded words so they are recognized in possessive form, e.g. <c>validator's</c>.
+    /// </summary>
+    private static readonly FlagValue possessiveFlag = new('M');
+
+    /// <summary>
+    /// Hunspell affix flag that allows a word to take the regular plural suffix (<c>SFX S</c> in en-us.aff).
+    /// Applied to excluded words so they are recognized in plural form, e.g. <c>validators</c>.
+    /// </summary>
+    private static readonly FlagValue pluralFlag = new('S');
+
+    private static readonly FlagSet exclusionFlags = FlagSet.Create(possessiveFlag, pluralFlag);
+
     private static readonly Assembly assembly = typeof(SpellChecker).Assembly;
 
     private static readonly string[] handledDictionaryFiles =
@@ -96,10 +110,15 @@ public static class SpellChecker
                 var word = line.Trim();
                 if (!string.IsNullOrWhiteSpace(word))
                 {
-                    wordList.Add(word);
+                    AddExcludedWord(wordList, word);
                 }
             }
         }
+    }
+
+    private static void AddExcludedWord(WordList wordList, string word)
+    {
+        wordList.Add(word, exclusionFlags, MorphSet.Empty, WordEntryOptions.None);
     }
 
     private static bool IsDictionaryHandled(string name) =>
@@ -118,7 +137,7 @@ public static class SpellChecker
             var word = line.ToString().Trim();
             if (!string.IsNullOrWhiteSpace(word))
             {
-                wordList.Add(word);
+                AddExcludedWord(wordList, word);
             }
         }
     }
@@ -229,7 +248,7 @@ public static class SpellChecker
             else
             {
                 // When name does not have camelCase we check it as usual.
-                wordList.Add(name);
+                AddExcludedWord(wordList, name);
             }
         }
 

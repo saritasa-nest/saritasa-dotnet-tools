@@ -16,7 +16,6 @@ amqp
 amqps
 aop
 api
-apis
 argb
 aspx
 ast
@@ -79,7 +78,6 @@ dgml
 dhcp
 dkim
 dll
-dlls
 dlna
 dml
 dns
@@ -94,7 +92,6 @@ dsssl
 dtd
 dte
 dto
-dtos
 dvcs
 dvi
 dvr
@@ -113,7 +110,6 @@ egpcs
 elt
 eof
 eol
-eols
 eot
 esmtp
 etl
@@ -137,7 +133,6 @@ gpu
 gssapi
 gui
 guid
-guids
 hdd
 hdmi
 hevc
@@ -145,7 +140,6 @@ hmac
 hsb
 hsl
 hsv
-htmls
 http
 httpd
 https
@@ -155,7 +149,6 @@ iana
 icmp
 id
 ide
-ids
 ieee
 ietf
 igmp
@@ -182,7 +175,6 @@ jpg
 jql
 jsp
 jwk
-jwks
 jwt
 khtml
 lan
@@ -323,7 +315,6 @@ scm
 scss
 sctp
 sdk
-sdks
 sdram
 seo
 serp
@@ -365,7 +356,6 @@ tcpip
 tcs
 tdd
 tfm
-tfms
 tfs
 tftp
 tfvc
@@ -383,15 +373,12 @@ uddi
 udp
 ui
 uid
-uids
 uml
 unc
 upn
 upnp
 uri
-uris
 url
-urls
 urn
 usb
 utf

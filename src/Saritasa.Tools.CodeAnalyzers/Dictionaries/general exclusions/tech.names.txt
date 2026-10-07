@@ -32,7 +32,6 @@ CakePHP
 cdnjs
 Chocolatey
 Chromebook
-Chromebooks
 Chromecast
 Clojure
 CMake
