@@ -1331,6 +1331,81 @@ public class SpellingAnalyzerTests
     }
 
     /// <summary>
+    /// Verifies that a name found in the middle of a word (e.g. "NLog" in "DomainLogger") is not masked,
+    /// so words are not cut at the wrong boundary.
+    /// </summary>
+    [Fact]
+    public async Task Name_ContainedInCamelCaseWords_ShouldNotCutWords()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class DomainLogger
+                {
+                    public void OrganizationLogo()
+                    {
+                        var evaluation = "Evaluation";
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that a name preceded by an upper-case prefix (interface "I", acronym) or a lower-case camelCase
+    /// boundary is masked.
+    /// </summary>
+    [Fact]
+    public async Task Name_PrecededByUpperCasePrefixOrBoundary_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                interface IMediatRHandler
+                {
+                    void HTTPMediatRCall();
+
+                    void MyMediatRCall();
+
+                    void INLogCall();
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that a name followed by a lower-case letter (e.g. "NLogs") is not masked, so the word is checked.
+    /// </summary>
+    [Fact]
+    public async Task Name_FollowedByLowerCaseLetter_ShouldCheckWord()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var test = "N[|Logss|]";
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
     /// Verifies that name with different first letter case does not produce a warning.
     /// </summary>
     /// <remarks>
