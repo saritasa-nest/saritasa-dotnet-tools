@@ -1416,4 +1416,52 @@ public class SpellingAnalyzerTests
 
         await context.RunAsync();
     }
+
+    /// <summary>
+    /// Verifies that unknown words with diacritics (names, loanwords) do not produce warnings.
+    /// </summary>
+    [Fact]
+    public async Task StringLiteral_WordsWithDiacritics_ShouldNotProduceWarning()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var test = "Côte Åland Curaçao";
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that a typo without diacritics is still reported next to words with diacritics.
+    /// </summary>
+    [Fact]
+    public async Task StringLiteral_WordsWithDiacritics_AndTypo_ShouldProduceWarningOnlyForTypo()
+    {
+        context.TestCode =
+            /* lang=c# */
+            """
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var test = "Curaçao [|typoo|]";
+                    }
+                }
+            }
+            """;
+
+        await context.RunAsync();
+    }
 }

@@ -359,7 +359,27 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         // For example, word "Monday" stored with upper-case first letter, but we could use it in identifier
         // where we have to use it with lower-case first letter.
         var titleCased = char.ToUpperInvariant(word[0]) + word.Substring(1);
-        return wordList.Check(titleCased);
+        return wordList.Check(titleCased) || HasDiacritics(word);
+    }
+
+    /// <summary>
+    /// Words with diacritics (Côte, Åland, Curaçao) are mostly foreign names and loanwords
+    /// that the English dictionary cannot validate, so unknown ones are skipped.
+    /// </summary>
+    private static bool HasDiacritics(string word)
+    {
+        // Highest ASCII code. Characters above it are not ASCII, for example "ô", "Å", "ç".
+        const int maxAsciiCode = 127;
+
+        foreach (var character in word)
+        {
+            if (char.IsLetter(character) && character > maxAsciiCode)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static void Report(
