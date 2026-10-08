@@ -277,6 +277,7 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         text = MaskFilePath(text);
         text = MaskFormatString(text);
         text = MaskAlphanumericToken(text);
+        text = MaskUpperCase(text);
 
         return text;
     }
@@ -353,6 +354,19 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
     private static string MaskAlphanumericToken(string text)
     {
         return alphanumericTokenRegex.Replace(text, ReplaceWithWhitespaces());
+    }
+
+    private static readonly Regex upperCaseRegex = new(
+        @"\b[A-Z]{2,}\b",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+    /// <summary>
+    /// Masks all-caps words: 2+ uppercase letters,
+    /// e.g. <c>US</c>, <c>AWG</c> or <c>XUNIT</c>.
+    /// </summary>
+    private static string MaskUpperCase(string text)
+    {
+        return upperCaseRegex.Replace(text, ReplaceWithWhitespaces());
     }
 
     private static MatchEvaluator ReplaceWithWhitespaces() => MaskWithWhitespaces;
