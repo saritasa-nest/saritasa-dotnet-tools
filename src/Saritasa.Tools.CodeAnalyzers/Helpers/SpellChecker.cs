@@ -219,13 +219,7 @@ public static class SpellChecker
             return firstLetter + Regex.Escape(name.Substring(1));
         });
 
-        // Match a name only as a whole camelCase segment, otherwise "NLog" masks "nLog" inside "DomainLogger".
-        const string wordStart = "(?:(?<![a-z])|(?<=[a-z])(?=[A-Z]))";
-
-        // Name must not continue with a lower-case letter, so "NLog" does not match the start of "NLogs".
-        const string wordEnd = "(?![a-z])";
-
-        var pattern = $"{wordStart}(?:{string.Join("|", patterns)}){wordEnd}";
+        var pattern = string.Join("|", patterns);
 
         return new Regex(pattern, RegexOptions.Compiled | RegexOptions.CultureInvariant);
     }
