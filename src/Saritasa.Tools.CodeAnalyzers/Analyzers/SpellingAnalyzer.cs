@@ -219,7 +219,35 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
             return text;
         }
 
-        return namesRegex.Replace(text, ReplaceWithWhitespaces());
+        return namesRegex.Replace(
+            text,
+            match => IsCamelCaseMatch(text, match) ? MaskWithWhitespaces(match) : match.Value);
+    }
+
+    /// <summary>
+    /// Checks that the match is a separate word in a camelCase identifier.
+    /// </summary>
+    /// <param name="text">Text where the match was found.</param>
+    /// <param name="match">Name match found in the text.</param>
+    /// <returns>
+    /// <c>true</c> if the match is a separate word. For example, "NLog" in "NLogProvider", "myNLog" or "_nLog".
+    /// <c>false</c> if the match is a part of a longer word, so it must be left as is.
+    /// For example, "NLog" in "NLogs" or "nLog" in "DomainLogger".
+    /// </returns>
+    private static bool IsCamelCaseMatch(string text, Match match)
+    {
+        var endIndex = match.Index + match.Length;
+        var continuesWithLowerCase = endIndex < text.Length && char.IsLower(text[endIndex]);
+        if (continuesWithLowerCase)
+        {
+            return false;
+        }
+
+        var isTextStart = match.Index == 0;
+        var startsWithUpperCase = char.IsUpper(text[match.Index]);
+        var followsLowerCase = !isTextStart && char.IsLower(text[match.Index - 1]);
+
+        return !followsLowerCase || startsWithUpperCase;
     }
 
     /// <summary>
@@ -341,7 +369,9 @@ public sealed class SpellingAnalyzer : DiagnosticAnalyzer
         return upperCaseRegex.Replace(text, ReplaceWithWhitespaces());
     }
 
-    private static MatchEvaluator ReplaceWithWhitespaces() => static match => new string(' ', match.Length);
+    private static MatchEvaluator ReplaceWithWhitespaces() => MaskWithWhitespaces;
+
+    private static string MaskWithWhitespaces(Match match) => new(' ', match.Length);
 
     private static bool IsValidWord(WordList wordList, string word)
     {

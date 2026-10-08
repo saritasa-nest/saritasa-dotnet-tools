@@ -194,6 +194,7 @@ public static class SpellChecker
 
     /// <summary>
     /// Builds a regex that matches any of the provided names.
+    /// Built for matching camel case names like "NLog" otherwise it would be split to words "N" and "Log".
     /// </summary>
     /// <remarks>
     /// Only the first character is case-flexible (to allow camelCase identifiers that start with lowercase).
