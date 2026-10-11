@@ -1,6 +1,7 @@
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
-using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Search;
+using Microsoft.CodeAnalysis;
+using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Requirements;
+using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Roslyn;
 
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.EntityFramework;
 
@@ -8,42 +9,84 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.EntityFramewo
 /// The one piece of Entity Framework knowledge the analyzer needs.
 /// </summary>
 /// <remarks>
-/// Every other rule answers "do the entities pass through?". This one answers "which property was added?",
-/// which needs to know EF's <c>Include</c>. It lives alone so nobody takes it for a general rule.
+/// Every other rule answers "do the entities pass through?". This one answers "which path was added?",
+/// which needs to know EF's <c>Include</c> and <c>ThenInclude</c>. It lives alone so nobody takes it for a general rule.
 /// </remarks>
 internal static class EfIncludeReader
 {
     private const string QueryableExtensions = "Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions";
 
     /// <summary>
-    /// Returns "Profile" for <c>Include(u =&gt; u.Profile)</c> or <c>Include("Profile")</c>;
-    /// null for other calls. Filtered includes such as <c>u =&gt; u.Orders.Where(...)</c> are not recognized.
+    /// Returns the path the call loads:
+    /// <list type="bullet">
+    /// <item>"Profile" for <c>Include(u =&gt; u.Profile)</c> or <c>Include("Profile")</c>;</item>
+    /// <item>"Settings.Profile" for <c>Include(u =&gt; u.Settings.Profile)</c> or <c>Include("Settings.Profile")</c>;</item>
+    /// <item>"Settings.Profile" for <c>Include(u =&gt; u.Settings).ThenInclude(s =&gt; s.Profile)</c>.</item>
+    /// </list>
+    /// Null for other calls. Filtered includes such as <c>u =&gt; u.Orders.Where(...)</c> are not recognized.
     /// </summary>
     /// <param name="call">Method call.</param>
-    /// <returns>Property name or null.</returns>
-    public static string? GetIncludedProperty(IInvocationOperation call)
+    /// <returns>Included path or null.</returns>
+    public static NavigationPath? GetIncludedPath(IInvocationOperation call)
     {
         var method = call.TargetMethod;
-        if (method.Name != "Include" ||
-            method.ContainingType.ToDisplayString() != QueryableExtensions ||
-            call.Arguments.Length < 2)
+        if (method.ContainingType.ToDisplayString() != QueryableExtensions || call.Arguments.Length < 2)
         {
             return null;
         }
 
-        var argument = call.Arguments[1].Value;
+        return method.Name switch
+        {
+            "Include" => ReadIncludeArgument(call.Arguments[1].Value),
+            "ThenInclude" => ReadThenInclude(call),
+            _ => null,
+        };
+    }
+
+    /// <summary>
+    /// "Include(u =&gt; u.Settings.Profile)" or "Include("Settings.Profile")".
+    /// </summary>
+    private static NavigationPath? ReadIncludeArgument(IOperation argument)
+    {
         if (argument.ConstantValue is { HasValue: true, Value: string path })
         {
-            return path;
+            return NavigationPath.Parse([path]);
         }
 
-        // "Include" takes an expression tree, which is data rather than code, so the compiler does not lower it
-        // into a graph the analyzer could read. The property name is taken from the syntax "u => u.Profile".
-        if (argument.Syntax is LambdaExpressionSyntax { ExpressionBody: MemberAccessExpressionSyntax memberAccess })
+        return RoslynReader.GetMemberChain(argument.Syntax) is { } chain
+            ? NavigationPath.Parse(chain)
+            : null;
+    }
+
+    /// <summary>
+    /// "query.Include(u =&gt; u.Settings).ThenInclude(s =&gt; s.Profile)": the path of the Include or ThenInclude it is
+    /// called on, followed by its own lambda.
+    /// </summary>
+    private static NavigationPath? ReadThenInclude(IInvocationOperation call)
+    {
+        // "s => s.Profile": what this ThenInclude adds.
+        var ownChain = RoslynReader.GetMemberChain(call.Arguments[1].Value.Syntax);
+        if (ownChain is null)
         {
-            return memberAccess.Name.Identifier.ValueText;
+            return null;
         }
 
-        return null;
+        var receiver = RoslynReader.GetReceiver(call);
+        var previousCall = receiver is null
+            ? null
+            : RoslynReader.SkipWrappers(receiver) as IInvocationOperation;
+        if (previousCall is null)
+        {
+            return null;
+        }
+
+        // "Include(u => u.Settings)": the path this ThenInclude continues.
+        var previousPath = GetIncludedPath(previousCall);
+        if (previousPath is null)
+        {
+            return null;
+        }
+
+        return NavigationPath.Parse(previousPath.Segments.Concat(ownChain));
     }
 }

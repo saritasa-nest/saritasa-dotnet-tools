@@ -195,4 +195,174 @@ public class QueryOperatorTests : NavigationIncludeTestBase
                         UpdateUserProfile(user, dto);
             """));
     }
+
+    /// <summary>
+    /// No INCL003: ThenInclude continues the path of the Include it is called on, so the query loads Settings.Profile.
+    /// </summary>
+    [Fact]
+    public async Task IncludeThenInclude_LoadsNestedPath_NoIncl3()
+    {
+        const string sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass(AppDbContext dbContext)
+                {
+                    [Includes(nameof(User.Settings), nameof(UserSettings.Profile))]
+                    async Task<User> GetUser(int id)
+                    {
+                        return await dbContext.Users
+                            .Include(u => u.Settings)
+                            .ThenInclude(s => s.Profile)
+                            .FirstOrDefaultAsync(u => u.Id == id);
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// INCL003: Include of Settings alone does not load its Profile.
+    /// </summary>
+    [Fact]
+    public async Task IncludeWithoutThenInclude_DoesNotLoadNestedPath_ReportsIncl3()
+    {
+        const string sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass(AppDbContext dbContext)
+                {
+                    [Includes(nameof(User.Settings), nameof(UserSettings.Profile))]
+                    async Task<User> GetUser(int id)
+                    {
+                        {|INCL003:return await dbContext.Users
+                            .Include(u => u.Settings)
+                            .FirstOrDefaultAsync(u => u.Id == id);|}
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No INCL003: a member chain in the Include lambda and a dotted Include string both load the whole path,
+    /// and a loaded path covers its prefix.
+    /// </summary>
+    [Fact]
+    public async Task IncludeChainAndDottedString_LoadNestedPath_NoIncl3()
+    {
+        const string sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass(AppDbContext dbContext)
+                {
+                    [Includes(nameof(User.Settings), nameof(UserSettings.Profile))]
+                    [Includes(nameof(User.Settings))]
+                    async Task<User> GetUserByChain(int id)
+                    {
+                        return await dbContext.Users
+                            .Include(u => u.Settings.Profile)
+                            .FirstOrDefaultAsync(u => u.Id == id);
+                    }
+
+                    [Includes("Settings.Profile")]
+                    async Task<User> GetUserByString(int id)
+                    {
+                        return await dbContext.Users
+                            .Include("Settings.Profile")
+                            .FirstOrDefaultAsync(u => u.Id == id);
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No INCL003: ThenInclude after a collection Include loads a property of each element.
+    /// </summary>
+    [Fact]
+    public async Task CollectionThenInclude_LoadsElementPath_NoIncl3()
+    {
+        const string sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass(AppDbContext dbContext)
+                {
+                    [Includes(nameof(User.Applications), nameof(Application.Stats))]
+                    async Task<User> GetUser(int id)
+                    {
+                        return await dbContext.Users
+                            .Include(u => u.Applications)
+                            .ThenInclude(a => a.Stats)
+                            .FirstOrDefaultAsync(u => u.Id == id);
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No INCL003: each Include starts a new path, so the search finds both nested paths in one chain, whatever
+    /// comes after them.
+    /// </summary>
+    [Fact]
+    public async Task SeveralIncludePaths_InOneChain_NoIncl3()
+    {
+        const string sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass(AppDbContext dbContext)
+                {
+                    [Includes(nameof(User.Settings), nameof(UserSettings.Profile))]
+                    [Includes(nameof(User.Applications), nameof(Application.Stats))]
+                    async Task<User> GetUser(int id)
+                    {
+                        return await dbContext.Users
+                            .Include(u => u.Settings)
+                            .ThenInclude(s => s.Profile)
+                            .Include(u => u.Applications)
+                            .ThenInclude(a => a.Stats)
+                            .Include(u => u.Organization)
+                            .FirstOrDefaultAsync(u => u.Id == id);
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// INCL003: the ThenInclude belongs to another Include, so it does not load Settings.Profile.
+    /// </summary>
+    [Fact]
+    public async Task ThenIncludeOfOtherInclude_DoesNotLoadPath_ReportsIncl3()
+    {
+        const string sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass(AppDbContext dbContext)
+                {
+                    [Includes(nameof(User.Settings), nameof(UserSettings.Profile))]
+                    async Task<User> GetUser(int id)
+                    {
+                        {|INCL003:return await dbContext.Users
+                            .Include(u => u.Settings)
+                            .Include(u => u.Manager)
+                            .ThenInclude(m => m.Profile)
+                            .FirstOrDefaultAsync(u => u.Id == id);|}
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
 }

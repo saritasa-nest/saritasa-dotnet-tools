@@ -67,8 +67,9 @@ internal sealed class IncludeSearcher
             _ when WritesWalker.GetVariable(value.Operation) is { } variable
                 => SearchAnswerInValuesWrites(variable, value.Position),
 
-            // "query.Include(u => u.Profile)", a call of a method annotated with [Includes("Profile")].
-            IInvocationOperation call when LoadsProperty(call)
+            // "query.Include(u => u.Profile)", "query.Include(u => u.Settings).ThenInclude(s => s.Profile)",
+            // a call of a method annotated with [Includes("Profile")].
+            IInvocationOperation call when LoadsPath(call)
                 => Answer.Loaded,
 
             // A move that keeps the same entities: "query.Where(...)", "users.ToList()", "users[0]",
@@ -197,13 +198,13 @@ internal sealed class IncludeSearcher
            AttributeReader.MethodHasIncludeRequiredAttribute(method, parameter.Name, path);
 
     /// <summary>
-    /// True if the call loads the property itself: <c>query.Include(u =&gt; u.Profile)</c> or a call of a method
-    /// annotated with <c>[Includes("Profile")]</c>.
+    /// True if the call loads the path itself: <c>query.Include(u =&gt; u.Profile)</c>,
+    /// <c>query.Include(u =&gt; u.Settings).ThenInclude(s =&gt; s.Profile)</c> or a call of a method annotated with
+    /// <c>[Includes("Profile")]</c>. A longer path loaded covers a shorter one.
     /// </summary>
-    private bool LoadsProperty(IInvocationOperation call)
+    private bool LoadsPath(IInvocationOperation call)
         => AttributeReader.MethodHasIncludesAttribute(call.TargetMethod, path) ||
-           (EfIncludeReader.GetIncludedProperty(call) is { } included &&
-            NavigationPath.Parse([included])?.Covers(path) == true);
+           EfIncludeReader.GetIncludedPath(call)?.Covers(path) == true;
 
     /// <summary>
     /// True if the method is in the assembly being compiled, where it can be read and annotated.
