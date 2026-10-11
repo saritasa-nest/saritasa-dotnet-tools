@@ -51,11 +51,29 @@ public class QueryOperatorTests : NavigationIncludeTestBase
     }
 
     /// <summary>
-    /// INCL004: Select hands back whatever its lambda made, not the entities it was given. The analyzer does
-    /// not read the lambda, so it says it cannot tell rather than claiming the property is missing.
+    /// INCL004: Select hands back whatever its lambda made, not the entities it was given. A lambda that is not a
+    /// chain of properties cannot be read, so the analyzer says it cannot tell rather than claiming the property
+    /// is missing.
     /// </summary>
     [Fact]
-    public async Task SelectProjection_DoesNotKeepIncludes_ReportsIncl4()
+    public async Task SelectProjection_NotPropertyChain_ReportsIncl4()
+    {
+        await VerifyAnalyzerAsync(HandleSource(
+            """
+                        var users = await dbContext.Users.Include(u => u.Profile).ToListAsync();
+                        var managers = users.Select(u => u.Manager ?? u).ToList();
+                        var manager = managers[0];
+
+                        {|INCL004:UpdateUserProfile(manager, dto)|};
+            """));
+    }
+
+    /// <summary>
+    /// INCL002: Select(u => u.Manager) holds the managers of users, so their Profile needs Manager.Profile included
+    /// on users. Profile alone is the users' own Profile.
+    /// </summary>
+    [Fact]
+    public async Task SelectNavigation_NestedPathNotIncluded_ReportsIncl2()
     {
         await VerifyAnalyzerAsync(HandleSource(
             """
@@ -63,7 +81,26 @@ public class QueryOperatorTests : NavigationIncludeTestBase
                         var managers = users.Select(u => u.Manager).ToList();
                         var manager = managers[0];
 
-                        {|INCL004:UpdateUserProfile(manager, dto)|};
+                        {|INCL002:UpdateUserProfile(manager, dto)|};
+            """));
+    }
+
+    /// <summary>
+    /// No INCL002: Manager.Profile is included on users, which covers Profile of the managers Select hands back.
+    /// </summary>
+    [Fact]
+    public async Task SelectNavigation_NestedPathIncluded_NoIncl2()
+    {
+        await VerifyAnalyzerAsync(HandleSource(
+            """
+                        var users = await dbContext.Users
+                            .Include(u => u.Manager)
+                            .ThenInclude(m => m.Profile)
+                            .ToListAsync();
+                        var managers = users.Select(u => u.Manager).ToList();
+                        var manager = managers[0];
+
+                        UpdateUserProfile(manager, dto);
             """));
     }
 
@@ -358,6 +395,71 @@ public class QueryOperatorTests : NavigationIncludeTestBase
                             .Include(u => u.Manager)
                             .ThenInclude(m => m.Profile)
                             .FirstOrDefaultAsync(u => u.Id == id);|}
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No INCL003: Select and SelectMany inside the query move from users to their Settings and Applications, whose
+    /// Profile and Stats the query includes.
+    /// </summary>
+    [Fact]
+    public async Task QueryableSelectAndSelectMany_NestedPathIncluded_NoIncl3()
+    {
+        const string sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass(AppDbContext dbContext)
+                {
+                    [Includes(nameof(UserSettings.Profile))]
+                    async Task<UserSettings> GetSettings(int id)
+                    {
+                        return await dbContext.Users
+                            .Include(u => u.Settings)
+                            .ThenInclude(s => s.Profile)
+                            .Where(u => u.Id == id)
+                            .Select(u => u.Settings)
+                            .FirstAsync();
+                    }
+
+                    [Includes(nameof(Application.Stats))]
+                    async Task<List<Application>> GetApplications()
+                    {
+                        return await dbContext.Users
+                            .Include(u => u.Applications)
+                            .ThenInclude(a => a.Stats)
+                            .SelectMany(u => u.Applications)
+                            .ToListAsync();
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// INCL003: SelectMany hands back the applications, but the query never included their Stats.
+    /// </summary>
+    [Fact]
+    public async Task QueryableSelectMany_NestedPathNotIncluded_ReportsIncl3()
+    {
+        const string sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass(AppDbContext dbContext)
+                {
+                    [Includes(nameof(Application.Stats))]
+                    async Task<List<Application>> GetApplications()
+                    {
+                        {|INCL003:return await dbContext.Users
+                            .Include(u => u.Applications)
+                            .SelectMany(u => u.Applications)
+                            .ToListAsync();|}
                     }
                 }
             }

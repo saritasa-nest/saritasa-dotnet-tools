@@ -232,4 +232,64 @@ public class IncludeRequiredTests : NavigationIncludeTestBase
 
         await VerifyAnalyzerAsync(sourceCode);
     }
+
+    /// <summary>
+    /// No INCL002: settings is user.Settings, so its Profile is Settings.Profile of user, which the method asks for.
+    /// </summary>
+    [Fact]
+    public async Task PassNavigationOfParameter_NestedPathRequired_NoDiagnostic()
+    {
+        const string sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass
+                {
+                    [IncludeRequired(nameof(user), nameof(User.Settings), nameof(UserSettings.Profile))]
+                    void Handle(User user)
+                    {
+                        var settings = user.Settings;
+                        UpdateProfile(settings);
+                    }
+
+                    [IncludeRequired(nameof(settings), nameof(UserSettings.Profile))]
+                    void UpdateProfile(UserSettings settings)
+                    {
+                        settings.Profile.Timezone = "UTC";
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// INCL002: the method asks only for Settings of user, which does not cover Settings.Profile.
+    /// </summary>
+    [Fact]
+    public async Task PassNavigationOfParameter_OnlyPrefixRequired_ReportsIncl2()
+    {
+        const string sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass
+                {
+                    [IncludeRequired(nameof(user), nameof(User.Settings))]
+                    void Handle(User user)
+                    {
+                        var settings = user.Settings;
+                        {|INCL002:UpdateProfile(settings)|};
+                    }
+
+                    [IncludeRequired(nameof(settings), nameof(UserSettings.Profile))]
+                    void UpdateProfile(UserSettings settings)
+                    {
+                        settings.Profile.Timezone = "UTC";
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
 }

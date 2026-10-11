@@ -7,42 +7,43 @@ using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Requirements;
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Search;
 
 /// <summary>
-/// Answers one question: "is the navigation property loaded in this value?".
+/// Answers one question: "is the navigation path loaded in this value?".
 /// </summary>
 /// <remarks>
-/// A value never says by itself whether the property is loaded, so the search reads backwards through the
+/// A value never says by itself whether the path is loaded, so the search reads backwards through the
 /// values it was made from. A variable is the one case it cannot do alone: it asks the
 /// <see cref="WritesWalker"/> and decides what the writes mean. Where several paths meet, all must be loaded.
+/// <para>
+/// The path asked for changes on the way: a navigation read adds a segment in front ("Profile" of
+/// <c>user.Settings</c> is "Settings.Profile" of <c>user</c>), and a bridge keeps it.
+/// </para>
 /// To teach the search a new method, annotate it with [PassesIncludes] rather than adding a case here.
 /// </remarks>
 internal sealed class IncludeSearcher
 {
-    private readonly NavigationPath path;
-    private readonly WritesWalker walker;
+    private readonly WritesWalker walker = new();
 
-    private IncludeSearcher(NavigationPath path)
+    private IncludeSearcher()
     {
-        this.path = path;
-        walker = new WritesWalker();
     }
 
     /// <summary>
-    /// Answers whether the navigation property is loaded in the value.
+    /// Answers whether the navigation path is loaded in the value.
     /// </summary>
     /// <param name="value">Value, e.g. a call argument or a returned expression.</param>
     /// <param name="path">Navigation path.</param>
     /// <param name="position">Position of the statement that contains the value.</param>
     /// <returns>Answer for the value.</returns>
     public static Answer Check(IOperation value, NavigationPath path, CodePosition position)
-        => new IncludeSearcher(path).Search(Value.Create(value, position));
+        => new IncludeSearcher().Search(Value.Create(value, position), path);
 
     /// <summary>
     /// Reads one value, and names it if it is the one that stopped the search. The deepest value wins, since
     /// only the first frame to see Unknown has nothing to name yet.
     /// </summary>
-    private Answer Search(Value value)
+    private Answer Search(Value value, NavigationPath path)
     {
-        var answer = ReadValue(value);
+        var answer = ReadValue(value, path);
 
         return answer.IsUnknown && answer.UnreadableValue is null
             ? Answer.Unknown(value.Operation)
@@ -53,32 +54,33 @@ internal sealed class IncludeSearcher
     /// Reads the value an expression holds, or answers <see cref="Answer.Unknown"/> when there is no
     /// expression to read.
     /// </summary>
-    private Answer Search(IOperation? operation, CodePosition position)
-        => operation is null ? Answer.Unknown() : Search(Value.Create(operation, position));
+    private Answer Search(IOperation? operation, CodePosition position, NavigationPath path)
+        => operation is null ? Answer.Unknown() : Search(Value.Create(operation, position), path);
 
     /// <summary>
     /// The answer for one value, from the value alone.
     /// </summary>
-    private Answer ReadValue(Value value)
+    private Answer ReadValue(Value value, NavigationPath path)
         => value.Operation switch
         {
             // "user", "users", "out var user", "#1": reading a variable is the only expression whose answer
             // depends on what ran before it, so it is the only one the walker has to follow.
             _ when WritesWalker.GetVariable(value.Operation) is { } variable
-                => SearchAnswerInValuesWrites(variable, value.Position),
+                => SearchAnswerInValuesWrites(variable, value.Position, path),
 
             // "query.Include(u => u.Profile)", "query.Include(u => u.Settings).ThenInclude(s => s.Profile)",
             // a call of a method annotated with [Includes("Profile")].
-            IInvocationOperation call when LoadsPath(call)
+            IInvocationOperation call when LoadsPath(call, path)
                 => Answer.Loaded,
 
-            // A move that keeps the same entities: "query.Where(...)", "users.ToList()", "users[0]",
-            // "pair.Value", "query.Paginate(1)". It says which values they came from.
-            _ when BridgeCrosser.FromValue(value) is { Count: > 0 } sources
-                => SearchSources(sources, value.Position),
+            // An annotated move: "query.Where(...)", "users.ToList()", "users[0]", "pair.Value",
+            // "query.Paginate(1)" keep the same entities; "users.Select(u => u.Settings)" moves to their Settings,
+            // so users must have "Settings" in front of the path loaded. It says which values they came from.
+            _ when BridgeCrosser.FromValue(value) is { Count: > 0 } crossings
+                => SearchSources(crossings, value.Position, path),
 
             // A call nobody annotated. In our own code that is a real answer: the method promises nothing with
-            // [Includes] or [PassesIncludes], so nothing loads the property. In someone else's code we
+            // [Includes] or [PassesIncludes], so nothing loads the path. In someone else's code we
             // simply cannot see.
             IInvocationOperation call
                 => IsOurOwnCode(call.TargetMethod, value.Position) ? Answer.NotLoaded : Answer.Unknown(),
@@ -92,43 +94,47 @@ internal sealed class IncludeSearcher
             IPropertyReferenceOperation reference when IsEntitySet(reference.Property.Type)
                 => Answer.NotLoaded,
 
+            // "user.Settings": "Profile" of it is loaded when "Settings.Profile" of user is.
+            IPropertyReferenceOperation { Instance: { } instance } reference
+                => Search(instance, value.Position, path.Prepend(reference.Property.Name)),
+
             // A field, a call we could not follow, anything else: we cannot tell.
             _ => Answer.Unknown(),
         };
 
     /// <summary>
-    /// The answer for a variable: every write the walker finds must have the property loaded.
+    /// The answer for a variable: every write the walker finds must have the path loaded.
     /// </summary>
-    private Answer SearchAnswerInValuesWrites(object variable, CodePosition position)
+    private Answer SearchAnswerInValuesWrites(object variable, CodePosition position, NavigationPath path)
         => JoinPaths(
             walker.FindWrites(variable, position)
-                .Select(ReadWrite)
+                .Select(write => ReadWrite(write, path))
             );
 
     /// <summary>
-    /// What one write of the walker means for the navigation property.
+    /// What one write of the walker means for the navigation path.
     /// </summary>
-    private Answer ReadWrite(Write write)
+    private Answer ReadWrite(Write write, NavigationPath path)
         => write switch
         {
             // "user = x": read the value the variable got.
-            Write.Written written => Search(written.Value),
+            Write.Written written => Search(written.Value, path),
 
             // "dictionary.TryGetValue(id, out var user)".
-            Write.OutArgument outArgument => ReadOutArgumentSource(outArgument),
+            Write.OutArgument outArgument => ReadOutArgumentSource(outArgument, path),
 
-            // The caller of a method that asks for the property with [IncludeRequired] is the one that loads
-            // it. A method that does not ask for it is a real answer: nobody loads the property.
+            // The caller of a method that asks for the path with [IncludeRequired] is the one that loads
+            // it. A method that does not ask for it is a real answer: nobody loads the path.
             Write.MethodParameter parameter
-                => IsRequiredFromCaller(parameter.Parameter) ? Answer.Loaded : Answer.NotLoaded,
+                => IsRequiredFromCaller(parameter.Parameter, path) ? Answer.Loaded : Answer.NotLoaded,
 
             // "users.Select(u => ...)": the parameter holds an element of users.
-            Write.LambdaParameter lambda => ReadLambdaSource(lambda),
+            Write.LambdaParameter lambda => ReadLambdaSource(lambda, path),
 
             // A loop came back to a place the search already read, so this path adds nothing new.
             Write.NothingNew => Answer.Loaded,
 
-            // Nothing ever wrote the variable, so nothing loaded the property either.
+            // Nothing ever wrote the variable, so nothing loaded the path either.
             Write.NeverWritten => Answer.NotLoaded,
 
             _ => Answer.Unknown(),
@@ -155,7 +161,7 @@ internal sealed class IncludeSearcher
     /// "dictionary.TryGetValue(id, out var user)": the bridge says user comes from the dictionary. A method
     /// nobody annotated could have put anything there, so we cannot tell.
     /// </summary>
-    private Answer ReadOutArgumentSource(Write.OutArgument outArgument)
+    private Answer ReadOutArgumentSource(Write.OutArgument outArgument, NavigationPath path)
     {
         var call = outArgument.Call;
 
@@ -166,34 +172,37 @@ internal sealed class IncludeSearcher
 
         return SearchSources(
             BridgeCrosser.FromOutArgument(invocation, outArgument.ParameterName, call.Position.FlowGraph.Bridges),
-            call.Position);
+            call.Position,
+            path);
     }
 
     /// <summary>
     /// "users.Select(u =&gt; ...)": the parameter is filled from users. For anything else, such as the index
     /// of "Select((u, i) =&gt; ...)", we cannot tell what it holds.
     /// </summary>
-    private Answer ReadLambdaSource(Write.LambdaParameter lambda)
+    private Answer ReadLambdaSource(Write.LambdaParameter lambda, NavigationPath path)
         => SearchSources(
             BridgeCrosser.FromLambdaParameter(
                 lambda.Lambda,
                 lambda.Parameter.Ordinal,
                 lambda.Creation.FlowGraph.Bridges),
-            lambda.Creation);
+            lambda.Creation,
+            path);
 
     /// <summary>
-    /// The answer for the values a bridge landed on. Two of them would both have to be loaded, which the
-    /// search cannot say yet, so it says it cannot tell rather than picking one.
+    /// The answer for the values a bridge landed on, asked for the path with what the bridge put in front of it.
+    /// Two of them would both have to be loaded, which the search cannot say yet, so it says it cannot tell
+    /// rather than picking one.
     /// </summary>
-    private Answer SearchSources(IReadOnlyList<IOperation> sources, CodePosition position)
-        => sources.Count == 1
-            ? Search(sources[0], position)
+    private Answer SearchSources(IReadOnlyList<Crossing> crossings, CodePosition position, NavigationPath path)
+        => crossings.Count == 1
+            ? Search(crossings[0].Source, position, path.Prepend([.. crossings[0].Prefix]))
             : Answer.Unknown();
 
     /// <summary>
-    /// True if the method asks for the property with [IncludeRequired], making its caller responsible.
+    /// True if the method asks for the path with [IncludeRequired], making its caller responsible.
     /// </summary>
-    private bool IsRequiredFromCaller(IParameterSymbol parameter)
+    private static bool IsRequiredFromCaller(IParameterSymbol parameter, NavigationPath path)
         => parameter.ContainingSymbol is IMethodSymbol method &&
            AttributeReader.MethodHasIncludeRequiredAttribute(method, parameter.Name, path);
 
@@ -202,7 +211,7 @@ internal sealed class IncludeSearcher
     /// <c>query.Include(u =&gt; u.Settings).ThenInclude(s =&gt; s.Profile)</c> or a call of a method annotated with
     /// <c>[Includes("Profile")]</c>. A longer path loaded covers a shorter one.
     /// </summary>
-    private bool LoadsPath(IInvocationOperation call)
+    private static bool LoadsPath(IInvocationOperation call, NavigationPath path)
         => AttributeReader.MethodHasIncludesAttribute(call.TargetMethod, path) ||
            EfIncludeReader.GetIncludedPath(call)?.Covers(path) == true;
 

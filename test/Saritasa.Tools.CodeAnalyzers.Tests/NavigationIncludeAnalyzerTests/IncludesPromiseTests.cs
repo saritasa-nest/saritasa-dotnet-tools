@@ -211,4 +211,57 @@ public class IncludesPromiseTests : NavigationIncludeTestBase
 
         await VerifyAnalyzerAsync(sourceCode);
     }
+
+    /// <summary>
+    /// No INCL003: the returned user.Settings has its Profile loaded, because the query includes Settings.Profile.
+    /// </summary>
+    [Fact]
+    public async Task ReturnNavigation_NestedPathIncluded_NoIncl3()
+    {
+        const string sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass(AppDbContext dbContext)
+                {
+                    [Includes(nameof(UserSettings.Profile))]
+                    async Task<UserSettings> GetSettings(int id)
+                    {
+                        var user = await dbContext.Users
+                            .Include(u => u.Settings)
+                            .ThenInclude(s => s.Profile)
+                            .FirstAsync(u => u.Id == id);
+                        return user.Settings;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// INCL003: the query includes Settings but not its Profile, so the returned user.Settings lacks Profile.
+    /// </summary>
+    [Fact]
+    public async Task ReturnNavigation_NestedPathNotIncluded_ReportsIncl3()
+    {
+        const string sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass(AppDbContext dbContext)
+                {
+                    [Includes(nameof(UserSettings.Profile))]
+                    async Task<UserSettings> GetSettings(int id)
+                    {
+                        var user = await dbContext.Users
+                            .Include(u => u.Settings)
+                            .FirstAsync(u => u.Id == id);
+                        {|INCL003:return user.Settings;|}
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
 }
