@@ -17,12 +17,12 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Search;
 /// </remarks>
 internal sealed class IncludeSearcher
 {
-    private readonly string property;
+    private readonly NavigationPath path;
     private readonly WritesWalker walker;
 
-    private IncludeSearcher(string property)
+    private IncludeSearcher(NavigationPath path)
     {
-        this.property = property;
+        this.path = path;
         walker = new WritesWalker();
     }
 
@@ -30,11 +30,11 @@ internal sealed class IncludeSearcher
     /// Answers whether the navigation property is loaded in the value.
     /// </summary>
     /// <param name="value">Value, e.g. a call argument or a returned expression.</param>
-    /// <param name="property">Navigation property name.</param>
+    /// <param name="path">Navigation path.</param>
     /// <param name="position">Position of the statement that contains the value.</param>
     /// <returns>Answer for the value.</returns>
-    public static Answer Check(IOperation value, string property, CodePosition position)
-        => new IncludeSearcher(property).Search(Value.Create(value, position));
+    public static Answer Check(IOperation value, NavigationPath path, CodePosition position)
+        => new IncludeSearcher(path).Search(Value.Create(value, position));
 
     /// <summary>
     /// Reads one value, and names it if it is the one that stopped the search. The deepest value wins, since
@@ -194,15 +194,16 @@ internal sealed class IncludeSearcher
     /// </summary>
     private bool IsRequiredFromCaller(IParameterSymbol parameter)
         => parameter.ContainingSymbol is IMethodSymbol method &&
-           AttributeReader.MethodHasIncludeRequiredAttribute(method, parameter.Name, property);
+           AttributeReader.MethodHasIncludeRequiredAttribute(method, parameter.Name, path);
 
     /// <summary>
     /// True if the call loads the property itself: <c>query.Include(u =&gt; u.Profile)</c> or a call of a method
     /// annotated with <c>[Includes("Profile")]</c>.
     /// </summary>
     private bool LoadsProperty(IInvocationOperation call)
-        => AttributeReader.MethodHasIncludesAttribute(call.TargetMethod, property) ||
-           EfIncludeReader.GetIncludedProperty(call) == property;
+        => AttributeReader.MethodHasIncludesAttribute(call.TargetMethod, path) ||
+           (EfIncludeReader.GetIncludedProperty(call) is { } included &&
+            NavigationPath.Parse([included])?.Covers(path) == true);
 
     /// <summary>
     /// True if the method is in the assembly being compiled, where it can be read and annotated.

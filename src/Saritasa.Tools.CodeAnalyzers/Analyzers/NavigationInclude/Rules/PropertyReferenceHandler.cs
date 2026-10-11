@@ -56,7 +56,8 @@ internal static class PropertyReferenceHandler
         var propertyName = propRef.Property.Name;
         var typeName = propRef.Property.ContainingType.Name;
 
-        if (AttributeReader.MethodHasIncludeRequiredAttribute(containingMethod, paramName, propertyName))
+        if (NavigationPath.Parse([propertyName]) is { } path &&
+            AttributeReader.MethodHasIncludeRequiredAttribute(containingMethod, paramName, path))
         {
             return;
         }

@@ -1,7 +1,7 @@
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Requirements;
 
 /// <summary>
-/// Describes a parameter which requires including a navigation property from argument prior to passing.
+/// Describes a parameter which requires including a navigation path from argument prior to passing.
 /// </summary>
 internal class IncludeRequirement
 {
@@ -9,20 +9,20 @@ internal class IncludeRequirement
     /// Constructor.
     /// </summary>
     /// <param name="parameterName">Name of the parameter.</param>
-    /// <param name="navigationProperty">Required navigation property.</param>
-    public IncludeRequirement(string parameterName, string navigationProperty)
+    /// <param name="path">Required navigation path.</param>
+    public IncludeRequirement(string parameterName, NavigationPath path)
     {
         ParameterName = parameterName;
-        NavigationProperty = navigationProperty;
+        Path = path;
     }
 
     /// <summary>
-    /// Name of parameter which should contain a <see cref="NavigationProperty"/>.
+    /// Name of parameter which should contain a <see cref="Path"/>.
     /// </summary>
     public string ParameterName { get; }
 
     /// <summary>
-    /// Required navigation property.
+    /// Required navigation path, e.g. "Profile" or "Settings.Profile".
     /// </summary>
-    public string NavigationProperty { get; }
+    public NavigationPath Path { get; }
 }

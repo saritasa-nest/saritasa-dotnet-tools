@@ -91,7 +91,7 @@ internal static class IncludeFlowHandler
                 continue;
             }
 
-            var answer = IncludeSearcher.Check(value, requirement.NavigationProperty, callStatement);
+            var answer = IncludeSearcher.Check(value, requirement.Path, callStatement);
             if (answer.IsLoaded)
             {
                 continue;
@@ -104,7 +104,7 @@ internal static class IncludeFlowHandler
                     call.Syntax.GetLocation(),
                     answer.UnreadableValue,
                     value,
-                    requirement.NavigationProperty);
+                    requirement.Path);
 
                 continue;
             }
@@ -113,7 +113,7 @@ internal static class IncludeFlowHandler
                 NavigationIncludeRulesProvider.GetDiagnosticDescriptor(ruleId),
                 call.Syntax.GetLocation(),
                 value.Type?.Name,
-                requirement.NavigationProperty,
+                requirement.Path.ToString(),
                 value.Syntax.ToString());
         }
     }
@@ -129,9 +129,9 @@ internal static class IncludeFlowHandler
             yield break;
         }
 
-        foreach (var property in AttributeReader.GetIncludesToVerify(position.FlowGraph.Method))
+        foreach (var path in AttributeReader.GetIncludesToVerify(position.FlowGraph.Method))
         {
-            var answer = IncludeSearcher.Check(returnedValue, property, position);
+            var answer = IncludeSearcher.Check(returnedValue, path, position);
             if (answer.IsLoaded)
             {
                 continue;
@@ -142,7 +142,7 @@ internal static class IncludeFlowHandler
 
             if (answer.IsUnknown)
             {
-                yield return CannotCheck(location, answer.UnreadableValue, returnedValue, property);
+                yield return CannotCheck(location, answer.UnreadableValue, returnedValue, path);
 
                 continue;
             }
@@ -151,7 +151,7 @@ internal static class IncludeFlowHandler
                 NavigationIncludeRulesProvider.GetDiagnosticDescriptor(
                     NavigationIncludeRulesProvider.Incl3IdMethodResultDoesntIncludeNavigationProperty),
                 location,
-                property);
+                path.ToString());
         }
     }
 
@@ -163,7 +163,7 @@ internal static class IncludeFlowHandler
         Location location,
         IOperation? unreadableValue,
         IOperation value,
-        string property)
+        NavigationPath path)
         => Diagnostic.Create(
             NavigationIncludeRulesProvider.GetDiagnosticDescriptor(
                 NavigationIncludeRulesProvider.Incl4IdCannotCheckNavigationProperty),
@@ -171,7 +171,7 @@ internal static class IncludeFlowHandler
             UnreadableMember.GetProperties(unreadableValue),
             UnreadableMember.Describe(unreadableValue),
             value.Type?.Name,
-            property,
+            path.ToString(),
             value.Syntax.ToString());
 
     /// <summary>

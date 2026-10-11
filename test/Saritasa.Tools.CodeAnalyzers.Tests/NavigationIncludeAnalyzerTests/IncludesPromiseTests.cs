@@ -178,4 +178,37 @@ public class IncludesPromiseTests : NavigationIncludeTestBase
 
         await VerifyAnalyzerAsync(sourceCode);
     }
+
+    /// <summary>
+    /// No INCL002: [Includes] given one segment per argument promises Profile as a prefix of its path.
+    /// </summary>
+    [Fact]
+    public async Task UseResult_SegmentIncludesCoversRequirement_NoIncl2()
+    {
+        const string sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task Handle(SaveUserDto dto)
+                    {
+                        var user = await GetUser(dto.Id);
+                        UpdateUserProfile(user, dto);
+                    }
+
+                    [Includes(nameof(User.Profile), nameof(UserProfile.Timezone), Verify = false)]
+                    async Task<User> GetUser(int id)
+                        => await dbContext.Users.FirstOrDefaultAsync(u => u.Id == id);
+
+                    [IncludeRequired(nameof(user), nameof(User.Profile))]
+                    void UpdateUserProfile(User user, SaveUserDto dto)
+                    {
+                        user.Profile.Timezone = dto.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
 }

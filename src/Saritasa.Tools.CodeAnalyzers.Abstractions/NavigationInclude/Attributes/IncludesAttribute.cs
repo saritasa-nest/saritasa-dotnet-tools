@@ -29,14 +29,27 @@
 /// Task&lt;User&gt; GetUser(int id) => _repository.GetWithIncludesAsync(id, IncludeProfile);
 /// </code>
 /// </example>
+/// <example>
+/// Nested path, one segment per argument, or as one dotted string <c>[Includes("Settings.Profile")]</c>.
+/// <code>
+/// [Includes(nameof(User.Settings), nameof(Settings.Profile))]
+/// async Task&lt;User&gt; GetUser(int id)
+/// {
+///     return await _dbContext.Users
+///         .Include(u =&gt; u.Settings)
+///         .ThenInclude(s =&gt; s.Profile)
+///         .FirstOrDefaultAsync(u =&gt; u.Id == id);
+/// }
+/// </code>
+/// </example>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
 public class IncludesAttribute : Attribute
 {
     /// <summary>
-    /// Name of the navigation property that is guaranteed to be loaded on the return value.
-    /// Must match the property name exactly (case-sensitive).
+    /// Navigation path that is guaranteed to be loaded on the return value, from the returned entity outwards,
+    /// e.g. ["Settings", "Profile"] or ["Settings.Profile"]. Must match the property names exactly (case-sensitive).
     /// </summary>
-    public string IncludedProperty { get; }
+    public string[] Path { get; }
 
     /// <summary>
     /// Whether the analyzer verifies that the method really loads the property (INCL003). Default is true.
@@ -45,11 +58,11 @@ public class IncludesAttribute : Attribute
     public bool Verify { get; set; } = true;
 
     /// <summary>
-    /// Initializes the attribute with the name of the navigation property guaranteed to be loaded.
+    /// Initializes the attribute with the navigation path guaranteed to be loaded.
     /// </summary>
-    /// <param name="includedProperty">Name of the navigation property loaded on the return value (case-sensitive, must match exactly).</param>
-    public IncludesAttribute(string includedProperty)
+    /// <param name="path">Navigation properties from the returned entity outwards: one per argument, e.g. <c>nameof(User.Settings), nameof(Settings.Profile)</c>, or a dotted string such as "Settings.Profile" (case-sensitive, must match exactly).</param>
+    public IncludesAttribute(params string[] path)
     {
-        IncludedProperty = includedProperty;
+        Path = path;
     }
 }

@@ -144,4 +144,92 @@ public class IncludeRequiredTests : NavigationIncludeTestBase
 
         await VerifyAnalyzerAsync(sourceCode);
     }
+
+    /// <summary>
+    /// No INCL001: the path given one segment per argument starts with Profile, so it covers what the callee asks for.
+    /// </summary>
+    [Fact]
+    public async Task PassParameter_SegmentPathCoversRequirement_NoIncl1()
+    {
+        const string sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass
+                {
+                    [IncludeRequired(nameof(user), nameof(User.Profile), nameof(UserProfile.Timezone))]
+                    void Handle(User user, SaveUserDto dto)
+                    {
+                        UpdateUserProfile(user, dto);
+                    }
+
+                    [IncludeRequired(nameof(user), nameof(User.Profile))]
+                    void UpdateUserProfile(User user, SaveUserDto dto)
+                    {
+                        user.Profile.Timezone = dto.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No INCL001: the dotted path "Profile.Timezone" covers Profile, both for the direct access and for the call.
+    /// </summary>
+    [Fact]
+    public async Task PassParameter_DottedPathCoversRequirement_NoIncl1()
+    {
+        const string sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass
+                {
+                    [IncludeRequired(nameof(user), "Profile.Timezone")]
+                    void Handle(User user, SaveUserDto dto)
+                    {
+                        var timezone = user.Profile.Timezone;
+                        UpdateUserProfile(user, dto);
+                    }
+
+                    [IncludeRequired(nameof(user), nameof(User.Profile))]
+                    void UpdateUserProfile(User user, SaveUserDto dto)
+                    {
+                        user.Profile.Timezone = dto.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// INCL001: the caller asks only for Profile, which does not cover the longer path the callee asks for.
+    /// </summary>
+    [Fact]
+    public async Task PassParameter_ShorterPathDoesNotCoverRequirement_ReportsIncl1()
+    {
+        const string sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass
+                {
+                    [IncludeRequired(nameof(user), nameof(User.Profile))]
+                    void Handle(User user, SaveUserDto dto)
+                    {
+                        {|INCL001:UpdateTimezone(user, dto)|};
+                    }
+
+                    [IncludeRequired(nameof(user), nameof(User.Profile), nameof(UserProfile.Timezone))]
+                    void UpdateTimezone(User user, SaveUserDto dto)
+                    {
+                        user.Profile.Timezone = dto.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
 }

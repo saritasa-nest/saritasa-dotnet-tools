@@ -22,6 +22,31 @@
 /// void UpdateUser(User user, UserDto dto) { ... }
 /// </code>
 /// </example>
+/// <example>
+/// Nested path, one segment per argument. <c>nameof(User.Settings.Profile)</c> gives only "Profile",
+/// so it does not describe the path.
+/// <code>
+/// [IncludeRequired(nameof(user), nameof(User.Settings), nameof(Settings.Profile))]
+/// void SetTimezone(User user, string timezone)
+/// {
+///     user.Settings.Profile.Timezone = timezone;
+/// }
+/// </code>
+/// The same path as one dotted string: <c>[IncludeRequired(nameof(user), "Settings.Profile")]</c>.
+/// </example>
+/// <example>
+/// A collection followed by a property of its elements, as <c>Include(...).ThenInclude(...)</c> loads it.
+/// <code>
+/// [IncludeRequired(nameof(admin), nameof(User.Applications), nameof(Application.Stats))]
+/// void ExportApplicationStats(User admin)
+/// {
+///     foreach (var application in admin.Applications)
+///     {
+///         var stat = application.Stats;
+///     }
+/// }
+/// </code>
+/// </example>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
 public class IncludeRequiredAttribute : Attribute
 {
@@ -32,19 +57,19 @@ public class IncludeRequiredAttribute : Attribute
     public string Param { get; set; }
 
     /// <summary>
-    /// Name of the navigation property that must be loaded before the method is called.
-    /// Must match the property name exactly (case-sensitive).
+    /// Navigation path that must be loaded before the method is called, from the parameter outwards,
+    /// e.g. ["Settings", "Profile"] or ["Settings.Profile"]. Must match the property names exactly (case-sensitive).
     /// </summary>
-    public string IncludedProperty { get; }
+    public string[] Path { get; }
 
     /// <summary>
-    /// Initializes the attribute with the parameter name and the navigation property name to require.
+    /// Initializes the attribute with the parameter name and the navigation path to require.
     /// </summary>
     /// <param name="param">Name of the method parameter (case-sensitive, must match exactly).</param>
-    /// <param name="includedProperty">Name of the navigation property that must be loaded (case-sensitive, must match exactly).</param>
-    public IncludeRequiredAttribute(string param, string includedProperty)
+    /// <param name="path">Navigation properties from the parameter outwards: one per argument, e.g. <c>nameof(User.Settings), nameof(Settings.Profile)</c>, or a dotted string such as "Settings.Profile" (case-sensitive, must match exactly).</param>
+    public IncludeRequiredAttribute(string param, params string[] path)
     {
         Param = param;
-        IncludedProperty = includedProperty;
+        Path = path;
     }
 }
