@@ -260,4 +260,125 @@ public class LocalVariableTests : NavigationIncludeTestBase
 
         await VerifyAnalyzerAsync(sourceCode);
     }
+
+    /// <summary>
+    /// INCL002 on the read: the local comes from a query that never Included Profile.
+    /// </summary>
+    [Fact]
+    public async Task ReadOfLocal_QueryWithoutInclude_ReportsIncl2()
+    {
+        const string sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task<string> GetTimezone(int id)
+                    {
+                        var user = await dbContext.Users.FirstAsync(u => u.Id == id);
+                        return user.{|INCL002:Profile|}.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// INCL002 on Profile: the query Includes Settings, but not Settings.Profile.
+    /// </summary>
+    [Fact]
+    public async Task NestedReadOfLocal_OnlyPrefixIncluded_ReportsIncl2()
+    {
+        const string sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task<string> GetTimezone(int id)
+                    {
+                        var user = await dbContext.Users
+                            .Include(u => u.Settings)
+                            .FirstAsync(u => u.Id == id);
+                        return user.Settings.{|INCL002:Profile|}.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No INCL002: Include and ThenInclude load the whole chain.
+    /// </summary>
+    [Fact]
+    public async Task NestedReadOfLocal_ThenIncluded_NoIncl2()
+    {
+        const string sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task<string> GetTimezone(int id)
+                    {
+                        var user = await dbContext.Users
+                            .Include(u => u.Settings)
+                            .ThenInclude(s => s.Profile)
+                            .FirstAsync(u => u.Id == id);
+                        return user.Settings.Profile.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// INCL002 on the read: GetUser is our own method and promises nothing with [Includes].
+    /// </summary>
+    [Fact]
+    public async Task ReadOfCallResult_UnannotatedMethod_ReportsIncl2()
+    {
+        const string sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task<string> GetTimezone(int id)
+                    {
+                        return (await GetUser(id)).{|INCL002:Profile|}.Timezone;
+                    }
+
+                    Task<User> GetUser(int id) => dbContext.Users.FirstAsync(u => u.Id == id);
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No INCL002: a new entity has no query behind it.
+    /// </summary>
+    [Fact]
+    public async Task ReadOfNewEntity_NoIncl2()
+    {
+        const string sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass
+                {
+                    string GetTimezone()
+                    {
+                        var user = new User { Profile = new UserProfile() };
+                        return user.Profile.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
 }

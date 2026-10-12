@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis;
 using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Bridging;
 using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.EntityFramework;
 using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Requirements;
+using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Roslyn;
 
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Search;
 
@@ -21,6 +22,8 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Search;
 /// </remarks>
 internal sealed class IncludeSearcher
 {
+    private const string EfDbSet = "Microsoft.EntityFrameworkCore.DbSet`1";
+
     private readonly WritesWalker walker = new();
 
     private IncludeSearcher()
@@ -45,7 +48,7 @@ internal sealed class IncludeSearcher
     {
         var answer = ReadValue(value, path);
 
-        return answer.IsUnknown && answer.UnreadableValue is null
+        return answer is Answer.UnknownAnswer { UnreadableValue: null }
             ? Answer.Unknown(value.Operation)
             : answer;
     }
@@ -124,9 +127,12 @@ internal sealed class IncludeSearcher
             Write.OutArgument outArgument => ReadOutArgumentSource(outArgument, path),
 
             // The caller of a method that asks for the path with [IncludeRequired] is the one that loads
-            // it. A method that does not ask for it is a real answer: nobody loads the path.
+            // it. A method that does not ask for it is a real answer: nobody loads the path, and the parameter
+            // is where to ask for it. The path is already counted from the parameter.
             Write.MethodParameter parameter
-                => IsRequiredFromCaller(parameter.Parameter, path) ? Answer.Loaded : Answer.NotLoaded,
+                => IsRequiredFromCaller(parameter.Parameter, path)
+                    ? Answer.Loaded
+                    : Answer.NotRequiredBy(parameter.Parameter, path),
 
             // "users.Select(u => ...)": the parameter holds an element of users.
             Write.LambdaParameter lambda => ReadLambdaSource(lambda, path),
@@ -148,7 +154,7 @@ internal sealed class IncludeSearcher
     {
         foreach (var answer in answers)
         {
-            if (!answer.IsLoaded)
+            if (answer is not Answer.LoadedAnswer)
             {
                 return answer;
             }
@@ -226,8 +232,5 @@ internal sealed class IncludeSearcher
     /// <summary>
     /// True for the "DbSet&lt;User&gt;" of a context property, where a query starts.
     /// </summary>
-    private static bool IsEntitySet(ITypeSymbol type)
-        => type is INamedTypeSymbol named &&
-           named.ConstructedFrom.MetadataName == "DbSet`1" &&
-           named.ContainingNamespace?.ToDisplayString() == "Microsoft.EntityFrameworkCore";
+    private static bool IsEntitySet(ITypeSymbol type) => RoslynReader.IsType(type, EfDbSet);
 }

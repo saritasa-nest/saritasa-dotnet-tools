@@ -2,6 +2,7 @@ using Microsoft.CodeAnalysis.FlowAnalysis;
 using Microsoft.CodeAnalysis.Operations;
 using Microsoft.CodeAnalysis;
 using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Bridging;
+using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Roslyn;
 
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Search;
 
@@ -15,6 +16,8 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Search;
 /// </remarks>
 internal sealed class FlowGraph
 {
+    private const string ExpressionTree = "System.Linq.Expressions.Expression`1";
+
     /// <summary>
     /// Initializes the graph of a method, constructor or local function body.
     /// </summary>
@@ -72,6 +75,15 @@ internal sealed class FlowGraph
     public bool IsLambda => Lambda is not null;
 
     /// <summary>
+    /// True if the graph is the body of a lambda that becomes an expression tree, or lies inside one:
+    /// "query.Where(u =&gt; u.Profile.IsActive)". Such code is translated, never run, so it reads nothing.
+    /// </summary>
+    public bool IsExpressionTree
+        => Lambda is not null &&
+           (IsConvertedToExpressionTree(Graph.OriginalOperation) ||
+            CreationStatement?.FlowGraph.IsExpressionTree == true);
+
+    /// <summary>
     /// Returns the reachable statements of the graph and of the lambdas and local functions written in it.
     /// If/while conditions and returned values count as statements.
     /// </summary>
@@ -115,6 +127,23 @@ internal sealed class FlowGraph
 
             // "users.Select(u => u.Orders.Select(o => u))": continue in the graph that creates this lambda.
             : CreationStatement.FlowGraph.FindLambda(lambdaSymbol);
+    }
+
+    /// <summary>
+    /// True if the lambda is converted to "Expression&lt;TDelegate&gt;". Reads the lambda as written, since the
+    /// copies in a graph have no semantic model.
+    /// </summary>
+    private static bool IsConvertedToExpressionTree(IOperation lambda)
+    {
+        if (lambda.SemanticModel is null)
+        {
+            return false;
+        }
+
+        // The type the lambda is converted to: "Func<User, bool>" or "Expression<Func<User, bool>>".
+        var convertedType = lambda.SemanticModel.GetTypeInfo(lambda.Syntax).ConvertedType;
+
+        return RoslynReader.IsType(convertedType, ExpressionTree);
     }
 
     /// <summary>

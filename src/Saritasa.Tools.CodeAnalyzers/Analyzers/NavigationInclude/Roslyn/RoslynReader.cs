@@ -11,6 +11,28 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Roslyn;
 internal static class RoslynReader
 {
     /// <summary>
+    /// True if the type is the one with the full metadata name, generic arguments aside: "DbSet&lt;User&gt;" is
+    /// "Microsoft.EntityFrameworkCore.DbSet`1".
+    /// </summary>
+    /// <param name="type">Type.</param>
+    /// <param name="fullMetadataName">Namespace and metadata name, e.g. "System.Linq.Expressions.Expression`1".</param>
+    /// <returns>True if the type has the name.</returns>
+    public static bool IsType(ITypeSymbol? type, string fullMetadataName)
+    {
+        if (type is not INamedTypeSymbol namedType)
+        {
+            return false;
+        }
+
+        var containingNamespace = namedType.ContainingNamespace;
+        var fullName = containingNamespace is null || containingNamespace.IsGlobalNamespace
+            ? namedType.MetadataName
+            : containingNamespace.ToDisplayString() + "." + namedType.MetadataName;
+
+        return string.Equals(fullName, fullMetadataName, StringComparison.Ordinal);
+    }
+
+    /// <summary>
     /// Removes conversion and delegate creation wrappers around an operation.
     /// </summary>
     /// <param name="operation">Operation.</param>
