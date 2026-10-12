@@ -49,8 +49,9 @@ internal static class NavigationIncludeRulesProvider
         "Navigation property '{0}.{1}' is required, but not checked. Use [IncludeRequired(\"{2}\", \"{1}\")] to this method.";
 
     private static readonly LocalizableString descriptionIncl1 =
-        "Navigation properties marked with [TrackIncludeRequired] must be annotated via [IncludeRequired] on every " +
-        "method that accesses them directly or propagates them to callee methods.";
+        "A navigation property marked with [TrackIncludeRequired] that is read on a method parameter, directly or " +
+        "through a local or a lambda, or passed on to a method that requires it, must be asked for with " +
+        "[IncludeRequired] on that method, so that its callers load it.";
 
     private static readonly DiagnosticDescriptor ruleIncl1 = new(
         Incl1IdAddIncludeRequiredForParameter,
@@ -99,9 +100,9 @@ internal static class NavigationIncludeRulesProvider
         "load '{1}' in the query, set the property in an object initializer, or remove [Includes(\"{0}\")]";
 
     private static readonly LocalizableString descriptionIncl3 =
-        "A method annotated with [Includes(\"PropertyName\")] promises its return value has the named navigation " +
-        "property loaded. The analyzer verifies this by checking the return expression for .Include(), an object " +
-        "initializer that sets the property, or a source method annotated with [Includes].";
+        "A method annotated with [Includes(\"Settings.Profile\")] promises its return value has the named navigation " +
+        "path loaded. The analyzer verifies this by following the returned value back to .Include() and " +
+        ".ThenInclude(), an object initializer that sets the property, or a source method annotated with [Includes].";
 
     private static readonly DiagnosticDescriptor ruleIncl3 = new(
         Incl3IdMethodResultDoesntIncludeNavigationProperty,

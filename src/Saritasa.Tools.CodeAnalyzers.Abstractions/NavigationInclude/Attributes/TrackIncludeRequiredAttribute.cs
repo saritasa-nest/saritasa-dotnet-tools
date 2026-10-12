@@ -2,7 +2,8 @@
 
 /// <summary>
 /// Marks a navigation property as requiring explicit loading via <c>.Include()</c>.
-/// Methods that access it must declare <c>[IncludeRequired]</c>.
+/// Every read of it must have it loaded: by the query the entity came from, by a method annotated with
+/// <c>[Includes]</c>, or, when the entity is a parameter, by the caller through <c>[IncludeRequired]</c>.
 /// </summary>
 /// <example>
 /// Only properties that need tracking should be annotated — untracked properties produce no diagnostics:

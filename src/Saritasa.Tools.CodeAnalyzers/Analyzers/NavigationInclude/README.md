@@ -59,15 +59,28 @@ This is the example used in the rest of this document.
 
 ## What the analyzer checks
 
-Two kinds of places, and both ask the same thing about one value:
+Three kinds of places, and all of them ask the same thing about one value:
 
-| Place | What is checked | Rule |
+| Place | What is checked |
+|---|---|
+| a read of a `[TrackIncludeRequired]` property, `x.Profile` | the value in front of it, `x`, must have `Profile` loaded |
+| a call of a method with `[IncludeRequired(param, path)]` | the argument for `param` must have `path` loaded |
+| a `return` in a method with `[Includes(path)]` | the returned value must have `path` loaded (not checked if `Verify = false`) |
+
+The rule does not depend on the place but on where the search ended, which the answer says:
+
+| Answer | Rule | Meaning |
 |---|---|---|
-| a call of a method with `[IncludeRequired(param, Property)]` | the argument for `param` must have `Property` loaded | INCL001 if the argument is a parameter of the current method, INCL002 if it is a local variable or a lambda parameter |
-| a `return` in a method with `[Includes(Property)]` | the returned value must have `Property` loaded | INCL003 (not checked if `Verify = false`) |
+| `Loaded` | none | |
+| `NotRequiredBy(parameter, path)` | INCL001 | the entities came from a parameter of a method that does not ask for the path; the message names that parameter and the path counted from it |
+| `NotLoaded(path)` | INCL002 | they came from a query without the `Include`, or a method of this project that does not promise it; the message names the path to load there |
+| `Unknown(value)` | INCL004 | the search could not read `value` |
 
-Reading `user.Profile` directly inside a method is also INCL001. That case needs no search at all and is handled
-by `PropertyReferenceHandler` alone. The rest of this document is about the other two.
+A `return` reports INCL003 instead of INCL001 or INCL002, because the method itself promised the path.
+
+`IncludeFlowHandler` walks each statement's operations once and sends a property read to `TryCheckRead`, a call
+to `TryCheckCall` and the statement itself to `TryCheckReturn`. Each starts with the cases it skips, then asks the
+search, then turns the answer into a diagnostic.
 
 Three more results come out of the search itself. **INCL004** means *the analyzer could not read the code far
 enough to decide*; it is a warning with a code fix, see
@@ -97,12 +110,13 @@ Sometimes several paths lead to the same place, for example after an `if`. Then 
 statements connected by arrows — so the analyzer needs no special code for `if`, `switch`, `?:`, `??`, loops,
 `try` or `foreach`.
 
-### The four words the code is built from
+### The five words the code is built from
 
 | Word | Meaning | File |
 |---|---|---|
 | **Value** | a place where entities sit: a variable, a parameter, an argument or the result of an expression, together with the position in the code where it is read | `Search/Value.cs` |
-| **Answer** | what the search decided: `Loaded`, `NotLoaded` or `Unknown` | `Search/Answer.cs` |
+| **Answer** | what the search decided, one type per kind: `Loaded`, `NotLoaded(path)`, `NotRequiredBy(parameter, path)` or `Unknown(value)`. Created through the static members of `Answer` and matched by type | `Search/Answer.cs` |
+| **Path** | the navigation path asked for, such as `Settings.Profile`. It grows at the front while the search walks back over navigation reads | `Requirements/NavigationPath.cs` |
 | **Write** | one thing found above a variable: `Written`, `OutArgument`, `MethodParameter`, `LambdaParameter`, `NothingNew`, `NeverWritten`, `Unreadable` | `Search/Write.cs` |
 | **Bridge** | an annotated move from one value to another that keeps the same entities: `Where`, `ToList`, an indexer. A pair of `BridgeEnd`s, read backwards | `Bridging/Bridge.cs` |
 
@@ -111,7 +125,7 @@ code and never a decision.
 
 ### The two jobs
 
-The search itself is one function, `IncludeSearcher.Check(value, property, position)`, and two classes share the
+The search itself is one function, `IncludeSearcher.Check(value, path, position)`, and two classes share the
 work behind it:
 
 | Class | Its question | What it knows | What it never does |
@@ -150,22 +164,28 @@ flowchart TD
     WRITES["ask the walker,<br/>then read every write"]
     MEANS{"What does this write mean?"}
     LOADED(["Loaded"])
-    NOTLOADED(["NotLoaded"])
-    UNKNOWN(["Unknown"])
+    NOTLOADED(["NotLoaded(path)"])
+    NOTREQUIRED(["NotRequiredBy(parameter, path)"])
+    UNKNOWN(["Unknown(value)"])
+    INSTANCE["the entity in front<br/>→ start again, segment in front of the path"]
 
-    VALUE -->|"an Include for P"| LOADED
+    VALUE -->|"an Include covering the path"| LOADED
     VALUE -->|"an annotated member"| SOURCE
     VALUE -->|"new User()"| LOADED
     VALUE -->|"db.Users"| NOTLOADED
     VALUE -->|"undeclared, our code"| NOTLOADED
     VALUE -->|"undeclared, a library"| UNKNOWN
+    VALUE -->|"a navigation read, user.Settings"| INSTANCE
     VALUE -->|"a variable"| WRITES
 
     WRITES --> MEANS
     MEANS -->|"NothingNew<br/>a required parameter"| LOADED
     MEANS -->|"Written<br/>OutArgument<br/>LambdaParameter"| SOURCE
-    MEANS -->|"a plain parameter<br/>NeverWritten"| NOTLOADED
+    MEANS -->|"a plain parameter"| NOTREQUIRED
+    MEANS -->|"NeverWritten"| NOTLOADED
     MEANS -->|"Unreadable"| UNKNOWN
+
+    INSTANCE --> VALUE
 
     SOURCE --> VALUE
 ```
@@ -201,29 +221,48 @@ Two rules are in neither diagram:
 
 1. When a step gives **several** values (the two ways into a block after an `if`, or two sources of one call),
    **every one** of them must end at `Loaded`. The first one that does not gives the answer.
-2. A dead end is never "nothing". It is always `NotLoaded` or `Unknown`, so a path that leads nowhere cannot
+2. A dead end is never "nothing". It is always `NotLoaded`, `NotRequiredBy` or `Unknown`, so a path that leads nowhere cannot
    silently disappear from the check.
 
 ### Where each path ends
 
 | Ending | Answer | Example |
 |---|---|---|
-| an `Include()` for the property | `Loaded` | `db.Users.Include(u => u.Profile)` |
+| an `Include()` chain covering the path | `Loaded` | `db.Users.Include(u => u.Settings).ThenInclude(s => s.Profile)` for `Settings.Profile` |
 | a method that promises it | `Loaded` | `[Includes("Profile")] Task<User> GetUser()` |
 | a parameter the method requires loaded | `Loaded` | `[IncludeRequired(nameof(user), "Profile")] void Update(User user)` |
 | a freshly constructed object | `Loaded` | `new User()` — it was not sourced from a query, so there was no Include to miss |
 | a loop that came back to a block already read | `Loaded` | this path adds nothing new |
-| a query the search read to its start | `NotLoaded` | `db.Users` with no `Include` |
-| a method of this project that promises nothing | `NotLoaded` | it can be read, and it says nothing |
-| a method parameter without the attribute | `NotLoaded` | reported as INCL001, which asks for `[IncludeRequired]` |
+| a query the search read to its start | `NotLoaded(path)` | `db.Users` with no `Include` |
+| a method of this project that promises nothing | `NotLoaded(path)` | it can be read, and it says nothing |
+| a method parameter without the attribute | `NotRequiredBy(parameter, path)` | reported as INCL001, which asks for `[IncludeRequired]` |
 | a member nothing annotates, in another assembly | `Unknown` | `query.Paginate(1)` from a library |
 | a value that could have come from two places | `Unknown` | `first.Concat(second)` — both would have to be loaded, and the search follows one value |
 | a lambda parameter nothing annotates | `Unknown` | the `i` of `Select((u, i) => …)`, a lambda given to a method outside LINQ |
 | an `out` argument of a method nothing annotates | `Unknown` | `Compute(out var user)`, while `d.TryGetValue(k, out var user)` follows `d` |
 | unreachable code | `Unknown` | no block jumps there |
 
-`NotLoaded` is a mistake in the user's code and `Unknown` is a limit of the analyzer. They must not be mixed,
-because a wrong warning is worse than no warning.
+`NotLoaded` and `NotRequiredBy` are mistakes in the user's code and `Unknown` is a limit of the analyzer. They
+must not be mixed, because a wrong warning is worse than no warning. The path an ending carries is counted from
+that ending, which is where the fix goes: `NotLoaded(Settings.Profile)` at `db.Users` means the query must load
+`Settings.Profile`, even if the read that started the search was `user.Settings.Profile`.
+
+### Nested paths
+
+The search asks for a path, not a single property. A navigation read on the way back puts its property in
+front of it:
+
+```text
+user.Settings.Profile          a read of Profile → Value( user.Settings ), path "Profile"
+Value( user.Settings )         a navigation read → Value( user ), path "Settings.Profile"
+```
+
+A `Select(u => u.Settings)` bridge does the same with the selector's member chain, and every ending compares the
+whole path: an `Include(...).ThenInclude(...)` chain, `[Includes]` and `[IncludeRequired]` cover it when their own
+path starts with it, so `Settings.Profile` covers `Settings`.
+
+Every read of a tracked property is its own check. `user.Settings.Profile` asks for `Settings` and for
+`Settings.Profile` on `user`, and each read that is not covered is reported on its own name.
 
 ### What the walker reports
 
@@ -234,10 +273,10 @@ what `IncludeSearcher` makes of each one.
 |---|---|---|
 | `Written(value)` | `user = expr`, `var user = expr`, `var (id, user) = pair` | read that value |
 | `OutArgument(call, parameter)` | `d.TryGetValue(key, out var user)` | cross the bridge out of that parameter |
-| `MethodParameter(parameter)` | the start of a method body | `Loaded` if the method requires it, else `NotLoaded` |
+| `MethodParameter(parameter)` | the start of a method body | `Loaded` if the method requires the path, else `NotRequiredBy(parameter, path)` |
 | `LambdaParameter(parameter, …)` | the start of a lambda body | cross the bridge out of that parameter |
 | `NothingNew` | a block the walk has already read | `Loaded` — this path adds nothing |
-| `NeverWritten` | the start of a body, with no write anywhere above | `NotLoaded` |
+| `NeverWritten` | the start of a body, with no write anywhere above | `NotLoaded(path)` |
 | `Unreadable` | a body the walker cannot read | `Unknown` |
 | nothing at all | a statement that does not write the variable | keep reading upward |
 
@@ -563,9 +602,9 @@ Two different ends mean the entities could have come from either place. `Include
 only place that decides what that is worth, and today it answers `Unknown`:
 
 ```csharp
-private Answer SearchSources(IReadOnlyList<IOperation> sources, CodePosition position)
-    => sources.Count == 1
-        ? Search(sources[0], position)
+private Answer SearchSources(IReadOnlyList<Crossing> crossings, CodePosition position, NavigationPath path)
+    => crossings.Count == 1
+        ? Search(crossings[0].Source, position, path.Prepend([.. crossings[0].Prefix]))
         : Answer.Unknown();
 ```
 
@@ -599,8 +638,8 @@ through it.
 ## Reading the code: bodies and positions
 
 `FlowGraph` is one body being analyzed — a method, constructor, local function or lambda — with its control
-flow graph from Roslyn. `IncludeFlowHandler` walks its statements, finds the places to check and reports the
-results.
+flow graph from Roslyn. `IncludeFlowHandler` walks its statements and their operations, finds the places to
+check and reports the results.
 
 A lambda that becomes a delegate is the difficult case. It has a graph of its own, and the statement that
 creates it holds only a reference. `FlowGraph.CreationStatement` is the way back, so a variable captured by a
@@ -619,6 +658,12 @@ reads through the expression to the same `TSource`, so `u` in `query.Select(u =>
 `Include(u => u.Profile)` is the one lambda read from syntax instead, because there the analyzer needs the
 property name and not the entities.
 
+Reads inside such a lambda are not checked: `query.Where(u => u.Profile.IsActive)` is translated to SQL, so
+nothing has to be loaded. `FlowGraph.IsExpressionTree` tells them apart; the graph's copies of the code have no
+semantic model, so it reads the lambda as written. Calls inside it are still checked: in
+`query.Select(u => GetTimezone(u))` EF cannot translate `GetTimezone`, so it runs it on the loaded entities, and
+those need the `Include`.
+
 `CodePosition` is a point in execution: a graph, a block, and the number of statements of that block that have
 already run. One position answers both questions a backward search needs — `Statement` is the statement that
 runs next, and `GetPreviousStatements()` gives the ones that already ran, the nearest first.
@@ -627,12 +672,14 @@ runs next, and `GetPreviousStatements()` gives the ones that already ran, the ne
 
 ### What the compiler rewrites
 
-The control flow graph holds simplified code. Three constructs look different from the source:
+The control flow graph holds simplified code. These constructs look different from the source:
 
 | Source | In the graph | Why the search still works |
 |---|---|---|
 | `foreach (var user in users)` | `#1 = users.GetEnumerator(); … user = #1.Current` | `GetEnumerator` and `Current` are annotated, so they pass through to `users`. Over an array the old non-generic `IEnumerator` is used, and it is annotated too. |
 | `flag ? a : b`, `a ?? b` | two blocks write `#1`, then they join | both paths are searched |
+| `user?.Settings?.Profile` | `#0 = user; #1 = #0.Settings; #1.Profile`, across blocks | each read is checked on its own, and the search follows `#1` back through its write, so `?.` gives the same answers as `.` |
+| `user.Profile = new UserProfile { … }` | the target `user.Profile` is captured before the initializer runs, and assigned later | whether a property reference is the left side of a plain `=` is read on the code as written, so it is never mistaken for a read |
 
 `#1` is a temporary variable the compiler creates. The walker treats it as any other variable.
 
