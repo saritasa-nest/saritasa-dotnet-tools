@@ -86,7 +86,7 @@ internal sealed class IncludeSearcher
             // [Includes] or [PassesIncludes], so nothing loads the path. In someone else's code we
             // simply cannot see.
             IInvocationOperation call
-                => IsOurOwnCode(call.TargetMethod, value.Position) ? Answer.NotLoaded : Answer.Unknown(),
+                => IsOurOwnCode(call.TargetMethod, value.Position) ? Answer.NotLoaded(path) : Answer.Unknown(),
 
             // "new User()", "new List<User>()": nothing here was sourced from a query, so there was no Include
             // to miss — Include simply does not apply, which this treats as satisfied rather than a violation.
@@ -95,7 +95,7 @@ internal sealed class IncludeSearcher
 
             // "dbContext.Users": the query starts here and no Include was put on it.
             IPropertyReferenceOperation reference when IsEntitySet(reference.Property.Type)
-                => Answer.NotLoaded,
+                => Answer.NotLoaded(path),
 
             // "user.Settings": "Profile" of it is loaded when "Settings.Profile" of user is.
             IPropertyReferenceOperation { Instance: { } instance } reference
@@ -141,7 +141,7 @@ internal sealed class IncludeSearcher
             Write.NothingNew => Answer.Loaded,
 
             // Nothing ever wrote the variable, so nothing loaded the path either.
-            Write.NeverWritten => Answer.NotLoaded,
+            Write.NeverWritten => Answer.NotLoaded(path),
 
             _ => Answer.Unknown(),
         };

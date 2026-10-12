@@ -30,15 +30,18 @@ internal abstract class Answer
     public static Answer Loaded { get; } = new LoadedAnswer();
 
     /// <summary>
-    /// The search followed the entities to the end and the property is not loaded there: "dbContext.Users"
-    /// with no Include, a method of our own code that does not promise it.
-    /// </summary>
-    public static Answer NotLoaded { get; } = new NotLoadedAnswer();
-
-    /// <summary>
     /// The answer before the value that stopped the search is known.
     /// </summary>
     private static UnknownAnswer UnnamedUnknown { get; } = new(null);
+
+    /// <summary>
+    /// The search followed the entities to the end and the path is not loaded there: "dbContext.Users" with no
+    /// Include, a method of our own code that does not promise it.
+    /// </summary>
+    /// <param name="path">The path that is missing, counted from where the search ended: what the query has to
+    /// Include, or the method has to promise.</param>
+    /// <returns>Answer.</returns>
+    public static Answer NotLoaded(NavigationPath path) => new NotLoadedAnswer(path);
 
     /// <summary>
     /// The search reached a parameter of a method that does not ask for the path with [IncludeRequired], so
@@ -71,6 +74,20 @@ internal abstract class Answer
     /// </summary>
     public sealed class NotLoadedAnswer : Answer
     {
+        /// <summary>
+        /// Initializes the answer.
+        /// </summary>
+        /// <param name="path">The path that is missing, counted from where the search ended.</param>
+        public NotLoadedAnswer(NavigationPath path)
+        {
+            Path = path;
+        }
+
+        /// <summary>
+        /// The path that is missing, counted from where the search ended: "Settings.Profile" for a read of
+        /// "user.Settings.Profile" when user comes from "dbContext.Users".
+        /// </summary>
+        public NavigationPath Path { get; }
     }
 
     /// <summary>

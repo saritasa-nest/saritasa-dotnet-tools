@@ -192,7 +192,8 @@ internal static class IncludeFlowHandler
                     NavigationIncludeRulesProvider.GetDiagnosticDescriptor(
                         NavigationIncludeRulesProvider.Incl3IdMethodResultDoesntIncludeNavigationProperty),
                     location,
-                    path.ToString())
+                    path.ToString(),
+                    GetQueryPath(answer, path).ToString())
                 : GetDiagnostic(answer, location, returnedValue, path);
 
             if (diagnostic is not null)
@@ -203,6 +204,15 @@ internal static class IncludeFlowHandler
 
         return diagnostics.Count > 0;
     }
+
+    /// <summary>
+    /// The path the query has to Include: counted from where the search ended when it ended at a query, otherwise
+    /// the promised path itself.
+    /// </summary>
+    private static NavigationPath GetQueryPath(Answer answer, NavigationPath promisedPath)
+        => answer is Answer.NotLoadedAnswer missing
+            ? missing.Path
+            : promisedPath;
 
     /// <summary>
     /// The diagnostic for a value that must have the path loaded, chosen by where the search ended: INCL001 at a
@@ -235,14 +245,16 @@ internal static class IncludeFlowHandler
                 missing.Path.ToString(),
                 missing.Parameter.Name),
 
-            // The entities came from a query or a method that does not load the path.
-            Answer.NotLoadedAnswer => Diagnostic.Create(
+            // The entities came from a query or a method that does not load the path. The fix goes where the search
+            // ended, so the path to load is counted from there.
+            Answer.NotLoadedAnswer missing => Diagnostic.Create(
                 NavigationIncludeRulesProvider.GetDiagnosticDescriptor(
                     NavigationIncludeRulesProvider.Incl2IdArgumentDoesntIncludeNavigationProperty),
                 location,
                 value.Type?.Name,
                 path.ToString(),
-                value.Syntax.ToString()),
+                value.Syntax.ToString(),
+                missing.Path.ToString()),
 
             _ => throw new ArgumentOutOfRangeException(nameof(answer), "Unknown answer."),
         };
