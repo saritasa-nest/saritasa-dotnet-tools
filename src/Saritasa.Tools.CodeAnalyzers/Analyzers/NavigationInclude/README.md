@@ -9,13 +9,14 @@ If you only want to *use* the analyzer, read the [package README](../../README.m
 
 1. [Why this analyzer exists](#why-this-analyzer-exists)
 2. [What the analyzer checks](#what-the-analyzer-checks)
-3. [How it works: one idea, two jobs](#how-it-works-one-idea-two-jobs)
-4. [Two examples, step by step](#two-examples-step-by-step)
-5. [Bridging](#bridging)
-6. [Reading the code: bodies and positions](#reading-the-code-bodies-and-positions)
-7. [Special cases](#special-cases)
-8. [When the analyzer cannot read the code](#when-the-analyzer-cannot-read-the-code)
-9. [Files](#files)
+3. [Limitations](#limitations)
+4. [How it works: one idea, two jobs](#how-it-works-one-idea-two-jobs)
+5. [Two examples, step by step](#two-examples-step-by-step)
+6. [Bridging](#bridging)
+7. [Reading the code: bodies and positions](#reading-the-code-bodies-and-positions)
+8. [Special cases](#special-cases)
+9. [When the analyzer cannot read the code](#when-the-analyzer-cannot-read-the-code)
+10. [Files](#files)
 
 ## Why this analyzer exists
 
@@ -87,6 +88,49 @@ enough to decide*; it is a warning with a code fix, see
 [When the analyzer cannot read the code](#when-the-analyzer-cannot-read-the-code). **INCL005** and **INCL006**
 are about the bridges themselves: one names a member that does not exist, the other describes a method the
 rules do not allow, see [Bridging](#bridging).
+
+## Limitations
+
+The analyzer reads one method body at a time and trusts its attributes. What follows is what it cannot see, and
+what it answers instead. `Unknown` is reported as INCL004; the other answers are silent or a real warning.
+
+**Ways of loading it does not know.** Only `Include`, `ThenInclude`, `[Includes]` and `[IncludeRequired]` count as
+loading a property.
+
+| Not recognized | Result |
+|---|---|
+| explicit loading, `db.Entry(user).Reference(u => u.Profile).LoadAsync()` | false INCL002 |
+| lazy loading proxies, `AutoInclude()` in the model, entities already tracked by the context | false INCL002 |
+| a filtered include, `Include(u => u.Orders.Where(...))` | not counted as loading `Orders` |
+| a `ThenInclude` not chained directly on its `Include`, e.g. through a variable in between | not counted |
+
+**Values it cannot follow.** The search stops with `Unknown`:
+
+| Value | Example |
+|---|---|
+| a call into another assembly that nothing annotates | `query.Paginate(1)` from a library without `[assembly: PassesIncludes]` |
+| a property of a library type | `page.Items`; an attribute cannot describe a property |
+| a value from two places | `Concat`, `Union`, `Append`, `Prepend`, or a member with two matching bridges |
+| a field, a static property, `this` | `_cachedUser`, `Current.User` |
+| a lambda parameter nothing annotates | the `i` of `Select((u, i) => ...)`, a lambda given to a method outside LINQ |
+| an `out` argument of a method nothing annotates | `Compute(out var user)` |
+| a type change | `Cast<T>()`, `OfType<T>()` |
+| unreachable code | no block jumps there |
+
+**Promises it does not check.**
+
+- `[PassesIncludes]` is believed as written. A wrong one silences real warnings; INCL006 only rejects the
+  shapes that are easy to get wrong (an instance method, a changed entity type).
+- `[Includes(..., Verify = false)]` is believed without reading the method body.
+- A method of this project with no attribute is read as promising nothing, so its result is `NotLoaded`, even if
+  its body does load the property.
+
+**Deliberately optimistic.**
+
+- `new User()` counts as loaded: there was no query, so no `Include` to miss.
+- Reads inside an expression tree, `query.Where(u => u.Profile.IsActive)`, are not checked, because EF translates
+  them to SQL.
+- Only properties marked `[TrackIncludeRequired]` are checked at all.
 
 ## How it works: one idea, two jobs
 
