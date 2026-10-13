@@ -6,27 +6,13 @@
 /// </summary>
 /// <example>
 /// <code>
-/// [Includes(nameof(User.Profile)]
+/// [Includes(nameof(User.Profile))]
 /// async Task&lt;User&gt; GetUser(int id)
 /// {
 ///     return await _dbContext.Users
 ///         .Include(u =&gt; u.Profile)
 ///         .FirstOrDefaultAsync(u =&gt; u.Id == id);
 /// }
-///
-/// // Callers can now use GetUser without INCL002 warnings
-/// async Task Handle(SaveUserDto dto)
-/// {
-///     var user = await GetUser(dto.Id);
-///     SetTimezone(user, dto.Timezone);  // no warning
-/// }
-/// </code>
-/// </example>
-/// <example>
-/// Verification disabled: the analyzer trusts the promise without checking the method body.
-/// <code>
-/// [Includes(nameof(User.Profile), Verify = false)]
-/// Task&lt;User&gt; GetUser(int id) => _repository.GetWithIncludesAsync(id, IncludeProfile);
 /// </code>
 /// </example>
 /// <example>

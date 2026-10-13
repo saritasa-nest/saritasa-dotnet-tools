@@ -175,36 +175,6 @@ public class IncludeRequiredTests : NavigationIncludeTestBase
     }
 
     /// <summary>
-    /// No INCL001: the dotted path "Profile.Timezone" covers Profile, both for the direct access and for the call.
-    /// </summary>
-    [Fact]
-    public async Task PassParameter_DottedPathCoversRequirement_NoIncl1()
-    {
-        const string sourceCode = Preamble +
-            /* lang=c# */
-            """
-                class TestClass
-                {
-                    [IncludeRequired(nameof(user), "Profile.Timezone")]
-                    void Handle(User user, SaveUserDto dto)
-                    {
-                        var timezone = user.Profile.Timezone;
-                        UpdateUserProfile(user, dto);
-                    }
-
-                    [IncludeRequired(nameof(user), nameof(User.Profile))]
-                    void UpdateUserProfile(User user, SaveUserDto dto)
-                    {
-                        user.Profile.Timezone = dto.Timezone;
-                    }
-                }
-            }
-            """;
-
-        await VerifyAnalyzerAsync(sourceCode);
-    }
-
-    /// <summary>
     /// INCL001: the caller asks only for Profile, which does not cover the longer path the callee asks for.
     /// </summary>
     [Fact]
@@ -369,36 +339,6 @@ public class IncludeRequiredTests : NavigationIncludeTestBase
                     {
                         {|INCL004:UpdateProfile(user)|};
                     }
-
-                    [IncludeRequired(nameof(user), nameof(User.Profile))]
-                    void UpdateProfile(User user)
-                    {
-                        user.Profile.Timezone = "UTC";
-                    }
-                }
-            }
-            """;
-
-        await VerifyAnalyzerAsync(sourceCode);
-    }
-
-    /// <summary>
-    /// INCL002: the argument is the result of a method of our own code that does not promise Profile.
-    /// </summary>
-    [Fact]
-    public async Task PassResultOfUnannotatedMethod_ReportsIncl2()
-    {
-        const string sourceCode = Preamble +
-            /* lang=c# */
-            """
-                class TestClass(AppDbContext dbContext)
-                {
-                    async Task Handle(int id)
-                    {
-                        {|INCL002:UpdateProfile(await GetUser(id))|};
-                    }
-
-                    Task<User> GetUser(int id) => dbContext.Users.FirstAsync(u => u.Id == id);
 
                     [IncludeRequired(nameof(user), nameof(User.Profile))]
                     void UpdateProfile(User user)

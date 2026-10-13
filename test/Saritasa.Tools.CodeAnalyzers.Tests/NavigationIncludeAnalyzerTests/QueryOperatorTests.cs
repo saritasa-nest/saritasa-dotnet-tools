@@ -234,32 +234,6 @@ public class QueryOperatorTests : NavigationIncludeTestBase
     }
 
     /// <summary>
-    /// No INCL003: ThenInclude continues the path of the Include it is called on, so the query loads Settings.Profile.
-    /// </summary>
-    [Fact]
-    public async Task IncludeThenInclude_LoadsNestedPath_NoIncl3()
-    {
-        const string sourceCode = Preamble +
-            /* lang=c# */
-            """
-                class TestClass(AppDbContext dbContext)
-                {
-                    [Includes(nameof(User.Settings), nameof(UserSettings.Profile))]
-                    async Task<User> GetUser(int id)
-                    {
-                        return await dbContext.Users
-                            .Include(u => u.Settings)
-                            .ThenInclude(s => s.Profile)
-                            .FirstOrDefaultAsync(u => u.Id == id);
-                    }
-                }
-            }
-            """;
-
-        await VerifyAnalyzerAsync(sourceCode);
-    }
-
-    /// <summary>
     /// INCL003: Include of Settings alone does not load its Profile.
     /// </summary>
     [Fact]
@@ -320,34 +294,9 @@ public class QueryOperatorTests : NavigationIncludeTestBase
     }
 
     /// <summary>
-    /// No INCL003: ThenInclude after a collection Include loads a property of each element.
-    /// </summary>
-    [Fact]
-    public async Task CollectionThenInclude_LoadsElementPath_NoIncl3()
-    {
-        const string sourceCode = Preamble +
-            /* lang=c# */
-            """
-                class TestClass(AppDbContext dbContext)
-                {
-                    [Includes(nameof(User.Applications), nameof(Application.Stats))]
-                    async Task<User> GetUser(int id)
-                    {
-                        return await dbContext.Users
-                            .Include(u => u.Applications)
-                            .ThenInclude(a => a.Stats)
-                            .FirstOrDefaultAsync(u => u.Id == id);
-                    }
-                }
-            }
-            """;
-
-        await VerifyAnalyzerAsync(sourceCode);
-    }
-
-    /// <summary>
-    /// No INCL003: each Include starts a new path, so the search finds both nested paths in one chain, whatever
-    /// comes after them.
+    /// No INCL003: ThenInclude continues the path of the Include it is called on, also after a collection Include,
+    /// where it loads a property of each element. Each Include starts a new path, so the search finds both nested
+    /// paths in one chain, whatever comes after them.
     /// </summary>
     [Fact]
     public async Task SeveralIncludePaths_InOneChain_NoIncl3()

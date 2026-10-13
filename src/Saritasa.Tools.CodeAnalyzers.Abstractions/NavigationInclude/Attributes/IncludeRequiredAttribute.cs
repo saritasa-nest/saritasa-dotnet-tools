@@ -15,14 +15,6 @@
 /// </code>
 /// </example>
 /// <example>
-/// Stacked — both Profile and Address must be loaded.
-/// <code>
-/// [IncludeRequired(nameof(user), nameof(User.Profile))]
-/// [IncludeRequired(nameof(user), nameof(User.Address))]
-/// void UpdateUser(User user, UserDto dto) { ... }
-/// </code>
-/// </example>
-/// <example>
 /// Nested path, one segment per argument. <c>nameof(User.Settings.Profile)</c> gives only "Profile",
 /// so it does not describe the path.
 /// <code>
@@ -33,19 +25,6 @@
 /// }
 /// </code>
 /// The same path as one dotted string: <c>[IncludeRequired(nameof(user), "Settings.Profile")]</c>.
-/// </example>
-/// <example>
-/// A collection followed by a property of its elements, as <c>Include(...).ThenInclude(...)</c> loads it.
-/// <code>
-/// [IncludeRequired(nameof(admin), nameof(User.Applications), nameof(Application.Stats))]
-/// void ExportApplicationStats(User admin)
-/// {
-///     foreach (var application in admin.Applications)
-///     {
-///         var stat = application.Stats;
-///     }
-/// }
-/// </code>
 /// </example>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
 public class IncludeRequiredAttribute : Attribute

@@ -10,7 +10,7 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Requirements;
 /// <c>[IncludeRequired(nameof(user), nameof(User.Settings), nameof(Settings.Profile))]</c>, or as one dotted string
 /// <c>"Settings.Profile"</c>. Both are read into the same path.
 /// </remarks>
-internal sealed class NavigationPath : IEquatable<NavigationPath>
+internal sealed class NavigationPath
 {
     private NavigationPath(ImmutableArray<string> segments)
     {
@@ -86,28 +86,6 @@ internal sealed class NavigationPath : IEquatable<NavigationPath>
         }
 
         return true;
-    }
-
-    /// <inheritdoc />
-    public bool Equals(NavigationPath? other)
-        => other is not null && Segments.SequenceEqual(other.Segments, StringComparer.Ordinal);
-
-    /// <inheritdoc />
-    public override bool Equals(object? obj) => Equals(obj as NavigationPath);
-
-    /// <inheritdoc />
-    public override int GetHashCode()
-    {
-        // Combines the segment hashes in order, so "A.B" and "B.A" differ. System.HashCode is not available on
-        // .NET Standard 2.0; 17 and 31 are the usual odd primes for this.
-        var hash = 17;
-
-        foreach (var segment in Segments)
-        {
-            hash = unchecked((hash * 31) + StringComparer.Ordinal.GetHashCode(segment));
-        }
-
-        return hash;
     }
 
     /// <summary>
