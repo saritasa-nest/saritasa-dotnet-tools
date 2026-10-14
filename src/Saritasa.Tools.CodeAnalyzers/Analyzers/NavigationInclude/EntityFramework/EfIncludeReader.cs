@@ -21,9 +21,11 @@ internal static class EfIncludeReader
     /// <list type="bullet">
     /// <item>"Profile" for <c>Include(u =&gt; u.Profile)</c> or <c>Include("Profile")</c>;</item>
     /// <item>"Settings.Profile" for <c>Include(u =&gt; u.Settings.Profile)</c> or <c>Include("Settings.Profile")</c>;</item>
-    /// <item>"Settings.Profile" for <c>Include(u =&gt; u.Settings).ThenInclude(s =&gt; s.Profile)</c>.</item>
+    /// <item>"Settings.Profile" for <c>Include(u =&gt; u.Settings).ThenInclude(s =&gt; s.Profile)</c>;</item>
+    /// <item>"Orders" for the filtered include <c>Include(u =&gt; u.Orders.Where(...).Take(5))</c>, which loads some
+    /// of the orders but fills the collection.</item>
     /// </list>
-    /// Null for other calls. Filtered includes such as <c>u =&gt; u.Orders.Where(...)</c> are not recognized.
+    /// Null for other calls.
     /// </summary>
     /// <param name="call">Method call.</param>
     /// <returns>Included path or null.</returns>
@@ -53,9 +55,24 @@ internal static class EfIncludeReader
             return NavigationPath.Parse([path]);
         }
 
-        return RoslynReader.GetMemberChain(argument.Syntax) is { } chain
+        return ReadLambdaChain(argument.Syntax) is { } chain
             ? NavigationPath.Parse(chain)
             : null;
+    }
+
+    /// <summary>
+    /// The properties an Include or ThenInclude lambda loads: ["Settings", "Profile"] for
+    /// <c>u =&gt; u.Settings.Profile</c>, and ["Orders"] for the filtered <c>u =&gt; u.Orders.Where(...).Take(5)</c>,
+    /// which loads some of the orders but fills the collection.
+    /// </summary>
+    private static IReadOnlyList<string>? ReadLambdaChain(SyntaxNode lambda)
+    {
+        var parameter = RoslynReader.GetLambdaParameter(lambda, position: 0);
+        var body = RoslynReader.GetLambdaBody(lambda);
+
+        return parameter is null || body is null
+            ? null
+            : RoslynReader.ReadMemberChain(RoslynReader.TrimCalls(body), parameter);
     }
 
     /// <summary>
@@ -65,7 +82,7 @@ internal static class EfIncludeReader
     private static NavigationPath? ReadThenInclude(IInvocationOperation call)
     {
         // "s => s.Profile": what this ThenInclude adds.
-        var ownChain = RoslynReader.GetMemberChain(call.Arguments[1].Value.Syntax);
+        var ownChain = ReadLambdaChain(call.Arguments[1].Value.Syntax);
         if (ownChain is null)
         {
             return null;

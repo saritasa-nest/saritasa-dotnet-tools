@@ -141,7 +141,7 @@ internal static class BridgeCrosser
 
     /// <summary>
     /// What the step puts in front of the path at this call. Null for a selector that is not a member chain,
-    /// such as <c>u =&gt; u.Manager ?? u</c> or <c>(u, i) =&gt; ...</c>: the bridge is then not crossed.
+    /// such as <c>u =&gt; u.Manager ?? u</c>: the bridge is then not crossed.
     /// </summary>
     private static IReadOnlyList<string>? GetPrefix(PathStep step, IInvocationOperation call)
         => step switch
@@ -149,10 +149,24 @@ internal static class BridgeCrosser
             PathStep.KeepStep => [],
             PathStep.SelectorChainStep selector
                 => GetArgument(call, selector.ParameterName) is { } argument
-                    ? RoslynReader.GetMemberChain(argument.Syntax)
+                    ? ReadSelectorChain(argument.Syntax)
                     : null,
             _ => null,
         };
+
+    /// <summary>
+    /// The properties a selector reads from its element, the first parameter: ["Settings"] for
+    /// <c>u =&gt; u.Settings</c> and for <c>(u, i) =&gt; u.Settings</c>.
+    /// </summary>
+    private static IReadOnlyList<string>? ReadSelectorChain(SyntaxNode lambda)
+    {
+        var parameter = RoslynReader.GetLambdaParameter(lambda, position: 0);
+        var body = RoslynReader.GetLambdaBody(lambda);
+
+        return parameter is null || body is null
+            ? null
+            : RoslynReader.ReadMemberChain(body, parameter);
+    }
 
     /// <summary>
     /// The value passed for the named parameter.

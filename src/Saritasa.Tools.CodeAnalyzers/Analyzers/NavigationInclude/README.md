@@ -101,7 +101,6 @@ loading a property.
 |---|---|
 | explicit loading, `db.Entry(user).Reference(u => u.Profile).LoadAsync()` | false INCL002 |
 | lazy loading proxies, `AutoInclude()` in the model, entities already tracked by the context | false INCL002 |
-| a filtered include, `Include(u => u.Orders.Where(...))` | not counted as loading `Orders` |
 | a `ThenInclude` not chained directly on its `Include`, e.g. through a variable in between | not counted |
 
 **Values it cannot follow.** The search stops with `Unknown`:

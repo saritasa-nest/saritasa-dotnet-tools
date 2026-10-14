@@ -326,6 +326,103 @@ public class QueryOperatorTests : NavigationIncludeTestBase
     }
 
     /// <summary>
+    /// No INCL003: a filtered include loads some of the elements but fills the collection, whatever operators
+    /// filter it, and a ThenInclude continues from it.
+    /// </summary>
+    [Fact]
+    public async Task FilteredInclude_LoadsCollection_NoIncl3()
+    {
+        const string sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass(AppDbContext dbContext)
+                {
+                    [Includes(nameof(User.Applications))]
+                    async Task<User> GetUserWithWhere(int id)
+                    {
+                        return await dbContext.Users
+                            .Include(u => u.Applications.Where(a => a.Stats.Downloads > 10))
+                            .FirstOrDefaultAsync(u => u.Id == id);
+                    }
+
+                    [Includes(nameof(User.Applications))]
+                    async Task<User> GetUserWithSeveralOperators(int id)
+                    {
+                        return await dbContext.Users
+                            .Include(u => u.Applications
+                                .Where(a => a.Stats.Downloads > 10)
+                                .OrderByDescending(a => a.Stats.Downloads)
+                                .Take(5))
+                            .FirstOrDefaultAsync(u => u.Id == id);
+                    }
+
+                    [Includes(nameof(User.Applications), nameof(Application.Stats))]
+                    async Task<User> GetUserWithThenInclude(int id)
+                    {
+                        return await dbContext.Users
+                            .Include(u => u.Applications.Where(a => a.Stats.Downloads > 10))
+                            .ThenInclude(a => a.Stats)
+                            .FirstOrDefaultAsync(u => u.Id == id);
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No INCL003: the filter can also stand in the lambda of a ThenInclude.
+    /// </summary>
+    [Fact]
+    public async Task FilteredThenInclude_LoadsCollection_NoIncl3()
+    {
+        const string sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass(AppDbContext dbContext)
+                {
+                    [Includes("Manager.Applications")]
+                    async Task<User> GetUser(int id)
+                    {
+                        return await dbContext.Users
+                            .Include(u => u.Manager)
+                            .ThenInclude(m => m.Applications.Where(a => a.Stats.Downloads > 10))
+                            .FirstOrDefaultAsync(u => u.Id == id);
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// INCL003: a filtered include loads only its own collection, not another property.
+    /// </summary>
+    [Fact]
+    public async Task FilteredInclude_OtherProperty_ReportsIncl3()
+    {
+        const string sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass(AppDbContext dbContext)
+                {
+                    [Includes(nameof(User.Profile))]
+                    async Task<User> GetUser(int id)
+                    {
+                        {|INCL003:return await dbContext.Users
+                            .Include(u => u.Applications.Where(a => a.Stats.Downloads > 10))
+                            .FirstOrDefaultAsync(u => u.Id == id);|}
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
     /// INCL003: the ThenInclude belongs to another Include, so it does not load Settings.Profile.
     /// </summary>
     [Fact]
