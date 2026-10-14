@@ -275,4 +275,69 @@ public class ControlFlowTests : NavigationIncludeTestBase
 
         await VerifyAnalyzerAsync(sourceCode);
     }
+
+    /// <summary>
+    /// INCL002: the branches of the conditional ask different paths of the same variable, "Profile" and
+    /// "Manager.Profile". The second branch walks into blocks the first one already read, and must still be
+    /// checked for its own path.
+    /// </summary>
+    [Fact]
+    public async Task Conditional_BranchesAskDifferentPathsOfSameVariable_ReportsIncl2()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task Handle(SaveUserDto dto, bool flag)
+                    {
+                        var user = await dbContext.Users.Include(u => u.Profile).FirstAsync();
+                        var target = flag ? user : user.Manager;
+                        {|INCL002:UpdateUserProfile(target, dto)|};
+                    }
+
+                    [IncludeRequired(nameof(user), nameof(User.Profile))]
+                    void UpdateUserProfile(User user, SaveUserDto dto)
+                    {
+                        user.Profile.Timezone = dto.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// INCL002: the same as <see cref="Conditional_BranchesAskDifferentPathsOfSameVariable_ReportsIncl2"/> with the
+    /// branches swapped, so the unloaded path is read first.
+    /// </summary>
+    [Fact]
+    public async Task Conditional_BranchesAskDifferentPathsOfSameVariableSwapped_ReportsIncl2()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task Handle(SaveUserDto dto, bool flag)
+                    {
+                        var user = await dbContext.Users.Include(u => u.Profile).FirstAsync();
+                        var target = flag ? user.Manager : user;
+                        {|INCL002:UpdateUserProfile(target, dto)|};
+                    }
+
+                    [IncludeRequired(nameof(user), nameof(User.Profile))]
+                    void UpdateUserProfile(User user, SaveUserDto dto)
+                    {
+                        user.Profile.Timezone = dto.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
 }

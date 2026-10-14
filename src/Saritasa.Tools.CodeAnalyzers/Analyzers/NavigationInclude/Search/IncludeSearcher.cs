@@ -110,7 +110,7 @@ internal sealed class IncludeSearcher
     /// </summary>
     private Answer SearchAnswerInValuesWrites(object variable, CodePosition position, NavigationPath path)
         => JoinPaths(
-            walker.FindWrites(variable, position)
+            walker.FindWrites(variable, position, path)
                 .Select(write => ReadWrite(write, path))
             );
 

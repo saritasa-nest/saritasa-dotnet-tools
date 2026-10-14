@@ -178,7 +178,8 @@ work behind it:
 
 The walker reports writes, `IncludeSearcher` says what they mean, and only `IncludeSearcher` calls the walker,
 never the other way round. Only the walker needs memory: it remembers the blocks it has already read, which is
-what stops a loop from walking forever.
+what stops a loop from walking forever. It remembers them per variable and per path, because two branches can
+read the same variable for different paths, as in `flag ? user : user.Manager`.
 
 The whole search is these two jobs calling each other back:
 
@@ -731,6 +732,11 @@ The control flow graph holds simplified code. These constructs look different fr
 A loop goes back to a block that was already read. The walker remembers the blocks it has read; when it comes
 back to one it reports `NothingNew`, and the search counts that path as `Loaded` because it adds nothing. So
 the search goes around a loop once, reads every write in the loop body, and stops.
+
+The same happens when two branches meet above a block: the second one to arrive gets `NothingNew`, because the
+first already read everything above for the same question. The memory is keyed by the variable **and the path**,
+so this holds only when both branches ask the same path. In `var target = flag ? user : user.Manager`, one branch
+asks `Profile` of `user` and the other `Manager.Profile`; each is read on its own.
 
 ### Exceptions
 
