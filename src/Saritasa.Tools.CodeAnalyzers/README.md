@@ -385,8 +385,6 @@ var timezone = user.Settings.Profile.Timezone;
 // Fix: .Include(u => u.Settings).ThenInclude(s => s.Profile)
 ```
 
-A filtered include, `Include(u => u.Orders.Where(o => o.IsPaid).Take(5))`, counts as loading `Orders`: it loads only some of the orders, but the collection is filled.
-
 The analyzer checks the value at the point where it is used. It follows reassignments, `if`/`else` branches (the property must be loaded on every branch), intermediate query variables (`var query = ...Include(...); var user = await query.FirstAsync();`), `foreach` loops over included collections, reassignments inside loops, LINQ lambdas such as `users.Select(u => ...)`, and dictionaries built with `ToDictionary(u => u.Id)` / `ToDictionaryAsync(u => u.Id)` (read via `dictionary[id]`, `TryGetValue`, `GetValueOrDefault`, `Values` or `foreach`). A dictionary built with an element selector (`ToDictionary(u => u.Id, u => ...)`) stores other objects, so its values are not considered loaded.
 
 #### Code causing a warning

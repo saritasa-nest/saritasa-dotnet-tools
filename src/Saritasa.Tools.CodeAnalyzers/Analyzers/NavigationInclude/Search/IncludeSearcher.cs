@@ -71,9 +71,13 @@ internal sealed class IncludeSearcher
             _ when WritesWalker.GetVariable(value.Operation) is { } variable
                 => SearchAnswerInValuesWrites(variable, value.Position, path),
 
-            // "query.Include(u => u.Profile)", "query.Include(u => u.Settings).ThenInclude(s => s.Profile)",
-            // a call of a method annotated with [Includes("Profile")].
-            IInvocationOperation call when LoadsPath(call, path)
+            // "query.Include(u => u.Profile)", "query.Include(u => u.Settings).ThenInclude(s => s.Profile)", also
+            // when "query.Include(...)" sits in a variable.
+            _ when ReadIncludeChain(value, path) is { } includeAnswer
+                => includeAnswer,
+
+            // A call of a method annotated with [Includes("Profile")].
+            IInvocationOperation call when AttributeReader.MethodHasIncludesAttribute(call.TargetMethod, path)
                 => Answer.Loaded,
 
             // An annotated move: "query.Where(...)", "users.ToList()", "users[0]", "pair.Value",
@@ -104,6 +108,61 @@ internal sealed class IncludeSearcher
             // A field, a call we could not follow, anything else: we cannot tell.
             _ => Answer.Unknown(),
         };
+
+    /// <summary>
+    /// The answer for a value of an <c>Include(...).ThenInclude(...)</c> chain; null when the value is not part of
+    /// one and the search goes on as usual.
+    /// </summary>
+    private Answer? ReadIncludeChain(Value value, NavigationPath path)
+    {
+        var insideMatch = path.Matched > 0;
+
+        // Inside a match only the rest of the include chain can continue it.
+        var notIncludeAnswer = insideMatch ? Answer.NotLoaded(path) : null;
+
+        if (value.Operation is not IInvocationOperation call)
+        {
+            return notIncludeAnswer;
+        }
+
+        var thenIncludeChain = EfIncludeReader.ReadThenInclude(call);
+        if ((EfIncludeReader.ReadInclude(call) ?? thenIncludeChain) is not { } chain)
+        {
+            return notIncludeAnswer;
+        }
+
+        var continuesChain = thenIncludeChain is not null;
+        var receiver = RoslynReader.GetReceiver(call);
+
+        // The step matches the end of what is left of the path with its first "count" properties. Inside a match
+        // it must match with all of them. An Include starts at the entity, so nothing may be left in front; a
+        // ThenInclude continues its receiver, which must end exactly at what is left in front.
+        for (var count = insideMatch ? chain.Count : 1; count <= chain.Count; count++)
+        {
+            if (!path.RemainingEndsWith(chain.Take(count).ToList()))
+            {
+                continue;
+            }
+
+            var leftInFront = path.Remaining.Length - count;
+
+            if (!continuesChain && leftInFront == 0)
+            {
+                return Answer.Loaded;
+            }
+
+            if (continuesChain && leftInFront > 0 &&
+                Search(receiver, value.Position, path.MatchTail(count)) is Answer.LoadedAnswer)
+            {
+                return Answer.Loaded;
+            }
+        }
+
+        // Outside a match the step is a query operator like any other: the receiver holds the same entities.
+        return insideMatch
+            ? Answer.NotLoaded(path)
+            : Search(receiver, value.Position, path);
+    }
 
     /// <summary>
     /// The answer for a variable: every write the walker finds must have the path loaded.
@@ -211,15 +270,6 @@ internal sealed class IncludeSearcher
     private static bool IsRequiredFromCaller(IParameterSymbol parameter, NavigationPath path)
         => parameter.ContainingSymbol is IMethodSymbol method &&
            AttributeReader.MethodHasIncludeRequiredAttribute(method, parameter.Name, path);
-
-    /// <summary>
-    /// True if the call loads the path itself: <c>query.Include(u =&gt; u.Profile)</c>,
-    /// <c>query.Include(u =&gt; u.Settings).ThenInclude(s =&gt; s.Profile)</c> or a call of a method annotated with
-    /// <c>[Includes("Profile")]</c>. A longer path loaded covers a shorter one.
-    /// </summary>
-    private static bool LoadsPath(IInvocationOperation call, NavigationPath path)
-        => AttributeReader.MethodHasIncludesAttribute(call.TargetMethod, path) ||
-           EfIncludeReader.GetIncludedPath(call)?.Covers(path) == true;
 
     /// <summary>
     /// True if the method is in the assembly being compiled, where it can be read and annotated.

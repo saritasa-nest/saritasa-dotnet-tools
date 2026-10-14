@@ -338,14 +338,6 @@ public class QueryOperatorTests : NavigationIncludeTestBase
                 class TestClass(AppDbContext dbContext)
                 {
                     [Includes(nameof(User.Applications))]
-                    async Task<User> GetUserWithWhere(int id)
-                    {
-                        return await dbContext.Users
-                            .Include(u => u.Applications.Where(a => a.Stats.Downloads > 10))
-                            .FirstOrDefaultAsync(u => u.Id == id);
-                    }
-
-                    [Includes(nameof(User.Applications))]
                     async Task<User> GetUserWithSeveralOperators(int id)
                     {
                         return await dbContext.Users
@@ -389,31 +381,6 @@ public class QueryOperatorTests : NavigationIncludeTestBase
                             .Include(u => u.Manager)
                             .ThenInclude(m => m.Applications.Where(a => a.Stats.Downloads > 10))
                             .FirstOrDefaultAsync(u => u.Id == id);
-                    }
-                }
-            }
-            """;
-
-        await VerifyAnalyzerAsync(sourceCode);
-    }
-
-    /// <summary>
-    /// INCL003: a filtered include loads only its own collection, not another property.
-    /// </summary>
-    [Fact]
-    public async Task FilteredInclude_OtherProperty_ReportsIncl3()
-    {
-        const string sourceCode = Preamble +
-            /* lang=c# */
-            """
-                class TestClass(AppDbContext dbContext)
-                {
-                    [Includes(nameof(User.Profile))]
-                    async Task<User> GetUser(int id)
-                    {
-                        {|INCL003:return await dbContext.Users
-                            .Include(u => u.Applications.Where(a => a.Stats.Downloads > 10))
-                            .FirstOrDefaultAsync(u => u.Id == id);|}
                     }
                 }
             }

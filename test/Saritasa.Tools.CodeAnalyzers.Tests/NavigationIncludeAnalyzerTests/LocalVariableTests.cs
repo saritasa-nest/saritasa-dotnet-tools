@@ -336,6 +336,127 @@ public class LocalVariableTests : NavigationIncludeTestBase
     }
 
     /// <summary>
+    /// No INCL002: a ThenInclude continues another ThenInclude held in a variable, which continues an Include held
+    /// in another one.
+    /// </summary>
+    [Fact]
+    public async Task ThenIncludeOnThenIncludeInVariables_NoIncl2()
+    {
+        const string sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task<string> GetTimezone(int id)
+                    {
+                        var managers = dbContext.Users.Include(u => u.Manager);
+                        var managerSettings = managers.ThenInclude(m => m.Settings);
+                        var user = await managerSettings.ThenInclude(s => s.Profile).FirstAsync(u => u.Id == id);
+                        return user.Manager.Settings.Profile.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// INCL002 on Settings and on Profile: one branch Includes the manager's Settings, so the ThenInclude continues
+    /// from there and loads Manager.Settings.Profile, not Settings.Profile of the user.
+    /// </summary>
+    [Fact]
+    public async Task ThenIncludeOnVariable_OneBranchIncludesOtherPrefix_ReportsIncl2()
+    {
+        const string sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task<string> GetTimezone(int id, bool ofManager)
+                    {
+                        Microsoft.EntityFrameworkCore.Query.IIncludableQueryable<User, UserSettings> query;
+                        if (ofManager)
+                        {
+                            query = dbContext.Users.Include(u => u.Manager.Settings);
+                        }
+                        else
+                        {
+                            query = dbContext.Users.Include(u => u.Settings);
+                        }
+
+                        var user = await query.ThenInclude(s => s.Profile).FirstAsync(u => u.Id == id);
+                        return user.{|INCL002:Settings|}.{|INCL002:Profile|}.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No INCL002: the ThenInclude's Profile matches the end of Settings.Profile, but its chain belongs to Manager;
+    /// an earlier Include loads Settings.Profile on its own.
+    /// </summary>
+    [Fact]
+    public async Task ThenIncludeOfOtherChain_EarlierIncludeLoadsPath_NoIncl2()
+    {
+        const string sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task<string> GetTimezone(int id)
+                    {
+                        var query = dbContext.Users.Include(u => u.Settings.Profile).Include(u => u.Manager);
+                        var user = await query.ThenInclude(m => m.Profile).FirstAsync(u => u.Id == id);
+                        return user.Settings.Profile.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No INCL001: Manager.Manager.Manager.Manager is loaded, and the two-segment lambda matches the end of each
+    /// required path in a different way: one Manager for the first method, two for the second.
+    /// </summary>
+    [Fact]
+    public async Task ThenIncludeWithRepeatedNames_EveryWayOfMatchingTried_NoIncl1()
+    {
+        const string sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task Handle(int id)
+                    {
+                        var query = dbContext.Users.Include(u => u.Manager.Manager);
+                        var user = await query.ThenInclude(m => m.Manager.Manager).FirstAsync(u => u.Id == id);
+                        UseThreeManagers(user);
+                        UseFourManagers(user);
+                    }
+
+                    [IncludeRequired(nameof(user), "Manager.Manager.Manager")]
+                    void UseThreeManagers(User user)
+                    {
+                    }
+
+                    [IncludeRequired(nameof(user), "Manager.Manager.Manager.Manager")]
+                    void UseFourManagers(User user)
+                    {
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
     /// INCL002 on the read: GetUser is our own method and promises nothing with [Includes].
     /// </summary>
     [Fact]

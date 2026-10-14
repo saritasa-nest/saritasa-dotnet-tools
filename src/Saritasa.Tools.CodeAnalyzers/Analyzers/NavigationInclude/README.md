@@ -101,7 +101,6 @@ loading a property.
 |---|---|
 | explicit loading, `db.Entry(user).Reference(u => u.Profile).LoadAsync()` | false INCL002 |
 | lazy loading proxies, `AutoInclude()` in the model, entities already tracked by the context | false INCL002 |
-| a `ThenInclude` not chained directly on its `Include`, e.g. through a variable in between | not counted |
 
 **Values it cannot follow.** The search stops with `Unknown`:
 
@@ -159,7 +158,7 @@ statements connected by arrows — so the analyzer needs no special code for `if
 |---|---|---|
 | **Value** | a place where entities sit: a variable, a parameter, an argument or the result of an expression, together with the position in the code where it is read | `Search/Value.cs` |
 | **Answer** | what the search decided, one type per kind: `Loaded`, `NotLoaded(path)`, `NotRequiredBy(parameter, path)` or `Unknown(value)`. Created through the static members of `Answer` and matched by type | `Search/Answer.cs` |
-| **Path** | the navigation path asked for, such as `Settings.Profile`. It grows at the front while the search walks back over navigation reads | `Requirements/NavigationPath.cs` |
+| **Path** | the navigation path asked for, such as `Settings.Profile`. It grows at the front while the search walks back over navigation reads. Inside an `Include(...).ThenInclude(...)` chain it also holds a cursor: how many segments at its end the ThenIncludes have matched | `Requirements/NavigationPath.cs` |
 | **Write** | one thing found above a variable: `Written`, `OutArgument`, `MethodParameter`, `LambdaParameter`, `NothingNew`, `NeverWritten`, `Unreadable` | `Search/Write.cs` |
 | **Bridge** | an annotated move from one value to another that keeps the same entities: `Where`, `ToList`, an indexer. A pair of `BridgeEnd`s, read backwards | `Bridging/Bridge.cs` |
 
@@ -678,6 +677,12 @@ query.Include(u => u.Profile)   // the analyzer must read the name "Profile" fro
 
 It is a bridge as well: `Include(u => u.Orders)` does not load `Profile`, so the search keeps walking back
 through it.
+
+It reads Include and ThenInclude the same way: the properties the call adds, `["Settings", "Profile"]` for
+`Include(u => u.Settings.Profile)` and `["Profile"]` for `ThenInclude(s => s.Profile)`. The only difference is
+where they start: an Include at the entity, a ThenInclude where the chain it is called on ends. Which chain that
+is, is a question about the code before it, possibly through variables and branches, so the search answers it,
+see [Include chains](#include-chains).
 
 ## Reading the code: bodies and positions
 

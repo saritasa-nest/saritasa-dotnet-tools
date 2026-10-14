@@ -17,48 +17,53 @@ internal static class EfIncludeReader
     private const string QueryableExtensions = "Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions";
 
     /// <summary>
-    /// Returns the path the call loads:
+    /// Returns the properties an Include loads, starting at the entity. Null for other calls.
     /// <list type="bullet">
-    /// <item>"Profile" for <c>Include(u =&gt; u.Profile)</c> or <c>Include("Profile")</c>;</item>
-    /// <item>"Settings.Profile" for <c>Include(u =&gt; u.Settings.Profile)</c> or <c>Include("Settings.Profile")</c>;</item>
-    /// <item>"Settings.Profile" for <c>Include(u =&gt; u.Settings).ThenInclude(s =&gt; s.Profile)</c>;</item>
-    /// <item>"Orders" for the filtered include <c>Include(u =&gt; u.Orders.Where(...).Take(5))</c>, which loads some
-    /// of the orders but fills the collection.</item>
+    /// <item>["Settings", "Profile"] for <c>Include(u =&gt; u.Settings.Profile)</c> or
+    /// <c>Include("Settings.Profile")</c>;</item>
+    /// <item>["Orders"] for the filtered <c>Include(u =&gt; u.Orders.Where(...).Take(5))</c>, which loads some of the
+    /// orders but fills the collection.</item>
     /// </list>
-    /// Null for other calls.
     /// </summary>
     /// <param name="call">Method call.</param>
-    /// <returns>Included path or null.</returns>
-    public static NavigationPath? GetIncludedPath(IInvocationOperation call)
+    /// <returns>Property names or null.</returns>
+    public static IReadOnlyList<string>? ReadInclude(IInvocationOperation call)
     {
-        var method = call.TargetMethod;
-        if (method.ContainingType.ToDisplayString() != QueryableExtensions || call.Arguments.Length < 2)
+        if (!IsQueryableExtension(call, "Include"))
         {
             return null;
         }
 
-        return method.Name switch
+        var argument = call.Arguments[1].Value;
+
+        // "Include("Settings.Profile")".
+        if (argument.ConstantValue is { HasValue: true, Value: string path })
         {
-            "Include" => ReadIncludeArgument(call.Arguments[1].Value),
-            "ThenInclude" => ReadThenInclude(call),
-            _ => null,
-        };
+            return NavigationPath.Parse([path])?.Segments;
+        }
+
+        return ReadLambdaChain(argument.Syntax);
     }
 
     /// <summary>
-    /// "Include(u =&gt; u.Settings.Profile)" or "Include("Settings.Profile")".
+    /// Returns the properties a ThenInclude adds where the chain it is called on ends: ["Profile"] for
+    /// <c>ThenInclude(s =&gt; s.Profile)</c>, also through a filter. Null for other calls. Which chain that is, is
+    /// the search's question.
     /// </summary>
-    private static NavigationPath? ReadIncludeArgument(IOperation argument)
-    {
-        if (argument.ConstantValue is { HasValue: true, Value: string path })
-        {
-            return NavigationPath.Parse([path]);
-        }
-
-        return ReadLambdaChain(argument.Syntax) is { } chain
-            ? NavigationPath.Parse(chain)
+    /// <param name="call">Method call.</param>
+    /// <returns>Property names or null.</returns>
+    public static IReadOnlyList<string>? ReadThenInclude(IInvocationOperation call)
+        => IsQueryableExtension(call, "ThenInclude")
+            ? ReadLambdaChain(call.Arguments[1].Value.Syntax)
             : null;
-    }
+
+    /// <summary>
+    /// True for a call of the EF method with the navigation argument.
+    /// </summary>
+    private static bool IsQueryableExtension(IInvocationOperation call, string methodName)
+        => call.TargetMethod.Name == methodName &&
+           call.TargetMethod.ContainingType.ToDisplayString() == QueryableExtensions &&
+           call.Arguments.Length >= 2;
 
     /// <summary>
     /// The properties an Include or ThenInclude lambda loads: ["Settings", "Profile"] for
@@ -73,37 +78,5 @@ internal static class EfIncludeReader
         return parameter is null || body is null
             ? null
             : RoslynReader.ReadMemberChain(RoslynReader.TrimCalls(body), parameter);
-    }
-
-    /// <summary>
-    /// "query.Include(u =&gt; u.Settings).ThenInclude(s =&gt; s.Profile)": the path of the Include or ThenInclude it is
-    /// called on, followed by its own lambda.
-    /// </summary>
-    private static NavigationPath? ReadThenInclude(IInvocationOperation call)
-    {
-        // "s => s.Profile": what this ThenInclude adds.
-        var ownChain = ReadLambdaChain(call.Arguments[1].Value.Syntax);
-        if (ownChain is null)
-        {
-            return null;
-        }
-
-        var receiver = RoslynReader.GetReceiver(call);
-        var previousCall = receiver is null
-            ? null
-            : RoslynReader.SkipWrappers(receiver) as IInvocationOperation;
-        if (previousCall is null)
-        {
-            return null;
-        }
-
-        // "Include(u => u.Settings)": the path this ThenInclude continues.
-        var previousPath = GetIncludedPath(previousCall);
-        if (previousPath is null)
-        {
-            return null;
-        }
-
-        return NavigationPath.Parse(previousPath.Segments.Concat(ownChain));
     }
 }
