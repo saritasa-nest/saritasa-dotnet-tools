@@ -20,7 +20,7 @@ internal static class AttributeReader
             .Any(attribute => IsAttribute(attribute, nameof(TrackIncludeRequiredAttribute)));
 
     /// <summary>
-    /// Returns the parameter and the property of every <see cref="IncludeRequiredAttribute"/> of the method.
+    /// Returns the parameter and the navigation path of every <see cref="IncludeRequiredAttribute"/> of the method.
     /// </summary>
     /// <param name="method">Method.</param>
     /// <returns>Requirements.</returns>
@@ -35,70 +35,94 @@ internal static class AttributeReader
             }
 
             var parameter = attribute.ConstructorArguments[0].Value as string;
-            var property = attribute.ConstructorArguments[1].Value as string;
+            var path = ReadPath(attribute.ConstructorArguments.Skip(1));
 
-            if (!string.IsNullOrEmpty(parameter) && !string.IsNullOrEmpty(property))
+            if (!string.IsNullOrEmpty(parameter) && path is not null)
             {
-                yield return new IncludeRequirement(parameter!, property!);
+                yield return new IncludeRequirement(parameter!, path);
             }
         }
     }
 
     /// <summary>
-    /// Returns true if the method asks for the property of the parameter with
-    /// <see cref="IncludeRequiredAttribute"/>.
+    /// Returns true if the method asks for the path of the parameter with <see cref="IncludeRequiredAttribute"/>.
+    /// A longer path asked for covers a shorter one: "Settings.Profile" covers "Settings".
     /// </summary>
     /// <param name="method">Method.</param>
     /// <param name="param">Parameter name.</param>
-    /// <param name="includedProperty">Navigation property name.</param>
-    /// <returns>True if the method asks for the property.</returns>
+    /// <param name="path">Required navigation path.</param>
+    /// <returns>True if the method asks for the path.</returns>
     public static bool MethodHasIncludeRequiredAttribute(
         IMethodSymbol method,
         string param,
-        string includedProperty)
+        NavigationPath path)
         => GetIncludeRequirements(method).Any(requirement =>
             string.Equals(requirement.ParameterName, param, StringComparison.Ordinal) &&
-            string.Equals(requirement.NavigationProperty, includedProperty, StringComparison.Ordinal));
+            requirement.Path.Covers(path));
 
     /// <summary>
-    /// Returns true if the method annotates <see cref="IncludesAttribute"/> for the property.
+    /// Returns true if the method annotates <see cref="IncludesAttribute"/> for the path or a longer one.
     /// </summary>
     /// <param name="method">Method.</param>
-    /// <param name="includedProperty">Navigation property name.</param>
-    /// <returns>True if the method promises the property.</returns>
-    public static bool MethodHasIncludesAttribute(IMethodSymbol method, string includedProperty)
-        => GetIncludes(method).Any(include =>
-            string.Equals(include.Property, includedProperty, StringComparison.Ordinal));
+    /// <param name="path">Navigation path.</param>
+    /// <returns>True if the method promises the path.</returns>
+    public static bool MethodHasIncludesAttribute(IMethodSymbol method, NavigationPath path)
+        => GetIncludes(method).Any(include => include.Path.Covers(path));
 
     /// <summary>
-    /// Returns the properties of every <see cref="IncludesAttribute"/> of the method that the analyzer must
+    /// Returns the paths of every <see cref="IncludesAttribute"/> of the method that the analyzer must
     /// check: all of them except those annotated with <c>Verify = false</c>.
     /// </summary>
     /// <param name="method">Method.</param>
-    /// <returns>Navigation property names.</returns>
-    public static IEnumerable<string> GetIncludesToVerify(IMethodSymbol method)
+    /// <returns>Navigation paths.</returns>
+    public static IEnumerable<NavigationPath> GetIncludesToVerify(IMethodSymbol method)
         => GetIncludes(method)
             .Where(include => include.Verify)
-            .Select(include => include.Property);
+            .Select(include => include.Path);
 
     /// <summary>
-    /// Returns the property and the <c>Verify</c> flag of every <see cref="IncludesAttribute"/> of the method.
+    /// Returns the path and the <c>Verify</c> flag of every <see cref="IncludesAttribute"/> of the method.
     /// </summary>
-    private static IEnumerable<(string Property, bool Verify)> GetIncludes(IMethodSymbol method)
+    private static IEnumerable<(NavigationPath Path, bool Verify)> GetIncludes(IMethodSymbol method)
     {
         foreach (var attribute in method.GetAttributes())
         {
-            if (!IsAttribute(attribute, nameof(IncludesAttribute)) ||
-                attribute.ConstructorArguments.Length < 1)
+            if (!IsAttribute(attribute, nameof(IncludesAttribute)))
             {
                 continue;
             }
 
-            if (attribute.ConstructorArguments[0].Value is string property)
+            if (ReadPath(attribute.ConstructorArguments) is { } path)
             {
-                yield return (property, IsVerifyEnabled(attribute));
+                yield return (path, IsVerifyEnabled(attribute));
             }
         }
+    }
+
+    /// <summary>
+    /// Reads a path from constructor arguments: a single string such as "Profile" or "Settings.Profile", or the
+    /// array of a <c>params string[]</c> constructor.
+    /// </summary>
+    private static NavigationPath? ReadPath(IEnumerable<TypedConstant> arguments)
+    {
+        var segments = new List<string?>();
+
+        foreach (var argument in arguments)
+        {
+            if (argument.Kind == TypedConstantKind.Array)
+            {
+                foreach (var value in argument.Values)
+                {
+                    segments.Add(value.Value as string);
+                }
+            }
+            else
+            {
+                segments.Add(argument.Value as string);
+            }
+        }
+
+        return NavigationPath.Parse(segments);
     }
 
     /// <summary>

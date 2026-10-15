@@ -306,6 +306,18 @@ internal static class BuiltInBridges
         Annotate(type, member: "Min", from: Result, to: Instance, excludeOverloadsWithParameters: ["selector"]),
         Annotate(type, member: "Max", from: Result, to: Instance, excludeOverloadsWithParameters: ["selector"]),
 
+        // "users.Select(u => u.Settings)", "users.SelectMany(u => u.Applications)": the result holds what the
+        // selector reads from each element. Only a member chain can be read, so "(u, i) => ..." and any other lambda
+        // are not crossed. The overload with a result selector hands back what that one made.
+        Annotate(type, member: "Select", from: Result, to: Instance, step: PathStep.SelectorChain("selector")),
+        Annotate(
+            type,
+            member: "SelectMany",
+            from: Result,
+            to: Instance,
+            step: PathStep.SelectorChain("selector"),
+            excludeOverloadsWithParameters: ["resultSelector"]),
+
         .. ElementInCallback.Select(entry =>
             Annotate(type, entry.Member, from: Callback(entry.Callback), to: Instance)),
 
@@ -334,7 +346,8 @@ internal static class BuiltInBridges
     /// <param name="declaringType">Metadata name of the type that declares the member.</param>
     /// <param name="member">Name of the method or property.</param>
     /// <param name="from">Where the search is standing when it reaches this member.</param>
-    /// <param name="to">Where the same entities came from.</param>
+    /// <param name="to">Where the entities came from.</param>
+    /// <param name="step">How the path changes on the way; kept when omitted.</param>
     /// <param name="excludeOverloadsWithParameters">Parameters of the overloads this line does not describe.</param>
     /// <returns>The record.</returns>
     private static BuiltInBridge Annotate(
@@ -342,8 +355,9 @@ internal static class BuiltInBridges
         string member,
         BridgeEnd from,
         BridgeEnd to,
+        PathStep? step = null,
         string[]? excludeOverloadsWithParameters = null)
-        => new(declaringType, member, new Bridge(from, to), excludeOverloadsWithParameters ?? []);
+        => new(declaringType, member, new Bridge(from, to, step), excludeOverloadsWithParameters ?? []);
 
     /// <summary>
     /// A parameter of the call, by name: the <c>inner</c> of <c>Join(outer, inner, ...)</c>.

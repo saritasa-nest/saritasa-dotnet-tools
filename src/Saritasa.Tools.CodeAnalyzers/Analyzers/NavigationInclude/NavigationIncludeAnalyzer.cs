@@ -22,9 +22,6 @@ public sealed class NavigationIncludeAnalyzer : DiagnosticAnalyzer
         context.EnableConcurrentExecution();
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
 
-        // INCL001 for direct access (user.Profile): one operation is enough.
-        context.RegisterOperationAction(PropertyReferenceHandler.Analyze, OperationKind.PropertyReference);
-
         // INCL005: an [assembly: PassesIncludes] that names nothing.
         // INCL006: a [PassesIncludes] that is not allowed on the method it describes.
         context.RegisterSyntaxNodeAction(BridgeAttributeHandler.Analyze, SyntaxKind.Attribute);
@@ -35,7 +32,8 @@ public sealed class NavigationIncludeAnalyzer : DiagnosticAnalyzer
             // done once here and handed to every method body of the compilation.
             var bridges = Bridges.Read(compilationStart.Compilation);
 
-            // INCL001 at call sites, INCL002, INCL003, INCL004: need the whole method body (control flow graph).
+            // INCL001-INCL004 for property reads, call sites and returns: need the whole method body
+            // (control flow graph).
             compilationStart.RegisterOperationBlockAction(
                 blockContext => IncludeFlowHandler.Analyze(blockContext, bridges));
         });

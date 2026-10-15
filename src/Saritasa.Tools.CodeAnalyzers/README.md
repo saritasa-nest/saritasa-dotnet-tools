@@ -27,7 +27,7 @@ If your project uses a [global package reference](https://learn.microsoft.com/en
 | [STAN1004](#stan1004-spelling) | Word '{0}' has a typo | Warning | Spelling |
 | [STAN1005](#stan1005-early-exit) | Use early return instead of else after return | Warning | Style |
 | [INCL001](#incl001-navigation-property-not-checked) | Method parameter should require a navigation property | Warning | Usage |
-| [INCL002](#incl002-local-variable-missing-include) | Local variable does not set the required navigation property | Warning | Usage |
+| [INCL002](#incl002-navigation-property-not-loaded) | Value does not load the required navigation property | Warning | Usage |
 | [INCL003](#incl003-includes-promise-not-fulfilled) | Method annotates [Includes] but return value does not load the required navigation property | Warning | Usage |
 | [INCL004](#incl004-cannot-check-navigation-property) | Cannot check whether the navigation property is loaded | Warning | Usage |
 | [INCL005](#incl005-preservesincludes-names-nothing) | [PassesIncludes] names a member that does not exist | Warning | Usage |
@@ -263,9 +263,9 @@ Four attributes control which navigation properties are tracked and how inclusio
 
 | Attribute | Target | Purpose |
 |-----------|--------|---------|
-| `[TrackIncludeRequired]` | Property | Marks a navigation property as requiring explicit loading. Only properties with this attribute are checked by INCL rules. |
-| `[IncludeRequired("param", "Property")]` | Method | States that the named parameter must have the named property loaded before the method is called. Repeatable. |
-| `[Includes("Property")]` | Method | Promises that the method's return value has the named property loaded. Repeatable. Set `Verify = false` to skip the INCL003 check of the method body. |
+| `[TrackIncludeRequired]` | Property | Marks a navigation property as requiring explicit loading. Only properties with this attribute are checked by INCL rules. Every read of it is checked. |
+| `[IncludeRequired("param", "Property")]` | Method | States that the named parameter must have the named property loaded before the method is called. A nested path is written as one dotted string, `"Settings.Profile"`, or one segment per argument, `nameof(User.Settings), nameof(UserSettings.Profile)`. Repeatable. |
+| `[Includes("Property")]` | Method | Promises that the method's return value has the named property loaded. Takes a nested path the same way. Repeatable. Set `Verify = false` to skip the INCL003 check of the method body. |
 | `[PassesIncludes]` | Method, assembly | Says that the method hands back the same entity objects it was given, so their includes are kept. Name the parameter they come from: `[PassesIncludes(nameof(query))]`; naming none means the value in front of the dot. For a library, put it on your assembly: `[assembly: PassesIncludes(typeof(Lib.Ext), "Paginate", "query")]`. The method must be **static** and must not change the entity type — see [INCL006](#incl006-passesincludes-is-not-allowed-here). `System.Linq`, EF Core and the collection types are annotated already. |
 
 How the analyzer follows a value back to its query is described in the
@@ -278,16 +278,47 @@ class User
 {
     public Organization Organization { get; set; }
 
-    [TrackIncludeRequired]  // Only Profile is tracked, Organization produces no diagnostics.
+    [TrackIncludeRequired]  // Only Profile and Settings are tracked, Organization produces no diagnostics.
+    public UserProfile Profile { get; set; }
+
+    [TrackIncludeRequired]
+    public UserSettings Settings { get; set; }
+}
+
+class UserSettings
+{
+    [TrackIncludeRequired]
     public UserProfile Profile { get; set; }
 }
 ```
+
+#### What counts as a read
+
+Every read of a tracked property is checked on its own, whatever the value in front of it is: a parameter, a local, a lambda parameter or the result of a call. `user.Settings.Profile` reads two tracked properties, so it needs `Settings` and `Settings.Profile` loaded on `user`; `?.` is checked the same way as `.`. The diagnostic is placed on the property name and its rule depends on where the entities came from:
+
+| The entities came from | Rule |
+|------------------------|------|
+| a parameter of the current method that does not ask for the path | [INCL001](#incl001-navigation-property-not-checked) |
+| a query without the `Include`, or a method of this project that does not promise it | [INCL002](#incl002-navigation-property-not-loaded) |
+| something the analyzer cannot follow | [INCL004](#incl004-cannot-check-navigation-property) |
+
+These are not reads and are not checked: an assignment to the property (`user.Profile = x`, object initializers), the entity reading its own property (`this.Profile`), and a lambda that becomes an expression tree, such as `query.Where(u => u.Profile.IsActive)`, which is translated to SQL and never runs.
 
 ---
 
 ### INCL001: Navigation property not checked
 
-Triggered when a method directly accesses a `[TrackIncludeRequired]` property on a parameter, or passes a parameter to a method that requires it via `[IncludeRequired]`, without annotating a matching `[IncludeRequired]` on the current method.
+Triggered when a `[TrackIncludeRequired]` property is read on a parameter, or a parameter is passed to a method that requires it via `[IncludeRequired]`, and the current method does not ask for the property with a matching `[IncludeRequired]`. The parameter is found through locals, lambdas and navigation reads too, and the message names the whole path the attribute must ask for:
+
+```csharp
+void SetTimezone(User user)
+{
+    var settings = user.Settings;   // INCL001: use [IncludeRequired("user", "Settings")]
+    settings.Profile.Timezone = "UTC";  // INCL001: use [IncludeRequired("user", "Settings.Profile")]
+}
+```
+
+One `[IncludeRequired(nameof(user), "Settings.Profile")]` fixes both, because a longer path covers a shorter one.
 
 #### Code causing a warning
 
@@ -340,11 +371,21 @@ void SetTimezone(User user, string timezone)
 
 ---
 
-### INCL002: Local variable missing include
+### INCL002: Navigation property not loaded
 
-Triggered when a local variable is passed to a method that requires a navigation property via `[IncludeRequired]`, but the variable was neither loaded with `.Include()`, set in an object initializer, nor returned from a method annotated with `[Includes]`.
+Triggered when a `[TrackIncludeRequired]` property is read, or a value is passed to a method that requires a navigation property via `[IncludeRequired]`, and the entities came from a query that does not `Include` it, or from a method of this project that does not promise it with `[Includes]`. The value may be a local, a lambda parameter, the result of a call or a navigation of another entity.
 
-The analyzer checks the value the variable has at the point of the call. It follows reassignments, `if`/`else` branches (the property must be loaded on every branch), intermediate query variables (`var query = ...Include(...); var user = await query.FirstAsync();`), `foreach` loops over included collections, reassignments inside loops, LINQ lambdas such as `users.Select(u => ...)`, and dictionaries built with `ToDictionary(u => u.Id)` / `ToDictionaryAsync(u => u.Id)` (read via `dictionary[id]`, `TryGetValue`, `GetValueOrDefault`, `Values` or `foreach`). A dictionary built with an element selector (`ToDictionary(u => u.Id, u => ...)`) stores other objects, so its values are not considered loaded.
+The message names the path to load counted from the query, which is not always the path that was read:
+
+```csharp
+var user = await _dbContext.Users.Include(u => u.Settings).FirstAsync(u => u.Id == id);
+var timezone = user.Settings.Profile.Timezone;
+// INCL002: Navigation property 'UserSettings.Profile' is not loaded for 'user.Settings';
+// load 'Settings.Profile' in the query, ...
+// Fix: .Include(u => u.Settings).ThenInclude(s => s.Profile)
+```
+
+The analyzer checks the value at the point where it is used. It follows reassignments, `if`/`else` branches (the property must be loaded on every branch), intermediate query variables (`var query = ...Include(...); var user = await query.FirstAsync();`), `foreach` loops over included collections, reassignments inside loops, LINQ lambdas such as `users.Select(u => ...)`, and dictionaries built with `ToDictionary(u => u.Id)` / `ToDictionaryAsync(u => u.Id)` (read via `dictionary[id]`, `TryGetValue`, `GetValueOrDefault`, `Values` or `foreach`). A dictionary built with an element selector (`ToDictionary(u => u.Id, u => ...)`) stores other objects, so its values are not considered loaded.
 
 #### Code causing a warning
 
@@ -481,7 +522,7 @@ async Task Handle3(SaveUserDto dto)
 
 ### INCL003: \[Includes\] promise not fulfilled
 
-Triggered when a method annotated with `[Includes("Property")]` returns a value that does not load the named property via `.Include()`, an object initializer, or a source method annotated with `[Includes]`.
+Triggered when a method annotated with `[Includes("Property")]` returns a value that does not load the named property via `.Include()` and `.ThenInclude()`, an object initializer, or a source method annotated with `[Includes]`. As for INCL002, the message names the path to load in the query: a method that promises `Profile` and returns `user.Settings` needs `Settings.Profile` loaded on the query of `user`.
 
 #### Code causing a warning
 
@@ -566,6 +607,8 @@ These are the cases it does not follow. All of them give INCL004, never a false 
 | A property of a library type, such as `page.Items` | an annotation can only describe a method. Make the type enumerable instead |
 | `Cast<T>`, `OfType<T>` | the entity type changes |
 | Entities reached through a navigation property, such as the `f` of `SelectMany(u => u.Friends, (u, f) => ...)` | they came from `u.Friends`, not from the query, and carry different includes |
+| A field, such as `UpdateUserProfile(this.user, dto)` or `this.user.Profile` | nothing in the method says where its value came from |
+| A lambda not passed to a known method, such as `Func<User, string> f = u => u.Profile.Timezone` | nothing says what `u` holds |
 
 `Except`, `ExceptBy`, `Intersect` and `IntersectBy` **are** followed: they hand back elements of the
 collection they were used on.

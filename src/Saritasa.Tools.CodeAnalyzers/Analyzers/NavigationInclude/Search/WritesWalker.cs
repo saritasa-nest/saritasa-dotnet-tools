@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.FlowAnalysis;
 using Microsoft.CodeAnalysis.Operations;
+using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Requirements;
 
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Search;
 
@@ -16,9 +17,11 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Search;
 internal sealed class WritesWalker
 {
     /// <summary>
-    /// Blocks already read for a variable. Without this the walk would circle a loop forever.
+    /// Blocks already read for a variable and the path asked about it. Without this the walk would circle a loop
+    /// forever. The path is part of the key because two branches can read the same variable for different paths,
+    /// as in <c>flag ? user : user.Manager</c>; the second must not take the first one's answer for its own.
     /// </summary>
-    private readonly HashSet<(BasicBlock Block, object Variable)> visitedBlocks = new();
+    private readonly HashSet<(BasicBlock Block, object Variable, NavigationPath Path)> visitedBlocks = new();
 
     /// <summary>
     /// Returns the local, parameter or compiler temporary the expression reads; null for anything else.
@@ -48,8 +51,10 @@ internal sealed class WritesWalker
     /// </summary>
     /// <param name="variable">Variable, see <see cref="GetVariable"/>.</param>
     /// <param name="position">Place the variable is read at.</param>
+    /// <param name="path">Path asked about the variable. The walker does not read it, it only remembers it with the
+    /// blocks it has read.</param>
     /// <returns>Writes; never empty.</returns>
-    public IEnumerable<Write> FindWrites(object variable, CodePosition position)
+    public IEnumerable<Write> FindWrites(object variable, CodePosition position, NavigationPath path)
     {
         var writeInThisBlock = position.GetPreviousStatements()
             .Select(previous => GetWriteOrDefault(previous, variable))
@@ -61,7 +66,7 @@ internal sealed class WritesWalker
         }
 
         // No write in this block, so the value was already there when the block started.
-        return FindWritesBeforeBlock(variable, position.FlowGraph, position.Block);
+        return FindWritesBeforeBlock(variable, position.FlowGraph, position.Block, path);
     }
 
     /// <summary>
@@ -137,30 +142,30 @@ internal sealed class WritesWalker
     /// <summary>
     /// No statement of the block writes the variable, so it comes from every way control can enter the block.
     /// </summary>
-    private IEnumerable<Write> FindWritesBeforeBlock(object variable, FlowGraph flowGraph, BasicBlock block)
+    private IEnumerable<Write> FindWritesBeforeBlock(object variable, FlowGraph flowGraph, BasicBlock block, NavigationPath path)
     {
         if (block.Kind == BasicBlockKind.Entry)
         {
             // This is the first block, so there is nothing before it inside the body.
-            return FindWritesBeforeBody(variable, flowGraph);
+            return FindWritesBeforeBody(variable, flowGraph, path);
         }
 
-        if (WasVisitedBefore(block, variable))
+        if (WasVisitedBefore(block, variable, path))
         {
-            // Re-enter in a loop body which nohow changes the value.
+            // A loop came back, or another branch already read the blocks above for the same path.
             return [new Write.NothingNew()];
         }
 
         // Unreachable code has no way in, and nothing is known about the variable there.
         return FindWaysIntoBlock(flowGraph, block)
-            .SelectMany(wayIn => FindWrites(variable, wayIn))
+            .SelectMany(wayIn => FindWrites(variable, wayIn, path))
             .DefaultIfEmpty(new Write.Unreadable());
     }
 
     /// <summary>
     /// Nothing in the body writes the variable, so it comes from outside: a parameter, or a capture.
     /// </summary>
-    private IEnumerable<Write> FindWritesBeforeBody(object variable, FlowGraph flowGraph)
+    private IEnumerable<Write> FindWritesBeforeBody(object variable, FlowGraph flowGraph, NavigationPath path)
     {
         if (flowGraph.CreationStatement is not { } lambdaCreation)
         {
@@ -175,14 +180,15 @@ internal sealed class WritesWalker
         }
 
         // A variable captured by the lambda: keep reading before the statement that creates the lambda.
-        return FindWrites(variable, lambdaCreation);
+        return FindWrites(variable, lambdaCreation, path);
     }
 
     /// <summary>
-    /// True if the walk already read this block for this variable, which happens when a loop leads back to it.
+    /// True if the walk already read this block for this variable and path, which happens when a loop leads back
+    /// to it, or when two branches meet above it.
     /// </summary>
-    private bool WasVisitedBefore(BasicBlock block, object variable)
-        => !visitedBlocks.Add((block, variable));
+    private bool WasVisitedBefore(BasicBlock block, object variable, NavigationPath path)
+        => !visitedBlocks.Add((block, variable, path));
 
     /// <summary>
     /// Where control can enter the block: every block that jumps to it and, for the first block of a catch,

@@ -345,4 +345,73 @@ public class LambdaTests : NavigationIncludeTestBase
 
         await VerifyAnalyzerAsync(sourceCode);
     }
+
+    /// <summary>
+    /// INCL001: u is an element of users, a parameter that does not ask for Profile.
+    /// </summary>
+    [Fact]
+    public async Task ReadInLambda_OverParameter_ReportsIncl1()
+    {
+        const string sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass
+                {
+                    List<string> GetTimezones(List<User> users)
+                    {
+                        return users.Select(u => u.{|INCL001:Profile|}.Timezone).ToList();
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No diagnostic: the lambdas of an IQueryable query are expression trees, translated and never run.
+    /// </summary>
+    [Fact]
+    public async Task ReadInExpressionTree_NotARead_NoDiagnostic()
+    {
+        const string sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task<List<User>> GetUsers()
+                    {
+                        return await dbContext.Users
+                            .Where(u => u.Settings.Profile.Timezone == "UTC")
+                            .OrderBy(u => u.Profile.Timezone)
+                            .ToListAsync();
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// INCL004: the lambda is not passed to any call, so nothing says what u holds.
+    /// </summary>
+    [Fact]
+    public async Task ReadInUnknownDelegate_ReportsIncl4()
+    {
+        const string sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass
+                {
+                    Func<User, string> GetTimezone()
+                    {
+                        return u => u.{|INCL004:Profile|}.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
 }

@@ -12,7 +12,7 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Bridging;
 /// They are kept apart because they may not say the same things: only a built-in line names overloads or
 /// speaks for a property, and only a built-in line describes a method that is not static, see
 /// <see cref="CustomBridgeRules"/>. Nothing here is inferred; a member nobody annotated is not followed.
-/// A lookup asks with the end the search stands on and gets back the ends to move to. Two of them mean the
+/// A lookup asks with the end the search stands on and gets back the bridges to cross. Two of them mean the
 /// entities could have come from either place, as for <c>first.Concat(second)</c>.
 /// </remarks>
 internal sealed class Bridges
@@ -56,22 +56,22 @@ internal sealed class Bridges
     }
 
     /// <summary>
-    /// Where a bridge out of this member's result lands.
+    /// The bridges out of this member's result.
     /// </summary>
     /// <param name="member">Method or property the search is standing on.</param>
-    /// <returns>Ends to move to. Empty when no bridge runs from there.</returns>
-    public IReadOnlyList<BridgeEnd> FindFromResult(ISymbol member)
+    /// <returns>Bridges to cross. Empty when no bridge runs from there.</returns>
+    public IReadOnlyList<Bridge> FindFromResult(ISymbol member)
         => Find(member, from: new BridgeEnd.Result());
 
     /// <summary>
-    /// Where a bridge out of something passed to this method lands. One question covers an out argument and
+    /// The bridges out of something passed to this method. One question covers an out argument and
     /// a callback parameter alike, since a parameter is never both.
     /// </summary>
     /// <param name="method">Method the entities were passed to.</param>
     /// <param name="parameterName">Name of the parameter they arrived through.</param>
     /// <param name="lambdaPosition">Position inside the callback, when the parameter takes one.</param>
-    /// <returns>Ends to move to. Empty when no bridge runs from there.</returns>
-    public IReadOnlyList<BridgeEnd> FindFromParameter(
+    /// <returns>Bridges to cross. Empty when no bridge runs from there.</returns>
+    public IReadOnlyList<Bridge> FindFromParameter(
         IMethodSymbol method,
         string parameterName,
         int lambdaPosition = 0)
@@ -140,7 +140,7 @@ internal sealed class Bridges
     /// Every bridge of this member running from the given end, from the first place that annotates any. The
     /// member itself has the last word, then the built-in table, then an assembly attribute.
     /// </summary>
-    private IReadOnlyList<BridgeEnd> Find(ISymbol member, BridgeEnd from)
+    private IReadOnlyList<Bridge> Find(ISymbol member, BridgeEnd from)
     {
         var definition = member.OriginalDefinition;
 
@@ -164,7 +164,7 @@ internal sealed class Bridges
     /// <summary>
     /// The same, among the bridges that ship with the analyzer.
     /// </summary>
-    private IReadOnlyList<BridgeEnd> FindBuiltIn(ISymbol definition, BridgeEnd from)
+    private IReadOnlyList<Bridge> FindBuiltIn(ISymbol definition, BridgeEnd from)
         => Collect(
             GetCandidates(builtIn, definition)
                 .Where(resolved =>
@@ -176,7 +176,7 @@ internal sealed class Bridges
     /// <summary>
     /// The same, among the bridges annotated by an assembly attribute.
     /// </summary>
-    private IReadOnlyList<BridgeEnd> FindAssemblyCustom(ISymbol definition, BridgeEnd from)
+    private IReadOnlyList<Bridge> FindAssemblyCustom(ISymbol definition, BridgeEnd from)
         => Collect(
             GetCandidates(custom, definition)
                 .Where(annotated => IsDeclaredBy(definition, annotated.DeclaringType))
@@ -193,22 +193,22 @@ internal sealed class Bridges
         => definition is IMethodSymbol method && CustomBridgeRules.IsAllowed(method, bridge, out _);
 
     /// <summary>
-    /// The ends the given bridges land on, counting each place once. A Dictionary is both an IDictionary and
+    /// The given bridges running from the end, counting each place they land on once. A Dictionary is both an IDictionary and
     /// an IReadOnlyDictionary, so its TryGetValue matches two lines that mean the same one place.
     /// </summary>
-    private static IReadOnlyList<BridgeEnd> Collect(IEnumerable<Bridge> bridges, BridgeEnd from)
+    private static IReadOnlyList<Bridge> Collect(IEnumerable<Bridge> bridges, BridgeEnd from)
     {
-        var ends = new List<BridgeEnd>();
+        var found = new List<Bridge>();
 
         foreach (var bridge in bridges)
         {
-            if (SameEnd(bridge.From, from) && !ends.Any(end => SameEnd(end, bridge.To)))
+            if (SameEnd(bridge.From, from) && !found.Any(other => SameEnd(other.To, bridge.To)))
             {
-                ends.Add(bridge.To);
+                found.Add(bridge);
             }
         }
 
-        return ends;
+        return found;
     }
 
     /// <summary>

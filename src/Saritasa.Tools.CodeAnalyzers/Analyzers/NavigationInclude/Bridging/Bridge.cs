@@ -3,13 +3,15 @@ using System.Diagnostics;
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Bridging;
 
 /// <summary>
-/// One annotated move of entities across a call: they sit at <see cref="From"/>, and the same entities came
-/// from <see cref="To"/>.
+/// One annotated move of entities across a call: they sit at <see cref="From"/>, they came from <see cref="To"/>,
+/// and <see cref="Step"/> says how the navigation path changes on the way.
 /// </summary>
 /// <remarks>
 /// The search reads backwards, so a bridge is written that way too. It says nothing about which property is
-/// loaded, only that the entities on both sides are the same ones, which is why one bridge covers every
-/// property. The member it belongs to is the key it is stored under, see <see cref="Bridges"/>.
+/// loaded, only where the entities came from, which is why one bridge covers every property. Usually the entities
+/// on both sides are the same ones; a projection such as <c>users.Select(u =&gt; u.Settings)</c> moves to their
+/// Settings instead, which its <see cref="Step"/> describes. The member it belongs to is the key it is stored under,
+/// see <see cref="Bridges"/>.
 /// Only four pairs are meaningful. The search always stands on a result or on something that arrived through
 /// a parameter, so <see cref="From"/> is never an instance; it only moves backwards, so <see cref="To"/> is
 /// never a result.
@@ -29,14 +31,16 @@ internal sealed class Bridge
     /// Initializes the bridge.
     /// </summary>
     /// <param name="from">Where the entities sit when the search reaches them.</param>
-    /// <param name="to">Where the same entities came from.</param>
-    public Bridge(BridgeEnd from, BridgeEnd to)
+    /// <param name="to">Where they came from.</param>
+    /// <param name="step">How the path changes on the way; <see cref="PathStep.Keep"/> when omitted.</param>
+    public Bridge(BridgeEnd from, BridgeEnd to, PathStep? step = null)
     {
         Debug.Assert(from is not BridgeEnd.Instance, "A bridge never runs from the value a member was used on.");
         Debug.Assert(to is not BridgeEnd.Result, "A bridge never lands on a result; the search reads backwards.");
 
         From = from;
         To = to;
+        Step = step ?? PathStep.Keep;
     }
 
     /// <summary>
@@ -45,7 +49,12 @@ internal sealed class Bridge
     public BridgeEnd From { get; }
 
     /// <summary>
-    /// Where the same entities came from: the value the member was used on, or one of its parameters.
+    /// Where the entities came from: the value the member was used on, or one of its parameters.
     /// </summary>
     public BridgeEnd To { get; }
+
+    /// <summary>
+    /// How the navigation path changes when the search crosses the bridge.
+    /// </summary>
+    public PathStep Step { get; }
 }

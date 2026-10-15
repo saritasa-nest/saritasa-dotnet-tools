@@ -13,8 +13,9 @@ namespace Saritasa.Tools.CodeAnalyzers.Tests.NavigationIncludeAnalyzerTests;
 public abstract class NavigationIncludeTestBase
 {
     /// <summary>
-    /// The model every test uses: a context with users, and a user whose Profile is tracked. The namespace is left
-    /// open, so a test appends its own classes and closes it.
+    /// The model every test uses: a context with users, and a user whose Profile is tracked. Nested paths go through
+    /// Settings to its Profile and through the Applications collection to each Stats. The namespace is left open, so a
+    /// test appends its own classes and closes it.
     /// </summary>
     protected const string Preamble =
         /* lang=c# */
@@ -43,6 +44,23 @@ public abstract class NavigationIncludeTestBase
                 public string Timezone { get; set; }
             }
 
+            public class UserSettings
+            {
+                [TrackIncludeRequired]
+                public UserProfile Profile { get; set; }
+            }
+
+            public class ApplicationStats
+            {
+                public int Downloads { get; set; }
+            }
+
+            public class Application
+            {
+                [TrackIncludeRequired]
+                public ApplicationStats Stats { get; set; }
+            }
+
             public class User
             {
                 public int Id { get; set; }
@@ -50,6 +68,10 @@ public abstract class NavigationIncludeTestBase
                 public User Manager { get; set; }
                 [TrackIncludeRequired]
                 public UserProfile Profile { get; set; }
+                [TrackIncludeRequired]
+                public UserSettings Settings { get; set; }
+                [TrackIncludeRequired]
+                public List<Application> Applications { get; set; }
             }
 
             public class SaveUserDto

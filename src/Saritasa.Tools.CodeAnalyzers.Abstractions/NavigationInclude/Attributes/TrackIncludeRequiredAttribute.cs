@@ -2,7 +2,6 @@
 
 /// <summary>
 /// Marks a navigation property as requiring explicit loading via <c>.Include()</c>.
-/// Methods that access it must declare <c>[IncludeRequired]</c>.
 /// </summary>
 /// <example>
 /// Only properties that need tracking should be annotated — untracked properties produce no diagnostics:
