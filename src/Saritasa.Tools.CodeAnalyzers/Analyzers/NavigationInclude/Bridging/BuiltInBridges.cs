@@ -9,7 +9,8 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Bridging;
 /// needs no reference to EF Core. Nothing is inferred: a member not on this list is not crossed.
 /// A line names both ends and reads backwards, the way the search walks: <c>from: Result, to: Instance</c>
 /// says <c>users.ToList()</c> hands back what <c>users</c> held.
-/// A member holding the entities of two places has no line at all, see <see cref="IsLeftOutOnPurpose"/>.
+/// A member holding the entities of two places, such as <c>first.Concat(second)</c>, has a line for each, and the
+/// path must be loaded in both.
 /// Enumerable and Queryable spell most operators identically, so those are written once in
 /// <see cref="QueryOperators"/> and read for both; keeping two hand-written copies in step is how Queryable
 /// came to claim a ToDictionary it does not have.
@@ -46,12 +47,6 @@ internal static class BuiltInBridges
     /// The value the member was used on: the <c>users</c> of <c>users.ToList()</c>.
     /// </summary>
     private static readonly BridgeEnd Instance = new BridgeEnd.Instance();
-
-    /// <summary>
-    /// Operators whose result holds the entities of two collections at once, which is why they have no line.
-    /// </summary>
-    private static readonly HashSet<string> leftOutOnPurpose =
-        new(["Concat", "Union", "UnionBy", "Append", "Prepend"], StringComparer.Ordinal);
 
     /// <summary>
     /// Operators whose result holds the entities it was given, on both Enumerable and Queryable.
@@ -166,6 +161,15 @@ internal static class BuiltInBridges
             from: Callback("resultSelector", position: 1),
             to: Parameter("second")),
 
+        // Concat, Union and UnionBy hand back the entities of two collections, so each has a line for both and the
+        // path must be loaded in each. Queryable names the second collection differently.
+        Annotate(LinqEnumerable, member: "Concat", from: Result, to: Instance),
+        Annotate(LinqEnumerable, member: "Concat", from: Result, to: Parameter("second")),
+        Annotate(LinqEnumerable, member: "Union", from: Result, to: Instance),
+        Annotate(LinqEnumerable, member: "Union", from: Result, to: Parameter("second")),
+        Annotate(LinqEnumerable, member: "UnionBy", from: Result, to: Instance),
+        Annotate(LinqEnumerable, member: "UnionBy", from: Result, to: Parameter("second")),
+
         // ----- Only on Queryable -----
         Annotate(LinqQueryable, member: "AsQueryable", from: Result, to: Instance),
         Annotate(
@@ -173,6 +177,14 @@ internal static class BuiltInBridges
             member: "Zip",
             from: Callback("resultSelector", position: 1),
             to: Parameter("source2")),
+
+        // Concat, Union and UnionBy, with the second collection named "source2".
+        Annotate(LinqQueryable, member: "Concat", from: Result, to: Instance),
+        Annotate(LinqQueryable, member: "Concat", from: Result, to: Parameter("source2")),
+        Annotate(LinqQueryable, member: "Union", from: Result, to: Instance),
+        Annotate(LinqQueryable, member: "Union", from: Result, to: Parameter("source2")),
+        Annotate(LinqQueryable, member: "UnionBy", from: Result, to: Instance),
+        Annotate(LinqQueryable, member: "UnionBy", from: Result, to: Parameter("source2")),
 
         // ----- EF Core query operators: the result holds the entities it was given -----
         Annotate(EfQueryable, member: "Include", from: Result, to: Instance),
@@ -280,20 +292,6 @@ internal static class BuiltInBridges
     ];
 
     /// <summary>
-    /// True for a member left off the table on purpose, rather than one simply not reached yet.
-    /// </summary>
-    /// <remarks>
-    /// These hand back the entities of two places at once and one line can name only one. A annotation
-    /// would be believed and would answer for entities nobody looked at, so nothing offers to write one.
-    /// </remarks>
-    /// <param name="declaringType">Metadata name of the type that declares the member.</param>
-    /// <param name="memberName">Name of the member.</param>
-    /// <returns>True when it is one of them.</returns>
-    public static bool IsLeftOutOnPurpose(string declaringType, string memberName)
-        => (declaringType == LinqEnumerable || declaringType == LinqQueryable) &&
-           leftOutOnPurpose.Contains(memberName);
-
-    /// <summary>
     /// The operators Enumerable and Queryable annotate the same way, read for one of them. Both types spell
     /// these members and their parameters identically, so a line that is right for one is right for the other.
     /// </summary>
@@ -326,6 +324,14 @@ internal static class BuiltInBridges
 
         // "Aggregate(seed, func)": the element is the second parameter, the accumulator is not.
         Annotate(type, member: "Aggregate", from: Callback("func", position: 1), to: Instance),
+
+        // Append and Prepend hand back the entities they were given and one of their own, so each has a line for
+        // both and the path must be loaded in each. Concat, Union and UnionBy are written in All, since the two types
+        // name their second collection differently.
+        Annotate(type, member: "Append", from: Result, to: Instance),
+        Annotate(type, member: "Append", from: Result, to: Parameter("element")),
+        Annotate(type, member: "Prepend", from: Result, to: Instance),
+        Annotate(type, member: "Prepend", from: Result, to: Parameter("element")),
 
         // Zip and the join operators are given a second collection of their own. Zip's is named differently on
         // each type, so those two lines are in All rather than here.

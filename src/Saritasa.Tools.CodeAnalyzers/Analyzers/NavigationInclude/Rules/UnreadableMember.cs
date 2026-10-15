@@ -48,16 +48,14 @@ internal static class UnreadableMember
     /// no annotation worth offering.
     /// </summary>
     /// <remarks>
-    /// Three cases where a fix would not help: a property, which no annotation can describe; a method the
-    /// rules would refuse, which swaps this warning for an INCL006; and a member the built-in table leaves
-    /// off on purpose, where annotating it from outside would quietly undo that decision.
+    /// Two cases where a fix would not help: a property, which no annotation can describe; and a method the
+    /// rules would refuse, which swaps this warning for an INCL006.
     /// </remarks>
     /// <param name="unknownSource">The value the search could not read.</param>
     /// <returns>Properties for the code fix.</returns>
     public static ImmutableDictionary<string, string?> GetProperties(IOperation? unknownSource)
     {
-        if (FindMember(unknownSource) is not IMethodSymbol { ContainingType: { } containingType } method ||
-            BuiltInBridges.IsLeftOutOnPurpose(GetMetadataName(containingType), method.Name))
+        if (FindMember(unknownSource) is not IMethodSymbol { ContainingType: { } containingType } method)
         {
             return ImmutableDictionary<string, string?>.Empty;
         }
@@ -84,14 +82,6 @@ internal static class UnreadableMember
             parameterName.Length == 0
                 ? new BridgeEnd.Instance()
                 : new BridgeEnd.Parameter(parameterName));
-
-    /// <summary>
-    /// Namespace and metadata name of the type, spelled the way <see cref="BuiltInBridges"/> spells one.
-    /// </summary>
-    private static string GetMetadataName(INamedTypeSymbol type)
-        => type.ContainingNamespace is { IsGlobalNamespace: false } containing
-            ? containing.ToDisplayString() + "." + type.OriginalDefinition.MetadataName
-            : type.OriginalDefinition.MetadataName;
 
     /// <summary>
     /// The name to write inside "typeof(...)", unbound: <c>PagedResult&lt;&gt;</c>, not
