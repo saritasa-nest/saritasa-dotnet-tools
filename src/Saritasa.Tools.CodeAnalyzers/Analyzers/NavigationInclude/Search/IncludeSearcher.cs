@@ -255,14 +255,15 @@ internal sealed class IncludeSearcher
             path);
 
     /// <summary>
-    /// The answer for the values a bridge landed on, asked for the path with what the bridge put in front of it.
-    /// Two of them would both have to be loaded, which the search cannot say yet, so it says it cannot tell
-    /// rather than picking one.
+    /// The answer for the values the bridges landed on, each asked for the path with what its bridge put in front
+    /// of it. Several of them, as for <c>first.Concat(second)</c>, must all have the path loaded, like the
+    /// branches of an "if". No bridge at all means nothing says where the entities came from, so we cannot tell.
     /// </summary>
     private Answer SearchSources(IReadOnlyList<Crossing> crossings, CodePosition position, NavigationPath path)
-        => crossings.Count == 1
-            ? Search(crossings[0].Source, position, path.Prepend([.. crossings[0].Prefix]))
-            : Answer.Unknown();
+        => crossings.Count == 0
+            ? Answer.Unknown()
+            : JoinPaths(crossings.Select(crossing =>
+                Search(crossing.Source, position, path.Prepend([.. crossing.Prefix]))));
 
     /// <summary>
     /// True if the method asks for the path with [IncludeRequired], making its caller responsible.
