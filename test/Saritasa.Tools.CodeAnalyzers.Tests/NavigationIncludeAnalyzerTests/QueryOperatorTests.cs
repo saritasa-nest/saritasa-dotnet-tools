@@ -152,12 +152,26 @@ public class QueryOperatorTests : NavigationIncludeTestBase
     }
 
     /// <summary>
-    /// INCL004: "Concat" hands back the entities of two collections, and the analyzer can follow only one
-    /// value at a time. Saying the property is loaded would mean answering for the second collection without
-    /// having looked at it, so it says it cannot tell.
+    /// No INCL002: Concat hands back the entities of both collections, and both include Profile.
     /// </summary>
     [Fact]
-    public async Task Concat_HasTwoSources_ReportsIncl4()
+    public async Task Concat_BothSourcesInclude_NoIncl2()
+    {
+        await VerifyAnalyzerAsync(HandleSource(
+            """
+                        var loaded = await dbContext.Users.Include(u => u.Profile).ToListAsync();
+                        var alsoLoaded = await dbContext.Users.Include(u => u.Profile).ToListAsync();
+                        var user = loaded.Concat(alsoLoaded).First();
+
+                        UpdateUserProfile(user, dto);
+            """));
+    }
+
+    /// <summary>
+    /// INCL002: the second collection Concat is given was loaded without Include, so the entity may come from it.
+    /// </summary>
+    [Fact]
+    public async Task Concat_SecondSourceWithoutInclude_ReportsIncl2()
     {
         await VerifyAnalyzerAsync(HandleSource(
             """
@@ -165,23 +179,39 @@ public class QueryOperatorTests : NavigationIncludeTestBase
                         var others = await dbContext.Users.ToListAsync();
                         var user = loaded.Concat(others).First();
 
-                        {|INCL004:UpdateUserProfile(user, dto)|};
+                        {|INCL002:UpdateUserProfile(user, dto)|};
             """));
     }
 
     /// <summary>
-    /// INCL004: the same for "Append", whose second source is one entity rather than a collection.
+    /// INCL001: the entity Prepend adds is a parameter, so the method has to ask its caller for the path.
     /// </summary>
     [Fact]
-    public async Task Append_HasTwoSources_ReportsIncl4()
+    public async Task Prepend_MethodParameter_ReportsIncl1()
     {
-        await VerifyAnalyzerAsync(HandleSource(
+        const string sourceCode = Preamble +
+            /* lang=c# */
             """
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task Handle(User currentUser, SaveUserDto dto)
+                    {
                         var loaded = await dbContext.Users.Include(u => u.Profile).ToListAsync();
-                        var user = loaded.Append(new User()).First();
+                        var user = loaded.Prepend(currentUser).First();
 
-                        {|INCL004:UpdateUserProfile(user, dto)|};
-            """));
+                        {|INCL001:UpdateUserProfile(user, dto)|};
+                    }
+
+                    [IncludeRequired(nameof(user), nameof(User.Profile))]
+                    void UpdateUserProfile(User user, SaveUserDto dto)
+                    {
+                        user.Profile.Timezone = dto.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
     }
 
     /// <summary>

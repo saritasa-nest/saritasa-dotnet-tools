@@ -108,7 +108,6 @@ loading a property.
 |---|---|
 | a call into another assembly that nothing annotates | `query.Paginate(1)` from a library without `[assembly: PassesIncludes]` |
 | a property of a library type | `page.Items`; an attribute cannot describe a property |
-| a value from two places | `Concat`, `Union`, `Append`, `Prepend`, or a member with two matching bridges |
 | a field, a static property, `this` | `_cachedUser`, `Current.User` |
 | a lambda parameter nothing annotates | the `i` of `Select((u, i) => ...)`, a lambda given to a method outside LINQ |
 | an `out` argument of a method nothing annotates | `Compute(out var user)` |
@@ -280,7 +279,6 @@ Two rules are in neither diagram:
 | a method of this project that promises nothing | `NotLoaded(path)` | it can be read, and it says nothing |
 | a method parameter without the attribute | `NotRequiredBy(parameter, path)` | reported as INCL001, which asks for `[IncludeRequired]` |
 | a member nothing annotates, in another assembly | `Unknown` | `query.Paginate(1)` from a library |
-| a value that could have come from two places | `Unknown` | `first.Concat(second)` — both would have to be loaded, and the search follows one value |
 | a lambda parameter nothing annotates | `Unknown` | the `i` of `Select((u, i) => …)`, a lambda given to a method outside LINQ |
 | an `out` argument of a method nothing annotates | `Unknown` | `Compute(out var user)`, while `d.TryGetValue(k, out var user)` follows `d` |
 | unreachable code | `Unknown` | no block jumps there |
@@ -641,23 +639,26 @@ is a private class inside `CustomBridgeRules` rather than a type of its own.
 a `Dictionary<K,V>` is both an `IDictionary` and an `IReadOnlyDictionary`, so its `TryGetValue` matches two
 lines meaning the same one place.
 
-Two different ends mean the entities could have come from either place. `IncludeSearcher.SearchSources` is the
-only place that decides what that is worth, and today it answers `Unknown`:
+Two different ends mean the entities came from both places, as for `first.Concat(second)` or
+`users.Append(user)`: those members have a line for each. `IncludeSearcher.SearchSources` is the only place that
+decides what that is worth, and it applies the rule of the branches of an `if`: every source must have the path
+loaded, and the first one that does not gives the answer.
 
 ```csharp
 private Answer SearchSources(IReadOnlyList<Crossing> crossings, CodePosition position, NavigationPath path)
-    => crossings.Count == 1
-        ? Search(crossings[0].Source, position, path.Prepend([.. crossings[0].Prefix]))
-        : Answer.Unknown();
+    => crossings.Count == 0
+        ? Answer.Unknown()
+        : JoinPaths(crossings.Select(crossing =>
+            Search(crossing.Source, position, path.Prepend([.. crossing.Prefix]))));
 ```
 
-When fan-out is implemented — "all of them must be loaded" — that method is the only one that changes.
+A call is crossed all or nothing: when one of its bridges cannot be crossed, `BridgeCrosser` crosses none, so a
+source that cannot be read is never silently skipped.
 
 ### What is deliberately not crossed
 
 | Not crossed | Why |
 |---|---|
-| `Concat`, `Union`, `UnionBy`, `Append`, `Prepend` | the result holds the entities of two places, and one line names one. `BuiltInBridges.IsLeftOutOnPurpose` names them, so the INCL004 code fix does not offer to annotate them back |
 | a property of a library type, such as `page.Items` | an attribute cannot be written on a property, and one naming a property by string is ignored |
 | `Cast<T>`, `OfType<T>` | the entity type changes |
 | the `f` of `SelectMany(u => u.Friends, (u, f) => ...)` | it came from `u.Friends`, not from the query, so it carries different includes. Following it would need to read the lambda's returned value, which is not done |
