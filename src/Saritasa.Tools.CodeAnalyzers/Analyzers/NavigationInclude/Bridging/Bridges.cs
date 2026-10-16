@@ -13,7 +13,7 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Bridging;
 /// speaks for a property, and only a built-in line describes a method that is not static, see
 /// <see cref="CustomBridgeRules"/>. Nothing here is inferred; a member nobody annotated is not followed.
 /// A lookup asks with the end the search stands on and gets back the bridges to cross. Two of them mean the
-/// entities could have come from either place, as for <c>first.Concat(second)</c>.
+/// entities came from both places, as for <c>first.Concat(second)</c>, and the path must be loaded in each.
 /// </remarks>
 internal sealed class Bridges
 {

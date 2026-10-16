@@ -13,7 +13,8 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Bridging;
 /// </summary>
 /// <remarks>
 /// One method per shape the search can be standing on, all landing through <see cref="GetCallCrossing"/>.
-/// There is normally one value on the other side; a member holding the entities of two places gives two.
+/// There is normally one value on the other side; a member holding the entities of two places gives two, and
+/// the path must be loaded in both.
 /// Nothing is inferred: what nobody annotated is not crossed.
 /// </remarks>
 internal static class BridgeCrosser
@@ -91,14 +92,27 @@ internal static class BridgeCrosser
         => GetCallCrossings(bridges.FindFromParameter(call.TargetMethod, outParameter), call);
 
     /// <summary>
-    /// The crossings of the bridges at the call, leaving out any whose value is not there to read.
+    /// The crossings of the bridges at the call. Empty when any of them cannot be crossed: the entities could
+    /// have come from that place too, and checking only the others would answer for it without looking.
     /// </summary>
     private static IReadOnlyList<Crossing> GetCallCrossings(
         IReadOnlyList<Bridge> bridges,
         IInvocationOperation call)
-        => bridges.Count == 0
-            ? []
-            : bridges.Select(bridge => GetCallCrossing(bridge, call)).OfType<Crossing>().ToList();
+    {
+        var crossings = new List<Crossing>(bridges.Count);
+
+        foreach (var bridge in bridges)
+        {
+            if (GetCallCrossing(bridge, call) is not { } crossing)
+            {
+                return [];
+            }
+
+            crossings.Add(crossing);
+        }
+
+        return crossings;
+    }
 
     /// <summary>
     /// The one value there is, with the path kept, or nothing when there is none.

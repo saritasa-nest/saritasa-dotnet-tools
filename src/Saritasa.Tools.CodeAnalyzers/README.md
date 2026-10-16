@@ -603,15 +603,11 @@ These are the cases it does not follow. All of them give INCL004, never a false 
 
 | Not followed | Why |
 |--------------|-----|
-| `Concat`, `Union`, `UnionBy`, `Append`, `Prepend` | the result holds the entities of two collections, and the analyzer follows one value at a time |
 | A property of a library type, such as `page.Items` | an annotation can only describe a method. Make the type enumerable instead |
 | `Cast<T>`, `OfType<T>` | the entity type changes |
 | Entities reached through a navigation property, such as the `f` of `SelectMany(u => u.Friends, (u, f) => ...)` | they came from `u.Friends`, not from the query, and carry different includes |
 | A field, such as `UpdateUserProfile(this.user, dto)` or `this.user.Profile` | nothing in the method says where its value came from |
 | A lambda not passed to a known method, such as `Func<User, string> f = u => u.Profile.Timezone` | nothing says what `u` holds |
-
-`Except`, `ExceptBy`, `Intersect` and `IntersectBy` **are** followed: they hand back elements of the
-collection they were used on.
 
 #### Code causing a warning
 
