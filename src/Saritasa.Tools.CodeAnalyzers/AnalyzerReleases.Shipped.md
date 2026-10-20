@@ -20,3 +20,13 @@ STAN1005 | Style    | Warning | STAN1004_EarlyExitAnalyzer
 INCL001  | Usage    | Warning | INCL001_NavigationIncludeAnalyze
 INCL002  | Usage    | Warning | INCL002_NavigationIncludeAnalyzer
 INCL003  | Usage    | Warning | INCL003_NavigationIncludeAnalyzer
+
+## Release 3.0
+
+### New Rules
+
+Rule ID | Category | Severity | Notes
+--------|----------|----------|--------------------------------------
+INCL004 | Usage    | Warning  | INCL004_NavigationIncludeAnalyzer
+INCL005 | Usage    | Warning  | INCL005_NavigationIncludeAnalyzer
+INCL006 | Usage    | Warning  | INCL006_NavigationIncludeAnalyzer

@@ -13,3 +13,13 @@
 
 0.2.2 [2026-09-10]
 [+] Add code fix for exception message dot analyzer.
+
+0.3.0 [2026-10-20]
+[+] Add ThenInclude and filtered Include support to navigation include analyzer (INCL004-INCL006).
+[+] Add merging operators support to navigation include analyzer.
+[*] Fix tracking of conditionally accessed properties in navigation include analyzer.
+[+] Spelling: ignore strings with digits and letters at the same time.
+[+] Spelling: ignore upper case words.
+[+] Spelling: ignore diacritics.
+[*] Spelling: fix name mask in the middle of a word.
+[*] Spelling: fix slow masking of names.
