@@ -193,7 +193,7 @@ public class PassesIncludesCodeFixTests : NavigationIncludeTestBase
         var test = CreateTest(GetAsyncCall);
         AddLibrary(test, GetAsyncLibrary);
         AddBridgesFile(
-            test,
+            test.FixedState.Sources,
             """[assembly: PassesIncludes(typeof(SomeLib.QueryExtensions), "GetAsync", "entities")]""");
 
         await test.RunAsync(CancellationToken.None);
@@ -216,7 +216,7 @@ public class PassesIncludesCodeFixTests : NavigationIncludeTestBase
         test.TestState.AdditionalReferences.AddRange(AnalyzerReferences);
         test.FixedState.AdditionalReferences.AddRange(AnalyzerReferences);
         AddBridgesFile(
-            test,
+            test.FixedState.Sources,
             """[assembly: PassesIncludes(typeof(System.Linq.Enumerable), "Chunk", "source")]""");
 
         await test.RunAsync(CancellationToken.None);
@@ -278,13 +278,19 @@ public class PassesIncludesCodeFixTests : NavigationIncludeTestBase
             }
             """;
 
+        var toReplace = "        [DebuggerStepThrough]";
+        var replaced =
+            /* lang=c# */
+            """
+                    [PassesIncludes(nameof(query))]
+                    [DebuggerStepThrough]
+            """;
+
         var test = CreateTest(OnlyActiveCall);
         AddLibrary(
             test,
             library,
-            library.Replace(
-                "        [DebuggerStepThrough]",
-                "        [PassesIncludes(nameof(query))]\n        [DebuggerStepThrough]"),
+            library.Replace(toReplace, replaced),
             seesAttributes: true);
 
         await test.RunAsync(CancellationToken.None);
@@ -300,7 +306,7 @@ public class PassesIncludesCodeFixTests : NavigationIncludeTestBase
         var test = CreateTest(TakePageCall);
         AddLibrary(test, TakePageLibrary);
         AddBridgesFile(
-            test,
+            test.FixedState.Sources,
             """[assembly: PassesIncludes(typeof(SomeLib.Paging), "TakePage", "source")]""");
 
         await test.RunAsync(CancellationToken.None);
@@ -316,7 +322,7 @@ public class PassesIncludesCodeFixTests : NavigationIncludeTestBase
         var test = CreateTest(ForEachItemCall);
         AddLibrary(test, CollectionLibrary);
         AddBridgesFile(
-            test,
+            test.FixedState.Sources,
             """[assembly: PassesIncludes(typeof(SomeLib.CollectionExtensions), "ForEachItem", "items", ToCallback = "action")]""");
 
         await test.RunAsync(CancellationToken.None);
@@ -329,17 +335,28 @@ public class PassesIncludesCodeFixTests : NavigationIncludeTestBase
     public async Task CannotCheck_OverOwnCallback_AnnotatesMethod()
     {
         var test = CreateTest(ForEachItemCall);
+
+        var usingToReplace = "using System.Collections.Generic;";
+        var usingReplaced =
+            $"""
+            using System.Collections.Generic;
+            {UsingAttributes}
+            """;
+
+        var attributeToReplace = "        public static void ForEachItem<T>";
+        var attributeReplaced =
+             /* lang=c# */
+            """
+                    [PassesIncludes(nameof(items), ToCallback = nameof(action))]
+                    public static void ForEachItem<T>
+            """;
+
         AddLibrary(
             test,
             CollectionLibrary,
             CollectionLibrary
-                .Replace(
-                    "using System.Collections.Generic;",
-                    "using System.Collections.Generic;\n" + UsingAttributes)
-                .Replace(
-                    "        public static void ForEachItem<T>",
-                    "        [PassesIncludes(nameof(items), ToCallback = nameof(action))]\n" +
-                    "        public static void ForEachItem<T>"),
+                .Replace(usingToReplace, usingReplaced)
+                .Replace(attributeToReplace, attributeReplaced),
             seesAttributes: true);
 
         await test.RunAsync(CancellationToken.None);
@@ -358,7 +375,7 @@ public class PassesIncludesCodeFixTests : NavigationIncludeTestBase
             """);
         AddLibrary(test, CollectionLibrary);
         AddBridgesFile(
-            test,
+            test.FixedState.Sources,
             """[assembly: PassesIncludes(typeof(SomeLib.CollectionExtensions), "ForEachIndexed", "items", ToCallback = "action", ToCallbackParameter = 1)]""");
 
         await test.RunAsync(CancellationToken.None);
@@ -380,8 +397,9 @@ public class PassesIncludesCodeFixTests : NavigationIncludeTestBase
             """);
         AddLibrary(test, CollectionLibrary);
         AddBridgesFile(
-            test,
+            test.FixedState.Sources,
             """[assembly: PassesIncludes(typeof(SomeLib.CollectionExtensions), "ForEachOfSecond", "second", ToCallback = "action")]""");
+
         test.CodeActionEquivalenceKey = "PassesIncludes:M:SomeLib.CollectionExtensions.ForEachOfSecond``1(" +
                                         "System.Collections.Generic.IEnumerable{``0}," +
                                         "System.Collections.Generic.IEnumerable{``0}," +
@@ -401,10 +419,11 @@ public class PassesIncludesCodeFixTests : NavigationIncludeTestBase
 
         var test = CreateTest(TakePageCall);
         AddLibrary(test, TakePageLibrary);
-        test.TestState.Sources.Add((BridgesFileName, UsingAttributes + "\n\n" + existingLine));
+
+        AddBridgesFile(test.TestState.Sources, existingLine);
         AddBridgesFile(
-            test,
-            existingLine + "\n" + """[assembly: PassesIncludes(typeof(SomeLib.Paging), "TakePage", "source")]""");
+            test.FixedState.Sources,
+            existingLine + Environment.NewLine + """[assembly: PassesIncludes(typeof(SomeLib.Paging), "TakePage", "source")]""");
 
         await test.RunAsync(CancellationToken.None);
     }
@@ -494,7 +513,14 @@ public class PassesIncludesCodeFixTests : NavigationIncludeTestBase
     private static CSharpCodeFixTest<NavigationIncludeAnalyzer, PassesIncludesCodeFixProvider, DefaultVerifier>
         CreateTest(string handleBody, bool expectFix = true)
     {
-        var source = HandleSource(handleBody).Replace("using System;", "using System;\nusing SomeLib;");
+        var usingToReplace = "using System;";
+        var usingReplaced =
+             /* lang=c# */
+            """
+            using System;
+            using SomeLib;
+            """;
+        var source = HandleSource(handleBody).Replace(usingToReplace, usingReplaced);
 
         var test = new CSharpCodeFixTest<NavigationIncludeAnalyzer, PassesIncludesCodeFixProvider, DefaultVerifier>
         {
@@ -544,8 +570,11 @@ public class PassesIncludesCodeFixTests : NavigationIncludeTestBase
     /// <summary>
     /// Expects NavigationIncludes.cs with these lines after the fix.
     /// </summary>
-    private static void AddBridgesFile(CodeFixTest<DefaultVerifier> test, string lines)
-        => test.FixedState.Sources.Add((BridgesFileName, UsingAttributes + "\n\n" + lines));
+    private static void AddBridgesFile(SourceFileList sorces, string lines)
+    {
+        var newLines = Environment.NewLine + Environment.NewLine;
+        sorces.Add((BridgesFileName, UsingAttributes + newLines + lines));
+    }
 
     /// <summary>
     /// INCL004 is reported and no fix changes anything.
