@@ -55,6 +55,29 @@ internal static class CustomBridgeRules
     }
 
     /// <summary>
+    /// True when the bridge is allowed and both its ends are known to hold the same entity, which is what a
+    /// code fix needs before it suggests writing it.
+    /// </summary>
+    /// <remarks>
+    /// Stricter than <see cref="IsAllowed"/>, which lets through an end whose type says nothing, such as
+    /// <c>object</c>: an annotation somebody wrote is given the benefit of the doubt, a suggestion is not.
+    /// </remarks>
+    /// <param name="method">Method the bridge would be written for.</param>
+    /// <param name="bridge">What the annotation would say.</param>
+    /// <returns>True when the bridge is worth suggesting.</returns>
+    public static bool IsSuggestable(IMethodSymbol method, Bridge bridge)
+    {
+        if (!IsAllowed(method, bridge, out _))
+        {
+            return false;
+        }
+
+        var annotation = GetAsWritten(method);
+
+        return EntityType.HoldsSameEntity(GetEndType(annotation, bridge.From), GetEndType(annotation, bridge.To));
+    }
+
+    /// <summary>
     /// The type of the value at one end of the bridge, as the method annotates it, or null where there is
     /// nothing to read.
     /// </summary>
@@ -162,6 +185,21 @@ internal static class CustomBridgeRules
             }
 
             return SymbolEqualityComparer.Default.Equals(left, right);
+        }
+
+        /// <summary>
+        /// True only when both sides are known to hold the same entity.
+        /// </summary>
+        /// <param name="from">Type of the value the search would be standing on.</param>
+        /// <param name="to">Type of the value the bridge lands on.</param>
+        /// <returns>True when both sides name the same entity.</returns>
+        public static bool HoldsSameEntity(ITypeSymbol? from, ITypeSymbol? to)
+        {
+            var left = GetEntityType(from);
+            var right = GetEntityType(to);
+
+            return left is not null && right is not null && !SaysNothing(left) && !SaysNothing(right) &&
+                   SymbolEqualityComparer.Default.Equals(left, right);
         }
 
         /// <summary>

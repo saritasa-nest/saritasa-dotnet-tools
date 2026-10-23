@@ -625,11 +625,24 @@ async Task Handle(SaveUserDto dto)
 
 #### Fixed
 
-The code fix adds the annotation to `NavigationIncludes.cs` in the project:
+A code fix adds the annotation for the method where the search stopped. For a method of a package, it goes into `NavigationIncludes.cs` in the project, which is created on first use and appended to after that:
 
 ```csharp
+using Saritasa.Tools.CodeAnalyzers.Abstractions.NavigationInclude.Attributes;
+
 [assembly: PassesIncludes(typeof(SomeLib.QueryExtensions), "Paginate", "query")]
 ```
+
+For a method whose source is in the solution, in a project that references the attributes, it goes on the method itself:
+
+```csharp
+[PassesIncludes(nameof(query))]
+public static PagedList<T> Paginate<T>(this IQueryable<T> query, int page) => ...;
+```
+
+Only parameters that hold the same entity as the result are offered. When there are several, such as two collections, the fix opens a submenu to pick the one the entities come from. When the search stopped at a lambda parameter, as in `items.ForEachItem(u => UpdateUserProfile(u, dto))`, the fix names the callback too: `[PassesIncludes(nameof(items), ToCallback = nameof(action))]`, with `ToCallbackParameter` when the entity is not the callback's first parameter.
+
+No fix is offered where the annotation would be rejected with [INCL006](#incl006-passesincludes-is-not-allowed-here) or would not help: an instance method, a property, a method where no parameter holds the same entity, or a container of your own that does not implement `IEnumerable<T>`.
 
 An annotation can only describe a method. When a library hands its entities back through a property instead, such as `page.Items`, there is nothing to annotate and the value cannot be followed. It works when the type is enumerable, because `First()`, `foreach` and the rest are annotated already.
 
