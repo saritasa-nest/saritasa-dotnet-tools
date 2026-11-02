@@ -64,6 +64,36 @@ public class IncludesPromiseTests : NavigationIncludeTestBase
     }
 
     /// <summary>
+    /// No INCL003: the queried entity is returned after its Profile was set by hand, which keeps the promise.
+    /// </summary>
+    [Fact]
+    public async Task GetUser_PropertyAssignedByHand_NoIncl3()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+
+                class TestClass(AppDbContext dbContext)
+                {
+                    [Includes(nameof(User.Profile))]
+                    async Task<User> GetUser(int id)
+                    {
+                        var user = await dbContext.Users
+                            .FirstAsync(u => u.Id == id);
+
+                        user.Profile = new UserProfile { Timezone = "UTC" };
+
+                        // No INCL003: Profile was set by hand.
+                        return user;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
     /// No INCL003: the returned object was not sourced from a query, so there was no Include to miss for any
     /// property, including one the method's own [Includes] names. The analyzer no longer checks that an
     /// [Includes] promise is actually kept when the method just constructs a fresh entity; that check is the

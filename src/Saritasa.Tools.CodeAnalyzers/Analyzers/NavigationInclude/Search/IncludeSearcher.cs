@@ -170,17 +170,20 @@ internal sealed class IncludeSearcher
     private Answer SearchAnswerInValuesWrites(object variable, CodePosition position, NavigationPath path)
         => JoinPaths(
             walker.FindWrites(variable, position, path)
-                .Select(write => ReadWrite(write, path))
+                .Select(write => ReadWrite(write, variable, path))
             );
 
     /// <summary>
     /// What one write of the walker means for the navigation path.
     /// </summary>
-    private Answer ReadWrite(Write write, NavigationPath path)
+    private Answer ReadWrite(Write write, object variable, NavigationPath path)
         => write switch
         {
             // "user = x": read the value the variable got.
             Write.Written written => Search(written.Value, path),
+
+            // "user.Settings = x" or "user.Settings.Profile = x" for "Settings.Profile".
+            Write.MemberWritten member => ReadMemberWrite(member, variable, path),
 
             // "dictionary.TryGetValue(id, out var user)".
             Write.OutArgument outArgument => ReadOutArgumentSource(outArgument, path),
@@ -220,6 +223,24 @@ internal sealed class IncludeSearcher
         }
 
         return Answer.Loaded;
+    }
+
+    /// <summary>
+    /// An assignment splits the path where it ends. For "Settings.Profile" after "user.Settings.Profile = x", user
+    /// must have had "Settings" before the assignment, and the property itself holds x. After
+    /// "user.Settings = x", x must have "Profile" loaded.
+    /// </summary>
+    private Answer ReadMemberWrite(Write.MemberWritten member, object variable, NavigationPath path)
+    {
+        var inFront = member.AssignedCount > 1
+            ? SearchAnswerInValuesWrites(variable, member.Statement, path.TakeFirst(member.AssignedCount - 1))
+            : Answer.Loaded;
+
+        var underAssigned = path.Segments.Length > member.AssignedCount
+            ? Search(member.Value, path.SkipFirst(member.AssignedCount))
+            : Answer.Loaded;
+
+        return JoinPaths([inFront, underAssigned]);
     }
 
     /// <summary>

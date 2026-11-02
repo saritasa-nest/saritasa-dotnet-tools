@@ -34,6 +34,42 @@ internal abstract class Write
     }
 
     /// <summary>
+    /// "user.Settings = x", "user.Settings.Profile = x": the start of the path asked about was assigned on the
+    /// variable itself.
+    /// </summary>
+    public sealed class MemberWritten : Write
+    {
+        /// <summary>
+        /// Initializes the write.
+        /// </summary>
+        /// <param name="value">The value that was assigned.</param>
+        /// <param name="assignedCount">How many properties at the start of the path the assignment goes through.</param>
+        /// <param name="statement">The assignment.</param>
+        public MemberWritten(Value value, int assignedCount, CodePosition statement)
+        {
+            Value = value;
+            AssignedCount = assignedCount;
+            Statement = statement;
+        }
+
+        /// <summary>
+        /// The value that was assigned: "x" of "user.Settings = x".
+        /// </summary>
+        public Value Value { get; }
+
+        /// <summary>
+        /// How many properties at the start of the path the assignment goes through: 2 for
+        /// "user.Settings.Profile = x".
+        /// </summary>
+        public int AssignedCount { get; }
+
+        /// <summary>
+        /// The assignment, above which the variable still holds what it held before.
+        /// </summary>
+        public CodePosition Statement { get; }
+    }
+
+    /// <summary>
     /// "dictionary.TryGetValue(id, out var user)": a call wrote the variable through an out argument.
     /// </summary>
     public sealed class OutArgument : Write

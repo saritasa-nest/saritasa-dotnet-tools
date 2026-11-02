@@ -84,6 +84,20 @@ internal sealed class NavigationPath : IEquatable<NavigationPath>
         => new(Segments.InsertRange(0, segments));
 
     /// <summary>
+    /// Returns the path of the first segments, e.g. "Settings" of "Settings.Profile".
+    /// </summary>
+    /// <param name="count">Number of segments to keep; more than zero.</param>
+    /// <returns>Shorter path, with nothing matched.</returns>
+    public NavigationPath TakeFirst(int count) => new(Segments.RemoveRange(count, Segments.Length - count));
+
+    /// <summary>
+    /// Returns the path that is left after the first segments, e.g. "Profile" of "Settings.Profile".
+    /// </summary>
+    /// <param name="count">Number of segments to drop; fewer than there are.</param>
+    /// <returns>Shorter path, with nothing matched.</returns>
+    public NavigationPath SkipFirst(int count) => new(Segments.RemoveRange(0, count));
+
+    /// <summary>
     /// True if the remaining segments end with the chain: ["Settings", "Profile"] ends with ["Profile"] and with
     /// ["Settings", "Profile"].
     /// </summary>
@@ -101,6 +115,30 @@ internal sealed class NavigationPath : IEquatable<NavigationPath>
         for (var i = 0; i < chain.Count; i++)
         {
             if (!string.Equals(remaining[start + i], chain[i], StringComparison.Ordinal))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// True if the path starts with the chain: ["Settings", "Profile"] starts with ["Settings"] and with
+    /// ["Settings", "Profile"]. Inside an include chain nothing does: the value there is a query, not an entity.
+    /// </summary>
+    /// <param name="chain">Property names from the entity outwards.</param>
+    /// <returns>True if the chain matches the start.</returns>
+    public bool StartsWith(IReadOnlyList<string> chain)
+    {
+        if (Matched > 0 || chain.Count == 0 || chain.Count > Segments.Length)
+        {
+            return false;
+        }
+
+        for (var i = 0; i < chain.Count; i++)
+        {
+            if (!string.Equals(Segments[i], chain[i], StringComparison.Ordinal))
             {
                 return false;
             }
