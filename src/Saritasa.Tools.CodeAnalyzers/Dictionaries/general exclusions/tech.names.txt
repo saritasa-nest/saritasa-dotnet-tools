@@ -132,6 +132,7 @@ Jupytext
 Katacoda
 KDiff
 KeePass
+Keycloak
 Kentico
 Kibana
 Kotlin
