@@ -104,6 +104,7 @@ Hastlayer
 HSQLDB
 HTML
 IBM
+iCalendar
 ICSharpCode
 Informix
 Intacept
@@ -131,6 +132,7 @@ Jupytext
 Katacoda
 KDiff
 KeePass
+Keycloak
 Kentico
 Kibana
 Kotlin
