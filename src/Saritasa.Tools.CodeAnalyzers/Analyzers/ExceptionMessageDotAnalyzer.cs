@@ -1,7 +1,8 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
+using Saritasa.Tools.CodeAnalyzers.Helpers;
 
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers;
 
@@ -15,7 +16,10 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
 {
-    private const string DiagnosticId = "STAN1002";
+    /// <summary>
+    /// The diagnostic ID for the exception message dot analyzer.
+    /// </summary>
+    public const string DiagnosticId = "STAN1002";
     private const string Category = "Spelling";
 
     private static readonly LocalizableString title = "Exception message should end with a dot";
@@ -166,7 +170,7 @@ public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
         // We cannot analyze method results.
         if (value is IInvocationOperation invocation)
         {
-            if (IsStringFormat(invocation.TargetMethod))
+            if (invocation.TargetMethod.IsStringFormat())
             {
                 var formatArg = invocation.Arguments.FirstOrDefault(a => a.Parameter?.Name == "format");
                 if (formatArg?.Value.ConstantValue is { HasValue: true, Value: string format })
@@ -204,7 +208,17 @@ public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
 
     private static bool IsStringType(ITypeSymbol? type) => type?.SpecialType == SpecialType.System_String;
 
-    private static bool EndsWithDot(string value) => value.TrimEnd().EndsWith(".", StringComparison.Ordinal);
+    private static bool EndsWithDot(string value)
+    {
+        var trimmed = value.TrimEnd();
+
+        if (trimmed.Length == 0)
+        {
+            return true;
+        }
+
+        return trimmed.EndsWith(".", StringComparison.Ordinal);
+    }
 
     private static bool DerivesFromException(ITypeSymbol type, INamedTypeSymbol exceptionType)
     {
@@ -220,10 +234,5 @@ public sealed class ExceptionMessageDotAnalyzer : DiagnosticAnalyzer
         }
 
         return false;
-    }
-
-    private static bool IsStringFormat(IMethodSymbol method)
-    {
-        return method.ContainingType.SpecialType == SpecialType.System_String && method.Name == "Format";
     }
 }

@@ -1,0 +1,1648 @@
+using Microsoft.CodeAnalysis.CSharp.Testing;
+using Microsoft.CodeAnalysis.Testing;
+using Saritasa.Tools.CodeAnalyzers.Analyzers;
+using Saritasa.Tools.CodeAnalyzers.CodeFixProviders;
+using Xunit;
+
+namespace Saritasa.Tools.CodeAnalyzers.Tests.ExceptionMessageDotAnalyzerTests;
+
+/// <summary>
+/// Tests for <see cref="ExceptionMessageDotCodeFixProvider"/>.
+/// </summary>
+public class ExceptionMessageDotCodeFixTests
+{
+    private CSharpCodeFixTest<ExceptionMessageDotAnalyzer, ExceptionMessageDotCodeFixProvider, DefaultVerifier> CreateTest(
+        string sourceCode,
+        string fixedCode)
+    {
+        return new CSharpCodeFixTest<ExceptionMessageDotAnalyzer, ExceptionMessageDotCodeFixProvider, DefaultVerifier>
+        {
+            ReferenceAssemblies = ReferenceAssemblies.Net.Net60,
+            TestCode = sourceCode,
+            FixedCode = fixedCode,
+        };
+    }
+
+    /// <summary>
+    /// Verifies that the code fix appends a dot to a simple string literal exception message.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_StringLiteral_AppendsDot()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        throw new ArgumentException([|"This is an error message without a dot"|]);
+                    }
+                }
+            }
+            """;
+
+        const string fixedCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        throw new ArgumentException("This is an error message without a dot.");
+                    }
+                }
+            }
+            """;
+
+        // Act
+        var test = CreateTest(sourceCode, fixedCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that the code fix inserts a dot before trailing whitespace in the exception message.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_StringLiteral_TrailingWhitespace_InsertsDotBeforeWhitespace()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        throw new ArgumentException([|"Error "|]);
+                    }
+                }
+            }
+            """;
+
+        const string fixedCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        throw new ArgumentException("Error. ");
+                    }
+                }
+            }
+            """;
+
+        // Act
+        var test = CreateTest(sourceCode, fixedCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that the code fix appends a dot to a raw string literal exception message.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_RawStringLiteral_AppendsDot()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """"
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        throw new ArgumentException([|"""Error without dot"""|]);
+                    }
+                }
+            }
+            """";
+
+        const string fixedCode =
+            /* lang=c# */
+            """"
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        throw new ArgumentException("""Error without dot.""");
+                    }
+                }
+            }
+            """";
+
+        // Act
+        var test = CreateTest(sourceCode, fixedCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that the code fix appends a dot to an interpolated string exception message.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_InterpolatedString_AppendsDot()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        const string test = "test";
+                        throw new ArgumentException([|$"Error: {test}"|]);
+                    }
+                }
+            }
+            """;
+
+        const string fixedCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        const string test = "test";
+                        throw new ArgumentException($"Error: {test}.");
+                    }
+                }
+            }
+            """;
+
+        // Act
+        var test = CreateTest(sourceCode, fixedCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that the code fix appends a dot to the last text part of an interpolated string.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_InterpolatedString_EndsWithText_AppendsDotToText()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        const string test = "test";
+                        throw new ArgumentException([|$"{test} error"|]);
+                    }
+                }
+            }
+            """;
+
+        const string fixedCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        const string test = "test";
+                        throw new ArgumentException($"{test} error.");
+                    }
+                }
+            }
+            """;
+
+        // Act
+        var test = CreateTest(sourceCode, fixedCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that the code fix appends a dot when an interpolated string ends with an interpolation.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_InterpolatedString_EndsWithInterpolation_AppendsDot()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        const string test = "test";
+                        const string test2 = "test2";
+                        throw new ArgumentException([|$"{test} {test2}"|]);
+                    }
+                }
+            }
+            """;
+
+        const string fixedCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        const string test = "test";
+                        const string test2 = "test2";
+                        throw new ArgumentException($"{test} {test2}.");
+                    }
+                }
+            }
+            """;
+
+        // Act
+        var test = CreateTest(sourceCode, fixedCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that the code fix appends a dot to the format string in a string.Format call.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_StringFormat_AppendsDotToFormatString()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(int id)
+                    {
+                        throw new ArgumentException([|string.Format("Error {0}", id)|]);
+                    }
+                }
+            }
+            """;
+
+        const string fixedCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(int id)
+                    {
+                        throw new ArgumentException(string.Format("Error {0}.", id));
+                    }
+                }
+            }
+            """;
+
+        // Act
+        var test = CreateTest(sourceCode, fixedCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that the code fix appends a dot to the format string in a string.Format call
+    /// that uses the (IFormatProvider, string, object[]) overload, where the format argument
+    /// is not at position 0.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_StringFormat_WithFormatProvider_AppendsDotToFormatString()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Globalization;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(int id)
+                    {
+                        throw new ArgumentException([|string.Format(CultureInfo.InvariantCulture, "Error {0}", id)|]);
+                    }
+                }
+            }
+            """;
+
+        const string fixedCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Globalization;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(int id)
+                    {
+                        throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "Error {0}.", id));
+                    }
+                }
+            }
+            """;
+
+        // Act
+        var test = CreateTest(sourceCode, fixedCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that the code fix appends a dot to both branches of a ternary operator.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_TernaryOperator_AppendsDotToBothBranches()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(bool isValid)
+                    {
+                        throw new ArgumentException([|isValid ? "Valid" : "Invalid"|]);
+                    }
+                }
+            }
+            """;
+
+        const string fixedCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(bool isValid)
+                    {
+                        throw new ArgumentException(isValid ? "Valid." : "Invalid.");
+                    }
+                }
+            }
+            """;
+
+        // Act
+        var test = CreateTest(sourceCode, fixedCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that the code fix appends a dot only to the branch missing a dot in a ternary operator.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_TernaryOperator_MixedDot_AppendsDotOnlyToMissingBranch()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(bool isValid)
+                    {
+                        throw new ArgumentException([|isValid ? "Valid." : "Invalid"|]);
+                    }
+                }
+            }
+            """;
+
+        const string fixedCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(bool isValid)
+                    {
+                        throw new ArgumentException(isValid ? "Valid." : "Invalid.");
+                    }
+                }
+            }
+            """;
+
+        // Act
+        var test = CreateTest(sourceCode, fixedCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that the code fix appends a dot only to the branch missing a dot in a reversed mixed ternary operator.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_TernaryOperator_MixedDotReversed_AppendsDotOnlyToMissingBranch()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(bool isValid)
+                    {
+                        throw new ArgumentException([|isValid ? "Invalid" : "Valid."|]);
+                    }
+                }
+            }
+            """;
+
+        const string fixedCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(bool isValid)
+                    {
+                        throw new ArgumentException(isValid ? "Invalid." : "Valid.");
+                    }
+                }
+            }
+            """;
+
+        // Act
+        var test = CreateTest(sourceCode, fixedCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that the code fix appends a dot to the right side of a null coalescing operator.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_NullCoalescing_AppendsDotToRightSide()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(string message)
+                    {
+                        throw new ArgumentException([|message ?? "Default error"|]);
+                    }
+                }
+            }
+            """;
+
+        const string fixedCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(string message)
+                    {
+                        throw new ArgumentException(message ?? "Default error.");
+                    }
+                }
+            }
+            """;
+
+        // Act
+        var test = CreateTest(sourceCode, fixedCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that the code fix appends a dot to all arms of a switch expression.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_SwitchExpression_AppendsDotToAllArms()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(int code)
+                    {
+                        throw new ArgumentException([|code switch
+                        {
+                            1 => "One",
+                            _ => "Two"
+                        }|]);
+                    }
+                }
+            }
+            """;
+
+        const string fixedCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(int code)
+                    {
+                        throw new ArgumentException(code switch
+                        {
+                            1 => "One.",
+                            _ => "Two."
+                        });
+                    }
+                }
+            }
+            """;
+
+        // Act
+        var test = CreateTest(sourceCode, fixedCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that the code fix appends a dot only to the arm missing a dot in a switch expression.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_SwitchExpression_MixedDot_AppendsDotOnlyToMissingArm()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(int code)
+                    {
+                        throw new ArgumentException([|code switch
+                        {
+                            1 => "One.",
+                            _ => "Two"
+                        }|]);
+                    }
+                }
+            }
+            """;
+
+        const string fixedCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(int code)
+                    {
+                        throw new ArgumentException(code switch
+                        {
+                            1 => "One.",
+                            _ => "Two."
+                        });
+                    }
+                }
+            }
+            """;
+
+        // Act
+        var test = CreateTest(sourceCode, fixedCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that the code fix appends a dot only to the arm missing a dot in a reversed mixed switch expression.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_SwitchExpression_MixedDotReversed_AppendsDotOnlyToMissingArm()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(int code)
+                    {
+                        throw new ArgumentException([|code switch
+                        {
+                            1 => "One",
+                            _ => "Two."
+                        }|]);
+                    }
+                }
+            }
+            """;
+
+        const string fixedCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(int code)
+                    {
+                        throw new ArgumentException(code switch
+                        {
+                            1 => "One.",
+                            _ => "Two."
+                        });
+                    }
+                }
+            }
+            """;
+
+        // Act
+        var test = CreateTest(sourceCode, fixedCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that the code fix appends a dot to the rightmost string literal in a binary concatenation.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_BinaryOperation_AppendsDotToRightmostLiteral()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var error = "Error";
+                        throw new ArgumentException([|error + " test"|]);
+                    }
+                }
+            }
+            """;
+
+        const string fixedCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var error = "Error";
+                        throw new ArgumentException(error + " test.");
+                    }
+                }
+            }
+            """;
+
+        // Act
+        var test = CreateTest(sourceCode, fixedCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that the code fix appends a dot to the rightmost literal in a nested binary concatenation.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_NestedBinaryOperation_AppendsDotToRightmostLiteral()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var error = "Error";
+                        throw new ArgumentException([|error + " detail" + " info"|]);
+                    }
+                }
+            }
+            """;
+
+        const string fixedCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var error = "Error";
+                        throw new ArgumentException(error + " detail" + " info.");
+                    }
+                }
+            }
+            """;
+
+        // Act
+        var test = CreateTest(sourceCode, fixedCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that the code fix appends a dot in a base constructor call.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_BaseConstructor_AppendsDot()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestException : Exception
+                {
+                    public TestException() : base([|"Error without dot"|])
+                    {
+                    }
+                }
+            }
+            """;
+
+        const string fixedCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestException : Exception
+                {
+                    public TestException() : base("Error without dot.")
+                    {
+                    }
+                }
+            }
+            """;
+
+        // Act
+        var test = CreateTest(sourceCode, fixedCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that the code fix appends a dot to the message in a multi-argument exception constructor.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_MultiArgConstructor_AppendsDot()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        throw new ArgumentException([|"Error"|], new Exception("Inner error."));
+                    }
+                }
+            }
+            """;
+
+        const string fixedCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        throw new ArgumentException("Error.", new Exception("Inner error."));
+                    }
+                }
+            }
+            """;
+
+        // Act
+        var test = CreateTest(sourceCode, fixedCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that the code fix appends a dot to the message in an exception constructor with paramName and message.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_ParamNameAndMessage_AppendsDot()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        throw new ArgumentNullException("paramName", [|"Error without dot"|]);
+                    }
+                }
+            }
+            """;
+
+        const string fixedCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        throw new ArgumentNullException("paramName", "Error without dot.");
+                    }
+                }
+            }
+            """;
+
+        // Act
+        var test = CreateTest(sourceCode, fixedCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that a base constructor call with both a message and an inner exception appends a dot to the message.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_BaseConstructorMultiArg_AppendsDotToMessage()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestException : Exception
+                {
+                    public TestException(Exception inner) : base([|"Error without dot"|], inner)
+                    {
+                    }
+                }
+            }
+            """;
+
+        const string fixedCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestException : Exception
+                {
+                    public TestException(Exception inner) : base("Error without dot.", inner)
+                    {
+                    }
+                }
+            }
+            """;
+
+        // Act
+        var test = CreateTest(sourceCode, fixedCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that fix all applies the code fix to every diagnostic in the document at once.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_FixAll_MultipleDiagnosticsInDocument_AppendsDotToAll()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void FirstMethod()
+                    {
+                        throw new ArgumentException([|"First error without dot"|]);
+                    }
+
+                    public void SecondMethod()
+                    {
+                        throw new ArgumentException([|"Second error without dot"|]);
+                    }
+                }
+            }
+            """;
+
+        const string fixedCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void FirstMethod()
+                    {
+                        throw new ArgumentException("First error without dot.");
+                    }
+
+                    public void SecondMethod()
+                    {
+                        throw new ArgumentException("Second error without dot.");
+                    }
+                }
+            }
+            """;
+
+        // Act
+        var test = CreateTest(sourceCode, fixedCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that the code fix appends a dot to a string literal containing an escaped quote.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_StringLiteral_WithEscapedQuote_AppendsDot()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        throw new ArgumentException([|"Error \"details\""|]);
+                    }
+                }
+            }
+            """;
+
+        const string fixedCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        throw new ArgumentException("Error \"details\".");
+                    }
+                }
+            }
+            """;
+
+        // Act
+        var test = CreateTest(sourceCode, fixedCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that the code fix appends a dot to a verbatim string literal containing an escaped (doubled) quote.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_VerbatimStringLiteral_WithEscapedQuote_AppendsDot()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """"
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        throw new ArgumentException([|@"Test ""string"""|]);
+                    }
+                }
+            }
+            """";
+
+        const string fixedCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        throw new ArgumentException(@"Test ""string"".");
+                    }
+                }
+            }
+            """;
+
+        // Act
+        var test = CreateTest(sourceCode, fixedCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that the code fix appends a dot to a verbatim string literal.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_VerbatimStringLiteral_AppendsDot()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        throw new ArgumentException([|@"Test"|]);
+                    }
+                }
+            }
+            """;
+
+        const string fixedCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        throw new ArgumentException(@"Test.");
+                    }
+                }
+            }
+            """;
+
+        // Act
+        var test = CreateTest(sourceCode, fixedCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that the code fix appends a dot when a trailing escaped newline is in a string literal.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_StringLiteral_WithEscapedNewline_AppendsDot()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        throw new ArgumentException([|"Line1\nLine2"|]);
+                    }
+                }
+            }
+            """;
+
+        const string fixedCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        throw new ArgumentException("Line1\nLine2.");
+                    }
+                }
+            }
+            """;
+
+        // Act
+        var test = CreateTest(sourceCode, fixedCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that the code fix appends a dot to a raw string literal containing a quote character.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_RawStringLiteral_WithQuote_AppendsDot()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """""
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        throw new ArgumentException([|""""Test "string" without dot""""|]);
+                    }
+                }
+            }
+            """"";
+
+        const string fixedCode =
+            /* lang=c# */
+            """""
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        throw new ArgumentException(""""Test "string" without dot."""");
+                    }
+                }
+            }
+            """"";
+
+        // Act
+        var test = CreateTest(sourceCode, fixedCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that the code fix appends a dot to an interpolated string literal containing an escaped quote.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_InterpolatedString_WithEscapedQuote_AppendsDot()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        const string test = "test";
+                        throw new ArgumentException([|$"Error \"{test}\" without dot"|]);
+                    }
+                }
+            }
+            """;
+
+        const string fixedCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        const string test = "test";
+                        throw new ArgumentException($"Error \"{test}\" without dot.");
+                    }
+                }
+            }
+            """;
+
+        // Act
+        var test = CreateTest(sourceCode, fixedCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that the code fix appends a dot to an interpolated string literal containing an escaped quote at the start.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_InterpolatedString_WithEscapedQuoteAtStart_AppendsDot()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        const string test = "test";
+                        throw new ArgumentException([|$"\"Error\" {test} without dot"|]);
+                    }
+                }
+            }
+            """;
+
+        const string fixedCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        const string test = "test";
+                        throw new ArgumentException($"\"Error\" {test} without dot.");
+                    }
+                }
+            }
+            """;
+
+        // Act
+        var test = CreateTest(sourceCode, fixedCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that the code fix appends a dot to an interpolated string literal containing an escaped quote at the end.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_InterpolatedString_WithEscapedQuoteAtEnd_AppendsDot()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        const string test = "test";
+                        throw new ArgumentException([|$"Error {test} without \"dot\""|]);
+                    }
+                }
+            }
+            """;
+
+        const string fixedCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        const string test = "test";
+                        throw new ArgumentException($"Error {test} without \"dot\".");
+                    }
+                }
+            }
+            """;
+
+        // Act
+        var test = CreateTest(sourceCode, fixedCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that the code fix appends a dot to an interpolated verbatim string literal containing an escaped (doubled) quote.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_InterpolatedVerbatimString_WithEscapedQuote_AppendsDot()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        const string test = "test";
+                        throw new ArgumentException([|$@"Test ""{test}"" without dot"|]);
+                    }
+                }
+            }
+            """;
+
+        const string fixedCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        const string test = "test";
+                        throw new ArgumentException($@"Test ""{test}"" without dot.");
+                    }
+                }
+            }
+            """;
+
+        // Act
+        var test = CreateTest(sourceCode, fixedCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that the code fix appends a dot to an interpolated string whose last text segment contains an escaped brace.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_InterpolatedString_WithEscapedBrace_AppendsDot()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        const string test = "test";
+                        throw new ArgumentException([|$"{test}: {{escaped}}"|]);
+                    }
+                }
+            }
+            """;
+
+        const string fixedCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        const string test = "test";
+                        throw new ArgumentException($"{test}: {{escaped}}.");
+                    }
+                }
+            }
+            """;
+
+        // Act
+        var test = CreateTest(sourceCode, fixedCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+
+    /// <summary>
+    /// Verifies that an empty string exception message is not flagged, so no code fix is offered for it.
+    /// </summary>
+    [Fact]
+    public async Task CodeFix_EmptyString_NoDiagnosticReported()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        throw new ArgumentException("");
+                    }
+                }
+            }
+            """;
+
+        // Act
+        var test = CreateTest(sourceCode, sourceCode);
+
+        // Assert
+        await test.RunAsync();
+    }
+}

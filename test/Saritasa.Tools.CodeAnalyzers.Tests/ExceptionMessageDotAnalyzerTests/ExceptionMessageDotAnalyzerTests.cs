@@ -1,4 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Testing;
+using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
 using Saritasa.Tools.CodeAnalyzers.Analyzers;
 using Xunit;
@@ -78,6 +78,73 @@ public class ExceptionMessageDotAnalyzerTests
             """;
 
         context.TestCode = sourceCode;
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Validates that an exception message with trailing whitespace after a dot does not produce a warning.
+    /// </summary>
+    [Fact]
+    public async Task ExceptionMessage_TrailingWhitespaceAfterDot_ShouldNotProduceWarning()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        throw new ArgumentException("Error. ");
+                    }
+                }
+            }
+            """;
+
+        // Act
+        context.TestCode = sourceCode;
+
+        // Assert
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Validates that an empty exception message does not produce a warning, since it has no phrasing
+    /// to be consistent with.
+    /// </summary>
+    [Fact]
+    public async Task ExceptionMessage_EmptyString_ShouldNotProduceWarning()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        throw new ArgumentException("");
+                    }
+                }
+            }
+            """;
+
+        // Act
+        context.TestCode = sourceCode;
+
+        // Assert
         await context.RunAsync();
     }
 
@@ -324,6 +391,72 @@ public class ExceptionMessageDotAnalyzerTests
     }
 
     /// <summary>
+    /// Validates that a ternary operator with mixed dot presence produces a warning.
+    /// </summary>
+    [Fact]
+    public async Task ExceptionMessage_TernaryOperator_MixedDot_ShouldProduceWarning()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(bool isValid)
+                    {
+                        throw new ArgumentException([|isValid ? "Valid." : "Invalid"|]);
+                    }
+                }
+            }
+            """;
+
+        // Act
+        context.TestCode = sourceCode;
+
+        // Assert
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Validates that a ternary operator with reversed mixed dot presence produces a warning.
+    /// </summary>
+    [Fact]
+    public async Task ExceptionMessage_TernaryOperator_MixedDotReversed_ShouldProduceWarning()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(bool isValid)
+                    {
+                        throw new ArgumentException([|isValid ? "Invalid" : "Valid."|]);
+                    }
+                }
+            }
+            """;
+
+        // Act
+        context.TestCode = sourceCode;
+
+        // Assert
+        await context.RunAsync();
+    }
+
+    /// <summary>
     /// Validates that null coalescing operator without dot produces a warning.
     /// </summary>
     [Fact]
@@ -448,6 +581,80 @@ public class ExceptionMessageDotAnalyzerTests
     }
 
     /// <summary>
+    /// Validates that a switch expression with mixed dot presence produces a warning.
+    /// </summary>
+    [Fact]
+    public async Task ExceptionMessage_SwitchExpression_MixedDot_ShouldProduceWarning()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(int code)
+                    {
+                        throw new ArgumentException([|code switch
+                        {
+                            1 => "One.",
+                            _ => "Two"
+                        }|]);
+                    }
+                }
+            }
+            """;
+
+        // Act
+        context.TestCode = sourceCode;
+
+        // Assert
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Validates that a switch expression with reversed mixed dot presence produces a warning.
+    /// </summary>
+    [Fact]
+    public async Task ExceptionMessage_SwitchExpression_MixedDotReversed_ShouldProduceWarning()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(int code)
+                    {
+                        throw new ArgumentException([|code switch
+                        {
+                            1 => "One",
+                            _ => "Two."
+                        }|]);
+                    }
+                }
+            }
+            """;
+
+        // Act
+        context.TestCode = sourceCode;
+
+        // Assert
+        await context.RunAsync();
+    }
+
+    /// <summary>
     /// Validates that a binary operation in exception message without a dot produces a warning.
     /// </summary>
     [Fact]
@@ -504,6 +711,40 @@ public class ExceptionMessageDotAnalyzerTests
             """;
 
         context.TestCode = sourceCode;
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Validates that nested binary concatenation without a dot produces a warning.
+    /// </summary>
+    [Fact]
+    public async Task ExceptionMessage_NestedBinaryOperation_WithoutDot_ShouldProduceWarning()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        var error = "Error";
+                        throw new ArgumentException([|error + " detail" + " info"|]);
+                    }
+                }
+            }
+            """;
+
+        // Act
+        context.TestCode = sourceCode;
+
+        // Assert
         await context.RunAsync();
     }
 
@@ -715,6 +956,105 @@ public class ExceptionMessageDotAnalyzerTests
     }
 
     /// <summary>
+    /// Validates that a multi-argument exception constructor with message without dot produces a warning.
+    /// </summary>
+    [Fact]
+    public async Task ExceptionMessage_MultiArgConstructor_WithoutDot_ShouldProduceWarning()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        throw new ArgumentException([|"Error"|], new Exception("Inner error."));
+                    }
+                }
+            }
+            """;
+
+        // Act
+        context.TestCode = sourceCode;
+
+        // Assert
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Validates that exception constructor with non-message parameter name does not produce a warning.
+    /// </summary>
+    [Fact]
+    public async Task ExceptionMessage_NonMessageParameter_ShouldNotProduceWarning()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        throw new ArgumentNullException("paramName");
+                    }
+                }
+            }
+            """;
+
+        // Act
+        context.TestCode = sourceCode;
+
+        // Assert
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Validates that exception constructor with both paramName and message parameters produces a warning when message lacks a dot.
+    /// </summary>
+    [Fact]
+    public async Task ExceptionMessage_ParamNameAndMessage_WithoutDot_ShouldProduceWarning()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod()
+                    {
+                        throw new ArgumentNullException("paramName", [|"Error without dot"|]);
+                    }
+                }
+            }
+            """;
+
+        // Act
+        context.TestCode = sourceCode;
+
+        // Assert
+        await context.RunAsync();
+    }
+
+    /// <summary>
     /// Validates that string.Format without dot produces a warning.
     /// </summary>
     [Fact]
@@ -769,6 +1109,77 @@ public class ExceptionMessageDotAnalyzerTests
             """;
 
         context.TestCode = sourceCode;
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Validates that string.Format with non-constant format argument does not produce a warning.
+    /// </summary>
+    [Fact]
+    public async Task ExceptionMessage_StringFormat_NonConstantFormat_ShouldNotProduceWarning()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(int id, string format)
+                    {
+                        throw new ArgumentException(string.Format(format, id));
+                    }
+                }
+            }
+            """;
+
+        // Act
+        context.TestCode = sourceCode;
+
+        // Assert
+        await context.RunAsync();
+    }
+
+    /// <summary>
+    /// Validates that a custom Format method with same signature as string.Format does not produce a warning.
+    /// </summary>
+    [Fact]
+    public async Task ExceptionMessage_CustomFormatMethod_ShouldNotProduceWarning()
+    {
+        // Arrange
+        const string sourceCode =
+            /* lang=c# */
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+
+            namespace TestApplication
+            {
+                class TestClass
+                {
+                    public void TestMethod(int id)
+                    {
+                        throw new ArgumentException(Formatter.Format("Error {0}", id));
+                    }
+                }
+
+                static class Formatter
+                {
+                    public static string Format(string format, object arg0) => format;
+                }
+            }
+            """;
+
+        // Act
+        context.TestCode = sourceCode;
+
+        // Assert
         await context.RunAsync();
     }
 }
