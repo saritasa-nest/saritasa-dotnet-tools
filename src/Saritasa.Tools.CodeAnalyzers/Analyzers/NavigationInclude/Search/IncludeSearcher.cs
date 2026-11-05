@@ -246,13 +246,23 @@ internal sealed class IncludeSearcher
     /// of "Select((u, i) =&gt; ...)", we cannot tell what it holds.
     /// </summary>
     private Answer ReadLambdaSource(Write.LambdaParameter lambda, NavigationPath path)
-        => SearchSources(
-            BridgeCrosser.FromLambdaParameter(
-                lambda.Lambda,
-                lambda.Parameter.Ordinal,
-                lambda.Creation.FlowGraph.Bridges),
-            lambda.Creation,
-            path);
+    {
+        var crossings = BridgeCrosser.FromLambdaParameter(
+            lambda.Lambda,
+            lambda.Parameter.Ordinal,
+            lambda.Creation.FlowGraph.Bridges);
+
+        // The parameter is not a value of its own to name, so name the call that fills it and the callback it
+        // arrives through: that is where an annotation would go.
+        if (crossings.Count == 0 &&
+            BridgeCrosser.GetLambdaArgument(lambda.Lambda) is
+                { Parameter: { } callback, Parent: IInvocationOperation call })
+        {
+            return Answer.UnknownCallback(call, new BridgeEnd.Parameter(callback.Name, lambda.Parameter.Ordinal));
+        }
+
+        return SearchSources(crossings, lambda.Creation, path);
+    }
 
     /// <summary>
     /// The answer for the values the bridges landed on, each asked for the path with what its bridge put in front

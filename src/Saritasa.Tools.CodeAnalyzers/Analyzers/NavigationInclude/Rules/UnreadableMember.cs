@@ -1,7 +1,9 @@
 using System.Collections.Immutable;
+using System.Globalization;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Operations;
 using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Bridging;
+using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Search;
 
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Rules;
 
@@ -12,7 +14,7 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Rules;
 internal static class UnreadableMember
 {
     /// <summary>
-    /// Key of the declaring type on the diagnostic.
+    /// Key of the declaring type on the diagnostic, as written inside "typeof(...)".
     /// </summary>
     public const string TypeKey = "UnreadableType";
 
@@ -22,9 +24,30 @@ internal static class UnreadableMember
     public const string MethodKey = "UnreadableMethod";
 
     /// <summary>
-    /// Key of the parameter the entities would come from, empty for a property or an instance method.
+    /// Key of the method's documentation id, which finds the method again in the code fix, so that an
+    /// annotation can go on the method itself when its source is in the solution.
     /// </summary>
-    public const string ParameterKey = "UnreadableParameter";
+    public const string MethodIdKey = "UnreadableMethodId";
+
+    /// <summary>
+    /// Key of the parameters the entities could come from, separated by <see cref="ParameterSeparator"/>.
+    /// </summary>
+    public const string ParametersKey = "UnreadableParameters";
+
+    /// <summary>
+    /// Key of the callback parameter the entities arrived through. Absent when they arrived at the result.
+    /// </summary>
+    public const string CallbackKey = "UnreadableCallback";
+
+    /// <summary>
+    /// Key of the position inside the callback the entities arrived at. Absent when they arrived at the result.
+    /// </summary>
+    public const string CallbackPositionKey = "UnreadableCallbackPosition";
+
+    /// <summary>
+    /// Separates the names under <see cref="ParametersKey"/>. A parameter name cannot contain it.
+    /// </summary>
+    public const char ParameterSeparator = ',';
 
     /// <summary>
     /// Returns how to name the member in a message, e.g. "SomeLib.QueryExtensions.Paginate".
@@ -48,40 +71,61 @@ internal static class UnreadableMember
     /// no annotation worth offering.
     /// </summary>
     /// <remarks>
-    /// Two cases where a fix would not help: a property, which no annotation can describe; and a method the
-    /// rules would refuse, which swaps this warning for an INCL006.
+    /// A fix is offered only when the annotation would be allowed and would let the search go on. So nothing
+    /// for a property, which no annotation can describe; nothing for a method that is already annotated, since
+    /// a second line would not help either; and nothing when no parameter holds the same entity, which covers
+    /// an instance method and a change of entity type alike, both of which the rules refuse.
     /// </remarks>
-    /// <param name="unknownSource">The value the search could not read.</param>
+    /// <param name="unknown">Where the search stopped.</param>
+    /// <param name="bridges">Every bridge the compilation can see.</param>
     /// <returns>Properties for the code fix.</returns>
-    public static ImmutableDictionary<string, string?> GetProperties(IOperation? unknownSource)
+    public static ImmutableDictionary<string, string?> GetProperties(Answer.UnknownAnswer unknown, Bridges bridges)
     {
-        if (FindMember(unknownSource) is not IMethodSymbol { ContainingType: { } containingType } method)
+        if (FindMember(unknown.UnreadableValue) is not IMethodSymbol { ContainingType: { } containingType } method ||
+            IsAnnotated(method, unknown.From, bridges))
         {
             return ImmutableDictionary<string, string?>.Empty;
         }
 
-        var parameterName = GetSourceParameterName(method);
-
-        if (!CustomBridgeRules.IsAllowed(method, BuildBridge(parameterName), out _))
+        var parameters = GetSourceParameters(method, unknown.From);
+        if (parameters.Count == 0)
         {
             return ImmutableDictionary<string, string?>.Empty;
         }
 
-        return ImmutableDictionary<string, string?>.Empty
+        var properties = ImmutableDictionary<string, string?>.Empty
             .Add(TypeKey, GetUnboundTypeName(containingType))
             .Add(MethodKey, method.Name)
-            .Add(ParameterKey, parameterName);
+            .Add(MethodIdKey, DocumentationCommentId.CreateDeclarationId(method))
+            .Add(ParametersKey, string.Join(ParameterSeparator.ToString(), parameters));
+
+        return unknown.From is BridgeEnd.Parameter callback
+            ? properties
+                .Add(CallbackKey, callback.Name)
+                .Add(CallbackPositionKey, callback.LambdaPosition.ToString(CultureInfo.InvariantCulture))
+            : properties;
     }
 
     /// <summary>
-    /// The bridge the code fix would write: out of the result, into the named parameter or the instance.
+    /// True when a bridge already runs from that end of the method, and only could not be crossed at this call.
     /// </summary>
-    private static Bridge BuildBridge(string parameterName)
-        => new(
-            new BridgeEnd.Result(),
-            parameterName.Length == 0
-                ? new BridgeEnd.Instance()
-                : new BridgeEnd.Parameter(parameterName));
+    private static bool IsAnnotated(IMethodSymbol method, BridgeEnd from, Bridges bridges)
+        => from is BridgeEnd.Parameter callback
+            ? bridges.FindFromParameter(method, callback.Name, callback.LambdaPosition).Count > 0
+            : bridges.FindFromResult(method).Count > 0;
+
+    /// <summary>
+    /// The parameters an annotation could name: every one that holds the same entity as the end the search
+    /// stands on. A callback and an out parameter are where entities arrive, never where they come from.
+    /// </summary>
+    private static IReadOnlyList<string> GetSourceParameters(IMethodSymbol method, BridgeEnd from)
+        => method.Parameters
+            .Where(parameter =>
+                parameter.RefKind != RefKind.Out &&
+                parameter.Type is not INamedTypeSymbol { DelegateInvokeMethod: not null } &&
+                CustomBridgeRules.IsSuggestable(method, new Bridge(from, new BridgeEnd.Parameter(parameter.Name))))
+            .Select(parameter => parameter.Name)
+            .ToList();
 
     /// <summary>
     /// The name to write inside "typeof(...)", unbound: <c>PagedResult&lt;&gt;</c>, not
@@ -111,12 +155,4 @@ internal static class UnreadableMember
             IPropertyReferenceOperation reference => reference.Property.OriginalDefinition,
             _ => null,
         };
-
-    /// <summary>
-    /// The parameter an annotation would name: the first one for an extension method, none otherwise.
-    /// </summary>
-    private static string GetSourceParameterName(IMethodSymbol method)
-        => method is { IsExtensionMethod: true, Parameters.Length: > 0 }
-            ? method.Parameters[0].Name
-            : string.Empty;
 }

@@ -750,3 +750,144 @@ The graph has no jumps for exceptions. The first block of a `catch`, a `catch wh
 incoming jumps, so it looks unreachable. But an exception can leave the `try` block after any statement, so
 **every place inside the `try`** counts as a way into the handler. For a `finally` after `try/catch`, the
 `catch` blocks are included too. This is the only reason the walker does more than `block.Predecessors`.
+
+## When the analyzer cannot read the code
+
+The analyzer follows only members a bridge is written for. `System.Linq`, EF Core and the collection types are
+in `BuiltInBridges`, so they work with no setup. Anything else has to be annotated by the project:
+
+```csharp
+var page = query.Paginate(1);   // a library method: nobody annotated it
+var user = page.Items[0];       // a library property: nothing can annotate it
+```
+
+For a library, the analyzer reports **INCL004**: it cannot read the code. For a method in the project's own
+code it reports **INCL002** instead, because that method can be read and it promises nothing. In both cases the
+answer is `[PassesIncludes]`, which means "this method hands back the entities it was given":
+
+```csharp
+[PassesIncludes(nameof(query))]                      // names the parameter the entities come from
+public static PagedResult<User> Paginate(this IQueryable<User> query, int page)
+```
+
+For a library the project does not own, the attribute goes on the assembly, before the namespace:
+
+```csharp
+[assembly: PassesIncludes(typeof(SomeLib.QueryExtensions), "Paginate", "query")]
+```
+
+Assembly attributes are read from the project itself and from every project and package it references, so a
+shared project can annotate a library once for the whole solution. An attribute that names a member that does
+not exist is **INCL005**, and one the rules do not allow is **INCL006**; both are ignored by the search.
+
+The attribute does not say *which* property is loaded. It only says **where the entities come from**, and the
+search continues from there.
+
+### The code fix
+
+Nobody has to write these by hand. INCL004 offers the annotation for the member that stopped the search, and the
+work is split between the analyzer, which knows what may be written, and the fix, which knows where to write it.
+
+**What the diagnostic carries.** `Answer.Unknown` names the value that stopped the search and `From`, the end of
+the call the search found the entities at: its `Result`, or a `Parameter` of a callback when the search stopped
+at a lambda parameter, as the `u` of `items.ForEachItem(u => ...)`. That is the `From` of the bridge that is
+missing. `UnreadableMember.GetProperties` turns it into strings on the diagnostic, since that is all a
+diagnostic can carry to a code fix:
+
+| Key | Holds |
+|---|---|
+| `UnreadableType` | the declaring type as written in `typeof(...)`, unbound: `SomeLib.Page<>` |
+| `UnreadableMethod` | the method name |
+| `UnreadableMethodId` | its documentation id, to find the method again in the solution |
+| `UnreadableParameters` | every parameter the entities may come from, comma-separated |
+| `UnreadableCallback`, `UnreadableCallbackPosition` | the callback and the position in it, only when the entities arrived through one |
+
+A parameter is offered when `CustomBridgeRules.IsSuggestable` holds for a bridge from `From` to it: the method is
+static, and both ends are *known* to hold the same entity. That is stricter than `IsAllowed`, which lets an
+`object` through because an annotation somebody wrote is given the benefit of the doubt; a suggestion is not.
+Callbacks and `out` parameters are never offered, because entities arrive there, they do not come from there.
+
+No properties means no fix, and that is how every limit is enforced:
+
+| No fix for | Because |
+|---|---|
+| an instance method | INCL006 would reject it |
+| a property, `page.Items` | an attribute cannot describe one |
+| a change of entity type, a container of its own that is not `IEnumerable<T>` | no parameter holds the same entity |
+| a member that already has a bridge from that end | it is there and only could not be crossed at this call, so a second line would not help |
+
+**Where it is written.** `PassesIncludesCodeFixProvider` finds the method by its id. If its source is in the
+solution and its project references the attributes, the attribute goes on the method, with the `using` added only
+where it is missing:
+
+```csharp
+[PassesIncludes(nameof(items), ToCallback = nameof(action))]
+public static void ForEachItem<T>(this IEnumerable<T> items, Action<T> action)
+```
+
+Otherwise the line goes into `NavigationIncludes.cs`, created on first use the way Visual Studio keeps
+`GlobalSuppressions.cs`, and appended to after that. The fix always names the parameter, even for an extension
+method, so the line says the same thing whoever reads it.
+
+One parameter gives one action. Several give a submenu, "Mark TakePage as passing includes from ▸", with one
+entry per parameter.
+
+## Files
+
+The folders are subsystems, each answering one question. A class that mostly *does* something is named for the
+job it does — `IncludeSearcher`, `WritesWalker`, `BridgeCrosser`, `EfIncludeReader` — and a class that mostly
+*is* something keeps a plain noun: `Value`, `Write`, `Answer`, `Bridge`.
+
+**`Search/` — is the property loaded in this value?**
+
+| File | What it does |
+|---|---|
+| `IncludeSearcher.cs` | The only class that decides. `Check`: reads a value, asks the walker, joins the paths. |
+| `WritesWalker.cs` | Where a variable was written: the backward walk through statements, blocks and bodies. |
+| `Write.cs` | One thing the walker found. A fact about the code, never a decision. |
+| `Value.cs` | What the search looks at: an expression and the position it is read at. |
+| `Answer.cs` | What the search decided: `Loaded`, `NotLoaded`, `NotRequiredBy` or `Unknown`. |
+| `CodePosition.cs` | A point in execution: graph + block + number of statements already run. |
+| `FlowGraph.cs` | One body and its control flow graph. Lists its statements, lambdas and local functions included. |
+
+**`Bridging/` — may the entities move, and where from?**
+
+| File | What it does |
+|---|---|
+| `Bridge.cs` | One annotated move of entities: a `From` end, a `To` end and a `Step`. |
+| `BridgeEnd.cs` | One side of a move: `Result`, `Instance` or `Parameter(name, lambdaPosition)`. |
+| `PathStep.cs` | What crossing a bridge does to the path: keep it, or put a selector's member chain in front of it. |
+| `Crossing.cs` | One crossed bridge: the value the search continues from, and what goes in front of the path. |
+| `Bridges.cs` | Every bridge the compilation can see, the built-in ones included, and the lookups over them. The only place that decides what is followed. |
+| `BuiltInBridges.cs` | The catalogue: one line per member of `System.Linq`, EF Core and the collection types that the search may cross. |
+| `BuiltInBridge.cs` | One line of that catalogue: the member, the move, and which overloads it describes. |
+| `CustomBridge.cs` | One `[assembly: PassesIncludes]`: the member and the move, with the type already resolved. |
+| `CustomBridgeRules.cs` | What a bridge somebody writes may say, what the code fix may suggest, and the container table behind the entity-type rule. |
+| `PassesIncludesReader.cs` | The attribute, turned into a `Bridge` once for everyone who reads it. |
+| `BridgeCrosser.cs` | Which values the entities came from, one method per shape the search stands on. The only file that walks bridges. |
+
+**`Rules/` — what do we report?**
+
+| File | What it does |
+|---|---|
+| `IncludeFlowHandler.cs` | Finds the places to check, calls `Check`, reports INCL001 – INCL004. |
+| `BridgeAttributeHandler.cs` | INCL005 and INCL006: a `[PassesIncludes]` that names nothing, or that the rules do not allow. |
+| `NavigationIncludeRulesProvider.cs` | The diagnostic descriptors and their ids. |
+| `UnreadableMember.cs` | The member that stopped the search, and what INCL004 carries for the code fix. |
+
+**`Requirements/` — what did the author ask for?**
+
+| File | What it does |
+|---|---|
+| `AttributeReader.cs` | Reads `[IncludeRequired]`, `[Includes]` and `[TrackIncludeRequired]` from symbols. |
+| `IncludeRequirement.cs` | One `[IncludeRequired(parameter, path)]` pair. |
+| `NavigationPath.cs` | The path asked for, `Settings.Profile`, and how far an Include chain has matched it. |
+
+**The rest**
+
+| File | What it does |
+|---|---|
+| `NavigationIncludeAnalyzer.cs` | Registers the two handlers in Roslyn and reads the bridges once per compilation. |
+| `EntityFramework/EfIncludeReader.cs` | The only rule that knows EF: reads the property names from `Include(u => u.Profile)` and `ThenInclude`. |
+| `Roslyn/RoslynReader.cs` | Roslyn details with no meaning of their own: wrappers, the receiver of a call, lambda syntax. |
+| `CodeFixes/PassesIncludesCodeFixProvider.cs` | The code fix for INCL004: writes a `[PassesIncludes]`, on the method or in `NavigationIncludes.cs`. |

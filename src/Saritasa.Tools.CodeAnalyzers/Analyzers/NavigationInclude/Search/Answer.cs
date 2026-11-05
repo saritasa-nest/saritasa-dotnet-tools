@@ -1,4 +1,6 @@
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Operations;
+using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Bridging;
 using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Requirements;
 
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Search;
@@ -32,7 +34,7 @@ internal abstract class Answer
     /// <summary>
     /// The answer before the value that stopped the search is known.
     /// </summary>
-    private static UnknownAnswer UnnamedUnknown { get; } = new(null);
+    private static UnknownAnswer UnnamedUnknown { get; } = new(null, new BridgeEnd.Result());
 
     /// <summary>
     /// The search followed the entities to the end and the path is not loaded there: "dbContext.Users" with no
@@ -60,7 +62,17 @@ internal abstract class Answer
     /// <param name="unreadableValue">The value that stopped the search, when it is already known.</param>
     /// <returns>Answer.</returns>
     public static Answer Unknown(IOperation? unreadableValue = null)
-        => unreadableValue is null ? UnnamedUnknown : new UnknownAnswer(unreadableValue);
+        => unreadableValue is null ? UnnamedUnknown : new UnknownAnswer(unreadableValue, new BridgeEnd.Result());
+
+    /// <summary>
+    /// The search reached a parameter of a callback that a call nobody annotated was given, as the <c>u</c> of
+    /// <c>users.ForEachItem(u =&gt; ...)</c>, so it cannot tell where the call took the entities from.
+    /// </summary>
+    /// <param name="call">The call that was given the callback.</param>
+    /// <param name="callback">The callback parameter of the call, and the position inside it.</param>
+    /// <returns>Answer.</returns>
+    public static Answer UnknownCallback(IInvocationOperation call, BridgeEnd.Parameter callback)
+        => new UnknownAnswer(call, callback);
 
     /// <summary>
     /// See <see cref="Loaded"/>.
@@ -127,9 +139,11 @@ internal abstract class Answer
         /// Initializes the answer.
         /// </summary>
         /// <param name="unreadableValue">The value that stopped the search, when it is already known.</param>
-        public UnknownAnswer(IOperation? unreadableValue)
+        /// <param name="from">Where the search found the entities at that value.</param>
+        public UnknownAnswer(IOperation? unreadableValue, BridgeEnd from)
         {
             UnreadableValue = unreadableValue;
+            From = from;
         }
 
         /// <summary>
@@ -137,5 +151,12 @@ internal abstract class Answer
         /// Null until the deepest value of the search that sees it names it.
         /// </summary>
         public IOperation? UnreadableValue { get; }
+
+        /// <summary>
+        /// Where the search found the entities at <see cref="UnreadableValue"/>: what it handed back, or a
+        /// parameter of a callback it was given. This is the <see cref="Bridge.From"/> of the bridge that is
+        /// missing, which the code fix offers to write.
+        /// </summary>
+        public BridgeEnd From { get; }
     }
 }
