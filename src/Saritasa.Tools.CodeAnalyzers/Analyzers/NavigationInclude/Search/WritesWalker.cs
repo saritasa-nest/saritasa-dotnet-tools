@@ -89,7 +89,7 @@ internal sealed class WritesWalker
         return operation switch
         {
             // "user = ..." and "var user = ...": the variable comes from the assigned value.
-            ISimpleAssignmentOperation assignment when WritesVariable(assignment, variable)
+            ISimpleAssignmentOperation assignment when WritesVariable(assignment, statement, variable, path)
                 => new Write.Written(Value.Create(assignment.Value, statement)),
 
             // "user.Settings = ..." or "user.Settings.Profile = ..." for "Settings.Profile" (the compiler also
@@ -97,7 +97,7 @@ internal sealed class WritesWalker
             // keeps reading upward.
             ISimpleAssignmentOperation assignment when
                 ReadAssignedCount(assignment, statement, variable, path) is { } assignedCount
-                => new Write.MemberWritten(Value.Create(assignment.Value, statement), assignedCount, statement),
+                => new Write.MemberWritten(assignedCount, statement),
 
             // "#1 = ...": a temporary value the compiler creates for ?:, ??, object initializers and foreach.
             IFlowCaptureOperation capture when AreSame(capture.Id, variable)
@@ -112,10 +112,15 @@ internal sealed class WritesWalker
     }
 
     /// <summary>
-    /// True for "user = ...", where the variable itself is assigned.
+    /// True for "user = ...", where the variable itself is assigned. The compiler writes "user = x" through a
+    /// temporary when x spans several statements, as "#0 = user; ...; #0 = #1": the temporary then stands for user.
     /// </summary>
-    private static bool WritesVariable(ISimpleAssignmentOperation assignment, object variable)
-        => AreSame(GetVariable(assignment.Target), variable);
+    private bool WritesVariable(ISimpleAssignmentOperation assignment, CodePosition statement, object variable, NavigationPath path)
+    {
+        var target = ReadThroughCapture(assignment.Target, statement, variable, path) ?? assignment.Target;
+
+        return AreSame(GetVariable(target), variable);
+    }
 
     /// <summary>
     /// For "user.Settings = ..." or "user.Settings.Profile = ...": how many properties at the start of the path
@@ -163,7 +168,9 @@ internal sealed class WritesWalker
         // path writes cannot name a single target.
         var writes = FindWrites(reference.Id, statement, path).ToList();
 
-        return writes.Count == 1 && writes[0] is Write.Written written ? written.Value.Operation : null;
+        return writes.Count == 1 && writes[0] is Write.Written written
+            ? written.Value.Operation
+            : null;
     }
 
     /// <summary>

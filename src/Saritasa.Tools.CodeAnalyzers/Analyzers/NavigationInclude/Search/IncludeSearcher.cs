@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis.Operations;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Bridging;
 using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.EntityFramework;
 using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Requirements;
@@ -66,6 +67,12 @@ internal sealed class IncludeSearcher
     private Answer ReadValue(Value value, NavigationPath path)
         => value.Operation switch
         {
+            // "user with { Settings = ... }": a record copied into a new object. The compiler lowers it to a call of the
+            // record's clone method, so it is recognized by its syntax. It counts as created, the same as "new", and is
+            // checked before the variable below, since the variable is only the copied record.
+            _ when value.Operation.Syntax is WithExpressionSyntax
+                => Answer.Loaded,
+
             // "user", "users", "out var user", "#1": reading a variable is the only expression whose answer
             // depends on what ran before it, so it is the only one the walker has to follow.
             _ when WritesWalker.GetVariable(value.Operation) is { } variable

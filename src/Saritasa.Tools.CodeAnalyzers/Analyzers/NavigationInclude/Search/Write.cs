@@ -42,20 +42,13 @@ internal abstract class Write
         /// <summary>
         /// Initializes the write.
         /// </summary>
-        /// <param name="value">The value that was assigned.</param>
         /// <param name="assignedCount">How many properties at the start of the path the assignment goes through.</param>
         /// <param name="statement">The assignment.</param>
-        public MemberWritten(Value value, int assignedCount, CodePosition statement)
+        public MemberWritten(int assignedCount, CodePosition statement)
         {
-            Value = value;
             AssignedCount = assignedCount;
             Statement = statement;
         }
-
-        /// <summary>
-        /// The value that was assigned: "x" of "user.Settings = x".
-        /// </summary>
-        public Value Value { get; }
 
         /// <summary>
         /// How many properties at the start of the path the assignment goes through: 2 for

@@ -124,7 +124,9 @@ loading a property.
 
 **Deliberately optimistic.**
 
-- `new User()` counts as loaded: there was no query, so no `Include` to miss.
+- `new User()`, `new User { … }` and `user with { … }` count as loaded: the object is created here, so there was no
+  query to miss. Assigning a property loads it and everything under it, whatever the value is; see
+  [Re-initialization](#re-initialization).
 - Reads inside an expression tree, `query.Where(u => u.Profile.IsActive)`, are not checked, because EF translates
   them to SQL.
 - Only properties marked `[TrackIncludeRequired]` are checked at all.
@@ -744,6 +746,7 @@ The control flow graph holds simplified code. These constructs look different fr
 | `flag ? a : b`, `a ?? b` | two blocks write `#1`, then they join | both paths are searched |
 | `user?.Settings?.Profile` | `#0 = user; #1 = #0.Settings; #1.Profile`, across blocks | each read is checked on its own, and the search follows `#1` back through its write, so `?.` gives the same answers as `.` |
 | `user.Profile = new UserProfile { … }` | the target `user.Profile` is captured before the initializer runs, and assigned later | whether a property reference is the left side of a plain `=` is read on the code as written, so it is never mistaken for a read |
+| `user = user with { … }`, or `user = x` where `x` spans several statements | the target is captured first, as `#0 = user; … #0 = #1` | the walker takes `#0` to be `user`; a record's copy is a call of its clone method, recognized by its syntax |
 
 `#1` is a temporary variable the compiler creates. The walker treats it as any other variable.
 
@@ -764,3 +767,22 @@ The graph has no jumps for exceptions. The first block of a `catch`, a `catch wh
 incoming jumps, so it looks unreachable. But an exception can leave the `try` block after any statement, so
 **every place inside the `try`** counts as a way into the handler. For a `finally` after `try/catch`, the
 `catch` blocks are included too. This is the only reason the walker does more than `block.Predecessors`.
+
+### Re-initialization
+
+Assigning to the loaded object, or to a part of it, changes what is loaded from that point on:
+
+| Assignment | Loaded afterwards |
+|---|---|
+| `user.Settings = x` | `Settings` and everything under it, whatever `x` is, `null` included. The chain in front of `Settings` is still checked before the assignment |
+| `user.Address = x` | `Address` and everything under it; other paths keep what the query loaded |
+| `user = new User { … }` or `user = user with { … }` | the whole object: it is a new object, so it counts as loaded |
+| `user = query` or `user = other` | the value is read as before, so the `Include`s of the query still decide |
+| an assignment on one branch only | loaded on that branch; the other branch is read as before |
+| an assignment after a use | does not help that use |
+
+Constructor arguments are never read: `new User(settings)` counts as loaded, like any object creation.
+
+Out of scope: an assignment inside a called method, a lambda or a local function, which is not analyzed as
+everywhere else; a `foreach` over elements is judged like any other statement, so elements that the query did not
+load give INCL002.

@@ -807,4 +807,87 @@ public class LocalVariableTests : NavigationIncludeTestBase
 
         await VerifyAnalyzerAsync(sourceCode);
     }
+
+    /// <summary>
+    /// No INCL002: "view with { ... }" builds a new object, so it counts as loaded, the same as "new".
+    /// </summary>
+    [Fact]
+    public async Task Handle_RecordWithExpression_NoIncl2()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass(AppDbContext dbContext)
+                {
+                    public record UserView
+                    {
+                        public int Id { get; init; }
+                        public UserSettings Settings { get; init; }
+                    }
+
+                    async Task Handle(SaveUserDto dto)
+                    {
+                        var view = LoadView(dto.Id);
+                        view = view with { Id = 2 };
+
+                        // No INCL002: the copy is a new object, so it counts as loaded even though only Id was set.
+                        UpdateTimezone(view, dto);
+                    }
+
+                    UserView LoadView(int id) => throw new NotImplementedException();
+
+                    [IncludeRequired(nameof(view), "Settings.Profile")]
+                    void UpdateTimezone(UserView view, SaveUserDto dto)
+                    {
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No INCL002: constructor arguments are not read. The new object counts as loaded, and the argument's Settings
+    /// came without its Profile, which does not matter.
+    /// </summary>
+    [Fact]
+    public async Task Handle_ConstructorArgumentsCountAsLoaded_NoIncl2()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass(AppDbContext dbContext)
+                {
+                    public record UserView
+                    {
+                        public UserView(UserSettings settings)
+                        {
+                            Settings = settings;
+                        }
+
+                        public UserSettings Settings { get; init; }
+                    }
+
+                    async Task Handle(SaveUserDto dto)
+                    {
+                        var other = await dbContext.Users
+                            .Include(u => u.Settings)
+                            .FirstOrDefaultAsync(u => u.Id == dto.Id);
+                        var view = new UserView(other.Settings);
+
+                        // No INCL002: the argument is not read, so what other.Settings lacks does not matter.
+                        UpdateTimezone(view, dto);
+                    }
+
+                    [IncludeRequired(nameof(view), "Settings.Profile")]
+                    void UpdateTimezone(UserView view, SaveUserDto dto)
+                    {
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
 }

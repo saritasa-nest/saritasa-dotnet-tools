@@ -91,13 +91,6 @@ internal sealed class NavigationPath : IEquatable<NavigationPath>
     public NavigationPath TakeFirst(int count) => new(Segments.RemoveRange(count, Segments.Length - count));
 
     /// <summary>
-    /// Returns the path that is left after the first segments, e.g. "Profile" of "Settings.Profile".
-    /// </summary>
-    /// <param name="count">Number of segments to drop; fewer than there are.</param>
-    /// <returns>Shorter path, with nothing matched.</returns>
-    public NavigationPath SkipFirst(int count) => new(Segments.RemoveRange(0, count));
-
-    /// <summary>
     /// True if the remaining segments end with the chain: ["Settings", "Profile"] ends with ["Profile"] and with
     /// ["Settings", "Profile"].
     /// </summary>
