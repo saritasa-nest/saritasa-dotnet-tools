@@ -227,20 +227,15 @@ internal sealed class IncludeSearcher
 
     /// <summary>
     /// An assignment splits the path where it ends. For "Settings.Profile" after "user.Settings.Profile = x", user
-    /// must have had "Settings" before the assignment, and the property itself holds x. After
-    /// "user.Settings = x", x must have "Profile" loaded.
+    /// must have had "Settings" before the assignment, and the property itself holds x. After "user.Settings = x",
+    /// the property and everything under it count as loaded, whatever x is: x is not read.
     /// </summary>
     private Answer ReadMemberWrite(Write.MemberWritten member, object variable, NavigationPath path)
     {
-        var inFront = member.AssignedCount > 1
+        // The chain to the assigned property must still be loaded before the assignment.
+        return member.AssignedCount > 1
             ? SearchAnswerInValuesWrites(variable, member.Statement, path.TakeFirst(member.AssignedCount - 1))
             : Answer.Loaded;
-
-        var underAssigned = path.Segments.Length > member.AssignedCount
-            ? Search(member.Value, path.SkipFirst(member.AssignedCount))
-            : Answer.Loaded;
-
-        return JoinPaths([inFront, underAssigned]);
     }
 
     /// <summary>

@@ -4,7 +4,7 @@ namespace Saritasa.Tools.CodeAnalyzers.Tests.NavigationIncludeAnalyzerTests;
 
 /// <summary>
 /// INCL002: the basic ways a local variable gets its value: a query, a fresh entity, an object initializer and
-/// a method.
+/// a method. Also re-initialization of the variable or of a part of it after its first value.
 /// </summary>
 public class LocalVariableTests : NavigationIncludeTestBase
 {
@@ -210,11 +210,11 @@ public class LocalVariableTests : NavigationIncludeTestBase
     }
 
     /// <summary>
-    /// INCL002: "user.Settings = other.Settings" makes the rest of the path a question about the assigned value,
-    /// and "other" was queried without Settings.Profile.
+    /// No INCL002: "user.Settings = other.Settings" loads Settings and everything under it, whatever the assigned value
+    /// holds, so the Profile that "other" was queried without does not matter.
     /// </summary>
     [Fact]
-    public async Task Handle_StartOfPathAssignedFromQuery_ReportsIncl2()
+    public async Task Handle_StartOfPathAssignedFromQuery_NoIncl2()
     {
         var sourceCode = Preamble +
             /* lang=c# */
@@ -230,8 +230,8 @@ public class LocalVariableTests : NavigationIncludeTestBase
                             .FirstOrDefaultAsync(u => u.Id != dto.Id);
                         user.Settings = other.Settings;
 
-                        // INCL002: the assigned Settings came without its Profile.
-                        {|INCL002:UpdateTimezone(user, dto)|};
+                        // No INCL002: Settings was assigned, so the Profile it came with is not checked.
+                        UpdateTimezone(user, dto);
                     }
 
                     [IncludeRequired(nameof(user), "Settings.Profile")]
@@ -246,11 +246,11 @@ public class LocalVariableTests : NavigationIncludeTestBase
     }
 
     /// <summary>
-    /// INCL002: an object initializer is an assignment too, so "new User { Settings = other.Settings }" asks the
-    /// assigned value for the rest of the path.
+    /// No INCL002: an object initializer is an assignment too, so "new User { Settings = other.Settings }" loads
+    /// Settings and everything under it.
     /// </summary>
     [Fact]
-    public async Task Handle_ObjectInitAssignsStartOfPathFromQuery_ReportsIncl2()
+    public async Task Handle_ObjectInitAssignsStartOfPathFromQuery_NoIncl2()
     {
         var sourceCode = Preamble +
             /* lang=c# */
@@ -264,8 +264,8 @@ public class LocalVariableTests : NavigationIncludeTestBase
                             .FirstOrDefaultAsync(u => u.Id == dto.Id);
                         var user = new User { Settings = other.Settings };
 
-                        // INCL002: the assigned Settings came without its Profile.
-                        {|INCL002:UpdateTimezone(user, dto)|};
+                        // No INCL002: Settings was assigned in the initializer.
+                        UpdateTimezone(user, dto);
                     }
 
                     [IncludeRequired(nameof(user), "Settings.Profile")]
@@ -732,6 +732,74 @@ public class LocalVariableTests : NavigationIncludeTestBase
                     {
                         var user = new User { Profile = new UserProfile() };
                         return user.Profile.Timezone;
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No INCL002: assigning "Profile", which is not on the required path, leaves "Settings.Profile" to the query,
+    /// and the query Included it.
+    /// </summary>
+    [Fact]
+    public async Task Reinit_OtherPropertyAssigned_RequiredPathLoadedByQuery_NoIncl2()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task Handle(SaveUserDto dto)
+                    {
+                        var user = await dbContext.Users
+                            .Include(u => u.Settings).ThenInclude(s => s.Profile)
+                            .FirstOrDefaultAsync(u => u.Id == dto.Id);
+                        user.Profile = new UserProfile();
+
+                        // No INCL002: Settings.Profile is still the one the query loaded.
+                        UpdateTimezone(user, dto);
+                    }
+
+                    [IncludeRequired(nameof(user), "Settings.Profile")]
+                    void UpdateTimezone(User user, SaveUserDto dto)
+                    {
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// No INCL002: a write below the required path ("Settings.Profile.Timezone") does not change what is loaded,
+    /// and the query Included "Settings.Profile".
+    /// </summary>
+    [Fact]
+    public async Task Reinit_WriteBelowRequiredPath_RequiredPathLoadedByQuery_NoIncl2()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task Handle(SaveUserDto dto)
+                    {
+                        var user = await dbContext.Users
+                            .Include(u => u.Settings).ThenInclude(s => s.Profile)
+                            .FirstOrDefaultAsync(u => u.Id == dto.Id);
+                        user.Settings.Profile.Timezone = dto.Timezone;
+
+                        // No INCL002: the write was below the required path, which the query loaded.
+                        UpdateTimezone(user, dto);
+                    }
+
+                    [IncludeRequired(nameof(user), "Settings.Profile")]
+                    void UpdateTimezone(User user, SaveUserDto dto)
+                    {
                     }
                 }
             }
