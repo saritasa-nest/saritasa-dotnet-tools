@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis.Operations;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Bridging;
 using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.EntityFramework;
 using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Requirements;
@@ -66,6 +67,12 @@ internal sealed class IncludeSearcher
     private Answer ReadValue(Value value, NavigationPath path)
         => value.Operation switch
         {
+            // "user with { Settings = ... }": a record copied into a new object. The compiler lowers it to a call of the
+            // record's clone method, so it is recognized by its syntax. It counts as created, the same as "new", and is
+            // checked before the variable below, since the variable is only the copied record.
+            _ when value.Operation.Syntax is WithExpressionSyntax
+                => Answer.Loaded,
+
             // "user", "users", "out var user", "#1": reading a variable is the only expression whose answer
             // depends on what ran before it, so it is the only one the walker has to follow.
             _ when WritesWalker.GetVariable(value.Operation) is { } variable
@@ -90,7 +97,7 @@ internal sealed class IncludeSearcher
             // [Includes] or [PassesIncludes], so nothing loads the path. In someone else's code we
             // simply cannot see.
             IInvocationOperation call
-                => IsOurOwnCode(call.TargetMethod, value.Position) ? Answer.NotLoaded(path) : Answer.Unknown(),
+                => IsOurOwnCode(call.TargetMethod, value.Position) ? Answer.NotLoaded(path, call.Type) : Answer.Unknown(),
 
             // "new User()", "new List<User>()": nothing here was sourced from a query, so there was no Include
             // to miss — Include simply does not apply, which this treats as satisfied rather than a violation.
@@ -99,7 +106,7 @@ internal sealed class IncludeSearcher
 
             // "dbContext.Users": the query starts here and no Include was put on it.
             IPropertyReferenceOperation reference when IsEntitySet(reference.Property.Type)
-                => Answer.NotLoaded(path),
+                => Answer.NotLoaded(path, reference.Type),
 
             // "user.Settings": "Profile" of it is loaded when "Settings.Profile" of user is.
             IPropertyReferenceOperation { Instance: { } instance } reference
@@ -118,7 +125,7 @@ internal sealed class IncludeSearcher
         var insideMatch = path.Matched > 0;
 
         // Inside a match only the rest of the include chain can continue it.
-        var notIncludeAnswer = insideMatch ? Answer.NotLoaded(path) : null;
+        var notIncludeAnswer = insideMatch ? Answer.NotLoaded(path, value.Operation.Type) : null;
 
         if (value.Operation is not IInvocationOperation call)
         {
@@ -160,7 +167,7 @@ internal sealed class IncludeSearcher
 
         // Outside a match the step is a query operator like any other: the receiver holds the same entities.
         return insideMatch
-            ? Answer.NotLoaded(path)
+            ? Answer.NotLoaded(path, value.Operation.Type)
             : Search(receiver, value.Position, path);
     }
 
@@ -170,17 +177,20 @@ internal sealed class IncludeSearcher
     private Answer SearchAnswerInValuesWrites(object variable, CodePosition position, NavigationPath path)
         => JoinPaths(
             walker.FindWrites(variable, position, path)
-                .Select(write => ReadWrite(write, path))
+                .Select(write => ReadWrite(write, variable, path))
             );
 
     /// <summary>
     /// What one write of the walker means for the navigation path.
     /// </summary>
-    private Answer ReadWrite(Write write, NavigationPath path)
+    private Answer ReadWrite(Write write, object variable, NavigationPath path)
         => write switch
         {
             // "user = x": read the value the variable got.
             Write.Written written => Search(written.Value, path),
+
+            // "user.Settings = x" or "user.Settings.Profile = x" for "Settings.Profile".
+            Write.MemberWritten member => ReadMemberWrite(member, variable, path),
 
             // "dictionary.TryGetValue(id, out var user)".
             Write.OutArgument outArgument => ReadOutArgumentSource(outArgument, path),
@@ -200,7 +210,7 @@ internal sealed class IncludeSearcher
             Write.NothingNew => Answer.Loaded,
 
             // Nothing ever wrote the variable, so nothing loaded the path either.
-            Write.NeverWritten => Answer.NotLoaded(path),
+            Write.NeverWritten => Answer.NotLoaded(path, source: null),
 
             _ => Answer.Unknown(),
         };
@@ -220,6 +230,19 @@ internal sealed class IncludeSearcher
         }
 
         return Answer.Loaded;
+    }
+
+    /// <summary>
+    /// An assignment splits the path where it ends. For "Settings.Profile" after "user.Settings.Profile = x", user
+    /// must have had "Settings" before the assignment, and the property itself holds x. After "user.Settings = x",
+    /// the property and everything under it count as loaded, whatever x is: x is not read.
+    /// </summary>
+    private Answer ReadMemberWrite(Write.MemberWritten member, object variable, NavigationPath path)
+    {
+        // The chain to the assigned property must still be loaded before the assignment.
+        return member.AssignedCount > 1
+            ? SearchAnswerInValuesWrites(variable, member.Statement, path.TakeFirst(member.AssignedCount - 1))
+            : Answer.Loaded;
     }
 
     /// <summary>

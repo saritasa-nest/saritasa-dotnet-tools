@@ -46,7 +46,7 @@ internal static class NavigationIncludeRulesProvider
         "Method parameter should require a navigation property";
 
     private static readonly LocalizableString messageFormatIncl1 =
-        "Navigation property '{0}.{1}' is required, but not checked. Use [IncludeRequired(\"{2}\", \"{1}\")] to this method.";
+        "Navigation property '{0}.{1}' is required, but not checked. Add [IncludeRequired({2})] to this method.";
 
     private static readonly LocalizableString descriptionIncl1 =
         "A navigation property marked with [TrackIncludeRequired] that is read on a method parameter, directly or " +
@@ -71,7 +71,7 @@ internal static class NavigationIncludeRulesProvider
 
     private static readonly LocalizableString messageFormatIncl2 =
         "Navigation property '{0}.{1}' is not loaded for '{2}'; load '{3}' in the query, " +
-        "set the property in an object initializer, annotate the source method with [Includes(\"{3}\")], " +
+        "set the property in an object initializer, annotate the source method with [Includes({4})], " +
         "or with [PassesIncludes] if it hands back the entities it was given";
 
     private static readonly LocalizableString descriptionIncl2 =
@@ -96,8 +96,8 @@ internal static class NavigationIncludeRulesProvider
         "Method annotates [Includes] but return value does not load the required navigation property";
 
     private static readonly LocalizableString messageFormatIncl3 =
-        "Method annotates [Includes(\"{0}\")] but the returned value does not load navigation property '{0}'; " +
-        "load '{1}' in the query, set the property in an object initializer, or remove [Includes(\"{0}\")]";
+        "Method annotates [Includes({2})] but the returned value does not load navigation property '{0}'; " +
+        "load '{1}' in the query, set the property in an object initializer, or remove [Includes({2})]";
 
     private static readonly LocalizableString descriptionIncl3 =
         "A method annotated with [Includes(\"Settings.Profile\")] promises its return value has the named navigation " +

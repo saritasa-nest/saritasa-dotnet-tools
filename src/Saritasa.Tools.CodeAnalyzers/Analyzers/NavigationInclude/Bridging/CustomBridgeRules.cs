@@ -124,7 +124,7 @@ internal static class CustomBridgeRules
     /// A type that says nothing at all is let through, because there the answer would be noise.
     /// This cannot tell overloads apart, see <see cref="BuiltInBridge.ExcludeOverloadsWithParameters"/>.
     /// </remarks>
-    private static class EntityType
+    internal static class EntityType
     {
         private const string Nullable = "System.Nullable`1";
         private const string Task = "System.Threading.Tasks.Task`1";

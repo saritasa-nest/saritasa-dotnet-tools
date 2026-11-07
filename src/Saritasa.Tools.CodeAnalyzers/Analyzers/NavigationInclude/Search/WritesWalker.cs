@@ -10,8 +10,10 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Search;
 /// </summary>
 /// <remarks>
 /// The walker reads code and decides nothing: it reports <see cref="Write"/>s and
-/// <see cref="IncludeSearcher"/> says what they mean. It knows nothing of navigation properties, so
-/// <c>user.Profile = x</c> is not a write to <c>user</c> and the walk reads straight past it.
+/// <see cref="IncludeSearcher"/> says what they mean. It knows navigation properties only because
+/// <c>user.Settings = x</c> and <c>user.Settings.Profile = x</c> write the start of the path "Settings.Profile"
+/// asked about <c>user</c>, while an assignment of any other property does not, and the walk reads straight
+/// past it.
 /// A variable is a local, a parameter or a compiler temporary, see <see cref="GetVariable"/>.
 /// </remarks>
 internal sealed class WritesWalker
@@ -51,13 +53,13 @@ internal sealed class WritesWalker
     /// </summary>
     /// <param name="variable">Variable, see <see cref="GetVariable"/>.</param>
     /// <param name="position">Place the variable is read at.</param>
-    /// <param name="path">Path asked about the variable. The walker does not read it, it only remembers it with the
-    /// blocks it has read.</param>
+    /// <param name="path">Path asked about the variable. An assignment of its start on the variable is a write, and
+    /// the walker remembers it with the blocks it has read.</param>
     /// <returns>Writes; never empty.</returns>
     public IEnumerable<Write> FindWrites(object variable, CodePosition position, NavigationPath path)
     {
         var writeInThisBlock = position.GetPreviousStatements()
-            .Select(previous => GetWriteOrDefault(previous, variable))
+            .Select(previous => GetWriteOrDefault(previous, variable, path))
             .FirstOrDefault(write => write is not null);
 
         if (writeInThisBlock is not null)
@@ -73,7 +75,7 @@ internal sealed class WritesWalker
     /// Returns the write the statement makes to the variable, or null when the statement leaves the variable
     /// alone and the walk has to keep reading upward.
     /// </summary>
-    private Write? GetWriteOrDefault(CodePosition statement, object variable)
+    private Write? GetWriteOrDefault(CodePosition statement, object variable, NavigationPath path)
     {
         if (statement.Statement is not { } statementOperation)
         {
@@ -87,8 +89,15 @@ internal sealed class WritesWalker
         return operation switch
         {
             // "user = ..." and "var user = ...": the variable comes from the assigned value.
-            ISimpleAssignmentOperation assignment when WritesVariable(assignment, variable)
+            ISimpleAssignmentOperation assignment when WritesVariable(assignment, statement, variable, path)
                 => new Write.Written(Value.Create(assignment.Value, statement)),
+
+            // "user.Settings = ..." or "user.Settings.Profile = ..." for "Settings.Profile" (the compiler also
+            // rewrites "new User { Settings = ... }" into this form). Another property says nothing, so the walk
+            // keeps reading upward.
+            ISimpleAssignmentOperation assignment when
+                ReadAssignedCount(assignment, statement, variable, path) is { } assignedCount
+                => new Write.MemberWritten(assignedCount, statement),
 
             // "#1 = ...": a temporary value the compiler creates for ?:, ??, object initializers and foreach.
             IFlowCaptureOperation capture when AreSame(capture.Id, variable)
@@ -103,10 +112,66 @@ internal sealed class WritesWalker
     }
 
     /// <summary>
-    /// True for "user = ...", where the variable itself is assigned.
+    /// True for "user = ...", where the variable itself is assigned. The compiler writes "user = x" through a
+    /// temporary when x spans several statements, as "#0 = user; ...; #0 = #1": the temporary then stands for user.
     /// </summary>
-    private static bool WritesVariable(ISimpleAssignmentOperation assignment, object variable)
-        => AreSame(GetVariable(assignment.Target), variable);
+    private bool WritesVariable(ISimpleAssignmentOperation assignment, CodePosition statement, object variable, NavigationPath path)
+    {
+        var target = ReadThroughCapture(assignment.Target, statement, variable, path) ?? assignment.Target;
+
+        return AreSame(GetVariable(target), variable);
+    }
+
+    /// <summary>
+    /// For "user.Settings = ..." or "user.Settings.Profile = ...": how many properties at the start of the path
+    /// asked about the variable were assigned. Null when the statement assigns something else.
+    /// </summary>
+    private int? ReadAssignedCount(
+        ISimpleAssignmentOperation assignment,
+        CodePosition statement,
+        object variable,
+        NavigationPath path)
+    {
+        var properties = new List<string>();
+        var target = ReadThroughCapture(assignment.Target, statement, variable, path);
+
+        while (target is IPropertyReferenceOperation { Instance: { } instance } reference)
+        {
+            properties.Insert(0, reference.Property.Name);
+            target = ReadThroughCapture(instance, statement, variable, path);
+        }
+
+        return path.StartsWith(properties) && AreSame(GetVariable(target), variable)
+            ? properties.Count
+            : null;
+    }
+
+    /// <summary>
+    /// The expression a compiler temporary was given above the statement, or the operation itself when it is not
+    /// one or is the variable the walk is looking for. A right side that spans several statements makes the
+    /// compiler capture the target first: "user.Profile = new UserProfile { ... }" becomes
+    /// "#1 = user.Profile; #2 = new UserProfile(); ...; #1 = #2".
+    /// </summary>
+    private IOperation? ReadThroughCapture(
+        IOperation operation,
+        CodePosition statement,
+        object variable,
+        NavigationPath path)
+    {
+        // "#1.Settings = x" of "new User { Settings = x }" while looking for #1 itself.
+        if (operation is not IFlowCaptureReferenceOperation reference || AreSame(reference.Id, variable))
+        {
+            return operation;
+        }
+
+        // The temporary is a variable like any other, so its write is found the same way. One that more than one
+        // path writes cannot name a single target.
+        var writes = FindWrites(reference.Id, statement, path).ToList();
+
+        return writes.Count == 1 && writes[0] is Write.Written written
+            ? written.Value.Operation
+            : null;
+    }
 
     /// <summary>
     /// True for "var (id, user) = pair", where the variable is one of the parts.

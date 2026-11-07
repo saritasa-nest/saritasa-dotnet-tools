@@ -124,7 +124,9 @@ loading a property.
 
 **Deliberately optimistic.**
 
-- `new User()` counts as loaded: there was no query, so no `Include` to miss.
+- `new User()`, `new User { … }` and `user with { … }` count as loaded: the object is created here, so there was no
+  query to miss. Assigning a property loads it and everything under it, whatever the value is; see
+  [Re-initialization](#re-initialization).
 - Reads inside an expression tree, `query.Where(u => u.Profile.IsActive)`, are not checked, because EF translates
   them to SQL.
 - Only properties marked `[TrackIncludeRequired]` are checked at all.
@@ -158,7 +160,7 @@ statements connected by arrows — so the analyzer needs no special code for `if
 | **Value** | a place where entities sit: a variable, a parameter, an argument or the result of an expression, together with the position in the code where it is read | `Search/Value.cs` |
 | **Answer** | what the search decided, one type per kind: `Loaded`, `NotLoaded(path)`, `NotRequiredBy(parameter, path)` or `Unknown(value)`. Created through the static members of `Answer` and matched by type | `Search/Answer.cs` |
 | **Path** | the navigation path asked for, such as `Settings.Profile`. It grows at the front while the search walks back over navigation reads. Inside an `Include(...).ThenInclude(...)` chain it also holds a cursor: how many segments at its end the ThenIncludes have matched | `Requirements/NavigationPath.cs` |
-| **Write** | one thing found above a variable: `Written`, `OutArgument`, `MethodParameter`, `LambdaParameter`, `NothingNew`, `NeverWritten`, `Unreadable` | `Search/Write.cs` |
+| **Write** | one thing found above a variable: `Written`, `MemberWritten`, `OutArgument`, `MethodParameter`, `LambdaParameter`, `NothingNew`, `NeverWritten`, `Unreadable` | `Search/Write.cs` |
 | **Bridge** | an annotated move from one value to another that keeps the same entities: `Where`, `ToList`, an indexer. A pair of `BridgeEnd`s, read backwards | `Bridging/Bridge.cs` |
 
 A value is a question and an answer is a decision, and the code never mixes the two. A write is a fact about the
@@ -223,6 +225,9 @@ flowchart TD
     WRITES --> MEANS
     MEANS -->|"NothingNew<br/>a required parameter"| LOADED
     MEANS -->|"Written<br/>OutArgument<br/>LambdaParameter"| SOURCE
+    MEANS -->|"MemberWritten"| SPLIT["the start before the assignment<br/>and the rest in the assigned value"]
+    SPLIT --> WRITES
+    SPLIT --> SOURCE
     MEANS -->|"a plain parameter"| NOTREQUIRED
     MEANS -->|"NeverWritten"| NOTLOADED
     MEANS -->|"Unreadable"| UNKNOWN
@@ -246,7 +251,8 @@ flowchart TD
 
     BLOCK -->|"user = expr"| WRITTEN["Written"]
     BLOCK -->|"f(out var user)"| OUT["OutArgument"]
-    BLOCK -->|"nothing here, incl. user.Profile = expr"| WAYSIN
+    BLOCK -->|"user.Settings = expr<br/>for Settings.Profile"| MEMBER["MemberWritten"]
+    BLOCK -->|"nothing here"| WAYSIN
 
     WAYSIN -->|"read every way in"| BLOCK
     WAYSIN -->|"a loop came back"| NOTHING["NothingNew"]
@@ -313,6 +319,7 @@ what `IncludeSearcher` makes of each one.
 | Write | Found where | What the search does |
 |---|---|---|
 | `Written(value)` | `user = expr`, `var user = expr`, `var (id, user) = pair` | read that value |
+| `MemberWritten` | `user.Settings = expr` or `user.Settings.Profile = expr` when the path starts with the assigned properties | search the start in front of the last assigned property above the assignment, and the rest of the path in the assigned value |
 | `OutArgument(call, parameter)` | `d.TryGetValue(key, out var user)` | cross the bridge out of that parameter |
 | `MethodParameter(parameter)` | the start of a method body | `Loaded` if the method requires the path, else `NotRequiredBy(parameter, path)` |
 | `LambdaParameter(parameter, …)` | the start of a lambda body | cross the bridge out of that parameter |
@@ -321,9 +328,18 @@ what `IncludeSearcher` makes of each one.
 | `Unreadable` | a body the walker cannot read | `Unknown` |
 | nothing at all | a statement that does not write the variable | keep reading upward |
 
-The last row covers more than it looks. `user.Profile = expr` writes a *property of* the variable, not the
-variable, so the walker says nothing and the walk continues past it — finding whether an `Include` happened
-is the search's job, not the walker's.
+An assignment of a property splits the path where it ends, and both parts are searched backward like any
+other value. For `Settings.Profile` of `user`:
+
+| Assignment | In front of it, above the assignment | In the assigned value |
+|---|---|---|
+| `user.Settings = expr` | nothing | `Profile` of `expr`, so `new UserSettings()` is `Loaded` and `other.Settings` asks `other` |
+| `user.Settings.Profile = expr` | `Settings` of `user` | nothing: the property itself was set |
+| `user.Profile = expr`, `user.Settings.Other = expr` | — | — the walk keeps reading upward |
+
+`new User { Settings = expr }` is the same assignment on the compiler's temporary. When the right side spans
+several statements, the compiler captures the target first (`#1 = user.Profile; …; #1 = #2`). The walker reads
+that capture backward like any other variable, so it finds `user.Profile` above the assignment.
 
 A "variable" here is a local, a parameter or a temporary the compiler made (`#1`), see
 [Special cases](#special-cases).
@@ -730,6 +746,7 @@ The control flow graph holds simplified code. These constructs look different fr
 | `flag ? a : b`, `a ?? b` | two blocks write `#1`, then they join | both paths are searched |
 | `user?.Settings?.Profile` | `#0 = user; #1 = #0.Settings; #1.Profile`, across blocks | each read is checked on its own, and the search follows `#1` back through its write, so `?.` gives the same answers as `.` |
 | `user.Profile = new UserProfile { … }` | the target `user.Profile` is captured before the initializer runs, and assigned later | whether a property reference is the left side of a plain `=` is read on the code as written, so it is never mistaken for a read |
+| `user = user with { … }`, or `user = x` where `x` spans several statements | the target is captured first, as `#0 = user; … #0 = #1` | the walker takes `#0` to be `user`; a record's copy is a call of its clone method, recognized by its syntax |
 
 `#1` is a temporary variable the compiler creates. The walker treats it as any other variable.
 
@@ -750,3 +767,22 @@ The graph has no jumps for exceptions. The first block of a `catch`, a `catch wh
 incoming jumps, so it looks unreachable. But an exception can leave the `try` block after any statement, so
 **every place inside the `try`** counts as a way into the handler. For a `finally` after `try/catch`, the
 `catch` blocks are included too. This is the only reason the walker does more than `block.Predecessors`.
+
+### Re-initialization
+
+Assigning to the loaded object, or to a part of it, changes what is loaded from that point on:
+
+| Assignment | Loaded afterwards |
+|---|---|
+| `user.Settings = x` | `Settings` and everything under it, whatever `x` is, `null` included. The chain in front of `Settings` is still checked before the assignment |
+| `user.Address = x` | `Address` and everything under it; other paths keep what the query loaded |
+| `user = new User { … }` or `user = user with { … }` | the whole object: it is a new object, so it counts as loaded |
+| `user = query` or `user = other` | the value is read as before, so the `Include`s of the query still decide |
+| an assignment on one branch only | loaded on that branch; the other branch is read as before |
+| an assignment after a use | does not help that use |
+
+Constructor arguments are never read: `new User(settings)` counts as loaded, like any object creation.
+
+Out of scope: an assignment inside a called method, a lambda or a local function, which is not analyzed as
+everywhere else; a `foreach` over elements is judged like any other statement, so elements that the query did not
+load give INCL002.

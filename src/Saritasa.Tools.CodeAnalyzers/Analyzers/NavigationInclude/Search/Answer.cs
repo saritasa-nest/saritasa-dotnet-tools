@@ -40,8 +40,10 @@ internal abstract class Answer
     /// </summary>
     /// <param name="path">The path that is missing, counted from where the search ended: what the query has to
     /// Include, or the method has to promise.</param>
+    /// <param name="source">Type of the value the search ended at, which the path is counted from; null when
+    /// there is none to read.</param>
     /// <returns>Answer.</returns>
-    public static Answer NotLoaded(NavigationPath path) => new NotLoadedAnswer(path);
+    public static Answer NotLoaded(NavigationPath path, ITypeSymbol? source) => new NotLoadedAnswer(path, source);
 
     /// <summary>
     /// The search reached a parameter of a method that does not ask for the path with [IncludeRequired], so
@@ -78,9 +80,11 @@ internal abstract class Answer
         /// Initializes the answer.
         /// </summary>
         /// <param name="path">The path that is missing, counted from where the search ended.</param>
-        public NotLoadedAnswer(NavigationPath path)
+        /// <param name="source">Type of the value the search ended at.</param>
+        public NotLoadedAnswer(NavigationPath path, ITypeSymbol? source)
         {
             Path = path;
+            Source = source;
         }
 
         /// <summary>
@@ -88,6 +92,12 @@ internal abstract class Answer
         /// "user.Settings.Profile" when user comes from "dbContext.Users".
         /// </summary>
         public NavigationPath Path { get; }
+
+        /// <summary>
+        /// Type of the value the search ended at, e.g. <c>DbSet&lt;User&gt;</c> or <c>Task&lt;User&gt;</c>, which
+        /// names the path in the message. Null when there was none to read.
+        /// </summary>
+        public ITypeSymbol? Source { get; }
     }
 
     /// <summary>

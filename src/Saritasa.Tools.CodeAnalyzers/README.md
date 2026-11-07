@@ -308,17 +308,17 @@ These are not reads and are not checked: an assignment to the property (`user.Pr
 
 ### INCL001: Navigation property not checked
 
-Triggered when a `[TrackIncludeRequired]` property is read on a parameter, or a parameter is passed to a method that requires it via `[IncludeRequired]`, and the current method does not ask for the property with a matching `[IncludeRequired]`. The parameter is found through locals, lambdas and navigation reads too, and the message names the whole path the attribute must ask for:
+Triggered when a `[TrackIncludeRequired]` property is read on a parameter, or a parameter is passed to a method that requires it via `[IncludeRequired]`, and the current method does not ask for the property with a matching `[IncludeRequired]`. The parameter is found through locals, lambdas and navigation reads too, and the message suggests the attribute for the whole path, with `nameof` for each segment on the type that holds it:
 
 ```csharp
 void SetTimezone(User user)
 {
-    var settings = user.Settings;   // INCL001: use [IncludeRequired("user", "Settings")]
-    settings.Profile.Timezone = "UTC";  // INCL001: use [IncludeRequired("user", "Settings.Profile")]
+    var settings = user.Settings;   // INCL001: add [IncludeRequired(nameof(user), nameof(User.Settings))]
+    settings.Profile.Timezone = "UTC";  // INCL001: add [IncludeRequired(nameof(user), nameof(User.Settings), nameof(UserSettings.Profile))]
 }
 ```
 
-One `[IncludeRequired(nameof(user), "Settings.Profile")]` fixes both, because a longer path covers a shorter one.
+The second one fixes both, because a longer path covers a shorter one. When a segment cannot be named with `nameof`, such as a property of a generic type, the message gives the path as a dotted string, `"Settings.Profile"`.
 
 #### Code causing a warning
 
