@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "codegraph": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@colbymchenry/codegraph", "serve", "--mcp"],
+      "env": {
+        "CODEGRAPH_MCP_TOOLS": "explore,search,callers,callees,impact,files,status,node"
+      }
+    }
+  }
+}
