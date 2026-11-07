@@ -193,7 +193,8 @@ internal static class IncludeFlowHandler
                         NavigationIncludeRulesProvider.Incl3IdMethodResultDoesntIncludeNavigationProperty),
                     location,
                     path.ToString(),
-                    GetQueryPath(answer, path).ToString())
+                    GetQueryPath(answer, path).ToString(),
+                    NavigationPathFormatter.ForIncludes(position.FlowGraph.Method.ReturnType, path))
                 : GetDiagnostic(answer, location, returnedValue, path);
 
             if (diagnostic is not null)
@@ -232,7 +233,7 @@ internal static class IncludeFlowHandler
                 location,
                 UnreadableMember.GetProperties(unknown.UnreadableValue),
                 UnreadableMember.Describe(unknown.UnreadableValue),
-                value.Type?.Name,
+                GetEntityName(value.Type),
                 path.ToString(),
                 value.Syntax.ToString()),
 
@@ -241,9 +242,9 @@ internal static class IncludeFlowHandler
                 NavigationIncludeRulesProvider.GetDiagnosticDescriptor(
                     NavigationIncludeRulesProvider.Incl1IdAddIncludeRequiredForParameter),
                 location,
-                missing.Parameter.Type.Name,
+                GetEntityName(missing.Parameter.Type),
                 missing.Path.ToString(),
-                missing.Parameter.Name),
+                NavigationPathFormatter.ForIncludeRequired(missing.Parameter, missing.Path)),
 
             // The entities came from a query or a method that does not load the path. The fix goes where the search
             // ended, so the path to load is counted from there.
@@ -251,13 +252,20 @@ internal static class IncludeFlowHandler
                 NavigationIncludeRulesProvider.GetDiagnosticDescriptor(
                     NavigationIncludeRulesProvider.Incl2IdArgumentDoesntIncludeNavigationProperty),
                 location,
-                value.Type?.Name,
+                GetEntityName(value.Type),
                 path.ToString(),
                 value.Syntax.ToString(),
-                missing.Path.ToString()),
+                missing.Path.ToString(),
+                NavigationPathFormatter.ForIncludes(missing.Source, missing.Path)),
 
             _ => throw new ArgumentOutOfRangeException(nameof(answer), "Unknown answer."),
         };
+
+    /// <summary>
+    /// The name of the entity a value holds, for the message: "User" for <c>List&lt;User&gt;</c>.
+    /// </summary>
+    private static string? GetEntityName(ITypeSymbol? type)
+        => CustomBridgeRules.EntityType.GetEntityType(type)?.Name;
 
     /// <summary>
     /// True for the left side of a plain "=". It is read on the code as written, since the graph may first

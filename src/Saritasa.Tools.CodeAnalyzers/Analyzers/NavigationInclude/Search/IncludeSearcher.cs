@@ -97,7 +97,7 @@ internal sealed class IncludeSearcher
             // [Includes] or [PassesIncludes], so nothing loads the path. In someone else's code we
             // simply cannot see.
             IInvocationOperation call
-                => IsOurOwnCode(call.TargetMethod, value.Position) ? Answer.NotLoaded(path) : Answer.Unknown(),
+                => IsOurOwnCode(call.TargetMethod, value.Position) ? Answer.NotLoaded(path, call.Type) : Answer.Unknown(),
 
             // "new User()", "new List<User>()": nothing here was sourced from a query, so there was no Include
             // to miss — Include simply does not apply, which this treats as satisfied rather than a violation.
@@ -106,7 +106,7 @@ internal sealed class IncludeSearcher
 
             // "dbContext.Users": the query starts here and no Include was put on it.
             IPropertyReferenceOperation reference when IsEntitySet(reference.Property.Type)
-                => Answer.NotLoaded(path),
+                => Answer.NotLoaded(path, reference.Type),
 
             // "user.Settings": "Profile" of it is loaded when "Settings.Profile" of user is.
             IPropertyReferenceOperation { Instance: { } instance } reference
@@ -125,7 +125,7 @@ internal sealed class IncludeSearcher
         var insideMatch = path.Matched > 0;
 
         // Inside a match only the rest of the include chain can continue it.
-        var notIncludeAnswer = insideMatch ? Answer.NotLoaded(path) : null;
+        var notIncludeAnswer = insideMatch ? Answer.NotLoaded(path, value.Operation.Type) : null;
 
         if (value.Operation is not IInvocationOperation call)
         {
@@ -167,7 +167,7 @@ internal sealed class IncludeSearcher
 
         // Outside a match the step is a query operator like any other: the receiver holds the same entities.
         return insideMatch
-            ? Answer.NotLoaded(path)
+            ? Answer.NotLoaded(path, value.Operation.Type)
             : Search(receiver, value.Position, path);
     }
 
@@ -210,7 +210,7 @@ internal sealed class IncludeSearcher
             Write.NothingNew => Answer.Loaded,
 
             // Nothing ever wrote the variable, so nothing loaded the path either.
-            Write.NeverWritten => Answer.NotLoaded(path),
+            Write.NeverWritten => Answer.NotLoaded(path, source: null),
 
             _ => Answer.Unknown(),
         };
