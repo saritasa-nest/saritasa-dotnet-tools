@@ -3,11 +3,11 @@ using Microsoft.CodeAnalysis;
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Aliasing;
 
 /// <summary>
-/// One object at runtime, named by where it comes from: a parameter, the operation that creates it, or the edge
-/// whose value it was before the method assigned anything to that edge.
+/// One object at runtime, named by where it comes from: the operation that creates it, or the slot whose value it
+/// was before the method assigned anything to that slot.
 /// </summary>
 /// <remarks>
-/// Two objects with the same origin are the same object. An edge nothing assigned therefore gets the same object on
+/// Two objects with the same origin are the same object. A slot nothing assigned therefore gets the same object on
 /// every branch, and the branches still agree where they meet.
 /// </remarks>
 internal sealed class AliasObject : IEquatable<AliasObject>
@@ -18,17 +18,14 @@ internal sealed class AliasObject : IEquatable<AliasObject>
     }
 
     /// <summary>
-    /// Where the object comes from: an <see cref="IParameterSymbol"/>, an <see cref="IOperation"/> or an
-    /// <see cref="Edge"/>.
+    /// The object the method's variables belong to, so a variable is a slot like a property.
     /// </summary>
-    public object Origin { get; }
+    public static AliasObject Frame { get; } = new(new object());
 
     /// <summary>
-    /// The object the caller passed in a parameter.
+    /// Where the object comes from: an <see cref="IOperation"/> or a <see cref="Slot"/>.
     /// </summary>
-    /// <param name="parameter">Parameter.</param>
-    /// <returns>Object.</returns>
-    public static AliasObject OfParameter(IParameterSymbol parameter) => new(parameter);
+    public object Origin { get; }
 
     /// <summary>
     /// The object an operation creates: <c>new</c>, <c>with</c>, a query, or a call to an <c>[Includes]</c> method.
@@ -38,11 +35,12 @@ internal sealed class AliasObject : IEquatable<AliasObject>
     public static AliasObject CreatedBy(IOperation creation) => new(creation);
 
     /// <summary>
-    /// The object an edge held before the method assigned anything to it, e.g. the Profile of a user parameter.
+    /// The object a slot held before the method assigned anything to it, e.g. the object the caller passed in a
+    /// parameter, or the Profile of that object.
     /// </summary>
-    /// <param name="edge">Edge.</param>
+    /// <param name="slot">Slot.</param>
     /// <returns>Object.</returns>
-    public static AliasObject InitialValueOf(Edge edge) => new(edge);
+    public static AliasObject InitialValueOf(Slot slot) => new(slot);
 
     /// <inheritdoc />
     public bool Equals(AliasObject? other)

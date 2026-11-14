@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Aliasing;
 
 /// <summary>
-/// The objects a variable or an edge may hold at one position.
+/// The objects a slot may hold at one position.
 /// </summary>
 /// <remarks>
 /// One object means sure. Several objects mean the branches that lead here disagree. Unknown means something the
@@ -54,7 +54,21 @@ internal sealed class ObjectSet : IEquatable<ObjectSet>
     /// </summary>
     /// <param name="other">Other set.</param>
     /// <returns>Combined set.</returns>
-    public ObjectSet Union(ObjectSet other) => new(Objects.Union(other.Objects), IsUnknown || other.IsUnknown);
+    public ObjectSet Union(ObjectSet other)
+    {
+        // Most unions add nothing new, e.g. where branches agree, so the existing set is reused.
+        if (Contains(other))
+        {
+            return this;
+        }
+
+        if (other.Contains(this))
+        {
+            return other;
+        }
+
+        return new(Objects.Union(other.Objects), IsUnknown || other.IsUnknown);
+    }
 
     /// <inheritdoc />
     public bool Equals(ObjectSet? other)
@@ -76,4 +90,8 @@ internal sealed class ObjectSet : IEquatable<ObjectSet>
 
         return hash;
     }
+
+    private bool Contains(ObjectSet other)
+        => ReferenceEquals(this, other) ||
+           ((IsUnknown || !other.IsUnknown) && other.Objects.IsSubsetOf(Objects));
 }

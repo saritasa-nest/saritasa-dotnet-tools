@@ -4,30 +4,27 @@ using Microsoft.CodeAnalysis;
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Aliasing;
 
 /// <summary>
-/// The picture of one position: which objects each variable holds, and which objects each edge holds.
+/// The picture of one position: which objects each slot holds. Variables are slots of
+/// <see cref="AliasObject.Frame"/>, properties are slots of the objects they belong to.
 /// </summary>
 /// <remarks>
-/// A reference such as <c>user.Profile.Settings</c> is not stored. It is resolved by starting at the variable and
-/// following one edge per property, so an assignment changes one entry, and every alias sees the change.
+/// A reference such as <c>user.Profile.Settings</c> is not stored. It is resolved by starting at the frame and
+/// following one slot per name, so an assignment changes one entry, and every alias sees the change.
 /// The state is immutable: every operation returns a new one.
 /// </remarks>
 internal sealed class AliasState : IEquatable<AliasState>
 {
-    private readonly ImmutableDictionary<object, ObjectSet> variables;
-
-    private readonly ImmutableDictionary<Edge, ObjectSet> edges;
+    private readonly ImmutableDictionary<Slot, ObjectSet> slots;
 
     // Properties assigned through a receiver nothing is known about. Such an assignment may have changed the
-    // property on any object, including edges that were never stored.
-    private readonly ImmutableHashSet<IPropertySymbol> propertiesAssignedOnUnknown;
+    // property on any object, including slots that were never stored.
+    private readonly ImmutableHashSet<object> propertiesAssignedOnUnknown;
 
     private AliasState(
-        ImmutableDictionary<object, ObjectSet> variables,
-        ImmutableDictionary<Edge, ObjectSet> edges,
-        ImmutableHashSet<IPropertySymbol> propertiesAssignedOnUnknown)
+        ImmutableDictionary<Slot, ObjectSet> slots,
+        ImmutableHashSet<object> propertiesAssignedOnUnknown)
     {
-        this.variables = variables;
-        this.edges = edges;
+        this.slots = slots;
         this.propertiesAssignedOnUnknown = propertiesAssignedOnUnknown;
     }
 
@@ -35,39 +32,34 @@ internal sealed class AliasState : IEquatable<AliasState>
     /// The picture before anything is assigned.
     /// </summary>
     public static AliasState Empty { get; } = new(
-        ImmutableDictionary.Create<object, ObjectSet>(VariableComparer.Instance),
-        ImmutableDictionary<Edge, ObjectSet>.Empty,
-        ImmutableHashSet.Create<IPropertySymbol>(SymbolEqualityComparer.Default));
+        ImmutableDictionary<Slot, ObjectSet>.Empty,
+        ImmutableHashSet.Create<object>(VariableComparer.Instance));
 
     /// <summary>
-    /// Returns the objects a variable holds. A variable the picture has no entry for holds unknown objects.
+    /// Returns the objects a slot holds. A slot nothing assigned holds the object it had when the method started.
     /// </summary>
-    /// <param name="variable">Local, parameter or compiler temporary.</param>
+    /// <remarks>
+    /// For a parameter that is the object the caller passed in. A local is never read before it is assigned, since
+    /// C# requires it.
+    /// </remarks>
+    /// <param name="slot">Slot.</param>
     /// <returns>Objects.</returns>
-    public ObjectSet ReadVariable(object variable)
-        => variables.TryGetValue(variable, out var objects) ? objects : ObjectSet.Unknown;
-
-    /// <summary>
-    /// Returns the objects an edge holds. An edge nothing assigned holds the object it had when the method started.
-    /// </summary>
-    /// <param name="edge">Edge.</param>
-    /// <returns>Objects.</returns>
-    public ObjectSet ReadEdge(Edge edge)
+    public ObjectSet Read(Slot slot)
     {
-        if (edges.TryGetValue(edge, out var objects))
+        if (slots.TryGetValue(slot, out var objects))
         {
             return objects;
         }
 
-        var initial = ObjectSet.Of(AliasObject.InitialValueOf(edge));
+        var initial = ObjectSet.Of(AliasObject.InitialValueOf(slot));
 
-        return propertiesAssignedOnUnknown.Contains(edge.Property)
+        return propertiesAssignedOnUnknown.Contains(slot.Member)
             ? initial.Union(ObjectSet.Unknown)
             : initial;
     }
 
     /// <summary>
-    /// Resolves a reference: the variable, then one edge per property, e.g. <c>user</c>, Profile, Settings for
+    /// Resolves a reference: the variable, then one property per step, e.g. <c>user</c>, Profile, Settings for
     /// <c>user.Profile.Settings</c>.
     /// </summary>
     /// <param name="variable">Variable the reference starts at.</param>
@@ -75,7 +67,7 @@ internal sealed class AliasState : IEquatable<AliasState>
     /// <returns>Objects the reference may hold.</returns>
     public ObjectSet Resolve(object variable, IEnumerable<IPropertySymbol> properties)
     {
-        var objects = ReadVariable(variable);
+        var objects = Read(Slot.OfVariable(variable));
 
         foreach (var property in properties)
         {
@@ -84,9 +76,14 @@ internal sealed class AliasState : IEquatable<AliasState>
                 return ObjectSet.Unknown;
             }
 
-            objects = objects.Objects.Aggregate(
-                ObjectSet.Empty,
-                (result, owner) => result.Union(ReadEdge(new Edge(owner, property))));
+            var next = ObjectSet.Empty;
+
+            foreach (var owner in objects.Objects)
+            {
+                next = next.Union(Read(new Slot(owner, property)));
+            }
+
+            objects = next;
         }
 
         return objects;
@@ -99,68 +96,33 @@ internal sealed class AliasState : IEquatable<AliasState>
     /// <param name="value">Objects of the assigned value.</param>
     /// <returns>New picture.</returns>
     public AliasState AssignVariable(object variable, ObjectSet value)
-        => new(variables.SetItem(variable, value), edges, propertiesAssignedOnUnknown);
+        => Assign(ObjectSet.Of(AliasObject.Frame), variable, value);
 
     /// <summary>
-    /// Returns the picture after <c>receiver.Property = value</c>. A sure receiver has its edge replaced. Several
-    /// receivers each may or may not have been assigned, so the value is added to what their edges held.
+    /// Returns the picture after <c>receiver.Property = value</c>.
     /// </summary>
     /// <param name="receiver">Objects of the expression before the property.</param>
     /// <param name="property">Assigned property.</param>
     /// <param name="value">Objects of the assigned value.</param>
     /// <returns>New picture.</returns>
-    public AliasState AssignEdge(ObjectSet receiver, IPropertySymbol property, ObjectSet value)
-    {
-        if (receiver.IsUnknown)
-        {
-            // Any object may be the receiver, so every edge with this property may now hold the value.
-            var changedEdges = edges
-                .Where(entry => SymbolEqualityComparer.Default.Equals(entry.Key.Property, property))
-                .Select(entry => new KeyValuePair<Edge, ObjectSet>(
-                    entry.Key,
-                    entry.Value.Union(value).Union(ObjectSet.Unknown)));
-
-            return new(variables, edges.SetItems(changedEdges), propertiesAssignedOnUnknown.Add(property));
-        }
-
-        if (receiver.IsSure)
-        {
-            var assignedEdge = new Edge(receiver.Objects.First(), property);
-
-            return new(variables, edges.SetItem(assignedEdge, value), propertiesAssignedOnUnknown);
-        }
-
-        var addedEdges = receiver.Objects
-            .Select(owner => new Edge(owner, property))
-            .Select(edge => new KeyValuePair<Edge, ObjectSet>(edge, ReadEdge(edge).Union(value)));
-
-        return new(variables, edges.SetItems(addedEdges), propertiesAssignedOnUnknown);
-    }
+    public AliasState AssignProperty(ObjectSet receiver, IPropertySymbol property, ObjectSet value)
+        => Assign(receiver, property, value);
 
     /// <summary>
-    /// Returns the picture where two branches meet: each variable and edge holds what it holds in either one.
+    /// Returns the picture where two branches meet: each slot holds what it holds in either one.
     /// </summary>
     /// <param name="other">Picture of the other branch.</param>
     /// <returns>Combined picture.</returns>
     public AliasState Combine(AliasState other)
     {
-        // A variable assigned on one branch only cannot be read after the branches meet, since C# requires it to be
-        // assigned on every branch, so it keeps the one value it has.
-        var combinedVariables = other.variables.Aggregate(
-            variables,
-            (result, entry) => result.SetItem(
-                entry.Key,
-                result.TryGetValue(entry.Key, out var objects) ? objects.Union(entry.Value) : entry.Value));
-
-        // An edge one branch has no entry for still holds its initial object there, which ReadEdge returns.
-        var combinedEdges = edges.Keys
-            .Concat(other.edges.Keys)
+        // A slot one branch has no entry for still holds its initial object there, which Read returns.
+        var combinedSlots = slots.Keys
+            .Concat(other.slots.Keys)
             .Distinct()
-            .Select(edge => new KeyValuePair<Edge, ObjectSet>(edge, ReadEdge(edge).Union(other.ReadEdge(edge))));
+            .Select(slot => new KeyValuePair<Slot, ObjectSet>(slot, Read(slot).Union(other.Read(slot))));
 
         return new(
-            combinedVariables,
-            ImmutableDictionary<Edge, ObjectSet>.Empty.SetItems(combinedEdges),
+            ImmutableDictionary<Slot, ObjectSet>.Empty.SetItems(combinedSlots),
             propertiesAssignedOnUnknown.Union(other.propertiesAssignedOnUnknown));
     }
 
@@ -172,8 +134,8 @@ internal sealed class AliasState : IEquatable<AliasState>
     /// <returns>True if equal.</returns>
     public bool Equals(AliasState? other)
         => other is not null &&
-           AreEqual(variables, other.variables) &&
-           AreEqual(edges, other.edges) &&
+           slots.Count == other.slots.Count &&
+           slots.All(entry => other.slots.TryGetValue(entry.Key, out var objects) && objects.Equals(entry.Value)) &&
            propertiesAssignedOnUnknown.SetEquals(other.propertiesAssignedOnUnknown);
 
     /// <inheritdoc />
@@ -181,12 +143,37 @@ internal sealed class AliasState : IEquatable<AliasState>
 
     /// <inheritdoc />
     public override int GetHashCode()
-        => unchecked((variables.Count * 31) + edges.Count + propertiesAssignedOnUnknown.Count);
+        => unchecked((slots.Count * 31) + propertiesAssignedOnUnknown.Count);
 
-    private static bool AreEqual<TKey>(
-        ImmutableDictionary<TKey, ObjectSet> first,
-        ImmutableDictionary<TKey, ObjectSet> second)
-        where TKey : notnull
-        => first.Count == second.Count &&
-           first.All(entry => second.TryGetValue(entry.Key, out var objects) && objects.Equals(entry.Value));
+    /// <summary>
+    /// Returns the picture after <c>owner.Member = value</c>. A sure owner has its slot replaced. Several owners each
+    /// may or may not have been assigned, so the value is added to what their slots held.
+    /// </summary>
+    private AliasState Assign(ObjectSet owners, object member, ObjectSet value)
+    {
+        if (owners.IsUnknown)
+        {
+            // Any object may be the owner, so every slot with this member may now hold the value.
+            var changedSlots = slots
+                .Where(entry => VariableComparer.Instance.Equals(entry.Key.Member, member))
+                .Select(entry => new KeyValuePair<Slot, ObjectSet>(
+                    entry.Key,
+                    entry.Value.Union(value).Union(ObjectSet.Unknown)));
+
+            return new(slots.SetItems(changedSlots), propertiesAssignedOnUnknown.Add(member));
+        }
+
+        if (owners.IsSure)
+        {
+            var assignedSlot = new Slot(owners.Objects.First(), member);
+
+            return new(slots.SetItem(assignedSlot, value), propertiesAssignedOnUnknown);
+        }
+
+        var addedSlots = owners.Objects
+            .Select(owner => new Slot(owner, member))
+            .Select(slot => new KeyValuePair<Slot, ObjectSet>(slot, Read(slot).Union(value)));
+
+        return new(slots.SetItems(addedSlots), propertiesAssignedOnUnknown);
+    }
 }

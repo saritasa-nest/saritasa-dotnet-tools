@@ -3,8 +3,8 @@ using Microsoft.CodeAnalysis;
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Aliasing;
 
 /// <summary>
-/// Compares variables and the origins of objects: symbols the way Roslyn compares them, anything else, such as a
-/// compiler temporary or an operation, by <see cref="object.Equals(object)"/>.
+/// Compares slot members and the origins of objects: symbols the way Roslyn compares them, anything else, such as a
+/// compiler temporary, an operation or a slot, by <see cref="object.Equals(object)"/>.
 /// </summary>
 internal sealed class VariableComparer : IEqualityComparer<object>
 {
