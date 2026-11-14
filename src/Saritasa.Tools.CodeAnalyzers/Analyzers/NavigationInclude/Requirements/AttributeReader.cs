@@ -70,6 +70,13 @@ internal static class AttributeReader
         => GetIncludes(method).Any(include => include.Path.Covers(path));
 
     /// <summary>
+    /// Returns true if the method annotates any <see cref="IncludesAttribute"/>.
+    /// </summary>
+    /// <param name="method">Method.</param>
+    /// <returns>True if the method promises any path.</returns>
+    public static bool MethodHasAnyIncludesAttribute(IMethodSymbol method) => GetIncludes(method).Any();
+
+    /// <summary>
     /// Returns the paths of every <see cref="IncludesAttribute"/> of the method that the analyzer must
     /// check: all of them except those annotated with <c>Verify = false</c>.
     /// </summary>

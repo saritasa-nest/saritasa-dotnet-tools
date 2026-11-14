@@ -292,7 +292,9 @@ internal sealed class WritesWalker
     /// "try/catch" is TryAndCatch, "catch when" wraps the handler into FilterAndHandler, "try/finally" is
     /// TryAndFinally. The try region is always the first nested one.
     /// </remarks>
-    private static ControlFlowRegion? FindHandledTryRegion(BasicBlock block)
+    /// <param name="block">Block.</param>
+    /// <returns>Try region or null.</returns>
+    public static ControlFlowRegion? FindHandledTryRegion(BasicBlock block)
     {
         var region = block.EnclosingRegion;
         while (region.EnclosingRegion is { } parent && region.FirstBlockOrdinal == block.Ordinal)

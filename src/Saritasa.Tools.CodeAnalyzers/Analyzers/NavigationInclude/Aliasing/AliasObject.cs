@@ -12,9 +12,15 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Aliasing;
 /// </remarks>
 internal sealed class AliasObject : IEquatable<AliasObject>
 {
+    /// <summary>
+    /// The deepest initial object that gets a name: <c>user.Profile.Settings</c> is 3 deep.
+    /// </summary>
+    public const int MaxDepth = 8;
+
     private AliasObject(object origin)
     {
         Origin = origin;
+        Depth = origin is Slot slot ? slot.Owner.Depth + 1 : 0;
     }
 
     /// <summary>
@@ -26,6 +32,12 @@ internal sealed class AliasObject : IEquatable<AliasObject>
     /// Where the object comes from: an <see cref="IOperation"/> or a <see cref="Slot"/>.
     /// </summary>
     public object Origin { get; }
+
+    /// <summary>
+    /// How many slots lead from the frame to an initial object: 1 for a parameter, 2 for its Profile. 0 for a
+    /// created object and the frame.
+    /// </summary>
+    public int Depth { get; }
 
     /// <summary>
     /// The object an operation creates: <c>new</c>, <c>with</c>, a query, or a call to an <c>[Includes]</c> method.

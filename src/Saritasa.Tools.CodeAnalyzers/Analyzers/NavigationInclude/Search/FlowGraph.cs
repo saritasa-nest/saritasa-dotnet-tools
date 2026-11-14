@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis.FlowAnalysis;
 using Microsoft.CodeAnalysis.Operations;
 using Microsoft.CodeAnalysis;
+using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Aliasing;
 using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Bridging;
 using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Roslyn;
 
@@ -17,6 +18,8 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Search;
 internal sealed class FlowGraph
 {
     private const string ExpressionTree = "System.Linq.Expressions.Expression`1";
+
+    private AliasIndex? aliases;
 
     /// <summary>
     /// Initializes the graph of a method, constructor or local function body.
@@ -73,6 +76,11 @@ internal sealed class FlowGraph
     /// True if the graph is the body of a lambda.
     /// </summary>
     public bool IsLambda => Lambda is not null;
+
+    /// <summary>
+    /// Which objects each variable and property may hold at each position. Built on first use.
+    /// </summary>
+    public AliasIndex Aliases => aliases ??= AliasIndex.Build(this);
 
     /// <summary>
     /// True if the graph is the body of a lambda that becomes an expression tree, or lies inside one:

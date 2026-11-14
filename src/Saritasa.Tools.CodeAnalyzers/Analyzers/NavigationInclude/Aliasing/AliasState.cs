@@ -51,6 +51,13 @@ internal sealed class AliasState : IEquatable<AliasState>
             return objects;
         }
 
+        // "node = node.Next" in a loop would name a deeper initial object on every pass, and the pass would never
+        // stop. Past the limit the object is not named.
+        if (slot.Owner.Depth >= AliasObject.MaxDepth)
+        {
+            return ObjectSet.Unknown;
+        }
+
         var initial = ObjectSet.Of(AliasObject.InitialValueOf(slot));
 
         return propertiesAssignedOnUnknown.Contains(slot.Member)
@@ -71,19 +78,30 @@ internal sealed class AliasState : IEquatable<AliasState>
 
         foreach (var property in properties)
         {
-            if (objects.IsUnknown)
-            {
-                return ObjectSet.Unknown;
-            }
+            objects = ReadProperty(objects, property);
+        }
 
-            var next = ObjectSet.Empty;
+        return objects;
+    }
 
-            foreach (var owner in objects.Objects)
-            {
-                next = next.Union(Read(new Slot(owner, property)));
-            }
+    /// <summary>
+    /// Returns the objects <c>owner.Property</c> may hold, for every object the owner may be.
+    /// </summary>
+    /// <param name="owners">Objects of the expression before the property.</param>
+    /// <param name="property">Property.</param>
+    /// <returns>Objects.</returns>
+    public ObjectSet ReadProperty(ObjectSet owners, IPropertySymbol property)
+    {
+        if (owners.IsUnknown)
+        {
+            return ObjectSet.Unknown;
+        }
 
-            objects = next;
+        var objects = ObjectSet.Empty;
+
+        foreach (var owner in owners.Objects)
+        {
+            objects = objects.Union(Read(new Slot(owner, property)));
         }
 
         return objects;
