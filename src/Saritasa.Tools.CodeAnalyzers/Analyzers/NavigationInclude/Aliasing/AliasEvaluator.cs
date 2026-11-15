@@ -123,6 +123,41 @@ internal sealed class AliasEvaluator
         };
     }
 
+    /// <summary>
+    /// Returns the property an assignment target writes, e.g. <c>profile.Settings</c>; null when it writes
+    /// something else.
+    /// </summary>
+    /// <remarks>
+    /// "user.Profile = new UserProfile { ... }" becomes "#1 = user.Profile; ...; #1 = #2": the temporary stands for
+    /// the property it captured.
+    /// </remarks>
+    /// <param name="target">Assignment target.</param>
+    /// <returns>Property reference or null.</returns>
+    public IPropertyReferenceOperation? ReadAssignedProperty(IOperation target)
+    {
+        if (target is IFlowCaptureReferenceOperation reference)
+        {
+            var captured = capturedValues[reference.Id].ToList();
+            target = captured.Count == 1 ? captured[0] : target;
+        }
+
+        return target as IPropertyReferenceOperation;
+    }
+
+    /// <summary>
+    /// Returns the type of a variable; null when it is not known.
+    /// </summary>
+    /// <param name="variable">Local, parameter or compiler temporary.</param>
+    /// <returns>Type or null.</returns>
+    public ITypeSymbol? GetVariableType(object variable)
+        => variable switch
+        {
+            ILocalSymbol local => local.Type,
+            IParameterSymbol parameter => parameter.Type,
+            CaptureId id => capturedValues[id].FirstOrDefault()?.Type,
+            _ => null,
+        };
+
     private static ObjectSet Created(IOperation operation) => ObjectSet.Of(AliasObject.CreatedBy(operation));
 
     /// <summary>
@@ -172,27 +207,15 @@ internal sealed class AliasEvaluator
     /// </summary>
     private AliasState Assign(AliasState state, IOperation target, ObjectSet value, CodePosition statement)
     {
-        // "user.Profile = new UserProfile { ... }" becomes "#1 = user.Profile; ...; #1 = #2": the temporary
-        // stands for the property it captured.
-        if (target is IFlowCaptureReferenceOperation reference)
+        // An indexer writes an element, which is not stored.
+        if (ReadAssignedProperty(target) is { Instance: { } instance, Property: { IsIndexer: false } property })
         {
-            var captured = capturedValues[reference.Id].ToList();
-
-            if (captured.Count == 1 && captured[0] is IPropertyReferenceOperation capturedProperty)
-            {
-                target = capturedProperty;
-            }
+            return state.AssignProperty(Evaluate(instance, state, statement), property, value);
         }
 
         if (WritesWalker.GetVariable(target) is { } variable)
         {
             return state.AssignVariable(variable, value);
-        }
-
-        // An indexer writes an element, which is not stored.
-        if (target is IPropertyReferenceOperation { Instance: { } instance, Property: { IsIndexer: false } property })
-        {
-            return state.AssignProperty(Evaluate(instance, state, statement), property, value);
         }
 
         return state;

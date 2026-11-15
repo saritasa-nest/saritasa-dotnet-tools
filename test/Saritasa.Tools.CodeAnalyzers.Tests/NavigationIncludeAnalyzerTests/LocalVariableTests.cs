@@ -890,4 +890,112 @@ public class LocalVariableTests : NavigationIncludeTestBase
 
         await VerifyAnalyzerAsync(sourceCode);
     }
+
+    /// <summary>
+    /// No INCL002: "settings" is user.Settings, so setting its Profile sets user.Settings.Profile.
+    /// </summary>
+    [Fact]
+    public async Task Handle_PropertyAssignedThroughAlias_NoIncl2()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task Handle(SaveUserDto dto)
+                    {
+                        var user = await dbContext.Users
+                            .Include(u => u.Settings)
+                            .FirstOrDefaultAsync(u => u.Id == dto.Id);
+                        var settings = user.Settings;
+                        settings.Profile = new UserProfile();
+
+                        // No INCL002: Settings.Profile was set through settings.
+                        UpdateTimezone(user, dto);
+                    }
+
+                    [IncludeRequired(nameof(user), "Settings.Profile")]
+                    void UpdateTimezone(User user, SaveUserDto dto)
+                    {
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// INCL004: on one branch "settings" is a new object, so setting its Profile may not set user.Settings.Profile.
+    /// </summary>
+    [Fact]
+    public async Task Handle_PropertyAssignedThroughAliasReassignedInBranch_ReportsIncl4()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task Handle(SaveUserDto dto)
+                    {
+                        var user = await dbContext.Users
+                            .Include(u => u.Settings)
+                            .FirstOrDefaultAsync(u => u.Id == dto.Id);
+                        var settings = user.Settings;
+                        if (dto.Id == 0)
+                        {
+                            settings = new UserSettings();
+                        }
+
+                        settings.Profile = new UserProfile();
+
+                        // INCL004: settings may or may not be user.Settings here.
+                        {|INCL004:UpdateTimezone(user, dto)|};
+                    }
+
+                    [IncludeRequired(nameof(user), "Settings.Profile")]
+                    void UpdateTimezone(User user, SaveUserDto dto)
+                    {
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
+
+    /// <summary>
+    /// INCL002: "manager" is another object, so setting its Profile does not set user.Settings.Profile, though the
+    /// property has the same name.
+    /// </summary>
+    [Fact]
+    public async Task Handle_SameNamePropertyAssignedOnOtherObject_ReportsIncl2()
+    {
+        var sourceCode = Preamble +
+            /* lang=c# */
+            """
+                class TestClass(AppDbContext dbContext)
+                {
+                    async Task Handle(SaveUserDto dto)
+                    {
+                        var user = await dbContext.Users
+                            .Include(u => u.Settings)
+                            .FirstOrDefaultAsync(u => u.Id == dto.Id);
+                        var manager = user.Manager;
+                        manager.Profile = new UserProfile();
+
+                        // INCL002: Settings.Profile was neither Included nor set.
+                        {|INCL002:UpdateTimezone(user, dto)|};
+                    }
+
+                    [IncludeRequired(nameof(user), "Settings.Profile")]
+                    void UpdateTimezone(User user, SaveUserDto dto)
+                    {
+                    }
+                }
+            }
+            """;
+
+        await VerifyAnalyzerAsync(sourceCode);
+    }
 }

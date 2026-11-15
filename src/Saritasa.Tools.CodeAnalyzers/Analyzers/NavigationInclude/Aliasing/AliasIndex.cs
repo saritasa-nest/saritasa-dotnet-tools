@@ -55,6 +55,63 @@ internal sealed class AliasIndex
         => evaluator.Evaluate(reference, GetState(position), position);
 
     /// <summary>
+    /// Returns what the assignment at the statement does to the slots <c>variable.path</c> goes through, e.g.
+    /// <c>profile.Settings = s</c> to <c>user.Profile.Settings</c> when profile is user.Profile.
+    /// </summary>
+    /// <param name="target">Assignment target.</param>
+    /// <param name="statement">Position of the assignment.</param>
+    /// <param name="variable">Variable the reference starts at.</param>
+    /// <param name="path">Property names after the variable, in order.</param>
+    /// <returns>The effect, and for <see cref="ChainEffect.Sure"/> how many properties of the path lead to the
+    /// assigned slot, the assigned one included.</returns>
+    public (ChainEffect Effect, int AssignedCount) FindChainEffect(
+        IOperation target,
+        CodePosition statement,
+        object variable,
+        IReadOnlyList<string> path)
+    {
+        if (evaluator.ReadAssignedProperty(target) is not { Instance: { } instance, Property: { IsIndexer: false } property })
+        {
+            return (ChainEffect.None, 0);
+        }
+
+        var state = GetState(statement);
+        var receiver = evaluator.Evaluate(instance, state, statement);
+        var owners = state.Read(Slot.OfVariable(variable));
+        var ownerType = evaluator.GetVariableType(variable);
+        var result = (ChainEffect.None, 0);
+
+        for (var index = 0; index < path.Count; index++)
+        {
+            if (string.Equals(path[index], property.Name, StringComparison.Ordinal))
+            {
+                switch (Compare(receiver, owners))
+                {
+                    // One unsure slot is enough to make the whole answer unsure.
+                    case ChainEffect.Maybe:
+                        return (ChainEffect.Maybe, 0);
+
+                    // The same object may come again further down, as in "user.Manager.Manager": the last one wins.
+                    case ChainEffect.Sure:
+                        result = (ChainEffect.Sure, index + 1);
+                        break;
+                }
+            }
+
+            // A collection on the way holds elements, which are new objects: no assignment reaches past it.
+            if (ownerType is null || FindProperty(ownerType, path[index]) is not { } step)
+            {
+                break;
+            }
+
+            owners = state.ReadProperty(owners, step);
+            ownerType = step.Type;
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// Returns the picture at the position.
     /// </summary>
     /// <param name="position">Position; the statement there has not run yet.</param>
@@ -68,6 +125,40 @@ internal sealed class AliasIndex
         }
 
         return states[position.StatementIndex];
+    }
+
+    /// <summary>
+    /// Whether the receiver of an assignment is the owner of a slot on the path.
+    /// </summary>
+    private static ChainEffect Compare(ObjectSet receiver, ObjectSet owners)
+    {
+        if (receiver.IsUnknown || owners.IsUnknown)
+        {
+            return ChainEffect.Maybe;
+        }
+
+        if (!receiver.Objects.Overlaps(owners.Objects))
+        {
+            return ChainEffect.None;
+        }
+
+        return receiver.IsSure && owners.IsSure ? ChainEffect.Sure : ChainEffect.Maybe;
+    }
+
+    /// <summary>
+    /// The property of the type or of one of its base types.
+    /// </summary>
+    private static IPropertySymbol? FindProperty(ITypeSymbol type, string name)
+    {
+        for (var current = type; current is not null; current = current.BaseType)
+        {
+            if (current.GetMembers(name).OfType<IPropertySymbol>().FirstOrDefault() is { } property)
+            {
+                return property;
+            }
+        }
+
+        return null;
     }
 
     private void RunForwardPass()

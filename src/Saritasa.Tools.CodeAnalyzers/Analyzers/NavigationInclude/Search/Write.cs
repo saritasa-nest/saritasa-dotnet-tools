@@ -35,7 +35,7 @@ internal abstract class Write
 
     /// <summary>
     /// "user.Settings = x", "user.Settings.Profile = x": the start of the path asked about was assigned on the
-    /// variable itself.
+    /// variable itself, or through another name for the same object, as "settings.Profile = x".
     /// </summary>
     public sealed class MemberWritten : Write
     {

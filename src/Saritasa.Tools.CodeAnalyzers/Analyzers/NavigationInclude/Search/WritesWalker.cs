@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.FlowAnalysis;
 using Microsoft.CodeAnalysis.Operations;
+using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Aliasing;
 using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Requirements;
 
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Search;
@@ -99,6 +100,12 @@ internal sealed class WritesWalker
                 ReadAssignedCount(assignment, statement, variable, path) is { } assignedCount
                 => new Write.MemberWritten(assignedCount, statement),
 
+            // "settings.Profile = ..." where settings is user.Settings, for "Settings.Profile" of user: the same
+            // object reached through another name.
+            ISimpleAssignmentOperation assignment when
+                ReadAliasWrite(assignment, statement, variable, path) is { } aliasWrite
+                => aliasWrite,
+
             // "#1 = ...": a temporary value the compiler creates for ?:, ??, object initializers and foreach.
             IFlowCaptureOperation capture when AreSame(capture.Id, variable)
                 => new Write.Written(Value.Create(capture.Value, statement)),
@@ -144,6 +151,38 @@ internal sealed class WritesWalker
         return path.StartsWith(properties) && AreSame(GetVariable(target), variable)
             ? properties.Count
             : null;
+    }
+
+    /// <summary>
+    /// For an assignment through another name: a write of the path when it surely assigns one of its properties,
+    /// <see cref="Write.Unreadable"/> when it may, null when it does not. The path is read where the assignment is:
+    /// nothing below it assigns the variable or a property of the path, or the walk would have stopped there.
+    /// </summary>
+    private static Write? ReadAliasWrite(
+        ISimpleAssignmentOperation assignment,
+        CodePosition statement,
+        object variable,
+        NavigationPath path)
+    {
+        // Inside an include chain the value is a query, not an entity. A property the path does not name cannot
+        // change it, and is not worth building the alias picture for.
+        if (path.Matched > 0 ||
+            assignment.Target is not IPropertyReferenceOperation and not IFlowCaptureReferenceOperation ||
+            (assignment.Target is IPropertyReferenceOperation { Property.Name: var name } &&
+             !path.Segments.Contains(name, StringComparer.Ordinal)))
+        {
+            return null;
+        }
+
+        var (effect, assignedCount) = statement.FlowGraph.Aliases
+            .FindChainEffect(assignment.Target, statement, variable, path.Segments);
+
+        return effect switch
+        {
+            ChainEffect.Sure => new Write.MemberWritten(assignedCount, statement),
+            ChainEffect.Maybe => new Write.Unreadable(),
+            _ => null,
+        };
     }
 
     /// <summary>
