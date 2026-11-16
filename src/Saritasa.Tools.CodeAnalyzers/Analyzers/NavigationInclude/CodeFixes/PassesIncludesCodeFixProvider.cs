@@ -6,10 +6,12 @@ using Microsoft.CodeAnalysis.Editing;
 using Microsoft.CodeAnalysis.FindSymbols;
 using Microsoft.CodeAnalysis.Simplification;
 using Microsoft.CodeAnalysis;
+using Saritasa.Tools.CodeAnalyzers.Abstractions.NavigationInclude.Attributes;
 using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Rules;
 using System.Collections.Immutable;
 using System.Composition;
 using System.Globalization;
+using System.Text;
 
 namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.CodeFixes;
 
@@ -31,11 +33,12 @@ namespace Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.CodeFixes;
 public sealed class PassesIncludesCodeFixProvider : CodeFixProvider
 {
     private const string BridgesFileName = "NavigationIncludes.cs";
+    private const string AttributeSuffix = "Attribute";
 
-    private const string AttributesNamespace =
-        "Saritasa.Tools.CodeAnalyzers.Abstractions.NavigationInclude.Attributes";
-
-    private const string AttributeName = "PassesIncludes";
+    private static readonly string attributesNamespace = typeof(PassesIncludesAttribute).Namespace!;
+    private static readonly string attributeName = nameof(PassesIncludesAttribute);
+    private static readonly string simplifiedAttributeName = attributeName
+        .Substring(0, attributeName.Length - AttributeSuffix.Length);
 
     /// <inheritdoc />
     public override ImmutableArray<string> FixableDiagnosticIds =>
@@ -82,15 +85,13 @@ public sealed class PassesIncludesCodeFixProvider : CodeFixProvider
         return CodeAction.Create($"Mark {request.MethodName} as passing includes from", nested, isInlinable: false);
     }
 
-    private static CodeAction CreateParameterAction(
-        string title,
-        Document document,
-        BridgeRequest request,
-        string from)
-        => CodeAction.Create(
+    private static CodeAction CreateParameterAction(string title, Document document, BridgeRequest request, string from)
+    {
+        return CodeAction.Create(
             title,
             cancellationToken => AddBridgeAsync(document, request, from, cancellationToken),
-            equivalenceKey: AttributeName + ":" + request.MethodId + ":" + from + ":" + request.Callback);
+            equivalenceKey: simplifiedAttributeName + ":" + request.MethodId + ":" + from + ":" + request.Callback);
+    }
 
     /// <summary>
     /// Annotates the method where its source can be edited, and describes it from this project otherwise.
@@ -127,15 +128,25 @@ public sealed class PassesIncludesCodeFixProvider : CodeFixProvider
             return null;
         }
 
-        var source = await SymbolFinder.FindSourceDefinitionAsync(method, project.Solution, cancellationToken)
+        var source = await SymbolFinder
+            .FindSourceDefinitionAsync(method, project.Solution, cancellationToken)
             .ConfigureAwait(false) ?? method;
 
         foreach (var reference in source.DeclaringSyntaxReferences)
         {
-            if (project.Solution.GetDocument(reference.SyntaxTree) is not { } document ||
-                await reference.GetSyntaxAsync(cancellationToken).ConfigureAwait(false)
-                    is not MethodDeclarationSyntax declaration ||
-                !await SeesAttributeAsync(document.Project, cancellationToken).ConfigureAwait(false))
+            if (project.Solution.GetDocument(reference.SyntaxTree) is not { } document)
+            {
+                continue;
+            }
+
+            if (await reference
+                    .GetSyntaxAsync(cancellationToken)
+                    .ConfigureAwait(false) is not MethodDeclarationSyntax declaration)
+            {
+                continue;
+            }
+
+            if (!await SeesAttributeAsync(document.Project, cancellationToken).ConfigureAwait(false))
             {
                 continue;
             }
@@ -152,8 +163,7 @@ public sealed class PassesIncludesCodeFixProvider : CodeFixProvider
     private static async Task<bool> SeesAttributeAsync(Project project, CancellationToken cancellationToken)
     {
         var compilation = await project.GetCompilationAsync(cancellationToken).ConfigureAwait(false);
-
-        return compilation?.GetTypeByMetadataName(AttributesNamespace + "." + AttributeName + "Attribute") is not null;
+        return compilation?.GetTypeByMetadataName(attributesNamespace + "." + attributeName) is not null;
     }
 
     /// <summary>
@@ -166,26 +176,35 @@ public sealed class PassesIncludesCodeFixProvider : CodeFixProvider
         string from,
         CancellationToken cancellationToken)
     {
-        var arguments = "nameof(" + from + ")";
+        var arguments = new StringBuilder()
+            .Append("(nameof(").Append(from).Append(')');
 
         if (request.Callback is { } callback)
         {
-            arguments += ", ToCallback = nameof(" + callback + ")";
+            arguments.Append(", ToCallback = nameof(").Append(callback).Append(')');
         }
 
         if (request.CallbackPosition != 0)
         {
-            arguments += ", ToCallbackParameter = " + request.CallbackPosition.ToString(CultureInfo.InvariantCulture);
+            arguments
+                .Append(", ToCallbackParameter = ")
+                .Append(request.CallbackPosition.ToString(CultureInfo.InvariantCulture));
         }
+
+        arguments.Append(')');
 
         // Written fully qualified and reduced afterwards, so the using is added only where it is missing, and
         // in the place the file keeps its usings.
-        var attribute = SyntaxFactory.Attribute(
-            SyntaxFactory.ParseName(AttributesNamespace + "." + AttributeName)
-                .WithAdditionalAnnotations(Simplifier.Annotation, Simplifier.AddImportsAnnotation),
-            SyntaxFactory.ParseAttributeArgumentList("(" + arguments + ")"));
+        var parsedName = SyntaxFactory
+            .ParseName(attributesNamespace + "." + simplifiedAttributeName)
+            .WithAdditionalAnnotations(Simplifier.Annotation, Simplifier.AddImportsAnnotation);
 
-        var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
+        var parsedArguments = SyntaxFactory.ParseAttributeArgumentList(arguments.ToString());
+        var attribute = SyntaxFactory.Attribute(parsedName, parsedArguments);
+
+        var root = await document
+            .GetSyntaxRootAsync(cancellationToken)
+            .ConfigureAwait(false);
         if (root is null)
         {
             return document.Project.Solution;
@@ -250,7 +269,7 @@ public sealed class PassesIncludesCodeFixProvider : CodeFixProvider
             // uses. Analyzers may not read Environment.NewLine.
             var newLine = await GetNewLineAsync(project.Documents, cancellationToken).ConfigureAwait(false);
             var newFile = SyntaxFactory
-                .ParseCompilationUnit("using " + AttributesNamespace + ";\n" + bridge)
+                .ParseCompilationUnit("using " + attributesNamespace + ";\n" + bridge)
                 .NormalizeWhitespace(eol: newLine);
 
             return project
@@ -307,27 +326,35 @@ public sealed class PassesIncludesCodeFixProvider : CodeFixProvider
     /// </summary>
     private static string BuildAssemblyBridge(BridgeRequest request, string from)
     {
-        var arguments = "typeof(" + request.TypeName + "), \"" + request.MethodName + "\", \"" + from + "\"";
+        var line = new StringBuilder()
+            .Append("[assembly: ").Append(simplifiedAttributeName)
+            .Append("(typeof(").Append(request.TypeName).Append(')')
+            .Append(", \"").Append(request.MethodName).Append('"')
+            .Append(", \"").Append(from).Append('"');
 
         if (request.Callback is { } callback)
         {
-            arguments += ", ToCallback = \"" + callback + "\"";
+            line.Append(", ToCallback = \"").Append(callback).Append('"');
         }
 
         if (request.CallbackPosition != 0)
         {
-            arguments += ", ToCallbackParameter = " + request.CallbackPosition.ToString(CultureInfo.InvariantCulture);
+            line
+                .Append(", ToCallbackParameter = ")
+                .Append(request.CallbackPosition.ToString(CultureInfo.InvariantCulture));
         }
 
-        return "[assembly: " + AttributeName + "(" + arguments + ")]";
+        return line.Append(")]").ToString();
     }
 
     /// <summary>
     /// The file this project already keeps its bridges in, or null when there is none.
     /// </summary>
     private static Document? FindBridgesDocument(Project project)
-        => project.Documents.FirstOrDefault(document =>
-            string.Equals(document.Name, BridgesFileName, StringComparison.Ordinal));
+    {
+        return project.Documents
+            .FirstOrDefault(document => string.Equals(document.Name, BridgesFileName, StringComparison.Ordinal));
+    }
 
     /// <summary>
     /// What the analyzer put on the diagnostic: the method, the parameters the entities may come from, and the
@@ -356,6 +383,9 @@ public sealed class PassesIncludesCodeFixProvider : CodeFixProvider
         /// </summary>
         public string TypeName { get; }
 
+        /// <summary>
+        /// Method name, as written into the attribute and shown in the code action title.
+        /// </summary>
         public string MethodName { get; }
 
         /// <summary>
