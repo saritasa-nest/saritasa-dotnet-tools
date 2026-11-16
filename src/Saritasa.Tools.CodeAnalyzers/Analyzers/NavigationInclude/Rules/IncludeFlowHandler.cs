@@ -118,7 +118,8 @@ internal static class IncludeFlowHandler
         var path = NavigationPath.Parse([read.Property.Name])!;
         var answer = IncludeSearcher.Check(read.Instance, path, position);
 
-        if (GetDiagnostic(answer, GetPropertyNameLocation(read), read.Instance, path) is not { } found)
+        var location = GetPropertyNameLocation(read);
+        if (GetDiagnostic(answer, location, read.Instance, path, position.FlowGraph.Bridges) is not { } found)
         {
             return false;
         }
@@ -152,7 +153,12 @@ internal static class IncludeFlowHandler
 
             var value = RoslynReader.SkipWrappers(argument.Value);
             var answer = IncludeSearcher.Check(value, requirement.Path, position);
-            var diagnostic = GetDiagnostic(answer, call.Syntax.GetLocation(), value, requirement.Path);
+            var diagnostic = GetDiagnostic(
+                answer,
+                call.Syntax.GetLocation(),
+                value,
+                requirement.Path,
+                position.FlowGraph.Bridges);
 
             // The same requirement annotated twice is still one problem.
             if (diagnostic is not null && !diagnostics.Contains(diagnostic))
@@ -194,7 +200,7 @@ internal static class IncludeFlowHandler
                     location,
                     path.ToString(),
                     GetQueryPath(answer, path).ToString())
-                : GetDiagnostic(answer, location, returnedValue, path);
+                : GetDiagnostic(answer, location, returnedValue, path, position.FlowGraph.Bridges);
 
             if (diagnostic is not null)
             {
@@ -219,7 +225,12 @@ internal static class IncludeFlowHandler
     /// parameter of a method that does not ask for the path, INCL002 at a query or a method that does not load
     /// it, INCL004 where the search could not read further. Null when the path is loaded.
     /// </summary>
-    private static Diagnostic? GetDiagnostic(Answer answer, Location location, IOperation value, NavigationPath path)
+    private static Diagnostic? GetDiagnostic(
+        Answer answer,
+        Location location,
+        IOperation value,
+        NavigationPath path,
+        Bridges bridges)
         => answer switch
         {
             Answer.LoadedAnswer => null,
@@ -230,7 +241,7 @@ internal static class IncludeFlowHandler
                 NavigationIncludeRulesProvider.GetDiagnosticDescriptor(
                     NavigationIncludeRulesProvider.Incl4IdCannotCheckNavigationProperty),
                 location,
-                UnreadableMember.GetProperties(unknown.UnreadableValue),
+                UnreadableMember.GetProperties(unknown, bridges),
                 UnreadableMember.Describe(unknown.UnreadableValue),
                 value.Type?.Name,
                 path.ToString(),

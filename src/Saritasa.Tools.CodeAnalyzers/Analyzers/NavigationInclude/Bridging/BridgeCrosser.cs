@@ -61,13 +61,7 @@ internal static class BridgeCrosser
         int parameterOrdinal,
         Bridges bridges)
     {
-        var parent = lambda.Parent;
-        while (parent is IConversionOperation or IDelegateCreationOperation)
-        {
-            parent = parent.Parent;
-        }
-
-        if (parent is not IArgumentOperation { Parameter: { } lambdaArgument, Parent: IInvocationOperation call })
+        if (RoslynReader.GetLambdaArgumentOperation(lambda) is not { Parameter: { } lambdaArgument, Parent: IInvocationOperation call })
         {
             return [];
         }
