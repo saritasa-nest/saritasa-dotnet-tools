@@ -255,7 +255,7 @@ internal sealed class IncludeSearcher
         // The parameter is not a value of its own to name, so name the call that fills it and the callback it
         // arrives through: that is where an annotation would go.
         if (crossings.Count == 0 &&
-            BridgeCrosser.GetLambdaArgument(lambda.Lambda) is
+            RoslynReader.GetLambdaArgumentOperation(lambda.Lambda) is
                 { Parameter: { } callback, Parent: IInvocationOperation call })
         {
             return Answer.UnknownCallback(call, new BridgeEnd.Parameter(callback.Name, lambda.Parameter.Ordinal));

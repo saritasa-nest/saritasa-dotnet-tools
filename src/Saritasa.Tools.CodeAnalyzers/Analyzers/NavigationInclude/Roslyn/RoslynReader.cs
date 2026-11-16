@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.FlowAnalysis;
 using Microsoft.CodeAnalysis.Operations;
 using Microsoft.CodeAnalysis;
 using Saritasa.Tools.CodeAnalyzers.Analyzers.NavigationInclude.Search;
@@ -44,6 +45,23 @@ internal static class RoslynReader
             IDelegateCreationOperation delegateCreation => SkipWrappers(delegateCreation.Target),
             _ => operation,
         };
+
+    /// <summary>
+    /// The argument a lambda was passed as: the <c>u =&gt; ...</c> of <c>users.Select(u =&gt; ...)</c>. Null for a
+    /// lambda that is not an argument, such as one assigned to a variable.
+    /// </summary>
+    /// <param name="lambda">Lambda.</param>
+    /// <returns>Argument, or null.</returns>
+    public static IArgumentOperation? GetLambdaArgumentOperation(IFlowAnonymousFunctionOperation lambda)
+    {
+        var parent = lambda.Parent;
+        while (parent is IConversionOperation or IDelegateCreationOperation)
+        {
+            parent = parent.Parent;
+        }
+
+        return parent as IArgumentOperation;
+    }
 
     /// <summary>
     /// The value the method is called on: <c>Instance</c> for instance methods, the first argument for

@@ -61,7 +61,7 @@ internal static class BridgeCrosser
         int parameterOrdinal,
         Bridges bridges)
     {
-        if (GetLambdaArgument(lambda) is not { Parameter: { } lambdaArgument, Parent: IInvocationOperation call })
+        if (RoslynReader.GetLambdaArgumentOperation(lambda) is not { Parameter: { } lambdaArgument, Parent: IInvocationOperation call })
         {
             return [];
         }
@@ -70,23 +70,6 @@ internal static class BridgeCrosser
         return GetCallCrossings(
             bridges.FindFromParameter(call.TargetMethod, lambdaArgument.Name, parameterOrdinal),
             call);
-    }
-
-    /// <summary>
-    /// The argument a lambda was passed as: the <c>u =&gt; ...</c> of <c>users.Select(u =&gt; ...)</c>. Null for a
-    /// lambda that is not an argument, such as one assigned to a variable.
-    /// </summary>
-    /// <param name="lambda">Lambda.</param>
-    /// <returns>Argument, or null.</returns>
-    public static IArgumentOperation? GetLambdaArgument(IFlowAnonymousFunctionOperation lambda)
-    {
-        var parent = lambda.Parent;
-        while (parent is IConversionOperation or IDelegateCreationOperation)
-        {
-            parent = parent.Parent;
-        }
-
-        return parent as IArgumentOperation;
     }
 
     /// <summary>
